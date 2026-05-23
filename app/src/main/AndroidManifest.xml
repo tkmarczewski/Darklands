@@ -11,12 +11,13 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-        <activity android:name=".ui.PartyActivity"     android:exported="false"/>
-        <activity android:name=".ui.CharacterActivity" android:exported="false"/>
-        <activity android:name=".ui.InventoryActivity" android:exported="false"/>
-        <activity android:name=".ui.MapActivity"       android:exported="false"/>
-        <activity android:name=".ui.PrayerActivity"    android:exported="false"/>
-        <activity android:name=".ui.AlchemyActivity"   android:exported="false"/>
-                <activity android:name=".ui.EndgameActivity"    android:exported="false"/>
+        <activity android:name=".ui.PartyActivity"      android:exported="false"/>
+        <activity android:name=".ui.CharacterActivity"  android:exported="false"/>
+        <activity android:name=".ui.InventoryActivity"  android:exported="false"/>
+        <activity android:name=".ui.MapActivity"        android:exported="false"/>
+        <activity android:name=".ui.PrayerActivity"     android:exported="false"/>
+        <activity android:name=".ui.AlchemyActivity"    android:exported="false"/>
+        <activity android:name=".ui.CombatActivity"     android:exported="false"/>
+        <activity android:name=".ui.EndgameActivity"    android:exported="false"/>
     </application>
 </manifest>
