@@ -2,7 +2,7 @@ package com.darklandsmobile.core
 
 /**
  * Katalog eventów DUNGEON (lochy, zamki, kryjówki kultu) na podstawie Darklands.
- * Obejmuje: pułapki, szkielety, kultystów, kaplice, skarbce, zamki raubritterów.
+ * Obejmuje: pułapki, szkielety, kultystów, kaplice, skarbce, zamki raubritteró, zamknięte drzwi, więźnia, sekretne przejścia.
  */
 
 object DungeonEventCatalog {
@@ -13,6 +13,9 @@ object DungeonEventCatalog {
     private val EV_SHRINE = EventId("ev_dung_shrine")
     private val EV_TREASURE = EventId("ev_dung_treasure")
     private val EV_RAUBRITTER_HALL = EventId("ev_dung_raubritter_hall")
+        private val EV_LOCKED_DOOR = EventId("ev_dung_locked_door")
+            private val EV_PRISONER = EventId("ev_dung_prisoner")
+                private val EV_SECRET_PASSAGE = EventId("ev_dung_secret_passage")
 
     fun buildEvents(): List<Event> = listOf(
         // ────── PUŁAPKA TRUCIZNOWA ─────────────────────────────────
@@ -71,6 +74,33 @@ object DungeonEventCatalog {
                 QuestStateCondition("quest_raubritter", "final")
             ),
             tags = setOf("quest", "boss")
+        ),
+        // ———————— ZAMKNIĘTE DRZWI ————————————————————————
+        Event(
+            id = EV_LOCKED_DOOR,
+            context = EventContext.DUNGEON,
+            category = EventCategory.RANDOM_ENCOUNTER,
+            weight = 5,
+            rootNodeId = EventNodeId("locked_door_n1"),
+            tags = setOf("puzzle", "trap")
+        ),
+        // ———————— WIĘZIEŃ ————————————————————————
+        Event(
+            id = EV_PRISONER,
+            context = EventContext.DUNGEON,
+            category = EventCategory.STORY,
+            weight = 3,
+            rootNodeId = EventNodeId("prisoner_n1"),
+            tags = setOf("rescue", "choice")
+        ),
+        // ———————— SEKRETNE PRZEJŚCIE ————————————————————————
+        Event(
+            id = EV_SECRET_PASSAGE,
+            context = EventContext.DUNGEON,
+            category = EventCategory.RANDOM_ENCOUNTER,
+            weight = 4,
+            rootNodeId = EventNodeId("secret_passage_n1"),
+            tags = setOf("discovery", "shortcut")
         )
     )
 
@@ -242,7 +272,98 @@ object DungeonEventCatalog {
                         ))
                     ))
                 )
+            ),
+        // ———————— ZAMKNIĘTE DRZWI ————————————————————————
+        EventNode(
+            id = EventNodeId("locked_door_n1"),
+            eventId = EV_LOCKED_DOOR,
+            textKey = "dung.locked_door.discovery",
+            illustrationAsset = "door_locked",
+            options = listOf(
+                EventOption(
+                    id = EventOptionId("door_lockpick"),
+                    textKey = "dung.door.lockpick",
+                    requirements = listOf(SkillRequirement("Lockpick", 20)),
+                    outcome = ChainOutcome(listOf(
+                        ModifyTimeOutcome(minutesDelta = 15),
+                        EventEnd(EventEndResult.Success)
+                    ))
+                ),
+                EventOption(
+                    id = EventOptionId("door_bash"),
+                    textKey = "dung.door.bash",
+                    requirements = listOf(AttributeRequirement("Strength", 15)),
+                    outcome = ChainOutcome(listOf(
+                        ModifyHealthOutcome(hpDeltaPerHero = -10),
+                        EventEnd(EventEndResult.Neutral)
+                    ))
+                ),
+                EventOption(
+                    id = EventOptionId("door_find_key"),
+                    textKey = "dung.door.search_key",
+                    outcome = ChainOutcome(listOf(
+                        ModifyTimeOutcome(minutesDelta = 30),
+                        EventEnd(EventEndResult.Success)
+                    ))
+                )
             )
+        ),
+        // ———————— WIĘZIEŃ ————————————————————————
+        EventNode(
+            id = EventNodeId("prisoner_n1"),
+            eventId = EV_PRISONER,
+            textKey = "dung.prisoner.encounter",
+            illustrationAsset = "cell_prisoner",
+            options = listOf(
+                EventOption(
+                    id = EventOptionId("prisoner_free"),
+                    textKey = "dung.prisoner.free",
+                    outcome = ChainOutcome(listOf(
+                        ModifyVirtueOutcome(virtueDelta = mapOf("Charity" to 15)),
+                        ModifyReputationOutcome(factionRepDelta = mapOf("Locals" to 10)),
+                        EventEnd(EventEndResult.Success)
+                    ))
+                ),
+                EventOption(
+                    id = EventOptionId("prisoner_question"),
+                    textKey = "dung.prisoner.question",
+                    outcome = ChainOutcome(listOf(
+                        ModifyTimeOutcome(minutesDelta = 10),
+                        EventEnd(EventEndResult.Neutral)
+                    ))
+                ),
+                EventOption(
+                    id = EventOptionId("prisoner_leave"),
+                    textKey = "dung.prisoner.leave",
+                    outcome = ChainOutcome(listOf(
+                        ModifyVirtueOutcome(virtueDelta = mapOf("Charity" to -10)),
+                        EventEnd(EventEndResult.Neutral)
+                    ))
+                )
+            )
+        ),
+        // ———————— SEKRETNE PRZEJŚCIE ————————————————————————
+        EventNode(
+            id = EventNodeId("secret_passage_n1"),
+            eventId = EV_SECRET_PASSAGE,
+            textKey = "dung.secret_passage.discovery",
+            illustrationAsset = "passage_hidden",
+            options = listOf(
+                EventOption(
+                    id = EventOptionId("passage_take"),
+                    textKey = "dung.passage.take",
+                    outcome = ChainOutcome(listOf(
+                        ModifyTimeOutcome(minutesDelta = -30),
+                        EventEnd(EventEndResult.Success)
+                    ))
+                ),
+                EventOption(
+                    id = EventOptionId("passage_ignore"),
+                    textKey = "dung.passage.ignore",
+                    outcome = EventEnd(EventEndResult.Neutral)
+                )
+            )
+        )
         )
     )
 }
