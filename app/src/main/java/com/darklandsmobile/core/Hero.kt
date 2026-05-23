@@ -5,13 +5,17 @@ data class Hero(
     val name: String,
     var age: Int,
     var strength: Int = 10,
+    var agility: Int = 10,
     var dex: Int = 10,
     var intelligence: Int = 10,
     var endurance: Int = 10,
     var charisma: Int = 10,
     var piety: Int = 10,
+    var virtue: Int = 0,
     var hp: Int = 30,
     var maxHp: Int = 30,
+    var currentCareer: Career? = null,
+    var careerHistory: List<CareerEntry> = emptyList(),
     val skills: MutableMap<String, Int> = mutableMapOf(),
     val equipment: MutableMap<String, String?> = mutableMapOf(
         "weapon" to null, "armor" to null, "helmet" to null
