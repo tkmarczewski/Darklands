@@ -106,3 +106,51 @@ data class EquippedItems(
     fun canEquipArmor(a: Armor, hero: Hero): Boolean =
         hero.strength >= a.requiredStrength
 }
+
+
+// ==================== ITEM QUALITY ====================
+
+enum class ItemQuality(val label: String, val damageBonus: Int, val defenseBonus: Int, val penetrationBonus: Int) {
+    POOR       ("Lichej jakosci",      -2, -1, -1),
+    NORMAL     ("Standardowe",          0,  0,  0),
+    GOOD       ("Dobrej jakosci",       1,  1,  1),
+    EXCELLENT  ("Doskonale",            2,  2,  2),
+    MASTERWORK ("Mistrzowskie",         3,  3,  3)
+}
+
+// ==================== WEAPON QUALITY SYSTEM ====================
+
+object WeaponQualitySystem {
+
+    // Effective damage after quality and armor penetration applied
+    fun effectiveDamage(weapon: Weapon, quality: ItemQuality = ItemQuality.NORMAL): Int =
+        (weapon.damage + quality.damageBonus).coerceAtLeast(1)
+
+    // Armor penetration: some weapons ignore part of armor defense
+    // Maces/hammers vs chain/plate: high penetration
+    // Swords vs leather: medium penetration
+    fun armorPenetration(weapon: Weapon, quality: ItemQuality = ItemQuality.NORMAL): Int {
+        val basePenetration = when (weapon.type) {
+            WeaponType.MACE, WeaponType.FLAIL -> 3   // Blunt weapons penetrate chain/plate
+            WeaponType.AXE                   -> 2
+            WeaponType.SWORD                 -> 1
+            WeaponType.DAGGER                -> 2   // Daggers find gaps in armor
+            WeaponType.SPEAR                 -> 2
+            WeaponType.BOW, WeaponType.CROSSBOW -> 1
+            else                             -> 0
+        }
+        return (basePenetration + quality.penetrationBonus).coerceAtLeast(0)
+    }
+
+    // Net damage after armor reduction, considering penetration
+    // penetration reduces effective armor defense
+    fun netDamage(weapon: Weapon, weaponQuality: ItemQuality, armor: Armor, armorQuality: ItemQuality): Int {
+        val attack = effectiveDamage(weapon, weaponQuality)
+        val pen    = armorPenetration(weapon, weaponQuality)
+        val defense = (armor.defense + armorQuality.defenseBonus - pen).coerceAtLeast(0)
+        return (attack - defense).coerceAtLeast(1)
+    }
+
+    fun qualityDescription(quality: ItemQuality, itemName: String): String =
+        "$itemName [${quality.label}]"
+}
