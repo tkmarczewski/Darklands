@@ -101,6 +101,30 @@ object QuestGraph {
             failState = FailState(FailPenaltyType.REPUTATION_LOSS, penaltyAmount = 3,
                 description = "Bandyci nadal grasują.")
         )
+                ,
+        Quest(
+            id = "q_raubritter",
+            title = "Rycerz-Rabus",
+            description = "Raubritter von Eisenbach terroryzuje trakty handlowe. Mieszczanie oferuja nagrode za jego glowe.",
+            requirements = QuestRequirements(
+                minVirtue = 20,
+                minCityReputation = 3,
+                requiredQuestIds = listOf("q_outlaw")
+            ),
+            rewards = QuestRewards(
+                gold = 120,
+                virtueBonus = 5,
+                cityReputationBonus = 5,
+                factionReputationBonus = mapOf("military" to 5, "peasants" to 3),
+                divineFavorBonus = 2,
+                unlocksQuestIds = listOf("q_shrine")
+            ),
+            failState = FailState(
+                FailPenaltyType.REPUTATION_LOSS,
+                penaltyAmount = 5,
+                description = "Raubritter uciekl - drogi sa nadal niebezpieczne."
+            )
+        )
     )
 
     fun findById(id: String) = quests.firstOrNull { it.id == id }
