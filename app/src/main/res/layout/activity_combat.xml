@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#1a1a2e">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <TextView
+            android:id="@+id/tvCombatTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="=== WALKA ==="
+            android:textColor="#e63946"
+            android:textSize="18sp"
+            android:fontFamily="monospace"
+            android:gravity="center"
+            android:layout_marginBottom="12dp" />
+
+        <TextView
+            android:id="@+id/tvEnemyStatus"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Przeciwnik: -"
+            android:textColor="#e63946"
+            android:fontFamily="monospace"
+            android:textSize="14sp"
+            android:layout_marginBottom="4dp" />
+
+        <TextView
+            android:id="@+id/tvHeroStatus"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Bohater: -"
+            android:textColor="#4ade80"
+            android:fontFamily="monospace"
+            android:textSize="14sp"
+            android:layout_marginBottom="12dp" />
+
+        <TextView
+            android:id="@+id/tvCombatLog"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text=""
+            android:textColor="#c8a96e"
+            android:fontFamily="monospace"
+            android:textSize="12sp"
+            android:layout_marginBottom="16dp" />
+
+        <Button
+            android:id="@+id/btnStartCombat"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Rozpocznij walke"
+            android:layout_marginBottom="8dp" />
+
+        <Button
+            android:id="@+id/btnAttack"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Atak!"
+            android:enabled="false"
+            android:layout_marginBottom="8dp" />
+
+        <Button
+            android:id="@+id/btnFlee"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Ucieczka"
+            android:enabled="false"
+            android:layout_marginBottom="8dp" />
+
+        <Button
+            android:id="@+id/btnBack"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Powrot" />
+
+    </LinearLayout>
+</ScrollView>
