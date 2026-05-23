@@ -9,5 +9,8 @@ data class GameState(
     val quest: QuestState = QuestState(),
     val prayer: PrayerState = PrayerState(),
     val reputation: ReputationState = ReputationState(),
-    val logEntries: MutableList<String> = mutableListOf()
+    val logEntries: MutableList<String> = mutableListOf(),
+    // Ekonomia — Goldene Kronen (waluta oryginalu)
+    var gold: Int = 50,
+    var partyStash: MutableMap<String, Int> = mutableMapOf() // przechowywanie u karczmarz
 )
