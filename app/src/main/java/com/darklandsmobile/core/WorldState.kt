@@ -6,5 +6,6 @@ data class WorldState(
     var day: Int = 1,
     var timeOfDay: String = "morning",
     var fatigue: Int = 0,
-    var lastEncounter: String = "none"
+    var lastEncounter: String = "none",
+    var season: Season = Season.SPRING
 )
