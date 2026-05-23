@@ -2,7 +2,7 @@ package com.darklandsmobile.core
 
 /**
  * Katalog eventów typu WILDERNESS (podroże po mapie) na podstawie Darklands.
- * Obejmuje: bandytów, wilki, karawany, pielgrzymów, zwiadowców, znąchorkę, kult, most, klasztor.
+ * Obejmuje: bandytów, wilki, karawany, pielgrzymów, zwiadowców, znąchorkę, kult, most, klaszto, pustelnika, uchodźców, opuszczony obóz, kupca pod atakiem.
  */
 
 object WildernessEventCatalog {
@@ -16,6 +16,10 @@ object WildernessEventCatalog {
     private val EV_CULT_MEETING = EventId("ev_wild_cult")
     private val EV_BRIDGE_TOLL = EventId("ev_wild_bridge")
     private val EV_MONASTERY = EventId("ev_wild_monastery")
+        private val EV_HERMIT = EventId("ev_wild_hermit")
+            private val EV_REFUGEES = EventId("ev_wild_refugees")
+                private val EV_ABANDONED_CAMP = EventId("ev_wild_abandoned_camp")
+                    private val EV_MERCHANT_ATTACK = EventId("ev_wild_merchant_attack")
 
     fun buildEvents(): List<Event> = listOf(
         // ────── BANDYCI ─────────────────────────────────────────────
@@ -107,6 +111,42 @@ object WildernessEventCatalog {
             weight = 1,
             rootNodeId = EventNodeId("monastery_n1"),
             tags = setOf("religion", "rest")
+        ),
+        // ———————— PUSTELNIK ————————————————————————
+        Event(
+            id = EV_HERMIT,
+            context = EventContext.WILDERNESS,
+            category = EventCategory.RANDOM_ENCOUNTER,
+            weight = 2,
+            rootNodeId = EventNodeId("hermit_n1"),
+            tags = setOf("peaceful", "wisdom")
+        ),
+        // ———————— UCHODŹCY ————————————————————————
+        Event(
+            id = EV_REFUGEES,
+            context = EventContext.WILDERNESS,
+            category = EventCategory.RANDOM_ENCOUNTER,
+            weight = 3,
+            rootNodeId = EventNodeId("refugees_n1"),
+            tags = setOf("charity", "encounter")
+        ),
+        // ———————— OPUSZCZONY OBÓZ ————————————————————————
+        Event(
+            id = EV_ABANDONED_CAMP,
+            context = EventContext.WILDERNESS,
+            category = EventCategory.RANDOM_ENCOUNTER,
+            weight = 4,
+            rootNodeId = EventNodeId("abandoned_camp_n1"),
+            tags = setOf("discovery", "loot")
+        ),
+        // ———————— KUPIEC POD ATAKIEM ————————————————————————
+        Event(
+            id = EV_MERCHANT_ATTACK,
+            context = EventContext.WILDERNESS,
+            category = EventCategory.RANDOM_ENCOUNTER,
+            weight = 5,
+            rootNodeId = EventNodeId("merchant_attack_n1"),
+            tags = setOf("combat", "rescue")
         )
     )
 
@@ -232,7 +272,136 @@ object WildernessEventCatalog {
                     textKey = "wild.caravan.leave",
                     outcome = EventEnd(EventEndResult.Neutral)
                 )
+            ),
+        // ———————— PUSTELNIK ————————————————————————
+        EventNode(
+            id = EventNodeId("hermit_n1"),
+            eventId = EV_HERMIT,
+            textKey = "wild.hermit.encounter",
+            illustrationAsset = "hermit_forest",
+            options = listOf(
+                EventOption(
+                    id = EventOptionId("hermit_talk"),
+                    textKey = "wild.hermit.talk",
+                    outcome = ChainOutcome(listOf(
+                        ModifyVirtueOutcome(virtueDelta = mapOf("Piety" to 5)),
+                        EventEnd(EventEndResult.Success)
+                    ))
+                ),
+                EventOption(
+                    id = EventOptionId("hermit_trade"),
+                    textKey = "wild.hermit.trade",
+                    outcome = ChainOutcome(listOf(
+                        ModifyResourcesOutcome(goldDelta = -10),
+                        EventEnd(EventEndResult.Neutral)
+                    ))
+                ),
+                EventOption(
+                    id = EventOptionId("hermit_leave"),
+                    textKey = "wild.hermit.leave",
+                    outcome = EventEnd(EventEndResult.Neutral)
+                )
             )
+        ),
+        // ———————— UCHODŹCY ————————————————————————
+        EventNode(
+            id = EventNodeId("refugees_n1"),
+            eventId = EV_REFUGEES,
+            textKey = "wild.refugees.encounter",
+            illustrationAsset = "refugees_road",
+            options = listOf(
+                EventOption(
+                    id = EventOptionId("refugees_help"),
+                    textKey = "wild.refugees.help",
+                    outcome = ChainOutcome(listOf(
+                        ModifyResourcesOutcome(goldDelta = -20),
+                        ModifyVirtueOutcome(virtueDelta = mapOf("Charity" to 10)),
+                        EventEnd(EventEndResult.Success)
+                    ))
+                ),
+                EventOption(
+                    id = EventOptionId("refugees_ignore"),
+                    textKey = "wild.refugees.ignore",
+                    outcome = ChainOutcome(listOf(
+                        ModifyVirtueOutcome(virtueDelta = mapOf("Charity" to -5)),
+                        EventEnd(EventEndResult.Neutral)
+                    ))
+                )
+            )
+        ),
+        // ———————— OPUSZCZONY OBÓZ ————————————————————————
+        EventNode(
+            id = EventNodeId("abandoned_camp_n1"),
+            eventId = EV_ABANDONED_CAMP,
+            textKey = "wild.abandoned_camp.discovery",
+            illustrationAsset = "camp_ruins",
+            options = listOf(
+                EventOption(
+                    id = EventOptionId("camp_search"),
+                    textKey = "wild.camp.search",
+                    outcome = ChainOutcome(listOf(
+                        ModifyResourcesOutcome(goldDelta = 15),
+                        EventEnd(EventEndResult.Success)
+                    ))
+                ),
+                EventOption(
+                    id = EventOptionId("camp_trap"),
+                    textKey = "wild.camp.trap",
+                    requirements = listOf(PerceptionRequirement(15)),
+                    outcome = ChainOutcome(listOf(
+                        ModifyHealthOutcome(hpDeltaPerHero = -5),
+                        EventEnd(EventEndResult.Failure)
+                    ))
+                ),
+                EventOption(
+                    id = EventOptionId("camp_leave"),
+                    textKey = "wild.camp.leave",
+                    outcome = EventEnd(EventEndResult.Neutral)
+                )
+            )
+        ),
+        // ———————— KUPIEC POD ATAKIEM ————————————————————————
+        EventNode(
+            id = EventNodeId("merchant_attack_n1"),
+            eventId = EV_MERCHANT_ATTACK,
+            textKey = "wild.merchant_attack.scene",
+            illustrationAsset = "merchant_bandits",
+            options = listOf(
+                EventOption(
+                    id = EventOptionId("merchant_rescue"),
+                    textKey = "wild.merchant.rescue",
+                    outcome = StartCombatOutcome(
+                        encounterId = EncounterId("bandits_merchant_raid"),
+                        onVictoryNode = EventNodeId("merchant_attack_reward")
+                    )
+                ),
+                EventOption(
+                    id = EventOptionId("merchant_avoid"),
+                    textKey = "wild.merchant.avoid",
+                    outcome = ChainOutcome(listOf(
+                        ModifyVirtueOutcome(virtueDelta = mapOf("Honor" to -10)),
+                        EventEnd(EventEndResult.Neutral)
+                    ))
+                )
+            )
+        ),
+        EventNode(
+            id = EventNodeId("merchant_attack_reward"),
+            eventId = EV_MERCHANT_ATTACK,
+            textKey = "wild.merchant.gratitude",
+            illustrationAsset = "merchant_thanks",
+            options = listOf(
+                EventOption(
+                    id = EventOptionId("merchant_accept_reward"),
+                    textKey = "wild.merchant.accept",
+                    outcome = ChainOutcome(listOf(
+                        ModifyResourcesOutcome(goldDelta = 50),
+                        ModifyVirtueOutcome(virtueDelta = mapOf("Honor" to 10)),
+                        EventEnd(EventEndResult.Success)
+                    ))
+                )
+            )
+        )
         )
     )
 }
