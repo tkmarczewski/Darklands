@@ -15,6 +15,13 @@ object CityEventCatalog {
     private val EV_GUILD_ALCHEMY = EventId("ev_guild_alchemy")
     private val EV_MARKETPLACE = EventId("ev_marketplace")
     private val EV_RUMOR_RAUBRITTER = EventId("ev_rumor_raubritter")
+    private val EV_UNIVERSITY = EventId("ev_university")
+    private val EV_GUILD_BLACKSMITH = EventId("ev_guild_blacksmith")
+    private val EV_PORT_TRADE = EventId("ev_port_trade")
+    private val EV_MONASTERY = EventId("ev_monastery")
+    private val EV_CITY_FESTIVAL = EventId("ev_city_festival")
+    private val EV_MERCHANT_DEAL = EventId("ev_merchant_deal")
+    private val EV_CRAFTSMAN_QUEST = EventId("ev_craftsman_quest")
 
     fun buildEvents(): List<Event> = listOf(
         // ────── KARCZMA ──────────────────────────────────────────
@@ -203,7 +210,81 @@ object CityEventCatalog {
                         ModifyReputationOutcome(mapOf(Faction.Thieves to 5)),
                         EventEnd(EventEndResult.Failure)
                     ))
-                )
+                ),
+
+        // ========== UNIWERSYTET ==========
+        Event(
+            id = EV_UNIVERSITY,
+            context = EventContext.CITY,
+            category = EventCategory.CITY_SERVICE,
+            weight = 3,
+            rootNodeId = EventNodeId("university_entry"),
+            tags = setOf("university", "learning"),
+            condition = CityDistrictCondition(DistrictType.UNIVERSITY)
+        ),
+
+        // ========== KOWAL / KUŹNIA ==========
+        Event(
+            id = EV_GUILD_BLACKSMITH,
+            context = EventContext.CITY,
+            category = EventCategory.CITY_SERVICE,
+            weight = 4,
+            rootNodeId = EventNodeId("blacksmith_entry"),
+            tags = setOf("guild", "blacksmith", "craft"),
+            condition = CityDistrictCondition(DistrictType.BLACKSMITH)
+        ),
+
+        // ========== PORT ==========
+        Event(
+            id = EV_PORT_TRADE,
+            context = EventContext.CITY,
+            category = EventCategory.CITY_SERVICE,
+            weight = 3,
+            rootNodeId = EventNodeId("port_entry"),
+            tags = setOf("port", "trade", "ship"),
+            condition = CityDistrictCondition(DistrictType.PORT)
+        ),
+
+        // ========== KLASZTOR ==========
+        Event(
+            id = EV_MONASTERY,
+            context = EventContext.CITY,
+            category = EventCategory.CITY_SERVICE,
+            weight = 2,
+            rootNodeId = EventNodeId("monastery_entry"),
+            tags = setOf("monastery", "religion", "learning")
+        ),
+
+        // ========== FESTIWAL MIEJSKI ==========
+        Event(
+            id = EV_CITY_FESTIVAL,
+            context = EventContext.CITY,
+            category = EventCategory.RANDOM_ENCOUNTER,
+            weight = 1,
+            rootNodeId = EventNodeId("festival_entry"),
+            tags = setOf("festival", "celebration"),
+            condition = TimeOfDayCondition(setOf(TimeOfDay.Noon, TimeOfDay.Afternoon))
+        ),
+
+        // ========== HANDLARZ ==========
+        Event(
+            id = EV_MERCHANT_DEAL,
+            context = EventContext.CITY,
+            category = EventCategory.RANDOM_ENCOUNTER,
+            weight = 2,
+            rootNodeId = EventNodeId("merchant_deal"),
+            tags = setOf("merchant", "trade", "deal")
+        ),
+
+        // ========== ZADANIE OD RZEMIEŚLNIKA ==========
+        Event(
+            id = EV_CRAFTSMAN_QUEST,
+            context = EventContext.CITY,
+            category = EventCategory.QUEST,
+            weight = 1,
+            rootNodeId = EventNodeId("craftsman_quest"),
+            tags = setOf("quest", "craftsman", "work")
+        )
             )
         )
     )
