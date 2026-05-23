@@ -19,5 +19,6 @@
         <activity android:name=".ui.AlchemyActivity"    android:exported="false"/>
         <activity android:name=".ui.CombatActivity"     android:exported="false"/>
         <activity android:name=".ui.EndgameActivity"    android:exported="false"/>
+                <activity android:name=".ui.EncounterActivity"  android:exported="false"/>
     </application>
 </manifest>
