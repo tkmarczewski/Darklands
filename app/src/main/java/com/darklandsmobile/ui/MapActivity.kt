@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.darklandsmobile.R
 import com.darklandsmobile.core.GameRepository
 import com.darklandsmobile.core.WorldMap
+import com.darklandsmobile.systems.TravelSystem
 
 class MapActivity : AppCompatActivity() {
 
@@ -13,16 +14,30 @@ class MapActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_map)
         val tv = findViewById<TextView>(R.id.tvMap)
-        val w = GameRepository.state.world
+        val w  = GameRepository.state.world
         val sb = StringBuilder()
+
         sb.appendLine("=== MAPA SWIATA ===")
+        sb.appendLine("Dzien: ${w.day} | Pora roku: ${TravelSystem.getSeasonDisplay()}")
+        sb.appendLine("Pora dnia: ${w.timeOfDay} | Zmeczenie: ${w.fatigue}")
         sb.appendLine()
-        WorldMap.regions.forEach { region ->
+
+        // Derive unique regions from node list
+        val regions = WorldMap.all().map { it.region }.distinct()
+        regions.forEach { region ->
             val marker = if (region == w.region) ">> " else "   "
             sb.appendLine("$marker${region.uppercase()}")
+            // List nodes in this region
+            WorldMap.all().filter { it.region == region }.forEach { node ->
+                val locMarker = if (node.name == w.location) "  * " else "    "
+                sb.appendLine("$locMarker${node.name}")
+            }
         }
         sb.appendLine()
         sb.appendLine("Aktualna lokacja: ${w.location} (${w.region})")
+        if (w.lastEncounter != "none") {
+            sb.appendLine("Ostatnie spotkanie: ${w.lastEncounter}")
+        }
         tv.text = sb.toString()
     }
 }
