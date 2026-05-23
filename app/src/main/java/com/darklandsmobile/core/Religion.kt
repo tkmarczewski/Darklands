@@ -49,7 +49,182 @@ object SaintCatalogue {
             name = "Jerzy Męczennik",
             domain = SaintDomain.JUSTICE,
             prayerBonus = 1,
-            description = "Symbol sprawiedliwości. Modlitwa wzmacnia cnotę."
+            description = "Symbol sprawiedliwości. Modlitwa wzmacnia cnotę.",
+        Saint(
+            id = "st_agnes",
+            name = "Święta Agnieszka",
+            domain = SaintDomain.MERCY,
+            prayerBonus = 1,
+            description = "Patronka czystości i dziewic."
+        ),
+        Saint(
+            id = "st_agatha",
+            name = "Święta Agata",
+            domain = SaintDomain.HEALING,
+            prayerBonus = 1,
+            description = "Uzdrowicielka chorych."
+        ),
+        Saint(
+            id = "st_anthony",
+            name = "Święty Antoni",
+            domain = SaintDomain.WISDOM,
+            prayerBonus = 2,
+            description = "Nauczyciel i patron rzeczy zaginionych."
+        ),
+        Saint(
+            id = "st_barbara",
+            name = "Święta Barbara",
+            domain = SaintDomain.JUSTICE,
+            prayerBonus = 1,
+            description = "Patronka górników i ochrony przed nagłą śmiercią."
+        ),
+        Saint(
+            id = "st_benedict",
+            name = "Święty Benedykt",
+            domain = SaintDomain.WISDOM,
+            prayerBonus = 2,
+            description = "Założyciel zakonu benedyktynów."
+        ),
+        Saint(
+            id = "st_bernard",
+            name = "Święty Bernard",
+            domain = SaintDomain.HEALING,
+            prayerBonus = 1,
+            description = "Uzdrowiciel i opiekun podróżnych."
+        ),
+        Saint(
+            id = "st_catherine",
+            name = "Święta Katarzyna",
+            domain = SaintDomain.WISDOM,
+            prayerBonus = 2,
+            description = "Patronka filozofów i uczonych."
+        ),
+        Saint(
+            id = "st_christopher",
+            name = "Święty Krzysztof",
+            domain = SaintDomain.NATURE,
+            prayerBonus = 1,
+            description = "Patron podróżnych i przewoźników."
+        ),
+        Saint(
+            id = "st_clare",
+            name = "Święta Klara",
+            domain = SaintDomain.MERCY,
+            prayerBonus = 1,
+            description = "Założycielka zakonu klarysek."
+        ),
+        Saint(
+            id = "st_cosmas",
+            name = "Święty Kosma",
+            domain = SaintDomain.HEALING,
+            prayerBonus = 2,
+            description = "Lekarz i uzdrowiciel."
+        ),
+        Saint(
+            id = "st_damian",
+            name = "Święty Damian",
+            domain = SaintDomain.HEALING,
+            prayerBonus = 2,
+            description = "Lekarz i uzdrowiciel, brat Kosmy."
+        ),
+        Saint(
+            id = "st_dominic",
+            name = "Święty Dominik",
+            domain = SaintDomain.JUSTICE,
+            prayerBonus = 1,
+            description = "Założyciel zakonu dominikanów."
+        ),
+        Saint(
+            id = "st_dorothy",
+            name = "Święta Dorota",
+            domain = SaintDomain.NATURE,
+            prayerBonus = 1,
+            description = "Patronka ogrodników."
+        ),
+        Saint(
+            id = "st_elizabeth",
+            name = "Święta Elżbieta",
+            domain = SaintDomain.MERCY,
+            prayerBonus = 2,
+            description = "Opiekunka ubogich i chorych."
+        ),
+        Saint(
+            id = "st_francis",
+            name = "Święty Franciszek",
+            domain = SaintDomain.NATURE,
+            prayerBonus = 2,
+            description = "Patron zwierząt i natury."
+        ),
+        Saint(
+            id = "st_helena",
+            name = "Święta Helena",
+            domain = SaintDomain.JUSTICE,
+            prayerBonus = 1,
+            description = "Odkrywczyni Krzyża Świętego."
+        ),
+        Saint(
+            id = "st_john",
+            name = "Święty Jan",
+            domain = SaintDomain.WISDOM,
+            prayerBonus = 2,
+            description = "Ewangelista i apostoł."
+        ),
+        Saint(
+            id = "st_lawrence",
+            name = "Święty Wawrzyniec",
+            domain = SaintDomain.JUSTICE,
+            prayerBonus = 1,
+            description = "Męczennik i diakon."
+        ),
+        Saint(
+            id = "st_leonard",
+            name = "Święty Leonard",
+            domain = SaintDomain.MERCY,
+            prayerBonus = 1,
+            description = "Patron więźniów."
+        ),
+        Saint(
+            id = "st_lucy",
+            name = "Święta Łucja",
+            domain = SaintDomain.HEALING,
+            prayerBonus = 1,
+            description = "Patronka wzroku."
+        ),
+        Saint(
+            id = "st_margaret",
+            name = "Święta Małgorzata",
+            domain = SaintDomain.MERCY,
+            prayerBonus = 1,
+            description = "Patronka kobiet w ciąży."
+        ),
+        Saint(
+            id = "st_martin",
+            name = "Święty Marcin",
+            domain = SaintDomain.WAR,
+            prayerBonus = 1,
+            description = "Żołnierz i biskup."
+        ),
+        Saint(
+            id = "st_nicholas",
+            name = "Święty Mikołaj",
+            domain = SaintDomain.MERCY,
+            prayerBonus = 2,
+            description = "Patron dzieci i obdarowujący."
+        ),
+        Saint(
+            id = "st_paul",
+            name = "Święty Paweł",
+            domain = SaintDomain.WISDOM,
+            prayerBonus = 2,
+            description = "Apostoł narodów."
+        ),
+        Saint(
+            id = "st_sebastian",
+            name = "Święty Sebastian",
+            domain = SaintDomain.WAR,
+            prayerBonus = 1,
+            description = "Żołnierz i męczennik."
+        )
         )
     )
 
