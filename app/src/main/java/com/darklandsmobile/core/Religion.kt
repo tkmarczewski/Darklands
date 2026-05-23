@@ -197,3 +197,54 @@ object DivineFavorSystem {
         else -> "Klątwa"
     }
 }
+
+
+// ==================== VIRTUE SYSTEM ====================
+
+object VirtueSystem {
+
+    // Virtue score (0-100) influences DivineFavor passively each day
+    // High virtue boosts favor with JUSTICE/MERCY saints
+    // Low virtue (sin) reduces favor and adds curses
+
+    fun applyVirtueToDivineFavor(virtue: Int, state: DivineFavorState): String {
+        val delta = when {
+            virtue >= 80 -> 2   // Very virtuous: passive favor gain
+            virtue >= 60 -> 1   // Virtuous
+            virtue >= 40 -> 0   // Neutral
+            virtue >= 20 -> -1  // Sinful: passive favor loss
+            else         -> -2  // Very sinful: strong favor penalty
+        }
+        if (delta != 0) {
+            state.favor = (state.favor + delta).coerceIn(-20, 20)
+        }
+        return when {
+            delta > 0  -> "Twoja cnota przynosi lask\u0119 Boza. (+$delta)"
+            delta < 0  -> "Twoje grzechy oddalaja cie od Boga. ($delta)"
+            else       -> "Twoja cnota jest neutralna."
+        }
+    }
+
+    fun virtueDescription(virtue: Int): String = when {
+        virtue >= 90 -> "Swiety"
+        virtue >= 70 -> "Prawy"
+        virtue >= 50 -> "Uczciwy"
+        virtue >= 30 -> "Watpliwy"
+        virtue >= 10 -> "Grzesznik"
+        else         -> "Potepieniec"
+    }
+
+    // Called when hero prays to a JUSTICE or MERCY saint
+    // virtue score improves on successful prayer
+    fun prayerBoostVirtue(currentVirtue: Int, saintDomain: SaintDomain): Int {
+        return if (saintDomain == SaintDomain.JUSTICE || saintDomain == SaintDomain.MERCY) {
+            (currentVirtue + 3).coerceAtMost(100)
+        } else {
+            currentVirtue
+        }
+    }
+
+    // Called when hero commits a sinful act (theft, murder, desecration)
+    fun sinPenalty(currentVirtue: Int, severity: Int = 5): Int =
+        (currentVirtue - severity).coerceAtLeast(0)
+}
