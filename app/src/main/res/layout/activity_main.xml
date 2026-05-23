@@ -18,15 +18,17 @@
             android:textColor="#c8a96e"
             android:textSize="13sp" />
 
-        <Button android:id="@+id/btnParty" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Druzyna" android:layout_marginTop="8dp"/>
+        <Button android:id="@+id/btnParty"     android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Druzyna"    android:layout_marginTop="8dp"/>
         <Button android:id="@+id/btnCharacter" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Postac"/>
         <Button android:id="@+id/btnInventory" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Ekwipunek"/>
-        <Button android:id="@+id/btnMap" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Mapa"/>
-        <Button android:id="@+id/btnPrayer" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Modlitwa"/>
-        <Button android:id="@+id/btnAlchemy" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Alchemia"/>
-        <Button android:id="@+id/btnQuest" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Quest"/>
-        <Button android:id="@+id/btnEvent" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Zdarzenie"/>
-        <Button android:id="@+id/btnSave" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Zapisz"/>
+        <Button android:id="@+id/btnMap"       android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Mapa"/>
+        <Button android:id="@+id/btnPrayer"    android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Modlitwa"/>
+        <Button android:id="@+id/btnAlchemy"   android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Alchemia"/>
+        <Button android:id="@+id/btnCombat"    android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Walka"/>
+        <Button android:id="@+id/btnQuest"     android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Quest"/>
+        <Button android:id="@+id/btnEvent"     android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Zdarzenie"/>
+        <Button android:id="@+id/btnSave"      android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Zapisz"/>
+        <Button android:id="@+id/btnEndgame"   android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Endgame"/>
 
     </LinearLayout>
 </ScrollView>
