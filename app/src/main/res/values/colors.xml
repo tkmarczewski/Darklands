@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#1a1a2e</color>
+    <color name="colorPrimaryVariant">#16213e</color>
+    <color name="colorOnPrimary">#c8a96e</color>
+    <color name="colorSecondary">#8b0000</color>
+    <color name="colorOnSecondary">#ffffff</color>
+    <color name="colorBackground">#1a1a2e</color>
+    <color name="colorSurface">#16213e</color>
+    <color name="colorOnBackground">#c8a96e</color>
+    <color name="colorOnSurface">#c8a96e</color>
+    <color name="colorAccent">#c8a96e</color>
+    <color name="colorGold">#c8a96e</color>
+    <color name="colorBlood">#8b0000</color>
+    <color name="colorSuccess">#a0e8a0</color>
+</resources>
