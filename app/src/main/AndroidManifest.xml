@@ -17,5 +17,6 @@
         <activity android:name=".ui.MapActivity"       android:exported="false"/>
         <activity android:name=".ui.PrayerActivity"    android:exported="false"/>
         <activity android:name=".ui.AlchemyActivity"   android:exported="false"/>
+                <activity android:name=".ui.EndgameActivity"    android:exported="false"/>
     </application>
 </manifest>
