@@ -81,7 +81,55 @@ enum class Career(
 }
 
 data class CareerEntry(
-    val career: Career,
+    val career: Career,,
+    CRAFTSMAN(
+        displayName = "Rzemieślnik",
+        minAge = 14, maxAge = 50,
+        requiredVirtue = 0,
+        requiredStrength = 2, requiredAgility = 2, requiredIntelligence = 1,
+        strBonus = 1, agiBonus = 1,
+        description = "Praca w warsztacie. Stolarz, kowal, garncarz."
+    ),
+    MERCHANT(
+        displayName = "Kupiec",
+        minAge = 18, maxAge = 60,
+        requiredVirtue = 1,
+        requiredStrength = 0, requiredAgility = 1, requiredIntelligence = 3,
+        intBonus = 2,
+        description = "Handel i biznes. Umiejętność negocjacji."
+    ),
+    GUARD(
+        displayName = "Strażnik",
+        minAge = 18, maxAge = 45,
+        requiredVirtue = 2,
+        requiredStrength = 4, requiredAgility = 2, requiredIntelligence = 0,
+        strBonus = 2, agiBonus = 1, virtueBonus = 1,
+        description = "Służba miejska. Porządek i prawo."
+    ),
+    PRIEST(
+        displayName = "Ksiądz",
+        minAge = 22, maxAge = 65,
+        requiredVirtue = 5,
+        requiredStrength = 0, requiredAgility = 0, requiredIntelligence = 3,
+        intBonus = 2, virtueBonus = 3,
+        description = "Służba Kościoła. Modlitwa i nauczanie."
+    ),
+    PHYSICIAN(
+        displayName = "Lekarz",
+        minAge = 20, maxAge = 60,
+        requiredVirtue = 1,
+        requiredStrength = 0, requiredAgility = 1, requiredIntelligence = 5,
+        intBonus = 3,
+        description = "Medycyna i leczenie. Znajomość ciała."
+    ),
+    APPRENTICE(
+        displayName = "Uczeń",
+        minAge = 10, maxAge = 18,
+        requiredVirtue = 0,
+        requiredStrength = 0, requiredAgility = 1, requiredIntelligence = 1,
+        agiBonus = 1,
+        description = "Nauka rzemiosła. Pierwszy krok kariery."
+    )
     val yearsServed: Int
 )
 
