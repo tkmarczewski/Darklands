@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Darklands Mobile</string>
+    <string name="btn_party">Druzyna</string>
+    <string name="btn_character">Postac</string>
+    <string name="btn_inventory">Ekwipunek</string>
+    <string name="btn_map">Mapa</string>
+    <string name="btn_prayer">Modlitwa</string>
+    <string name="btn_alchemy">Alchemia</string>
+    <string name="btn_quest">Zadanie</string>
+    <string name="btn_event">Zdarzenie</string>
+    <string name="btn_save">Zapisz</string>
+    <string name="btn_load">Wczytaj</string>
+    <string name="btn_use">Uzyj</string>
+    <string name="btn_pray">Modl sie</string>
+    <string name="btn_donate">Ofiaruj zloto</string>
+    <string name="btn_brew">Warz miksture</string>
+    <string name="hint_item_index">Numer przedmiotu</string>
+    <string name="hint_donation">Kwota darowizny</string>
+    <string name="hint_recipe_index">Numer receptury</string>
+</resources>
