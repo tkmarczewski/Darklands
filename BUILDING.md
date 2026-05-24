@@ -140,6 +140,27 @@ adb wait-for-device
 - **`Execution failed for task ':app:lintReport'`** — projekt nie korzysta z lint w CI; jeśli przeszkadza: `./gradlew assembleDebug -x lint`.
 - **Testy uruchomione, ale brak rezultatów** — sprawdź `app/build/reports/tests/`, czasem `--info` lub `--stacktrace` na komendzie Gradle pokazuje przyczynę.
 
+## CI (GitHub Actions)
+
+Workflow `.github/workflows/android-ci.yml` odpala się automatycznie:
+
+- na każdy `push` do gałęzi `master`,
+- na każdy `pull_request` skierowany do `master`.
+
+Co robi workflow (job `build-and-test` na `ubuntu-latest`):
+
+1. Checkout repo (`actions/checkout@v4`).
+2. JDK 17 Temurin (`actions/setup-java@v4`).
+3. Android SDK (`android-actions/setup-android@v3`).
+4. Gradle 8.4 (`gradle/actions/setup-gradle@v3`) + wygenerowanie wrappera, jeśli go nie ma w repo.
+5. Unit testy: `./gradlew :app:testDebugUnitTest`.
+6. Build debug APK: `./gradlew :app:assembleDebug`.
+
+Artefakty po przebiegu (zakładka **Actions → workflow run → Artifacts**):
+
+- `unit-test-report` — raport HTML z `app/build/reports/tests/testDebugUnitTest` (uploadowany zawsze, również przy czerwonym buildzie).
+- `app-debug-apk` — APK z `app/build/outputs/apk/debug/*.apk` (uploadowany przy udanym buildzie).
+
 ## Struktura testów
 
 ```
