@@ -19,6 +19,10 @@ Darklands to mobilna gra RPG osadzona w mrocznym średniowieczu. Gracz wcielają
 - System zapisu gry z autozapisem i migracją wersji
 - Cztery zakończenia: Dobry, Pragmatyczny, Odkupienie, Skażenie
 
+## Budowanie i uruchamianie
+
+Pełna instrukcja (wymagania, komendy `assembleDebug` / `test`, instalacja przez `adb`, częste problemy) znajduje się w [BUILDING.md](BUILDING.md).
+
 ## Technologie
 
 - Kotlin (Android)
