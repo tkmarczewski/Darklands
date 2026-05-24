@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Sprint 9: tabelaryczny podglad reputacji miast (i opcjonalnie frakcji). -->
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#1a1a2e">
+    <TextView
+        android:id="@+id/reputationStatus"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:fontFamily="monospace"
+        android:textColor="#c8a96e"
+        android:textSize="14sp"
+        android:padding="16dp"
+        android:text="Reputacja" />
+</ScrollView>

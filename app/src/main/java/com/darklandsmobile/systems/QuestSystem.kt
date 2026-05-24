@@ -29,4 +29,18 @@ object QuestSystem {
         } else "Quest $questId: postep $current/3"
     }
     fun activeList() = GameRepository.state.quest.activeQuests.toList()
+
+    // Sprint 15: scalone podsumowanie questow na ekran QuestFinalActivity (UI sprintu 12+).
+    fun finalQuestSummary(): String {
+        val q = GameRepository.state.quest
+        val active = if (q.activeQuests.isEmpty()) "  brak"
+                     else q.activeQuests.joinToString("\n") { id ->
+                         val title = questTemplates[id] ?: id
+                         val progress = q.questProgress.getOrDefault(id, 0)
+                         "  - $title ($progress/3)"
+                     }
+        val completed = if (q.completedQuests.isEmpty()) "  brak"
+                        else q.completedQuests.joinToString("\n") { id -> "  - ${questTemplates[id] ?: id}" }
+        return "Aktywne questy:\n$active\n\nUkonczone questy:\n$completed"
+    }
 }

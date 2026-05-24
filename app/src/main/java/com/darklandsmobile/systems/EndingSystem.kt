@@ -1,5 +1,6 @@
 package com.darklandsmobile.systems
 
+import com.darklandsmobile.core.GameRepository
 import com.darklandsmobile.core.GameState
 
 enum class EndingType { GOOD, PRAGMATIC, CORRUPTED, REDEMPTION }
@@ -48,5 +49,21 @@ object EndingSystem {
                     "a ty stałeś się częścią ciemności, którą chciałeś pokonać."
                 )
         }
+    }
+
+    // Sprint 17: tekstowy status finalu (Baphomet / koniec gry) dla BaphometActivity (UI sprintu 12+).
+    // Nie wywoluje resolveEnding bezposrednio, bo wymaga to pol stanu z resztki repo;
+    // zwraca tekst opisujacy biezacy etap finalu w oparciu o stan modlitwy/reputacji.
+    fun finaleStatus(): String {
+        val s = GameRepository.state
+        val faith = s.prayer.faith
+        val sins  = s.prayer.sins
+        val title = when {
+            faith >= 50 && sins <= 2 -> "Oczyszczenie"
+            faith >= 20              -> "Gorzkie Zwyciestwo"
+            sins  >= 5               -> "Skazenie"
+            else                     -> "Pielgrzymka trwa"
+        }
+        return "Finale: $title\n\nWiara: $faith\nGrzechy: $sins"
     }
 }

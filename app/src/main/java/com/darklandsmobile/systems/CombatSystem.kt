@@ -99,4 +99,16 @@ object CombatSystem {
     fun isCombatActive() = GameRepository.state.combat.active
 
     fun getCombatLog(): List<String> = GameRepository.state.combat.log
+
+    // Sprint 14: prosty status walki dla ekranu CombatStatusActivity (UI sprintu 12+).
+    // Zwraca podsumowanie aktualnego stanu walki lub komunikat o braku aktywnej walki.
+    fun combatSummary(): String {
+        val c = GameRepository.state.combat
+        if (!c.active && c.log.isEmpty()) return "Brak danych o walce."
+        val header = if (c.active) "Walka aktywna z ${c.enemyName} (runda ${c.round})"
+                     else "Walka zakonczona (${c.enemyName})"
+        val hpLine = "Wrog HP: ${c.enemyHp}/${c.enemyMaxHp}"
+        val tail = c.log.takeLast(8).joinToString("\n") { "- $it" }
+        return "$header\n$hpLine\n\n$tail"
+    }
 }

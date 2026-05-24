@@ -59,4 +59,30 @@ object InventorySystem {
             .sumOf { it.weight.toDouble() }
             .toFloat()
     }
+
+    // Sprint 12: logiczny transfer przedmiotu miedzy postaciami w obrebie wspolnego inventory druzyny.
+    // Aktualny model trzyma inventory na poziomie GameRepository.state, wiec transfer to zapis w logu
+    // potwierdzajacy przekazanie - bez fizycznej zmiany lokalizacji itemu w pamieci stanu.
+    fun transferItem(fromHeroId: String, toHeroId: String, itemId: String): String {
+        val party = GameRepository.state.party
+        val from = party.firstOrNull { it.id == fromHeroId } ?: return "Brak bohatera: $fromHeroId"
+        val to   = party.firstOrNull { it.id == toHeroId }   ?: return "Brak bohatera: $toHeroId"
+        val item = GameRepository.state.inventory.firstOrNull { it.id == itemId }
+            ?: return "Nie znaleziono: $itemId"
+        GameRepository.log("Transfer ${item.name}: ${from.name} -> ${to.name}")
+        return "Transfer ${item.name}: ${from.name} -> ${to.name}"
+    }
+
+    // Sprint 12: zwraca skrocone szczegoly pojedynczego przedmiotu (lub komunikat).
+    fun itemDetail(itemId: String): String {
+        val item = GameRepository.state.inventory.firstOrNull { it.id == itemId }
+            ?: return "Nie znaleziono: $itemId"
+        val effects = item.effects.entries.joinToString(", ") { (k, v) -> "$k=$v" }
+        return buildString {
+            appendLine(item.name)
+            appendLine("typ: ${item.type}")
+            appendLine("waga: ${item.weight}")
+            if (effects.isNotEmpty()) appendLine("efekty: $effects")
+        }.trim()
+    }
 }
