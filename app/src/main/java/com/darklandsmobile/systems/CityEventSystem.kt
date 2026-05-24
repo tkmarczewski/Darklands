@@ -3,6 +3,9 @@ package com.darklandsmobile.systems
 import com.darklandsmobile.core.GameRepository
 import com.darklandsmobile.world.CityCatalogue
 
+/**
+ * Proste eventy miejskie uzależnione od reputacji lokalnej.
+ */
 object CityEventSystem {
     fun runCityEvent(cityId: String): String {
         val city = CityCatalogue.get(cityId) ?: return "Nieznane miasto: $cityId"

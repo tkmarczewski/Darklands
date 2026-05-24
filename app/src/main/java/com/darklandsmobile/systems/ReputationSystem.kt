@@ -3,6 +3,9 @@ package com.darklandsmobile.systems
 import com.darklandsmobile.core.GameRepository
 import com.darklandsmobile.core.FactionReputation.FactionCatalogue
 
+/**
+ * Reputacja per miasto i per frakcja oraz prosty wpływ na ceny.
+ */
 object ReputationSystem {
 
     fun changeCity(city: String, delta: Int): String {

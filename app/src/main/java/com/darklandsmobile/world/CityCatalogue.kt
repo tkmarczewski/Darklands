@@ -1,5 +1,8 @@
 package com.darklandsmobile.world
 
+/**
+ * Dane miasta: identyfikator, region, typ, populacja i lokalny mnożnik cen.
+ */
 data class CityData(
     val id: String,
     val name: String,
@@ -10,6 +13,9 @@ data class CityData(
     val events: MutableList<String> = mutableListOf()
 )
 
+/**
+ * Centralny katalog miast dla mapy, ekonomii i eventów.
+ */
 object CityCatalogue {
     private val cities = mutableMapOf<String, CityData>()
 
@@ -17,6 +23,9 @@ object CityCatalogue {
     fun get(id: String): CityData? = cities[id]
     fun all(): List<CityData> = cities.values.toList()
 
+    /**
+     * Minimalny zestaw miast do sprintu 6.
+     */
     fun seedSprint1() {
         if (cities.isNotEmpty()) return
         register(CityData("magdeburg", "Magdeburg", "central", "city", 32000, 1.0f, mutableListOf("market_day", "church_rumor")))

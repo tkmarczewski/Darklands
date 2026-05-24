@@ -6,6 +6,9 @@ import com.darklandsmobile.core.Season
 import com.darklandsmobile.core.WorldMap
 import com.darklandsmobile.world.CityCatalogue
 
+/**
+ * Obsługa podróży po mapie świata.
+ */
 object TravelSystem {
 
     fun travelTo(regionOrNodeId: String): String {
@@ -32,6 +35,10 @@ object TravelSystem {
         if (w.fatigue >= 80) GameRepository.log("Druzyna jest wyczerpana!")
 
         val city = CityCatalogue.all().firstOrNull { it.name == node.name }
+        if (city != null) {
+            CityEventSystem.runCityEvent(city.id)
+        }
+
         val encounterLine = if (encounter != null) " Spotkanie: ${encounter.title} — ${encounter.description}" else ""
         val cityLine = if (city != null) " Przybyto do miasta: ${city.name}." else ""
         val msg = "Podroz do ${node.name} (dzien ${w.day}, ${season.displayName()})." + encounterLine + cityLine
