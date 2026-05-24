@@ -4,46 +4,47 @@ import com.darklandsmobile.core.EncounterSystem
 import com.darklandsmobile.core.GameRepository
 import com.darklandsmobile.core.Season
 import com.darklandsmobile.core.WorldMap
+import com.darklandsmobile.world.CityCatalogue
 
 object TravelSystem {
 
     fun travelTo(regionOrNodeId: String): String {
-        val w    = GameRepository.state.world
+        val w = GameRepository.state.world
         val node = WorldMap.all().firstOrNull { it.id == regionOrNodeId || it.region == regionOrNodeId }
             ?: return "Nieznane miejsce: $regionOrNodeId"
 
         val season = currentSeason(w.day)
         val fatigueCost = (5 * season.travelModifier()).toInt().coerceAtLeast(1)
 
-        w.region       = node.region
-        w.location     = node.name
-        w.day         += 1
-        w.fatigue     += fatigueCost
-        w.timeOfDay    = when (w.day % 3) { 0 -> "night"; 1 -> "morning"; else -> "afternoon" }
+        w.region = node.region
+        w.location = node.name
+        w.day += 1
+        w.fatigue += fatigueCost
+        w.timeOfDay = when (w.day % 3) { 0 -> "night"; 1 -> "morning"; else -> "afternoon" }
 
         val encounter = EncounterSystem.rollEncounter(node.region)
         w.lastEncounter = encounter?.type?.name?.lowercase() ?: "none"
 
-        // Apply encounter side-effects to world state
         if (encounter != null) {
             w.fatigue = (w.fatigue + encounter.fatigueDelta).coerceAtLeast(0)
         }
 
         if (w.fatigue >= 80) GameRepository.log("Druzyna jest wyczerpana!")
 
-        val encounterLine = if (encounter != null)
-            " Spotkanie: ${encounter.title} — ${encounter.description}" else ""
-        val msg = "Podroz do ${node.name} (dzien ${w.day}, ${season.displayName()})." + encounterLine
+        val city = CityCatalogue.all().firstOrNull { it.name == node.name }
+        val encounterLine = if (encounter != null) " Spotkanie: ${encounter.title} — ${encounter.description}" else ""
+        val cityLine = if (city != null) " Przybyto do miasta: ${city.name}." else ""
+        val msg = "Podroz do ${node.name} (dzien ${w.day}, ${season.displayName()})." + encounterLine + cityLine
         GameRepository.log(msg)
         return msg
     }
 
     fun rest(): String {
-        val w         = GameRepository.state.world
+        val w = GameRepository.state.world
         val recovered = minOf(w.fatigue, 20)
-        w.fatigue    -= recovered
-        w.day        += 1
-        w.timeOfDay   = "morning"
+        w.fatigue -= recovered
+        w.day += 1
+        w.timeOfDay = "morning"
         val msg = "Odpoczynek. Zmeczenie: ${w.fatigue}"
         GameRepository.log(msg)
         return "Druzyna odpoczela. Zmeczenie: ${w.fatigue}"
