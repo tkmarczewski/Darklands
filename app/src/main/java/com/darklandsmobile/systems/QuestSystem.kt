@@ -1,46 +1,106 @@
 package com.darklandsmobile.systems
 
-import com.darklandsmobile.core.GameRepository
+import com.darklandsmobile.world.ProceduralLocation
+import com.darklandsmobile.world.ProceduralLocationGenerator
 
+enum class QuestOriginType {
+    CITY_EVENT,
+    PROCEDURAL_LOCATION
+}
+
+enum class QuestStatus {
+    AVAILABLE,
+    ACTIVE,
+    COMPLETED,
+    FAILED
+}
+
+data class QuestEntry(
+    val id: String,
+    val title: String,
+    val description: String,
+    val cityId: String,
+    val originType: QuestOriginType,
+    val originRefId: String,
+    val rewardGold: Int,
+    val status: QuestStatus = QuestStatus.AVAILABLE
+)
+
+/**
+ * Integration layer joining city events and procedural locations into a single quest feed.
+ */
 object QuestSystem {
-    private val questTemplates = mapOf(
-        "forest_hermit" to "Znajdz pustelnika w lesie",
-        "bandit_camp"   to "Rozprosz oboz bandytow",
-        "lost_relic"    to "Odzyskaj zagubiona relikwie"
-    )
-    fun start(questId: String): String {
-        val q = GameRepository.state.quest
-        if (q.activeQuests.contains(questId)) return "Quest $questId juz aktywny"
-        q.activeQuests.add(questId)
-        q.questProgress[questId] = 0
-        val title = questTemplates[questId] ?: questId
-        GameRepository.log("Nowy quest: $title")
-        return "Rozpoczeto quest: $title"
-    }
-    fun advance(questId: String, amount: Int = 1): String {
-        val q = GameRepository.state.quest
-        if (!q.activeQuests.contains(questId)) return "Quest $questId nie jest aktywny"
-        val current = (q.questProgress.getOrDefault(questId, 0)) + amount
-        q.questProgress[questId] = current
-        return if (current >= 3) {
-            q.activeQuests.remove(questId); q.completedQuests.add(questId)
-            GameRepository.log("Quest ukonczony: $questId")
-            "Quest $questId ukonczony!"
-        } else "Quest $questId: postep $current/3"
-    }
-    fun activeList() = GameRepository.state.quest.activeQuests.toList()
+    private val quests = linkedMapOf<String, QuestEntry>()
+    private var currentSeed: Int = 0
 
-    // Sprint 15: scalone podsumowanie questow na ekran QuestFinalActivity (UI sprintu 12+).
-    fun finalQuestSummary(): String {
-        val q = GameRepository.state.quest
-        val active = if (q.activeQuests.isEmpty()) "  brak"
-                     else q.activeQuests.joinToString("\n") { id ->
-                         val title = questTemplates[id] ?: id
-                         val progress = q.questProgress.getOrDefault(id, 0)
-                         "  - $title ($progress/3)"
-                     }
-        val completed = if (q.completedQuests.isEmpty()) "  brak"
-                        else q.completedQuests.joinToString("\n") { id -> "  - ${questTemplates[id] ?: id}" }
-        return "Aktywne questy:\n$active\n\nUkonczone questy:\n$completed"
+    fun clear() {
+        quests.clear()
+        currentSeed = 0
     }
+
+    fun seedIntegratedContent(seed: Int = 1) {
+        if (quests.isNotEmpty() && currentSeed == seed) return
+        clear()
+        currentSeed = seed
+
+        CityEventSystem.seedStage1Events()
+
+        CityEventSystem.getEventsForCity("magdeburg").forEach { event ->
+            register(
+                QuestEntry(
+                    id = "quest_${event.id}",
+                    title = event.title,
+                    description = event.description,
+                    cityId = event.cityId,
+                    originType = QuestOriginType.CITY_EVENT,
+                    originRefId = event.id,
+                    rewardGold = event.rewardGold
+                )
+            )
+        }
+
+        val generatedLocations = ProceduralLocationGenerator.generate(seed = seed, count = 8)
+        generatedLocations.forEach { location ->
+            register(location.toQuest())
+        }
+    }
+
+    fun register(entry: QuestEntry) {
+        quests[entry.id] = entry
+    }
+
+    fun all(): List<QuestEntry> = quests.values.toList()
+
+    fun availableForCity(cityId: String): List<QuestEntry> =
+        quests.values.filter { it.cityId == cityId && it.status == QuestStatus.AVAILABLE }
+
+    fun activate(questId: String): QuestEntry {
+        val quest = quests[questId] ?: error("Unknown quest: $questId")
+        val updated = quest.copy(status = QuestStatus.ACTIVE)
+        quests[questId] = updated
+        return updated
+    }
+
+    fun complete(questId: String): QuestEntry {
+        val quest = quests[questId] ?: error("Unknown quest: $questId")
+        val updated = quest.copy(status = QuestStatus.COMPLETED)
+        quests[questId] = updated
+        return updated
+    }
+
+    private fun ProceduralLocation.toQuest(): QuestEntry = QuestEntry(
+        id = "quest_${id}",
+        title = when (type.name) {
+            "RUINS" -> "Zbadaj ruiny"
+            "RAUBRITTER_CASTLE" -> "Uderz na zamek raubrittera"
+            "MONASTERY" -> "Odwiedź klasztor"
+            "DUNGEON" -> "Zejdź do lochów"
+            else -> "Pomóż pobliskiej osadzie"
+        },
+        description = "Cel wyprawy: $name.",
+        cityId = nearestCityId,
+        originType = QuestOriginType.PROCEDURAL_LOCATION,
+        originRefId = id,
+        rewardGold = rewardGold
+    )
 }

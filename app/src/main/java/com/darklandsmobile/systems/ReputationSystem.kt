@@ -1,48 +1,56 @@
 package com.darklandsmobile.systems
 
-import com.darklandsmobile.core.GameRepository
-import com.darklandsmobile.core.FactionCatalogue
+enum class CityFaction {
+    KNIGHTS,
+    MERCHANTS,
+    CHURCH,
+    COMMONERS
+}
+
+data class CityReputation(
+    val cityId: String,
+    val factionScores: MutableMap<CityFaction, Int> = mutableMapOf(
+        CityFaction.KNIGHTS to 0,
+        CityFaction.MERCHANTS to 0,
+        CityFaction.CHURCH to 0,
+        CityFaction.COMMONERS to 0
+    )
+) {
+    fun score(faction: CityFaction): Int = factionScores[faction] ?: 0
+}
 
 /**
- * Reputacja per miasto i per frakcja oraz prosty wplyw na ceny.
+ * Stage 1 local reputation support.
+ * Reputation is isolated per city, so actions in one city do not leak into another.
  */
 object ReputationSystem {
+    private val localReputations = mutableMapOf<String, CityReputation>()
 
-    fun changeCity(city: String, delta: Int): String {
-        val rep = GameRepository.state.reputation
-        rep.city[city] = (rep.city.getOrDefault(city, 0) + delta).coerceIn(-100, 100)
-        GameRepository.log("Reputacja w $city: ${rep.city[city]}")
-        return "Reputacja w $city: ${rep.city[city]}"
+    fun clear() = localReputations.clear()
+
+    fun ensureCity(cityId: String): CityReputation =
+        localReputations.getOrPut(cityId) { CityReputation(cityId = cityId) }
+
+    fun modify(cityId: String, faction: CityFaction, delta: Int): Int {
+        val cityRep = ensureCity(cityId)
+        val updated = (cityRep.factionScores[faction] ?: 0) + delta
+        cityRep.factionScores[faction] = updated
+        return updated
     }
 
-    fun getCityRep(city: String): Int =
-        GameRepository.state.reputation.city.getOrDefault(city, 0)
+    fun score(cityId: String, faction: CityFaction): Int = ensureCity(cityId).score(faction)
 
-    fun allCities(): Map<String, Int> =
-        GameRepository.state.reputation.city.toMap()
-
-    fun changeFaction(factionId: String, delta: Int): String {
-        val faction = FactionCatalogue.factions.firstOrNull { it.id == factionId }
-            ?: return "Nieznana frakcja: $factionId"
-        val rep = GameRepository.state.reputation
-        rep.faction[factionId] = (rep.faction.getOrDefault(factionId, 0) + delta).coerceIn(-100, 100)
-        GameRepository.log("Reputacja u ${faction.name}: ${rep.faction[factionId]}")
-        return "Reputacja u ${faction.name}: ${rep.faction[factionId]}"
-    }
-
-    fun getFactionRep(factionId: String): Int =
-        GameRepository.state.reputation.faction.getOrDefault(factionId, 0)
-
-    fun allFactions(): Map<String, Int> =
-        GameRepository.state.reputation.faction.toMap()
-
-    fun priceModifier(city: String): Float {
-        val rep = getCityRep(city)
+    fun priceModifier(cityId: String, faction: CityFaction = CityFaction.MERCHANTS): Float {
+        val score = score(cityId, faction)
         return when {
-            rep >= 50 -> 0.8f
-            rep >= 0 -> 1.0f
-            rep >= -50 -> 1.3f
-            else -> 2.0f
+            score >= 50 -> 0.85f
+            score >= 20 -> 0.90f
+            score <= -50 -> 1.20f
+            score <= -20 -> 1.10f
+            else -> 1.00f
         }
     }
+
+    fun snapshot(): Map<String, Map<CityFaction, Int>> =
+        localReputations.mapValues { (_, rep) -> rep.factionScores.toMap() }
 }
