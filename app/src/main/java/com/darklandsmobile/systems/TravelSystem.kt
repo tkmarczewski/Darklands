@@ -36,7 +36,7 @@ object TravelSystem {
 
         val city = CityCatalogue.all().firstOrNull { it.name == node.name }
         if (city != null) {
-            CityEventSystem.runCityEvent(city.id)
+            CityEventSystem.cityAudience(city.id)
         }
 
         val encounterLine = if (encounter != null) " Spotkanie: ${encounter.title} — ${encounter.description}" else ""
