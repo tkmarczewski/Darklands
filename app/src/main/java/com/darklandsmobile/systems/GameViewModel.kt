@@ -1,0 +1,63 @@
+package com.darklandsmobile.systems
+
+import com.darklandsmobile.core.CityScreenState
+import com.darklandsmobile.core.PlayerState
+import com.darklandsmobile.core.QuestJournalState
+import com.darklandsmobile.core.ResolutionScreenState
+import com.darklandsmobile.core.SaveState
+import com.darklandsmobile.core.TravelScreenState
+
+/**
+ * Simple UI-facing state holder independent from Android framework classes.
+ * Can later be wrapped by a real ViewModel.
+ */
+class GameViewModel {
+    var playerState: PlayerState = GameLoopController.bootstrap()
+        private set
+
+    var cityScreenState: CityScreenState = GameLoopController.cityScreen(playerState)
+        private set
+
+    var travelScreenState: TravelScreenState? = null
+        private set
+
+    var resolutionScreenState: ResolutionScreenState? = null
+        private set
+
+    var journalState: QuestJournalState = QuestJournalSystem.build(playerState)
+        private set
+
+    fun refreshCityScreen() {
+        cityScreenState = GameLoopController.cityScreen(playerState)
+        journalState = QuestJournalSystem.build(playerState)
+    }
+
+    fun acceptQuest(questId: String) {
+        playerState = GameLoopController.acceptQuest(playerState, questId)
+        refreshCityScreen()
+    }
+
+    fun travelToActiveQuest() {
+        val (updatedPlayer, travelState) = GameLoopController.travelToQuest(playerState)
+        playerState = updatedPlayer
+        travelScreenState = travelState
+        refreshCityScreen()
+    }
+
+    fun resolveActiveQuest() {
+        val (updatedPlayer, resolutionState) = GameLoopController.resolveActiveQuest(playerState)
+        playerState = updatedPlayer
+        resolutionScreenState = resolutionState
+        refreshCityScreen()
+        SaveLoadSystem.save(playerState, resolutionState.summary)
+    }
+
+    fun saveGame(): SaveState = SaveLoadSystem.save(playerState, resolutionScreenState?.summary)
+
+    fun loadGame(): SaveState? {
+        val loaded = SaveLoadSystem.load() ?: return null
+        playerState = loaded.playerState
+        refreshCityScreen()
+        return loaded
+    }
+}
