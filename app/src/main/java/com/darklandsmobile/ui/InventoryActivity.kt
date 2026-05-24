@@ -6,6 +6,8 @@ import com.darklandsmobile.core.GameRepository
 import com.darklandsmobile.databinding.ActivityInventoryBinding
 import com.darklandsmobile.systems.InventorySystem
 
+// Ekran ekwipunku - lista przedmiotow z numeracja, podstawowe info i akcja "uzyj".
+// Uzytkownik podaje 1-indeksowany numer przedmiotu, aktywujemy przez InventorySystem.useItem(itemId).
 class InventoryActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityInventoryBinding
@@ -18,16 +20,20 @@ class InventoryActivity : AppCompatActivity() {
 
         binding.btnUse.setOnClickListener {
             val idx = binding.etItemIndex.text.toString().toIntOrNull()
-            if (idx != null) {
-                val result = InventorySystem.useItem(idx)
+            val items = GameRepository.state.inventory
+            if (idx != null && idx in 1..items.size) {
+                val itemId = items[idx - 1].id
+                val result = InventorySystem.useItem(itemId)
                 binding.tvResult.text = result
                 render()
+            } else {
+                binding.tvResult.text = "Bledny numer przedmiotu"
             }
         }
     }
 
     private fun render() {
-        val inventory = GameRepository.state.party.inventory
+        val inventory = GameRepository.state.inventory
         val sb = StringBuilder()
         sb.appendLine("=== EKWIPUNEK ===")
         sb.appendLine()
@@ -35,7 +41,9 @@ class InventoryActivity : AppCompatActivity() {
             sb.appendLine("Brak przedmiotow")
         } else {
             inventory.forEachIndexed { i, item ->
-                sb.appendLine("${i + 1}. ${item.name} [${item.type}] - ${item.description}")
+                val effects = if (item.effects.isNotEmpty())
+                    " " + item.effects.entries.joinToString(", ") { (k, v) -> "$k=$v" } else ""
+                sb.appendLine("${i + 1}. ${item.name} [${item.type}]$effects")
             }
         }
         binding.tvInventory.text = sb.toString()

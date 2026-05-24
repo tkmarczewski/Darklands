@@ -77,11 +77,7 @@ enum class Career(
         requiredStrength = 0, requiredAgility = 1, requiredIntelligence = 5,
         intBonus = 3,
         description = "Nauka tajemna. Mikstury, transmutacje, eksperymenty."
-    )
-}
-
-data class CareerEntry(
-    val career: Career,,
+    ),
     CRAFTSMAN(
         displayName = "Rzemieślnik",
         minAge = 14, maxAge = 50,
@@ -130,6 +126,11 @@ data class CareerEntry(
         agiBonus = 1,
         description = "Nauka rzemiosła. Pierwszy krok kariery."
     )
+}
+
+// Wpis w historii kariery bohatera - jaka kariera i ile lat sluzyl.
+data class CareerEntry(
+    val career: Career,
     val yearsServed: Int
 )
 

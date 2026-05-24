@@ -7,7 +7,7 @@ object GameRepository {
         state = GameState()
         val hero1 = Hero(
             id = "hero_1", name = "Friedrich", age = 25,
-            strength = 14, dex = 10, intelligence = 12,
+            strength = 14, agility = 10, intelligence = 12,
             endurance = 13, charisma = 9, piety = 8,
             hp = 35, maxHp = 35
         ).also {
@@ -16,7 +16,7 @@ object GameRepository {
         }
         val hero2 = Hero(
             id = "hero_2", name = "Hildegard", age = 22,
-            strength = 9, dex = 13, intelligence = 16,
+            strength = 9, agility = 13, intelligence = 16,
             endurance = 10, charisma = 14, piety = 18,
             hp = 25, maxHp = 25
         ).also {

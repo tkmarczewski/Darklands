@@ -23,7 +23,6 @@
         <activity android:name=".ui.AlchemyActivity"    android:exported="false"/>
         <activity android:name=".ui.CombatActivity"     android:exported="false"/>
         <activity android:name=".ui.EndgameActivity"    android:exported="false"/>
-        <activity android:name=".ui.EncounterActivity"  android:exported="false"/>
 
         <!-- Sprint 9+: hub testowy i ekrany finalnego pakietu (miasto, reputacja, swieci, eventy, handel, transfer, status walki, questy, final). -->
         <activity android:name=".ui.HubActivity"               android:exported="false"/>

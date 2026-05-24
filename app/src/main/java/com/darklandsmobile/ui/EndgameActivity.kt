@@ -1,20 +1,26 @@
 package com.darklandsmobile.ui
 
-import android.content.Context
 import android.os.Bundle
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
-import com.darklandsmobile.core.GameState
-import com.darklandsmobile.systems.*
+import com.darklandsmobile.core.GameRepository
+import com.darklandsmobile.core.PartyRepository
+import com.darklandsmobile.systems.BossBattleSystem
+import com.darklandsmobile.systems.BossState
+import com.darklandsmobile.systems.EndgameQuestChain
+import com.darklandsmobile.systems.EndgameQuestStatus
+import com.darklandsmobile.systems.EndingSystem
 
+// Ekran finalu: lancuch koncowych questow + walka z bossem. Korzysta wylacznie z GameRepository.state
+// i systems/* - bez zaleznosci od skasowanych modulow Event*.
 class EndgameActivity : AppCompatActivity() {
-    private lateinit var gs: GameState
+
     private var bossState: BossState? = null
     private val log = mutableListOf<String>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        gs = GameState.load(this)
+        val gs = GameRepository.state
 
         val layout = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
@@ -27,32 +33,38 @@ class EndgameActivity : AppCompatActivity() {
 
         fun refreshStatus() {
             val boss = bossState
+            val hero = PartyRepository.activeHero()
             tvStatus.text = if (boss != null) {
                 "Boss HP: ${boss.hp} | Faza: ${boss.phase} | Morale: ${boss.morale}\n" +
-                "Twoje HP: ${gs.battle.hp} | Morale: ${gs.battle.morale}"
+                "Twoje HP: ${hero?.hp ?: 0}/${hero?.maxHp ?: 0}"
             } else {
-                "Finałowe questy:\n" + EndgameQuestChain.quests.joinToString("\n") {
+                "Finalowe questy:\n" + EndgameQuestChain.quests.joinToString("\n") {
                     "  ${it.title}: ${it.status}"
                 }
             }
             tvLog.text = log.takeLast(6).joinToString("\n")
         }
 
+        // Helper: czy quest spelnia wymagania w aktualnym stanie gry.
+        fun isEligible(req: com.darklandsmobile.systems.EndgameRequirements): Boolean {
+            val cityRep = gs.reputation.city.values.sum()
+            val factionRep = gs.reputation.faction.values.sum()
+            return gs.prayer.faith >= req.minFaith &&
+                gs.prayer.virtue >= req.minVirtue &&
+                cityRep >= req.minCityReputation &&
+                factionRep >= req.minFactionReputation &&
+                req.requiredQuestIds.all { id ->
+                    EndgameQuestChain.quests.find { it.id == id }?.status == EndgameQuestStatus.COMPLETED
+                }
+        }
+
         val btnStartChain = Button(this).apply {
-            text = "Rozpocznij finałowy wątek"
+            text = "Rozpocznij finalowy watek"
             setOnClickListener {
                 EndgameQuestChain.quests.forEach { q ->
-                    val req = q.requirements
-                    val eligible = gs.religion.faith >= req.minFaith &&
-                        gs.religion.virtue >= req.minVirtue &&
-                        gs.reputation.cityReputation >= req.minCityReputation &&
-                        gs.reputation.factionReputation >= req.minFactionReputation &&
-                        req.requiredQuestIds.all { id ->
-                            EndgameQuestChain.quests.find { it.id == id }?.status == EndgameQuestStatus.COMPLETED
-                        }
-                    if (eligible && q.status == EndgameQuestStatus.LOCKED) {
+                    if (isEligible(q.requirements) && q.status == EndgameQuestStatus.LOCKED) {
                         q.status = EndgameQuestStatus.AVAILABLE
-                        log.add("Quest dostępny: ${q.title}")
+                        log.add("Quest dostepny: ${q.title}")
                     }
                 }
                 refreshStatus()
@@ -60,46 +72,42 @@ class EndgameActivity : AppCompatActivity() {
         }
 
         val btnCompleteQuest = Button(this).apply {
-            text = "Ukończ aktywny quest"
+            text = "Ukoncz aktywny quest"
             setOnClickListener {
                 val q = EndgameQuestChain.quests.firstOrNull { it.status == EndgameQuestStatus.AVAILABLE }
                 if (q != null) {
                     q.status = EndgameQuestStatus.COMPLETED
                     gs.gold += q.rewards.gold
-                    gs.religion.faith += q.rewards.faithBonus
-                    gs.reputation.cityReputation += q.rewards.reputationBonus
-                    gs.religion.divineFavor += q.rewards.divineFavorBonus
-                    log.add("Ukończono: ${q.title} | +${q.rewards.gold} złota")
+                    gs.prayer.faith = (gs.prayer.faith + q.rewards.faithBonus).coerceAtMost(100)
+                    // Nagroda reputacyjna trafia do pierwszego znanego miasta - upraszczamy.
+                    gs.reputation.city.keys.firstOrNull()?.let { key ->
+                        gs.reputation.city[key] = (gs.reputation.city[key]!! + q.rewards.reputationBonus)
+                            .coerceIn(-100, 100)
+                    }
+                    gs.prayer.blessings += q.rewards.divineFavorBonus
+                    log.add("Ukonczono: ${q.title} | +${q.rewards.gold} zlota")
                     EndgameQuestChain.quests.forEach { nq ->
-                        val req = nq.requirements
-                        val eligible = gs.religion.faith >= req.minFaith &&
-                            gs.religion.virtue >= req.minVirtue &&
-                            gs.reputation.cityReputation >= req.minCityReputation &&
-                            gs.reputation.factionReputation >= req.minFactionReputation &&
-                            req.requiredQuestIds.all { id ->
-                                EndgameQuestChain.quests.find { it.id == id }?.status == EndgameQuestStatus.COMPLETED
-                            }
-                        if (eligible && nq.status == EndgameQuestStatus.LOCKED) {
+                        if (isEligible(nq.requirements) && nq.status == EndgameQuestStatus.LOCKED) {
                             nq.status = EndgameQuestStatus.AVAILABLE
                             log.add("Odblokowano: ${nq.title}")
                         }
                     }
                 } else {
-                    log.add("Brak dostępnych questów.")
+                    log.add("Brak dostepnych questow.")
                 }
                 refreshStatus()
             }
         }
 
         val btnBoss = Button(this).apply {
-            text = "Zmierz się z bossem"
+            text = "Zmierz sie z bossem"
             setOnClickListener {
                 val lastQuest = EndgameQuestChain.quests.last()
                 if (lastQuest.status == EndgameQuestStatus.COMPLETED) {
                     bossState = BossBattleSystem.startBoss(gs)
-                    log.add("Boss battle rozpoczęty!")
+                    log.add("Boss battle rozpoczety!")
                 } else {
-                    log.add("Najpierw ukończ wszystkie finałowe questy.")
+                    log.add("Najpierw ukoncz wszystkie finalowe questy.")
                 }
                 refreshStatus()
             }
@@ -118,9 +126,8 @@ class EndgameActivity : AppCompatActivity() {
                         val ending = EndingSystem.resolveEnding(gs)
                         tvEnding.text = "=== ${ending.title} ===\n${ending.description}"
                         log.add("Koniec gry: ${ending.type}")
-                        gs.save(this@EndgameActivity)
                     } else if (BossBattleSystem.isPlayerDefeated(gs)) {
-                        tvEnding.text = "=== Porażka ===\nZostałeś pokonany przez mroczne siły."
+                        tvEnding.text = "=== Porazka ===\nZostales pokonany przez mroczne sily."
                         log.add("Gracz pokonany.")
                     }
                 } else {
@@ -131,7 +138,7 @@ class EndgameActivity : AppCompatActivity() {
         }
 
         val btnEnding = Button(this).apply {
-            text = "Pokaż zakończenie"
+            text = "Pokaz zakonczenie"
             setOnClickListener {
                 val ending = EndingSystem.resolveEnding(gs)
                 tvEnding.text = "=== ${ending.title} ===\n${ending.description}"
@@ -139,7 +146,7 @@ class EndgameActivity : AppCompatActivity() {
         }
 
         listOf(
-            TextView(this).apply { text = "=== FINAŁ ===" },
+            TextView(this).apply { text = "=== FINAL ===" },
             tvStatus, btnStartChain, btnCompleteQuest, btnBoss, btnAttack, btnEnding,
             tvLog, tvEnding
         ).forEach { layout.addView(it) }

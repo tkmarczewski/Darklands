@@ -209,7 +209,7 @@ object Bestiary {
 
 // ────────── ENCOUNTER DEFINITIONS ─────────────────────────────────────────
 
-data class Encounter(
+data class BattleEncounter(
     val id: String,
     val name: String,
     val enemies: List<EnemyType>,
@@ -218,7 +218,7 @@ data class Encounter(
 
 object EncounterCatalog {
     private val encounters = mapOf(
-        "combat_bandits" to Encounter(
+        "combat_bandits" to BattleEncounter(
             id = "combat_bandits",
             name = "Bandyci",
             enemies = listOf(
@@ -227,13 +227,13 @@ object EncounterCatalog {
             ),
             difficulty = 2
         ),
-        "combat_alley_thieves" to Encounter(
+        "combat_alley_thieves" to BattleEncounter(
             id = "combat_alley_thieves",
             name = "Złodzieje w zaułku",
             enemies = listOf(EnemyType.BANDIT, EnemyType.BANDIT),
             difficulty = 1
         ),
-        "combat_inn_brawl" to Encounter(
+        "combat_inn_brawl" to BattleEncounter(
             id = "combat_inn_brawl",
             name = "Awantura w karczmie",
             enemies = listOf(
@@ -241,7 +241,7 @@ object EncounterCatalog {
             ),
             difficulty = 1
         ),
-        "combat_wolves" to Encounter(
+        "combat_wolves" to BattleEncounter(
             id = "combat_wolves",
             name = "Wataha wilków",
             enemies = listOf(
@@ -250,7 +250,7 @@ object EncounterCatalog {
             ),
             difficulty = 2
         ),
-        "combat_undead" to Encounter(
+        "combat_undead" to BattleEncounter(
             id = "combat_undead",
             name = "Szkielety",
             enemies = listOf(
@@ -259,7 +259,7 @@ object EncounterCatalog {
             ),
             difficulty = 2
         ),
-        "combat_cultists" to Encounter(
+        "combat_cultists" to BattleEncounter(
             id = "combat_cultists",
             name = "Kultyści",
             enemies = listOf(
@@ -268,7 +268,7 @@ object EncounterCatalog {
             ),
             difficulty = 4
         ),
-        "combat_raubritter_scouts" to Encounter(
+        "combat_raubritter_scouts" to BattleEncounter(
             id = "combat_raubritter_scouts",
             name = "Zwiadowcy raubrittera",
             enemies = listOf(
@@ -277,7 +277,7 @@ object EncounterCatalog {
             ),
             difficulty = 3
         ),
-        "combat_raubritter_boss" to Encounter(
+        "combat_raubritter_boss" to BattleEncounter(
             id = "combat_raubritter_boss",
             name = "Raubritter i jego straż",
             enemies = listOf(
@@ -287,7 +287,7 @@ object EncounterCatalog {
             ),
             difficulty = 5
         ),
-        "combat_dragon" to Encounter(
+        "combat_dragon" to BattleEncounter(
             id = "combat_dragon",
             name = "Smok",
             enemies = listOf(EnemyType.DRAGON),
@@ -295,6 +295,6 @@ object EncounterCatalog {
         )
     )
 
-    fun get(id: String): Encounter = encounters[id] ?: error("Unknown encounter: $id")
-    fun all(): List<Encounter> = encounters.values.toList()
+    fun get(id: String): BattleEncounter = encounters[id] ?: error("Unknown encounter: $id")
+    fun all(): List<BattleEncounter> = encounters.values.toList()
 }

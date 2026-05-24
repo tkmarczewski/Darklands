@@ -2,10 +2,10 @@ package com.darklandsmobile.ui
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import com.darklandsmobile.R
 import com.darklandsmobile.core.GameRepository
 import com.darklandsmobile.databinding.ActivityPartyBinding
 
+// Ekran druzyny - prosty dump skladu z atrybutami pierwszej linii statystyk.
 class PartyActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityPartyBinding
@@ -18,16 +18,19 @@ class PartyActivity : AppCompatActivity() {
     }
 
     private fun render() {
-        val party = GameRepository.state.party
+        val state = GameRepository.state
+        val party = state.party
         val sb = StringBuilder()
         sb.appendLine("=== DRUZYNA ===")
         sb.appendLine()
-        party.members.forEachIndexed { i, hero ->
-            sb.appendLine("${i + 1}. ${hero.name} (${hero.heroClass})")
-            sb.appendLine("   HP: ${hero.hp}/${hero.maxHp}  Sila: ${hero.strength}  Zrecznosc: ${hero.dexterity}")
-            sb.appendLine("   Wiara: ${hero.faith}  Reputacja: ${hero.reputation}")
+        party.forEachIndexed { i, hero ->
+            val careerName = hero.currentCareer?.displayName ?: "Bez kariery"
+            sb.appendLine("${i + 1}. ${hero.name} ($careerName)")
+            sb.appendLine("   HP: ${hero.hp}/${hero.maxHp}  Sila: ${hero.strength}  Zwinnosc: ${hero.agility}")
+            sb.appendLine("   Wiara: ${state.prayer.faith}  Cnota: ${hero.virtue}")
             sb.appendLine()
         }
+        sb.appendLine("Zloto druzyny: ${state.gold}")
         binding.tvParty.text = sb.toString()
     }
 }

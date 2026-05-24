@@ -1,10 +1,10 @@
 package com.darklandsmobile.systems
 
 import com.darklandsmobile.core.GameRepository
-import com.darklandsmobile.core.FactionReputation.FactionCatalogue
+import com.darklandsmobile.core.FactionCatalogue
 
 /**
- * Reputacja per miasto i per frakcja oraz prosty wpływ na ceny.
+ * Reputacja per miasto i per frakcja oraz prosty wplyw na ceny.
  */
 object ReputationSystem {
 
@@ -22,7 +22,7 @@ object ReputationSystem {
         GameRepository.state.reputation.city.toMap()
 
     fun changeFaction(factionId: String, delta: Int): String {
-        val faction = FactionCatalogue.all().firstOrNull { it.id == factionId }
+        val faction = FactionCatalogue.factions.firstOrNull { it.id == factionId }
             ?: return "Nieznana frakcja: $factionId"
         val rep = GameRepository.state.reputation
         rep.faction[factionId] = (rep.faction.getOrDefault(factionId, 0) + delta).coerceIn(-100, 100)

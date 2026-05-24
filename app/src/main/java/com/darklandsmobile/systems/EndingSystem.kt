@@ -11,49 +11,48 @@ data class Ending(
     val description: String
 )
 
+// Wybor zakonczenia liczony z stanu modlitwy (faith/virtue/sins/blessings) i sumy reputacji w miastach.
 object EndingSystem {
     fun resolveEnding(gameState: GameState): Ending {
-        val faith = gameState.religion.faith
-        val virtue = gameState.religion.virtue
-        val cityRep = gameState.reputation.cityReputation
-        val sins = gameState.religion.sins
-        val divineFavor = gameState.religion.divineFavor
+        val faith = gameState.prayer.faith
+        val virtue = gameState.prayer.virtue
+        val cityRep = gameState.reputation.city.values.sum()
+        val sins = gameState.prayer.sins
+        val divineFavor = gameState.prayer.blessings
 
         return when {
-            faith >= 8 && virtue >= 6 && cityRep >= 5 && sins <= 2 ->
+            faith >= 60 && virtue >= 50 && cityRep >= 20 && sins <= 2 ->
                 Ending(
                     EndingType.GOOD,
                     "Oczyszczenie",
-                    "Twoja wiara i cnota przyniosły pokój. Świat odzyskał równowagę, " +
-                    "a twoje imię zostało zapisane wśród świętych obrońców."
+                    "Twoja wiara i cnota przyniosly pokoj. Swiat odzyskal rownowage, " +
+                    "a twoje imie zostalo zapisane wsrod swietych obroncow."
                 )
-            faith >= 5 && cityRep >= 3 && sins <= 5 ->
+            faith >= 30 && cityRep >= 10 && sins <= 5 ->
                 Ending(
                     EndingType.PRAGMATIC,
-                    "Gorzkie Zwycięstwo",
-                    "Pokonałeś zagrożenie, ale świat pozostał poranny. " +
-                    "Historia zapamięta cię jako skutecznego, lecz nie czystego."
+                    "Gorzkie Zwyciestwo",
+                    "Pokonales zagrozenie, ale swiat pozostal poraniony. " +
+                    "Historia zapamieta cie jako skutecznego, lecz nie czystego."
                 )
-            divineFavor >= 10 && sins >= 6 ->
+            divineFavor >= 5 && sins >= 6 ->
                 Ending(
                     EndingType.REDEMPTION,
                     "Odkupienie",
-                    "Mimo ciężkich strat i grzechów, łaska boska nie opuściła cię. " +
+                    "Mimo ciezkich strat i grzechow, laska boska nie opuscila cie. " +
                     "Twoje odkupienie jest prawdziwe i kosztowne."
                 )
             else ->
                 Ending(
                     EndingType.CORRUPTED,
-                    "Skażenie",
-                    "Zbyt wiele złych wyborów. Świat pochłonęło skażenie, " +
-                    "a ty stałeś się częścią ciemności, którą chciałeś pokonać."
+                    "Skazenie",
+                    "Zbyt wiele zlych wyborow. Swiat pochlonelo skazenie, " +
+                    "a ty stales sie czescia ciemnosci, ktora chciales pokonac."
                 )
         }
     }
 
-    // Sprint 17: tekstowy status finalu (Baphomet / koniec gry) dla BaphometActivity (UI sprintu 12+).
-    // Nie wywoluje resolveEnding bezposrednio, bo wymaga to pol stanu z resztki repo;
-    // zwraca tekst opisujacy biezacy etap finalu w oparciu o stan modlitwy/reputacji.
+    // Sprint 17: tekstowy status finalu (Baphomet / koniec gry) dla BaphometActivity.
     fun finaleStatus(): String {
         val s = GameRepository.state
         val faith = s.prayer.faith

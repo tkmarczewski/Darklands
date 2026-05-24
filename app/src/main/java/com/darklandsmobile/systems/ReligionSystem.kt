@@ -2,10 +2,10 @@ package com.darklandsmobile.systems
 
 import com.darklandsmobile.core.GameRepository
 import com.darklandsmobile.core.SaintCatalogue
-import com.darklandsmobile.core.Religion.ShrineType
+import com.darklandsmobile.core.ShrineType
 
 /**
- * Religia: modlitwa, grzech, cnota i łaska świętych.
+ * Religia: modlitwa, grzech, cnota i laska swietych.
  */
 object ReligionSystem {
 
@@ -16,7 +16,9 @@ object ReligionSystem {
         val gain = when (shrineType) {
             ShrineType.CATHEDRAL -> 10
             ShrineType.CHAPEL -> 5
+            ShrineType.MONASTERY -> 4
             ShrineType.ROADSIDE -> 2
+            ShrineType.RUINS -> 1
         }
 
         p.favor[saintId] = (p.favor.getOrDefault(saintId, 0) + gain).coerceIn(0, 100)

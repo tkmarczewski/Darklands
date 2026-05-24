@@ -15,7 +15,7 @@ object CharacterFactory {
             age = startingAge,
             strength = 8,
             agility = 8,
-            dex = 8,
+            perception = 8,
             intelligence = 8,
             endurance = 10,
             charisma = 8,
