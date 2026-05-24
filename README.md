@@ -1,5 +1,6 @@
 # Darklands
 
+[![Android CI](https://github.com/tkmarczewski/Darklands/actions/workflows/android-ci.yml/badge.svg)](https://github.com/tkmarczewski/Darklands/actions/workflows/android-ci.yml)
 [![MIT License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
 Darklands Mobile — gra RPG na Androida inspirowana średniowieczem.
