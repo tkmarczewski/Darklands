@@ -5,10 +5,6 @@ import com.darklandsmobile.core.QuestJournalState
 import com.darklandsmobile.core.ResolutionScreenState
 import com.darklandsmobile.core.TravelScreenState
 
-/**
- * Compose-ready text renderers that can be converted into real @Composable screens.
- * They stay framework-light so they can compile even before Android UI wiring is restored.
- */
 object GameplayScreens {
 
     fun renderCity(state: CityScreenState): String = buildString {
@@ -50,7 +46,7 @@ object GameplayScreens {
         appendLine("Completed quests: ${state.completedQuestIds.size}")
         appendLine("Entries:")
         state.entries.forEach { entry ->
-            appendLine("- ${entry.questId}: ${entry.title} [${entry.status}] ${entry.rewardGold}g @ ${entry.cityId}")
+            appendLine("- ${entry.questId}: ${entry.title} [${entry.status}] ${entry.notes}")
         }
     }
 }

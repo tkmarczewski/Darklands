@@ -16,19 +16,45 @@
             android:layout_height="wrap_content"
             android:fontFamily="monospace"
             android:textColor="#c8a96e"
-            android:textSize="13sp" />
+            android:textSize="14sp"
+            android:paddingBottom="16dp" />
 
-        <Button android:id="@+id/btnParty"     android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Druzyna"    android:layout_marginTop="8dp"/>
-        <Button android:id="@+id/btnCharacter" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Postac"/>
-        <Button android:id="@+id/btnInventory" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Ekwipunek"/>
-        <Button android:id="@+id/btnMap"       android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Mapa"/>
-        <Button android:id="@+id/btnPrayer"    android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Modlitwa"/>
-        <Button android:id="@+id/btnAlchemy"   android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Alchemia"/>
-        <Button android:id="@+id/btnCombat"    android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Walka"/>
-        <Button android:id="@+id/btnQuest"     android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Quest"/>
-        <Button android:id="@+id/btnEvent"     android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Zdarzenie"/>
-        <Button android:id="@+id/btnSave"      android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Zapisz"/>
-        <Button android:id="@+id/btnEndgame"   android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Endgame"/>
+        <Button
+            android:id="@+id/btnBootstrap"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Bootstrap MVP" />
+
+        <Button
+            android:id="@+id/btnCity"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="Show City" />
+
+        <Button
+            android:id="@+id/btnAcceptQuest"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Accept First Quest" />
+
+        <Button
+            android:id="@+id/btnTravel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Travel To Quest" />
+
+        <Button
+            android:id="@+id/btnResolve"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Resolve Quest" />
+
+        <Button
+            android:id="@+id/btnJournal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Show Journal" />
 
     </LinearLayout>
 </ScrollView>
