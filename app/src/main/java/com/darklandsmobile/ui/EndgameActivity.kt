@@ -48,15 +48,15 @@ class EndgameActivity : AppCompatActivity() {
         // Helper: czy quest spelnia wymagania w aktualnym stanie gry.
         fun isEligible(req: com.darklandsmobile.systems.EndgameRequirements): Boolean {
             val cityRep = gs.reputation.city.values.sum()
-            val factionRep = gs.reputation.faction.values.sum()
+            val factionRep = 0
             return gs.prayer.faith >= req.minFaith &&
-                gs.prayer.virtue >= req.minVirtue &&
-                cityRep >= req.minCityReputation &&
-                factionRep >= req.minFactionReputation &&
-                req.requiredQuestIds.all { id ->
-                    EndgameQuestChain.quests.find { it.id == id }?.status == EndgameQuestStatus.COMPLETED
-                }
+            gs.prayer.virtue >= req.minVirtue &&
+            cityRep >= req.minCityReputation &&
+            factionRep >= req.minFactionReputation &&
+            req.requiredQuestIds.all { id ->
+            EndgameQuestChain.quests.find { it.id == id }?.status == EndgameQuestStatus.COMPLETED
         }
+}
 
         val btnStartChain = Button(this).apply {
             text = "Rozpocznij finalowy watek"
