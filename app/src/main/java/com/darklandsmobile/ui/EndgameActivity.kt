@@ -56,7 +56,7 @@ class EndgameActivity : AppCompatActivity() {
             req.requiredQuestIds.all { id ->
             EndgameQuestChain.quests.find { it.id == id }?.status == EndgameQuestStatus.COMPLETED
         }
-}
+}}
 
         val btnStartChain = Button(this).apply {
             text = "Rozpocznij finalowy watek"

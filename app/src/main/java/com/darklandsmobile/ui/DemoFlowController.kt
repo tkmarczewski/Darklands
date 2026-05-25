@@ -1,8 +1,8 @@
 package com.darklandsmobile.ui
 
-object DemoFlowController {
-    fun title(): String = "Darklands MVP Demo"
-
-    fun description(): String =
-        "Legacy demo flow is currently disabled. Use MainActivity for the MVP vertical slice."
+class DemoFlowController {
+    fun mainMenu(): String = "Darklands MVP Demo"
+    fun select(cityId: String): String = "Selected city: $cityId"
+    fun openCurrentSlice(): String = "Legacy demo flow is disabled. Use MainActivity for the MVP slice."
+    fun addPlaytestNote(note: String): String = "Playtest note saved: $note"
 }
