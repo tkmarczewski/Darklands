@@ -5,7 +5,6 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.darklandsmobile.R
 import com.darklandsmobile.core.GameRepository
-import com.darklandsmobile.core.WorldMap
 import com.darklandsmobile.systems.TravelSystem
 
 class MapActivity : AppCompatActivity() {
@@ -16,33 +15,19 @@ class MapActivity : AppCompatActivity() {
 
         val tv = findViewById<TextView>(R.id.tvMap)
         val w = GameRepository.state.world
-        val sb = StringBuilder()
 
-        sb.appendLine("=== MAPA SWIATA ===")
-        sb.appendLine("Dzien: ${w.day} | Pora roku: ${TravelSystem.getSeasonDisplay()}")
-        sb.appendLine("Pora dnia: ${w.timeOfDay} | Zmeczenie: ${w.fatigue}")
-        sb.appendLine()
-
-        val nodes = WorldMap.all()
-        val regions = nodes.map { node -> node.region }.distinct()
-
-        regions.forEach { region ->
-            val marker = if (region == w.region) ">> " else "   "
-            sb.appendLine("$marker${region.uppercase()}")
-
-            nodes.filter { node -> node.region == region }
-                .forEach { node ->
-                    val locMarker = if (node.name == w.location) "  * " else "    "
-                    sb.appendLine("$locMarker${node.name}")
-                }
+        tv.text = buildString {
+            appendLine("=== MAPA SWIATA ===")
+            appendLine("Aktualna lokacja: ${w.location}")
+            appendLine("Region: ${w.region}")
+            appendLine("Dzien: ${w.day}")
+            appendLine("Pora roku: ${TravelSystem.getSeasonDisplay()}")
+            appendLine("Pora dnia: ${w.timeOfDay}")
+            appendLine("Zmeczenie: ${w.fatigue}")
+            appendLine("Ostatnie spotkanie: ${w.lastEncounter}")
+            appendLine()
+            appendLine("Mapa MVP jest obecnie uproszczona.")
+            appendLine("Pelny widok polaczen miast zostanie przywrocony po stabilizacji vertical slice.")
         }
-
-        sb.appendLine()
-        sb.appendLine("Aktualna lokacja: ${w.location} (${w.region})")
-        if (w.lastEncounter != "none") {
-            sb.appendLine("Ostatnie spotkanie: ${w.lastEncounter}")
-        }
-
-        tv.text = sb.toString()
     }
 }
