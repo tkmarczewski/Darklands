@@ -13,8 +13,9 @@ class MapActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_map)
+
         val tv = findViewById<TextView>(R.id.tvMap)
-        val w  = GameRepository.state.world
+        val w = GameRepository.state.world
         val sb = StringBuilder()
 
         sb.appendLine("=== MAPA SWIATA ===")
@@ -22,22 +23,26 @@ class MapActivity : AppCompatActivity() {
         sb.appendLine("Pora dnia: ${w.timeOfDay} | Zmeczenie: ${w.fatigue}")
         sb.appendLine()
 
-        // Derive unique regions from node list
-        val regions = WorldMap.all().map { it.region }.distinct()
+        val nodes = WorldMap.all()
+        val regions = nodes.map { node -> node.region }.distinct()
+
         regions.forEach { region ->
             val marker = if (region == w.region) ">> " else "   "
             sb.appendLine("$marker${region.uppercase()}")
-            // List nodes in this region
-            WorldMap.all().filter { it.region == region }.forEach { node ->
-                val locMarker = if (node.name == w.location) "  * " else "    "
-                sb.appendLine("$locMarker${node.name}")
-            }
+
+            nodes.filter { node -> node.region == region }
+                .forEach { node ->
+                    val locMarker = if (node.name == w.location) "  * " else "    "
+                    sb.appendLine("$locMarker${node.name}")
+                }
         }
+
         sb.appendLine()
         sb.appendLine("Aktualna lokacja: ${w.location} (${w.region})")
         if (w.lastEncounter != "none") {
             sb.appendLine("Ostatnie spotkanie: ${w.lastEncounter}")
         }
+
         tv.text = sb.toString()
     }
 }

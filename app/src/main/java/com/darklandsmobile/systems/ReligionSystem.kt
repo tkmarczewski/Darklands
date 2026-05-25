@@ -4,9 +4,6 @@ import com.darklandsmobile.core.GameRepository
 import com.darklandsmobile.core.SaintCatalogue
 import com.darklandsmobile.core.ShrineType
 
-/**
- * Religia: modlitwa, grzech, cnota i laska swietych.
- */
 object ReligionSystem {
 
     fun pray(saintId: String, shrineType: ShrineType): String {
@@ -21,12 +18,12 @@ object ReligionSystem {
             ShrineType.RUINS -> 1
         }
 
-        p.favor[saintId] = (p.favor.getOrDefault(saintId, 0) + gain).coerceIn(0, 100)
         p.faith = minOf(100, p.faith + gain)
-        p.blessings++
+        p.virtue = minOf(100, p.virtue + (gain / 2).coerceAtLeast(1))
+        p.blessings += 1
 
-        GameRepository.log("Modlitwa do ${saint.name} przy ${shrineType.name}. Laska: ${p.favor[saintId]}")
-        return "Modlitwa do ${saint.name}. +$gain laski. Wiara: ${p.faith}"
+        GameRepository.log("Modlitwa do ${saint.name} przy ${shrineType.name}. Wiara: ${p.faith}")
+        return "Modlitwa do ${saint.name}. +$gain wiary. Wiara: ${p.faith}"
     }
 
     fun sin(amount: Int = 1): String {
@@ -40,6 +37,8 @@ object ReligionSystem {
 
     fun allSaints() = SaintCatalogue.all()
 
-    fun favorFor(saintId: String): Int =
-        GameRepository.state.prayer.favor.getOrDefault(saintId, 0)
+    fun favorFor(saintId: String): Int {
+        val p = GameRepository.state.prayer
+        return (p.faith + p.blessings * 5 - p.sins * 2).coerceIn(0, 100)
+    }
 }
