@@ -15,29 +15,41 @@ object MagdeburgSliceSystem {
 
     fun seed() {
         ExpandedContentSeeder.seed(seed = 34)
+
         QuestSystem.register(
             QuestEntry(
                 id = "quest_magdeburg_dock_watch",
                 title = "Watch the River Docks",
+                description = "Keep eyes on suspicious cargo moving after curfew.",
                 cityId = "magdeburg",
+                originType = QuestOriginType.CITY_EVENT,
+                originRefId = "magdeburg_dock_watch",
                 rewardGold = 85,
                 status = QuestStatus.AVAILABLE
             )
         )
+
         QuestSystem.register(
             QuestEntry(
                 id = "quest_magdeburg_smuggler_letters",
                 title = "Intercept Smuggler Letters",
+                description = "Recover encoded letters before the guild learns too much.",
                 cityId = "magdeburg",
+                originType = QuestOriginType.CITY_EVENT,
+                originRefId = "magdeburg_smuggler_letters",
                 rewardGold = 105,
                 status = QuestStatus.AVAILABLE
             )
         )
+
         QuestSystem.register(
             QuestEntry(
                 id = "quest_magdeburg_night_patrol",
                 title = "Join the Night Patrol",
+                description = "Walk with the night watch and survive the alleys.",
                 cityId = "magdeburg",
+                originType = QuestOriginType.CITY_EVENT,
+                originRefId = "magdeburg_night_patrol",
                 rewardGold = 70,
                 status = QuestStatus.AVAILABLE
             )

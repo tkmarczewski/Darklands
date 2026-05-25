@@ -20,9 +20,36 @@ object RegionalSliceSystem {
             backgroundUrl = "https://commons.wikimedia.org/wiki/Special:FilePath/Prague%20Castle%20as%20seen%20at%20night.jpg",
             referenceTitle = "Prague Castle as seen at night",
             quests = listOf(
-                QuestEntry("quest_praha_cathedral_watch", "Guard the Cathedral Steps", "praha", 95, QuestStatus.AVAILABLE),
-                QuestEntry("quest_praha_alchemist_debt", "Collect the Alchemist's Debt", "praha", 80, QuestStatus.AVAILABLE),
-                QuestEntry("quest_praha_scriptorium_fire", "Investigate the Scriptorium Fire", "praha", 120, QuestStatus.AVAILABLE)
+                QuestEntry(
+                    id = "quest_praha_cathedral_watch",
+                    title = "Guard the Cathedral Steps",
+                    description = "Keep watch near the cathedral after dark.",
+                    cityId = "praha",
+                    originType = QuestOriginType.CITY_EVENT,
+                    originRefId = "praha_cathedral_watch",
+                    rewardGold = 95,
+                    status = QuestStatus.AVAILABLE
+                ),
+                QuestEntry(
+                    id = "quest_praha_alchemist_debt",
+                    title = "Collect the Alchemist's Debt",
+                    description = "Recover payment owed to a nervous alchemist.",
+                    cityId = "praha",
+                    originType = QuestOriginType.CITY_EVENT,
+                    originRefId = "praha_alchemist_debt",
+                    rewardGold = 80,
+                    status = QuestStatus.AVAILABLE
+                ),
+                QuestEntry(
+                    id = "quest_praha_scriptorium_fire",
+                    title = "Investigate the Scriptorium Fire",
+                    description = "Find out who profited from the fire in the scriptorium.",
+                    cityId = "praha",
+                    originType = QuestOriginType.CITY_EVENT,
+                    originRefId = "praha_scriptorium_fire",
+                    rewardGold = 120,
+                    status = QuestStatus.AVAILABLE
+                )
             )
         ),
         "koln" to SliceDef(
@@ -31,9 +58,36 @@ object RegionalSliceSystem {
             backgroundUrl = "https://commons.wikimedia.org/wiki/Special:FilePath/Cologne%20Cathedral%20at%20night%20-%20Cologne%2C%20Germany%20-%20DSC09696.jpg",
             referenceTitle = "Cologne Cathedral at night",
             quests = listOf(
-                QuestEntry("quest_koln_relic_guard", "Guard the Pilgrim Relics", "koln", 100, QuestStatus.AVAILABLE),
-                QuestEntry("quest_koln_wharf_extortion", "Break the Wharf Extortion Ring", "koln", 90, QuestStatus.AVAILABLE),
-                QuestEntry("quest_koln_cathedral_letters", "Carry Letters to the Chapter", "koln", 75, QuestStatus.AVAILABLE)
+                QuestEntry(
+                    id = "quest_koln_relic_guard",
+                    title = "Guard the Pilgrim Relics",
+                    description = "Keep relic traffic secure during the evening rush.",
+                    cityId = "koln",
+                    originType = QuestOriginType.CITY_EVENT,
+                    originRefId = "koln_relic_guard",
+                    rewardGold = 100,
+                    status = QuestStatus.AVAILABLE
+                ),
+                QuestEntry(
+                    id = "quest_koln_wharf_extortion",
+                    title = "Break the Wharf Extortion Ring",
+                    description = "Find who is squeezing the dockworkers for coin.",
+                    cityId = "koln",
+                    originType = QuestOriginType.CITY_EVENT,
+                    originRefId = "koln_wharf_extortion",
+                    rewardGold = 90,
+                    status = QuestStatus.AVAILABLE
+                ),
+                QuestEntry(
+                    id = "quest_koln_cathedral_letters",
+                    title = "Carry Letters to the Chapter",
+                    description = "Deliver sealed letters before sunrise prayers.",
+                    cityId = "koln",
+                    originType = QuestOriginType.CITY_EVENT,
+                    originRefId = "koln_cathedral_letters",
+                    rewardGold = 75,
+                    status = QuestStatus.AVAILABLE
+                )
             )
         ),
         "brno" to SliceDef(
@@ -42,9 +96,36 @@ object RegionalSliceSystem {
             backgroundUrl = "https://commons.wikimedia.org/wiki/Special:FilePath/Brno%20-%20Zeln%C3%BD%20trh%20-%20night.jpg",
             referenceTitle = "Night in Brno reference",
             quests = listOf(
-                QuestEntry("quest_brno_market_spy", "Find the Market Informant", "brno", 70, QuestStatus.AVAILABLE),
-                QuestEntry("quest_brno_gate_patrol", "Reinforce the South Gate", "brno", 85, QuestStatus.AVAILABLE),
-                QuestEntry("quest_brno_caravan_oath", "Witness a Caravan Oath", "brno", 95, QuestStatus.AVAILABLE)
+                QuestEntry(
+                    id = "quest_brno_market_spy",
+                    title = "Find the Market Informant",
+                    description = "A whisper network in the market hides one useful witness.",
+                    cityId = "brno",
+                    originType = QuestOriginType.CITY_EVENT,
+                    originRefId = "brno_market_spy",
+                    rewardGold = 70,
+                    status = QuestStatus.AVAILABLE
+                ),
+                QuestEntry(
+                    id = "quest_brno_gate_patrol",
+                    title = "Reinforce the South Gate",
+                    description = "Join the watch before tensions spill into violence.",
+                    cityId = "brno",
+                    originType = QuestOriginType.CITY_EVENT,
+                    originRefId = "brno_gate_patrol",
+                    rewardGold = 85,
+                    status = QuestStatus.AVAILABLE
+                ),
+                QuestEntry(
+                    id = "quest_brno_caravan_oath",
+                    title = "Witness a Caravan Oath",
+                    description = "Stand witness to a deal that may not hold until dawn.",
+                    cityId = "brno",
+                    originType = QuestOriginType.CITY_EVENT,
+                    originRefId = "brno_caravan_oath",
+                    rewardGold = 95,
+                    status = QuestStatus.AVAILABLE
+                )
             )
         ),
         "wroclaw" to SliceDef(
@@ -53,9 +134,36 @@ object RegionalSliceSystem {
             backgroundUrl = "https://commons.wikimedia.org/wiki/Special:FilePath/Tumski%20Bridge%20in%20Wroc%C5%82aw%2C%20Poland.jpg",
             referenceTitle = "Tumski Bridge in Wroclaw",
             quests = listOf(
-                QuestEntry("quest_wroclaw_bridge_watch", "Watch the Tumski Crossing", "wroclaw", 90, QuestStatus.AVAILABLE),
-                QuestEntry("quest_wroclaw_boatmen_dispute", "Settle the Boatmen Dispute", "wroclaw", 80, QuestStatus.AVAILABLE),
-                QuestEntry("quest_wroclaw_river_relic", "Recover the River Relic", "wroclaw", 110, QuestStatus.AVAILABLE)
+                QuestEntry(
+                    id = "quest_wroclaw_bridge_watch",
+                    title = "Watch the Tumski Crossing",
+                    description = "Observe suspicious movement across the bridge after dark.",
+                    cityId = "wroclaw",
+                    originType = QuestOriginType.CITY_EVENT,
+                    originRefId = "wroclaw_bridge_watch",
+                    rewardGold = 90,
+                    status = QuestStatus.AVAILABLE
+                ),
+                QuestEntry(
+                    id = "quest_wroclaw_boatmen_dispute",
+                    title = "Settle the Boatmen Dispute",
+                    description = "Calm a river quarrel before blades come out.",
+                    cityId = "wroclaw",
+                    originType = QuestOriginType.CITY_EVENT,
+                    originRefId = "wroclaw_boatmen_dispute",
+                    rewardGold = 80,
+                    status = QuestStatus.AVAILABLE
+                ),
+                QuestEntry(
+                    id = "quest_wroclaw_river_relic",
+                    title = "Recover the River Relic",
+                    description = "Track a sacred object lost in the river trade.",
+                    cityId = "wroclaw",
+                    originType = QuestOriginType.CITY_EVENT,
+                    originRefId = "wroclaw_river_relic",
+                    rewardGold = 110,
+                    status = QuestStatus.AVAILABLE
+                )
             )
         ),
         "vienna" to SliceDef(
@@ -64,9 +172,36 @@ object RegionalSliceSystem {
             backgroundUrl = "https://commons.wikimedia.org/wiki/Special:FilePath/St.%20Stephen%27s%20Cathedral%20Vienna%20April%202007%20front.jpg",
             referenceTitle = "Vienna cathedral reference",
             quests = listOf(
-                QuestEntry("quest_vienna_court_mask", "Deliver a Masked Invitation", "vienna", 100, QuestStatus.AVAILABLE),
-                QuestEntry("quest_vienna_treasury_rumor", "Trace the Treasury Rumor", "vienna", 120, QuestStatus.AVAILABLE),
-                QuestEntry("quest_vienna_watch_captain", "Aid the Watch Captain", "vienna", 85, QuestStatus.AVAILABLE)
+                QuestEntry(
+                    id = "quest_vienna_court_mask",
+                    title = "Deliver a Masked Invitation",
+                    description = "Carry a discreet invitation through the court district.",
+                    cityId = "vienna",
+                    originType = QuestOriginType.CITY_EVENT,
+                    originRefId = "vienna_court_mask",
+                    rewardGold = 100,
+                    status = QuestStatus.AVAILABLE
+                ),
+                QuestEntry(
+                    id = "quest_vienna_treasury_rumor",
+                    title = "Trace the Treasury Rumor",
+                    description = "Follow a dangerous rumor before it reaches the wrong ears.",
+                    cityId = "vienna",
+                    originType = QuestOriginType.CITY_EVENT,
+                    originRefId = "vienna_treasury_rumor",
+                    rewardGold = 120,
+                    status = QuestStatus.AVAILABLE
+                ),
+                QuestEntry(
+                    id = "quest_vienna_watch_captain",
+                    title = "Aid the Watch Captain",
+                    description = "Support the city watch in a politically sensitive matter.",
+                    cityId = "vienna",
+                    originType = QuestOriginType.CITY_EVENT,
+                    originRefId = "vienna_watch_captain",
+                    rewardGold = 85,
+                    status = QuestStatus.AVAILABLE
+                )
             )
         )
     )
