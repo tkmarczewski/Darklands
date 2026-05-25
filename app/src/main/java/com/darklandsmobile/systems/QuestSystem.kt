@@ -103,4 +103,13 @@ object QuestSystem {
         originRefId = id,
         rewardGold = rewardGold
     )
+
+    // dla MainActivity:QuestSystem.start("forest_hermit")
+    fun start(questId: String): String {
+        seedIntegratedContent()
+        val resolvedId = if (quests.containsKey(questId)) questId else quests.keys.firstOrNull()
+            ?: return "Brak dostępnych questów."
+        val quest = activate(resolvedId)
+        return "Rozpoczęto quest: ${quest.title}"
+    }
 }

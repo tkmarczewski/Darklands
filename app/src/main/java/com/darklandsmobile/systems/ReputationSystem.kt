@@ -1,5 +1,7 @@
 package com.darklandsmobile.systems
 
+import com.darklandsmobile.world.CityCatalogue
+
 enum class CityFaction {
     KNIGHTS,
     MERCHANTS,
@@ -53,4 +55,12 @@ object ReputationSystem {
 
     fun snapshot(): Map<String, Map<CityFaction, Int>> =
         localReputations.mapValues { (_, rep) -> rep.factionScores.toMap() }
+
+    // 1) zwraca sumę reputationu miasta (wszystkie frakcje)
+    fun getCityRep(cityId: String): Int =
+        ensureCity(cityId).factionScores.values.sum()
+
+    // 2) zwraca mapę miasto -> total reputation
+    fun allCities(): Map<String, Int> =
+        localReputations.mapValues { (_, rep) -> rep.factionScores.values.sum() }
 }

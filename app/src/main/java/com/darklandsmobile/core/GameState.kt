@@ -8,5 +8,6 @@ data class GameState(
     val logEntries: MutableList<String> = mutableListOf(),
     val combat: CombatState = CombatState(),
     val prayer: PrayerState = PrayerState(),
-    val reputation: ReputationState = ReputationState()
+    val reputation: ReputationState = ReputationState(),
+    var gold: Int = 100
 )

@@ -4,6 +4,8 @@ import com.darklandsmobile.core.TravelPartyState
 import com.darklandsmobile.core.TravelResult
 import com.darklandsmobile.core.TravelRules
 import com.darklandsmobile.core.WorldMap
+import com.darklandsmobile.core.GameRepository
+import com.darklandsmobile.core.Season
 import kotlin.random.Random
 
 /**
@@ -48,4 +50,35 @@ object TravelSystem {
     fun restInCity(partyState: TravelPartyState, restHours: Int = 8): TravelPartyState {
         return partyState.copy(fatigue = TravelRules.reduceFatigueWithRest(partyState.fatigue, restHours))
     }
+
+    // wrapper dla MainActivity.travelTo
+    fun travelTo(region: String): String {
+        val w = GameRepository.state.world
+        w.region = region
+        w.location = region.replaceFirstChar { it.uppercase() }
+        w.day += 1
+        w.timeOfDay = when (w.timeOfDay) {
+            "morning" -> "afternoon"
+            "afternoon" -> "evening"
+            "evening" -> "night"
+            else -> "morning"
+        }
+        w.fatigue += 1
+        w.lastEncounter = when (region) {
+            "forest" -> "wolves"
+            "road" -> "bandits"
+            else -> "none"
+        }
+        GameRepository.log("Podróż do regionu: $region")
+        return "Podróż do $region zakończona."
+    }
+
+    // wrapper dla MainActivity.getSeasonDisplay
+    fun getSeasonDisplay(): String =
+        when (GameRepository.state.world.season) {
+            Season.SPRING -> "Wiosna"
+            Season.SUMMER -> "Lato"
+            Season.AUTUMN -> "Jesień"
+            Season.WINTER -> "Zima"
+        }
 }

@@ -16,8 +16,7 @@ object QuestJournalSystem {
                 questId = quest.id,
                 title = quest.title,
                 status = status,
-                cityId = quest.cityId,
-                rewardGold = quest.rewardGold
+                notes = "City: ${quest.cityId}, reward: ${quest.rewardGold} gold"
             )
         }
 

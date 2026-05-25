@@ -123,9 +123,4 @@ object CityEventSystem {
                 CityEventFaction.NONE -> true
                 CityEventFaction.KNIGHTS -> ReputationSystem.score(cityId, CityFaction.KNIGHTS) >= event.requiredReputation
                 CityEventFaction.MERCHANTS -> ReputationSystem.score(cityId, CityFaction.MERCHANTS) >= event.requiredReputation
-                CityEventFaction.CHURCH -> ReputationSystem.score(cityId, CityFaction.CHURCH) >= event.requiredReputation
-                CityEventFaction.COMMONERS -> ReputationSystem.score(cityId, CityFaction.COMMONERS) >= event.requiredReputation
-            }
-        }
-    }
-}
+                CityEventFaction.CHURCH -> ReputationSystem.score(cityId, CityFaction.CHURCH) 

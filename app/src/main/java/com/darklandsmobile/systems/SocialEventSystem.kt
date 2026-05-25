@@ -10,7 +10,7 @@ import com.darklandsmobile.world.CityCatalogue
 object SocialEventSystem {
     fun cityAudience(cityId: String, saintId: String? = null): String {
         val city = CityCatalogue.get(cityId) ?: return "Nieznane miasto: $cityId"
-        val rep = ReputationSystem.getCityRep(city.name)
+        val rep = ReputationSystem.getCityRep(cityId)  // używamy cityId, nie nazwy miasta
         val saint = saintId?.let { SaintCatalogue.get(it) }
         val base = when {
             rep >= 50 -> "Mieszczanie witają was przychylnie."

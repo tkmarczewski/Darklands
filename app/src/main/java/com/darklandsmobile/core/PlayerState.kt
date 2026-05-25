@@ -9,5 +9,5 @@ data class PlayerState(
     val completedQuestIds: List<String> = emptyList(),
     val finalQuestSummary: String = "",
     val questLog: List<QuestLogEntry> = emptyList(),
-    val travelState: TravelState = TravelState()
+    val travelState: TravelPartyState = TravelPartyState()
 )
