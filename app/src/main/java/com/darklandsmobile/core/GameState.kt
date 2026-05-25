@@ -6,5 +6,7 @@ data class GameState(
     val inventory: MutableList<Item> = mutableListOf(),
     var activeHeroId: String? = null,
     val logEntries: MutableList<String> = mutableListOf(),
-    val combat: CombatState = CombatState()
+    val combat: CombatState = CombatState(),
+    val prayer: PrayerState = PrayerState(),
+    val reputation: ReputationState = ReputationState()
 )
