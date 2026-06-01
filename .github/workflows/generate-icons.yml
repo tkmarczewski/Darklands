@@ -1,0 +1,38 @@
+name: Generate GrimReich Icons
+
+on:
+  workflow_dispatch:
+
+jobs:
+  generate-icons:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Pillow
+        run: pip install Pillow
+
+      - name: Run icon generator script
+        run: python generate_grimreich_icons.py
+
+      - name: Copy generated icons to drawable
+        run: |
+          mkdir -p app/src/main/res/drawable
+          cp output/drawable/*.png app/src/main/res/drawable/
+
+      - name: Commit and push icons
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add app/src/main/res/drawable/
+          git diff --cached --quiet || git commit -m "assets: GrimReich icons generated via script"
+          git push
