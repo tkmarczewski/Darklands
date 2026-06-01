@@ -3,7 +3,7 @@
     <application
         android:allowBackup="true"
         android:label="@string/app_name"
-        android:theme="@style/Theme.DarklandsMobile"
+        android:theme="@style/Theme.GrimReich"
         android:supportsRtl="true">
 
         <!-- Glowny launcher gry. Hub testowy sprintow 9+ uruchamia sie z poziomu MainActivity. -->
@@ -15,26 +15,26 @@
         </activity>
 
         <!-- Activities sprzed sprintow UI 8-17 (rdzen gry: party, postac, ekwipunek, mapa, modlitwa itd.). -->
-        <activity android:name=".ui.PartyActivity"      android:exported="false"/>
-        <activity android:name=".ui.CharacterActivity"  android:exported="false"/>
-        <activity android:name=".ui.InventoryActivity"  android:exported="false"/>
-        <activity android:name=".ui.MapActivity"        android:exported="false"/>
-        <activity android:name=".ui.PrayerActivity"     android:exported="false"/>
-        <activity android:name=".ui.AlchemyActivity"    android:exported="false"/>
-        <activity android:name=".ui.CombatActivity"     android:exported="false"/>
-        <activity android:name=".ui.EndgameActivity"    android:exported="false"/>
+        <activity android:name=".ui.PartyActivity"           android:exported="false"/>
+        <activity android:name=".ui.CharacterActivity"       android:exported="false"/>
+        <activity android:name=".ui.InventoryActivity"       android:exported="false"/>
+        <activity android:name=".ui.MapActivity"             android:exported="false"/>
+        <activity android:name=".ui.PrayerActivity"          android:exported="false"/>
+        <activity android:name=".ui.AlchemyActivity"         android:exported="false"/>
+        <activity android:name=".ui.CombatActivity"          android:exported="false"/>
+        <activity android:name=".ui.EndgameActivity"         android:exported="false"/>
 
         <!-- Sprint 9+: hub testowy i ekrany finalnego pakietu (miasto, reputacja, swieci, eventy, handel, transfer, status walki, questy, final). -->
-        <activity android:name=".ui.HubActivity"               android:exported="false"/>
-        <activity android:name=".ui.CityActivity"              android:exported="false"/>
-        <activity android:name=".ui.ReputationActivity"        android:exported="false"/>
-        <activity android:name=".ui.SaintsActivity"            android:exported="false"/>
-        <activity android:name=".ui.CityEventsActivity"        android:exported="false"/>
-        <activity android:name=".ui.TradeActivity"             android:exported="false"/>
-        <activity android:name=".ui.InventoryTransferActivity" android:exported="false"/>
-        <activity android:name=".ui.InventoryDetailActivity"   android:exported="false"/>
-        <activity android:name=".ui.CombatStatusActivity"      android:exported="false"/>
-        <activity android:name=".ui.QuestFinalActivity"        android:exported="false"/>
-        <activity android:name=".ui.BaphometActivity"          android:exported="false"/>
+        <activity android:name=".ui.HubActivity"                  android:exported="false"/>
+        <activity android:name=".ui.CityActivity"                 android:exported="false"/>
+        <activity android:name=".ui.ReputationActivity"           android:exported="false"/>
+        <activity android:name=".ui.SaintsActivity"               android:exported="false"/>
+        <activity android:name=".ui.CityEventsActivity"           android:exported="false"/>
+        <activity android:name=".ui.TradeActivity"                android:exported="false"/>
+        <activity android:name=".ui.InventoryTransferActivity"    android:exported="false"/>
+        <activity android:name=".ui.InventoryDetailActivity"      android:exported="false"/>
+        <activity android:name=".ui.CombatStatusActivity"         android:exported="false"/>
+        <activity android:name=".ui.QuestFinalActivity"           android:exported="false"/>
+        <activity android:name=".ui.BaphometActivity"             android:exported="false"/>
     </application>
 </manifest>
