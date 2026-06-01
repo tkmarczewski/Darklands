@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Darklands Mobile</string>
+    <string name="app_name">GrimReich</string>
     <string name="btn_party">Druzyna</string>
     <string name="btn_character">Postac</string>
     <string name="btn_inventory">Ekwipunek</string>
