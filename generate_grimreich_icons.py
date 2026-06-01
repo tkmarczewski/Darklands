@@ -75,7 +75,7 @@ def draw_scroll(draw, c, color):
     draw.ellipse([(s(c[0]-14),s(c[1]-16)),(s(c[0]+14),s(c[1]-8))], fill=(180,160,100))
     draw.ellipse([(s(c[0]-14),s(c[1]+8)),(s(c[0]+14),s(c[1]+16))], fill=(180,160,100))
     draw.ellipse([(s(c[0]-6),s(c[1]+4)),(s(c[0]+6),s(c[1]+10))], fill=(120,80,40))
-    
+
 # --- STATS ---
 def draw_stats_str(draw, c, color):
     draw.ellipse([(s(c[0]-16),s(c[1]-16)),(s(c[0]+16),s(c[1]+16))], fill=(140,20,20))
@@ -95,7 +95,8 @@ def draw_stats_will(draw, c, color):
     draw.ellipse([(s(c[0]-16),s(c[1]-16)),(s(c[0]+16),s(c[1]+16))], fill=(60,20,100))
     draw.polygon([(s(c[0]),s(c[1]-16)),(s(c[0]+4),s(c[1]-4)),(s(c[0]+8),s(c[1]+12)),
                   (s(c[0]),s(c[1]+6)),(s(c[0]-8),s(c[1]+12)),(s(c[0]-4),s(c[1]-4))], fill=(240,220,80))
-    draw.ellipse([(s(c[0]-2),s(c[0]-2)),(s(c[0]+2),s(c[1]+2))], fill=(255,200,50))
+    # BUGFIX: było s(c[0]-2) zamiast s(c[1]-2) w y-koordynacie
+    draw.ellipse([(s(c[0]-2),s(c[1]-2)),(s(c[0]+2),s(c[1]+2))], fill=(255,200,50))
 
 def draw_stats_know(draw, c, color):
     draw.ellipse([(s(c[0]-16),s(c[1]-16)),(s(c[0]+16),s(c[1]+16))], fill=(20,60,140))
@@ -184,22 +185,26 @@ def draw_status_intox(draw, c, color):
 
 def draw_status_curse(draw, c, color):
     draw.ellipse([(s(c[0]-16),s(c[1]-16)),(s(c[0]+16),s(c[1]+16))], fill=(60,20,80))
-    draw.line([(s(c[0]-s(10)),s(c[1]-s(8)),(s(c[0])+s(10)),s(c[1]+s(8))], fill=(200,80,255), width=s(3))
-    draw.line([(s(c[0]+s(10),s(c[1]-s(8)),(s(c[0])-s(10),s(c[1]+s(8))], fill=(200,80,255), width=s(3))
+    # BUGFIX: brakujące nawiasy zamykające
+    draw.line([(s(c[0]-s(10)),s(c[1]-s(8))),(s(c[0])+s(10),s(c[1]+s(8)))], fill=(200,80,255), width=s(3))
+    draw.line([(s(c[0]+s(10)),s(c[1]-s(8))),(s(c[0])-s(10),s(c[1]+s(8)))], fill=(200,80,255), width=s(3))
 
 def draw_status_protect(draw, c, color):
     draw.ellipse([(s(c[0]-16),s(c[1]-16)),(s(c[0]+16),s(c[1]+16))], fill=(20,40,100))
-    draw.ellipse([(s(c[0]-10),s(c[1]-10)),(s(c[0]+10),s(c[1]+10)], fill=(100,160,240))
+    # BUGFIX: brakujący nawias zamykający po s(c[1]+10)
+    draw.ellipse([(s(c[0]-10),s(c[1]-10)),(s(c[0]+10),s(c[1]+10))], fill=(100,160,240))
     draw.ellipse([(s(c[0]-6),s(c[1]-6)),(s(c[0]+6),s(c[1]+6))], fill=(60,120,200))
 
 def draw_status_regen(draw, c, color):
     draw.ellipse([(s(c[0]-16),s(c[1]-16)),(s(c[0]+16),s(c[1]+16))], fill=(20,80,20))
-    draw.ellipse([(s(c[0]-8),s(c[1]-8)),(s(c[0]+8)),(s(c[0]+8),s(c[1]+8))], fill=(100,220,100))
+    # BUGFIX: nadmiarowy element (s(c[0]+8)) przed przecinkiem
+    draw.ellipse([(s(c[0]-8),s(c[1]-8)),(s(c[0]+8),s(c[1]+8))], fill=(100,220,100))
     draw.line([(s(c[0])-s(2),s(c[1])),(s(c[0]+10),s(c[1]))], fill=(0,180,40), width=s(3))
 
 def draw_status_silence(draw, c, color):
     draw.ellipse([(s(c[0]-16),s(c[1]-16)),(s(c[0]+16),s(c[1]+16))], fill=(40,40,60))
-    draw.line([(s(c[0]-s(12),s(c[1]-s(8)),(s(c[0])+s(12),s(c[1]+s(8))], fill=(200,80,180), width=s(3))
+    # BUGFIX: brakujące nawiasy zamykające
+    draw.line([(s(c[0]-s(12)),s(c[1]-s(8))),(s(c[0])+s(12),s(c[1]+s(8)))], fill=(200,80,180), width=s(3))
 
 # --- ALCHEMY ---
 def draw_alchemy_hp_plus(draw, c, color):
@@ -207,24 +212,22 @@ def draw_alchemy_hp_plus(draw, c, color):
     draw.rectangle([(s(c[0]-8),s(c[1]-4)),(s(c[0]+8),s(c[1]+18))], fill=(200,60,60))
     draw.rectangle([(s(c[0]-4),s(c[1]-16)),(s(c[0]+4),s(c[1]-4))], fill=(140,140,140))
     draw.polygon([(s(c[0]+2),s(c[1]+0)),(s(c[0]+2),s(c[1]-6)),(s(c[0]+8),s(c[1]-6)),
-                  (s(c[0]+
-
-8),s(c[1]-3)),(s(c[0]+4),s(c[1]-3)),(s(c[0]+4),s(c[1]+0))], fill=(240,220,80))
+                  (s(c[0]+8),s(c[1]-3)),(s(c[0]+4),s(c[1]-3)),(s(c[0]+4),s(c[1]+0))], fill=(240,220,80))
 
 def draw_alchemy_mp_plus(draw, c, color):
     draw.ellipse([(s(c[0]-16),s(c[1]-16)),(s(c[0]+16),s(c[1]+16))], fill=(20,40,120))
     draw.rectangle([(s(c[0]-8),s(c[1]-4)),(s(c[0]+8),s(c[1]+18))], fill=(80,140,220))
     draw.rectangle([(s(c[0]-4),s(c[1]-16)),(s(c[0]+4),s(c[1]-4))], fill=(140,140,140))
-    draw.polygon([(s(c[0]+
-
-2),s(c[1]+0)),(s(c[0]+2),s(c[1]-6)),(s(c[0]+8),s(c[1]-6)),(s(c[0]+8),s(c[1]-3)),(s(c[0]+4),s(c[1]-3)),(s(c[0]+4),s(c[1]+0))], fill=(200,220,255))
+    draw.polygon([(s(c[0]+2),s(c[1]+0)),(s(c[0]+2),s(c[1]-6)),(s(c[0]+8),s(c[1]-6)),
+                  (s(c[0]+8),s(c[1]-3)),(s(c[0]+4),s(c[1]-3)),(s(c[0]+4),s(c[1]+0))], fill=(200,220,255))
 
 def draw_alchemy_str(draw, c, color):
     draw.ellipse([(s(c[0]-16),s(c[1]-16)),(s(c[0]+16),s(c[1]+16))], fill=(120,20,40))
     draw.rectangle([(s(c[0]-8),s(c[1]-4)),(s(c[0]+8),s(c[1]+18))], fill=(200,60,80))
     draw.rectangle([(s(c[0]-4),s(c[1]-16)),(s(c[0]+4),s(c[1]-4))], fill=(140,140,140))
     draw.line([(s(c[0]),s(c[1]+2)),(s(c[0]),s(c[1]+14))], fill=(220,180,40), width=s(2))
-    draw.line([(s(c[0]-s(6),s(c[1]+8)),(s(c[0])+s(6),s(c[1]+8))], fill=(220,180,40), width=s(2))
+    # BUGFIX: brakujący nawias zamykający
+    draw.line([(s(c[0]-s(6)),s(c[1]+8)),(s(c[0])+s(6),s(c[1]+8))], fill=(220,180,40), width=s(2))
 
 def draw_alchemy_dex(draw, c, color):
     draw.ellipse([(s(c[0]-16),s(c[1]-16)),(s(c[0]+16),s(c[1]+16))], fill=(20,100,40))
@@ -298,16 +301,16 @@ def draw_sigil_light(draw, c, color):
 
 def draw_sigil_shadow(draw, c, color):
     draw.ellipse([(s(c[0]-16),s(c[1]-16)),(s(c[0]+16),s(c[1]+16))], fill=(80,80,100))
-    draw.polygon([(s(c[0]),s(c[1]-14)),(s(c[0])+s(
-
-10),s(c[1]+6)),(s(c[0])+s(4),s(c[1]+14)),(s(c[0])-s(6),s(c[1]+10)),(s(c[0])-s(10),s(c[1]+2))], fill=(40,40,60))
+    draw.polygon([(s(c[0]),s(c[1]-14)),(s(c[0])+s(10),s(c[1]+6)),(s(c[0])+s(4),s(c[1]+14)),
+                  (s(c[0])-s(6),s(c[1]+10)),(s(c[0])-s(10),s(c[1]+2))], fill=(40,40,60))
 
 # --- COMBAT ---
 def draw_combat_attack(draw, c, color):
     draw.ellipse([(s(c[0]-16),s(c[1]-16)),(s(c[0]+16),s(c[1]+16))], fill=(80,20,20))
-    pts = [(s(c[0]-s(4)),s(c[1]+s(18)),(s(c[0]+s(4)),s(c[1]+s(18)),(s(c[0]),s(c[1]-s(14)))]
+    # BUGFIX: brakujące nawiasy zamykające
+    pts = [(s(c[0]-s(4)),s(c[1]+s(18))),(s(c[0]+s(4)),s(c[1]+s(18))),(s(c[0]),s(c[1]-s(14)))]
     draw.polygon(pts, fill=(200,200,210))
-    draw.polygon([(s(c[0]),s(c[1]-s(14)),(s(c[0])+s(8),s(c[1]-s(12)),(s(c[0])+s(14),s(c[1]-s(8))], fill=(180,180,190))
+    draw.polygon([(s(c[0]),s(c[1]-s(14))),(s(c[0])+s(8),s(c[1]-s(12))),(s(c[0])+s(14),s(c[1]-s(8)))], fill=(180,180,190))
 
 def draw_combat_defend(draw, c, color):
     draw.ellipse([(s(c[0]-16),s(c[1]-16)),(s(c[0]+16),s(c[1]+16))], fill=(20,60,100))
@@ -315,158 +318,125 @@ def draw_combat_defend(draw, c, color):
     draw.line([(s(c[0]),s(c[1]-12)),(s(c[0]),s(c[1]+14))], fill=(200,220,255), width=s(2))
 
 def draw_combat_dodge(draw, c, color):
-    draw.ellipse([(s(c[0]-16),s(c[1]-16)),(s(c[0]+16,s(c[1]+16))], fill=(40,80,20))
-    pts = [(s(c[0]+s(10),s(c[1]-s(12)),(s(c[0]+s(10),s(c[1]+s(12)),(s(c[0]-s(6),s(c[1]+s(4)),(s(c[0]+s(2),s(c[1]))]
+    # BUGFIX: brakujące nawiasy zamykające
+    draw.ellipse([(s(c[0]-16),s(c[1]-16)),(s(c[0]+16),s(c[1]+16))], fill=(40,80,20))
+    pts = [(s(c[0]+s(10)),s(c[1]-s(12))),(s(c[0]+s(10)),s(c[1]+s(12))),(s(c[0]-s(6)),s(c[1]+s(4))),(s(c[0]+s(2)),s(c[1]))]
     draw.polygon(pts, fill=(200,230,160))
-    draw.polygon([(s(c[0]-s(6),s(c[1]+s(0)),(s(c[0]-s(14),s(c[1]-s(4)),(s(c[0]-s(14),s(c[1]+s(4))], fill=(160,200,100))
+    draw.polygon([(s(c[0]-s(6)),s(c[1]+s(0))),(s(c[0]-s(14)),s(c[1]-s(4))),(s(c[0]-s(14)),s(c[1]+s(4)))], fill=(160,200,100))
 
 def draw_combat_counter(draw, c, color):
-    draw.ellipse([(s(c[0]-16),s(c[1]-16)),(s(c[0
-
-]+16),s(c[1]+16))], fill=(100,40,40))
-    draw.line([(s(c[0]-s(12),s(c[1]-s(8)),(s(c[0])+s(12),s(c[1]+s(8))], fill=(200,200,220), width=s(3))
-    draw.line([(s(c[0]+s(12),s(c[1]-s(8)),(s(c[0])-s(12),s(c[1]+s(8))], fill=(200,200,220), width=s(3))
+    draw.ellipse([(s(c[0]-16),s(c[1]-16)),(s(c[0]+16),s(c[1]+16))], fill=(100,40,40))
+    # BUGFIX: brakujące nawiasy zamykające
+    draw.line([(s(c[0]-s(12)),s(c[1]-s(8))),(s(c[0])+s(12),s(c[1]+s(8)))], fill=(200,200,220), width=s(3))
+    draw.line([(s(c[0]+s(12)),s(c[1]-s(8))),(s(c[0])-s(12),s(c[1]+s(8)))], fill=(200,200,220), width=s(3))
 
 def draw_combat_special(draw, c, color):
     draw.ellipse([(s(c[0]-16),s(c[1]-16)),(s(c[0]+16),s(c[1]+16))], fill=(80,20,80))
     for i in range(5):
         a = i * 1.256
-        draw.line([(s(c[0]),s(c[1])),(s(c[0])+s(12),s(c[1]))], fill=(220,80,220
-
-), width=s(2))
+        draw.line([(s(c[0]),s(c[1])),(s(c[0])+s(12),s(c[1]))], fill=(220,80,220), width=s(2))
 
 def draw_combat_magic(draw, c, color):
     draw.ellipse([(s(c[0]-16),s(c[1]-16)),(s(c[0]+16),s(c[1]+16))], fill=(40,20,80))
     draw.polygon([(s(c[0]),s(c[1]-12)),(s(c[0])+s(10),s(c[1]+4)),(s(c[0]),s(c[1]+12)),(s(c[0])-s(10),s(c[1]+4))], fill=(160,100,220))
-    draw.ellipse([(s(c[0]-s(3),s(c[1]-s(2)),(s(c[0]+
-
-s(3),s(c[1]+s(2))], fill=(220,180,255))
+    # BUGFIX: brakujące nawiasy zamykające
+    draw.ellipse([(s(c[0]-s(3)),s(c[1]-s(2))),(s(c[0]+s(3)),s(c[1]+s(2)))], fill=(220,180,255))
 
 def draw_combat_shoot(draw, c, color):
     draw.ellipse([(s(c[0]-16),s(c[1]-16)),(s(c[0]+16),s(c[1]+16))], fill=(60,40,40))
-    draw.polygon([(s(c[0]-s(14),s(c[1]),(s(c[0]-s(8),s(c[1]-s(3)),(s(c[0]-s(8),s(c[1]+s(3))], fill=(180,180,200))
-    draw.line([(s(c[0]-s(14),s(c[
-
-1]),(s(c[0])+s(12),s(c[1]))], fill=(220,220,240), width=s(2))
+    # BUGFIX: brakujące nawiasy zamykające
+    draw.polygon([(s(c[0]-s(14)),s(c[1])),(s(c[0]-s(8)),s(c[1]-s(3))),(s(c[0]-s(8)),s(c[1]+s(3)))], fill=(180,180,200))
+    draw.line([(s(c[0]-s(14)),s(c[1])),(s(c[0])+s(12),s(c[1]))], fill=(220,220,240), width=s(2))
 
 def draw_combat_break(draw, c, color):
     draw.ellipse([(s(c[0]-16),s(c[1]-16)),(s(c[0]+16),s(c[1]+16))], fill=(80,40,20))
     draw.ellipse([(s(c[0]-10),s(c[1]-10)),(s(c[0]+10),s(c[1]+10))], fill=(140,140,160))
-    draw.line([(s
-
-(c[0]-s(6),-s(8)),(s(c[0])+s(4),s(c[1]+s(2))], fill=(255,80,80), width=s(2))
-    draw.line([(s(c[0]-s(2),-s(10)),(s(c[0])+s(8),s(c[1]+s(4))], fill=(255,80,80), width=s(2))
+    # BUGFIX: brakujące c[1] w y-koordynacie (było samo -s(8))
+    draw.line([(s(c[0]-s(6)),s(c[1]-s(8))),(s(c[0])+s(4),s(c[1]+s(2)))], fill=(255,80,80), width=s(2))
+    draw.line([(s(c[0]-s(2)),s(c[1]-s(10))),(s(c[0])+s(8),s(c[1]+s(4)))], fill=(255,80,80), width=s(2))
 
 # --- DAMAGE ---
 def draw_damage_slash(draw, c, color):
-    draw.ellipse([(s(c[0]-16),s(c[
-
-1]-16)),(s(c[0]+16),s(c[1]+16))], fill=(80,20,20))
-    draw.line([(s(c[0]-s(14),s(c[1]-s(4)),(s(c[0])+s(14),s(c[1]+s(4))], fill=(240,200,180), width=s(4))
-    draw.line([(s(c[0]-s(12),s(c[1]+s(2)),(s(c[0])+s(12),s(c[1]-s(2
-
-))], fill=(240,200,180), width=s(4))
+    draw.ellipse([(s(c[0]-16),s(c[1]-16)),(s(c[0]+16),s(c[1]+16))], fill=(80,20,20))
+    # BUGFIX: brakujące nawiasy zamykające
+    draw.line([(s(c[0]-s(14)),s(c[1]-s(4))),(s(c[0])+s(14),s(c[1]+s(4)))], fill=(240,200,180), width=s(4))
+    draw.line([(s(c[0]-s(12)),s(c[1]+s(2))),(s(c[0])+s(12),s(c[1]-s(2)))], fill=(240,200,180), width=s(4))
 
 def draw_damage_pierce(draw, c, color):
     draw.ellipse([(s(c[0]-16),s(c[1]-16)),(s(c[0]+16),s(c[1]+16))], fill=(60,40,20))
-    draw.polygon([(s(c[0]),s(c[1]-14)),(s(c[0])+s(4
-
-),s(c[1]-8)),(s(c[0])+s(8),s(c[1]+8)),(s(c[0])+s(4),s(c[1]+14)),(s(c[0]),s(c[1]+14)),(s(c[0])-s(4),s(c[1]+8)),(s(c[0])-s(4),s(c[1]-8))], fill=(200,220
-
-,190))
+    draw.polygon([(s(c[0]),s(c[1]-14)),(s(c[0])+s(4),s(c[1]-8)),(s(c[0])+s(8),s(c[1]+8)),
+                  (s(c[0])+s(4),s(c[1]+14)),(s(c[0]),s(c[1]+14)),(s(c[0])-s(4),s(c[1]+8)),(s(c[0])-s(4),s(c[1]-8))], fill=(200,220,190))
 
 def draw_damage_blunt(draw, c, color):
     draw.ellipse([(s(c[0]-16),s(c[1]-16)),(s(c[0]+16),s(c[1]+16))], fill=(60,40,20))
-    draw.rectangle([(s(c[0]-s(8),s(c[1]-s(10)),(s(c[0]+s(8),s(c[1]+s(10))], fill=(180,1
-
-70,150))
+    # BUGFIX: brakujące nawiasy zamykające
+    draw.rectangle([(s(c[0]-s(8)),s(c[1]-s(10))),(s(c[0]+s(8)),s(c[1]+s(10)))], fill=(180,170,150))
 
 def draw_damage_fire(draw, c, color):
     draw.ellipse([(s(c[0]-16),s(c[1]-16)),(s(c[0]+16),s(c[1]+16))], fill=(100,20,0))
-    pts = [(s(c[0]),s(c[1]-14)),(s(c[0])+s(8),s(c[1]+4)),(s(c[0])-
-
-s(6),s(c[1]+6)),(s(c[0])+s(6),s(c[1]+10)),(s(c[0])-s(10),s(c[1]+12)),(s(c[0]),s(c[1]+8))]
+    pts = [(s(c[0]),s(c[1]-14)),(s(c[0])+s(8),s(c[1]+4)),(s(c[0])-s(6),s(c[1]+6)),
+           (s(c[0])+s(6),s(c[1]+10)),(s(c[0])-s(10),s(c[1]+12)),(s(c[0]),s(c[1]+8))]
     draw.polygon(pts, fill=(255,140,0))
 
 # --- SYSTEM ---
 def draw_system_map(draw, c, color):
-    draw.ellipse([(s(c[0]-
-
-16),s(c[1]-16)),(s(c[0]+16),s(c[1]+16))], fill=(80,60,30))
-    draw.polygon([(s(c[0]-s(12),s(c[1]-s(10)),(s(c[0]+s(12),s(c[1]-s(8)),(s(c[0]+s(12),s(c[1]+s(8)),(s
-
-(c[0]-s(12),s(c[1]+s(10))], fill=(200,170,120))
-    draw.line([(s(c[0]-s(4),s(c[1]-s(6)),(s(c[0])+s(8),s(c[1]))], fill=(80,60,40), width=s(1))
-    draw.line([(s(c[0]-s(4
-
-),s(c[1]+s(2)),(s(c[0])+s(8),s(c[1]+s(8))], fill=(80,60,40), width=s(1))
+    draw.ellipse([(s(c[0]-16),s(c[1]-16)),(s(c[0]+16),s(c[1]+16))], fill=(80,60,30))
+    # BUGFIX: brakujące nawiasy zamykające
+    draw.polygon([(s(c[0]-s(12)),s(c[1]-s(10))),(s(c[0]+s(12)),s(c[1]-s(8))),
+                  (s(c[0]+s(12)),s(c[1]+s(8))),(s(c[0]-s(12)),s(c[1]+s(10)))], fill=(200,170,120))
+    draw.line([(s(c[0]-s(4)),s(c[1]-s(6))),(s(c[0])+s(8),s(c[1]))], fill=(80,60,40), width=s(1))
+    draw.line([(s(c[0]-s(4)),s(c[1]+s(2))),(s(c[0])+s(8),s(c[1]+s(8)))], fill=(80,60,40), width=s(1))
 
 def draw_system_journal(draw, c, color):
     draw.ellipse([(s(c[0]-16),s(c[1]-16)),(s(c[0]+16),s(c[1]+16))], fill=(80,60,40))
-    
-draw.rectangle([(s(c[0]-s(10),s(c[1]-s(12)),(s(c[0]+s(10),s(c[1]+s(12))], fill=(200,170,120))
-    draw.rectangle([(s(c[0]-s(10),s(c[1]-s(12)),(s(c[0]-s(8
-
-),s(c[1]+s(12))], fill=(60,40,20))
-    draw.polygon([(s(c[0]+s(8),s(c[1]-s(12)),(s(c[0]+s(14),s(c[1]-s(6)),(s(c[0]+s(14),s(c[1]+s(0)),(s(c[0]+s(8),s(c[1]+
-
-s(4))], fill=(200,170,120))
+    # BUGFIX: brakujące nawiasy zamykające
+    draw.rectangle([(s(c[0]-s(10)),s(c[1]-s(12))),(s(c[0]+s(10)),s(c[1]+s(12)))], fill=(200,170,120))
+    draw.rectangle([(s(c[0]-s(10)),s(c[1]-s(12))),(s(c[0]-s(8)),s(c[1]+s(12)))], fill=(60,40,20))
+    draw.polygon([(s(c[0]+s(8)),s(c[1]-s(12))),(s(c[0]+s(14)),s(c[1]-s(6))),
+                  (s(c[0]+s(14)),s(c[1]+s(0))),(s(c[0]+s(8)),s(c[1]+s(4)))], fill=(200,170,120))
 
 def draw_system_quests(draw, c, color):
-    draw.ellipse([(s(c[0]-16),s(c[1]-16)),(s(c[0]+16),s(c[1]+16))], fill=(80,40,
-20))
-    draw.rectangle([(s(c[0]-s(10),s(c[1]-s(12)),(s(c[0]+s(10),s(c[1]+s(12))], fill=(220,200,160))
-    draw.ellipse([(s(c[0]-s(8),s(c[1]+s(8)),(s(c[0]-s(4),s
-
-(c[1]+s(12))], fill=(160,40,40))
+    draw.ellipse([(s(c[0]-16),s(c[1]-16)),(s(c[0]+16),s(c[1]+16))], fill=(80,40,20))
+    # BUGFIX: brakujące nawiasy zamykające
+    draw.rectangle([(s(c[0]-s(10)),s(c[1]-s(12))),(s(c[0]+s(10)),s(c[1]+s(12)))], fill=(220,200,160))
+    draw.ellipse([(s(c[0]-s(8)),s(c[1]+s(8))),(s(c[0]-s(4)),s(c[1]+s(12)))], fill=(160,40,40))
     for y in [-s(6),0,6]:
-        draw.line([(s(c[0]-s(6),s(c[1]+y)),(s(c[0])+s(6),s(c[1]+y))], fill=(120,80,40), width=s(1))
+        draw.line([(s(c[0]-s(6)),s(c[1]+y)),(s(c[0])+s(6),s(c[1]+y))], fill=(120,80,40), width=s(1))
 
-def draw_system_
-settings(draw, c, color):
+def draw_system_settings(draw, c, color):
     draw.ellipse([(s(c[0]-16),s(c[1]-16)),(s(c[0]+16),s(c[1]+16))], fill=(60,40,20))
-    draw.ellipse([(s(c[0]-s(10),s(c[1]-s(10)),(s(c[0]+s(10),s(c[1]+s(10))],
- fill=(100,80,40))
+    # BUGFIX: brakujące nawiasy zamykające
+    draw.ellipse([(s(c[0]-s(10)),s(c[1]-s(10))),(s(c[0]+s(10)),s(c[1]+s(10)))], fill=(100,80,40))
     for i in range(6):
         a = i * 1.047
         x = s(int(s(12) * s(1)))
         y = s(0)
-        draw.ellipse([(s(c[0])+s(10),
-s(c[1]-s(4)),(s(c[0])+s(14),s(c[1]+s(4))], fill=(80,100,120))
-    draw.ellipse([(s(c[0]-s(4),s(c[1]-s(4)),(s(c[0]+s(4),s(c[1]+s(4))], fill=(140,160,180))
+        draw.ellipse([(s(c[0])+s(10),s(c[1]-s(4))),(s(c[0])+s(14),s(c[1]+s(4)))], fill=(80,100,120))
+    draw.ellipse([(s(c[0]-s(4)),s(c[1]-s(4))),(s(c[0]+s(4)),s(c[1]+s(4)))], fill=(140,160,180))
 
-# --- CATEGORY MAP
-PING ---
+# --- CATEGORY MAPPING ---
 fs_map = {
     "sword": draw_sword, "axe": draw_axe, "spear": draw_spear, "shield": draw_shield,
     "helmet": draw_helmet, "armor": draw_armor, "pouch": draw_pouch, "book": draw_book,
     "potion_red": draw_potion, "potion_blue": draw_potion, "potion_green": draw_potion, "scroll": draw_scroll,
-    "str
-": draw_stats_str, "dex": draw_stats_dex, "will": draw_stats_will, "know": draw_stats_know,
+    "str": draw_stats_str, "dex": draw_stats_dex, "will": draw_stats_will, "know": draw_stats_know,
     "cha": draw_stats_cha, "luck": draw_stats_luck, "perception": draw_stats_perception, "endurance": draw_stats_endurance,
-    "poison": draw_status_poison, "bleed": draw_status_bleed, "fear
-": draw_status_fear, "bless": draw_status_bless,
+    "poison": draw_status_poison, "bleed": draw_status_bleed, "fear": draw_status_fear, "bless": draw_status_bless,
     "fatigue": draw_status_fatigue, "freeze": draw_status_freeze, "fire_status": draw_status_fire, "intox": draw_status_intox,
     "curse": draw_status_curse, "protect": draw_status_protect, "regen": draw_status_regen, "silence": draw_status_silence,
-    "hp
-_plus": draw_alchemy_hp_plus, "mp_plus": draw_alchemy_mp_plus, "alchemy_str": draw_alchemy_str, "alchemy_dex": draw_alchemy_dex,
+    "hp_plus": draw_alchemy_hp_plus, "mp_plus": draw_alchemy_mp_plus, "alchemy_str": draw_alchemy_str, "alchemy_dex": draw_alchemy_dex,
     "alchemy_res": draw_alchemy_res, "alchemy_oil": draw_alchemy_oil, "strong_poison": draw_alchemy_strong_poison, "alchemy_antidote": draw_alchemy_antidote,
-    
-"rune_def": draw_rune_def, "rune_atk": draw_rune_atk, "rune_alch": draw_rune_alch,
+    "rune_def": draw_rune_def, "rune_atk": draw_rune_atk, "rune_alch": draw_rune_alch,
     "sigil_fire": draw_sigil_fire, "sigil_ice": draw_sigil_ice, "sigil_poison": draw_sigil_poison,
     "sigil_light": draw_sigil_light, "sigil_shadow": draw_sigil_shadow,
-    "combat_attack
-": draw_combat_attack, "combat_defend": draw_combat_defend, "combat_dodge": draw_combat_dodge, "combat_counter": draw_combat_counter,
+    "combat_attack": draw_combat_attack, "combat_defend": draw_combat_defend, "combat_dodge": draw_combat_dodge, "combat_counter": draw_combat_counter,
     "combat_special": draw_combat_special, "combat_magic": draw_combat_magic, "combat_shoot": draw_combat_shoot,
     "combat_break": draw_combat_break,
-    "damage_slash": draw_damage_slash, "
-damage_pierce": draw_damage_pierce, "damage_blunt": draw_damage_blunt, "damage_fire": draw_damage_fire,
+    "damage_slash": draw_damage_slash, "damage_pierce": draw_damage_pierce, "damage_blunt": draw_damage_blunt, "damage_fire": draw_damage_fire,
     "system_map": draw_system_map, "system_journal": draw_system_journal, "system_quests": draw_system_quests, "system_settings": draw_system_settings
 }
 
 def get_fn(name):
-    # strip "ic_" prefix
-
     n = name.replace("ic_", "")
     for key, fn in fs_map.items():
         if key == n:
@@ -484,9 +454,7 @@ def make_icon(fname):
             fn(d, (32, 32), None)
         except:
             pass
-    # vignette border
-    d.rectangle([(0
-, 0), (SIZE-1, SIZE-1)], outline=(80, 60, 40), width=2)
+    d.rectangle([(0, 0), (SIZE-1, SIZE-1)], outline=(80, 60, 40), width=2)
     return img
 
 os.makedirs("output/drawable", exist_ok=True)
@@ -494,5 +462,4 @@ for fname in filenames:
     img = make_icon(fname)
     img.save(f"output/drawable/{fname}.png")
     print(f"Generated: {fname}.png")
-print(f"Done: {len(filenames
-)} icons")
+print(f"Done: {len(filenames)} icons")
