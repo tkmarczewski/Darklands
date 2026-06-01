@@ -50,7 +50,7 @@ def draw_text_symbol(draw, cx, cy, scale, text, color):
         f = ImageFont.truetype("DejaVuSans-Bold.ttf", int(28*scale))
     except:
         f = ImageFont.load_default()
-    w,h = draw.textsize(text, font=f)
+        bbox = f.getbbox(text); w,h = bbox[2]-bbox[0], bbox[3]-bbox[1]
     draw.text((cx-w/2, cy-h/2), text, font=f, fill=color)
 
 # category -> draw function and color
