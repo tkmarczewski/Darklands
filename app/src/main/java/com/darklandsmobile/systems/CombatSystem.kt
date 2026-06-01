@@ -15,25 +15,25 @@ object CombatSystem {
         val hero = PartyRepository.activeHero() ?: return null
         val armorValue = if (hero.equipment["armor"] != null) 3 else 0
         return CombatantState(
-            name        = hero.name,
-            hp          = hero.hp,
-            maxHp       = hero.maxHp,
-            endurance   = hero.endurance,
-            morale      = 70,
-            armor       = armorValue,
-            attackBase  = hero.strength
+            name       = hero.name,
+            hp         = hero.hp,
+            maxHp      = hero.maxHp,
+            endurance  = hero.endurance,
+            morale     = 70,
+            armor      = armorValue,
+            attackBase = hero.strength
         )
     }
 
     fun startCombat(enemyName: String, enemyHp: Int, enemyAttack: Int, enemyDefense: Int) {
         val c = GameRepository.state.combat
-        c.active        = true
-        c.round         = 0
-        c.enemyName     = enemyName
-        c.enemyHp       = enemyHp
-        c.enemyMaxHp    = enemyHp
-        c.enemyAttack   = enemyAttack
-        c.enemyDefense  = enemyDefense
+        c.active      = true
+        c.round       = 0
+        c.enemyName   = enemyName
+        c.enemyHp     = enemyHp
+        c.enemyMaxHp  = enemyHp
+        c.enemyAttack = enemyAttack
+        c.enemyDefense = enemyDefense
         c.log.clear()
         c.log.add("Walka z $enemyName rozpoczeta!")
         GameRepository.log("Walka z $enemyName!")
@@ -63,14 +63,15 @@ object CombatSystem {
         c.round++
 
         // Apply results back to legacy CombatState
-        c.enemyHp = enemyState.hp
-        hero.hp   = heroState.hp
+        c.enemyHp        = enemyState.hp
+        hero.hp          = heroState.hp
+        hero.endurance   = heroState.endurance  // sync endurance after round
         c.log.addAll(result.log)
 
         // Sync morale log
-        val heroMorale   = MoraleSystem.computeStatus(result.attackerMorale)
-        val enemyMorale  = MoraleSystem.computeStatus(result.defenderMorale)
-        val woundMsg     = if (result.defenderWound != WoundType.NONE)
+        val heroMorale  = MoraleSystem.computeStatus(result.attackerMorale)
+        val enemyMorale = MoraleSystem.computeStatus(result.defenderMorale)
+        val woundMsg = if (result.defenderWound != WoundType.NONE)
             " [Rana ${c.enemyName}: ${result.defenderWound}]" else ""
         val heroWoundMsg = if (result.attackerWound != WoundType.NONE)
             " [Rana ${hero.name}: ${result.attackerWound}]" else ""
@@ -81,7 +82,8 @@ object CombatSystem {
             c.log.add("${c.enemyName} pokonany!")
             GameRepository.log("Pokonano ${c.enemyName}")
             val recovery = CombatRound.postCombatRecovery(heroState)
-            hero.hp = heroState.hp
+            hero.hp        = heroState.hp
+            hero.endurance = heroState.endurance  // sync endurance after recovery
             c.log.add(recovery)
         }
         if (CombatRound.isDefeated(heroState)) {
@@ -92,8 +94,8 @@ object CombatSystem {
         val summary = result.log.joinToString(" | ")
         GameRepository.log(summary)
         return "Runda ${c.round}: $summary" +
-               " | Morale: $heroMorale vs $enemyMorale" +
-               woundMsg + heroWoundMsg
+                " | Morale: $heroMorale vs $enemyMorale" +
+                woundMsg + heroWoundMsg
     }
 
     fun isCombatActive() = GameRepository.state.combat.active
