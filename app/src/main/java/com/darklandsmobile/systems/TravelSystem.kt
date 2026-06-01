@@ -29,7 +29,7 @@ object TravelSystem {
         val encounterId = if (encounterTriggered) TravelRules.encounterForTerrain(terrain, random) else null
 
         val updatedState = partyState.copy(
-            fatigue = partyState.fatigue + fatigueGain,
+            fatigue = minOf(partyState.fatigue + fatigueGain, 100),  // clamp fatigue to max 100
             totalHoursTraveled = partyState.totalHoursTraveled + hoursSpent,
             lastEncounterId = encounterId
         )
@@ -43,7 +43,6 @@ object TravelSystem {
             encounterTriggered = encounterTriggered,
             encounterId = encounterId
         )
-
         return updatedState to result
     }
 
@@ -58,27 +57,26 @@ object TravelSystem {
         w.location = region.replaceFirstChar { it.uppercase() }
         w.day += 1
         w.timeOfDay = when (w.timeOfDay) {
-            "morning" -> "afternoon"
+            "morning"   -> "afternoon"
             "afternoon" -> "evening"
-            "evening" -> "night"
-            else -> "morning"
+            "evening"   -> "night"
+            else        -> "morning"
         }
-        w.fatigue += 1
+        w.fatigue = minOf(w.fatigue + 1, 100)  // clamp fatigue to max 100
         w.lastEncounter = when (region) {
             "forest" -> "wolves"
-            "road" -> "bandits"
-            else -> "none"
+            "road"   -> "bandits"
+            else     -> "none"
         }
-        GameRepository.log("Podróż do regionu: $region")
-        return "Podróż do $region zakończona."
+        GameRepository.log("Podr\u00f3\u017c do regionu: $region")
+        return "Podr\u00f3\u017c do $region zako\u0144czona."
     }
 
     // wrapper dla MainActivity.getSeasonDisplay
-    fun getSeasonDisplay(): String =
-        when (GameRepository.state.world.season) {
-            Season.SPRING -> "Wiosna"
-            Season.SUMMER -> "Lato"
-            Season.AUTUMN -> "Jesień"
-            Season.WINTER -> "Zima"
-        }
+    fun getSeasonDisplay(): String = when (GameRepository.state.world.season) {
+        Season.SPRING -> "Wiosna"
+        Season.SUMMER -> "Lato"
+        Season.AUTUMN -> "Jesie\u0144"
+        Season.WINTER -> "Zima"
+    }
 }
