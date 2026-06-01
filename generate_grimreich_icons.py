@@ -1,7 +1,7 @@
 from PIL import Image, ImageDraw, ImageFont, ImageFilter
 import os, zipfile
 
-# Manifest (64 plików) — dokładne nazwy
+# Manifest (64 plikow) - dokladne nazwy
 filenames = [
 "ic_equipment_sword.png","ic_equipment_axe.png","ic_equipment_spear.png","ic_equipment_shield.png",
 "ic_equipment_helmet.png","ic_equipment_armor.png","ic_equipment_pouch.png","ic_equipment_book.png",
@@ -48,95 +48,58 @@ def draw_text_symbol(draw, cx, cy, scale, text, color):
     # fallback: draw a bold letter
     try:
         f = ImageFont.truetype("DejaVuSans-Bold.ttf", int(28*scale))
-    except:
+    except Exception:
         f = ImageFont.load_default()
-        bbox = f.getbbox(text); w,h = bbox[2]-bbox[0], bbox[3]-bbox[1]
-    draw.text((cx-w/2, cy-h/2), text, font=f, fill=color)
+    bbox = f.getbbox(text)
+    w, h = bbox[2] - bbox[0], bbox[3] - bbox[1]
+    draw.text((cx - w/2, cy - h/2), text, font=f, fill=color)
 
 # category -> draw function and color
 category_draw = {
     "sword": (draw_sword, (200,200,210)),
     "shield": (draw_shield, (170,180,190)),
     "potion_red": (draw_potion, (200,60,60)),
-    "potion_blue": (draw_potion, (60,120,200)),
-    "potion_green": (draw_potion, (80,180,80)),
-    "rune": (draw_rune, (180,140,60)),
-    "flame": (draw_flame, (240,120,40)),
-    "default": (draw_text_symbol, (220,220,220))
+    "potion_blue": (draw_potion, (60,100,200)),
+    "potion_green": (draw_potion, (60,180,80)),
+    "rune": (draw_rune, (180,140,255)),
+    "flame": (draw_flame, (240,120,30)),
+    "axe": (draw_sword, (190,190,200)),
+    "spear": (draw_sword, (180,180,190)),
+    "armor": (draw_shield, (160,170,180)),
+    "helmet": (draw_shield, (150,160,170)),
+    "pouch": (draw_potion, (160,120,80)),
+    "book": (draw_shield, (140,100,60)),
+    "scroll": (draw_potion, (200,180,120)),
+    "default": (draw_rune, (200,200,200)),
 }
 
-# simple heuristics to pick draw function by filename
-def pick_drawer(name):
-    if "sword" in name: return ("sword","S")
-    if "axe" in name: return ("sword","A")  # reuse sword shape as heavy blade
-    if "spear" in name: return ("sword","P")
-    if "shield" in name: return ("shield","")
-    if "potion_red" in name: return ("potion_red","")
-    if "potion_blue" in name: return ("potion_blue","")
-    if "potion_green" in name: return ("potion_green","")
-    if "scroll" in name or "book" in name: return ("default","B")
-    if "pouch" in name: return ("default","$") 
-    if "str" in name: return ("default","STR")
-    if "dex" in name: return ("default","DEX")
-    if "will" in name: return ("default","W")
-    if "know" in name: return ("default","K")
-    if "poison" in name and "sigil" not in name: return ("potion_green","")
-    if "bleed" in name: return ("default","♥")
-    if "fire" in name and "sigil" in name: return ("flame","")
-    if "sigil" in name or "rune" in name: return ("rune","")
-    if "attack" in name: return ("sword","")
-    if "defend" in name: return ("shield","")
-    if "magic" in name: return ("rune","")
-    if "map" in name: return ("default","M")
-    if "journal" in name: return ("default","J")
-    if "quests" in name: return ("default","Q")
-    if "settings" in name: return ("default","⚙")
-    if "damage" in name: return ("default","DMG")
-    return ("default","?")
+def get_draw_fn(name):
+    for key, val in category_draw.items():
+        if key in name:
+            return val
+    return category_draw["default"]
 
-# create output dirs
-out_dir = os.path.join("output","drawable")
-os.makedirs(out_dir, exist_ok=True)
-
-SIZE = 96
-for fname in filenames:
-    img = Image.new("RGBA", (SIZE, SIZE), (18,18,20,255))  # dark background
+def generate_icon(name, size=64):
+    bg = (30, 25, 20)
+    img = Image.new("RGBA", (size, size), bg)
     draw = ImageDraw.Draw(img)
+    cx, cy = size // 2, size // 2
+    scale = size / 64
+    fn, color = get_draw_fn(name)
+    try:
+        fn(draw, cx, cy, scale, color)
+    except TypeError:
+        # text symbol fallback
+        letter = name.replace("ic_","")[0].upper()
+        draw_text_symbol(draw, cx, cy, scale, letter, color)
+    # subtle vignette border
+    draw.rectangle([(0,0),(size-1,size-1)], outline=(80,60,40), width=2)
+    return img
 
-    # subtle vignette / texture
-    overlay = Image.new("RGBA", (SIZE, SIZE), (0,0,0,0))
-    od = ImageDraw.Draw(overlay)
-    od.ellipse([(-20,-20),(SIZE+20,SIZE+20)], fill=(0,0,0,40))
-    img = Image.alpha_composite(img, overlay)
+os.makedirs("output/drawable", exist_ok=True)
+for fname in filenames:
+    img = generate_icon(fname)
+    img.save(f"output/drawable/{fname}")
+    print(f"Generated: {fname}")
 
-    cat, label = pick_drawer(fname)
-    drawer, color = category_draw.get(cat, category_draw["default"])
-
-    cx, cy = SIZE//2, SIZE//2
-    scale = 1.0
-
-    # draw symbol
-    if drawer == draw_text_symbol:
-        drawer(draw, cx, cy, scale, label, color)
-    else:
-        drawer(draw, cx, cy, scale, color)
-
-    # slight pixelation effect (optional): resize down and up to get blocky look
-    small = img.resize((48,48), resample=Image.NEAREST)
-    img = small.resize((SIZE,SIZE), Image.NEAREST)
-
-    # save
-    path = os.path.join(out_dir, fname)
-    img.convert("RGBA").save(path, optimize=True)
-
-# zip the folder
-zip_name = "grimreich_icons.zip"
-with zipfile.ZipFile(zip_name, "w", zipfile.ZIP_DEFLATED) as z:
-    for root, _, files in os.walk(out_dir):
-        for f in files:
-            full = os.path.join(root, f)
-            arcname = os.path.join("drawable", f)
-            z.write(full, arcname)
-
-print("Gotowe:", zip_name)
-print("Pliki w:", out_dir)
+print(f"Done: {len(filenames)} icons saved to output/drawable/")
