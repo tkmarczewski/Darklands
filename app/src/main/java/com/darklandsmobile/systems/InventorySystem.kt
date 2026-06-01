@@ -58,14 +58,20 @@ object InventorySystem {
     }
 
     // Sprint 12: logiczny transfer przedmiotu miedzy postaciami w obrebie wspolnego inventory druzyny.
-    // Aktualny model trzyma inventory na poziomie GameRepository.state, wiec transfer to zapis w logu
-    // potwierdzajacy przekazanie - bez fizycznej zmiany lokalizacji itemu w pamieci stanu.
+    // Jesli przedmiot jest aktualnie zalozony przez nadawce, zostaje najpierw zdjety.
     fun transferItem(fromHeroId: String, toHeroId: String, itemId: String): String {
         val party = GameRepository.state.party
-        val from = party.firstOrNull { it.id == fromHeroId } ?: return "Brak bohatera: $fromHeroId"
-        val to   = party.firstOrNull { it.id == toHeroId }   ?: return "Brak bohatera: $toHeroId"
-        val item = GameRepository.state.inventory.firstOrNull { it.id == itemId }
+        val from  = party.firstOrNull { it.id == fromHeroId } ?: return "Brak bohatera: $fromHeroId"
+        val to    = party.firstOrNull { it.id == toHeroId }   ?: return "Brak bohatera: $toHeroId"
+        val item  = GameRepository.state.inventory.firstOrNull { it.id == itemId }
             ?: return "Nie znaleziono: $itemId"
+
+        // Detach item from sender's equipment slots if currently equipped
+        val equippedSlot = from.equipment.entries.firstOrNull { it.value == itemId }?.key
+        if (equippedSlot != null) {
+            from.equipment[equippedSlot] = null
+        }
+
         GameRepository.log("Transfer ${item.name}: ${from.name} -> ${to.name}")
         return "Transfer ${item.name}: ${from.name} -> ${to.name}"
     }
@@ -86,9 +92,9 @@ object InventorySystem {
     // Aktywne uzycie itemu (eliksir, ziolo) - zdejmuje przedmiot z inventory, leczy aktywnego bohatera.
     fun useItem(itemId: String): String {
         val state = GameRepository.state
-        val item = state.inventory.firstOrNull { it.id == itemId } ?: return "Nie znaleziono: $itemId"
-        val hero = PartyRepository.activeHero() ?: return "Brak aktywnego bohatera."
-        val heal = item.effects["heal"] ?: 0
+        val item  = state.inventory.firstOrNull { it.id == itemId } ?: return "Nie znaleziono: $itemId"
+        val hero  = PartyRepository.activeHero() ?: return "Brak aktywnego bohatera."
+        val heal  = item.effects["heal"] ?: 0
         if (heal > 0) {
             hero.hp = (hero.hp + heal).coerceAtMost(hero.maxHp)
         }
