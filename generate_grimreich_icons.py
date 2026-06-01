@@ -184,7 +184,7 @@ def draw_status_intox(draw, c, color):
 
 def draw_status_curse(draw, c, color):
     draw.ellipse([(s(c[0]-16),s(c[1]-16)),(s(c[0]+16),s(c[1]+16))], fill=(60,20,80))
-    draw.line([(s(c[0]-s(10)),s(c[1]-s(8)),(s(c[0])+s(10),s(c[1]+s(8))], fill=(200,80,255), width=s(3))
+    draw.line([(s(c[0]-s(10)),s(c[1]-s(8)),(s(c[0])+s(10)),s(c[1]+s(8))], fill=(200,80,255), width=s(3))
     draw.line([(s(c[0]+s(10),s(c[1]-s(8)),(s(c[0])-s(10),s(c[1]+s(8))], fill=(200,80,255), width=s(3))
 
 def draw_status_protect(draw, c, color):
