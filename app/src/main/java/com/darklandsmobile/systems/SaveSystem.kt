@@ -2,6 +2,7 @@ package com.darklandsmobile.systems
 
 import com.darklandsmobile.core.GameRepository
 import com.darklandsmobile.core.SaveSnapshot
+import com.darklandsmobile.core.deepCopy
 
 object SaveSystem {
     private val saves = mutableListOf<SaveSnapshot>()
@@ -13,7 +14,7 @@ object SaveSystem {
             version   = versionCounter,
             timestamp = System.currentTimeMillis(),
             label     = label,
-            state     = GameRepository.state.copy()
+            state     = GameRepository.state.deepCopy()
         )
         saves.add(snap)
         if (saves.size > 10) saves.removeAt(0)
@@ -24,7 +25,7 @@ object SaveSystem {
     fun load(version: Int): String {
         val snap = saves.firstOrNull { it.version == version }
             ?: return "Brak zapisu v$version"
-        GameRepository.state = snap.state.copy()
+        GameRepository.state = snap.state.deepCopy()
         GameRepository.log("Wczytano: v$version - ${snap.label}")
         return "Wczytano: v$version - ${snap.label}"
     }
