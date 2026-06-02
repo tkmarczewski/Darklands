@@ -1,5 +1,6 @@
 package com.darklandsmobile.systems
 
+import com.darklandsmobile.core.GameRepository
 import com.darklandsmobile.world.ProceduralLocation
 import com.darklandsmobile.world.ProceduralLocationGenerator
 
@@ -91,11 +92,11 @@ object QuestSystem {
     private fun ProceduralLocation.toQuest(): QuestEntry = QuestEntry(
         id = "quest_${id}",
         title = when (type.name) {
-            "RUINS" -> "Zbadaj ruiny"
-            "RAUBRITTER_CASTLE" -> "Uderz na zamek raubrittera"
-            "MONASTERY" -> "Odwiedź klasztor"
-            "DUNGEON" -> "Zejdź do lochów"
-            else -> "Pomóż pobliskiej osadzie"
+            "RUINS"            -> "Zbadaj ruiny"
+            "RAUBRITTER_CASTLE"-> "Uderz na zamek raubrittera"
+            "MONASTERY"        -> "Odwiedz klasztor"
+            "DUNGEON"          -> "Zejdz do lochow"
+            else               -> "Pomoz pobliskiej osadzie"
         },
         description = "Cel wyprawy: $name.",
         cityId = nearestCityId,
@@ -104,12 +105,109 @@ object QuestSystem {
         rewardGold = rewardGold
     )
 
-    // dla MainActivity:QuestSystem.start("forest_hermit")
+    // LEGACY API dla testów:
+
+    private val legacyActiveQuests = linkedMapOf<String, Int>() // questId -> progress 0..3
+    private val legacyCompletedQuests = mutableListOf<String>()
+
+    private fun syncToRepo() {
+        val q = GameRepository.state.quest
+        q.activeQuests.clear()
+        q.activeQuests.addAll(legacyActiveQuests.keys)
+        q.completedQuests.clear()
+        q.completedQuests.addAll(legacyCompletedQuests)
+        q.questProgress.clear()
+        q.questProgress.putAll(legacyActiveQuests)
+    }
+
     fun start(questId: String): String {
-        seedIntegratedContent()
-        val resolvedId = if (quests.containsKey(questId)) questId else quests.keys.firstOrNull()
-            ?: return "Brak dostępnych questów."
-        val quest = activate(resolvedId)
-        return "Rozpoczęto quest: ${quest.title}"
+        if (legacyActiveQuests.containsKey(questId)) {
+            val msg = "Quest $questId jest juz aktywny."
+            syncToRepo()
+            return msg
+        }
+
+        legacyActiveQuests[questId] = 0
+
+        val title = when (questId) {
+            "forest_hermit" -> "Znajdz pustelnika w lesie"
+            "bandit_camp"   -> "Rozprosz oboz bandytow"
+            "lost_relic"    -> "Odnajdz zaginiony relikt"
+            else            -> questId
+        }
+
+        val msg = "Rozpoczeto quest: $title"
+        syncToRepo()
+        return msg
+    }
+
+    fun advance(questId: String, steps: Int = 1): String {
+        val current = legacyActiveQuests[questId]
+            ?: run {
+                val msg = "Quest $questId nie jest aktywny."
+                syncToRepo()
+                return msg
+            }
+
+        val newProgress = (current + steps).coerceAtMost(3)
+        legacyActiveQuests[questId] = newProgress
+
+        val title = when (questId) {
+            "forest_hermit" -> "Znajdz pustelnika w lesie"
+            "bandit_camp"   -> "Rozprosz oboz bandytow"
+            "lost_relic"    -> "Odnajdz zaginiony relikt"
+            else            -> questId
+        }
+
+        val msg = if (newProgress >= 3) {
+            legacyActiveQuests.remove(questId)
+            if (!legacyCompletedQuests.contains(questId)) {
+                legacyCompletedQuests.add(questId)
+            }
+            "Quest $title ukonczony."
+        } else {
+            "Quest $title: postep ${newProgress}/3"
+        }
+
+        syncToRepo()
+        return msg
+    }
+
+    fun activeList(): List<String> = legacyActiveQuests.keys.toList()
+
+    fun finalQuestSummary(): String {
+        val sb = StringBuilder()
+
+        if (legacyActiveQuests.isEmpty()) {
+            sb.append("Aktywne questy:\n  brak\n")
+        } else {
+            sb.append("Aktywne questy:\n")
+            for ((id, progress) in legacyActiveQuests) {
+                val title = when (id) {
+                    "forest_hermit" -> "Znajdz pustelnika w lesie"
+                    "bandit_camp"   -> "Rozprosz oboz bandytow"
+                    "lost_relic"    -> "Odnajdz zaginiony relikt"
+                    else            -> id
+                }
+                sb.append("  $title (${progress}/3)\n")
+            }
+        }
+
+        if (legacyCompletedQuests.isEmpty()) {
+            sb.append("Ukonczone questy:\n  brak")
+        } else {
+            sb.append("Ukonczone questy:\n")
+            for (id in legacyCompletedQuests) {
+                val title = when (id) {
+                    "forest_hermit" -> "Znajdz пустelnika w lesie"
+                    "bandit_camp"   -> "Rozprosz oboz bandytow"
+                    "lost_relic"    -> "Odnajdz zaginiony relikt"
+                    else            -> id
+                }
+                sb.append("  $title\n")
+            }
+        }
+
+        return sb.toString()
     }
 }

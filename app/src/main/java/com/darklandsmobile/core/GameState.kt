@@ -1,5 +1,11 @@
 package com.darklandsmobile.core
 
+data class QuestState(
+    val activeQuests: MutableList<String> = mutableListOf(),
+    val completedQuests: MutableList<String> = mutableListOf(),
+    val questProgress: MutableMap<String, Int> = mutableMapOf()
+)
+
 data class GameState(
     val world: WorldState = WorldState(),
     val party: MutableList<Hero> = mutableListOf(),
@@ -9,7 +15,8 @@ data class GameState(
     val combat: CombatState = CombatState(),
     val prayer: PrayerState = PrayerState(),
     val reputation: ReputationState = ReputationState(),
-    var gold: Int = 100
+    var gold: Int = 100,
+    val quest: QuestState = QuestState()
 )
 
 /**
@@ -22,7 +29,11 @@ fun GameState.deepCopy(): GameState = GameState(
     party = party.map { hero ->
         hero.copy(
             skills = hero.skills.toMutableMap(),
-            equipment = mutableMapOf("weapon" to hero.equipment["weapon"], "armor" to hero.equipment["armor"], "helmet" to hero.equipment["helmet"])
+            equipment = mutableMapOf(
+                "weapon" to hero.equipment["weapon"],
+                "armor" to hero.equipment["armor"],
+                "helmet" to hero.equipment["helmet"]
+            )
         )
     }.toMutableList(),
     inventory = inventory.map { it.copy(effects = it.effects.toMap()) }.toMutableList(),
@@ -31,5 +42,10 @@ fun GameState.deepCopy(): GameState = GameState(
     combat = combat.copy(log = combat.log.toMutableList()),
     prayer = prayer.copy(),
     reputation = reputation.copy(city = reputation.city.toMutableMap()),
-    gold = gold
+    gold = gold,
+    quest = quest.copy(
+        activeQuests = quest.activeQuests.toMutableList(),
+        completedQuests = quest.completedQuests.toMutableList(),
+        questProgress = quest.questProgress.toMutableMap()
+    )
 )

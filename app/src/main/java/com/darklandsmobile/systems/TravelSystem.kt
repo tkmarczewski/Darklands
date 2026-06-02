@@ -13,6 +13,7 @@ import kotlin.random.Random
  * systems/ orchestrates gameplay rules defined in core.
  */
 object TravelSystem {
+
     fun travel(
         fromCityId: String,
         toCityId: String,
@@ -26,10 +27,10 @@ object TravelSystem {
         val hoursSpent = TravelRules.computeSegmentHours(terrain, random)
         val fatigueGain = TravelRules.computeFatigueGain(terrain, hoursSpent)
         val encounterTriggered = TravelRules.encounterRoll(terrain, random)
-        val encounterId = if (encounterTriggered) TravelRules.encounterForTerrain(terrain, random) else null
+        val encounterId = if (encounterTriggered) TravelRules.encourterForTerrain(terrain, random) else null
 
         val updatedState = partyState.copy(
-            fatigue = minOf(partyState.fatigue + fatigueGain, 100),  // clamp fatigue to max 100
+            fatigue = minOf(partyState.fatigue + fatigueGain, 100),
             totalHoursTraveled = partyState.totalHoursTraveled + hoursSpent,
             lastEncounterId = encounterId
         )
@@ -47,10 +48,43 @@ object TravelSystem {
     }
 
     fun restInCity(partyState: TravelPartyState, restHours: Int = 8): TravelPartyState {
-        return partyState.copy(fatigue = TravelRules.reduceFatigueWithRest(partyState.fatigue, restHours))
+        return partyState.copy(
+            fatigue = TravelRules.reduceFatigueWithRest(partyState.fatigue, restHours)
+        )
     }
 
-    // wrapper dla MainActivity.travelTo
+    fun rest(): String {
+        val w = GameRepository.state.world
+        val newFatigue = (w.fatigue - 20).coerceAtLeast(0)
+        w.fatigue = newFatigue
+        w.day += 1
+        w.timeOfDay = "morning"
+
+        val msg = "Druzyna odpoczela i odzyskala sily."
+        GameRepository.log(msg)
+        return msg
+    }
+
+    fun advanceSeason() {
+        val w = GameRepository.state.world
+        w.season = when (w.season) {
+            Season.SPRING -> Season.SUMMER
+            Season.SUMMER -> Season.AUTUMN
+            Season.AUTUMN -> Season.WINTER
+            Season.WINTER -> Season.SPRING
+        }
+    }
+
+    fun currentSeason(day: Int): Season {
+        val slot = (day / 30) % 4
+        return when (slot) {
+            0 -> Season.SPRING
+            1 -> Season.SUMMER
+            2 -> Season.AUTUMN
+            else -> Season.WINTER
+        }
+    }
+
     fun travelTo(region: String): String {
         val w = GameRepository.state.world
         w.region = region
@@ -62,21 +96,24 @@ object TravelSystem {
             "evening"   -> "night"
             else        -> "morning"
         }
-        w.fatigue = minOf(w.fatigue + 1, 100)  // clamp fatigue to max 100
+        w.fatigue = minOf(w.fatigue + 1, 100)
         w.lastEncounter = when (region) {
             "forest" -> "wolves"
             "road"   -> "bandits"
             else     -> "none"
         }
-        GameRepository.log("Podr\u00f3\u017c do regionu: $region")
-        return "Podr\u00f3\u017c do $region zako\u0144czona."
+        GameRepository.log("Podroz do regionu: $region")
+        return "Podroz do $region zakonczona."
     }
 
-    // wrapper dla MainActivity.getSeasonDisplay
-    fun getSeasonDisplay(): String = when (GameRepository.state.world.season) {
-        Season.SPRING -> "Wiosna"
-        Season.SUMMER -> "Lato"
-        Season.AUTUMN -> "Jesie\u0144"
-        Season.WINTER -> "Zima"
+    fun getSeasonDisplay(): String {
+        val w = GameRepository.state.world
+        val season = currentSeason(w.day)
+        return when (season) {
+            Season.SPRING -> "Wiosna"
+            Season.SUMMER -> "Lato"
+            Season.AUTUMN -> "Jesien"
+            Season.WINTER -> "Zima"
+        }
     }
 }
