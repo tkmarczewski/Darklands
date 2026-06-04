@@ -1,14 +1,16 @@
 package com.darklandsmobile.ui.expedition
 
-import com.darklandsmobile.core.GrimSeed
+import com.darklandsmobile.core.GameBootstrap
+import com.darklandsmobile.core.GameRepository
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
 
 class OtherSideViewModelTest {
+
     @Before
     fun setup() {
-        GrimSeed.initialize()
+        GameRepository.state = GameBootstrap.initialize()
     }
 
     @Test
@@ -17,7 +19,7 @@ class OtherSideViewModelTest {
         vm.startForCurrentRegion()
         val s = vm.state.value
         assertNotNull(s)
-        assertTrue(!s!!.enemies.isNullOrEmpty())
-        assertTrue(!s.rewards.isNullOrEmpty())
+        assertTrue(s!!.enemies.isNotEmpty())
+        assertTrue(s.rewards.isNotEmpty())
     }
 }
