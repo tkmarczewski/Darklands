@@ -1,7 +1,7 @@
 package com.darklandsmobile.systems
 
 import com.darklandsmobile.core.NPC
-import com.darklandsmobile.world.WorldAI
+import com.darklandsmobile.core.WorldAI
 
 /**
  * MutacjeNPC2.0 - System mutacji NPC dla GrimReich.
@@ -14,7 +14,7 @@ data class NPCMutation(
     val originalState: NPCState,
     var currentState: NPCState,
     val regionId: Int,
-    val grimReichAwareness: Float = 0.0f,
+    var grimReichAwareness: Float = 0.0f,
     val isInfested: Boolean = false,
     val mutationIntensity: Float = 0.0f
 )
@@ -104,15 +104,16 @@ object MutacjeNPC2_0 {
         val mutation = npcMutations[npcId] ?: return
         val awareness = mutation.grimReichAwareness
         val originalState = mutation.originalState
+        val npcType = mutation.npcType
 
         mutation.currentState = when {
             originalState == NPCState.HOSTILE && awareness >= 0.5f -> NPCState.CORRUPTED
             awareness >= 0.8f -> NPCState.INFESTED
-            awareness >= 0.6f && originalState == NPCType.GUARD -> NPCState.CORRUPTED
+            awareness >= 0.6f && npcType == NPCType.GUARD -> NPCState.CORRUPTED
             awareness >= 0.6f -> NPCState.HOSTILE
             awareness >= 0.4f -> NPCState.ALERT
-            globalGrimReichThreat >= 0.8f && originalState == NPCType.MERCHANT -> NPCState.FLEEING
-            originalState == NPCType.VILLAGER && awareness >= 0.3f -> NPCState.ALERT
+            globalGrimReichThreat >= 0.8f && npcType == NPCType.MERCHANT -> NPCState.FLEEING
+            npcType == NPCType.VILLAGER && awareness >= 0.3f -> NPCState.ALERT
             else -> originalState
         }
     }

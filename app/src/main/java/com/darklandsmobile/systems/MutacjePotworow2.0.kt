@@ -11,7 +11,7 @@ data class MonsterMutation(
     val monsterId: Int,
     val baseTier: Int,
     var activeTier: Int,
-    val mutationType: MonsterMutationType,
+    var mutationType: MonsterMutationType,
     val mutationIntensity: Float,
     val regionId: Int,
     val segmentId: Int,

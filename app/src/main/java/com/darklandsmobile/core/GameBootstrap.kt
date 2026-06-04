@@ -3,7 +3,7 @@ package com.darklandsmobile.core
 import com.darklandsmobile.grimreich.v1.*
 
 object GameBootstrap {
-    fun init(state: GameState): GameState {
+    fun init(state: GameState = GameState()): GameState {
         seedGrimWorld(state.grimEngine)
         return state
     }

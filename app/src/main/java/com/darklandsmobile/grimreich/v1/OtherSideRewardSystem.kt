@@ -1,11 +1,5 @@
 package com.darklandsmobile.grimreich.v1
 
-data class OtherSideReward(
-    val baseRewards: List<String>,
-    val finalRewards: List<String>,
-    val riskNote: String
-)
-
 class OtherSideRewardSystem {
     fun applyNpcModifiers(
         baseRewards: List<String>,

@@ -6,7 +6,7 @@ import org.junit.Test
 class GrimMissingFilesTest {
     @Test fun catalogues_and_generators_exist() {
         assertEquals(7, GrimRegionCatalogue.all.size)
-        assertTrue(GrimBossCatalogue.allRegionalBosses.isNotEmpty())
+        assertTrue(GrimNpcCatalogue.allRegionalBosses().isNotEmpty())
         assertTrue(GrimNpcCatalogue.all.isNotEmpty())
         val npc = NpcGenerator().generateNpc("Nowy Świat", "mist", 4)
         val q = QuestGenerator().generateQuest("Nowy Świat", "mist", npc, 2)
@@ -16,7 +16,7 @@ class GrimMissingFilesTest {
             WorldCollapse("stage",1,1,0,0,0,0,"ei")
         )
         val ex = ExpeditionGenerator().generateExpedition("Nowy Świat", "mist", 3, 2)
-        val loot = LootRoller().roll(listOf("x"), OtherSideReward(1,1,1), 2)
+        val loot = LootRoller().roll(listOf("x"), OtherSideReward(emptyList(), emptyList(), ""), 2)
         assertTrue(npc.npcName.isNotBlank())
         assertTrue(q.title.isNotBlank())
         assertTrue(ev.title.isNotBlank())

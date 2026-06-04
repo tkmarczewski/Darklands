@@ -1,6 +1,7 @@
 package com.darklandsmobile.core
 
 import com.darklandsmobile.world.CityCatalogue
+import com.darklandsmobile.world.CityData
 
 enum class TerrainType(
     val encounterChance: Float,
@@ -17,6 +18,13 @@ data class TravelConnection(
     val fromCityId: String,
     val toCityId: String,
     val terrain: TerrainType
+)
+
+data class CityNode(
+    val city: CityData,
+    val connections: List<String>,
+    val region: String = city.region,
+    val name: String = city.name
 )
 
 /**
@@ -67,5 +75,20 @@ object WorldMap {
 
     private fun link(a: String, b: String, terrain: TerrainType) {
         connections += TravelConnection(a, b, terrain)
+    }
+
+    fun all(): List<CityNode> {
+        return CityCatalogue.all().map { city ->
+            CityNode(city, neighbors(city.id).map { 
+                if (it.fromCityId == city.id) it.toCityId else it.fromCityId 
+            })
+        }
+    }
+
+    fun get(id: String): CityNode? {
+        val city = CityCatalogue.get(id) ?: return null
+        return CityNode(city, neighbors(id).map { 
+            if (it.fromCityId == id) it.toCityId else it.fromCityId 
+        })
     }
 }

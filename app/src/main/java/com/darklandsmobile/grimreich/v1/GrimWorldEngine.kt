@@ -9,7 +9,14 @@ class GrimWorldEngine(
     private val artifactSystem: ArtifactSystem,
     private val avatarSystem: AvatarSystem
 ) {
-    val query: GrimWorldQuery = GrimWorldQuery(regionSystem)
+    val query: GrimWorldQuery = GrimWorldQuery(
+        regionSystem,
+        npcSystem,
+        artifactSystem,
+        avatarSystem,
+        expeditionSystem,
+        narrativeSystem
+    )
 
     fun loadRegion(region: RegionConsciousness, time: NonlinearTime, arch: FullnessArchitecture) {
         regionSystem.applyConsciousness(region)

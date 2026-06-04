@@ -26,4 +26,24 @@ class DefaultRegionSystem : RegionSystem {
     fun getTime(name: String): NonlinearTime? = times[name]
     fun getArchitectures(): List<FullnessArchitecture> = architectures.values.toList()
     fun getCollapse(): WorldCollapse? = collapse
+    
+    fun getSnapshot(name: String): RegionSnapshot? {
+        val region = getRegion(name) ?: return null
+        val time = getTime(name) ?: return null
+        return RegionSnapshot(
+            regionName = name,
+            emotionalState = region.emotionalState,
+            mistMind = region.mistMind,
+            bloodBody = region.bloodBody,
+            reflectionSoul = region.reflectionSoul,
+            chaosLevel = time.chaosTimeLevel,
+            mistTimeLevel = time.mistTimeLevel,
+            timeEffects = time.activeTimeEffects,
+            memory = region.memory,
+            reactions = region.reactions,
+            endingImpact = region.endingImpact
+        )
+    }
+
+    fun getCollapseSnapshot(): WorldCollapse? = collapse
 }

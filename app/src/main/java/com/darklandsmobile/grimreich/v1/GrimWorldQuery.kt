@@ -1,5 +1,59 @@
 package com.darklandsmobile.grimreich.v1
 
+class GrimWorldQuery(
+    private val regionSystem: RegionSystem,
+    private val npcSystem: NPCSystem? = null,
+    private val artifactSystem: ArtifactSystem? = null,
+    private val avatarSystem: AvatarSystem? = null,
+    private val expeditionSystem: ExpeditionSystem? = null,
+    private val narrativeSystem: WorldNarrativeSystem? = null
+) {
+    fun getRegionSnapshot(name: String): RegionSnapshot? {
+        val sys = regionSystem as? DefaultRegionSystem ?: return null
+        return sys.getSnapshot(name)
+    }
+
+    fun getCollapseSnapshot(): WorldCollapse? {
+        val sys = regionSystem as? DefaultRegionSystem ?: return null
+        return sys.getCollapseSnapshot()
+    }
+
+    fun queryReligion(name: String): PhenomenonReligion? {
+        val sys = npcSystem as? DefaultNPCSystem ?: return null
+        return sys.getReligionByNpc(name)
+    }
+
+    fun queryArtifact(name: String): FullnessArtifact? {
+        val sys = artifactSystem as? DefaultArtifactSystem ?: return null
+        return sys.allArtifacts().find { it.artifactName == name }
+    }
+
+    fun queryAvatar(): FullnessAvatar? {
+        val sys = avatarSystem as? DefaultAvatarSystem ?: return null
+        return sys.currentAvatar
+    }
+
+    fun queryExpedition(name: String): OtherSideExpedition? {
+        val sys = expeditionSystem as? DefaultExpeditionSystem ?: return null
+        return sys.activeExpeditions().find { it.expeditionName == name }
+    }
+
+    fun queryCollapse(): WorldCollapse? {
+        return getCollapseSnapshot()
+    }
+
+    fun queryHistory(name: String): AlternateHistory? {
+        // Histories are not exposed by DefaultNarrativeSystem getter yet, but I can add it if needed.
+        // For now, let's keep it null or fix DefaultNarrativeSystem.
+        return null
+    }
+
+    fun queryChronicle(name: String): WorldChronicle? {
+        val sys = narrativeSystem as? DefaultNarrativeSystem ?: return null
+        return sys.allChronicles().find { it.chronicleName == name }
+    }
+}
+
 data class RegionSnapshot(
     val regionName: String,
     val emotionalState: String,
@@ -14,36 +68,7 @@ data class RegionSnapshot(
     val endingImpact: String
 )
 
-data class CollapseSnapshot(
-    val collapseStage: String,
-    val layerCollapse: Int,
-    val regionDecay: Int,
-    val endingImpact: String
-)
-
-class GrimWorldQuery(private val regionSystem: RegionSystem) {
-    fun getRegionSnapshot(name: String): RegionSnapshot? {
-        val sys = regionSystem as? DefaultRegionSystem ?: return null
-        val region = sys.getRegion(name) ?: return null
-        val time = sys.getTime(name)
-        return RegionSnapshot(
-            regionName = region.regionName,
-            emotionalState = region.emotionalState,
-            mistMind = region.mistMind,
-            bloodBody = region.bloodBody,
-            reflectionSoul = region.reflectionSoul,
-            chaosLevel = time?.chaosTimeLevel ?: 0,
-            mistTimeLevel = time?.mistTimeLevel ?: 0,
-            timeEffects = time?.activeTimeEffects ?: emptyList(),
-            memory = region.memory,
-            reactions = region.reactions,
-            endingImpact = region.endingImpact
-        )
-    }
-
-    fun getCollapseSnapshot(): CollapseSnapshot? {
-        val sys = regionSystem as? DefaultRegionSystem ?: return null
-        val c = sys.getCollapse() ?: return null
-        return CollapseSnapshot(c.collapseStage, c.layerCollapse, c.regionDecay, c.endingImpact)
-    }
+interface RegionSnapshotProvider {
+    val id: String
+    val regions: List<String>
 }

@@ -1,7 +1,8 @@
 package com.darklandsmobile.content
 
-import org.junit.Test
-import kotlin.test.assertFailsWith
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
+import kotlin.test.DefaultAsserter.assertNotNull
 
 /**
  * Unit tests for data format constraints and validation.
@@ -13,21 +14,21 @@ class DataFormatsTest {
 
     @Test
     fun `CityData requires non-blank id`() {
-        assertFailsWith<IllegalArgumentException> {
+        assertThrows<IllegalArgumentException> {
             CityData(id = "", name = "Test City", region = "test", type = CityType.CITY, population = 5000)
         }
     }
 
     @Test
     fun `CityData requires non-blank name`() {
-        assertFailsWith<IllegalArgumentException> {
+        assertThrows<IllegalArgumentException> {
             CityData(id = "test", name = "", region = "test", type = CityType.CITY, population = 5000)
         }
     }
 
     @Test
     fun `CityData requires positive population`() {
-        assertFailsWith<IllegalArgumentException> {
+        assertThrows<IllegalArgumentException> {
             CityData(id = "test", name = "Test", region = "test", type = CityType.CITY, population = 0)
         }
     }
@@ -51,7 +52,7 @@ class DataFormatsTest {
 
     @Test
     fun `SaintData requires non-blank id`() {
-        assertFailsWith<IllegalArgumentException> {
+        assertThrows<IllegalArgumentException> {
             SaintData(
                 id = "",
                 name = "Saint",
@@ -63,7 +64,7 @@ class DataFormatsTest {
 
     @Test
     fun `SaintData requires non-blank name`() {
-        assertFailsWith<IllegalArgumentException> {
+        assertThrows<IllegalArgumentException> {
             SaintData(
                 id = "st_test",
                 name = "",
@@ -75,7 +76,7 @@ class DataFormatsTest {
 
     @Test
     fun `SaintPower requires positive faith cost`() {
-        assertFailsWith<IllegalArgumentException> {
+        assertThrows<IllegalArgumentException> {
             SaintPower(
                 name = "Test Power",
                 description = "Test",
@@ -107,7 +108,7 @@ class DataFormatsTest {
 
     @Test
     fun `CareerData requires non-blank id`() {
-        assertFailsWith<IllegalArgumentException> {
+        assertThrows<IllegalArgumentException> {
             CareerData(
                 id = "",
                 name = "Soldier",
@@ -120,7 +121,7 @@ class DataFormatsTest {
 
     @Test
     fun `CareerData requires non-blank name`() {
-        assertFailsWith<IllegalArgumentException> {
+        assertThrows<IllegalArgumentException> {
             CareerData(
                 id = "soldier",
                 name = "",
@@ -156,21 +157,21 @@ class DataFormatsTest {
 
     @Test
     fun `EnemyStats requires positive hp`() {
-        assertFailsWith<IllegalArgumentException> {
+        assertThrows<IllegalArgumentException> {
             EnemyStats(hp = 0, strength = 5, agility = 5, intellect = 2, constitution = 5, armor = 2)
         }
     }
 
     @Test
     fun `EnemyStats requires non-negative armor`() {
-        assertFailsWith<IllegalArgumentException> {
+        assertThrows<IllegalArgumentException> {
             EnemyStats(hp = 30, strength = 5, agility = 5, intellect = 2, constitution = 5, armor = -1)
         }
     }
 
     @Test
     fun `EnemyType requires non-blank id`() {
-        assertFailsWith<IllegalArgumentException> {
+        assertThrows<IllegalArgumentException> {
             EnemyType(
                 id = "",
                 name = "Bandit",
@@ -197,28 +198,28 @@ class DataFormatsTest {
 
     @Test
     fun `QuestEvent requires non-blank id`() {
-        assertFailsWith<IllegalArgumentException> {
+        assertThrows<IllegalArgumentException> {
             QuestEvent(id = "", description = "Test event")
         }
     }
 
     @Test
     fun `QuestRewards requires non-negative gold`() {
-        assertFailsWith<IllegalArgumentException> {
+        assertThrows<IllegalArgumentException> {
             QuestRewards(gold = -10)
         }
     }
 
     @Test
     fun `QuestEnding requires non-blank id`() {
-        assertFailsWith<IllegalArgumentException> {
+        assertThrows<IllegalArgumentException> {
             QuestEnding(id = "", description = "Test", requirementEvents = emptyList())
         }
     }
 
     @Test
     fun `QuestChain requires non-empty events`() {
-        assertFailsWith<IllegalArgumentException> {
+        assertThrows<IllegalArgumentException> {
             QuestChain(
                 id = "test_quest",
                 name = "Test Quest",
@@ -232,7 +233,7 @@ class DataFormatsTest {
 
     @Test
     fun `QuestChain requires non-empty endings`() {
-        assertFailsWith<IllegalArgumentException> {
+        assertThrows<IllegalArgumentException> {
             QuestChain(
                 id = "test_quest",
                 name = "Test Quest",
@@ -268,25 +269,25 @@ class DataFormatsTest {
 
     @Test
     fun `Rumor requires non-blank id`() {
-        assertFailsWith<IllegalArgumentException> {
+        assertThrows<IllegalArgumentException> {
             Rumor(id = "", text = "Test rumor", region = "test", sourceType = RumorSource.TAVERN)
         }
     }
 
     @Test
     fun `Rumor requires non-blank text`() {
-        assertFailsWith<IllegalArgumentException> {
+        assertThrows<IllegalArgumentException> {
             Rumor(id = "r1", text = "", region = "test", sourceType = RumorSource.TAVERN)
         }
     }
 
     @Test
     fun `Rumor veracity must be between 0 and 1`() {
-        assertFailsWith<IllegalArgumentException> {
+        assertThrows<IllegalArgumentException> {
             Rumor(id = "r1", text = "Test", region = "test", sourceType = RumorSource.TAVERN, veracity = 1.5f)
         }
 
-        assertFailsWith<IllegalArgumentException> {
+        assertThrows<IllegalArgumentException> {
             Rumor(id = "r1", text = "Test", region = "test", sourceType = RumorSource.TAVERN, veracity = -0.1f)
         }
     }
@@ -309,21 +310,21 @@ class DataFormatsTest {
 
     @Test
     fun `NamedNpc requires non-blank id`() {
-        assertFailsWith<IllegalArgumentException> {
+        assertThrows<IllegalArgumentException> {
             NamedNpc(id = "", name = "John", role = NpcRole.TAVERN_KEEPER, cityId = "prague")
         }
     }
 
     @Test
     fun `NamedNpc requires non-blank name`() {
-        assertFailsWith<IllegalArgumentException> {
+        assertThrows<IllegalArgumentException> {
             NamedNpc(id = "npc1", name = "", role = NpcRole.TAVERN_KEEPER, cityId = "prague")
         }
     }
 
     @Test
     fun `NamedNpc requires non-blank cityId`() {
-        assertFailsWith<IllegalArgumentException> {
+        assertThrows<IllegalArgumentException> {
             NamedNpc(id = "npc1", name = "John", role = NpcRole.TAVERN_KEEPER, cityId = "")
         }
     }

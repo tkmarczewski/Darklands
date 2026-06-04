@@ -2,7 +2,7 @@ package com.darklandsmobile.systems
 
 import com.darklandsmobile.core.GameState
 import com.darklandsmobile.core.Segment
-import com.darklandsmobile.world.WorldAI
+import com.darklandsmobile.core.WorldAI
 
 /**
  * MutacjeRegionow2.0 - System mutacji regionów dla GrimReich.
@@ -12,7 +12,7 @@ data class RegionMutation(
     val regionId: Int,
     val baseScale: Float,
     var activeScale: Float,
-    val mutationType: MutationType,
+    var mutationType: MutationType,
     val mutationIntensity: Float,
     val affectedSegments: List<Segment>,
     val cascadeTriggered: Boolean = false,
@@ -50,7 +50,7 @@ object MutacjeRegionow2_0 {
         }
     }
 
-    fun applyGrimReichFactor(factor: Float, worldAI: WorldAI) {
+    fun applyGrimReichFactor(factor: Float) {
         globalGrimReichFactor = factor.coerceIn(0.0f, 3.0f)
         mutations.forEach { (_, m) ->
             m.activeScale = calculateActiveScale(m, globalGrimReichFactor)
@@ -97,11 +97,11 @@ object MutacjeRegionow2_0 {
 
     fun updateSegmentInfestation(gameState: GameState, segmentId: Int) {
         val segment = WorldAI.currentSegments[0].segments.find { it.id == segmentId } ?: return
-        val totalInfestation = mutations
+        val totalInfestation = mutations.values
             .filter { m ->
-                m.value.affectedSegments.any { s -> s.id == segmentId }
+                m.affectedSegments.any { s -> s.id == segmentId }
             }
-            .sumOf { m -> m.value.activeScale }
+            .sumOf { it.activeScale.toDouble() }.toFloat()
         segment.infestationChance = totalInfestation.coerceIn(0.0f, 100.0f)
     }
 }

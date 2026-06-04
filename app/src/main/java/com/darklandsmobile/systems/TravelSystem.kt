@@ -27,7 +27,7 @@ object TravelSystem {
         val hoursSpent = TravelRules.computeSegmentHours(terrain, random)
         val fatigueGain = TravelRules.computeFatigueGain(terrain, hoursSpent)
         val encounterTriggered = TravelRules.encounterRoll(terrain, random)
-        val encounterId = if (encounterTriggered) TravelRules.encourterForTerrain(terrain, random) else null
+        val encounterId = if (encounterTriggered) TravelRules.encounterForTerrain(terrain, random) else null
 
         val updatedState = partyState.copy(
             fatigue = minOf(partyState.fatigue + fatigueGain, 100),

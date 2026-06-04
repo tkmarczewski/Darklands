@@ -2,7 +2,7 @@ package com.darklandsmobile.systems
 
 import com.darklandsmobile.core.Enemy
 import com.darklandsmobile.core.Segment
-import com.darklandsmobile.world.WorldAI
+import com.darklandsmobile.core.WorldAI
 
 /**
  * TriLayerBoss2.0 - System trzech warstw dla bossow w GrimReich.

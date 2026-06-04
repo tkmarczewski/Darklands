@@ -37,7 +37,7 @@ class GrimFullTest {
         val quest = QuestGenerator().generateQuest("Serce Krainy", "Odbicie", npc, 3)
         val ev = WorldEventGenerator().generate(RegionConsciousness("R","","","","a", listOf("m"), listOf("r"), "i", "e"), GrimBuilders.defaultNonlinearTime("R"), WorldCollapse("s",1,1,1,1,1,1,"e"))
         val ex = ExpeditionGenerator().generate("Równiny Koronne", "Krew", 5, 2)
-        val loot = LootRoller().roll(listOf("x"), OtherSideReward(1,1,1), 2)
+        val loot = LootRoller().roll(listOf("x"), OtherSideReward(emptyList(), emptyList(), ""), 2)
         assertTrue(npc.npcName.isNotBlank())
         assertTrue(quest.title.isNotBlank())
         assertTrue(ev.title.isNotBlank())

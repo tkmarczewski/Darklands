@@ -4,40 +4,31 @@ import com.darklandsmobile.grimreich.v1.*
 
 object GrimSeed {
     fun initialize() {
-        val regions = GrimRegionCatalogue.all
+        val regions = GrimRegionCatalogue.regions
         val npcs = GrimNpcCatalogue.all
         
-        for (region in regions) {
-            val nonlinearTime = NonlinearTime(
-                regionName = region.regionName,
-                mistTimeLevel = 0,
-                bloodTimeLevel = 0,
-                reflectionTimeLevel = 0,
-                fullnessTimeLevel = 0,
-                chaosTimeLevel = 0,
-                activeTimeEffects = emptyList(),
+        for (entry in regions) {
+            val nonlinearTime = entry.time
+            val architecture = entry.architecture
+            
+            val consciousness = RegionConsciousness(
+                regionName = entry.regionName,
+                mistMind = entry.phenomenon,
+                bloodBody = entry.phenomenon,
+                reflectionSoul = entry.phenomenon,
+                emotionalState = "neutral",
+                memory = listOf("initial_seed"),
+                reactions = emptyList(),
                 regionImpact = "none",
-                npcImpact = "none",
-                monsterImpact = "none",
                 endingImpact = "none"
             )
             
-            val architecture = FullnessArchitecture(
-                structureName = "${region.regionName} Heart",
-                mistForm = "veiled",
-                bloodForm = "flowing",
-                reflectionForm = "mirrored",
-                fullnessEffect = "stable",
-                chaosEffect = "calm",
-                regionImpact = "foundation",
-                endingImpact = "none"
-            )
-            
-            GrimGameRepository.state.grimEngine.loadRegion(region, nonlinearTime, architecture)
+            GrimGameRepository.state.grimEngine.loadRegion(consciousness, nonlinearTime, architecture)
         }
         
-        for (npc in npcs) {
-            GrimGameRepository.state.grimEngine.registerNPC(npc, emptyList())
+        for (npcName in npcs) {
+            val path = GrimBuilders.basicNPCLifePath(npcName)
+            GrimGameRepository.state.grimEngine.registerNPC(path, emptyList())
         }
     }
 }

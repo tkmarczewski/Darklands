@@ -12,10 +12,10 @@ class GrimClosingManifestTest {
     @Test fun generators_work_with_new_lore() {
         val npc = NpcGenerator().generateNpc("Wybrzeże Północne","mist",5)
         val quest = QuestGenerator().generateQuest("Serce Krainy","reflection",npc,4)
-        val region = GrimRegionCatalogue.northCoastConsciousness
-        val event = WorldEventGenerator().generateEvent(region, GrimRegionCatalogue.northCoastTime, WorldCollapse("collapse",1,1,0,0,0,0,""))
+        val region = GrimBuilders.northCoastConsciousness
+        val event = WorldEventGenerator().generateEvent(region, GrimBuilders.northCoastTime, WorldCollapse("collapse",1,1,0,0,0,0,""))
         val exp = ExpeditionGenerator().generateExpedition("Ziemie Dzikie","blood",6,3)
-        val loot = LootRoller().roll(listOf("mistshard"), OtherSideReward(1,1,1), 3)
+        val loot = LootRoller().roll(listOf("mistshard"), OtherSideReward(emptyList(), emptyList(), ""), 3)
         assertTrue(quest.title.isNotBlank())
         assertTrue(event.title.isNotBlank())
         assertTrue(exp.enemies.isNotEmpty())

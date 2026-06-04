@@ -26,6 +26,7 @@ data class CityData(
  * - Stage 1 / Sprint 4-5: 11 connected cities (Magdeburg + 10 target cities)
  */
 object CityCatalogue {
+    const val startingCityId = "magdeburg"
     private val cities = linkedMapOf<String, CityData>()
 
     fun register(city: CityData) {

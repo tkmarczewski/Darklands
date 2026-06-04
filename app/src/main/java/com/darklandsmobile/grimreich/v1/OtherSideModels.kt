@@ -1,17 +1,19 @@
 package com.darklandsmobile.grimreich.v1
 
-enum class OtherSideLoyalty {
-    LOYAL,
-    TORN,
-    BETRAYER
-}
+enum class OtherSideLoyalty { LOYAL, TORN, BETRAYER }
 
 data class OtherSideNpcState(
     val npcName: String,
     val loyalty: OtherSideLoyalty,
-    val currentHp: Int,
-    val maxHp: Int,
-    val armorClass: Int,
+    val sanity: Int,
+    val corruption: Int,
+    val deathRisk: Int,
     val rewardModifier: Int,
-    val deathRisk: Int
+    val notes: String
+)
+
+data class OtherSideReward(
+    val baseRewards: List<String>,
+    val finalRewards: List<String>,
+    val riskNote: String
 )

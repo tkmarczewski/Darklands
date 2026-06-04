@@ -11,7 +11,7 @@ class OtherSideBalanceTests {
             npcName = "Test",
             mistFate = "",
             bloodFate = "",
-            reflectionF = "",
+            reflectionFate = "",
             fullnessLevel = 10,
             chaosLevel = 5,
             timelineEvents = emptyList(),

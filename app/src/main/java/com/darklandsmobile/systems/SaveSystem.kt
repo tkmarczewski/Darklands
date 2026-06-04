@@ -2,7 +2,6 @@ package com.darklandsmobile.systems
 
 import com.darklandsmobile.core.GameRepository
 import com.darklandsmobile.core.SaveSnapshot
-import com.darklandsmobile.core.deepCopy
 
 object SaveSystem {
     private val saves = mutableListOf<SaveSnapshot>()

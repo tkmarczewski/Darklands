@@ -11,4 +11,7 @@ object GrimRegionCatalogue {
         RegionEntry("Góry Południowe","Absolut","None","Bestia Rozdarcia",GrimBuilders.defaultNonlinearTime("Góry Południowe"), FullnessArchitecture("Szczyt Zaniku","mgła","krew","odbicie","pełnia","rozdarcie","szczyt_zaniku","wzmacnia_zakonczenie_absolutu")),
         RegionEntry("Ziemie Dzikie","Mgła","Bractwo Cienia","Trybun Lustrzany",GrimBuilders.defaultNonlinearTime("Ziemie Dzikie"), FullnessArchitecture("Krąg Łowów","mgła","krew","odbicie","pełnia","rozdarcie","centrum_dzikich_pól","wzmacnia_zakonczenie_mieszane"))
     )
+
+    val allRegions = regions.map { it.regionName }
+    val all = regions
 }
