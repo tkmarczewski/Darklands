@@ -13,14 +13,18 @@
 
         <Button android:id="@+id/openCity"        android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Miasto" android:layout_marginTop="8dp"/>
         <Button android:id="@+id/openReputation"  android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Reputacja"/>
-        <Button android:id="@+id/openMap"         android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Mapa"/>
+        <Button android:id="@+id/openMap"         android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Mapa"
+            android:drawableStart="@drawable/ic_system_map" android:drawablePadding="8dp"/>
         <Button android:id="@+id/openSaints"      android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Swieci"/>
         <Button android:id="@+id/openCityEvents"  android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Eventy miasta"/>
-        <Button android:id="@+id/openInventory"   android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Ekwipunek"/>
+        <Button android:id="@+id/openInventory"   android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Ekwipunek"
+            android:drawableStart="@drawable/ic_equipment_sword" android:drawablePadding="8dp"/>
         <Button android:id="@+id/openTrade"       android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Handel"/>
         <Button android:id="@+id/openTransfer"    android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Transfer"/>
         <Button android:id="@+id/openCombatStatus" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Status walki"/>
-        <Button android:id="@+id/openQuests"      android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Questy"/>
-        <Button android:id="@+id/openBaphomet"    android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Final / Baphomet"/>
+        <Button android:id="@+id/openQuests"      android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Questy"
+            android:drawableStart="@drawable/ic_system_quests" android:drawablePadding="8dp"/>
+        <Button android:id="@+id/openBaphomet"    android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Final / Baphomet"
+            android:drawableStart="@drawable/ic_system_settings" android:drawablePadding="8dp"/>
     </LinearLayout>
 </ScrollView>
