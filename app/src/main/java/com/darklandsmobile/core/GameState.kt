@@ -1,10 +1,6 @@
 package com.darklandsmobile.core
 
-data class QuestState(
-    val activeQuests: MutableList<String> = mutableListOf(),
-    val completedQuests: MutableList<String> = mutableListOf(),
-    val questProgress: MutableMap<String, Int> = mutableMapOf()
-)
+import com.darklandsmobile.grimreich.v1.GrimWorldEngine
 
 data class GameState(
     val world: WorldState = WorldState(),
@@ -17,43 +13,22 @@ data class GameState(
     val reputation: ReputationState = ReputationState(),
     var gold: Int = 100,
     val quest: QuestState = QuestState(),
-
-    // GrimReich
-    val grimEngine: com.darklandsmobile.grimreich.v1.GrimWorldEngine =
-        com.darklandsmobile.grimreich.v1.GrimWorldEngineFactory.create(),
-    var grimCurrentRegion: String = "Schwarzwald",
+    val grimEngine: GrimWorldEngine = GrimWorldEngineFactory.create(),
+    var grimCurrentRegion: String = "Nowe Wybrzeże",
     var grimPendingExpeditionName: String? = null
 )
 
-/**
- * Głęboka kopia stanu gry — zapobiega płytka kopiowaniu mutowalnych kolekcji.
- * Bez tego notify() współdzieli referencje do list/map/heroów,
- * przez co zapis i aktywny stan mogą się nadpisywać.
- */
 fun GameState.deepCopy(): GameState = GameState(
     world = world.copy(),
-    party = party.map { hero ->
-        hero.copy(
-            skills = hero.skills.toMutableMap(),
-            equipment = mutableMapOf(
-                "weapon" to hero.equipment["weapon"],
-                "armor" to hero.equipment["armor"],
-                "helmet" to hero.equipment["helmet"]
-            )
-        )
-    }.toMutableList(),
-    inventory = inventory.map { it.copy(effects = it.effects.toMap()) }.toMutableList(),
+    party = party.map { it.copy() }.toMutableList(),
+    inventory = inventory.map { it.copy() }.toMutableList(),
     activeHeroId = activeHeroId,
     logEntries = logEntries.toMutableList(),
-    combat = combat.copy(log = combat.log.toMutableList()),
+    combat = combat.copy(),
     prayer = prayer.copy(),
-    reputation = reputation.copy(city = reputation.city.toMutableMap()),
+    reputation = reputation.copy(),
     gold = gold,
-    quest = quest.copy(
-        activeQuests = quest.activeQuests.toMutableList(),
-        completedQuests = quest.completedQuests.toMutableList(),
-        questProgress = quest.questProgress.toMutableMap()
-    ),
+    quest = quest.copy(),
     grimEngine = grimEngine,
     grimCurrentRegion = grimCurrentRegion,
     grimPendingExpeditionName = grimPendingExpeditionName
