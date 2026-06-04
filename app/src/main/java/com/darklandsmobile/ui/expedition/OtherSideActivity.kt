@@ -47,8 +47,7 @@ class OtherSideActivity : AppCompatActivity() {
                         append(st.deathRisk)
                         append(" | Nagrody: ")
                         append(st.rewardModifier)
-                        append('
-')
+                        append('\n')
                     }
                     append(s.rewardSummary.riskNote)
                 }.trim()
