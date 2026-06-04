@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#080b11"
+    android:padding="16dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView android:id="@+id/tvRegionName" android:layout_width="match_parent" android:layout_height="wrap_content" android:textSize="22sp" android:textColor="#e0d080" android:textStyle="bold" android:paddingBottom="8dp" />
+        <TextView android:id="@+id/tvEmotionalState" android:layout_width="match_parent" android:layout_height="wrap_content" android:textColor="#b0b0b0" android:paddingBottom="6dp" />
+        <TextView android:id="@+id/tvMistMind" android:layout_width="match_parent" android:layout_height="wrap_content" android:textColor="#c0d0e0" android:paddingBottom="4dp" />
+        <TextView android:id="@+id/tvBloodBody" android:layout_width="match_parent" android:layout_height="wrap_content" android:textColor="#d08080" android:paddingBottom="4dp" />
+        <TextView android:id="@+id/tvReflectionSoul" android:layout_width="match_parent" android:layout_height="wrap_content" android:textColor="#b090d0" android:paddingBottom="4dp" />
+        <TextView android:id="@+id/tvChaosLevel" android:layout_width="match_parent" android:layout_height="wrap_content" android:textColor="#c0b090" android:paddingBottom="4dp" />
+        <TextView android:id="@+id/tvTimeEffects" android:layout_width="match_parent" android:layout_height="wrap_content" android:textColor="#b0b0b0" android:paddingBottom="4dp" />
+        <TextView android:id="@+id/tvMemory" android:layout_width="match_parent" android:layout_height="wrap_content" android:textColor="#d0d0d0" android:paddingBottom="4dp" />
+        <TextView android:id="@+id/tvReactions" android:layout_width="match_parent" android:layout_height="wrap_content" android:textColor="#d0d0d0" android:paddingBottom="4dp" />
+        <TextView android:id="@+id/tvEndingImpact" android:layout_width="match_parent" android:layout_height="wrap_content" android:textColor="#808080" android:fontFamily="monospace" />
+
+    </LinearLayout>
+</ScrollView>

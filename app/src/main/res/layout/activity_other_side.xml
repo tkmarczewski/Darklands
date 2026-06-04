@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#080b11"
+    android:padding="16dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView android:id="@+id/tvExpeditionName" android:layout_width="match_parent" android:layout_height="wrap_content" android:textSize="22sp" android:textColor="#e0d080" android:textStyle="bold" android:paddingBottom="8dp" />
+        <TextView android:id="@+id/tvLayers" android:layout_width="match_parent" android:layout_height="wrap_content" android:textColor="#b0b0b0" android:paddingBottom="8dp" />
+        <TextView android:id="@+id/tvEnemies" android:layout_width="match_parent" android:layout_height="wrap_content" android:textColor="#d08080" android:paddingBottom="4dp" />
+        <TextView android:id="@+id/tvRewards" android:layout_width="match_parent" android:layout_height="wrap_content" android:textColor="#80c090" android:paddingBottom="8dp" />
+        <TextView android:id="@+id/tvRegionImpact" android:layout_width="match_parent" android:layout_height="wrap_content" android:textColor="#c0b090" android:paddingBottom="4dp" />
+        <TextView android:id="@+id/tvEndingImpact" android:layout_width="match_parent" android:layout_height="wrap_content" android:textColor="#808080" android:fontFamily="monospace" android:paddingBottom="8dp" />
+        <TextView android:id="@+id/tvNpcStates" android:layout_width="match_parent" android:layout_height="wrap_content" android:textColor="#e0d0a0" android:fontFamily="monospace" />
+
+    </LinearLayout>
+</ScrollView>

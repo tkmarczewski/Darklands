@@ -16,7 +16,13 @@ data class GameState(
     val prayer: PrayerState = PrayerState(),
     val reputation: ReputationState = ReputationState(),
     var gold: Int = 100,
-    val quest: QuestState = QuestState()
+    val quest: QuestState = QuestState(),
+
+    // GrimReich
+    val grimEngine: com.darklandsmobile.grimreich.v1.GrimWorldEngine =
+        com.darklandsmobile.grimreich.v1.GrimWorldEngineFactory.create(),
+    var grimCurrentRegion: String = "Schwarzwald",
+    var grimPendingExpeditionName: String? = null
 )
 
 /**
@@ -47,5 +53,8 @@ fun GameState.deepCopy(): GameState = GameState(
         activeQuests = quest.activeQuests.toMutableList(),
         completedQuests = quest.completedQuests.toMutableList(),
         questProgress = quest.questProgress.toMutableMap()
-    )
+    ),
+    grimEngine = grimEngine,
+    grimCurrentRegion = grimCurrentRegion,
+    grimPendingExpeditionName = grimPendingExpeditionName
 )
