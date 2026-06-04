@@ -1,8 +1,8 @@
 package com.darklandsmobile.grimreich.v1
 
 object GrimBossCatalogue {
-    val prophetOfSeaMist = FactionBoss("Prorok Morskiej Mgły", "Zakon Świtu", "archpriest", listOf("visionary", "fanatic", "broken"), emptyList(), listOf("proroctwo", "burza_mgielna", "otwarcie_rozdarcia"), emptyList(), 80, 60)
-    val mirrorKing = FactionBoss("Lustrzany Król", "Trybunał", "tribune", listOf("paranoid", "occult", "strategic"), emptyList(), listOf("dwor", "miasto_lustro", "trybunal_cieni"), emptyList(), 90, 70)
+    val prophetOfSeaMist = FactionBoss("Prorok Morskiej Mgły", "Zakon Świtu", "archpriest", listOf("visionary", "fanatic", "broken"), emptyList(), listOf("proroctwo", "burza_mgielna", "otwarcie_rzeki"), emptyList(), 90, 100)
+    val mirrorKing = FactionBoss("Lustrzany Król", "Trybunał", "tribune", listOf("paranoid", "occult", "strategic"), emptyList(), listOf("dwor", "miasto_lustro", "trybunal_cieni"), emptyList(), 95, 110)
     val bloodAvatarRegional = FactionBoss("Awatar Krwi", "Gildia", "grandmaster", listOf("cruel", "visionary", "fanatic"), emptyList(), listOf("krwawe_pola", "organiczna_katedra", "mutacja_regionalna"), emptyList(), 95, 85)
     val symmetryDemiurgeRegional = FactionBoss("Demiurg Symetrii", "Trybunał", "tribune", listOf("logical", "occult", "vengeful"), emptyList(), listOf("kaniony", "burza_lustrzana", "arena_symetryczna"), emptyList(), 85, 75)
     val goldenWarden = FactionBoss("Złoty Strażnik", "Bractwo Cienia", "inquisitor", listOf("fanatic", "occult", "paranoid"), emptyList(), listOf("nekropolia", "krew_i_mgla", "echo_smierci"), emptyList(), 80, 80)
@@ -15,4 +15,5 @@ object GrimBossCatalogue {
     val serethTri = TriLayerBoss("Sereth, Rycerz Pełni", 700, 700, 700, "mist", true, 9, true, true, true, true, "trzy_style_wojny_odcisniete_na_regionach", "mieszane_zakonczenia_pelni_krwi_mgly_lustra")
     val allRegionalBosses = listOf(prophetOfSeaMist, mirrorKing, bloodAvatarRegional, symmetryDemiurgeRegional, goldenWarden, fullnessAvatarRegional, riftBeastRegional)
     val allTriLayerBosses = listOf(vorthemTri, mirrorTribuneTri, xyrelTri, aelionTri, serethTri)
+    val allBosses = allRegionalBosses + allTriLayerBosses
 }
