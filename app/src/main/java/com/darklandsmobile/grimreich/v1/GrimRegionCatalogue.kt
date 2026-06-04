@@ -1,13 +1,14 @@
 package com.darklandsmobile.grimreich.v1
 
 object GrimRegionCatalogue {
-    val coastalNorth = RegionConsciousness("Wybrzeże Północne", "mgła_pamięci", "krew_fal", "odbicie_latarnie", "niepokój", listOf("stare_żagle", "burza"), listOf("widma", "przypływ"), "odpłynięcie", "morze")
-    val heartland = RegionConsciousness("Serce Krainy", "mgła_centrum", "krew_rdzeń", "odbicie_zwierciadło", "kontrola", listOf("tron", "rynek"), listOf("dyscyplina", "intryga"), "stabilizacja", "rządy")
-    val crownPlains = RegionConsciousness("Równiny Koronne", "mgła_stepu", "krew_jeźdźców", "odbicie_banner", "duma", listOf("szlak", "kurhan"), listOf("najazd", "warta"), "ekspansja", "wojna")
-    val steppeBorder = RegionConsciousness("Pogranicze Stepowe", "mgła_horyzontu", "krew_pylu", "odbicie_wichru", "czujność", listOf("droga", "posterunek"), listOf("rajdy", "czaty"), "granica", "konflikt")
-    val southernRuins = RegionConsciousness("Południowe Ruiny", "mgła_gruzu", "krew_kamienia", "odbicie_echa", "żałoba", listOf("ruina", "studnia"), listOf("cienie", "zapadanie"), "osunięcie", "upadek")
-    val southernMountains = RegionConsciousness("Góry Południowe", "mgła_szczytów", "krew_rudy", "odbicie_lodu", "duma", listOf("grań", "kopalnia"), listOf("lawina", "echa"), "izolacja", "cisza")
-    val wildLands = RegionConsciousness("Ziemie Dzikie", "mgła_dziczy", "krew_zwierząt", "odbicie_krzaków", "szał", listOf("puszcza", "bór"), listOf("łowy", "wilki"), "nieokiełznanie", "piękno")
-    val all = listOf(coastalNorth, heartland, crownPlains, steppeBorder, southernRuins, southernMountains, wildLands)
-    val regions = all
+    data class RegionEntry(val regionName:String,val phenomenon:String,val faction:String,val bossName:String,val time:NonlinearTime,val architecture:FullnessArchitecture)
+    val regions = listOf(
+        RegionEntry("Wybrzeże Północne","Mgła","Zakon Świtu","Prorok Morskiej Mgły",GrimBuilders.defaultNonlinearTime("Wybrzeże Północne"), FullnessArchitecture("Latarnia Trzech Przyszłości","mgła","krew","odbicie","pełnia","rozdarcie","przepowiednie_na_morzu","wzmacnia_zakonczenie_mgly")),
+        RegionEntry("Serce Krainy","Odbicie","Trybunał","Lustrzany Król",GrimBuilders.defaultNonlinearTime("Serce Krainy"), FullnessArchitecture("Dwór Złoty","mgła","krew","odbicie","pełnia","rozdarcie","centrum_trybunalu","wezel_zakonczenia_lustra")),
+        RegionEntry("Równiny Koronne","Krew","Gildia","Awatar Krwi",GrimBuilders.defaultNonlinearTime("Równiny Koronne"), FullnessArchitecture("Katedra Jednego Ciała","mgła","krew","odbicie","pełnia","rozdarcie","centrum_rytualow_krwi","klucz_do_zakonczenia_krwi")),
+        RegionEntry("Pogranicze Stepowe","Rozdarcie","Bractwo Cienia","Złoty Strażnik",GrimBuilders.defaultNonlinearTime("Pogranicze Stepowe"), FullnessArchitecture("Fort Rozłamu","mgła","krew","odbicie","pełnia","rozdarcie","centrum_bursztynowych_pustkowi","wzmacnia_zakonczenie_rozdarcia")),
+        RegionEntry("Południowe Ruiny","Pełnia","Trybunał","Demiurg Symetrii",GrimBuilders.defaultNonlinearTime("Południowe Ruiny"), FullnessArchitecture("Zrujnowany Trybunał","mgła","krew","odbicie","pełnia","rozdarcie","centrum_ruin_pełni","wzmacnia_zakonczenie_pelni")),
+        RegionEntry("Góry Południowe","Absolut","None","Bestia Rozdarcia",GrimBuilders.defaultNonlinearTime("Góry Południowe"), FullnessArchitecture("Szczyt Zaniku","mgła","krew","odbicie","pełnia","rozdarcie","szczyt_zaniku","wzmacnia_zakonczenie_absolutu")),
+        RegionEntry("Ziemie Dzikie","Mgła","Bractwo Cienia","Trybun Lustrzany",GrimBuilders.defaultNonlinearTime("Ziemie Dzikie"), FullnessArchitecture("Krąg Łowów","mgła","krew","odbicie","pełnia","rozdarcie","centrum_dzikich_pól","wzmacnia_zakonczenie_mieszane"))
+    )
 }

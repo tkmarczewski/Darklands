@@ -1,1 +1,1 @@
-{"collapseStage":"example","phenomenonLoss":3,"layerCollapse":2,"regionDecay":1,"npcDecay":0,"monsterDecay":0,"historyLoss":0,"endingImpact":"example_collapse"}
+{"id":"world-1","regions":[{"id":"r1","name":"Misty Vale"}],"notes":"example"}
