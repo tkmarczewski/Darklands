@@ -85,7 +85,7 @@ object TravelSystem {
         }
     }
 
-    fun travelTo(region: String): String {
+    fun travelTo(region: String, context: android.content.Context? = null): String {
         val w = GameRepository.state.world
         w.region = region
         w.location = region.replaceFirstChar { it.uppercase() }
@@ -98,9 +98,13 @@ object TravelSystem {
         }
         w.fatigue = minOf(w.fatigue + 1, 100)
         
-        val encounter = EncounterSystem.rollEncounter(Random.Default)
+        val encounter = EncounterSystem.rollEncounter(kotlin.random.Random.Default)
         val encounterMsg = if (encounter != null) {
-            "\n" + EncounterSystem.resolve(encounter)
+            EncounterSystem.activeEncounter = encounter
+            if (context != null) {
+                context.startActivity(android.content.Intent(context, com.grimreich.ui.EncounterActivity::class.java))
+            }
+            "\nSpotkanie: ${encounter.title}"
         } else {
             ""
         }

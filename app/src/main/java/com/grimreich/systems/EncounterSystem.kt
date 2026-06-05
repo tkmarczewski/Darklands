@@ -1,55 +1,80 @@
 package com.grimreich.systems
 
 import com.grimreich.core.GameRepository
-import com.grimreich.core.TimeOfDay
+import com.grimreich.core.GameState
 import kotlin.random.Random
 
 enum class EncounterType {
-    COMBAT, NARRATIVE, RESOURCE
+    COMBAT, INTERACTIVE, RESOURCE
 }
+
+data class EncounterChoice(
+    val label: String,
+    val description: String,
+    val effect: (GameState) -> String
+)
 
 data class Encounter(
     val id: String,
     val title: String,
     val description: String,
-    val type: EncounterType
+    val type: EncounterType,
+    val choices: List<EncounterChoice> = emptyList()
 )
 
 object EncounterSystem {
     private val encounters = listOf(
-        Encounter("wolves", "Atak wilków", "Stado wygłodniałych wilków wyłania się z gęstwiny.", EncounterType.COMBAT),
-        Encounter("bandits", "Zasadzka zbójców", "Zza krzaków wypadają uzbrojeni bandyci!", EncounterType.COMBAT),
-        Encounter("pilgrims", "Pielgrzymi", "Spotykacie grupę zmęczonych podróżników dzielących się wieściami.", EncounterType.NARRATIVE),
-        Encounter("shrine", "Zapomniana kapliczka", "Odnajdujecie miejsce kultu spowite mchem.", EncounterType.RESOURCE),
-        Encounter("abandoned_cart", "Porzucony wóz", "W przydrożnym rowie leży rozbity wóz handlowy.", EncounterType.RESOURCE)
+        Encounter(
+            "abandoned_cart", 
+            "Porzucony wóz", 
+            "W przydrożnym rowie leży rozbity wóz handlowy. Nie widać żywej duszy.", 
+            EncounterType.INTERACTIVE,
+            listOf(
+                EncounterChoice("Przeszukaj", "Szukasz cennych przedmiotów.") { state ->
+                    val gold = Random.nextInt(20, 60)
+                    state.gold += gold
+                    state.party.forEach { it.corruption += 1 }
+                    "Znalazłeś $gold złota, ale sumienie cię gryzie (+1 Korupcja)."
+                },
+                EncounterChoice("Módl się", "Odmawiasz modlitwę za właścicieli.") { state ->
+                    state.prayer.virtue += 2
+                    state.party.forEach { it.sanity += 5 }
+                    "Poczuliście spokój (+2 Cnota, +5 Poczytalność)."
+                },
+                EncounterChoice("Zignoruj", "Omijasz wóz szerokim łukiem.") { "Zostawiliście to miejsce w mroku." }
+            )
+        ),
+        Encounter(
+            "mysterious_shrine",
+            "Mroczna kapliczka",
+            "Na rozstajach dróg stoi kapliczka spowita czarną mgłą.",
+            EncounterType.INTERACTIVE,
+            listOf(
+                EncounterChoice("Złóż ofiarę", "Poświęcasz odrobinę krwi.") { state ->
+                    state.party.forEach { 
+                        it.hp -= 5
+                        it.corruption += 5
+                    }
+                    "Mrok cię zauważył (+5 Korupcja, -5 HP)."
+                },
+                EncounterChoice("Oczyść ją", "Używasz świętej wody i modlitwy.") { state ->
+                    state.prayer.faith += 5
+                    state.prayer.virtue += 5
+                    "Mgła nieco rzednie (+5 Wiara, +5 Cnota)."
+                }
+            )
+        )
     )
 
     fun rollEncounter(random: Random): Encounter? {
-        val chance = 0.4f // 40% chance during travel
+        val chance = 0.5f 
         if (random.nextFloat() > chance) return null
         return encounters.random(random)
     }
 
-    fun resolve(encounter: Encounter): String {
-        val w = GameRepository.state.world
-        w.lastEncounter = encounter.id
-        
-        return when (encounter.type) {
-            EncounterType.COMBAT -> {
-                // In a real app, this would switch to CombatActivity
-                "Rozpoczyna się walka: ${encounter.title}!"
-            }
-            EncounterType.RESOURCE -> {
-                val goldFound = Random.nextInt(10, 50)
-                GameRepository.state.gold += goldFound
-                "Znaleziono surowce: +$goldFound złota."
-            }
-            EncounterType.NARRATIVE -> {
-                GameRepository.state.reputation.city.keys.randomOrNull()?.let { city ->
-                    // Modify reputation
-                }
-                "Rozmowa z nieznajomymi przyniosła nowe informacje."
-            }
-        }
+    var activeEncounter: Encounter? = null
+
+    fun selectEncounter(encounter: Encounter) {
+        activeEncounter = encounter
     }
 }

@@ -32,5 +32,6 @@
         <activity android:name=".ui.CombatStatusActivity" android:exported="false"/>
         <activity android:name=".ui.QuestFinalActivity" android:exported="false"/>
         <activity android:name=".ui.FinaleActivity" android:exported="false"/>
+        <activity android:name=".ui.EncounterActivity" android:exported="false"/>
     </application>
 </manifest>
