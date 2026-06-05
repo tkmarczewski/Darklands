@@ -1,6 +1,7 @@
 package com.grimreich.world
 
 import com.grimreich.core.EnemyType
+import com.grimreich.grimreich.v1.GrimBossCatalogue
 import kotlin.random.Random
 
 enum class LocationType {
@@ -19,7 +20,9 @@ data class ProceduralLocation(
     val nearestCityId: String,
     val enemies: List<EnemyType>,
     val rewardGold: Int,
-    val linkedEventId: String? = null
+    val linkedEventId: String? = null,
+    val narrativeFlavor: String = "",
+    val bossName: String? = null
 )
 
 /**
@@ -47,6 +50,10 @@ object ProceduralLocationGenerator {
         city: CityData,
         random: Random
     ): ProceduralLocation {
+        val flavor = GrimLoreGenerator.generateDescription(type, random)
+        val hasBoss = random.nextFloat() < 0.3f && (type == LocationType.DUNGEON || type == LocationType.RAUBRITTER_CASTLE)
+        val boss = if (hasBoss) GrimBossCatalogue.allBosses.random(random) else null
+        
         return when (type) {
             LocationType.RUINS -> ProceduralLocation(
                 id = "ruins_${city.id}_$index",
@@ -56,7 +63,8 @@ object ProceduralLocationGenerator {
                 nearestCityId = city.id,
                 enemies = listOf(EnemyType.BANDIT, EnemyType.SKELETON),
                 rewardGold = 40 + random.nextInt(70),
-                linkedEventId = "ruins_discovery"
+                linkedEventId = "ruins_discovery",
+                narrativeFlavor = flavor
             )
             LocationType.RAUBRITTER_CASTLE -> ProceduralLocation(
                 id = "castle_${city.id}_$index",
@@ -66,7 +74,9 @@ object ProceduralLocationGenerator {
                 nearestCityId = city.id,
                 enemies = listOf(EnemyType.RAUBRITTER_SOLDIER, EnemyType.RAUBRITTER_KNIGHT),
                 rewardGold = 100 + random.nextInt(180),
-                linkedEventId = "raubritter_scout_report"
+                linkedEventId = "raubritter_scout_report",
+                narrativeFlavor = flavor,
+                bossName = boss
             )
             LocationType.MONASTERY -> ProceduralLocation(
                 id = "monastery_${city.id}_$index",
@@ -76,7 +86,8 @@ object ProceduralLocationGenerator {
                 nearestCityId = city.id,
                 enemies = emptyList(),
                 rewardGold = 20 + random.nextInt(40),
-                linkedEventId = "pilgrim_request"
+                linkedEventId = "pilgrim_request",
+                narrativeFlavor = flavor
             )
             LocationType.DUNGEON -> ProceduralLocation(
                 id = "dungeon_${city.id}_$index",
@@ -86,7 +97,9 @@ object ProceduralLocationGenerator {
                 nearestCityId = city.id,
                 enemies = listOf(EnemyType.SKELETON_WARRIOR, EnemyType.GHOST, EnemyType.CULTIST),
                 rewardGold = 80 + random.nextInt(140),
-                linkedEventId = "dungeon_whispers"
+                linkedEventId = "dungeon_whispers",
+                narrativeFlavor = flavor,
+                bossName = boss
             )
             LocationType.HAMLET -> ProceduralLocation(
                 id = "hamlet_${city.id}_$index",
@@ -96,7 +109,8 @@ object ProceduralLocationGenerator {
                 nearestCityId = city.id,
                 enemies = listOf(EnemyType.WOLF),
                 rewardGold = 15 + random.nextInt(35),
-                linkedEventId = "hamlet_trouble"
+                linkedEventId = "hamlet_trouble",
+                narrativeFlavor = flavor
             )
         }
     }

@@ -10,6 +10,10 @@ class HubActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_hub)
+        
+        val world = com.grimreich.core.GameRepository.state.world
+        findViewById<android.widget.TextView>(R.id.tvTime).text = "Dzień ${world.day}, ${world.timeOfDay}"
+
         findViewById<Button>(R.id.openCity).setOnClickListener { startActivity(Intent(this, CityActivity::class.java).putExtra("cityId", "grimhold")) }
         findViewById<Button>(R.id.openReputation).setOnClickListener { startActivity(Intent(this, ReputationActivity::class.java)) }
         findViewById<Button>(R.id.openMap).setOnClickListener { startActivity(Intent(this, MapActivity::class.java)) }

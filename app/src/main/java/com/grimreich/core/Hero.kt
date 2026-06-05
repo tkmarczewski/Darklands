@@ -15,6 +15,11 @@ data class Hero(
     // Cnota i wiara
     var virtue: Int       = 0,
     var divineFavor: Int  = 50,  // DF: 0-150, konieczne do modlitwy do swietych
+    
+    // Status psychiczny i duchowy
+    var sanity: Int       = 100, // 0-100, spada podczas ekspedycji na Druga Strone
+    var corruption: Int   = 0,   // 0-100, rosnie przy kontaktach z mrokiem
+
     // Punkty zycia
     var hp: Int           = 30,
     var maxHp: Int        = 30,

@@ -8,6 +8,16 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:padding="16dp">
+
+        <TextView
+            android:id="@+id/tvTime"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Dzień 1, Poranek"
+            android:textColor="#c8a96e"
+            android:gravity="center"
+            android:layout_marginBottom="8dp" />
+
         <Button android:id="@+id/openCity" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/menu_city" android:layout_marginTop="8dp"/>
         <Button android:id="@+id/openReputation" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/menu_reputation"/>
         <Button android:id="@+id/openMap" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/menu_map" android:drawableStart="@drawable/ic_system_map" android:drawablePadding="8dp"/>

@@ -97,13 +97,16 @@ object TravelSystem {
             else        -> "morning"
         }
         w.fatigue = minOf(w.fatigue + 1, 100)
-        w.lastEncounter = when (region) {
-            "forest" -> "wolves"
-            "road"   -> "bandits"
-            else     -> "none"
+        
+        val encounter = EncounterSystem.rollEncounter(Random.Default)
+        val encounterMsg = if (encounter != null) {
+            "\n" + EncounterSystem.resolve(encounter)
+        } else {
+            ""
         }
+        
         GameRepository.log("Podroz do regionu: $region")
-        return "Podroz do $region zakonczona."
+        return "Podroz do $region zakonczona.$encounterMsg"
     }
 
     fun getSeasonDisplay(): String {
