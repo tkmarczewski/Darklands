@@ -6,7 +6,7 @@
         android:theme="@style/Theme.GrimReich"
         android:supportsRtl="true">
 
-        <!-- Glowny launcher gry. Hub testowy sprintow 9+ uruchamia sie z poziomu MainActivity. -->
+        <!-- Glowny launcher gry. Hub uruchamia sie z poziomu MainActivity. -->
         <activity android:name=".ui.MainActivity" android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
@@ -14,7 +14,7 @@
             </intent-filter>
         </activity>
 
-        <!-- Activities sprzed sprintow UI 8-17 (rdzen gry: party, postac, ekwipunek, mapa, modlitwa itd.). -->
+        <!-- Rdzen gry: druzyna, postac, ekwipunek, mapa, modlitwa, alchemia, walka, zakonczenie. -->
         <activity android:name=".ui.PartyActivity"           android:exported="false"/>
         <activity android:name=".ui.CharacterActivity"       android:exported="false"/>
         <activity android:name=".ui.InventoryActivity"       android:exported="false"/>
@@ -24,7 +24,7 @@
         <activity android:name=".ui.CombatActivity"          android:exported="false"/>
         <activity android:name=".ui.EndgameActivity"         android:exported="false"/>
 
-        <!-- Sprint 9+: hub testowy i ekrany finalnego pakietu (miasto, reputacja, swieci, eventy, handel, transfer, status walki, questy, final). -->
+        <!-- Hub i ekrany: miasto, reputacja, swieci, eventy, handel, transfer, status walki, questy, final. -->
         <activity android:name=".ui.HubActivity"                  android:exported="false"/>
         <activity android:name=".ui.CityActivity"                 android:exported="false"/>
         <activity android:name=".ui.ReputationActivity"           android:exported="false"/>
@@ -35,6 +35,6 @@
         <activity android:name=".ui.InventoryDetailActivity"      android:exported="false"/>
         <activity android:name=".ui.CombatStatusActivity"         android:exported="false"/>
         <activity android:name=".ui.QuestFinalActivity"           android:exported="false"/>
-        <activity android:name=".ui.BaphometActivity"             android:exported="false"/>
+        <activity android:name=".ui.FinaleActivity"               android:exported="false"/>
     </application>
 </manifest>

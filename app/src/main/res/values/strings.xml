@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">GrimReich</string>
-    <string name="btn_party">Druzyna</string>
-    <string name="btn_character">Postac</string>
+    <string name="app_name">Grimreich</string>
+    <string name="btn_party">Drużyna</string>
+    <string name="btn_character">Postać</string>
     <string name="btn_inventory">Ekwipunek</string>
     <string name="btn_map">Mapa</string>
     <string name="btn_prayer">Modlitwa</string>
@@ -11,11 +11,24 @@
     <string name="btn_event">Zdarzenie</string>
     <string name="btn_save">Zapisz</string>
     <string name="btn_load">Wczytaj</string>
-    <string name="btn_use">Uzyj</string>
-    <string name="btn_pray">Modl sie</string>
-    <string name="btn_donate">Ofiaruj zloto</string>
-    <string name="btn_brew">Warz miksture</string>
+    <string name="btn_use">Użyj</string>
+    <string name="btn_pray">Módl się</string>
+    <string name="btn_donate">Ofiaruj złoto</string>
+    <string name="btn_brew">Warzyj miksturę</string>
     <string name="hint_item_index">Numer przedmiotu</string>
     <string name="hint_donation">Kwota darowizny</string>
     <string name="hint_recipe_index">Numer receptury</string>
+    <string name="menu_city">Miasto</string>
+    <string name="menu_reputation">Reputacja</string>
+    <string name="menu_map">Mapa</string>
+    <string name="menu_saints">Święci</string>
+    <string name="menu_city_events">Eventy miasta</string>
+    <string name="menu_inventory">Ekwipunek</string>
+    <string name="menu_trade">Handel</string>
+    <string name="menu_transfer">Transfer</string>
+    <string name="menu_combat_status">Status walki</string>
+    <string name="menu_quests">Questy</string>
+    <string name="menu_finale">Finał</string>
+    <string name="grimreich_mvp_title">=== GRIMREICH 1.0 ===</string>
+    <string name="grimreich_mvp_prompt">Naciśnij „Bootstrap" żeby zainicjować grę.</string>
 </resources>

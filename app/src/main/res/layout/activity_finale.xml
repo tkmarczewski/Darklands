@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Ekran finału Grimreich 1.0 — EndingSystem.finaleStatus() -->
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#1a1a2e">
+    <TextView
+        android:id="@+id/finaleText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:fontFamily="monospace"
+        android:textColor="#c8a96e"
+        android:textSize="14sp"
+        android:padding="16dp"
+        android:text="@string/menu_finale" />
+</ScrollView>

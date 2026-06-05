@@ -1,24 +1,24 @@
-# Darklands
+# Grimreich
 
 [![Android CI](https://github.com/tkmarczewski/Darklands/actions/workflows/android-ci.yml/badge.svg)](https://github.com/tkmarczewski/Darklands/actions/workflows/android-ci.yml)
 [![MIT License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
-Darklands Mobile — gra RPG na Androida inspirowana średniowieczem.
+Grimreich 1.0 — mobilna gra RPG na Androida osadzona w mrocznym średniowiecznym świecie Grimreich.
 
 ## Opis
 
-Darklands to mobilna gra RPG osadzona w mrocznym średniowieczu. Gracz wcielają się w bohatera, który musi zmierzyć się z wyzwaniami wiary, reputacji, starzenia i walki, dążąc do jednego z czterech możliwych zakończeń.
+Grimreich to mobilna gra RPG, w której gracz wciela się w bohatera wędrującego przez krainę Grimreich. Musi on zmierzyć się z wyzwaniami wiary, reputacji, starzenia i walki, dążąc do jednego z czterech możliwych zakończeń: Oczyszczenia, Gorzkiego Zwycięstwa, Odkupienia lub Skażenia.
 
 ## Funkcje
 
 - System postaci z karierami, starzeniem i atrybutami
-- System walki z moralne (MoraleSystem) i ranami (WoundType)
-- System reputacji frakcji (Rycerze, Kupcy, Kościół, Lud)
-- System religii i łaski bożej
+- System walki z moraleSystemem i ranami (WoundType)
+- System reputacji frakcji krainy Grimreich
+- System religii i łaski
 - Graf zadań (QuestGraph) z zależnościami
 - System ekwipunku: broń, zbroja, przedmioty
 - System zapisu gry z autozapisem i migracją wersji
-- Cztery zakończenia: Dobry, Pragmatyczny, Odkupienie, Skażenie
+- Cztery zakończenia: Oczyszczenie, Gorzkie Zwycięstwo, Odkupienie, Skażenie
 
 ## Budowanie i uruchamianie
 

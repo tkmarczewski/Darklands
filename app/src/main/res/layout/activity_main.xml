@@ -17,44 +17,45 @@
             android:fontFamily="monospace"
             android:textColor="#c8a96e"
             android:textSize="14sp"
-            android:paddingBottom="16dp" />
+            android:paddingBottom="16dp"
+            android:text="@string/grimreich_mvp_prompt"/>
 
         <Button
             android:id="@+id/btnBootstrap"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Bootstrap MVP" />
+            android:text="Bootstrap Grimreich" />
 
         <Button
             android:id="@+id/btnCity"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:text="Show City" />
+            android:text="@string/menu_city" />
 
         <Button
             android:id="@+id/btnAcceptQuest"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Accept First Quest" />
+            android:text="@string/btn_quest" />
 
         <Button
             android:id="@+id/btnTravel"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Travel To Quest" />
+            android:text="Podróż do questa" />
 
         <Button
             android:id="@+id/btnResolve"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Resolve Quest" />
+            android:text="Rozwiąż questa" />
 
         <Button
             android:id="@+id/btnJournal"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Show Journal" />
+            android:text="Dziennik" />
 
     </LinearLayout>
 </ScrollView>
