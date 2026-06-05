@@ -1,23 +1,54 @@
 package com.grimreich.ui
 
 import android.os.Bundle
+import android.widget.Button
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.grimreich.R
+import com.grimreich.core.GameRepository
 import com.grimreich.core.SaintCatalogue
+import com.grimreich.systems.ChurchSystem
 
-/**
- * Ekran swietych (Sprint 10): czytelna lista patronow z SaintCatalogue.
- */
 class SaintsActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_saints)
 
-        val saintsText = SaintCatalogue.all().joinToString("\n\n") { saint ->
+        render()
+
+        findViewById<Button>(R.id.btnPray).setOnClickListener {
+            val hero = GameRepository.state.party.firstOrNull() ?: return@setOnClickListener
+            val msg = ChurchSystem.pray(hero)
+            Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
+            render()
+        }
+
+        findViewById<Button>(R.id.btnCleanse).setOnClickListener {
+            val hero = GameRepository.state.party.firstOrNull() ?: return@setOnClickListener
+            val msg = ChurchSystem.cleanseRelic(hero)
+            Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
+            render()
+        }
+    }
+
+    private fun render() {
+        val saintsList = SaintCatalogue.all()
+        val saintsText = if (saintsList.isEmpty()) "Brak świętych." else saintsList.joinToString("\n\n") { saint ->
             "${saint.name}\n  domain: ${saint.domain}\n  patronage: ${saint.patronage}"
         }
-        findViewById<TextView>(R.id.saintsStatus).text =
-            saintsText.ifBlank { "Brak swietych" }
+        
+        val g = GameRepository.state
+        val partyStatus = g.party.joinToString("\n") { h ->
+            "${h.name}: Favor=${h.divineFavor}, Virtue=${h.virtue}, Corruption=${h.corruption}, Sanity=${h.sanity}%"
+        }
+
+        findViewById<TextView>(R.id.saintsStatus).text = buildString {
+            append("=== TWOJA DRUŻYNA ===\n")
+            append(if (partyStatus.isBlank()) "Brak bohaterów.\n" else partyStatus + "\n")
+            append("\n")
+            append("=== KATALOG ŚWIĘTYCH ===\n")
+            append(saintsText + "\n")
+        }
     }
 }

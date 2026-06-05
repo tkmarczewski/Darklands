@@ -12,13 +12,13 @@ data class Hero(
     var endurance: Int    = 10,
     var charisma: Int     = 10,
     var piety: Int        = 10,  // Pobozhnosc
-    // Cnota i wiara
-    var virtue: Int       = 0,
-    var divineFavor: Int  = 50,  // DF: 0-150, konieczne do modlitwy do swietych
     
     // Status psychiczny i duchowy
+    var virtue: Int       = 0,
+    var divineFavor: Int  = 50,  // DF: 0-150, konieczne do modlitwy do swietych
     var sanity: Int       = 100, // 0-100, spada podczas ekspedycji na Druga Strone
     var corruption: Int   = 0,   // 0-100, rosnie przy kontaktach z mrokiem
+    var morale: Int       = 70,  // 0-100, biezacy stan ducha
 
     // Punkty zycia
     var hp: Int           = 30,
