@@ -14,9 +14,16 @@ class MainActivity : AppCompatActivity() {
     private var initialized = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        android.util.Log.e("DARKLANDS", "MainActivity.onCreate START")
         super.onCreate(savedInstanceState)
-        binding = ActivityMainBinding.inflate(layoutInflater)
-        setContentView(binding.root)
+        try {
+            binding = ActivityMainBinding.inflate(layoutInflater)
+            android.util.Log.e("DARKLANDS", "MainActivity.onCreate INFLATED")
+            setContentView(binding.root)
+            android.util.Log.e("DARKLANDS", "MainActivity.onCreate CONTENT SET")
+        } catch (e: Exception) {
+            android.util.Log.e("DARKLANDS", "MainActivity.onCreate ERROR", e)
+        }
 
         binding.btnBootstrap.setOnClickListener {
             playerState = GameLoopController.bootstrap(seed = 1)

@@ -40,7 +40,8 @@ class VectorDraw:
         x1, y1 = bounds[1]
         cx, cy = (x0 + x1) / 2.0, (y0 + y1) / 2.0
         rx, ry = abs(x1 - x0) / 2.0, abs(y1 - y0) / 2.0
-        # Use two arcs to make a full ellipse
+        if rx == 0 or ry == 0: return
+        # A full ellipse using two 180-degree arcs
         self.paths.append(f'<path android:fillColor="{self._color(fill)}" android:pathData="M{cx-rx},{cy} A{rx},{ry} 0 1,1 {cx+rx},{cy} A{rx},{ry} 0 1,1 {cx-rx},{cy} Z" />')
 
     def line(self, points, fill, width=1):

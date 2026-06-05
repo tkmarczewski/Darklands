@@ -3,16 +3,7 @@
     android:height="24dp"
     android:viewportWidth="64"
     android:viewportHeight="64">
-    <!-- Blade -->
-    <path
-        android:fillColor="#B4B4BE"
-        android:pathData="M29,52 L35,52 L33,12 L31,12 Z" />
-    <!-- Crossguard -->
-    <path
-        android:fillColor="#785A32"
-        android:pathData="M22,50 L42,50 L42,54 L22,54 Z" />
-    <!-- Handle -->
-    <path
-        android:fillColor="#503C1E"
-        android:pathData="M30,54 L34,54 L34,62 L30,62 Z" />
+    <path android:fillColor="#B4B4BE" android:pathData="M29,52 L35,52 L33,12 L31,12 Z" />
+    <path android:fillColor="#785A32" android:pathData="M22,50 L42,50 L42,54 L22,54 Z" />
+    <path android:fillColor="#503C1E" android:pathData="M30,54 L34,54 L34,62 L30,62 Z" />
 </vector>
