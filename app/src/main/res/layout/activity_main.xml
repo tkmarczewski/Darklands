@@ -3,13 +3,11 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/bg_road_night">
-
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:padding="16dp">
-
         <TextView
             android:id="@+id/tvMain"
             android:layout_width="match_parent"
@@ -18,44 +16,12 @@
             android:textColor="#c8a96e"
             android:textSize="14sp"
             android:paddingBottom="16dp"
-            android:text="@string/grimreich_mvp_prompt"/>
-
-        <Button
-            android:id="@+id/btnBootstrap"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Bootstrap Grimreich" />
-
-        <Button
-            android:id="@+id/btnCity"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:text="@string/menu_city" />
-
-        <Button
-            android:id="@+id/btnAcceptQuest"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/btn_quest" />
-
-        <Button
-            android:id="@+id/btnTravel"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Podróż do questa" />
-
-        <Button
-            android:id="@+id/btnResolve"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Rozwiąż questa" />
-
-        <Button
-            android:id="@+id/btnJournal"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Dziennik" />
-
+            android:text="@string/grimreich_mvp_prompt" />
+        <Button android:id="@+id/btnBootstrap" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Bootstrap Grimreich" />
+        <Button android:id="@+id/btnCity" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:text="@string/menu_city" />
+        <Button android:id="@+id/btnAcceptQuest" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/btn_quest" />
+        <Button android:id="@+id/btnTravel" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Podróż do questa" />
+        <Button android:id="@+id/btnResolve" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Rozwiąż questa" />
+        <Button android:id="@+id/btnJournal" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Dziennik" />
     </LinearLayout>
 </ScrollView>

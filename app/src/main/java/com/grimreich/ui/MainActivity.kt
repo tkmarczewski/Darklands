@@ -8,7 +8,6 @@ import com.grimreich.systems.GameLoopController
 import com.grimreich.systems.QuestJournalSystem
 
 class MainActivity : AppCompatActivity() {
-
     private lateinit var binding: ActivityMainBinding
     private var playerState: PlayerState = PlayerState()
     private var initialized = false
@@ -47,10 +46,8 @@ class MainActivity : AppCompatActivity() {
                 } else {
                     playerState = GameLoopController.acceptQuest(playerState, firstQuest.id)
                     showText(
-                        """
-                        Przyjęto quest: ${firstQuest.title}
-                        ID questa: ${firstQuest.id}
-                        """.trimIndent()
+                        """Przyjęto quest: ${firstQuest.title}
+ID questa: ${firstQuest.id}""".trimIndent()
                     )
                 }
             }
@@ -87,7 +84,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        binding.tvMain.text = getString(R.string.grimreich_mvp_prompt)
+        binding.tvMain.text = getString(com.grimreich.R.string.grimreich_mvp_prompt)
     }
 
     private fun guardInitialized(action: () -> Unit) {

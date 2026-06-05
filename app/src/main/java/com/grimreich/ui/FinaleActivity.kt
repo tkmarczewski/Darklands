@@ -6,10 +6,6 @@ import androidx.appcompat.app.AppCompatActivity
 import com.grimreich.R
 import com.grimreich.systems.EndingSystem
 
-/**
- * Ekran finału Grimreich 1.0.
- * Wyświetla status zakończenia obliczony przez EndingSystem.
- */
 class FinaleActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

@@ -1,0 +1,9 @@
+package com.grimreich.core
+
+data class PrayerState(
+    var faith: Int = 0,
+    var virtue: Int = 0,
+    var sins: Int = 0,
+    var blessings: Int = 0,
+    val favor: MutableMap<String, Int> = mutableMapOf()
+)

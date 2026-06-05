@@ -1,57 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Hub nawigacyjny Grimreich 1.0 -->
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#1a1a2e">
-
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:padding="16dp">
-
-        <Button android:id="@+id/openCity"
-            android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:text="@string/menu_city"
-            android:layout_marginTop="8dp"/>
-        <Button android:id="@+id/openReputation"
-            android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:text="@string/menu_reputation"/>
-        <Button android:id="@+id/openMap"
-            android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:text="@string/menu_map"
-            android:drawableStart="@drawable/ic_system_map"
-            android:drawablePadding="8dp"/>
-        <Button android:id="@+id/openSaints"
-            android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:text="@string/menu_saints"/>
-        <Button android:id="@+id/openCityEvents"
-            android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:text="@string/menu_city_events"/>
-        <Button android:id="@+id/openInventory"
-            android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:text="@string/menu_inventory"
-            android:drawableStart="@drawable/ic_equipment_sword"
-            android:drawablePadding="8dp"/>
-        <Button android:id="@+id/openTrade"
-            android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:text="@string/menu_trade"/>
-        <Button android:id="@+id/openTransfer"
-            android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:text="@string/menu_transfer"/>
-        <Button android:id="@+id/openCombatStatus"
-            android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:text="@string/menu_combat_status"/>
-        <Button android:id="@+id/openQuests"
-            android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:text="@string/menu_quests"
-            android:drawableStart="@drawable/ic_system_quests"
-            android:drawablePadding="8dp"/>
-        <Button android:id="@+id/openFinale"
-            android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:text="@string/menu_finale"
-            android:drawableStart="@drawable/ic_system_settings"
-            android:drawablePadding="8dp"/>
+        <Button android:id="@+id/openCity" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/menu_city" android:layout_marginTop="8dp"/>
+        <Button android:id="@+id/openReputation" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/menu_reputation"/>
+        <Button android:id="@+id/openMap" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/menu_map" android:drawableStart="@drawable/ic_system_map" android:drawablePadding="8dp"/>
+        <Button android:id="@+id/openSaints" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/menu_saints"/>
+        <Button android:id="@+id/openCityEvents" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/menu_city_events"/>
+        <Button android:id="@+id/openInventory" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/menu_inventory" android:drawableStart="@drawable/ic_equipment_sword" android:drawablePadding="8dp"/>
+        <Button android:id="@+id/openTrade" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/menu_trade"/>
+        <Button android:id="@+id/openTransfer" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/menu_transfer"/>
+        <Button android:id="@+id/openCombatStatus" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/menu_combat_status"/>
+        <Button android:id="@+id/openQuests" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/menu_quests" android:drawableStart="@drawable/ic_system_quests" android:drawablePadding="8dp"/>
+        <Button android:id="@+id/openFinale" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/menu_finale" android:drawableStart="@drawable/ic_system_settings" android:drawablePadding="8dp"/>
     </LinearLayout>
 </ScrollView>

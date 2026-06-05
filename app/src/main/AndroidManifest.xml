@@ -6,7 +6,6 @@
         android:theme="@style/Theme.GrimReich"
         android:supportsRtl="true">
 
-        <!-- Glowny launcher gry. Hub uruchamia sie z poziomu MainActivity. -->
         <activity android:name=".ui.MainActivity" android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
@@ -14,27 +13,24 @@
             </intent-filter>
         </activity>
 
-        <!-- Rdzen gry: druzyna, postac, ekwipunek, mapa, modlitwa, alchemia, walka, zakonczenie. -->
-        <activity android:name=".ui.PartyActivity"           android:exported="false"/>
-        <activity android:name=".ui.CharacterActivity"       android:exported="false"/>
-        <activity android:name=".ui.InventoryActivity"       android:exported="false"/>
-        <activity android:name=".ui.MapActivity"             android:exported="false"/>
-        <activity android:name=".ui.PrayerActivity"          android:exported="false"/>
-        <activity android:name=".ui.AlchemyActivity"         android:exported="false"/>
-        <activity android:name=".ui.CombatActivity"          android:exported="false"/>
-        <activity android:name=".ui.EndgameActivity"         android:exported="false"/>
-
-        <!-- Hub i ekrany: miasto, reputacja, swieci, eventy, handel, transfer, status walki, questy, final. -->
-        <activity android:name=".ui.HubActivity"                  android:exported="false"/>
-        <activity android:name=".ui.CityActivity"                 android:exported="false"/>
-        <activity android:name=".ui.ReputationActivity"           android:exported="false"/>
-        <activity android:name=".ui.SaintsActivity"               android:exported="false"/>
-        <activity android:name=".ui.CityEventsActivity"           android:exported="false"/>
-        <activity android:name=".ui.TradeActivity"                android:exported="false"/>
-        <activity android:name=".ui.InventoryTransferActivity"    android:exported="false"/>
-        <activity android:name=".ui.InventoryDetailActivity"      android:exported="false"/>
-        <activity android:name=".ui.CombatStatusActivity"         android:exported="false"/>
-        <activity android:name=".ui.QuestFinalActivity"           android:exported="false"/>
-        <activity android:name=".ui.FinaleActivity"               android:exported="false"/>
+        <activity android:name=".ui.PartyActivity" android:exported="false"/>
+        <activity android:name=".ui.CharacterActivity" android:exported="false"/>
+        <activity android:name=".ui.InventoryActivity" android:exported="false"/>
+        <activity android:name=".ui.MapActivity" android:exported="false"/>
+        <activity android:name=".ui.PrayerActivity" android:exported="false"/>
+        <activity android:name=".ui.AlchemyActivity" android:exported="false"/>
+        <activity android:name=".ui.CombatActivity" android:exported="false"/>
+        <activity android:name=".ui.EndgameActivity" android:exported="false"/>
+        <activity android:name=".ui.HubActivity" android:exported="false"/>
+        <activity android:name=".ui.CityActivity" android:exported="false"/>
+        <activity android:name=".ui.ReputationActivity" android:exported="false"/>
+        <activity android:name=".ui.SaintsActivity" android:exported="false"/>
+        <activity android:name=".ui.CityEventsActivity" android:exported="false"/>
+        <activity android:name=".ui.TradeActivity" android:exported="false"/>
+        <activity android:name=".ui.InventoryTransferActivity" android:exported="false"/>
+        <activity android:name=".ui.InventoryDetailActivity" android:exported="false"/>
+        <activity android:name=".ui.CombatStatusActivity" android:exported="false"/>
+        <activity android:name=".ui.QuestFinalActivity" android:exported="false"/>
+        <activity android:name=".ui.FinaleActivity" android:exported="false"/>
     </application>
 </manifest>

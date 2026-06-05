@@ -14,7 +14,7 @@
     <string name="btn_use">Użyj</string>
     <string name="btn_pray">Módl się</string>
     <string name="btn_donate">Ofiaruj złoto</string>
-    <string name="btn_brew">Warzyj miksturę</string>
+    <string name="btn_brew">Warz miksturę</string>
     <string name="hint_item_index">Numer przedmiotu</string>
     <string name="hint_donation">Kwota darowizny</string>
     <string name="hint_recipe_index">Numer receptury</string>
@@ -29,6 +29,5 @@
     <string name="menu_combat_status">Status walki</string>
     <string name="menu_quests">Questy</string>
     <string name="menu_finale">Finał</string>
-    <string name="grimreich_mvp_title">=== GRIMREICH 1.0 ===</string>
-    <string name="grimreich_mvp_prompt">Naciśnij „Bootstrap" żeby zainicjować grę.</string>
+    <string name="grimreich_mvp_prompt">Naciśnij Bootstrap, żeby zainicjować GrimReich 1.0.</string>
 </resources>
