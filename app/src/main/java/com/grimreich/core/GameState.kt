@@ -1,20 +1,19 @@
 package com.grimreich.core
 
-import com.grimreich.grimreich.v1.GrimWorldEngine
-import com.grimreich.grimreich.v1.GrimWorldEngineFactory
+import com.grimreich.grimreich.v1.*
 
 data class GameState(
-    val grimEngine: GrimWorldEngine = GrimWorldEngineFactory.create(),
+    @Transient val grimEngine: GrimWorldEngine = GrimWorldEngineFactory.create(),
     var grimCurrentRegion: String = "Wybrzeże Północne",
     var grimPendingExpeditionName: String? = null,
-    
+
     // Core game state
     val party: MutableList<Hero> = mutableListOf(),
     var activeHeroId: String? = null,
     val inventory: MutableList<Item> = mutableListOf(),
     val logEntries: MutableList<String> = mutableListOf(),
     var gold: Int = 100,
-    
+
     val quest: QuestState = QuestState(),
     val reputation: ReputationState = ReputationState(),
     val prayer: PrayerState = PrayerState(),
@@ -35,9 +34,15 @@ data class GameState(
             completedQuests = quest.completedQuests.toMutableList(),
             questProgress = quest.questProgress.toMutableMap()
         ),
-        reputation = reputation.copy(city = reputation.city.toMutableMap()),
+        reputation = reputation.copy(
+            city = reputation.city.toMutableMap()
+        ),
         prayer = prayer.copy(),
         world = world.copy(),
-        combat = combat.copy(log = combat.log.toMutableList())
+        combat = combat.copy(
+            log = combat.log.toMutableList(),
+            enemyEffects = combat.enemyEffects.toMutableList(),
+            heroEffects = combat.heroEffects.toMutableList()
+        )
     )
 }

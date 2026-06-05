@@ -4,7 +4,6 @@ import com.grimreich.core.WorldMap
 import com.grimreich.systems.CityEventSystem
 import com.grimreich.systems.QuestSystem
 import com.grimreich.systems.ReputationSystem
-import com.grimreich.systems.SaveLoadSystem
 import com.grimreich.ui.DemoFlowController
 import com.grimreich.world.CityCatalogue
 import org.junit.Assert.assertTrue
@@ -20,7 +19,6 @@ class DemoFlowControllerTest {
         ReputationSystem.clear()
         CityEventSystem.clear()
         QuestSystem.clear()
-        SaveLoadSystem.clear()
     }
 
     @Test

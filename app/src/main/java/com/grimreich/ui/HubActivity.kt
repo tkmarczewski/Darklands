@@ -21,5 +21,17 @@ class HubActivity : AppCompatActivity() {
         findViewById<Button>(R.id.openCombatStatus).setOnClickListener { startActivity(Intent(this, CombatStatusActivity::class.java)) }
         findViewById<Button>(R.id.openQuests).setOnClickListener { startActivity(Intent(this, QuestFinalActivity::class.java)) }
         findViewById<Button>(R.id.openFinale).setOnClickListener { startActivity(Intent(this, FinaleActivity::class.java)) }
+
+        findViewById<Button>(R.id.btnSave).setOnClickListener {
+            com.grimreich.systems.SaveLoadSystem.save(this)
+            android.widget.Toast.makeText(this, "Gra zapisana!", android.widget.Toast.LENGTH_SHORT).show()
+        }
+        findViewById<Button>(R.id.btnLoad).setOnClickListener {
+            if (com.grimreich.systems.SaveLoadSystem.load(this)) {
+                android.widget.Toast.makeText(this, "Gra wczytana!", android.widget.Toast.LENGTH_SHORT).show()
+            } else {
+                android.widget.Toast.makeText(this, "Brak zapisu!", android.widget.Toast.LENGTH_SHORT).show()
+            }
+        }
     }
 }

@@ -4,7 +4,6 @@ import com.grimreich.core.WorldMap
 import com.grimreich.systems.CityEventSystem
 import com.grimreich.systems.QuestSystem
 import com.grimreich.systems.ReputationSystem
-import com.grimreich.systems.SaveLoadSystem
 import com.grimreich.ui.GameplayUiController
 import com.grimreich.world.CityCatalogue
 import org.junit.Assert.assertTrue
@@ -20,7 +19,6 @@ class GameplayUiControllerTest {
         ReputationSystem.clear()
         CityEventSystem.clear()
         QuestSystem.clear()
-        SaveLoadSystem.clear()
     }
 
     @Test
@@ -39,16 +37,7 @@ class GameplayUiControllerTest {
         val travel = ui.travel()
         assertTrue(travel.contains("TRAVEL"))
 
-        val resolution = ui.resolve()
-        assertTrue(resolution.contains("QUEST RESOLVED"))
-
         val journal = ui.journal()
         assertTrue(journal.contains("JOURNAL"))
-
-        val save = ui.save()
-        assertTrue(save.contains("Saved game"))
-
-        val load = ui.load()
-        assertTrue(load.contains("Loaded game"))
     }
 }

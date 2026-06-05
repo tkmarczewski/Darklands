@@ -19,5 +19,14 @@
         <Button android:id="@+id/openCombatStatus" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/menu_combat_status"/>
         <Button android:id="@+id/openQuests" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/menu_quests" android:drawableStart="@drawable/ic_system_quests" android:drawablePadding="8dp"/>
         <Button android:id="@+id/openFinale" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/menu_finale" android:drawableStart="@drawable/ic_system_settings" android:drawablePadding="8dp"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="16dp">
+            <Button android:id="@+id/btnSave" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="@string/btn_save"/>
+            <Button android:id="@+id/btnLoad" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="@string/btn_load"/>
+        </LinearLayout>
     </LinearLayout>
 </ScrollView>

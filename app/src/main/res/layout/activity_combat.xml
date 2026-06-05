@@ -31,6 +31,13 @@
             android:textSize="14sp"
             android:layout_marginBottom="4dp" />
 
+        <LinearLayout
+            android:id="@+id/enemyEffects"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="8dp" />
+
         <TextView
             android:id="@+id/tvHeroStatus"
             android:layout_width="match_parent"
@@ -39,6 +46,13 @@
             android:textColor="#4ade80"
             android:fontFamily="monospace"
             android:textSize="14sp"
+            android:layout_marginBottom="4dp" />
+
+        <LinearLayout
+            android:id="@+id/heroEffects"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
             android:layout_marginBottom="12dp" />
 
         <TextView

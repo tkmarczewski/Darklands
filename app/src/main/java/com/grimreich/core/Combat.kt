@@ -43,7 +43,19 @@ object MoraleSystem {
         (morale - 20).coerceAtLeast(0)
 }
 
-// ==================== COMBAT ROUND ====================
+// ==================== STATUS EFFECTS ====================
+
+enum class StatusEffectType {
+    POISON, BLEED, FIRE, FREEZE
+}
+
+data class StatusEffect(
+    val type: StatusEffectType,
+    var duration: Int, // rounds remaining
+    val strength: Int  // dmg or effect intensity
+)
+
+// ==================== COMBAT MODELS ====================
 
 enum class WoundType {
     NONE, LIGHT, SERIOUS, CRITICAL
@@ -57,6 +69,10 @@ data class CombatantState(
     var morale: Int = 80,
     var armor: Int = 0,
     var attackBase: Int = 5,
+    var agility: Int = 5,
+    var intelligence: Int = 5,
+    var strength: Int = 5,
+    var activeEffects: MutableList<StatusEffect> = mutableListOf(),
     var wounds: MutableList<WoundType> = mutableListOf()
 )
 
@@ -78,38 +94,57 @@ object CombatRound {
         attackerEquipped: EquippedItems = EquippedItems()
     ): RoundResult {
         val log = mutableListOf<String>()
+
+        // 1. Tick Status Effects for attacker
+        applyStatusTick(attacker, log)
+        if (isDefeated(attacker)) return RoundResult(0, 0, attacker.morale, defender.morale, WoundType.NONE, WoundType.NONE, log)
+
         val attackerStatus = MoraleSystem.computeStatus(attacker.morale)
         val defenderStatus = MoraleSystem.computeStatus(defender.morale)
 
-        // Atak
-        val rawAtk = attacker.attackBase + attackerEquipped.totalAttack()
-        val atkMod = attackerStatus.attackModifier()
-        val defMod = defenderStatus.defenseModifier()
-        val defArmor = defender.armor + attackerEquipped.totalDefense()
+        // 2. Dodge Roll (Agility based)
+        val dodgeChance = 0.05f + (defender.agility * 0.02f)
+        val dodged = Random.nextFloat() < dodgeChance
 
-        val attackRoll = (rawAtk * atkMod * Random.nextFloat().let { 0.7f + it * 0.6f }).toInt()
-        val defendRoll = (defArmor * defMod * Random.nextFloat().let { 0.5f + it * 0.5f }).toInt()
+        val dmgToDefender = if (dodged) {
+            log.add("${defender.name} unika ataku!")
+            0
+        } else {
+            // Atak
+            val rawAtk = attacker.attackBase + (attacker.strength / 2) + attackerEquipped.totalAttack()
+            val atkMod = attackerStatus.attackModifier()
+            val defMod = defenderStatus.defenseModifier()
+            val defArmor = defender.armor + attackerEquipped.totalDefense()
 
-        val dmgToDefender = maxOf(1, attackRoll - defendRoll)
-        defender.hp -= dmgToDefender
-        defender.endurance = (defender.endurance - dmgToDefender / 2).coerceAtLeast(0)
-        val newDefenderMorale = MoraleSystem.moraleAfterHit(defender.morale, dmgToDefender)
-        defender.morale = newDefenderMorale
-        log.add("${attacker.name} atakuje ${defender.name}: $dmgToDefender obrażeń.")
+            val attackRoll = (rawAtk * atkMod * Random.nextFloat().let { 0.7f + it * 0.6f }).toInt()
+            val defendRoll = (defArmor * defMod * Random.nextFloat().let { 0.5f + it * 0.5f }).toInt()
 
-        // Kontratak
-        val counterAtk = (defender.attackBase * defenderStatus.attackModifier() *
-            Random.nextFloat().let { 0.6f + it * 0.8f }).toInt()
-        val attackerDef = (attacker.armor * attackerStatus.defenseModifier() *
-            Random.nextFloat().let { 0.5f + it * 0.5f }).toInt()
-        val dmgToAttacker = maxOf(0, counterAtk - attackerDef)
-        attacker.hp -= dmgToAttacker
-        attacker.endurance = (attacker.endurance - dmgToAttacker / 2).coerceAtLeast(0)
-        val newAttackerMorale = MoraleSystem.moraleAfterHit(attacker.morale, dmgToAttacker)
-        attacker.morale = newAttackerMorale
-        if (dmgToAttacker > 0) log.add("${defender.name} kontratakuje: $dmgToAttacker obrażeń.")
+            val dmg = maxOf(1, attackRoll - defendRoll)
+            defender.hp -= dmg
+            defender.endurance = (defender.endurance - dmg / 2).coerceAtLeast(0)
+            defender.morale = MoraleSystem.moraleAfterHit(defender.morale, dmg)
+            log.add("${attacker.name} atakuje ${defender.name}: $dmg obrażeń.")
 
-        // Rany
+            // 3. Status application (Knowledge based)
+            tryApplyStatus(attacker, defender, log)
+            dmg
+        }
+
+        // 4. Counterattack
+        var dmgToAttacker = 0
+        if (!isDefeated(defender)) {
+            val counterAtk = (defender.attackBase * defenderStatus.attackModifier() *
+                Random.nextFloat().let { 0.6f + it * 0.8f }).toInt()
+            val attackerDef = (attacker.armor * attackerStatus.defenseModifier() *
+                Random.nextFloat().let { 0.5f + it * 0.5f }).toInt()
+            dmgToAttacker = maxOf(0, counterAtk - attackerDef)
+            attacker.hp -= dmgToAttacker
+            attacker.endurance = (attacker.endurance - dmgToAttacker / 2).coerceAtLeast(0)
+            attacker.morale = MoraleSystem.moraleAfterHit(attacker.morale, dmgToAttacker)
+            if (dmgToAttacker > 0) log.add("${defender.name} kontratakuje: $dmgToAttacker obrażeń.")
+        }
+
+        // 5. Wounds
         val defenderWound = computeWound(defender)
         val attackerWound = computeWound(attacker)
         if (defenderWound != WoundType.NONE) {
@@ -124,12 +159,58 @@ object CombatRound {
         return RoundResult(
             attackerDamage = dmgToDefender,
             defenderDamage = dmgToAttacker,
-            attackerMorale = newAttackerMorale,
-            defenderMorale = newDefenderMorale,
+            attackerMorale = attacker.morale,
+            defenderMorale = defender.morale,
             attackerWound = attackerWound,
             defenderWound = defenderWound,
             log = log
         )
+    }
+
+    private fun applyStatusTick(combatant: CombatantState, log: MutableList<String>) {
+        val it = combatant.activeEffects.iterator()
+        while (it.hasNext()) {
+            val effect = it.next()
+            when (effect.type) {
+                StatusEffectType.POISON -> {
+                    combatant.hp -= effect.strength
+                    log.add("${combatant.name} cierpi od trucizny: -${effect.strength} HP.")
+                }
+                StatusEffectType.BLEED -> {
+                    combatant.hp -= effect.strength
+                    combatant.endurance = (combatant.endurance - 1).coerceAtLeast(0)
+                    log.add("${combatant.name} krwawi: -${effect.strength} HP.")
+                }
+                StatusEffectType.FIRE -> {
+                    combatant.hp -= effect.strength
+                    combatant.morale -= 2
+                    log.add("${combatant.name} płonie: -${effect.strength} HP.")
+                }
+                StatusEffectType.FREEZE -> {
+                    // Reduce agility/morale
+                    combatant.morale -= 1
+                    log.add("${combatant.name} jest przemarznięty.")
+                }
+            }
+            effect.duration--
+            if (effect.duration <= 0) it.remove()
+        }
+    }
+
+    private fun tryApplyStatus(attacker: CombatantState, defender: CombatantState, log: MutableList<String>) {
+        // Base chance + Knowledge bonus
+        val statusChance = 0.1f + (attacker.intelligence * 0.03f)
+        if (Random.nextFloat() < statusChance) {
+            // Pick a random effect based on something? For now random
+            val effectType = StatusEffectType.entries.toTypedArray().random()
+            val existing = defender.activeEffects.find { it.type == effectType }
+            if (existing != null) {
+                existing.duration += 2
+            } else {
+                defender.activeEffects.add(StatusEffect(effectType, 3, 2 + attacker.intelligence / 4))
+            }
+            log.add("${defender.name} otrzymuje status: $effectType!")
+        }
     }
 
     private fun computeWound(state: CombatantState): WoundType {

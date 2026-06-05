@@ -21,7 +21,10 @@ object CombatSystem {
             endurance  = hero.endurance,
             morale     = 70,
             armor      = armorValue,
-            attackBase = hero.strength
+            attackBase = 5,
+            strength   = hero.strength,
+            agility    = hero.agility,
+            intelligence = hero.intelligence
         )
     }
 
@@ -45,6 +48,8 @@ object CombatSystem {
         if (!c.active) return "Brak aktywnej walki"
 
         val heroState = heroToCombatant() ?: return "Brak bohatera"
+        heroState.activeEffects = c.heroEffects
+        
         val enemyState = CombatantState(
             name       = c.enemyName,
             hp         = c.enemyHp,
@@ -52,7 +57,11 @@ object CombatSystem {
             endurance  = c.enemyHp / 2,
             morale     = 60,
             armor      = c.enemyDefense,
-            attackBase = c.enemyAttack
+            attackBase = c.enemyAttack,
+            agility    = c.enemyAgility,
+            intelligence = c.enemyIntelligence,
+            strength = c.enemyStrength,
+            activeEffects = c.enemyEffects
         )
 
         val result = CombatRound.resolveRound(
@@ -67,6 +76,10 @@ object CombatSystem {
         hero.hp          = heroState.hp
         hero.endurance   = heroState.endurance  // sync endurance after round
         c.log.addAll(result.log)
+        
+        // Update persistent effects
+        c.heroEffects  = heroState.activeEffects
+        c.enemyEffects = enemyState.activeEffects
 
         // Sync morale log
         val heroMorale  = MoraleSystem.computeStatus(result.attackerMorale)

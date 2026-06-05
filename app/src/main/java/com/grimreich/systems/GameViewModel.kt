@@ -1,10 +1,10 @@
 package com.grimreich.systems
 
+import android.content.Context
 import com.grimreich.core.CityScreenState
 import com.grimreich.core.PlayerState
 import com.grimreich.core.QuestJournalState
 import com.grimreich.core.ResolutionScreenState
-import com.grimreich.core.SaveState
 import com.grimreich.core.TravelScreenState
 
 /**
@@ -44,20 +44,26 @@ class GameViewModel {
         refreshCityScreen()
     }
 
-    fun resolveActiveQuest() {
+    fun resolveActiveQuest(context: Context) {
         val (updatedPlayer, resolutionState) = GameLoopController.resolveActiveQuest(playerState)
         playerState = updatedPlayer
         resolutionScreenState = resolutionState
         refreshCityScreen()
-        SaveLoadSystem.save(playerState, resolutionState.summary)
+        SaveLoadSystem.save(context)
     }
 
-    fun saveGame(): SaveState = SaveLoadSystem.save(playerState, resolutionScreenState?.summary)
+    fun saveGame(context: Context) {
+        SaveLoadSystem.save(context)
+    }
 
-    fun loadGame(): SaveState? {
-        val loaded = SaveLoadSystem.load() ?: return null
-        playerState = loaded.playerState
-        refreshCityScreen()
-        return loaded
+    fun loadGame(context: Context): Boolean {
+        val success = SaveLoadSystem.load(context)
+        if (success) {
+            // playerState is updated inside SaveLoadSystem.load for simplicity in this implementation
+            // But we might need to sync it back if we want to keep GameViewModel in sync.
+            // GameRepository.state is the source of truth now.
+            refreshCityScreen()
+        }
+        return success
     }
 }

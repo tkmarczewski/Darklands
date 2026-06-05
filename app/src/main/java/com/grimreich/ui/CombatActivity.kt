@@ -20,6 +20,8 @@ class CombatActivity : AppCompatActivity() {
     private lateinit var btnAttack: Button
     private lateinit var btnFlee: Button
     private lateinit var btnBack: Button
+    private lateinit var heroEffects: android.widget.LinearLayout
+    private lateinit var enemyEffects: android.widget.LinearLayout
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,6 +35,8 @@ class CombatActivity : AppCompatActivity() {
         btnAttack      = findViewById(R.id.btnAttack)
         btnFlee        = findViewById(R.id.btnFlee)
         btnBack        = findViewById(R.id.btnBack)
+        heroEffects    = findViewById(R.id.heroEffects)
+        enemyEffects   = findViewById(R.id.enemyEffects)
 
         renderStatus()
 
@@ -109,5 +113,26 @@ class CombatActivity : AppCompatActivity() {
 
         val logLines = CombatSystem.getCombatLog().takeLast(8)
         tvCombatLog.text = logLines.joinToString("\n")
+
+        renderEffects(heroEffects, c.heroEffects)
+        renderEffects(enemyEffects, c.enemyEffects)
+    }
+
+    private fun renderEffects(container: android.widget.LinearLayout, effects: List<com.grimreich.core.StatusEffect>) {
+        container.removeAllViews()
+        for (effect in effects) {
+            val iv = android.widget.ImageView(this)
+            val params = android.widget.LinearLayout.LayoutParams(48, 48)
+            params.marginEnd = 8
+            iv.layoutParams = params
+            val iconRes = when (effect.type) {
+                com.grimreich.core.StatusEffectType.POISON -> R.drawable.ic_status_poison
+                com.grimreich.core.StatusEffectType.BLEED -> R.drawable.ic_status_bleed
+                com.grimreich.core.StatusEffectType.FIRE -> R.drawable.ic_status_fire
+                com.grimreich.core.StatusEffectType.FREEZE -> R.drawable.ic_status_freeze
+            }
+            iv.setImageResource(iconRes)
+            container.addView(iv)
+        }
     }
 }

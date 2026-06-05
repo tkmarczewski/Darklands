@@ -1,6 +1,8 @@
 package com.grimreich.ui
 
+import android.content.Context
 import com.grimreich.systems.GameViewModel
+import com.grimreich.core.GameRepository
 
 /**
  * Lightweight adapter exposing fully rendered screen text for early UI wiring,
@@ -23,18 +25,22 @@ class GameplayUiController(
         return GameplayScreens.renderTravel(requireNotNull(viewModel.travelScreenState))
     }
 
-    fun resolve(): String {
-        viewModel.resolveActiveQuest()
+    fun resolve(context: Context): String {
+        viewModel.resolveActiveQuest(context)
         return GameplayScreens.renderResolution(requireNotNull(viewModel.resolutionScreenState))
     }
 
-    fun save(): String {
-        val save = viewModel.saveGame()
-        return "Saved game v${save.version} for city ${save.playerState.currentCityId}"
+    fun save(context: Context): String {
+        viewModel.saveGame(context)
+        return "Saved game state to persistent storage."
     }
 
-    fun load(): String {
-        val loaded = viewModel.loadGame() ?: return "No save found"
-        return "Loaded game v${loaded.version} for city ${loaded.playerState.currentCityId}"
+    fun load(context: Context): String {
+        val success = viewModel.loadGame(context)
+        return if (success) {
+            "Loaded game from persistent storage. City: ${GameRepository.state.grimCurrentRegion}"
+        } else {
+            "No save found or load failed"
+        }
     }
 }
