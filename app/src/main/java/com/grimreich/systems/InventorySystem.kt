@@ -104,4 +104,14 @@ object InventorySystem {
         state.inventory.remove(item)
         return "${hero.name} uzyl ${item.name}. +$heal HP"
     }
+
+    fun getEquippedItems(hero: com.grimreich.core.Hero): com.grimreich.core.EquippedItems {
+        val state = GameRepository.state
+        val gear = com.grimreich.core.EquippedItems()
+        hero.equipment["weapon"]?.let { id -> gear.weapon = state.inventory.firstOrNull { it.id == id } }
+        hero.equipment["armor"]?.let { id -> gear.bodyArmor = state.inventory.firstOrNull { it.id == id } }
+        hero.equipment["helmet"]?.let { id -> gear.helmet = state.inventory.firstOrNull { it.id == id } }
+        hero.equipment["shield"]?.let { id -> gear.shield = state.inventory.firstOrNull { it.id == id } }
+        return gear
+    }
 }

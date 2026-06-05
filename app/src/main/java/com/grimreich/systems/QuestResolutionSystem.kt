@@ -36,11 +36,9 @@ object QuestResolutionSystem {
         
         // Random loot
         val items = mutableListOf<Item>()
-        if (Random.nextFloat() < 0.3f) {
-            ItemCatalogue.all().randomOrNull()?.let { 
-                items.add(it)
-                GameRepository.state.inventory.add(it)
-            }
+        LootSystem.rollLoot(0.4f)?.let { 
+            items.add(it)
+            GameRepository.state.inventory.add(it)
         }
 
         return QuestRewardResult(

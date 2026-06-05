@@ -33,19 +33,9 @@ class InventoryActivity : AppCompatActivity() {
     }
 
     private fun render() {
-        val inventory = GameRepository.state.inventory
-        val sb = StringBuilder()
-        sb.appendLine("=== EKWIPUNEK ===")
-        sb.appendLine()
-        if (inventory.isEmpty()) {
-            sb.appendLine("Brak przedmiotow")
-        } else {
-            inventory.forEachIndexed { i, item ->
-                val effects = if (item.effects.isNotEmpty())
-                    " " + item.effects.entries.joinToString(", ") { (k, v) -> "$k=$v" } else ""
-                sb.appendLine("${i + 1}. ${item.name} [${item.type}]$effects")
-            }
+        binding.tvInventory.text = buildString {
+            append("=== EKWIPUNEK ===\n\n")
+            append(InventorySystem.listInventory())
         }
-        binding.tvInventory.text = sb.toString()
     }
 }

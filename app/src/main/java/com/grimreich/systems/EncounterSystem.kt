@@ -34,7 +34,8 @@ object EncounterSystem {
                     val gold = Random.nextInt(20, 60)
                     state.gold += gold
                     state.party.forEach { it.corruption += 1 }
-                    "Znalazłeś $gold złota, ale sumienie cię gryzie (+1 Korupcja)."
+                    val lootMsg = LootSystem.awardLoot(0.3f)
+                    "Znalazłeś $gold złota, ale sumienie cię gryzie (+1 Korupcja).$lootMsg"
                 },
                 EncounterChoice("Módl się", "Odmawiasz modlitwę za właścicieli.") { state ->
                     state.prayer.virtue += 2

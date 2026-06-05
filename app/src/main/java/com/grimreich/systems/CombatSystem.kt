@@ -67,7 +67,7 @@ object CombatSystem {
         val result = CombatRound.resolveRound(
             attacker        = heroState,
             defender        = enemyState,
-            attackerEquipped = EquippedItems()
+            attackerEquipped = InventorySystem.getEquippedItems(hero)
         )
         c.round++
 
@@ -94,6 +94,10 @@ object CombatSystem {
             c.active = false
             c.log.add("${c.enemyName} pokonany!")
             GameRepository.log("Pokonano ${c.enemyName}")
+            
+            val lootMsg = LootSystem.awardLoot(0.5f)
+            if (lootMsg.isNotEmpty()) c.log.add(lootMsg)
+
             val recovery = CombatRound.postCombatRecovery(heroState)
             hero.hp        = heroState.hp
             hero.endurance = heroState.endurance  // sync endurance after recovery

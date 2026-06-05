@@ -50,6 +50,9 @@ class CharacterActivity : AppCompatActivity() {
         sb.appendLine("Charyzma: ${hero.charisma}")
         sb.appendLine("Poboznosc: ${hero.piety}")
         sb.appendLine("Cnota: ${hero.virtue}")
+        sb.appendLine("Poczytalnosc: ${hero.sanity}%")
+        sb.appendLine("Korupcja: ${hero.corruption}%")
+        sb.appendLine("Morale: ${hero.morale}%")
         sb.appendLine()
 
         val available = CareerChain.availableCareers(hero)
