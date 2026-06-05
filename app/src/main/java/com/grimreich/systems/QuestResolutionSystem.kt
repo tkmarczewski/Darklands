@@ -1,6 +1,9 @@
 package com.grimreich.systems
 
-import com.grimreich.core.TravelPartyState
+import com.grimreich.core.*
+import com.grimreich.grimreich.v1.Item
+import com.grimreich.world.ItemCatalogue
+import kotlin.random.Random
 
 data class QuestRewardResult(
     val questId: String,
@@ -10,7 +13,8 @@ data class QuestRewardResult(
     val reputationDelta: Int,
     val updatedReputation: Int,
     val updatedQuestStatus: QuestStatus,
-    val updatedPartyState: TravelPartyState
+    val updatedPartyState: TravelPartyState,
+    val itemsAwarded: List<Item> = emptyList()
 )
 
 /**
@@ -29,6 +33,15 @@ object QuestResolutionSystem {
         val updatedParty = partyState.copy(
             lastEncounterId = "quest_complete:${completedQuest.id}"
         )
+        
+        // Random loot
+        val items = mutableListOf<Item>()
+        if (Random.nextFloat() < 0.3f) {
+            ItemCatalogue.all().randomOrNull()?.let { 
+                items.add(it)
+                GameRepository.state.inventory.add(it)
+            }
+        }
 
         return QuestRewardResult(
             questId = completedQuest.id,
@@ -38,7 +51,8 @@ object QuestResolutionSystem {
             reputationDelta = reputationDelta,
             updatedReputation = updatedReputation,
             updatedQuestStatus = completedQuest.status,
-            updatedPartyState = updatedParty
+            updatedPartyState = updatedParty,
+            itemsAwarded = items
         )
     }
 }

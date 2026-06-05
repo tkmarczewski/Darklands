@@ -2,6 +2,7 @@ package com.grimreich.systems
 
 import com.grimreich.core.GameRepository
 import com.grimreich.core.PartyRepository
+import com.grimreich.grimreich.v1.Item
 
 // Inventory operuje na top-levelowym `Item` (Item.kt), gdzie typ broni/zbroi jest stringiem,
 // a statystyki (attack/defense) trzymane sa w mapie `effects`. Slot trzymany jako string ("weapon", "armor", ...).
@@ -38,12 +39,14 @@ object InventorySystem {
         val items = GameRepository.state.inventory
         if (items.isEmpty()) return "Ekwipunek jest pusty"
         return items.joinToString("\n") { item ->
+            val rarityLabel = if (item.rarity != "normal") " [${item.rarity.uppercase()}]" else ""
             val extra = when (item.type) {
-                "weapon" -> " ATK:${item.effects["attack"] ?: 0} waga:${item.weight}"
-                "armor"  -> " DEF:${item.effects["defense"] ?: 0} waga:${item.weight}"
+                "weapon" -> " (ATK:${item.effects["attack"] ?: 0})"
+                "armor"  -> " (DEF:${item.effects["defense"] ?: 0})"
+                "potion" -> " (HEAL:${item.effects["heal"] ?: 0})"
                 else     -> " (${item.type})"
             }
-            "- ${item.name}$extra"
+            "- ${item.name}$rarityLabel$extra | ${item.weight}kg"
         }
     }
 

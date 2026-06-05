@@ -1,5 +1,7 @@
 package com.grimreich.core
 
+import com.grimreich.grimreich.v1.Item
+
 /**
  * Bestiariusz i encountery z Grimreich: pełna lista wrogów ze statystykami,
  * AI, loot tables i definicje encounterów bojowych.

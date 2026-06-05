@@ -81,13 +81,17 @@ object GameLoopController {
             travelState = reward.updatedPartyState
         )
 
+        val itemMsg = if (reward.itemsAwarded.isNotEmpty()) 
+            "\nFound items: " + reward.itemsAwarded.joinToString { it.name }
+        else ""
+
         val resolutionState = ResolutionScreenState(
             questId = reward.questId,
             cityId = reward.cityId,
             goldBefore = goldBefore,
             goldAfter = updatedPlayer.gold,
             reputationAfter = reward.updatedReputation,
-            summary = "Quest completed in ${reward.cityId}: +${reward.goldAwarded} gold, reputation ${reward.updatedReputation}."
+            summary = "Quest completed in ${reward.cityId}: +${reward.goldAwarded} gold, reputation ${reward.updatedReputation}.$itemMsg"
         )
 
         return updatedPlayer to resolutionState

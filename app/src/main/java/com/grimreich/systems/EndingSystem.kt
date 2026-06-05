@@ -25,15 +25,26 @@ object EndingSystem {
         val s = GameRepository.state
         val faith = s.prayer.faith
         val sins = s.prayer.sins
+        val avgSanity = if (s.party.isNotEmpty()) s.party.map { it.sanity }.average().toInt() else 100
+        val maxCorruption = if (s.party.isNotEmpty()) s.party.maxOf { it.corruption } else 0
+        
         val title = when {
-            faith >= 50 && sins <= 2 -> "Oczyszczenie"
-            faith >= 20 -> "Gorzkie Zwycięstwo"
-            sins >= 5 -> "Skażenie"
+            faith >= 50 && sins <= 2 && avgSanity >= 70 -> "Święte Oczyszczenie"
+            faith >= 20 && avgSanity >= 40 -> "Gorzkie Zwycięstwo"
+            maxCorruption >= 50 -> "Upadek w Mrok"
             else -> "Wędrówka trwa"
         }
-        return """Finał: $title
-
-Wiara: $faith
-Grzechy: $sins""".trimIndent()
+        
+        return """
+            === FINAŁ GRIMREICH ===
+            Stan świata: $title
+            
+            Wiara: $faith
+            Grzechy: $sins
+            Średnia Poczytalność: $avgSanity%
+            Najwyższa Korupcja: $maxCorruption%
+            
+            ${if (avgSanity < 30) "Družyna jest na krawędzi obłędu..." else ""}
+        """.trimIndent()
     }
 }

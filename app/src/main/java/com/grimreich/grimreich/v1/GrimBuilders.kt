@@ -11,7 +11,7 @@ object GrimBuilders {
     fun emptyWorldChronicle(name: String) = WorldChronicle(name, "mist", "blood", "reflection", "fullness", "chaos", "region", "npc", "ending")
     fun defaultNonlinearTime(regionName: String) = NonlinearTime(regionName, 1, 1, 1, 1, 1, emptyList(), "region", "npc", "monster", "ending")
     fun boss(id: String = randomId("boss"), name: String = "Ancient Horror", level: Int = 10, lootTable: RewardTable = rewardTable()) = Boss(id, name, level, lootTable)
-    fun item(id: String = randomId("item"), name: String = "Rusty Blade", type: String = "weapon", rarity: String = "common", properties: Map<String, Any> = emptyMap()) = Item(id, name, type, rarity, properties.toMap())
+    fun item(id: String = randomId("item"), name: String = "Rusty Blade", type: String = "weapon", rarity: String = "common", properties: Map<String, Any> = emptyMap()) = Item(id = id, name = name, type = type, rarity = rarity, properties = properties.toMap())
     fun lootEntry(itemId: String, weight: Int = 10, minQty: Int = 1, maxQty: Int = 1) = LootEntry(itemId, weight, minQty, maxQty)
     fun rewardTable(id: String = randomId("reward"), entries: List<LootEntry> = listOf(lootEntry(item().id, 100))) = RewardTable(id, entries.toList())
     fun encounter(id: String = randomId("enc"), name: String = "Wandering Bandits", difficulty: Int = 1, possibleNpcs: List<String> = emptyList()) = Encounter(id, name, difficulty, possibleNpcs.toList())

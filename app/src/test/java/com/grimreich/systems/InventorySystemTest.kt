@@ -3,7 +3,7 @@ package com.grimreich.systems
 import com.grimreich.TestSupport
 import com.grimreich.core.GameRepository
 import com.grimreich.core.Hero
-import com.grimreich.core.Item
+import com.grimreich.grimreich.v1.Item
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
@@ -49,7 +49,7 @@ class InventorySystemTest {
     @Test
     fun `equip enforces minimum strength requirement`() {
         GameRepository.state.inventory.add(
-            Item("heavy_sword", "Ciezki Miecz", "weapon", "weapon", 200, 6.0, mapOf("attack" to 12, "minStrength" to 20))
+            Item("heavy_sword", "Ciezki Miecz", "weapon", "weapon", 200, 6.0, effects = mapOf("attack" to 12, "minStrength" to 20))
         )
         val hero = GameRepository.state.party.first { it.id == "hero_1" }
         val previousSlot = hero.equipment["weapon"]

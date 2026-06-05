@@ -1,5 +1,7 @@
 package com.grimreich.core
 
+import com.grimreich.grimreich.v1.Item
+
 object GameRepository {
     var state = GameState()
 
@@ -26,10 +28,10 @@ object GameRepository {
         state.party.addAll(listOf(hero1, hero2))
         state.activeHeroId = hero1.id
         state.inventory.addAll(listOf(
-            Item("sword_01",  "Zelazny Miecz",    "weapon", "weapon", 50,  2.5, mapOf("attack"  to 8)),
-            Item("herb_01",   "Ziele Lecznicze",  "herb",   null,      5,  0.1, mapOf("heal"    to 5)),
-            Item("armor_01",  "Skorzana Zbroja",  "armor",  "armor",  80,  5.0, mapOf("defense" to 4)),
-            Item("potion_01", "Mikstura Zdrowia", "potion", null,     20,  0.3, mapOf("heal"    to 15))
+            Item("sword_01",  "Zelazny Miecz",    "weapon", "weapon", 50,  2.5, effects = mapOf("attack"  to 8)),
+            Item("herb_01",   "Ziele Lecznicze",  "herb",   null,      5,  0.1, effects = mapOf("heal"    to 5)),
+            Item("armor_01",  "Skorzana Zbroja",  "armor",  "armor",  80,  5.0, effects = mapOf("defense" to 4)),
+            Item("potion_01", "Mikstura Zdrowia", "potion", null,     20,  0.3, effects = mapOf("heal"    to 15))
         ))
         state.logEntries.add("Druzyna rozpoczyna przygode w Grimholdu.")
     }
