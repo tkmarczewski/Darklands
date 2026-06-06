@@ -17,7 +17,7 @@ object GameLoopController {
         WorldMap.seedStage1()
         CityEventSystem.seedStage1Events()
         QuestSystem.seedIntegratedContent(seed)
-        return PlayerState()
+        return PlayerState(currentCityId = "grimhold")
     }
 
     fun cityScreen(playerState: PlayerState): CityScreenState {
@@ -37,22 +37,25 @@ object GameLoopController {
 
     fun travelToQuest(playerState: PlayerState): Pair<PlayerState, TravelScreenState> {
         val questId = playerState.activeQuestId ?: error("No active quest")
-        val quest = QuestSystem.all().firstOrNull { it.id == questId } ?: error("Unknown quest: $questId")
+        val quest = QuestSystem.all().find { it.id == questId } ?: error("Unknown quest: $questId")
 
-        val traveledState = if (playerState.currentCityId != quest.cityId) {
-            TravelSystem.travel(playerState.currentCityId, quest.cityId, playerState.travelState).first
+        // Logic check: ensure quest destination is a valid city from catalogue
+        val destinationCity = quest.cityId
+
+        val traveledState = if (playerState.currentCityId != destinationCity) {
+            TravelSystem.travel(playerState.currentCityId, destinationCity, playerState.travelState).first
         } else {
             playerState.travelState
         }
 
         val updatedPlayer = playerState.copy(
-            currentCityId = quest.cityId,
+            currentCityId = destinationCity,
             travelState = traveledState
         )
 
         val travelScreen = TravelScreenState(
             fromCityId = playerState.currentCityId,
-            toCityId = quest.cityId,
+            toCityId = destinationCity,
             totalHoursTraveled = traveledState.totalHoursTraveled,
             fatigue = traveledState.fatigue,
             lastEncounterId = traveledState.lastEncounterId

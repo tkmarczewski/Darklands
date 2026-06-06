@@ -3,19 +3,24 @@ package com.grimreich.world
 import kotlin.random.Random
 
 object GrimLoreGenerator {
-    private val prefixes = listOf("Mroczne", "Zapomniane", "Przeklęte", "Krwawe", "Cieniste", "Zniszczone")
-    private val adjectives = listOf("pachnące siarką", "spowite mgłą", "pełne szeptów", "skalne", "starożytne")
-    
-    fun generateDescription(type: LocationType, random: Random): String {
-        val atmosphere = when (type) {
-            LocationType.RUINS -> "Powietrze tutaj jest ciężkie od pyłu i echa dawnych modlitw."
-            LocationType.RAUBRITTER_CASTLE -> "Z murów wciąż zwisają resztki sztandarów, a wiatr wyje w pustych wieżach."
-            LocationType.MONASTERY -> "Cisza jest tu niemal fizyczna, przerywana jedynie szeptem mchu na kamieniach."
-            LocationType.DUNGEON -> "Wilgoć i zapach zgnilizny nie pozostawiają złudzeń co do przeznaczenia tego miejsca."
-            LocationType.HAMLET -> "Biedne chaty tulą się do siebie, jakby szukały ochrony przed nadchodzącym mrokiem."
-        }
+
+    fun generateDescription(location: ProceduralLocation): String {
+        val random = Random(location.id.hashCode())
         
-        val detail = adjectives.random(random)
-        return "${prefixes.random(random)} miejsce, $detail. $atmosphere"
+        val baseDesc = when (location.type) {
+            LocationType.RUINS            -> "Zgliszcza spowite nienaturalną mgłą."
+            LocationType.MONASTERY        -> "Opactwo, w którym dzwony biją same z siebie."
+            LocationType.RAUBRITTER_CASTLE -> "Twierdza zbudowana na kościach zapomnianych królów."
+            LocationType.DUNGEON          -> "Lochy, w których ściany wydają się oddychać."
+            LocationType.SHRINE           -> "Kapliczka, która krwawi, gdy nikt nie patrzy."
+        }
+
+        val atmosphere = listOf(
+            "Czuć tu zapach ozonu i starej krwi.",
+            "W powietrzu unosi się pył z rozpadającej się rzeczywistości.",
+            "Cisza jest tak gęsta, że można ją kroić nożem."
+        ).random(random)
+
+        return "$baseDesc $atmosphere"
     }
 }

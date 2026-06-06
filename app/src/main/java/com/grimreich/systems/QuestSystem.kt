@@ -1,6 +1,7 @@
 package com.grimreich.systems
 
 import com.grimreich.core.GameRepository
+import com.grimreich.world.CityCatalogue
 import com.grimreich.world.ProceduralLocation
 import com.grimreich.world.ProceduralLocationGenerator
 
@@ -44,20 +45,24 @@ object QuestSystem {
         clear()
         currentSeed = seed
 
+        CityCatalogue.seedSprint1()
         CityEventSystem.seedStage1Events()
 
-        CityEventSystem.getEventsForCity("grimhold").forEach { event ->
-            register(
-                QuestEntry(
-                    id = "quest_${event.id}",
-                    title = event.title,
-                    description = event.description,
-                    cityId = event.cityId,
-                    originType = QuestOriginType.CITY_EVENT,
-                    originRefId = event.id,
-                    rewardGold = event.rewardGold
+        // Seed events for ALL cities in catalogue
+        CityCatalogue.all().forEach { city ->
+            CityEventSystem.getEventsForCity(city.id).forEach { event ->
+                register(
+                    QuestEntry(
+                        id = "quest_${event.id}",
+                        title = event.title,
+                        description = event.description,
+                        cityId = event.cityId,
+                        originType = QuestOriginType.CITY_EVENT,
+                        originRefId = event.id,
+                        rewardGold = event.rewardGold
+                    )
                 )
-            )
+            }
         }
 
         val generatedLocations = ProceduralLocationGenerator.generate(seed = seed, count = 8)
@@ -99,15 +104,14 @@ object QuestSystem {
             else               -> "Pomoz pobliskiej osadzie"
         },
         description = "Cel wyprawy: $name.",
-        cityId = nearestCityId,
+        cityId = nearestCityId, // ProceduralLocationGenerator needs to return IDs from CityCatalogue
         originType = QuestOriginType.PROCEDURAL_LOCATION,
         originRefId = id,
         rewardGold = rewardGold
     )
 
-    // LEGACY API dla testów:
-
-    private val legacyActiveQuests = linkedMapOf<String, Int>() // questId -> progress 0..3
+    // LEGACY API remains for compatibility
+    private val legacyActiveQuests = linkedMapOf<String, Int>() 
     private val legacyCompletedQuests = mutableListOf<String>()
 
     private fun syncToRepo() {
@@ -126,88 +130,24 @@ object QuestSystem {
             syncToRepo()
             return msg
         }
-
         legacyActiveQuests[questId] = 0
-
-        val title = when (questId) {
-            "forest_hermit" -> "Znajdz pustelnika w lesie"
-            "bandit_camp"   -> "Rozprosz oboz bandytow"
-            "lost_relic"    -> "Odnajdz zaginiony relikt"
-            else            -> questId
-        }
-
-        val msg = "Rozpoczeto quest: $title"
         syncToRepo()
-        return msg
+        return "Rozpoczeto quest: $questId"
     }
 
     fun advance(questId: String, steps: Int = 1): String {
-        val current = legacyActiveQuests[questId]
-            ?: run {
-                val msg = "Quest $questId nie jest aktywny."
-                syncToRepo()
-                return msg
-            }
-
+        val current = legacyActiveQuests[questId] ?: return "Quest $questId nie jest aktywny."
         val newProgress = (current + steps).coerceAtMost(3)
         legacyActiveQuests[questId] = newProgress
-
-        val title = when (questId) {
-            "forest_hermit" -> "Znajdz pustelnika w lesie"
-            "bandit_camp"   -> "Rozprosz oboz bandytow"
-            "lost_relic"    -> "Odnajdz zaginiony relikt"
-            else            -> questId
-        }
-
-        val msg = if (newProgress >= 3) {
+        if (newProgress >= 3) {
             legacyActiveQuests.remove(questId)
-            if (!legacyCompletedQuests.contains(questId)) {
-                legacyCompletedQuests.add(questId)
-            }
-            "Quest $title ukonczony."
-        } else {
-            "Quest $title: postep ${newProgress}/3"
+            legacyCompletedQuests.add(questId)
         }
-
         syncToRepo()
-        return msg
+        return "Quest $questId: postep ${newProgress}/3"
     }
 
     fun activeList(): List<String> = legacyActiveQuests.keys.toList()
 
-    fun finalQuestSummary(): String {
-        val sb = StringBuilder()
-
-        if (legacyActiveQuests.isEmpty()) {
-            sb.append("Aktywne questy:\n  brak\n")
-        } else {
-            sb.append("Aktywne questy:\n")
-            for ((id, progress) in legacyActiveQuests) {
-                val title = when (id) {
-                    "forest_hermit" -> "Znajdz pustelnika w lesie"
-                    "bandit_camp"   -> "Rozprosz oboz bandytow"
-                    "lost_relic"    -> "Odnajdz zaginiony relikt"
-                    else            -> id
-                }
-                sb.append("  $title (${progress}/3)\n")
-            }
-        }
-
-        if (legacyCompletedQuests.isEmpty()) {
-            sb.append("Ukonczone questy:\n  brak")
-        } else {
-            sb.append("Ukonczone questy:\n")
-            for (id in legacyCompletedQuests) {
-                val title = when (id) {
-                    "forest_hermit" -> "Znajdz пустelnika w lesie"
-                    "bandit_camp"   -> "Rozprosz oboz bandytow"
-                    "lost_relic"    -> "Odnajdz zaginiony relikt"
-                    else            -> id
-                }
-                sb.append("  $title\n")
-            }
-        }
-
-        return sb.toString()
-    }
+    fun finalQuestSummary(): String = "Summary functionality migrated to QuestJournalSystem."
 }

@@ -4,7 +4,7 @@ import com.grimreich.core.GrimholdSliceViewData
 
 object GrimholdSliceScreen {
     fun render(state: GrimholdSliceViewData): String = buildString {
-        appendLine("=== MAGDEBURG VERTICAL SLICE ===")
+        appendLine("=== GRIMHOLD VERTICAL SLICE ===")
         appendLine("Background: ${state.backgroundUrl}")
         appendLine("Reference: ${state.referenceTitle} (${state.sourceLabel})")
         appendLine("Mood: ${state.moodText}")

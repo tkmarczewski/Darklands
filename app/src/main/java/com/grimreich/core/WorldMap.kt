@@ -30,24 +30,24 @@ data class CityNode(
 )
 
 object WorldMap {
-    // Stage 1 connections
     private val connections = mutableListOf<TravelConnection>()
 
     fun seedStage1() {
         if (connections.isNotEmpty()) return
         CityCatalogue.seedSprint1()
 
-        link("magdeburg", "wroclaw", TerrainType.ROAD)
-        link("magdeburg", "berlin",  TerrainType.ROAD)
-        link("berlin",    "szczecin", TerrainType.ROAD)
-        link("wroclaw",   "brno",    TerrainType.MOUNTAIN)
-        link("brno",      "wien",    TerrainType.ROAD)
-        link("wien",      "graz",    TerrainType.MOUNTAIN)
-        link("graz",      "vienna",  TerrainType.ROAD)
-        link("wroclaw",   "praha",   TerrainType.FOREST)
-        link("praha",     "nurnberg", TerrainType.ROAD)
-        link("nurnberg",  "koln",     TerrainType.ROAD)
-        link("koln",      "strasbourg", TerrainType.RIVER)
+        // Syncing with CityCatalogue IDs: 
+        // grimhold, koln, nurnberg, frankfurt, praha, lubeck, hamburg, wien, breslau, augsburg, strasbourg
+        link("grimhold", "breslau",   TerrainType.ROAD)
+        link("grimhold", "nurnberg",  TerrainType.ROAD)
+        link("nurnberg", "koln",      TerrainType.ROAD)
+        link("koln",     "strasbourg", TerrainType.RIVER)
+        link("praha",    "wien",       TerrainType.MOUNTAIN)
+        link("praha",    "breslau",    TerrainType.FOREST)
+        link("lubeck",   "hamburg",    TerrainType.ROAD)
+        link("hamburg",  "koln",       TerrainType.ROAD)
+        link("frankfurt", "augsburg",  TerrainType.ROAD)
+        link("wien",     "augsburg",   TerrainType.ROAD)
     }
 
     fun clear() { connections.clear() }
