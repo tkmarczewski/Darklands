@@ -19,7 +19,7 @@ object ProceduralLocationGenerator {
     // Seeded generation of locations connected to valid CityCatalogue IDs
     fun generate(seed: Int, count: Int): List<ProceduralLocation> {
         val random = Random(seed)
-        val cities = listOf("grimhold", "koln", "nurnberg", "frankfurt", "praha", "lubeck", "hamburg", "wien", "breslau", "augsburg", "strasbourg")
+        val cities = listOf("wybrzeze_polnocne", "serce_krainy", "rowniny_koronne", "pogranicze_stepowe", "poludniowe_ruiny", "gory_poludniowe", "ziemie_dzikie")
         
         return (0 until count).map { i ->
             val type = LocationType.entries.random(random)

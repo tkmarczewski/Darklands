@@ -99,12 +99,12 @@ object QuestSystem {
         title = when (type.name) {
             "RUINS"            -> "Zbadaj ruiny"
             "RAUBRITTER_CASTLE"-> "Uderz na zamek raubrittera"
-            "MONASTERY"        -> "Odwiedz klasztor"
-            "DUNGEON"          -> "Zejdz do lochow"
-            else               -> "Pomoz pobliskiej osadzie"
+            "MONASTERY"        -> "Odwiedź klasztor"
+            "DUNGEON"          -> "Zejdź do lochów"
+            else               -> "Pomóż pobliskiej osadzie"
         },
         description = "Cel wyprawy: $name.",
-        cityId = nearestCityId, // ProceduralLocationGenerator needs to return IDs from CityCatalogue
+        cityId = nearestCityId,
         originType = QuestOriginType.PROCEDURAL_LOCATION,
         originRefId = id,
         rewardGold = rewardGold
@@ -126,13 +126,13 @@ object QuestSystem {
 
     fun start(questId: String): String {
         if (legacyActiveQuests.containsKey(questId)) {
-            val msg = "Quest $questId jest juz aktywny."
+            val msg = "Quest $questId jest już aktywny."
             syncToRepo()
             return msg
         }
         legacyActiveQuests[questId] = 0
         syncToRepo()
-        return "Rozpoczeto quest: $questId"
+        return "Rozpoczęto quest: $questId"
     }
 
     fun advance(questId: String, steps: Int = 1): String {
@@ -144,7 +144,7 @@ object QuestSystem {
             legacyCompletedQuests.add(questId)
         }
         syncToRepo()
-        return "Quest $questId: postep ${newProgress}/3"
+        return "Quest $questId: postęp ${newProgress}/3"
     }
 
     fun activeList(): List<String> = legacyActiveQuests.keys.toList()

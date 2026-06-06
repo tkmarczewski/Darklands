@@ -17,7 +17,7 @@ object GameLoopController {
         WorldMap.seedStage1()
         CityEventSystem.seedStage1Events()
         QuestSystem.seedIntegratedContent(seed)
-        return PlayerState(currentCityId = "grimhold")
+        return PlayerState(currentCityId = CityCatalogue.startingCityId)
     }
 
     fun cityScreen(playerState: PlayerState): CityScreenState {
@@ -39,7 +39,6 @@ object GameLoopController {
         val questId = playerState.activeQuestId ?: error("No active quest")
         val quest = QuestSystem.all().find { it.id == questId } ?: error("Unknown quest: $questId")
 
-        // Logic check: ensure quest destination is a valid city from catalogue
         val destinationCity = quest.cityId
 
         val traveledState = if (playerState.currentCityId != destinationCity) {
@@ -85,7 +84,7 @@ object GameLoopController {
         )
 
         val itemMsg = if (reward.itemsAwarded.isNotEmpty()) 
-            "\nFound items: " + reward.itemsAwarded.joinToString { it.name }
+            "\nZnaleziono przedmioty: " + reward.itemsAwarded.joinToString { it.name }
         else ""
 
         val resolutionState = ResolutionScreenState(
@@ -94,7 +93,7 @@ object GameLoopController {
             goldBefore = goldBefore,
             goldAfter = updatedPlayer.gold,
             reputationAfter = reward.updatedReputation,
-            summary = "Quest completed in ${reward.cityId}: +${reward.goldAwarded} gold, reputation ${reward.updatedReputation}.$itemMsg"
+            summary = "Zadanie ukończone w ${reward.cityId}: +${reward.goldAwarded} złota, reputacja ${reward.updatedReputation}.$itemMsg"
         )
 
         return updatedPlayer to resolutionState

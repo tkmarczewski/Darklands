@@ -36,18 +36,16 @@ object WorldMap {
         if (connections.isNotEmpty()) return
         CityCatalogue.seedSprint1()
 
-        // Syncing with CityCatalogue IDs: 
-        // grimhold, koln, nurnberg, frankfurt, praha, lubeck, hamburg, wien, breslau, augsburg, strasbourg
-        link("grimhold", "breslau",   TerrainType.ROAD)
-        link("grimhold", "nurnberg",  TerrainType.ROAD)
-        link("nurnberg", "koln",      TerrainType.ROAD)
-        link("koln",     "strasbourg", TerrainType.RIVER)
-        link("praha",    "wien",       TerrainType.MOUNTAIN)
-        link("praha",    "breslau",    TerrainType.FOREST)
-        link("lubeck",   "hamburg",    TerrainType.ROAD)
-        link("hamburg",  "koln",       TerrainType.ROAD)
-        link("frankfurt", "augsburg",  TerrainType.ROAD)
-        link("wien",     "augsburg",   TerrainType.ROAD)
+        // Syncing with GrimReich canonical regions:
+        // wybrzeze_polnocne, serce_krainy, rowniny_koronne, pogranicze_stepowe, poludniowe_ruiny, gory_poludniowe, ziemie_dzikie
+        link("wybrzeze_polnocne", "serce_krainy",      TerrainType.ROAD)
+        link("wybrzeze_polnocne", "ziemie_dzikie",     TerrainType.FOREST)
+        link("serce_krainy",     "rowniny_koronne",    TerrainType.ROAD)
+        link("serce_krainy",     "pogranicze_stepowe", TerrainType.ROAD)
+        link("serce_krainy",     "poludniowe_ruiny",   TerrainType.RIVER)
+        link("rowniny_koronne",  "poludniowe_ruiny",   TerrainType.ROAD)
+        link("pogranicze_stepowe", "ziemie_dzikie",    TerrainType.SWAMP)
+        link("poludniowe_ruiny",  "gory_poludniowe",   TerrainType.MOUNTAIN)
     }
 
     fun clear() { connections.clear() }

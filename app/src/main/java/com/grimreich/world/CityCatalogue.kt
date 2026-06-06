@@ -1,32 +1,21 @@
 package com.grimreich.world
 
 /**
- * TODO conventions for world content:
- * - TODO[city] add new city pack / local content
- * - TODO[event] attach richer city events and NPC hooks
- * - TODO[map] tune connectivity and region routes
- *
- * world/ contains canonical static world data used by core and systems layers.
+ * Central city and region catalogue for GrimReich.
+ * Synchronized with GrimLoreCatalogues to ensure lore consistency.
  */
 data class CityData(
     val id: String,
     val name: String,
     val region: String,
-    val type: String,
-    val population: Int,
+    val phenomenon: String,
+    val rulingFaction: String,
     val priceModifier: Float,
     val events: MutableList<String> = mutableListOf()
 )
 
-/**
- * Central city catalogue for map, economy and event systems.
- *
- * Sprint coverage:
- * - Stage 0: canonical data format for CityData
- * - Stage 1 / Sprint 4-5: 11 connected cities (Grimhold + 10 target cities)
- */
 object CityCatalogue {
-    const val startingCityId = "grimhold"
+    const val startingCityId = "wybrzeze_polnocne"
     private val cities = linkedMapOf<String, CityData>()
 
     fun register(city: CityData) {
@@ -40,131 +29,86 @@ object CityCatalogue {
     fun clear() = cities.clear()
 
     /**
-     * Seeds Stage 1 world cities.
-     * The method name is preserved for compatibility with existing callers.
+     * Seeds GrimReich lore-compliant locations.
      */
     fun seedSprint1() {
         if (cities.isNotEmpty()) return
 
         register(
             CityData(
-                id = "grimhold",
-                name = "Grimhold",
-                region = "central",
-                type = "city",
-                population = 32000,
-                priceModifier = 1.00f,
-                events = mutableListOf("market_day", "church_rumor")
-            )
-        )
-        register(
-            CityData(
-                id = "koln",
-                name = "Köln",
-                region = "west",
-                type = "metropolis",
-                population = 50000,
-                priceModifier = 0.95f,
-                events = mutableListOf("trade_fair", "guild_reaction")
-            )
-        )
-        register(
-            CityData(
-                id = "nurnberg",
-                name = "Nürnberg",
-                region = "south",
-                type = "city",
-                population = 42000,
-                priceModifier = 1.00f,
-                events = mutableListOf("craftsman_news", "church_reaction")
-            )
-        )
-        register(
-            CityData(
-                id = "frankfurt",
-                name = "Frankfurt",
-                region = "central_west",
-                type = "city",
-                population = 46000,
-                priceModifier = 1.10f,
-                events = mutableListOf("bank_notice", "merchant_reaction")
-            )
-        )
-        register(
-            CityData(
-                id = "praha",
-                name = "Praha",
-                region = "east_south",
-                type = "city",
-                population = 38000,
-                priceModifier = 1.05f,
-                events = mutableListOf("night_watch", "church_reaction")
-            )
-        )
-        register(
-            CityData(
-                id = "lubeck",
-                name = "Lübeck",
+                id = "wybrzeze_polnocne",
+                name = "Wybrzeże Północne",
                 region = "north",
-                type = "port",
-                population = 30000,
-                priceModifier = 0.90f,
-                events = mutableListOf("harbor_news", "merchant_reaction")
+                phenomenon = "Mgła",
+                rulingFaction = "Zakon Świtu",
+                priceModifier = 1.0f,
+                events = mutableListOf("mist_vision", "lighthouse_call")
             )
         )
         register(
             CityData(
-                id = "hamburg",
-                name = "Hamburg",
-                region = "north_west",
-                type = "port",
-                population = 34000,
-                priceModifier = 0.92f,
-                events = mutableListOf("dockside_brawl", "benon_pilgrims")
+                id = "serce_krainy",
+                name = "Serce Krainy",
+                region = "central",
+                phenomenon = "Odbicie",
+                rulingFaction = "Trybunał",
+                priceModifier = 1.2f,
+                events = mutableListOf("mirror_judgment", "court_decree")
             )
         )
         register(
             CityData(
-                id = "wien",
-                name = "Wien",
-                region = "south_east",
-                type = "capital",
-                population = 41000,
-                priceModifier = 1.08f,
-                events = mutableListOf("court_petition", "cathedral_procession")
-            )
-        )
-        register(
-            CityData(
-                id = "breslau",
-                name = "Breslau",
+                id = "rowniny_koronne",
+                name = "Równiny Koronne",
                 region = "east",
-                type = "city",
-                population = 29000,
-                priceModifier = 0.98f,
-                events = mutableListOf("river_tolls", "guild_reaction")
+                phenomenon = "Krew",
+                rulingFaction = "Gildia",
+                priceModifier = 0.9f,
+                events = mutableListOf("blood_harvest", "guild_tax")
             )
         )
         register(
             CityData(
-                id = "augsburg",
-                name = "Augsburg",
-                region = "south_west",
-                type = "city",
-                population = 36000,
-                priceModifier = 1.03f,
-                events = mutableListOf("banker_patron", "church_reaction")
+                id = "pogranicze_stepowe",
+                name = "Pogranicze Stepowe",
+                region = "west",
+                phenomenon = "Rozdarcie",
+                rulingFaction = "Bractwo Cienia",
+                priceModifier = 1.1f,
+                events = mutableListOf("rift_leak", "shadow_raid")
             )
         )
         register(
             CityData(
-                id = "strasbourg",
-                name = "Strasbourg",
-                region = "far_west",
-                type = "border_city",
-                population = 33000,
-                priceModifier = 1.01f,
-                events = mutableListOf("bridge_tax", "market_day")
+                id = "poludniowe_ruiny",
+                name = "Południowe Ruiny",
+                region = "south",
+                phenomenon = "Pełnia",
+                rulingFaction = "Zakon Świtu",
+                priceModifier = 1.05f,
+                events = mutableListOf("ash_rain", "hymn_echo")
+            )
+        )
+        register(
+            CityData(
+                id = "gory_poludniowe",
+                name = "Góry Południowe",
+                region = "far_south",
+                phenomenon = "Absolut",
+                rulingFaction = "Trybunał",
+                priceModifier = 1.3f,
+                events = mutableListOf("absolute_silence", "summit_whisper")
+            )
+        )
+        register(
+            CityData(
+                id = "ziemie_dzikie",
+                name = "Ziemie Dzikie",
+                region = "untamed",
+                phenomenon = "Mgła",
+                rulingFaction = "None",
+                priceModifier = 0.85f,
+                events = mutableListOf("wild_hunt", "primal_hunger")
             )
         )
     }

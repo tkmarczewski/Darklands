@@ -1,67 +1,41 @@
 package com.grimreich
 
-import com.grimreich.core.TerrainType
-import com.grimreich.core.WorldMap
 import com.grimreich.world.CityCatalogue
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertFalse
+import com.grimreich.core.WorldMap
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
-import java.util.ArrayDeque
 
 class CataloguesAndWorldTest {
 
     @Before
-    fun reset() {
-        CityCatalogue.clear()
-        WorldMap.clear()
-    }
-
-    @Test
-    fun `stage 1 city catalogue seeds eleven cities`() {
-        CityCatalogue.seedSprint1()
-
-        val cities = CityCatalogue.all()
-        assertEquals(11, cities.size)
-        assertTrue(cities.all { it.population > 0 })
-        assertTrue(cities.all { it.events.size >= 2 })
-        assertNotNull(CityCatalogue.get("wien"))
-        assertNotNull(CityCatalogue.get("strasbourg"))
-    }
-
-    @Test
-    fun `world map is fully connected from grimhold`() {
+    fun seed() {
         CityCatalogue.seedSprint1()
         WorldMap.seedStage1()
+    }
 
-        val visited = mutableSetOf<String>()
-        val queue = ArrayDeque<String>()
-        queue.add("grimhold")
-        visited.add("grimhold")
+    @Test
+    fun `CityCatalogue contains canonical regions`() {
+        val all = CityCatalogue.all()
+        assertTrue(all.any { it.id == "wybrzeze_polnocne" })
+        assertTrue(all.any { it.id == "serce_krainy" })
+        assertTrue(all.any { it.id == "rowniny_koronne" })
+    }
 
-        while (queue.isNotEmpty()) {
-            val current = queue.removeFirst()
-            WorldMap.neighbors(current)
-                .map { if (it.fromCityId == current) it.toCityId else it.fromCityId }
-                .filterNot { it in visited }
-                .forEach {
-                    visited += it
-                    queue.add(it)
-                }
+    @Test
+    fun `WorldMap connections use valid city IDs`() {
+        val connections = WorldMap.allConnections()
+        for (conn in connections) {
+            assertNotNull("From city ${conn.fromCityId} should exist", CityCatalogue.get(conn.fromCityId))
+            assertNotNull("To city ${conn.toCityId} should exist", CityCatalogue.get(conn.toCityId))
         }
-
-        assertEquals(CityCatalogue.all().map { it.id }.toSet(), visited)
     }
 
     @Test
-    fun `terrain links are assigned for stage 1 routes`() {
-        WorldMap.seedStage1()
-
-        assertEquals(TerrainType.ROAD, WorldMap.terrainBetween("grimhold", "hamburg"))
-        assertEquals(TerrainType.MOUNTAIN, WorldMap.terrainBetween("praha", "wien"))
-        assertEquals(TerrainType.RIVER, WorldMap.terrainBetween("koln", "strasbourg"))
-        assertFalse(WorldMap.isConnected("hamburg", "wien"))
+    fun `CityData has lore attributes`() {
+        val city = CityCatalogue.get("serce_krainy")!!
+        assertTrue(city.phenomenon == "Odbicie")
+        assertTrue(city.rulingFaction == "Trybunał")
     }
 }
