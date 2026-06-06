@@ -7,5 +7,7 @@ data class WorldState(
     var timeOfDay: String = "morning",
     var fatigue: Int = 0,
     var lastEncounter: String = "none",
-    var season: Season = Season.SPRING
+    var season: Season = Season.SPRING,
+    var globalStability: Int = 100,
+    var weather: WeatherType = WeatherType.CLEAR
 )

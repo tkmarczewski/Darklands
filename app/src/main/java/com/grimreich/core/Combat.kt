@@ -46,7 +46,7 @@ object MoraleSystem {
 // ==================== STATUS EFFECTS ====================
 
 enum class StatusEffectType {
-    POISON, BLEED, FIRE, FREEZE
+    POISON, BLEED, FIRE, FREEZE, WET, SHOCK
 }
 
 data class StatusEffect(
@@ -56,6 +56,20 @@ data class StatusEffect(
 )
 
 // ==================== COMBAT MODELS ====================
+
+enum class SkillType {
+    MELEE, RANGED, PRAYER, ALCHEMY
+}
+
+data class CombatSkill(
+    val id: String,
+    val name: String,
+    val type: SkillType,
+    val staminaCost: Int = 0,
+    val favorCost: Int = 0,
+    val description: String = "",
+    val effect: (CombatantState, CombatantState) -> String
+)
 
 enum class WoundType {
     NONE, LIGHT, SERIOUS, CRITICAL
@@ -83,7 +97,15 @@ data class RoundResult(
     val defenderMorale: Int,
     val attackerWound: WoundType,
     val defenderWound: WoundType,
-    val log: List<String>
+    val log: List<String>,
+    val visualEvents: List<CombatVisualEvent> = emptyList()
+)
+
+data class CombatVisualEvent(
+    val target: String, // "hero" or "enemy"
+    val type: String,   // "damage", "miss", "status", "heal"
+    val value: Int = 0,
+    val label: String = ""
 )
 
 object CombatRound {
@@ -111,7 +133,15 @@ object CombatRound {
             0
         } else {
             // Atak
-            val rawAtk = attacker.attackBase + (attacker.strength / 2) + attackerEquipped.totalAttack()
+            var rawAtk = attacker.attackBase + (attacker.strength / 2) + attackerEquipped.totalAttack()
+            
+            // Synergy check
+            if (defender.activeEffects.any { it.type == StatusEffectType.WET } && 
+                attacker.activeEffects.any { it.type == StatusEffectType.SHOCK }) {
+                rawAtk = (rawAtk * 1.5f).toInt()
+                log.add("Przewodnictwo! Mokry wróg otrzymuje zwiększone obrażenia od porażenia.")
+            }
+
             val atkMod = attackerStatus.attackModifier()
             val defMod = defenderStatus.defenseModifier()
             val defArmor = defender.armor + attackerEquipped.totalDefense()
@@ -187,9 +217,16 @@ object CombatRound {
                     log.add("${combatant.name} płonie: -${effect.strength} HP.")
                 }
                 StatusEffectType.FREEZE -> {
-                    // Reduce agility/morale
                     combatant.morale -= 1
                     log.add("${combatant.name} jest przemarznięty.")
+                }
+                StatusEffectType.WET -> {
+                    // No direct dmg, but affects synergies
+                    log.add("${combatant.name} jest przemoczony.")
+                }
+                StatusEffectType.SHOCK -> {
+                    combatant.endurance -= 2
+                    log.add("${combatant.name} drży od wyładowań.")
                 }
             }
             effect.duration--
@@ -198,10 +235,8 @@ object CombatRound {
     }
 
     private fun tryApplyStatus(attacker: CombatantState, defender: CombatantState, log: MutableList<String>) {
-        // Base chance + Knowledge bonus
         val statusChance = 0.1f + (attacker.intelligence * 0.03f)
         if (Random.nextFloat() < statusChance) {
-            // Pick a random effect based on something? For now random
             val effectType = StatusEffectType.entries.toTypedArray().random()
             val existing = defender.activeEffects.find { it.type == effectType }
             if (existing != null) {

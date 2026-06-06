@@ -19,6 +19,12 @@ data class Hero(
     var sanity: Int       = 100, // 0-100, spada podczas ekspedycji na Druga Strone
     var corruption: Int   = 0,   // 0-100, rosnie przy kontaktach z mrokiem
     var morale: Int       = 70,  // 0-100, biezacy stan ducha
+    
+    // Progresja
+    var level: Int        = 1,
+    var xp: Int           = 0,
+    var attributePoints: Int = 0,
+    var portraitRes: String = "ic_stats_cha", // Default portrait
 
     // Punkty zycia
     var hp: Int           = 30,

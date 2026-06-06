@@ -2,7 +2,16 @@ package com.grimreich.grimreich.v1
 
 data class GrimWorld(val id: String, val name: String, val regions: List<Region> = emptyList(), val factions: List<Faction> = emptyList(), val notes: String? = null)
 data class Region(val id: String, val name: String, val description: String = "", val encounters: List<Encounter> = emptyList(), val seed: Long? = null)
-data class NPC(val id: String, val name: String, val role: String, val factionId: String? = null, val stats: Map<String, Int> = emptyMap(), val inventory: List<Item> = emptyList(), val dialogue: Map<String, Any>? = null)
+data class NPC(
+    val id: String, 
+    val name: String, 
+    val role: String, 
+    val factionId: String? = null, 
+    val stats: Map<String, Int> = emptyMap(), 
+    val inventory: List<Item> = emptyList(), 
+    val dialogue: Map<String, Any>? = null,
+    val startNodeId: String? = null // Link to DialogueNode
+)
 data class Boss(val id: String, val name: String, val level: Int, val lootTable: RewardTable)
 
 // Consolidated Item class
@@ -26,3 +35,19 @@ data class Faction(val id: String, val name: String, val disposition: String = "
 data class Quest(val id: String, val title: String, val description: String, val rewards: RewardTable)
 data class Skill(val id: String, val name: String, val power: Int)
 data class Equipment(val id: String, val name: String, val slot: String, val stats: Map<String, Int> = emptyMap())
+
+// Dialogue System
+data class DialogueChoice(
+    val text: String,
+    val targetNodeId: String,
+    val requiredReputation: Int = 0,
+    val factionId: String? = null,
+    val onSelect: (com.grimreich.core.GameState) -> Unit = {}
+)
+
+data class DialogueNode(
+    val id: String,
+    val npcId: String,
+    val text: String,
+    val choices: List<DialogueChoice> = emptyList()
+)

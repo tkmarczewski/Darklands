@@ -130,6 +130,8 @@ class CombatActivity : AppCompatActivity() {
                 com.grimreich.core.StatusEffectType.BLEED -> R.drawable.ic_status_bleed
                 com.grimreich.core.StatusEffectType.FIRE -> R.drawable.ic_status_fire
                 com.grimreich.core.StatusEffectType.FREEZE -> R.drawable.ic_status_freeze
+                com.grimreich.core.StatusEffectType.WET -> R.drawable.ic_sigil_ice // Placeholder
+                com.grimreich.core.StatusEffectType.SHOCK -> R.drawable.ic_sigil_light // Placeholder
             }
             iv.setImageResource(iconRes)
             container.addView(iv)

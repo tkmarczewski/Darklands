@@ -1,13 +1,20 @@
 package com.grimreich.systems
 
-import com.grimreich.world.CityCatalogue
+import com.grimreich.core.GameRepository
+import com.grimreich.grimreich.v1.Item
 
-/**
- * Liczy ceny lokalne na podstawie mnożnika miasta.
- */
 object EconomySystem {
+    
     fun priceInCity(cityId: String, basePrice: Int): Int {
-        val city = CityCatalogue.get(cityId) ?: return basePrice
-        return (basePrice * city.priceModifier).toInt().coerceAtLeast(1)
+        val g = GameRepository.state
+        // Uproszczona logika regionalna: w Magdeburgu drożej, w innych taniej
+        return if (cityId == "magdeburg") (basePrice * 1.2).toInt() else basePrice
+    }
+    
+    fun sellItem(item: Item): Int {
+        val sellPrice = (item.value * 0.4).toInt()
+        GameRepository.state.gold += sellPrice
+        GameRepository.state.inventory.remove(item)
+        return sellPrice
     }
 }

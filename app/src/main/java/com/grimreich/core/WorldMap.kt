@@ -7,11 +7,11 @@ enum class TerrainType(
     val encounterChance: Float,
     val travelHoursRange: IntRange
 ) {
-    ROAD(encounterChance = 0.10f, travelHoursRange = 2..3),
-    FOREST(encounterChance = 0.30f, travelHoursRange = 3..5),
-    MOUNTAIN(encounterChance = 0.40f, travelHoursRange = 4..6),
-    RIVER(encounterChance = 0.20f, travelHoursRange = 3..4),
-    SWAMP(encounterChance = 0.35f, travelHoursRange = 4..6)
+    ROAD(0.2f, 4..8),
+    FOREST(0.4f, 6..12),
+    MOUNTAIN(0.6f, 10..20),
+    RIVER(0.3f, 3..6),
+    SWAMP(0.7f, 12..24)
 }
 
 data class TravelConnection(
@@ -23,72 +23,64 @@ data class TravelConnection(
 data class CityNode(
     val city: CityData,
     val connections: List<String>,
-    val region: String = city.region,
-    val name: String = city.name
+    val region: String,
+    val name: String,
+    val x: Int = 0,
+    val y: Int = 0
 )
 
-/**
- * TODO[map] Fine tune historical routes and distances.
- * core/ contains pure world traversal rules; world/ contains the actual content data.
- */
 object WorldMap {
+    // Stage 1 connections
     private val connections = mutableListOf<TravelConnection>()
 
     fun seedStage1() {
         if (connections.isNotEmpty()) return
         CityCatalogue.seedSprint1()
 
-        link("grimhold", "hamburg", TerrainType.ROAD)
-        link("grimhold", "lubeck", TerrainType.FOREST)
-        link("grimhold", "frankfurt", TerrainType.ROAD)
-        link("grimhold", "breslau", TerrainType.ROAD)
-        link("hamburg", "lubeck", TerrainType.RIVER)
-        link("koln", "frankfurt", TerrainType.ROAD)
-        link("koln", "strasbourg", TerrainType.RIVER)
-        link("frankfurt", "nurnberg", TerrainType.FOREST)
-        link("frankfurt", "strasbourg", TerrainType.ROAD)
-        link("nurnberg", "augsburg", TerrainType.ROAD)
-        link("nurnberg", "praha", TerrainType.FOREST)
-        link("nurnberg", "wien", TerrainType.MOUNTAIN)
-        link("praha", "breslau", TerrainType.ROAD)
-        link("praha", "wien", TerrainType.MOUNTAIN)
-        link("augsburg", "wien", TerrainType.MOUNTAIN)
-        link("augsburg", "strasbourg", TerrainType.ROAD)
-        link("breslau", "wien", TerrainType.ROAD)
+        link("magdeburg", "wroclaw", TerrainType.ROAD)
+        link("magdeburg", "berlin",  TerrainType.ROAD)
+        link("berlin",    "szczecin", TerrainType.ROAD)
+        link("wroclaw",   "brno",    TerrainType.MOUNTAIN)
+        link("brno",      "wien",    TerrainType.ROAD)
+        link("wien",      "graz",    TerrainType.MOUNTAIN)
+        link("graz",      "vienna",  TerrainType.ROAD)
+        link("wroclaw",   "praha",   TerrainType.FOREST)
+        link("praha",     "nurnberg", TerrainType.ROAD)
+        link("nurnberg",  "koln",     TerrainType.ROAD)
+        link("koln",      "strasbourg", TerrainType.RIVER)
     }
 
-    fun clear() = connections.clear()
+    fun clear() { connections.clear() }
 
-    fun allConnections(): List<TravelConnection> = connections.toList()
+    fun allConnections() = connections.toList()
 
-    fun neighbors(cityId: String): List<TravelConnection> = connections.filter {
-        it.fromCityId == cityId || it.toCityId == cityId
+    fun neighbors(cityId: String): List<TravelConnection> =
+        connections.filter { it.fromCityId == cityId || it.toCityId == cityId }
+
+    fun terrainBetween(c1: String, c2: String): TerrainType? {
+        val conn = connections.firstOrNull { 
+            (it.fromCityId == c1 && it.toCityId == c2) || (it.fromCityId == c2 && it.toCityId == c1)
+        }
+        return conn?.terrain
     }
 
-    fun terrainBetween(cityA: String, cityB: String): TerrainType? =
-        connections.firstOrNull {
-            (it.fromCityId == cityA && it.toCityId == cityB) ||
-                (it.fromCityId == cityB && it.toCityId == cityA)
-        }?.terrain
+    fun isConnected(c1: String, c2: String) = terrainBetween(c1, c2) != null
 
-    fun isConnected(cityA: String, cityB: String): Boolean = terrainBetween(cityA, cityB) != null
-
-    private fun link(a: String, b: String, terrain: TerrainType) {
-        connections += TravelConnection(a, b, terrain)
+    fun link(c1: String, c2: String, terrain: TerrainType) {
+        connections.add(TravelConnection(c1, c2, terrain))
     }
 
     fun all(): List<CityNode> {
-        return CityCatalogue.all().map { city ->
-            CityNode(city, neighbors(city.id).map { 
-                if (it.fromCityId == city.id) it.toCityId else it.fromCityId 
-            })
+        val allCities = CityCatalogue.all()
+        return allCities.map { city ->
+            val linked = neighbors(city.id).map { if (it.fromCityId == city.id) it.toCityId else it.fromCityId }
+            CityNode(city, linked, city.region, city.name, x = city.hashCode() % 100, y = city.hashCode() / 100 % 100)
         }
     }
 
     fun get(id: String): CityNode? {
         val city = CityCatalogue.get(id) ?: return null
-        return CityNode(city, neighbors(id).map { 
-            if (it.fromCityId == id) it.toCityId else it.fromCityId 
-        })
+        val linked = neighbors(id).map { if (it.fromCityId == id) it.toCityId else it.fromCityId }
+        return CityNode(city, linked, city.region, city.name, x = city.hashCode() % 100, y = city.hashCode() / 100 % 100)
     }
 }

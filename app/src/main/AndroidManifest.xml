@@ -21,7 +21,7 @@
         <activity android:name=".ui.AlchemyActivity" android:exported="false"/>
         <activity android:name=".ui.CombatActivity" android:exported="false"/>
         <activity android:name=".ui.EndgameActivity" android:exported="false"/>
-        <activity android:name=".ui.HubActivity" android:exported="false"/>
+        <activity android:name=".ui.HubActivity" android:exported="true"/>
         <activity android:name=".ui.CityActivity" android:exported="false"/>
         <activity android:name=".ui.ReputationActivity" android:exported="false"/>
         <activity android:name=".ui.SaintsActivity" android:exported="false"/>
