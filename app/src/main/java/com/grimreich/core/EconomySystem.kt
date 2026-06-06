@@ -1,192 +1,122 @@
 package com.grimreich.core
 
-/**
- * System ekonomiczny — towary, handel, ceny w miastach.
- * Każde miasto może mieć inne ceny towarów w zależności od produkcji lokalnej.
- */
+import com.grimreich.world.CityCatalogue
 
-// ==================== TOWAR ====================
+// ==================== TRADE GOOD TYPES ====================
+
 enum class TradeGoodType {
-    // Surowce
+    // Basics
     GRAIN, SALT, IRON_ORE, TIMBER, WOOL,
-    // Rzemiosło
+    // Crafted
     CLOTH, WEAPONS, TOOLS, LEATHER_GOODS,
-    // Luksus
+    // Luxuries
     SPICES, WINE, SILK, JEWELRY
 }
+
+// ==================== TRADE GOOD MODEL ====================
 
 data class TradeGood(
     val type: TradeGoodType,
     val name: String,
-    val basePrice: Int,          // floreny za jednostkę
-    val weight: Int = 1,
-    val description: String = ""
+    val basePrice: Int,
+    val weight: Int, // in dkg
+    val description: String
 )
+
+// ==================== TRADE GOOD CATALOG ====================
 
 object TradeGoodCatalog {
     val goods = listOf(
-        // SUROWCE
-        TradeGood(
-            type = TradeGoodType.GRAIN,
-            name = "Zboże",
-            basePrice = 5,
-            weight = 2,
-            description = "Podstawowe pożywienie."
-        ),
-        TradeGood(
-            type = TradeGoodType.SALT,
-            name = "Sól",
-            basePrice = 10,
-            weight = 1,
-            description = "Do konserwacji i przypraw."
-        ),
-        TradeGood(
-            type = TradeGoodType.IRON_ORE,
-            name = "Ruda żelaza",
-            basePrice = 15,
-            weight = 3,
-            description = "Surowiec do produkcji broni."
-        ),
-        TradeGood(
-            type = TradeGoodType.TIMBER,
-            name = "Drewno",
-            basePrice = 8,
-            weight = 5,
-            description = "Materiał budowlany."
-        ),
-        TradeGood(
-            type = TradeGoodType.WOOL,
-            name = "Wełna",
-            basePrice = 12,
-            weight = 1,
-            description = "Do produkcji sukna."
-        ),
-        // RZEMIOSŁO
-        TradeGood(
-            type = TradeGoodType.CLOTH,
-            name = "Sukno",
-            basePrice = 25,
-            weight = 1,
-            description = "Materiał na odzież."
-        ),
-        TradeGood(
-            type = TradeGoodType.WEAPONS,
-            name = "Broń",
-            basePrice = 50,
-            weight = 2,
-            description = "Miecze, topory, lance."
-        ),
-        TradeGood(
-            type = TradeGoodType.TOOLS,
-            name = "Narzędzia",
-            basePrice = 20,
-            weight = 2,
-            description = "Młoty, piły, lemiesze."
-        ),
-        TradeGood(
-            type = TradeGoodType.LEATHER_GOODS,
-            name = "Wyroby skórzane",
-            basePrice = 30,
-            weight = 1,
-            description = "Obuwie, pasy, sakwy."
-        ),
-        // LUKSUS
-        TradeGood(
-            type = TradeGoodType.SPICES,
-            name = "Przyprawy",
-            basePrice = 80,
-            weight = 1,
-            description = "Pieprz, goździki, cynamon."
-        ),
-        TradeGood(
-            type = TradeGoodType.WINE,
-            name = "Wino",
-            basePrice = 40,
-            weight = 2,
-            description = "Reńskie i węgierskie."
-        ),
-        TradeGood(
-            type = TradeGoodType.SILK,
-            name = "Jedwab",
-            basePrice = 120,
-            weight = 1,
-            description = "Luksusowa tkanina."
-        ),
-        TradeGood(
-            type = TradeGoodType.JEWELRY,
-            name = "Biżuteria",
-            basePrice = 200,
-            weight = 1,
-            description = "Złoto i kamienie szlachetne."
-        )
+        TradeGood(TradeGoodType.GRAIN, "Zboże", 10, 100, "Podstawowe pożywienie."),
+        TradeGood(TradeGoodType.SALT, "Sól", 25, 50, "Białe złoto północy."),
+        TradeGood(TradeGoodType.IRON_ORE, "Ruda żelaza", 40, 200, "Surowiec do wyrobu broni."),
+        TradeGood(TradeGoodType.TIMBER, "Drewno", 15, 250, "Materiał budowlany."),
+        TradeGood(TradeGoodType.WOOL, "Wełna", 20, 80, "Surowiec na ubrania."),
+        TradeGood(TradeGoodType.CLOTH, "Sukno", 50, 60, "Wytworny materiał."),
+        TradeGood(TradeGoodType.WEAPONS, "Broń", 150, 150, "Miecze i topory."),
+        TradeGood(TradeGoodType.TOOLS, "Narzędzia", 80, 120, "Niezbędne w rzemiośle."),
+        TradeGood(TradeGoodType.LEATHER_GOODS, "Wyroby skórzane", 60, 90, "Buty i pasy."),
+        TradeGood(TradeGoodType.SPICES, "Przyprawy", 300, 10, "Egzotyczne aromaty."),
+        TradeGood(TradeGoodType.WINE, "Wino", 120, 100, "Trunek dla szlachty."),
+        TradeGood(TradeGoodType.SILK, "Jedwab", 500, 20, "Najdroższy materiał."),
+        TradeGood(TradeGoodType.JEWELRY, "Biżuteria", 800, 5, "Złoto i klejnoty.")
     )
 
-    fun findByType(type: TradeGoodType): TradeGood? = goods.firstOrNull { it.type == type }
+    fun findByType(type: TradeGoodType) = goods.firstOrNull { it.type == type }
 }
 
-// ==================== CENY W MIASTACH ====================
-/**
- * Modyfikator ceny w danym mieście (100 = cena bazowa, 120 = +20%, 80 = -20%)
- */
-data class CityPriceModifier(
-    val goodType: TradeGoodType,
-    val pricePercent: Int
-)
+// ==================== CITY MARKET LOGIC ====================
 
 data class CityMarket(
     val cityId: String,
-    val priceModifiers: Map<TradeGoodType, Int>  // % modyfikator ceny
+    val priceModifiers: Map<TradeGoodType, Int> // percent of base price, e.g. 120 means 120%
 ) {
-    fun getPrice(goodType: TradeGoodType): Int {
-        val good = TradeGoodCatalog.findByType(goodType) ?: return 0
-        val modifier = priceModifiers[goodType] ?: 100
-        return (good.basePrice * modifier) / 100
+    fun getPrice(type: TradeGoodType): Int {
+        val base = TradeGoodCatalog.findByType(type)?.basePrice ?: 0
+        val mod = priceModifiers[type] ?: 100
+        return (base * mod) / 100
     }
 }
 
-// ==================== PRZYKŁADOWE RYNKI ====================
 object CityMarketCatalog {
-    val markets = mapOf(
-        "augsburg" to CityMarket(
-            cityId = "augsburg",
+    val markets: Map<String, CityMarket> = mapOf(
+        "wybrzeze_polnocne" to CityMarket(
+            cityId = "wybrzeze_polnocne",
             priceModifiers = mapOf(
-                TradeGoodType.WEAPONS to 90,      // tańsza broń
-                TradeGoodType.SPICES to 110,
-                TradeGoodType.JEWELRY to 120
+                TradeGoodType.SALT to 70, // Plenty of salt from the sea
+                TradeGoodType.GRAIN to 130, // Hard to grow in the mist
+                TradeGoodType.SPICES to 150
             )
         ),
-        "koln" to CityMarket(
-            cityId = "koln",
+        "serce_krainy" to CityMarket(
+            cityId = "serce_krainy",
             priceModifiers = mapOf(
-                TradeGoodType.WINE to 80,          // tańsze wino
-                TradeGoodType.CLOTH to 85,
-                TradeGoodType.SPICES to 130        // drogie przyprawy
-            )
-        ),
-        "nurnberg" to CityMarket(
-            cityId = "nurnberg",
-            priceModifiers = mapOf(
-                TradeGoodType.TOOLS to 90,
-                TradeGoodType.IRON_ORE to 110
-            )
-        ),
-        "hamburg" to CityMarket(
-            cityId = "hamburg",
-            priceModifiers = mapOf(
-                TradeGoodType.TIMBER to 75,        // port = tanie drewno
-                TradeGoodType.SALT to 80,
-                TradeGoodType.SPICES to 120
-            )
-        ),
-        "wien" to CityMarket(
-            cityId = "wien",
-            priceModifiers = mapOf(
-                TradeGoodType.WINE to 70,
+                TradeGoodType.WINE to 80,
                 TradeGoodType.SILK to 90,
-                TradeGoodType.JEWELRY to 85
+                TradeGoodType.IRON_ORE to 120
+            )
+        ),
+        "rowniny_koronne" to CityMarket(
+            cityId = "rowniny_koronne",
+            priceModifiers = mapOf(
+                TradeGoodType.GRAIN to 70, // Fertile lands
+                TradeGoodType.WOOL to 80,
+                TradeGoodType.WEAPONS to 130
+            )
+        ),
+        "pogranicze_stepowe" to CityMarket(
+            cityId = "pogranicze_stepowe",
+            priceModifiers = mapOf(
+                TradeGoodType.WEAPONS to 90,
+                TradeGoodType.LEATHER_GOODS to 70,
+                TradeGoodType.WINE to 140
+            )
+        ),
+        "poludniowe_ruiny" to CityMarket(
+            cityId = "poludniowe_ruiny",
+            priceModifiers = mapOf(
+                TradeGoodType.TOOLS to 120,
+                TradeGoodType.CLOTH to 110,
+                TradeGoodType.SALT to 130
+            )
+        ),
+        "gory_poludniowe" to CityMarket(
+            cityId = "gory_poludniowe",
+            priceModifiers = mapOf(
+                TradeGoodType.IRON_ORE to 70, // Mining region
+                TradeGoodType.JEWELRY to 80,
+                TradeGoodType.GRAIN to 160
+            )
+        ),
+        "ziemie_dzikie" to CityMarket(
+            cityId = "ziemie_dzikie",
+            priceModifiers = mapOf(
+                TradeGoodType.TIMBER to 50, // Massive forests
+                TradeGoodType.LEATHER_GOODS to 80,
+                TradeGoodType.SILK to 200
             )
         )
     )
 
-    fun getMarket(cityId: String): CityMarket? = markets[cityId]
+    fun getMarket(cityId: String) = markets[cityId]
 }

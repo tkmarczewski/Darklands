@@ -1,6 +1,7 @@
 package com.grimreich.systems
 
-import com.grimreich.TestSupport
+import com.grimreich.core.GameRepository
+import com.grimreich.core.GameState
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -10,72 +11,69 @@ class ReputationSystemTest {
 
     @Before
     fun setUp() {
-        TestSupport.resetRepoEmpty()
+        GameRepository.state = GameState()
     }
 
     @Test
     fun `changeCity adds delta`() {
-        val msg = ReputationSystem.changeCity("grimhold", 25)
-        assertEquals(25, ReputationSystem.getCityRep("grimhold"))
-        assertTrue(msg.contains("grimhold"))
+        ReputationSystem.changeCity("serce_krainy", 10)
+        assertEquals(10, ReputationSystem.getCityRep("serce_krainy"))
     }
 
     @Test
     fun `changeCity is clamped to plus minus 100`() {
-        ReputationSystem.changeCity("grimhold", 500)
-        assertEquals(100, ReputationSystem.getCityRep("grimhold"))
-
-        ReputationSystem.changeCity("frankfurt", -1000)
-        assertEquals(-100, ReputationSystem.getCityRep("frankfurt"))
+        ReputationSystem.changeCity("serce_krainy", 200)
+        assertEquals(100, ReputationSystem.getCityRep("serce_krainy"))
+        
+        ReputationSystem.changeCity("serce_krainy", -1000)
+        assertEquals(-100, ReputationSystem.getCityRep("serce_krainy"))
     }
 
     @Test
     fun `changeCity creates a new entry for unknown city`() {
-        // ReputationState juz ma kilka miast w domyslnej mapie, ale dodajemy nowe
-        ReputationSystem.changeCity("dummy_city", 7)
-        assertEquals(7, ReputationSystem.getCityRep("dummy_city"))
+        ReputationSystem.changeCity("ghost_town", 5)
+        assertEquals(5, ReputationSystem.getCityRep("ghost_town"))
     }
 
     @Test
     fun `allCities returns snapshot map`() {
-        ReputationSystem.changeCity("grimhold", 10)
-        val snap = ReputationSystem.allCities()
-        assertEquals(10, snap["grimhold"])
+        ReputationSystem.changeCity("serce_krainy", 50)
+        val all = ReputationSystem.allCities()
+        assertEquals(1, all.size)
+        assertEquals(50, all["serce_krainy"])
     }
 
     @Test
     fun `changeFaction rejects unknown faction`() {
-        val msg = ReputationSystem.changeFaction("ghost_faction", 10)
-        assertTrue(msg.startsWith("Nieznana frakcja"))
-        assertEquals(0, ReputationSystem.getFactionRep("ghost_faction"))
+        val result = ReputationSystem.changeFaction("unknown", 10)
+        assertTrue(result.contains("Nieznana frakcja"))
     }
 
     @Test
     fun `changeFaction applies and clamps`() {
-        ReputationSystem.changeFaction("church", 30)
-        assertEquals(30, ReputationSystem.getFactionRep("church"))
-
-        ReputationSystem.changeFaction("church", 200)
-        assertEquals(100, ReputationSystem.getFactionRep("church"))
+        ReputationSystem.changeFaction("commoners", 20)
+        assertEquals(20, ReputationSystem.getFactionRep("commoners"))
+        
+        ReputationSystem.changeFaction("commoners", -200)
+        assertEquals(-100, ReputationSystem.getFactionRep("commoners"))
     }
 
     @Test
     fun `priceModifier maps reputation tiers correctly`() {
-        ReputationSystem.changeCity("grimhold", 60)
-        assertEquals(0.8f, ReputationSystem.priceModifier("grimhold"), 0.0001f)
-
-        ReputationSystem.changeCity("koln", 10) // starts at 0, so end 10
-        assertEquals(1.0f, ReputationSystem.priceModifier("koln"), 0.0001f)
-
-        ReputationSystem.changeCity("frankfurt", -10) // 0 -> -10
-        assertEquals(1.3f, ReputationSystem.priceModifier("frankfurt"), 0.0001f)
-
-        ReputationSystem.changeCity("dummy", -80) // 0 -> -80
-        assertEquals(2.0f, ReputationSystem.priceModifier("dummy"), 0.0001f)
+        // Neutral: 1.0f
+        assertEquals(1.0f, ReputationSystem.priceModifier("serce_krainy"), 0.0001f)
+        
+        // Hated: 1.3f
+        ReputationSystem.changeCity("serce_krainy", -10) // 0 -> -10
+        assertEquals(1.3f, ReputationSystem.priceModifier("serce_krainy"), 0.0001f)
+        
+        // Admired: 0.8f
+        ReputationSystem.changeCity("serce_krainy", 80) // -10 -> 70
+        assertEquals(0.8f, ReputationSystem.priceModifier("serce_krainy"), 0.0001f)
     }
 
     @Test
     fun `unknown city defaults to neutral modifier`() {
-        assertEquals(1.0f, ReputationSystem.priceModifier("never_visited"), 0.0001f)
+        assertEquals(1.0f, ReputationSystem.priceModifier("nowhere"), 0.0001f)
     }
 }

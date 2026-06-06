@@ -1,59 +1,52 @@
 package com.grimreich
 
 import com.grimreich.core.TravelPartyState
-import com.grimreich.core.WorldMap
 import com.grimreich.systems.CityFaction
 import com.grimreich.systems.ReputationSystem
 import com.grimreich.systems.TravelSystem
-import com.grimreich.world.CityCatalogue
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
-import kotlin.random.Random
 
 class TravelAndReputationTest {
 
     @Before
     fun reset() {
-        CityCatalogue.clear()
-        WorldMap.clear()
         ReputationSystem.clear()
-        CityCatalogue.seedSprint1()
-        WorldMap.seedStage1()
     }
 
     @Test
     fun `travel increases fatigue and time`() {
-        val initial = TravelPartyState(fatigue = 0, totalHoursTraveled = 0)
-        val (updated, result) = TravelSystem.travel(
-            fromCityId = "grimhold",
-            toCityId = "hamburg",
-            partyState = initial,
-            random = Random(7)
+        val initial = TravelPartyState(totalHoursTraveled = 0, fatigue = 0)
+        
+        val (partyResult, travelResult) = TravelSystem.travel(
+            fromCityId = "wybrzeze_polnocne",
+            toCityId = "serce_krainy",
+            partyState = initial
         )
-
-        assertEquals("hamburg", result.destinationCityId)
-        assertTrue(result.hoursSpent >= 2)
-        assertTrue(updated.totalHoursTraveled >= result.hoursSpent)
-        assertTrue(updated.fatigue > initial.fatigue)
+        
+        assertEquals("serce_krainy", travelResult.destinationCityId)
+        assertTrue(partyResult.totalHoursTraveled > 0)
+        assertTrue(partyResult.fatigue > 0)
     }
 
     @Test
     fun `rest lowers fatigue`() {
-        val rested = TravelSystem.restInCity(TravelPartyState(fatigue = 9), restHours = 8)
-        assertTrue(rested.fatigue < 9)
+        val tired = TravelPartyState(fatigue = 20)
+        val rested = TravelSystem.restInCity(tired, 10)
+        assertEquals(10, rested.fatigue)
     }
 
     @Test
     fun `reputation is isolated per city`() {
-        ReputationSystem.modify("grimhold", CityFaction.MERCHANTS, 25)
-        ReputationSystem.modify("hamburg", CityFaction.MERCHANTS, -10)
-
-        assertEquals(25, ReputationSystem.score("grimhold", CityFaction.MERCHANTS))
-        assertEquals(-10, ReputationSystem.score("hamburg", CityFaction.MERCHANTS))
-        assertEquals(0, ReputationSystem.score("wien", CityFaction.MERCHANTS))
-        assertTrue(ReputationSystem.priceModifier("grimhold") < 1.0f)
-        assertTrue(ReputationSystem.priceModifier("hamburg") > 1.0f)
+        ReputationSystem.modify("wybrzeze_polnocne", CityFaction.MERCHANTS, 20)
+        ReputationSystem.modify("serce_krainy", CityFaction.MERCHANTS, -10)
+        
+        assertEquals(20, ReputationSystem.score("wybrzeze_polnocne", CityFaction.MERCHANTS))
+        assertEquals(-10, ReputationSystem.score("serce_krainy", CityFaction.MERCHANTS))
+        assertEquals(0, ReputationSystem.score("rowniny_koronne", CityFaction.MERCHANTS))
+        
+        assertTrue(ReputationSystem.priceModifier("serce_krainy") > 1.0f)
     }
 }

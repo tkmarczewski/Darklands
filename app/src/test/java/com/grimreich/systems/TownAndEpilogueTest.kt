@@ -14,7 +14,7 @@ class TownAndEpilogueTest {
 
     @Test
     fun `TownSystem investment levels up town and modifies prices`() {
-        val cityId = "magdeburg"
+        val cityId = "wybrzeze_polnocne"
         GameRepository.state.gold = 1000
         
         // Invest 500 to level up from 1 to 2

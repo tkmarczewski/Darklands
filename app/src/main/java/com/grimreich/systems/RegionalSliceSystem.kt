@@ -3,6 +3,7 @@ package com.grimreich.systems
 import com.grimreich.core.GrimholdSliceViewData
 import com.grimreich.core.SliceQuestDetail
 import com.grimreich.core.PlayerState
+import com.grimreich.world.CityCatalogue
 
 /**
  * Logic for the "Vertical Slice" screen.
@@ -10,9 +11,8 @@ import com.grimreich.core.PlayerState
 object RegionalSliceSystem {
 
     fun buildViewData(playerState: PlayerState): GrimholdSliceViewData {
-        // Renamed Magdeburg references to Grimhold for 1.0 consistency
         val currentCity = playerState.currentCityId
-        val displayCityName = if (currentCity == "grimhold") "Grimhold" else currentCity.uppercase()
+        val displayCityName = CityCatalogue.get(currentCity)?.name ?: currentCity.uppercase()
 
         val activeQuests = QuestSystem.availableForCity(currentCity).take(3).map { q ->
             SliceQuestDetail(
@@ -29,7 +29,7 @@ object RegionalSliceSystem {
             cityTitle = displayCityName,
             backgroundUrl = "bg_grimhold_main",
             referenceTitle = displayCityName,
-            sourceLabel = "GrimReich 1.0 Vertical Slice",
+            sourceLabel = "GrimReich 1.5 Evolution Slice",
             moodText = "The air is heavy with the scent of old parchment and dry blood.",
             gold = playerState.gold,
             activeQuestId = playerState.activeQuestId,

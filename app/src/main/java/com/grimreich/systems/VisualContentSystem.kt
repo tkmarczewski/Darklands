@@ -7,12 +7,13 @@ import com.grimreich.core.QuestCardViewData
 
 object VisualContentSystem {
     private val visuals = mapOf(
-        "grimhold" to CityVisual("grimhold", "Grimhold", "city_grimhold_docks", "emblem_eagle", "Busy river trade, suspicious alleys, restless guild politics."),
-        "praha" to CityVisual("praha", "Praha", "city_praha_castle", "emblem_lion", "Scholars, nobles and intrigue under cathedral shadows."),
-        "koln" to CityVisual("koln", "Koln", "city_koln_cathedral", "emblem_spire", "Pilgrims, relics and merchant traffic around the great cathedral."),
-        "brno" to CityVisual("brno", "Brno", "city_brno_market", "emblem_gate", "Frontier bargaining, caravan gossip and guarded optimism."),
-        "wroclaw" to CityVisual("wroclaw", "Wroclaw", "city_wroclaw_bridges", "emblem_raven", "Islands, bridges and deals whispered at dusk."),
-        "vienna" to CityVisual("vienna", "Vienna", "city_vienna_walls", "emblem_crown", "Power, ceremony and expensive promises behind strong walls.")
+        "wybrzeze_polnocne" to CityVisual("wybrzeze_polnocne", "Wybrzeże Północne", "city_mist_cliffs", "emblem_ship", "Cold cliffs, wrecks and eternal mist."),
+        "serce_krainy" to CityVisual("serce_krainy", "Serce Krainy", "city_mirror_cathedral", "emblem_mirror", "Cathedral city, mirrors and archives of truth."),
+        "rowniny_koronne" to CityVisual("rowniny_koronne", "Równiny Koronne", "city_blood_canal", "emblem_blood", "Fertile fields, red canals and guild law."),
+        "pogranicze_stepowe" to CityVisual("pogranicze_stepowe", "Pogranicze Stepowe", "city_rift_fort", "emblem_rift", "Steppe, rifts and shadow raids."),
+        "poludniowe_ruiny" to CityVisual("poludniowe_ruiny", "Południowe Ruiny", "city_ash_temple", "emblem_hymn", "Ruined temples, ash and echoes of hymns."),
+        "gory_poludniowe" to CityVisual("gory_poludniowe", "Góry Południowe", "city_ice_summit", "emblem_peak", "Ice passes, absolute silence and summits."),
+        "ziemie_dzikie" to CityVisual("ziemie_dzikie", "Ziemie Dzikie", "city_wild_forest", "emblem_runes", "Forests, hunger and ancient runes.")
     )
 
     fun cityHub(playerState: PlayerState): CityHubViewData {

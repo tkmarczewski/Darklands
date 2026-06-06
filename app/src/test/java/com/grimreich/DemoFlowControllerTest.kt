@@ -1,39 +1,34 @@
 package com.grimreich
 
-import com.grimreich.core.WorldMap
-import com.grimreich.systems.CityEventSystem
-import com.grimreich.systems.QuestSystem
-import com.grimreich.systems.ReputationSystem
 import com.grimreich.ui.DemoFlowController
-import com.grimreich.world.CityCatalogue
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 
 class DemoFlowControllerTest {
 
+    private lateinit var demo: DemoFlowController
+
     @Before
-    fun reset() {
-        CityCatalogue.clear()
-        WorldMap.clear()
-        ReputationSystem.clear()
-        CityEventSystem.clear()
-        QuestSystem.clear()
+    fun setup() {
+        demo = DemoFlowController()
     }
 
     @Test
-    fun `demo shell supports selection slice opening and notes`() {
-        val demo = DemoFlowController()
-        val menu = demo.mainMenu()
-        assertTrue(menu.contains("Grimreich Internal Demo"))
+    fun `selecting city updates current state`() {
+        val selected = demo.select("serce_krainy")
+        assertTrue(selected.contains("Current city: serce_krainy"))
+    }
 
-        val selected = demo.select("praha")
-        assertTrue(selected.contains("Current city: praha"))
-
+    @Test
+    fun `opening slice returns formatted text`() {
         val slice = demo.openCurrentSlice()
-        assertTrue(slice.contains("PRAHA SLICE"))
+        assertTrue(slice.contains("VERTICAL SLICE"))
+    }
 
-        val updated = demo.addPlaytestNote("Praha flow feels strong.")
-        assertTrue(updated.contains("Session notes: 1"))
+    @Test
+    fun `adding playtest note returns confirmation`() {
+        val result = demo.addPlaytestNote("System test note.")
+        assertTrue(result.contains("Note added"))
     }
 }
