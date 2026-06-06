@@ -3,13 +3,9 @@ package com.grimreich.ui
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.grimreich.core.GameRepository
-import com.grimreich.core.SaintCatalogue
-import com.grimreich.core.ShrineType
 import com.grimreich.databinding.ActivityPrayerBinding
 import com.grimreich.systems.ReligionSystem
 
-// Ekran modlitwy - aktywne czyny: modlitwa do losowego swietego (typ kapliczki CHAPEL),
-// oraz "ofiarowanie" zlota (proste dodanie wiary i zmniejszenie zlota druzyny).
 class PrayerActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityPrayerBinding
@@ -21,10 +17,14 @@ class PrayerActivity : AppCompatActivity() {
         render()
 
         binding.btnPray.setOnClickListener {
-            val saint = SaintCatalogue.all().random()
-            val result = ReligionSystem.pray(saint.id, ShrineType.CHAPEL)
-            binding.tvResult.text = result
-            render()
+            val hero = GameRepository.state.party.firstOrNull()
+            if (hero != null) {
+                val result = ReligionSystem.pray(hero)
+                binding.tvResult.text = result
+                render()
+            } else {
+                binding.tvResult.text = "Brak bohatera w drużynie."
+            }
         }
 
         binding.btnDonate.setOnClickListener {
@@ -35,29 +35,27 @@ class PrayerActivity : AppCompatActivity() {
         }
     }
 
-    // Lokalna ofiara: zlota -> wiara (1zl = 1 punkt wiary, max 100).
     private fun donate(amount: Int): String {
         val s = GameRepository.state
-        if (amount <= 0) return "Podaj dodatnia kwote."
-        if (s.gold < amount) return "Za malo zlota (masz ${s.gold})."
+        if (amount <= 0) return "Podaj dodatnią kwotę."
+        if (s.gold < amount) return "Za mało złota (masz ${s.gold})."
         s.gold -= amount
-        s.prayer.faith = (s.prayer.faith + amount).coerceAtMost(100)
-        GameRepository.log("Ofiarowano $amount zlota. Wiara: ${s.prayer.faith}")
-        return "Ofiarowano $amount zlota. Wiara: ${s.prayer.faith}"
+        s.prayer.faith = (s.prayer.faith + amount / 5).coerceAtMost(150)
+        return "Ofiarowano $amount złota. Wiara wzrosła."
     }
 
     private fun render() {
         val g = GameRepository.state
         val hero = g.party.firstOrNull()
         val sb = StringBuilder()
-        sb.appendLine("=== MODLITWA ===")
+        sb.appendLine("=== MROCZNA MODLITWA ===")
         sb.appendLine()
-        sb.appendLine("Wiara: ${g.prayer.faith}")
-        sb.appendLine("Cnota: ${g.prayer.virtue}")
-        sb.appendLine("Grzechy: ${g.prayer.sins}")
-        sb.appendLine("Blogoslawienstwa: ${g.prayer.blessings}")
-        if (hero != null) sb.appendLine("Aktywny bohater: ${hero.name} (poboznosc ${hero.piety})")
-        sb.appendLine("Zloto druzyny: ${g.gold}")
+        sb.appendLine("Uznanie Proroków: ${g.prayer.faith}")
+        sb.appendLine("Stabilność Duszy: ${g.prayer.virtue}")
+        sb.appendLine("Skażenie: ${g.prayer.sins}")
+        sb.appendLine("Otrzymane Wizje: ${g.prayer.blessings.joinToString(", ")}")
+        if (hero != null) sb.appendLine("Aktywny bohater: ${hero.name} (pobozność ${hero.piety})")
+        sb.appendLine("Złoto drużyny: ${g.gold}")
         binding.tvPrayer.text = sb.toString()
     }
 }

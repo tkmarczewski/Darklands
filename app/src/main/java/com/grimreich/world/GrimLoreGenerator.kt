@@ -8,11 +8,11 @@ object GrimLoreGenerator {
         val random = Random(location.id.hashCode())
         
         val baseDesc = when (location.type) {
-            LocationType.RUINS            -> "Zgliszcza spowite nienaturalną mgłą."
-            LocationType.MONASTERY        -> "Opactwo, w którym dzwony biją same z siebie."
-            LocationType.RAUBRITTER_CASTLE -> "Twierdza zbudowana na kościach zapomnianych królów."
-            LocationType.DUNGEON          -> "Lochy, w których ściany wydają się oddychać."
-            LocationType.SHRINE           -> "Kapliczka, która krwawi, gdy nikt nie patrzy."
+            LocationType.ZGLISZCZA      -> "Zgliszcza spowite nienaturalną mgłą."
+            LocationType.MROCZNY_ZAKON  -> "Miejsce, w którym dzwony biją same z siebie."
+            LocationType.TWIERDZA_CIENIA -> "Twierdza zbudowana na kościach zapomnianych królów."
+            LocationType.KATAKUMBY_MROKU -> "Lochy, w których ściany wydają się oddychać."
+            LocationType.KAPLICZKA_KRWI  -> "Kapliczka, która krwawi, gdy nikt nie patrzy."
         }
 
         val atmosphere = listOf(

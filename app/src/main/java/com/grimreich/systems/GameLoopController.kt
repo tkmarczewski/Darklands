@@ -7,16 +7,17 @@ import com.grimreich.core.TravelScreenState
 import com.grimreich.core.WorldMap
 import com.grimreich.world.CityCatalogue
 
-/**
- * UI-facing façade for a minimal playable loop:
- * city -> quest list -> travel -> complete -> updated player state.
- */
 object GameLoopController {
     fun bootstrap(seed: Int = 1): PlayerState {
+        CityCatalogue.clear()
+        WorldMap.clear()
+        QuestSystem.clear()
+        
         CityCatalogue.seedSprint1()
         WorldMap.seedStage1()
         CityEventSystem.seedStage1Events()
         QuestSystem.seedIntegratedContent(seed)
+        
         return PlayerState(currentCityId = CityCatalogue.startingCityId)
     }
 
@@ -36,8 +37,8 @@ object GameLoopController {
     }
 
     fun travelToQuest(playerState: PlayerState): Pair<PlayerState, TravelScreenState> {
-        val questId = playerState.activeQuestId ?: error("No active quest")
-        val quest = QuestSystem.all().find { it.id == questId } ?: error("Unknown quest: $questId")
+        val questId = playerState.activeQuestId ?: error("Brak aktywnego zadania")
+        val quest = QuestSystem.all().find { it.id == questId } ?: error("Nieznane zadanie: $questId")
 
         val destinationCity = quest.cityId
 
@@ -67,7 +68,7 @@ object GameLoopController {
         playerState: PlayerState,
         faction: CityFaction = CityFaction.COMMONERS
     ): Pair<PlayerState, ResolutionScreenState> {
-        val questId = playerState.activeQuestId ?: error("No active quest")
+        val questId = playerState.activeQuestId ?: error("Brak zadania do wykonania")
         val goldBefore = playerState.gold
         val reward = QuestResolutionSystem.completeQuestWithRewards(
             questId = questId,
@@ -84,7 +85,7 @@ object GameLoopController {
         )
 
         val itemMsg = if (reward.itemsAwarded.isNotEmpty()) 
-            "\nZnaleziono przedmioty: " + reward.itemsAwarded.joinToString { it.name }
+            "\nZnalezione artefakty: " + reward.itemsAwarded.joinToString { it.name }
         else ""
 
         val resolutionState = ResolutionScreenState(
@@ -93,7 +94,7 @@ object GameLoopController {
             goldBefore = goldBefore,
             goldAfter = updatedPlayer.gold,
             reputationAfter = reward.updatedReputation,
-            summary = "Zadanie ukończone w ${reward.cityId}: +${reward.goldAwarded} złota, reputacja ${reward.updatedReputation}.$itemMsg"
+            summary = "Misja zakończona w ${reward.cityId}: +${reward.goldAwarded} złota, reputacja ${reward.updatedReputation}.$itemMsg"
         )
 
         return updatedPlayer to resolutionState

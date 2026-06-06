@@ -1,8 +1,5 @@
 package com.grimreich.core
 
-/**
- * Prosty katalog świętych używany przez religię i eventy społeczne.
- */
 data class Saint(
     val id: String,
     val name: String,
@@ -12,10 +9,10 @@ data class Saint(
 
 object SaintCatalogue {
     private val saints = mutableListOf(
-        Saint("s1", "Święty Jerzy", "courage", "warriors"),
-        Saint("s2", "Święta Katarzyna", "wisdom", "scholars"),
-        Saint("s3", "Święty Mikołaj", "mercy", "travelers"),
-        Saint("s4", "Święty Marcin", "charity", "the poor")
+        Saint("s1", "Prorok Aelion", "Pamięć i Mgła", "Wybrzeże Północne"),
+        Saint("s2", "Herold Xyrel", "Krew i Wojna", "Równiny Koronne"),
+        Saint("s3", "Sędzia Mira", "Prawda i Odbicia", "Serce Krainy"),
+        Saint("s4", "Strażnik Sereth", "Pełnia i Światło", "Południowe Ruiny")
     )
 
     fun all(): List<Saint> = saints.toList()

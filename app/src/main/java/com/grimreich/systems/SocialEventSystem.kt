@@ -1,36 +1,46 @@
 package com.grimreich.systems
 
 import com.grimreich.core.GameRepository
-import com.grimreich.core.SaintCatalogue
 import com.grimreich.world.CityCatalogue
 
-/**
- * Eventy społeczne wywoływane po wejściu do miasta albo po modlitwie.
- */
+enum class SocialEventType {
+    DRINKING, GOSSIP, BRAWL, CEREMONY
+}
+
 object SocialEventSystem {
-    fun cityAudience(cityId: String, saintId: String? = null): String {
-        val city = CityCatalogue.get(cityId) ?: return "Nieznane miasto: $cityId"
-        val rep = ReputationSystem.getCityRep(cityId)  // używamy cityId, nie nazwy miasta
-        val saint = saintId?.let { SaintCatalogue.get(it) }
-        val base = when {
-            rep >= 50 -> "Mieszczanie witają was przychylnie."
-            rep >= 0 -> "Ludzie obserwują was z ciekawością."
-            rep >= -50 -> "Straż miejska ma was na oku."
-            else -> "W mieście narasta nieufność wobec was."
+    
+    fun cityAudience(cityId: String, saintId: String?): String {
+        val city = CityCatalogue.get(cityId) ?: return "Miasto spowite mrokiem."
+        return buildString {
+            appendLine("=== AUDIENCJA: ${city.name.uppercase()} ===")
+            appendLine("Główny fenomen: ${city.phenomenon}")
+            appendLine("Rządząca frakcja: ${city.rulingFaction}")
+            if (saintId != null) {
+                appendLine("Obecny Prorok: $saintId")
+            }
+            appendLine()
+            appendLine("Ludzie szepczą o nadchodzących pęknięciach rzeczywistości.")
         }
-        val saintLine = saint?.let { " Patron: ${it.name} (${it.domain})." } ?: ""
-        val msg = base + saintLine
-        GameRepository.log("SocialEvent: $msg @ ${city.name}")
-        return msg
     }
 
-    fun prayerReaction(saintId: String): String {
-        val saint = SaintCatalogue.get(saintId) ?: return "Nieznany święty: $saintId"
-        val favor = ReligionSystem.favorFor(saintId)
-        return when {
-            favor >= 50 -> "Ludzie mówią o łasce ${saint.name}."
-            favor >= 20 -> "Modlitwa do ${saint.name} została dobrze przyjęta."
-            else -> "Modlitwa odbyła się bez większego echa."
+    fun runTavernEvent(): String {
+        val g = GameRepository.state
+        if (g.gold < 10) return "Brak złota na wejście do karczmy."
+        
+        g.gold -= 10
+        val eventType = SocialEventType.entries.random()
+        
+        return when(eventType) {
+            SocialEventType.DRINKING -> {
+                g.party.forEach { it.morale = (it.morale + 10).coerceAtMost(100) }
+                "Picie z miejscowymi podniosło morale drużyny."
+            }
+            SocialEventType.GOSSIP -> "Usłyszeliście plotki o zbliżającej się mgle."
+            SocialEventType.BRAWL -> {
+                g.party.forEach { it.hp -= 2 }
+                "Karczemna bójka! Kilka siniaków, ale respekt zdobyty."
+            }
+            SocialEventType.CEREMONY -> "W karczmie odbywa się dziwny, milczący rytuał."
         }
     }
 }

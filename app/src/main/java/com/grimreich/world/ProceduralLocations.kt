@@ -3,7 +3,11 @@ package com.grimreich.world
 import kotlin.random.Random
 
 enum class LocationType {
-    RUINS, MONASTERY, RAUBRITTER_CASTLE, DUNGEON, SHRINE
+    ZGLISZCZA,        // dawne RUINS
+    MROCZNY_ZAKON,    // dawne MONASTERY
+    TWIERDZA_CIENIA,  // dawne RAUBRITTER_CASTLE
+    KATAKUMBY_MROKU,  // dawne DUNGEON
+    KAPLICZKA_KRWI    // dawne SHRINE
 }
 
 data class ProceduralLocation(
@@ -16,7 +20,6 @@ data class ProceduralLocation(
 
 object ProceduralLocationGenerator {
     
-    // Seeded generation of locations connected to valid CityCatalogue IDs
     fun generate(seed: Int, count: Int): List<ProceduralLocation> {
         val random = Random(seed)
         val cities = listOf("wybrzeze_polnocne", "serce_krainy", "rowniny_koronne", "pogranicze_stepowe", "poludniowe_ruiny", "gory_poludniowe", "ziemie_dzikie")
@@ -36,8 +39,14 @@ object ProceduralLocationGenerator {
     }
 
     private fun generateName(type: LocationType, random: Random): String {
-        val prefixes = listOf("Mroczne", "Zapomniane", "Przeklęte", "Stare", "Krwawe")
-        val ruins = listOf("Zgliszcza", "Kurhany", "Opactwo", "Lochy", "Mury")
-        return "${prefixes.random(random)} ${ruins.random(random)}"
+        val prefixes = listOf("Przeklęte", "Zimne", "Krwawe", "Cieniste", "Milczące")
+        val nouns = when(type) {
+            LocationType.ZGLISZCZA -> listOf("Zgliszcza", "Kurhany", "Pustkowia")
+            LocationType.MROCZNY_ZAKON -> listOf("Opactwo", "Klasztorzysko", "Sanktuarium")
+            LocationType.TWIERDZA_CIENIA -> listOf("Zamczysko", "Fortecę", "Bastion")
+            LocationType.KATAKUMBY_MROKU -> listOf("Lochy", "Kryptę", "Czeluść")
+            LocationType.KAPLICZKA_KRWI -> listOf("Kapliczkę", "Ołtarz", "Miejsce Ofiar")
+        }
+        return "${prefixes.random(random)} ${nouns.random(random)}"
     }
 }

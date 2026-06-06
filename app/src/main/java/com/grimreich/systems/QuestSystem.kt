@@ -2,19 +2,20 @@ package com.grimreich.systems
 
 import com.grimreich.core.GameRepository
 import com.grimreich.world.CityCatalogue
+import com.grimreich.world.LocationType
 import com.grimreich.world.ProceduralLocation
 import com.grimreich.world.ProceduralLocationGenerator
 
 enum class QuestOriginType {
-    CITY_EVENT,
-    PROCEDURAL_LOCATION
+    ZDARZENIE_MIEJSKIE,
+    LOKACJA_PROCEDURALNA
 }
 
 enum class QuestStatus {
-    AVAILABLE,
-    ACTIVE,
-    COMPLETED,
-    FAILED
+    DOSTEPNE,
+    AKTYWNE,
+    UKONCZONE,
+    PRZERWANE
 }
 
 data class QuestEntry(
@@ -25,12 +26,9 @@ data class QuestEntry(
     val originType: QuestOriginType,
     val originRefId: String,
     val rewardGold: Int,
-    val status: QuestStatus = QuestStatus.AVAILABLE
+    val status: QuestStatus = QuestStatus.DOSTEPNE
 )
 
-/**
- * Integration layer joining city events and procedural locations into a single quest feed.
- */
 object QuestSystem {
     private val quests = linkedMapOf<String, QuestEntry>()
     private var currentSeed: Int = 0
@@ -48,7 +46,6 @@ object QuestSystem {
         CityCatalogue.seedSprint1()
         CityEventSystem.seedStage1Events()
 
-        // Seed events for ALL cities in catalogue
         CityCatalogue.all().forEach { city ->
             CityEventSystem.getEventsForCity(city.id).forEach { event ->
                 register(
@@ -57,7 +54,7 @@ object QuestSystem {
                         title = event.title,
                         description = event.description,
                         cityId = event.cityId,
-                        originType = QuestOriginType.CITY_EVENT,
+                        originType = QuestOriginType.ZDARZENIE_MIEJSKIE,
                         originRefId = event.id,
                         rewardGold = event.rewardGold
                     )
@@ -78,76 +75,38 @@ object QuestSystem {
     fun all(): List<QuestEntry> = quests.values.toList()
 
     fun availableForCity(cityId: String): List<QuestEntry> =
-        quests.values.filter { it.cityId == cityId && it.status == QuestStatus.AVAILABLE }
+        quests.values.filter { it.cityId == cityId && it.status == QuestStatus.DOSTEPNE }
 
     fun activate(questId: String): QuestEntry {
-        val quest = quests[questId] ?: error("Unknown quest: $questId")
-        val updated = quest.copy(status = QuestStatus.ACTIVE)
+        val quest = quests[questId] ?: error("Nieznane zadanie: $questId")
+        val updated = quest.copy(status = QuestStatus.AKTYWNE)
         quests[questId] = updated
         return updated
     }
 
     fun complete(questId: String): QuestEntry {
-        val quest = quests[questId] ?: error("Unknown quest: $questId")
-        val updated = quest.copy(status = QuestStatus.COMPLETED)
+        val quest = quests[questId] ?: error("Nieznane zadanie: $questId")
+        val updated = quest.copy(status = QuestStatus.UKONCZONE)
         quests[questId] = updated
         return updated
     }
 
     private fun ProceduralLocation.toQuest(): QuestEntry = QuestEntry(
         id = "quest_${id}",
-        title = when (type.name) {
-            "RUINS"            -> "Zbadaj ruiny"
-            "RAUBRITTER_CASTLE"-> "Uderz na zamek raubrittera"
-            "MONASTERY"        -> "Odwiedź klasztor"
-            "DUNGEON"          -> "Zejdź do lochów"
-            else               -> "Pomóż pobliskiej osadzie"
+        title = when (type) {
+            LocationType.ZGLISZCZA      -> "Zbadaj Zgliszcza"
+            LocationType.MROCZNY_ZAKON  -> "Oczyść Mroczny Zakon"
+            LocationType.TWIERDZA_CIENIA -> "Uderz na Twierdzę Cienia"
+            LocationType.KATAKUMBY_MROKU -> "Zejdź do Katakumb"
+            LocationType.KAPLICZKA_KRWI  -> "Zbezcześć Kapliczkę Krwi"
         },
         description = "Cel wyprawy: $name.",
         cityId = nearestCityId,
-        originType = QuestOriginType.PROCEDURAL_LOCATION,
+        originType = QuestOriginType.LOKACJA_PROCEDURALNA,
         originRefId = id,
         rewardGold = rewardGold
     )
-
-    // LEGACY API remains for compatibility
-    private val legacyActiveQuests = linkedMapOf<String, Int>() 
-    private val legacyCompletedQuests = mutableListOf<String>()
-
-    private fun syncToRepo() {
-        val q = GameRepository.state.quest
-        q.activeQuests.clear()
-        q.activeQuests.addAll(legacyActiveQuests.keys)
-        q.completedQuests.clear()
-        q.completedQuests.addAll(legacyCompletedQuests)
-        q.questProgress.clear()
-        q.questProgress.putAll(legacyActiveQuests)
-    }
-
-    fun start(questId: String): String {
-        if (legacyActiveQuests.containsKey(questId)) {
-            val msg = "Quest $questId jest już aktywny."
-            syncToRepo()
-            return msg
-        }
-        legacyActiveQuests[questId] = 0
-        syncToRepo()
-        return "Rozpoczęto quest: $questId"
-    }
-
-    fun advance(questId: String, steps: Int = 1): String {
-        val current = legacyActiveQuests[questId] ?: return "Quest $questId nie jest aktywny."
-        val newProgress = (current + steps).coerceAtMost(3)
-        legacyActiveQuests[questId] = newProgress
-        if (newProgress >= 3) {
-            legacyActiveQuests.remove(questId)
-            legacyCompletedQuests.add(questId)
-        }
-        syncToRepo()
-        return "Quest $questId: postęp ${newProgress}/3"
-    }
-
-    fun activeList(): List<String> = legacyActiveQuests.keys.toList()
-
-    fun finalQuestSummary(): String = "Summary functionality migrated to QuestJournalSystem."
+    
+    // Legacy API removed to avoid confusion
+    fun activeList(): List<String> = quests.values.filter { it.status == QuestStatus.AKTYWNE }.map { it.id }
 }
