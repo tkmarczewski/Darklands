@@ -3,6 +3,7 @@ package com.grimreich.systems
 import com.grimreich.core.GameRepository
 import com.grimreich.grimreich.v1.DialogueNode
 import com.grimreich.grimreich.v1.DialogueChoice
+import kotlin.random.Random
 
 object ConversationManager {
     private val dialogueNodes = mutableMapOf<String, DialogueNode>()
@@ -12,13 +13,30 @@ object ConversationManager {
     }
 
     fun start(npcId: String): DialogueNode? {
-        // Return the start node for the given NPC
-        return dialogueNodes.values.find { it.npcId == npcId && it.id.endsWith("_start") }
+        val node = dialogueNodes.values.find { it.npcId == npcId && it.id.endsWith("_start") }
+        return node?.let { applyEchoEffect(it) }
     }
 
     fun makeChoice(choice: DialogueChoice): DialogueNode? {
         choice.onSelect(GameRepository.state)
-        return dialogueNodes[choice.targetNodeId]
+        val node = dialogueNodes[choice.targetNodeId]
+        return node?.let { applyEchoEffect(it) }
+    }
+    
+    private fun applyEchoEffect(node: DialogueNode): DialogueNode {
+        val intensity = GameRepository.state.world.echoIntensity
+        if (intensity <= 0.1f) return node
+        
+        // Simulating fractured memory/speech
+        val echoedText = if (Random.nextFloat() < intensity) {
+            node.text.split(" ").map { word ->
+                if (Random.nextFloat() < intensity * 0.5f) "[...]" else word
+            }.joinToString(" ") + " ...czy to się już wydarzyło?"
+        } else {
+            node.text
+        }
+        
+        return node.copy(text = echoedText)
     }
     
     fun seedSampleDialogues() {

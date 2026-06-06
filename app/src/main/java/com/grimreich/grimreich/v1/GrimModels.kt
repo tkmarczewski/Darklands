@@ -1,5 +1,7 @@
 package com.grimreich.grimreich.v1
 
+import com.grimreich.core.GameState
+
 data class GrimWorld(val id: String, val name: String, val regions: List<Region> = emptyList(), val factions: List<Faction> = emptyList(), val notes: String? = null)
 data class Region(val id: String, val name: String, val description: String = "", val encounters: List<Encounter> = emptyList(), val seed: Long? = null)
 data class NPC(
@@ -10,7 +12,8 @@ data class NPC(
     val stats: Map<String, Int> = emptyMap(), 
     val inventory: List<Item> = emptyList(), 
     val dialogue: Map<String, Any>? = null,
-    val startNodeId: String? = null // Link to DialogueNode
+    val startNodeId: String? = null,
+    var stability: Float = 1.0f // 1.5 Era: Stability of reality for this NPC
 )
 data class Boss(val id: String, val name: String, val level: Int, val lootTable: RewardTable)
 
@@ -42,7 +45,7 @@ data class DialogueChoice(
     val targetNodeId: String,
     val requiredReputation: Int = 0,
     val factionId: String? = null,
-    val onSelect: (com.grimreich.core.GameState) -> Unit = {}
+    val onSelect: (GameState) -> Unit = {}
 )
 
 data class DialogueNode(
@@ -51,3 +54,16 @@ data class DialogueNode(
     val text: String,
     val choices: List<DialogueChoice> = emptyList()
 )
+
+// Fenomeny 1.5
+data class Phenomenon15(
+    val id: String,
+    val type: PhenomenonType,
+    var corePulse: Float = 0.5f,
+    var stabilityLevel: Float = 1.0f,
+    var awakeningStage: Int = 0
+)
+
+enum class PhenomenonType {
+    MIST, BLOOD, REFLECTION, FULLNESS, CHAOS, ZERO, ABSOLUTE
+}

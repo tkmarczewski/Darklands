@@ -8,6 +8,8 @@ data class WorldState(
     var fatigue: Int = 0,
     var lastEncounter: String = "none",
     var season: Season = Season.SPRING,
-    var globalStability: Int = 100,
-    var weather: WeatherType = WeatherType.CLEAR
+    var globalStability: Int = 100, // 0-100
+    var weather: WeatherType = WeatherType.CLEAR,
+    var echoIntensity: Float = 0.0f, // 0.0 - 1.0 (Era of Fracture)
+    var collapseProgress: Float = 0.0f // 0.0 - 1.0 (Transition to 2.0)
 )
