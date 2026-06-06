@@ -32,6 +32,15 @@ object EndingSystem {
         }
     }
 
+    fun getHeroEpilogue(hero: com.grimreich.core.Hero): String {
+        return when {
+            hero.corruption >= 80 -> "${hero.name} stał się naczyniem dla mroku, błąkając się wiecznie po Drugiej Stronie."
+            hero.sanity <= 20 -> "${hero.name} popadł w obłęd, widząc rzeczy, których śmiertelnik nie powinien znać."
+            hero.virtue >= 40 -> "${hero.name} został zapamiętany jako święty obrońca krainy."
+            else -> "${hero.name} wrócił do normalnego życia, lecz cienie przeszłości nigdy go nie opuściły."
+        }
+    }
+
     fun finaleStatus(): String {
         val s = GameRepository.state
         val faith = s.prayer.faith
