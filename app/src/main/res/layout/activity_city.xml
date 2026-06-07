@@ -21,13 +21,11 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1">
-        <TextView
-            android:id="@+id/cityStatus"
+        <LinearLayout
+            android:id="@+id/npcListContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:fontFamily="monospace"
-            android:textColor="#c8a96e"
-            android:textSize="14sp" />
+            android:orientation="vertical" />
     </ScrollView>
 
     <LinearLayout
