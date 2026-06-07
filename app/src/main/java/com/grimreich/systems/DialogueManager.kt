@@ -40,6 +40,9 @@ object DialogueManager {
     }
     
     fun seedBasicDialogues() {
+        nodes.clear()
+
+        // MERCHANT DIALOGUES
         registerNode(DialogueNode(
             id = "merchant_start",
             npcId = "procedural",
@@ -50,16 +53,48 @@ object DialogueManager {
                 DialogueChoice("Żegnaj", "end")
             )
         ))
-        
+        registerNode(DialogueNode(id = "merchant_info", npcId = "procedural", text = "Część z odzysku, część z... Drugiej Strony. Pytaj mniej, płać więcej."))
+        registerNode(DialogueNode(id = "merchant_trade", npcId = "procedural", text = "Złoto to jedyna stała w tym rozpadającym się świecie."))
+
+        // CHRONICLER DIALOGUES
         registerNode(DialogueNode(
             id = "chronicler_start",
             npcId = "procedural",
             text = "Każde pęknięcie w rzeczywistości zapisuję w mojej księdze. Czy chcesz poznać prawdę?",
             choices = listOf(
-                DialogueChoice("Tak, powiedz mi", "chronicler_truth", onSelect = { it.party.forEach { h -> h.sanity -= 5 } }),
+                DialogueChoice("Tak, powiedz mi", "chronicler_truth", onSelect = { it.party.forEach { h -> h.sanity -= 10 } }),
                 DialogueChoice("To tylko bajki", "chronicler_dismiss"),
                 DialogueChoice("Nie teraz", "end")
             )
         ))
+        registerNode(DialogueNode(id = "chronicler_truth", npcId = "procedural", text = "Świat jest snem fenomenów. My jesteśmy tylko echem, które powoli zanika... [Tracisz Poczytalność]"))
+        registerNode(DialogueNode(id = "chronicler_dismiss", npcId = "procedural", text = "Ignorancja to dar, którego ci zazdroszczersss..."))
+
+        // ZEALOT DIALOGUES
+        registerNode(DialogueNode(
+            id = "zealot_start",
+            npcId = "procedural",
+            text = "Prorocy patrzą! Czy Twoja dusza jest czysta, wędrowcze?",
+            choices = listOf(
+                DialogueChoice("Ofiaruj krew (HP-5)", "zealot_sacrifice", onSelect = { 
+                    it.party.forEach { h -> h.hp -= 5 }
+                    it.prayer.faith += 15
+                }),
+                DialogueChoice("Odejdź w pokoju", "end")
+            )
+        ))
+        registerNode(DialogueNode(id = "zealot_sacrifice", npcId = "procedural", text = "Twoja ofiara została przyjęta. Prorocy szepczą Twoje imię."))
+        
+        // MYSTIC DIALOGUES
+        registerNode(DialogueNode(
+            id = "mystic_start",
+            npcId = "procedural",
+            text = "Widzę mrok wokół Ciebie. Czy on też Cię woła?",
+            choices = listOf(
+                DialogueChoice("O czym mówisz?", "mystic_lore"),
+                DialogueChoice("Zostaw mnie", "end")
+            )
+        ))
+        registerNode(DialogueNode(id = "mystic_lore", npcId = "procedural", text = "Absolut nie jest bogiem. To błąd w tkance, który chce zostać naprawiony naszym kosztem."))
     }
 }

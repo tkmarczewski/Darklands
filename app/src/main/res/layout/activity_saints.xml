@@ -53,4 +53,11 @@
             android:drawableTop="@drawable/ic_sigil_light" />
     </LinearLayout>
 
+    <Button
+        android:id="@+id/btnExitSaints"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Odejdź spod ołtarza"
+        android:layout_marginTop="8dp" />
+
 </LinearLayout>

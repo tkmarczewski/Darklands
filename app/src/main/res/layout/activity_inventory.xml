@@ -14,4 +14,5 @@
     <Button android:id="@+id/btnUse" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Uzyj"/>
     <TextView android:id="@+id/tvResult" android:layout_width="match_parent" android:layout_height="wrap_content"
         android:textColor="#a0e8a0" android:textSize="13sp"/>
+    <Button android:id="@+id/btnExitInventory" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Zamknij plecak"/>
 </LinearLayout>

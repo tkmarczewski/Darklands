@@ -30,6 +30,10 @@ class SaintsActivity : AppCompatActivity() {
             Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
             render()
         }
+
+        findViewById<Button>(R.id.btnExitSaints).setOnClickListener {
+            finish()
+        }
     }
 
     private fun render() {

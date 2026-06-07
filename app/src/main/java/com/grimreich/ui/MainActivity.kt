@@ -20,14 +20,7 @@ class MainActivity : AppCompatActivity() {
         binding.btnBootstrap.setOnClickListener {
             playerState = GameLoopController.bootstrap(seed = 1)
             initialized = true
-            showText(
-                """
-                === GRIMREICH 1.0 ===
-                Bootstrap complete.
-                Miasto startowe: ${playerState.currentCityId}
-                Złoto: ${playerState.gold}
-                """.trimIndent()
-            )
+            startActivity(android.content.Intent(this, HubActivity::class.java))
         }
 
         binding.btnCity.setOnClickListener {

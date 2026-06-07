@@ -19,6 +19,10 @@ class TradeActivity : AppCompatActivity() {
 
         val cityId = GameRepository.state.world.location.lowercase()
         render(cityId)
+
+        findViewById<Button>(R.id.btnExitTrade).setOnClickListener {
+            finish()
+        }
     }
 
     private fun render(cityId: String) {

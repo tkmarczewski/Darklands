@@ -30,6 +30,10 @@ class InventoryActivity : AppCompatActivity() {
                 binding.tvResult.text = "Bledny numer przedmiotu"
             }
         }
+
+        binding.btnExitInventory.setOnClickListener {
+            finish()
+        }
     }
 
     private fun render() {
