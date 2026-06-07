@@ -1,16 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Sprint 14: status walki z CombatSystem.combatSummary. -->
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#1a1a2e">
+    android:orientation="vertical"
+    android:background="#1a1a2e"
+    android:padding="16dp">
+
     <TextView
-        android:id="@+id/combatStatusText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:fontFamily="monospace"
+        android:text="STATUS DRUŻYNY"
         android:textColor="#c8a96e"
-        android:textSize="14sp"
-        android:padding="16dp"
-        android:text="Status walki" />
-</ScrollView>
+        android:textSize="18sp"
+        android:fontFamily="monospace"
+        android:gravity="center"
+        android:layout_marginBottom="16dp" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+        <TextView
+            android:id="@+id/combatStatusText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="monospace"
+            android:textColor="#c8a96e"
+            android:textSize="13sp" />
+    </ScrollView>
+
+    <Button
+        android:id="@+id/btnExitCombatStatus"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Powrót"
+        android:layout_marginTop="16dp" />
+
+</LinearLayout>

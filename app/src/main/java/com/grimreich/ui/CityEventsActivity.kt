@@ -1,6 +1,7 @@
 package com.grimreich.ui
 
 import android.os.Bundle
+import android.widget.Button
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.grimreich.R
@@ -12,12 +13,12 @@ class CityEventsActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_city_events)
 
-        val cityId = GameRepository.state.world.location.lowercase()
+        val cityId = GameRepository.state.world.location.lowercase().replace(" ", "_")
         val events = CityEventSystem.getEventsForCity(cityId)
         
         val tv = findViewById<TextView>(R.id.cityEventsStatus)
         tv.text = buildString {
-            appendLine("=== EVENTY MIEJSKIE: ${cityId.uppercase()} ===")
+            appendLine("=== WYDARZENIA: ${cityId.uppercase()} ===")
             if (events.isEmpty()) {
                 appendLine("Obecnie w mieście panuje nienaturalna cisza.")
             } else {
@@ -27,6 +28,10 @@ class CityEventsActivity : AppCompatActivity() {
                     appendLine()
                 }
             }
+        }
+
+        findViewById<Button>(R.id.btnExitCityEvents).setOnClickListener {
+            finish()
         }
     }
 }

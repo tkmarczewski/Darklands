@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.TextView
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.grimreich.R
 import com.grimreich.core.GameRepository
@@ -23,10 +22,11 @@ class CityActivity : AppCompatActivity() {
 
         DialogueManager.seedBasicDialogues()
         renderNpcs(cityId)
+        updateCityStatus(SocialEventSystem.cityAudience(cityId, null))
 
         findViewById<Button>(R.id.btnTavern).setOnClickListener {
             val result = SocialEventSystem.runTavernEvent()
-            Toast.makeText(this, result, Toast.LENGTH_SHORT).show()
+            updateCityStatus(result)
         }
 
         findViewById<Button>(R.id.btnChurch).setOnClickListener {
@@ -36,6 +36,14 @@ class CityActivity : AppCompatActivity() {
         findViewById<Button>(R.id.btnMarket).setOnClickListener {
             startActivity(Intent(this, TradeActivity::class.java))
         }
+
+        findViewById<Button>(R.id.btnExitCity).setOnClickListener {
+            finish()
+        }
+    }
+
+    private fun updateCityStatus(text: String) {
+        findViewById<TextView>(R.id.cityStatus).text = text
     }
 
     private fun renderNpcs(cityId: String) {
