@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/grimBg">
+
+    <!-- THE WORLD MAP -->
+    <ImageView
+        android:id="@+id/ivWorldMap"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="centerCrop"
+        android:src="@drawable/bg_map_candle" />
+
+    <!-- LOGO OVERLAY -->
+    <ImageView
+        android:layout_width="200dp"
+        android:layout_height="60dp"
+        android:layout_gravity="top|center_horizontal"
+        android:layout_marginTop="16dp"
+        android:src="@drawable/logo_grimreich_clean" />
+
+    <!-- INTERACTIVE POINTS CONTAINER -->
+    <RelativeLayout
+        android:id="@+id/mapOverlay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <!-- Invisible Hotspots (Example positions based on the provided map image) -->
+        <!-- These will be dynamically handled or hardcoded for the key cities -->
+
+        <View
+            android:id="@+id/point_city_of_crowns"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:layout_centerInParent="true"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="?attr/selectableItemBackgroundBorderless" />
+
+        <View
+            android:id="@+id/point_northern_coast"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentStart="true"
+            android:layout_marginTop="100dp"
+            android:layout_marginStart="100dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="?attr/selectableItemBackgroundBorderless" />
+
+    </RelativeLayout>
+
+    <!-- BACK BUTTON -->
+    <Button
+        android:id="@+id/btnExitAtlas"
+        style="@style/GrimBackButton"
+        android:layout_gravity="bottom"
+        android:text="POWRÓT DO HUBU" />
+
+</FrameLayout>

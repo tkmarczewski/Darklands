@@ -1,5 +1,7 @@
 package com.grimreich.core
 
+import com.grimreich.grimreich.v1.OntologicalLevel
+
 data class WorldState(
     var region: String = "town",
     var location: String = "Grimhold",
@@ -11,5 +13,6 @@ data class WorldState(
     var globalStability: Int = 100, // 0-100
     var weather: WeatherType = WeatherType.CLEAR,
     var echoIntensity: Float = 0.0f, // 0.0 - 1.0 (Era of Fracture)
-    var collapseProgress: Float = 0.0f // 0.0 - 1.0 (Transition to 2.0)
+    var collapseProgress: Float = 0.0f, // 0.0 - 1.0 (Transition to 2.0)
+    var ontologicalLevel: OntologicalLevel = OntologicalLevel.MATERIAL
 )

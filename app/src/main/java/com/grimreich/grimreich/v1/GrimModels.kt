@@ -2,22 +2,40 @@ package com.grimreich.grimreich.v1
 
 import com.grimreich.core.GameState
 
-data class GrimWorld(val id: String, val name: String, val regions: List<Region> = emptyList(), val factions: List<Faction> = emptyList(), val notes: String? = null)
-data class Region(val id: String, val name: String, val description: String = "", val encounters: List<Encounter> = emptyList(), val seed: Long? = null)
+data class GrimWorld(val id: String, val name: String, val regions: List<Region>, val factions: List<Faction>, val notes: String?)
+data class Region(val id: String, val name: String, val description: String, val encounters: List<Encounter>, val seed: Long?)
+
+enum class OntologicalLevel(val level: Int, val displayName: String) {
+    MATERIAL(1, "Materialne"),
+    ALTERED(2, "Zmienione"),
+    SPIRITS(3, "Duchy"),
+    RELICS(4, "Relikwie"),
+    UNIQUE(5, "Unikalne"),
+    COLOSSI(6, "Kolosy"),
+    APOCALYPSE(7, "Apokalipsa"),
+    TRANSCENDENCE(8, "Transcendencja"),
+    IDEAS(9, "Idee"),
+    IMPOSSIBILITY(10, "Niemożliwość"),
+    COSMOS(11, "Kosmos"),
+    ABSOLUTE(12, "Absolutne"),
+    META_NARRATION(13, "Meta-Narracja"),
+    ABSOLUTE_SCRIBES(14, "Skrybowie Absolutni")
+}
+
 data class NPC(
-    val id: String, 
-    val name: String, 
-    val role: String, 
-    val factionId: String? = null, 
-    val stats: Map<String, Int> = emptyMap(), 
-    val inventory: List<Item> = emptyList(), 
+    val id: String,
+    val name: String,
+    val role: String,
+    val factionId: String? = null,
+    val stats: Map<String, Int> = emptyMap(),
+    val inventory: List<Item> = emptyList(),
     val dialogue: Map<String, Any>? = null,
     val startNodeId: String? = null,
-    var stability: Float = 1.0f // 1.5 Era: Stability of reality for this NPC
+    val stability: Float = 1.0f
 )
+
 data class Boss(val id: String, val name: String, val level: Int, val lootTable: RewardTable)
 
-// Consolidated Item class
 data class Item(
     val id: String,
     val name: String,
@@ -30,16 +48,15 @@ data class Item(
     val effects: Map<String, Int> = emptyMap()
 )
 
-data class LootEntry(val itemId: String, val weight: Int = 0, val minQty: Int = 1, val maxQty: Int = 1)
+data class LootEntry(val itemId: String, val weight: Int, val minQty: Int = 1, val maxQty: Int = 1)
 data class GeneratedLoot(val entries: List<LootEntry>)
-data class RewardTable(val id: String, val entries: List<LootEntry> = emptyList())
-data class Encounter(val id: String, val name: String, val difficulty: Int = 1, val possibleNpcs: List<String> = emptyList())
-data class Faction(val id: String, val name: String, val disposition: String = "neutral")
+data class RewardTable(val id: String, val entries: List<LootEntry>)
+data class Encounter(val id: String, val name: String, val difficulty: Int, val possibleNpcs: List<String>)
+data class Faction(val id: String, val name: String, val disposition: String)
 data class Quest(val id: String, val title: String, val description: String, val rewards: RewardTable)
 data class Skill(val id: String, val name: String, val power: Int)
-data class Equipment(val id: String, val name: String, val slot: String, val stats: Map<String, Int> = emptyMap())
+data class Equipment(val id: String, val name: String, val slot: String, val stats: Map<String, Int>)
 
-// Dialogue System
 data class DialogueChoice(
     val text: String,
     val targetNodeId: String,
@@ -52,18 +69,5 @@ data class DialogueNode(
     val id: String,
     val npcId: String,
     val text: String,
-    val choices: List<DialogueChoice> = emptyList()
+    val choices: List<DialogueChoice>
 )
-
-// Fenomeny 1.5
-data class Phenomenon15(
-    val id: String,
-    val type: PhenomenonType,
-    var corePulse: Float = 0.5f,
-    var stabilityLevel: Float = 1.0f,
-    var awakeningStage: Int = 0
-)
-
-enum class PhenomenonType {
-    MIST, BLOOD, REFLECTION, FULLNESS, CHAOS, ZERO, ABSOLUTE
-}

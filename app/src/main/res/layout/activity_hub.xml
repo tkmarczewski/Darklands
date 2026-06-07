@@ -1,11 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="#1a1a2e">
+    android:layout_height="match_parent">
+
+    <!-- BACKGROUND: The Party at the Castle -->
+    <ImageView
+        android:id="@+id/ivHubBg"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="centerCrop"
+        android:src="@drawable/bg_party_castle" />
+
+    <!-- OVERLAY FOR BETTER TEXT READABILITY -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#80000000" />
+
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:orientation="vertical"
         android:padding="16dp">
 
@@ -13,30 +27,46 @@
             android:id="@+id/tvTime"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Dzień 1, Poranek"
-            android:textColor="#c8a96e"
+            android:textColor="@color/grimParchment"
+            android:fontFamily="serif"
+            android:textSize="14sp"
             android:gravity="center"
-            android:layout_marginBottom="8dp" />
+            android:layout_marginBottom="16dp" />
 
-        <Button android:id="@+id/openCity" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/menu_city" android:layout_marginTop="8dp"/>
-        <Button android:id="@+id/openReputation" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/menu_reputation"/>
-        <Button android:id="@+id/openMap" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/menu_map" android:drawableStart="@drawable/ic_system_map" android:drawablePadding="8dp"/>
-        <Button android:id="@+id/openSaints" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/menu_saints"/>
-        <Button android:id="@+id/openCityEvents" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/menu_city_events"/>
-        <Button android:id="@+id/openInventory" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/menu_inventory" android:drawableStart="@drawable/ic_equipment_sword" android:drawablePadding="8dp"/>
-        <Button android:id="@+id/openTrade" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/menu_trade"/>
-        <Button android:id="@+id/openTransfer" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/menu_transfer"/>
-        <Button android:id="@+id/openCombatStatus" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/menu_combat_status"/>
-        <Button android:id="@+id/openQuests" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/menu_quests" android:drawableStart="@drawable/ic_system_quests" android:drawablePadding="8dp"/>
-        <Button android:id="@+id/openFinale" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/menu_finale" android:drawableStart="@drawable/ic_system_settings" android:drawablePadding="8dp"/>
+        <GridLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:columnCount="4"
+            android:rowCount="3"
+            android:alignmentMode="alignMargins"
+            android:columnOrderPreserved="false">
+
+            <Button android:id="@+id/openCity" style="@style/GrimNavButton" android:text="Miasto" />
+            <Button android:id="@+id/openMap" style="@style/GrimNavButton" android:text="Mapa" />
+            <Button android:id="@+id/openInventory" style="@style/GrimNavButton" android:text="Plecak" />
+            <Button android:id="@+id/openTrade" style="@style/GrimNavButton" android:text="Handel" />
+
+            <Button android:id="@+id/openSaints" style="@style/GrimNavButton" android:text="Prorocy" />
+            <Button android:id="@+id/openQuests" style="@style/GrimNavButton" android:text="Zadania" />
+            <Button android:id="@+id/openCombatStatus" style="@style/GrimNavButton" android:text="Walka" />
+            <Button android:id="@+id/openCityEvents" style="@style/GrimNavButton" android:text="Wieści" />
+
+            <!-- Empty space or more buttons -->
+            <Button android:id="@+id/openReputation" style="@style/GrimNavButton" android:text="Reputacja" />
+            <Button android:id="@+id/openTransfer" style="@style/GrimNavButton" android:text="Transfer" />
+            <Button android:id="@+id/openFinale" style="@style/GrimNavButton" android:text="FINAŁ" />
+
+        </GridLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:layout_marginTop="16dp">
-            <Button android:id="@+id/btnSave" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="@string/btn_save"/>
-            <Button android:id="@+id/btnLoad" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="@string/btn_load"/>
+            android:gravity="center">
+            <Button android:id="@+id/btnSave" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Zapisz" android:layout_marginEnd="8dp" />
+            <Button android:id="@+id/btnLoad" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Wczytaj" />
         </LinearLayout>
+
     </LinearLayout>
-</ScrollView>
+</FrameLayout>

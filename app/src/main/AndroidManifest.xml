@@ -6,33 +6,35 @@
         android:theme="@style/Theme.GrimReich"
         android:supportsRtl="true">
 
-        <activity android:name=".ui.MainActivity" android:exported="true">
+        <activity android:name=".ui.MainActivity"
+            android:exported="true"
+            android:screenOrientation="landscape">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
 
-        <activity android:name=".ui.PartyActivity" android:exported="false"/>
-        <activity android:name=".ui.CharacterActivity" android:exported="false"/>
-        <activity android:name=".ui.InventoryActivity" android:exported="false"/>
-        <activity android:name=".ui.MapActivity" android:exported="false"/>
-        <activity android:name=".ui.PrayerActivity" android:exported="false"/>
-        <activity android:name=".ui.AlchemyActivity" android:exported="false"/>
-        <activity android:name=".ui.CombatActivity" android:exported="false"/>
-        <activity android:name=".ui.EndgameActivity" android:exported="false"/>
-        <activity android:name=".ui.HubActivity" android:exported="true"/>
-        <activity android:name=".ui.CityActivity" android:exported="false"/>
-        <activity android:name=".ui.ReputationActivity" android:exported="false"/>
-        <activity android:name=".ui.SaintsActivity" android:exported="false"/>
-        <activity android:name=".ui.CityEventsActivity" android:exported="false"/>
-        <activity android:name=".ui.TradeActivity" android:exported="false"/>
-        <activity android:name=".ui.InventoryTransferActivity" android:exported="false"/>
-        <activity android:name=".ui.InventoryDetailActivity" android:exported="false"/>
-        <activity android:name=".ui.CombatStatusActivity" android:exported="false"/>
-        <activity android:name=".ui.QuestFinalActivity" android:exported="false"/>
-        <activity android:name=".ui.FinaleActivity" android:exported="false"/>
-        <activity android:name=".ui.EncounterActivity" android:exported="false"/>
-        <activity android:name=".ui.DialogueActivity" android:exported="false"/>
+        <activity android:name=".ui.PartyActivity" android:exported="false" android:screenOrientation="landscape"/>
+        <activity android:name=".ui.CharacterActivity" android:exported="false" android:screenOrientation="landscape"/>
+        <activity android:name=".ui.InventoryActivity" android:exported="false" android:screenOrientation="landscape"/>
+        <activity android:name=".ui.MapActivity" android:exported="false" android:screenOrientation="landscape"/>
+        <activity android:name=".ui.PrayerActivity" android:exported="false" android:screenOrientation="landscape"/>
+        <activity android:name=".ui.AlchemyActivity" android:exported="false" android:screenOrientation="landscape"/>
+        <activity android:name=".ui.CombatActivity" android:exported="false" android:screenOrientation="landscape"/>
+        <activity android:name=".ui.EndgameActivity" android:exported="false" android:screenOrientation="landscape"/>
+        <activity android:name=".ui.HubActivity" android:exported="true" android:screenOrientation="landscape"/>
+        <activity android:name=".ui.CityActivity" android:exported="false" android:screenOrientation="landscape"/>
+        <activity android:name=".ui.ReputationActivity" android:exported="false" android:screenOrientation="landscape"/>
+        <activity android:name=".ui.SaintsActivity" android:exported="false" android:screenOrientation="landscape"/>
+        <activity android:name=".ui.CityEventsActivity" android:exported="false" android:screenOrientation="landscape"/>
+        <activity android:name=".ui.TradeActivity" android:exported="false" android:screenOrientation="landscape"/>
+        <activity android:name=".ui.InventoryTransferActivity" android:exported="false" android:screenOrientation="landscape"/>
+        <activity android:name=".ui.InventoryDetailActivity" android:exported="false" android:screenOrientation="landscape"/>
+        <activity android:name=".ui.CombatStatusActivity" android:exported="false" android:screenOrientation="landscape"/>
+        <activity android:name=".ui.QuestFinalActivity" android:exported="false" android:screenOrientation="landscape"/>
+        <activity android:name=".ui.FinaleActivity" android:exported="false" android:screenOrientation="landscape"/>
+        <activity android:name=".ui.EncounterActivity" android:exported="false" android:screenOrientation="landscape"/>
+        <activity android:name=".ui.DialogueActivity" android:exported="false" android:screenOrientation="landscape"/>
     </application>
 </manifest>

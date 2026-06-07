@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="64dp"
+    android:background="#110000"
+    android:orientation="horizontal"
+    android:padding="4dp">
+
+    <!-- Powtórzone x4 dla każdej postaci (możesz zastąpić RecyclerView) -->
+    <LinearLayout
+        android:id="@+id/charSlot0"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:padding="2dp"
+        android:background="@drawable/btn_nav_bg"
+        android:layout_marginEnd="2dp">
+
+        <TextView android:id="@+id/tvChar0Name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Aelion"
+            android:textColor="@color/grimParchment"
+            android:textSize="10sp"
+            android:gravity="center"
+            android:fontFamily="serif"/>
+
+        <ProgressBar android:id="@+id/pbChar0HP"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="match_parent"
+            android:layout_height="6dp"
+            android:progressTint="@color/grimBlood"
+            android:progressBackgroundTint="#330000"
+            android:progress="80" android:max="100"/>
+
+        <TextView android:id="@+id/tvChar0Fenomen"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="☁ Mgła"
+            android:textColor="@color/grimMist"
+            android:textSize="9sp"
+            android:gravity="center"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/charSlot1"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:padding="2dp"
+        android:background="@drawable/btn_nav_bg"
+        android:layout_marginEnd="2dp">
+
+        <TextView android:id="@+id/tvChar1Name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Xyrel"
+            android:textColor="@color/grimParchment"
+            android:textSize="10sp"
+            android:gravity="center"
+            android:fontFamily="serif"/>
+
+        <ProgressBar android:id="@+id/pbChar1HP"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="match_parent"
+            android:layout_height="6dp"
+            android:progressTint="@color/grimBlood"
+            android:progressBackgroundTint="#330000"
+            android:progress="55" android:max="100"/>
+
+        <TextView android:id="@+id/tvChar1Fenomen"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="🩸 Krew"
+            android:textColor="@color/grimBlood"
+            android:textSize="9sp"
+            android:gravity="center"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/charSlot2"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:padding="2dp"
+        android:background="@drawable/btn_nav_bg"
+        android:layout_marginEnd="2dp">
+
+        <TextView android:id="@+id/tvChar2Name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Sereth"
+            android:textColor="@color/grimParchment"
+            android:textSize="10sp"
+            android:gravity="center"
+            android:fontFamily="serif"/>
+
+        <ProgressBar android:id="@+id/pbChar2HP"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="match_parent"
+            android:layout_height="6dp"
+            android:progressTint="@color/grimBlood"
+            android:progressBackgroundTint="#330000"
+            android:progress="100" android:max="100"/>
+
+        <TextView android:id="@+id/tvChar2Fenomen"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="🪞 Odbicie"
+            android:textColor="@color/grimReflection"
+            android:textSize="9sp"
+            android:gravity="center"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/charSlot3"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:padding="2dp"
+        android:background="@drawable/btn_nav_bg">
+
+        <TextView android:id="@+id/tvChar3Name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Vorn"
+            android:textColor="@color/grimParchment"
+            android:textSize="10sp"
+            android:gravity="center"
+            android:fontFamily="serif"/>
+
+        <ProgressBar android:id="@+id/pbChar3HP"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="match_parent"
+            android:layout_height="6dp"
+            android:progressTint="@color/grimBlood"
+            android:progressBackgroundTint="#330000"
+            android:progress="30" android:max="100"/>
+
+        <TextView android:id="@+id/tvChar3Fenomen"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="☁ Mgła"
+            android:textColor="@color/grimMist"
+            android:textSize="9sp"
+            android:gravity="center"/>
+    </LinearLayout>
+
+</LinearLayout>

@@ -1,16 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#1a1a2e</color>
-    <color name="colorPrimaryVariant">#16213e</color>
-    <color name="colorOnPrimary">#c8a96e</color>
-    <color name="colorSecondary">#8b0000</color>
-    <color name="colorOnSecondary">#ffffff</color>
-    <color name="colorBackground">#1a1a2e</color>
-    <color name="colorSurface">#16213e</color>
-    <color name="colorOnBackground">#c8a96e</color>
-    <color name="colorOnSurface">#c8a96e</color>
-    <color name="colorAccent">#c8a96e</color>
-    <color name="colorGold">#c8a96e</color>
-    <color name="colorBlood">#8b0000</color>
-    <color name="colorSuccess">#a0e8a0</color>
+    <!-- Core GrimReich palette -->
+    <color name="grimBg">#0D0D0D</color>
+    <color name="grimBgDark">#080808</color>
+    <color name="grimParchment">#D4C8A8</color>
+    <color name="grimGold">#B8860B</color>
+
+    <!-- Fenomeny -->
+    <color name="grimMist">#7B9CBF</color>        <!-- Mgła: stalowy błękit -->
+    <color name="grimBlood">#CC0000</color>        <!-- Krew: głęboka czerwień -->
+    <color name="grimReflection">#9B59B6</color>   <!-- Odbicie: ciemny fiolet -->
+
+    <!-- Akcenty -->
+    <color name="grimAccent">#8B0000</color>       <!-- Obramowania, aktywne elementy -->
+    <color name="grimAccentLight">#CC0000</color>
+    <color name="grimIron">#2A2A2A</color>         <!-- Tła kart -->
 </resources>
