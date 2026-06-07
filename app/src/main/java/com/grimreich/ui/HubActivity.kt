@@ -68,7 +68,18 @@ class HubActivity : AppCompatActivity() {
     }
 
     private fun render() {
-        val world = GameRepository.state.world
+        val state = GameRepository.state
+        val world = state.world
         findViewById<TextView>(R.id.tvTime).text = "Lokacja: ${world.location}\nDzień ${world.day}, ${world.timeOfDay}"
+
+        // Dynamic Visibility
+        findViewById<Button>(R.id.openCombatStatus).visibility = 
+            if (state.combat.active) android.view.View.VISIBLE else android.view.View.GONE
+            
+        findViewById<Button>(R.id.openFinale).visibility = 
+            if (world.globalStability < 30) android.view.View.VISIBLE else android.view.View.GONE
+
+        findViewById<Button>(R.id.openTransfer).visibility = 
+            if (state.party.size >= 2) android.view.View.VISIBLE else android.view.View.GONE
     }
 }

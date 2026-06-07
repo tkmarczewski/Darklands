@@ -83,4 +83,11 @@
         android:text="Zwykły Atak"
         android:layout_marginTop="8dp" />
 
+    <Button
+        android:id="@+id/btnExitCombat"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Odejdź z pola walki"
+        android:layout_marginTop="8dp" />
+
 </LinearLayout>

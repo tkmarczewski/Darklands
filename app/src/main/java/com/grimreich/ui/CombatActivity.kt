@@ -59,5 +59,9 @@ class CombatActivity : AppCompatActivity() {
             findViewById<Button>(R.id.btnAttack).text = "WALKA ZAKOŃCZONA"
             findViewById<Button>(R.id.btnAttack).isEnabled = false
         }
+        
+        findViewById<Button>(R.id.btnExitCombat).setOnClickListener {
+            finish()
+        }
     }
 }
