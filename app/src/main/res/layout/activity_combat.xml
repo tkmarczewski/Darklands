@@ -1,98 +1,86 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#1a1a2e">
+    android:orientation="vertical"
+    android:background="#1a1a2e"
+    android:padding="16dp">
+
+    <TextView
+        android:id="@+id/tvCombatTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="WALKA"
+        android:textColor="#e63946"
+        android:textSize="20sp"
+        android:gravity="center"
+        android:layout_marginBottom="16dp" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="16dp">
+        android:orientation="horizontal">
 
         <TextView
-            android:id="@+id/tvCombatTitle"
-            android:layout_width="match_parent"
+            android:id="@+id/heroStatus"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="=== WALKA ==="
-            android:textColor="#e63946"
-            android:textSize="18sp"
-            android:fontFamily="monospace"
-            android:gravity="center"
-            android:layout_marginBottom="12dp" />
-
-        <TextView
-            android:id="@+id/tvEnemyStatus"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Przeciwnik: -"
-            android:textColor="#e63946"
-            android:fontFamily="monospace"
-            android:textSize="14sp"
-            android:layout_marginBottom="4dp" />
-
-        <LinearLayout
-            android:id="@+id/enemyEffects"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_marginBottom="8dp" />
-
-        <TextView
-            android:id="@+id/tvHeroStatus"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Bohater: -"
-            android:textColor="#4ade80"
-            android:fontFamily="monospace"
-            android:textSize="14sp"
-            android:layout_marginBottom="4dp" />
-
-        <LinearLayout
-            android:id="@+id/heroEffects"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_marginBottom="12dp" />
-
-        <TextView
-            android:id="@+id/tvCombatLog"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text=""
+            android:layout_weight="1"
             android:textColor="#c8a96e"
-            android:fontFamily="monospace"
             android:textSize="12sp"
-            android:layout_marginBottom="16dp" />
+            android:fontFamily="monospace" />
 
-        <Button
-            android:id="@+id/btnStartCombat"
-            android:layout_width="match_parent"
+        <TextView
+            android:id="@+id/enemyStatus"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="Rozpocznij walke"
-            android:layout_marginBottom="8dp" />
-
-        <Button
-            android:id="@+id/btnAttack"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Atak!"
-            android:enabled="false"
-            android:layout_marginBottom="8dp" />
-
-        <Button
-            android:id="@+id/btnFlee"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Ucieczka"
-            android:enabled="false"
-            android:layout_marginBottom="8dp" />
-
-        <Button
-            android:id="@+id/btnBack"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Powrot" />
-
+            android:layout_weight="1"
+            android:textColor="#e63946"
+            android:textSize="12sp"
+            android:fontFamily="monospace"
+            android:gravity="end" />
     </LinearLayout>
-</ScrollView>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginTop="16dp"
+        android:background="#16213e">
+        <TextView
+            android:id="@+id/combatLog"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="8dp"
+            android:textColor="#ffffff"
+            android:textSize="11sp"
+            android:fontFamily="monospace" />
+    </ScrollView>
+
+    <TextView
+        android:id="@+id/tvSkillsTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="UMIEJĘTNOŚCI"
+        android:textColor="#c8a96e"
+        android:textSize="12sp"
+        android:layout_marginTop="8dp" />
+
+    <HorizontalScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <LinearLayout
+            android:id="@+id/skillsContainer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal" />
+    </HorizontalScrollView>
+
+    <Button
+        android:id="@+id/btnAttack"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Zwykły Atak"
+        android:layout_marginTop="8dp" />
+
+</LinearLayout>

@@ -1,125 +1,113 @@
 package com.grimreich.systems
 
-import com.grimreich.core.TravelPartyState
-import com.grimreich.core.TravelResult
-import com.grimreich.core.TravelRules
-import com.grimreich.core.WorldMap
-import com.grimreich.core.GameRepository
-import com.grimreich.core.Season
-import kotlin.random.Random
+import android.content.Context
+import android.content.Intent
+import com.grimreich.core.*
+import com.grimreich.ui.EncounterActivity
+import java.util.Random
 
-/**
- * TODO[travel] Integrate party food, weight and UI presentation.
- * systems/ orchestrates gameplay rules defined in core.
- */
 object TravelSystem {
 
     fun travel(
         fromCityId: String,
         toCityId: String,
         partyState: TravelPartyState,
-        random: Random = Random.Default
+        random: kotlin.random.Random = kotlin.random.Random.Default
     ): Pair<TravelPartyState, TravelResult> {
-        WorldMap.seedStage1()
-        val terrain = WorldMap.terrainBetween(fromCityId, toCityId)
-            ?: error("Cities are not directly connected: $fromCityId -> $toCityId")
-
-        val hoursSpent = TravelRules.computeSegmentHours(terrain, random)
-        val fatigueGain = TravelRules.computeFatigueGain(terrain, hoursSpent)
-        val encounterTriggered = TravelRules.encounterRoll(terrain, random)
-        val encounterId = if (encounterTriggered) TravelRules.encounterForTerrain(terrain, random) else null
-
-        val updatedState = partyState.copy(
-            fatigue = minOf(partyState.fatigue + fatigueGain, 100),
-            totalHoursTraveled = partyState.totalHoursTraveled + hoursSpent,
-            lastEncounterId = encounterId
+        val terrain = WorldMap.terrainBetween(fromCityId, toCityId) ?: TerrainType.ROAD
+        val hoursSpent = terrain.travelHoursRange.random(random)
+        val fatigueGain = hoursSpent * 2
+        
+        val updatedParty = partyState.copy(
+            fatigue = (partyState.fatigue + fatigueGain).coerceAtMost(100),
+            totalHoursTraveled = partyState.totalHoursTraveled + hoursSpent
         )
-
+        
+        val encounterTriggered = random.nextFloat() < terrain.encounterChance
+        val encounterId = if (encounterTriggered) {
+            EncounterSystem.rollEncounter(random)?.id
+        } else null
+        
         val result = TravelResult(
             destinationCityId = toCityId,
             terrain = terrain,
             hoursSpent = hoursSpent,
             fatigueBefore = partyState.fatigue,
-            fatigueAfter = updatedState.fatigue,
+            fatigueAfter = updatedParty.fatigue,
             encounterTriggered = encounterTriggered,
             encounterId = encounterId
         )
-        return updatedState to result
+        
+        return updatedParty to result
     }
 
-    fun restInCity(partyState: TravelPartyState, restHours: Int = 8): TravelPartyState {
+    fun restInCity(partyState: TravelPartyState, hours: Int): TravelPartyState {
+        val recovery = hours * 5
         return partyState.copy(
-            fatigue = TravelRules.reduceFatigueWithRest(partyState.fatigue, restHours)
+            fatigue = (partyState.fatigue - recovery).coerceAtLeast(0)
         )
     }
 
     fun rest(): String {
         val w = GameRepository.state.world
-        val newFatigue = (w.fatigue - 20).coerceAtLeast(0)
-        w.fatigue = newFatigue
+        w.fatigue = 0
         w.day += 1
         w.timeOfDay = "morning"
-
-        val msg = "Druzyna odpoczela i odzyskala sily."
-        GameRepository.log(msg)
-        return msg
+        advanceSeason()
+        return "Wypoczynek zakończony. Siły zregenerowane."
     }
 
     fun advanceSeason() {
         val w = GameRepository.state.world
-        w.season = when (w.season) {
-            Season.SPRING -> Season.SUMMER
-            Season.SUMMER -> Season.AUTUMN
-            Season.AUTUMN -> Season.WINTER
-            Season.WINTER -> Season.SPRING
-        }
-    }
-
-    fun currentSeason(day: Int): Season {
-        val slot = (day / 30) % 4
-        return when (slot) {
-            0 -> Season.SPRING
-            1 -> Season.SUMMER
-            2 -> Season.AUTUMN
+        w.season = when (w.day % 120) {
+            in 0..29 -> Season.SPRING
+            in 30..59 -> Season.SUMMER
+            in 60..89 -> Season.AUTUMN
             else -> Season.WINTER
         }
     }
 
-    fun travelTo(region: String, context: android.content.Context? = null): String {
-        val w = GameRepository.state.world
-        w.region = region
-        w.location = region.replaceFirstChar { it.uppercase() }
-        w.day += 1
-        w.timeOfDay = when (w.timeOfDay) {
-            "morning"   -> "afternoon"
-            "afternoon" -> "evening"
-            "evening"   -> "night"
-            else        -> "morning"
+    fun currentSeason(day: Int): Season {
+        return when (day % 120) {
+            in 0..29 -> Season.SPRING
+            in 30..59 -> Season.SUMMER
+            in 60..89 -> Season.AUTUMN
+            else -> Season.WINTER
         }
-        w.fatigue = minOf(w.fatigue + 1, 100)
+    }
+
+    fun travelTo(regionId: String, context: Context? = null): String {
+        val g = GameRepository.state
+        val w = g.world
+        val currentLoc = w.location.lowercase().replace(" ", "_")
         
-        val encounter = EncounterSystem.rollEncounter(kotlin.random.Random.Default)
-        val encounterMsg = if (encounter != null) {
-            EncounterSystem.activeEncounter = encounter
-            if (context != null) {
-                context.startActivity(android.content.Intent(context, com.grimreich.ui.EncounterActivity::class.java))
+        // Manual travel with choice integration
+        val (newParty, travelResult) = travel(currentLoc, regionId, g.party.firstOrNull()?.let { 
+            TravelPartyState(w.fatigue, 0, w.lastEncounter) 
+        } ?: TravelPartyState())
+        
+        w.location = com.grimreich.world.CityCatalogue.get(regionId)?.name ?: regionId
+        w.fatigue = newParty.fatigue
+        w.day += (travelResult.hoursSpent / 12).coerceAtLeast(1)
+        w.timeOfDay = if (newParty.totalHoursTraveled % 24 > 12) "evening" else "afternoon"
+        
+        if (travelResult.encounterTriggered && context != null) {
+            val encounter = EncounterSystem.rollEncounter(kotlin.random.Random.Default)
+            if (encounter != null) {
+                EncounterSystem.activeEncounter = encounter
+                context.startActivity(Intent(context, EncounterActivity::class.java))
             }
-            "\nSpotkanie: ${encounter.title}"
-        } else {
-            ""
         }
         
-        GameRepository.log("Podroz do regionu: $region")
-        return "Podroz do $region zakonczona.$encounterMsg"
+        return "Podróż do $regionId zakończona."
     }
 
     fun getSeasonDisplay(): String {
-        val w = GameRepository.state.world
-        val season = currentSeason(w.day)
-        return when (season) {
+        val g = GameRepository.state
+        return when (currentSeason(g.world.day)) {
             Season.SPRING -> "Wiosna"
             Season.SUMMER -> "Lato"
-            Season.AUTUMN -> "Jesien"
+            Season.AUTUMN -> "Jesień"
             Season.WINTER -> "Zima"
         }
     }

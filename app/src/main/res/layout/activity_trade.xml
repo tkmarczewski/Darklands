@@ -1,16 +1,47 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Sprint 11: wynik EconomySystem.priceInCity dla wybranego miasta. -->
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#1a1a2e">
+    android:orientation="vertical"
+    android:background="#1a1a2e"
+    android:padding="16dp">
+
+    <TextView
+        android:id="@+id/tvTradeTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="HANDLARZ"
+        android:textColor="#c8a96e"
+        android:textSize="20sp"
+        android:gravity="center"
+        android:layout_marginBottom="16dp" />
+
     <TextView
         android:id="@+id/tradeStatus"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:fontFamily="monospace"
         android:textColor="#c8a96e"
         android:textSize="14sp"
-        android:padding="16dp"
-        android:text="Handel" />
-</ScrollView>
+        android:fontFamily="monospace"
+        android:layout_marginBottom="16dp" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+        <LinearLayout
+            android:id="@+id/goodsContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" />
+    </ScrollView>
+
+    <TextView
+        android:id="@+id/tvTradeResult"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="#a0e8a0"
+        android:layout_marginTop="8dp"
+        android:gravity="center" />
+
+</LinearLayout>
