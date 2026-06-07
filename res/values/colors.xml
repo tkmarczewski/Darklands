@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Core GrimReich palette -->
+    <color name="grimBg">#0D0D0D</color>
+    <color name="grimBgDark">#080808</color>
+    <color name="grimParchment">#D4C8A8</color>
+    <color name="grimGold">#B8860B</color>
+
+    <!-- Fenomeny -->
+    <color name="grimMist">#7B9CBF</color>        <!-- Mgła: stalowy błękit -->
+    <color name="grimBlood">#CC0000</color>        <!-- Krew: głęboka czerwień -->
+    <color name="grimReflection">#9B59B6</color>   <!-- Odbicie: ciemny fiolet -->
+
+    <!-- Akcenty -->
+    <color name="grimAccent">#8B0000</color>       <!-- Obramowania, aktywne elementy -->
+    <color name="grimAccentLight">#CC0000</color>
+    <color name="grimIron">#2A2A2A</color>         <!-- Tła kart -->
+</resources>

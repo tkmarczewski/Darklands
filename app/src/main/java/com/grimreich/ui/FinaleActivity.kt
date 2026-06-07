@@ -11,5 +11,9 @@ class FinaleActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_finale)
         findViewById<TextView>(R.id.finaleText).text = EndingSystem.finaleStatus()
+        
+        findViewById<android.widget.Button>(R.id.btnExitFinale).setOnClickListener {
+            finish()
+        }
     }
 }

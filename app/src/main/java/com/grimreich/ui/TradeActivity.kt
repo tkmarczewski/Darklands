@@ -40,8 +40,9 @@ class TradeActivity : AppCompatActivity() {
             btn.text = "Kup ${good.name} ($price g)"
             btn.setOnClickListener {
                 val result = TradeSystem.buyGood(cityId, good.type)
-                findViewById<TextView>(R.id.tvTradeResult).text = result
-                render(cityId)
+                UiUtils.showNarrativePopup(this@TradeActivity, "TRANSAKCJA", result) {
+                    render(cityId)
+                }
             }
             container.addView(btn)
         }

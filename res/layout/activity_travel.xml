@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/grimBg">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="ATLAS ŚWIATA"
+        android:textColor="@color/grimGold"
+        android:fontFamily="serif"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:gravity="center"
+        android:paddingVertical="12dp"
+        android:background="@color/grimBgDark"/>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:padding="8dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <Button android:id="@+id/btnNorthCoast"
+                style="@style/GrimRegionButton"
+                android:text="☁  Wybrzeże Północne  [Mgła / Zakon Świtu]"/>
+
+            <Button android:id="@+id/btnHeartland"
+                style="@style/GrimRegionButton"
+                android:text="🩸  Serce Krainy  [Krew / Pełnia]"/>
+
+            <Button android:id="@+id/btnMirrorPlains"
+                style="@style/GrimRegionButton"
+                android:text="🪞  Równiny Odbicia  [Odbicie / Cień]"/>
+
+            <Button android:id="@+id/btnAshfeld"
+                style="@style/GrimRegionButton"
+                android:text="🔥  Ashfeld  [Krew / Zakon]"/>
+
+            <Button android:id="@+id/btnDreadmoor"
+                style="@style/GrimRegionButton"
+                android:text="☁  Dreadmoor  [Mgła / Cień]"/>
+
+            <Button android:id="@+id/btnIronHollow"
+                style="@style/GrimRegionButton"
+                android:text="⚔  Iron Hollow  [Krew / Pełnia]"/>
+
+            <Button android:id="@+id/btnVoidEdge"
+                style="@style/GrimRegionButton"
+                android:text="🪞  Krawędź Próżni  [Odbicie / Absolut]"/>
+
+        </LinearLayout>
+    </ScrollView>
+
+    <Button android:id="@+id/btnBackFromTravel"
+        style="@style/GrimBackButton"
+        android:text="← Wróć"/>
+
+</LinearLayout>

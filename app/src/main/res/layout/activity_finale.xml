@@ -1,15 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#1a1a2e">
+    android:orientation="vertical"
+    android:background="#000000"
+    android:padding="24dp"
+    android:gravity="center">
+
     <TextView
         android:id="@+id/finaleText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:fontFamily="monospace"
-        android:textColor="#c8a96e"
-        android:textSize="14sp"
-        android:padding="16dp"
-        android:text="@string/menu_finale" />
-</ScrollView>
+        android:textColor="#ffffff"
+        android:textSize="18sp"
+        android:fontFamily="serif"
+        android:gravity="center"
+        android:layout_marginBottom="32dp" />
+
+    <Button
+        android:id="@+id/btnExitFinale"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Powrót do świata żywych"
+        android:backgroundTint="#1a1a2e"
+        android:textColor="#c8a96e" />
+
+</LinearLayout>

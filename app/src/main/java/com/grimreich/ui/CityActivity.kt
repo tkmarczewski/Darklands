@@ -26,7 +26,7 @@ class CityActivity : AppCompatActivity() {
 
         findViewById<Button>(R.id.btnTavern).setOnClickListener {
             val result = SocialEventSystem.runTavernEvent()
-            updateCityStatus(result)
+            UiUtils.showNarrativePopup(this, "KARCZMA", result)
         }
 
         findViewById<Button>(R.id.btnChurch).setOnClickListener {
