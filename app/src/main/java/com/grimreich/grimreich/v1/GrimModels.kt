@@ -48,7 +48,7 @@ data class Item(
     val effects: Map<String, Int> = emptyMap()
 )
 
-data class LootEntry(val itemId: String, val weight: Int, val minQty: Int = 1, val maxQty: Int = 1)
+data class LootEntry(val itemId: String, val weight: Int = 1, val minQty: Int = 1, val maxQty: Int = 1)
 data class GeneratedLoot(val entries: List<LootEntry>)
 data class RewardTable(val id: String, val entries: List<LootEntry>)
 data class Encounter(val id: String, val name: String, val difficulty: Int, val possibleNpcs: List<String>)
@@ -69,5 +69,5 @@ data class DialogueNode(
     val id: String,
     val npcId: String,
     val text: String,
-    val choices: List<DialogueChoice>
+    val choices: List<DialogueChoice> = emptyList()
 )

@@ -19,17 +19,8 @@ class HubActivity : AppCompatActivity() {
         findViewById<Button>(R.id.openCity).setOnClickListener { 
             startActivity(Intent(this, CityActivity::class.java)) 
         }
-        findViewById<Button>(R.id.openReputation).setOnClickListener { 
-            startActivity(Intent(this, ReputationActivity::class.java)) 
-        }
         findViewById<Button>(R.id.openMap).setOnClickListener { 
             startActivity(Intent(this, MapActivity::class.java)) 
-        }
-        findViewById<Button>(R.id.openSaints).setOnClickListener { 
-            startActivity(Intent(this, SaintsActivity::class.java)) 
-        }
-        findViewById<Button>(R.id.openCityEvents).setOnClickListener { 
-            startActivity(Intent(this, CityEventsActivity::class.java)) 
         }
         findViewById<Button>(R.id.openInventory).setOnClickListener { 
             startActivity(Intent(this, InventoryActivity::class.java)) 
@@ -37,18 +28,14 @@ class HubActivity : AppCompatActivity() {
         findViewById<Button>(R.id.openTrade).setOnClickListener { 
             startActivity(Intent(this, TradeActivity::class.java)) 
         }
-        findViewById<Button>(R.id.openTransfer).setOnClickListener { 
-            startActivity(Intent(this, InventoryTransferActivity::class.java)) 
+        findViewById<Button>(R.id.openSaints).setOnClickListener { 
+            startActivity(Intent(this, SaintsActivity::class.java)) 
         }
-        findViewById<Button>(R.id.openCombatStatus).setOnClickListener { 
-            startActivity(Intent(this, CombatStatusActivity::class.java)) 
-        }
-        findViewById<Button>(R.id.openQuests).setOnClickListener { 
-            startActivity(Intent(this, QuestFinalActivity::class.java)) 
-        }
-        findViewById<Button>(R.id.openFinale).setOnClickListener { 
-            startActivity(Intent(this, FinaleActivity::class.java)) 
-        }
+        
+        // Safety: ensure hidden buttons don't accidentally get clicked if layout overlaps
+        findViewById<Button>(R.id.openReputation).setOnClickListener { }
+        findViewById<Button>(R.id.openQuests).setOnClickListener { }
+        findViewById<Button>(R.id.openCityEvents).setOnClickListener { }
 
         findViewById<Button>(R.id.btnSave).setOnClickListener {
             com.grimreich.systems.SaveLoadSystem.save(this)
@@ -74,17 +61,17 @@ class HubActivity : AppCompatActivity() {
         val world = state.world
         findViewById<TextView>(R.id.tvTime).text = "Lokacja: ${world.location}\nDzień ${world.day}, ${world.timeOfDay}"
 
-        // Dynamic Visibility & Safety Gaps
+        // Dynamic Visibility for MVP stability
         findViewById<Button>(R.id.openCombatStatus).visibility = 
             if (state.combat.active) View.VISIBLE else View.GONE
             
         findViewById<Button>(R.id.openFinale).visibility = 
             if (world.globalStability < 30) View.VISIBLE else View.GONE
 
-        findViewById<Button>(R.id.openTransfer).visibility = 
-            if (state.party.size >= 2) View.VISIBLE else View.GONE
-            
-        // Hide unfinished/stub activities for now to prevent dead ends
-        findViewById<Button>(R.id.openReputation).visibility = View.GONE // Placeholder
+        // Hide non-MVP/unfinished modules to prevent dead ends
+        findViewById<Button>(R.id.openReputation).visibility = View.GONE
+        findViewById<Button>(R.id.openQuests).visibility = View.GONE
+        findViewById<Button>(R.id.openCityEvents).visibility = View.GONE
+        findViewById<Button>(R.id.openTransfer).visibility = View.GONE
     }
 }

@@ -7,12 +7,27 @@
     <color name="grimGold">#B8860B</color>
 
     <!-- Fenomeny -->
-    <color name="grimMist">#7B9CBF</color>        <!-- Mgła: stalowy błękit -->
-    <color name="grimBlood">#CC0000</color>        <!-- Krew: głęboka czerwień -->
-    <color name="grimReflection">#9B59B6</color>   <!-- Odbicie: ciemny fiolet -->
+    <color name="grimMist">#7B9CBF</color>
+    <color name="grimBlood">#CC0000</color>
+    <color name="grimReflection">#9B59B6</color>
 
     <!-- Akcenty -->
-    <color name="grimAccent">#8B0000</color>       <!-- Obramowania, aktywne elementy -->
+    <color name="grimAccent">#8B0000</color>
     <color name="grimAccentLight">#CC0000</color>
-    <color name="grimIron">#2A2A2A</color>         <!-- Tła kart -->
+    <color name="grimIron">#2A2A2A</color>
+
+    <!-- Compatibility Aliases -->
+    <color name="colorPrimary">#0D0D0D</color>
+    <color name="colorPrimaryVariant">#080808</color>
+    <color name="colorOnPrimary">#D4C8A8</color>
+    <color name="colorSecondary">#8B0000</color>
+    <color name="colorOnSecondary">#FFFFFF</color>
+    <color name="colorBackground">#0D0D0D</color>
+    <color name="colorSurface">#080808</color>
+    <color name="colorOnBackground">#D4C8A8</color>
+    <color name="colorOnSurface">#D4C8A8</color>
+    <color name="colorAccent">#B8860B</color>
+    <color name="colorGold">#B8860B</color>
+    <color name="colorBlood">#CC0000</color>
+    <color name="colorSuccess">#A0E8A0</color>
 </resources>

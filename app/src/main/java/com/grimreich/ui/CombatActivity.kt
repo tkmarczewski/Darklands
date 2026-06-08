@@ -1,14 +1,13 @@
 package com.grimreich.ui
 
 import android.os.Bundle
+import android.view.View
 import android.widget.Button
-import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.grimreich.R
 import com.grimreich.core.GameRepository
 import com.grimreich.systems.CombatSystem
-import com.grimreich.systems.SkillCatalogue
 
 class CombatActivity : AppCompatActivity() {
 
@@ -16,52 +15,50 @@ class CombatActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_combat)
 
-        // Ensure combat is active
-        if (GameRepository.state.combat.enemyHp <= 0) {
-            CombatSystem.startCombat("Cień Przeszłości", 50, 5, 80)
+        // Safety: If entered without active combat, allow immediate exit
+        if (!GameRepository.state.combat.active) {
+            findViewById<TextView>(R.id.tvCombatLog).text = "Brak aktywnego starcia w tym miejscu."
         }
 
         render()
 
         findViewById<Button>(R.id.btnAttack).setOnClickListener {
-            val result = CombatSystem.playerAttack()
-            render()
-        }
-        
-        val skillsContainer = findViewById<LinearLayout>(R.id.skillsContainer)
-        SkillCatalogue.allSkills.forEach { skill ->
-            val btn = Button(this)
-            btn.text = skill.name
-            btn.setOnClickListener {
-                // Simplified skill usage logic
-                val hero = GameRepository.state.party.firstOrNull() ?: return@setOnClickListener
-                val msg = skill.effect(
-                    com.grimreich.core.CombatantState(hero.name, hero.hp, hero.maxHp, 20, hero.morale, 0),
-                    com.grimreich.core.CombatantState("Enemy", GameRepository.state.combat.enemyHp, 50, 20, 80, 0)
-                )
-                GameRepository.state.combat.log.add(msg)
+            if (GameRepository.state.combat.active) {
+                CombatSystem.playerAttack()
                 render()
             }
-            skillsContainer.addView(btn)
         }
+
+        findViewById<Button>(R.id.btnFlee).setOnClickListener {
+            finish() // Use Flee as exit for now
+        }
+        
+        // Ensure other buttons don't crash
+        findViewById<Button>(R.id.btnDefend).setOnClickListener { /* TODO */ }
+        findViewById<Button>(R.id.btnUseMist).setOnClickListener { /* TODO */ }
+        findViewById<Button>(R.id.btnUseBlood).setOnClickListener { /* TODO */ }
+        findViewById<Button>(R.id.btnUseReflection).setOnClickListener { /* TODO */ }
     }
 
     private fun render() {
         val c = GameRepository.state.combat
-        val hero = GameRepository.state.party.firstOrNull() ?: return
+        val party = GameRepository.state.party
         
-        findViewById<TextView>(R.id.heroStatus).text = "${hero.name}\nHP: ${hero.hp}/${hero.maxHp}\nMorale: ${hero.morale}"
-        findViewById<TextView>(R.id.enemyStatus).text = "${c.enemyName}\nHP: ${c.enemyHp}/50"
+        // Update Log
+        findViewById<TextView>(R.id.tvCombatLog).text = c.log.takeLast(5).joinToString("\n")
         
-        findViewById<TextView>(R.id.combatLog).text = c.log.takeLast(10).joinToString("\n")
+        // Update Title/Round
+        findViewById<TextView>(R.id.tvCombatTitle).text = if (c.active) "⚔ WALKA: ${c.enemyName}" else "⚔ KONIEC WALKI"
         
-        if (!c.active) {
-            findViewById<Button>(R.id.btnAttack).text = "WALKA ZAKOŃCZONA"
-            findViewById<Button>(R.id.btnAttack).isEnabled = false
+        // Update Party Strip (Simple mapping for now)
+        if (party.isNotEmpty()) {
+            findViewById<TextView>(R.id.tvChar0Name).text = party[0].name
+            findViewById<android.widget.ProgressBar>(R.id.pbChar0HP).progress = (party[0].hp * 100 / party[0].maxHp)
         }
         
-        findViewById<Button>(R.id.btnExitCombat).setOnClickListener {
-            finish()
+        if (!c.active) {
+            findViewById<Button>(R.id.btnAttack).isEnabled = false
+            findViewById<Button>(R.id.btnFlee).text = "POWRÓT"
         }
     }
 }

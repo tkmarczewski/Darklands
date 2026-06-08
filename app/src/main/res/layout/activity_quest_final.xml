@@ -1,16 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Sprint 15: podsumowanie questow z QuestSystem.finalQuestSummary. -->
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#1a1a2e">
+    android:orientation="vertical"
+    android:background="#1a1a2e"
+    android:padding="24dp"
+    android:gravity="center">
+
     <TextView
         android:id="@+id/questFinalText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:fontFamily="monospace"
         android:textColor="#c8a96e"
-        android:textSize="14sp"
-        android:padding="16dp"
-        android:text="Questy" />
-</ScrollView>
+        android:textSize="18sp"
+        android:fontFamily="serif"
+        android:gravity="center"
+        android:layout_marginBottom="32dp" />
+
+    <Button
+        android:id="@+id/btnExitQuestFinal"
+        style="@style/GrimBackButton"
+        android:text="POWRÓT" />
+
+</LinearLayout>
