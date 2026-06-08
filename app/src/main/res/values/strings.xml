@@ -31,4 +31,13 @@
     <string name="menu_finale">Finał</string>
     <string name="grimreich_mvp_prompt">Naciśnij Bootstrap, żeby zainicjować GrimReich 1.0.</string>
     <string name="btn_close_inventory">Zamknij plecak</string>
+    <string name="loc_zatoka_piracka">Zatoka Piracka</string>
+    <string name="loc_port_mrozny">Port Mroźny</string>
+    <string name="loc_latarnia_switu">Latarnia Świtu</string>
+    <string name="loc_dwor_zloty">Dwór Złoty</string>
+    <string name="loc_kamienna_przystan">Kamienna Przystań</string>
+    <string name="loc_cmentarzysko_krolow">Cmentarzysko Królów</string>
+    <string name="loc_spalona_wies">Spalona Wieś</string>
+    <string name="loc_las_cieni">Las Cieni</string>
+    <string name="loc_zlote_ruiny">Złote Ruiny</string>
 </resources>
