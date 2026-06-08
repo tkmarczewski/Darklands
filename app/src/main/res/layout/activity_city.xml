@@ -1,91 +1,54 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/grimBgMain">
 
-    <!-- BACKGROUND: The Dark Street -->
-    <ImageView
-        android:id="@+id/ivCityBg"
+    <!-- Premium Header Area -->
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:scaleType="centerCrop"
-        android:src="@drawable/bg_tavern_planning" />
+        android:layout_height="80dp"
+        android:background="@drawable/premium_frame_gold"
+        android:padding="4dp">
 
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="#A0000000" />
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="horizontal"
-        android:padding="16dp">
-
-        <!-- LEFT SIDE: ACTIONS & NPC LIST -->
-        <LinearLayout
-            android:layout_width="0dp"
+        <TextView
+            android:id="@+id/tvCityName"
+            android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:orientation="vertical">
+            style="@style/GrimTextHeader"
+            android:gravity="center"
+            android:text="MIASTO"
+            android:textAllCaps="true"
+            android:letterSpacing="0.1"/>
+    </FrameLayout>
 
-            <TextView
-                android:id="@+id/cityTitle"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textColor="@color/grimGold"
-                android:textSize="22sp"
-                android:fontFamily="serif"
-                android:textStyle="bold"
-                android:layout_marginBottom="8dp" />
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
 
-            <ScrollView
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1">
-                <LinearLayout
-                    android:id="@+id/npcListContainer"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical" />
-            </ScrollView>
-
-            <Button
-                android:id="@+id/btnExitCity"
-                style="@style/GrimBackButton"
-                android:text="OPUŚĆ MIASTO"
-                android:layout_marginTop="8dp" />
-        </LinearLayout>
-
-        <!-- RIGHT SIDE: STATUS & NARRATIVE -->
         <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1.2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:paddingStart="16dp">
+            android:padding="16dp">
 
             <TextView
-                android:id="@+id/cityStatus"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1"
-                android:textColor="@color/grimParchment"
-                android:fontFamily="monospace"
-                android:textSize="14sp"
-                android:background="#40000000"
-                android:padding="8dp" />
-
-            <LinearLayout
+                android:id="@+id/tvCityDesc"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_marginTop="8dp">
-                <Button android:id="@+id/btnTavern" style="@style/GrimNavButton" android:text="Karczma" android:drawableTop="@drawable/ic_equipment_potion_red" />
-                <Button android:id="@+id/btnChurch" style="@style/GrimNavButton" android:text="Kościół" android:drawableTop="@drawable/ic_status_bless" />
-                <Button android:id="@+id/btnMarket" style="@style/GrimNavButton" android:text="Rynek" android:drawableTop="@drawable/ic_equipment_pouch" />
-            </LinearLayout>
-        </LinearLayout>
+                style="@style/GrimTextBody"
+                android:text="Opis miasta..."
+                android:paddingBottom="16dp"/>
 
-    </LinearLayout>
-</FrameLayout>
+            <!-- Placeholder for city actions -->
+
+        </LinearLayout>
+    </ScrollView>
+
+    <Button android:id="@+id/btnBackFromCity"
+        style="@style/GrimBackButton"
+        android:text="← POWRÓT DO HUBU"/>
+
+</LinearLayout>

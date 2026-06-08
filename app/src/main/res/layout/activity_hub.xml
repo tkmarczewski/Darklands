@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <!-- BACKGROUND: The Party at the Castle -->
+    <!-- BACKGROUND -->
     <ImageView
         android:id="@+id/ivHubBg"
         android:layout_width="match_parent"
@@ -11,51 +11,48 @@
         android:scaleType="centerCrop"
         android:src="@drawable/bg_party_castle" />
 
-    <!-- OVERLAY FOR BETTER TEXT READABILITY -->
+    <!-- DARK GOTHIC OVERLAY -->
     <View
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#80000000" />
+        android:background="#A6000000" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        android:padding="16dp">
+        android:padding="24dp">
 
         <TextView
             android:id="@+id/tvTime"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textColor="@color/grimParchment"
-            android:fontFamily="serif"
-            android:textSize="14sp"
+            style="@style/GrimTextHeader"
             android:gravity="center"
-            android:layout_marginBottom="16dp" />
+            android:layout_marginBottom="32dp" />
 
         <GridLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
-            android:columnCount="4"
-            android:rowCount="3"
+            android:columnCount="3"
             android:alignmentMode="alignMargins"
             android:columnOrderPreserved="false">
 
-            <Button android:id="@+id/openCity" style="@style/GrimNavButton" android:text="Miasto" />
-            <Button android:id="@+id/openMap" style="@style/GrimNavButton" android:text="Mapa" />
-            <Button android:id="@+id/openInventory" style="@style/GrimNavButton" android:text="Plecak" />
-            <Button android:id="@+id/openTrade" style="@style/GrimNavButton" android:text="Handel" />
+            <Button android:id="@+id/openCity" style="@style/GrimNavButton" android:text="@string/menu_city" />
+            <Button android:id="@+id/openMap" style="@style/GrimNavButton" android:text="@string/menu_map" />
+            <Button android:id="@+id/openInventory" style="@style/GrimNavButton" android:text="@string/menu_inventory" />
 
-            <Button android:id="@+id/openSaints" style="@style/GrimNavButton" android:text="Prorocy" />
-            <Button android:id="@+id/openQuests" style="@style/GrimNavButton" android:text="Zadania" />
+            <Button android:id="@+id/openTrade" style="@style/GrimNavButton" android:text="@string/menu_trade" />
+            <Button android:id="@+id/openSaints" style="@style/GrimNavButton" android:text="@string/menu_saints" />
+            <Button android:id="@+id/openQuests" style="@style/GrimNavButton" android:text="@string/menu_quests" />
+
             <Button android:id="@+id/openCombatStatus" style="@style/GrimNavButton" android:text="Walka" />
-            <Button android:id="@+id/openCityEvents" style="@style/GrimNavButton" android:text="Wieści" />
+            <Button android:id="@+id/openCityEvents" style="@style/GrimNavButton" android:text="@string/menu_city_events" />
+            <Button android:id="@+id/openReputation" style="@style/GrimNavButton" android:text="@string/menu_reputation" />
 
-            <!-- Empty space or more buttons -->
-            <Button android:id="@+id/openReputation" style="@style/GrimNavButton" android:text="Reputacja" />
-            <Button android:id="@+id/openTransfer" style="@style/GrimNavButton" android:text="Transfer" />
-            <Button android:id="@+id/openFinale" style="@style/GrimNavButton" android:text="FINAŁ" />
+            <Button android:id="@+id/openTransfer" style="@style/GrimNavButton" android:text="@string/menu_transfer" />
+            <Button android:id="@+id/openFinale" style="@style/GrimNavButton" android:text="@string/menu_finale" />
 
         </GridLayout>
 
@@ -63,9 +60,17 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:gravity="center">
-            <Button android:id="@+id/btnSave" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Zapisz" android:layout_marginEnd="8dp" />
-            <Button android:id="@+id/btnLoad" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Wczytaj" />
+            android:gravity="center"
+            android:paddingTop="16dp">
+            <Button android:id="@+id/btnSave"
+                style="@style/GrimCombatButton"
+                android:layout_width="wrap_content"
+                android:text="@string/btn_save"
+                android:layout_marginEnd="8dp" />
+            <Button android:id="@+id/btnLoad"
+                style="@style/GrimCombatButton"
+                android:layout_width="wrap_content"
+                android:text="@string/btn_load" />
         </LinearLayout>
 
     </LinearLayout>
