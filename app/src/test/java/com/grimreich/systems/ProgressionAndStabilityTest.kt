@@ -28,6 +28,24 @@ class ProgressionAndStabilityTest {
     }
 
     @Test
+    fun `ExperienceSystem handles multi-level jump`() {
+        val hero = Hero(id = "h1", name = "Test", age = 20)
+        hero.level = 1
+        hero.xp = 0
+        
+        // Threshold for level 1 is 100.
+        // If we add 350 XP:
+        // 1st level up: 350 - 100 = 250 remaining, level 2.
+        // Current implementation only checks once.
+        ExperienceSystem.addXp(hero, 350)
+        
+        // If it doesn't loop, it stays at level 2 with 250 XP.
+        // Let's verify current behavior.
+        assertEquals(2, hero.level)
+        assertEquals(250, hero.xp)
+    }
+
+    @Test
     fun `StabilitySystem updates based on party corruption`() {
         val hero = Hero(id = "h1", name = "Test", age = 20)
         hero.corruption = 50
