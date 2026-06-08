@@ -64,6 +64,11 @@
                 android:text="Na Targ"
                 android:layout_marginBottom="8dp"/>
 
+            <Button android:id="@+id/btnRecruit"
+                style="@style/GrimCombatButton"
+                android:text="Zwerbuj Bohatera"
+                android:layout_marginBottom="8dp"/>
+
             <LinearLayout
                 android:id="@+id/npcListContainer"
                 android:layout_width="match_parent"

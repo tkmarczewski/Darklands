@@ -3,7 +3,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <!-- BACKGROUND -->
     <ImageView
         android:id="@+id/ivHubBg"
         android:layout_width="match_parent"
@@ -11,7 +10,6 @@
         android:scaleType="centerCrop"
         android:src="@drawable/bg_party_castle" />
 
-    <!-- DARK GOTHIC OVERLAY -->
     <View
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -21,7 +19,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        android:padding="24dp">
+        android:padding="16dp">
 
         <TextView
             android:id="@+id/tvTime"
@@ -29,48 +27,38 @@
             android:layout_height="wrap_content"
             style="@style/GrimTextHeader"
             android:gravity="center"
-            android:layout_marginBottom="32dp" />
+            android:layout_marginBottom="16dp" />
 
+        <!-- CORE NAVIGATION -->
         <GridLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
             android:columnCount="3"
-            android:alignmentMode="alignMargins"
-            android:columnOrderPreserved="false">
+            android:alignmentMode="alignMargins">
 
-            <Button android:id="@+id/openCity" style="@style/GrimNavButton" android:text="@string/menu_city" />
-            <Button android:id="@+id/openMap" style="@style/GrimNavButton" android:text="@string/menu_map" />
-            <Button android:id="@+id/openInventory" style="@style/GrimNavButton" android:text="@string/menu_inventory" />
+            <Button android:id="@+id/openCity" style="@style/GrimNavButton" android:text="Wjedź do Miasta" />
+            <Button android:id="@+id/openMap" style="@style/GrimNavButton" android:text="Atlas Świata" />
+            <Button android:id="@+id/openInventory" style="@style/GrimNavButton" android:text="Ekwipunek" />
 
-            <Button android:id="@+id/openTrade" style="@style/GrimNavButton" android:text="@string/menu_trade" />
-            <Button android:id="@+id/openSaints" style="@style/GrimNavButton" android:text="@string/menu_saints" />
-            <Button android:id="@+id/openQuests" style="@style/GrimNavButton" android:text="@string/menu_quests" />
-
+            <Button android:id="@+id/openQuests" style="@style/GrimNavButton" android:text="Zadania" />
             <Button android:id="@+id/openCombatStatus" style="@style/GrimNavButton" android:text="Walka" />
-            <Button android:id="@+id/openCityEvents" style="@style/GrimNavButton" android:text="@string/menu_city_events" />
-            <Button android:id="@+id/openReputation" style="@style/GrimNavButton" android:text="@string/menu_reputation" />
-
-            <Button android:id="@+id/openTransfer" style="@style/GrimNavButton" android:text="@string/menu_transfer" />
-            <Button android:id="@+id/openFinale" style="@style/GrimNavButton" android:text="@string/menu_finale" />
+            <Button android:id="@+id/openReputation" style="@style/GrimNavButton" android:text="Reputacja" />
 
         </GridLayout>
+
+        <!-- PARTY STRIP VISIBILITY -->
+        <include layout="@layout/strip_party" />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:gravity="center"
-            android:paddingTop="16dp">
-            <Button android:id="@+id/btnSave"
-                style="@style/GrimCombatButton"
-                android:layout_width="wrap_content"
-                android:text="@string/btn_save"
-                android:layout_marginEnd="8dp" />
-            <Button android:id="@+id/btnLoad"
-                style="@style/GrimCombatButton"
-                android:layout_width="wrap_content"
-                android:text="@string/btn_load" />
+            android:layout_marginTop="8dp">
+            <Button android:id="@+id/btnSave" style="@style/GrimSmallButton" android:text="Zapisz" android:layout_width="100dp" />
+            <Button android:id="@+id/btnLoad" style="@style/GrimSmallButton" android:text="Wczytaj" android:layout_width="100dp" />
+            <Button android:id="@+id/openFinale" style="@style/GrimSmallButton" android:text="FINAŁ" android:layout_width="100dp" />
         </LinearLayout>
 
     </LinearLayout>

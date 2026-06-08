@@ -37,6 +37,10 @@ class CityActivity : AppCompatActivity() {
             startActivity(Intent(this, TradeActivity::class.java))
         }
 
+        findViewById<Button>(R.id.btnRecruit).setOnClickListener {
+            startActivity(Intent(this, RecruitmentActivity::class.java))
+        }
+
         findViewById<Button>(R.id.btnExitCity).setOnClickListener {
             finish()
         }
