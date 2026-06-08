@@ -13,7 +13,7 @@
         android:padding="4dp">
 
         <TextView
-            android:id="@+id/tvCityName"
+            android:id="@+id/cityTitle"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             style="@style/GrimTextHeader"
@@ -42,12 +42,47 @@
                 android:text="Opis miasta..."
                 android:paddingBottom="16dp"/>
 
-            <!-- Placeholder for city actions -->
+            <TextView
+                android:id="@+id/cityStatus"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                style="@style/GrimTextMuted"
+                android:paddingBottom="16dp"/>
+
+            <Button android:id="@+id/btnTavern"
+                style="@style/GrimCombatButton"
+                android:text="Odwiedź Karczmę"
+                android:layout_marginBottom="8dp"/>
+
+            <Button android:id="@+id/btnChurch"
+                style="@style/GrimCombatButton"
+                android:text="Idź do Kościoła"
+                android:layout_marginBottom="8dp"/>
+
+            <Button android:id="@+id/btnMarket"
+                style="@style/GrimCombatButton"
+                android:text="Na Targ"
+                android:layout_marginBottom="8dp"/>
+
+            <LinearLayout
+                android:id="@+id/npcListContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingTop="16dp">
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    style="@style/GrimTextHeader"
+                    android:textSize="16sp"
+                    android:text="MIESZKAŃCY"
+                    android:paddingBottom="8dp"/>
+            </LinearLayout>
 
         </LinearLayout>
     </ScrollView>
 
-    <Button android:id="@+id/btnBackFromCity"
+    <Button android:id="@+id/btnExitCity"
         style="@style/GrimBackButton"
         android:text="← POWRÓT DO HUBU"/>
 
