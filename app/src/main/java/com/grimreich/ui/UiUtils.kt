@@ -4,7 +4,6 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.widget.Button
 import android.widget.TextView
-import androidx.appcompat.app.AlertDialog
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.grimreich.R
 

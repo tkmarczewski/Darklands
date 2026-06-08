@@ -7,7 +7,7 @@ object StabilitySystem {
     
     fun updateStability() {
         val g = GameRepository.state
-        val avgCorruption = if (g.party.isNotEmpty()) g.party.map { it.corruption }.average().toInt() else 0
+        val avgCorruption = if (g.party.isNotEmpty()) g.party.asSequence().map { it.corruption }.average().toInt() else 0
         
         // Stability drops as average corruption rises
         g.world.globalStability = (100 - avgCorruption).coerceIn(0, 100)
@@ -32,7 +32,7 @@ object StabilitySystem {
     
     fun checkFractureEvent(): String? {
         val g = GameRepository.state
-        if (g.world.echoIntensity > 0.3f && Random.nextFloat() < g.world.echoIntensity * 0.2f) {
+        if (g.world.echoIntensity > 0.3f && (Random.nextFloat() < g.world.echoIntensity * 0.2f)) {
             return "Pęknięcie rzeczywistości! Widzisz obrazy z innych czasów."
         }
         return null

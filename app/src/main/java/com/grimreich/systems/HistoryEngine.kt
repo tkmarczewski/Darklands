@@ -1,11 +1,9 @@
 package com.grimreich.systems
 
-import com.grimreich.core.GameRepository
-
 data class HistoryTimeline(
     val id: String,
     val name: String,
-    var active: Boolean = true
+    var active: Boolean = true,
 )
 
 object HistoryEngine {
@@ -17,5 +15,5 @@ object HistoryEngine {
         ChronicleSystem.record("Historia rozszczepiła się: $name")
     }
     
-    fun getActiveTimelines(): List<HistoryTimeline> = timelines.filter { it.active }
+    fun getActiveTimelines(): List<HistoryTimeline> = timelines.asSequence().filter { it.active }.toList()
 }

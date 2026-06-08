@@ -30,4 +30,5 @@
     <string name="menu_quests">Questy</string>
     <string name="menu_finale">Finał</string>
     <string name="grimreich_mvp_prompt">Naciśnij Bootstrap, żeby zainicjować GrimReich 1.0.</string>
+    <string name="btn_close_inventory">Zamknij plecak</string>
 </resources>

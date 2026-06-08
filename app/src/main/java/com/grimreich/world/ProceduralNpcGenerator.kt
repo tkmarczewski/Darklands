@@ -8,17 +8,26 @@ object ProceduralNpcGenerator {
     fun generateForCity(cityId: String, seed: Int): List<NPC> {
         val random = Random(seed + cityId.hashCode())
         val count = random.nextInt(2, 5)
+        val generatedNames = mutableSetOf<String>()
         
-        return (0 until count).map { i ->
+        return (0 until count).mapNotNull { i ->
+            var name = generateName(random)
+            var attempts = 0
+            while (generatedNames.contains(name) && (attempts < 10)) {
+                name = generateName(random)
+                attempts++
+            }
+            if (generatedNames.contains(name)) return@mapNotNull null
+            generatedNames.add(name)
+
             val role = listOf("Chronicler", "Zealot", "Merchant", "Fugitive", "Mystic").random(random)
-            val name = generateName(random)
             NPC(
                 id = "npc_${cityId}_$i",
                 name = name,
                 role = role,
                 factionId = decideFaction(cityId, random),
-                stability = 0.5f + random.nextFloat() * 0.5f,
-                startNodeId = "${role.lowercase()}_start"
+                stability = 0.5f + (random.nextFloat() * 0.5f),
+                startNodeId = "${role.lowercase()}_start",
             )
         }
     }

@@ -13,7 +13,7 @@ object ConversationManager {
     }
 
     fun start(npcId: String): DialogueNode? {
-        val node = dialogueNodes.values.find { it.npcId == npcId && it.id.endsWith("_start") }
+        val node = dialogueNodes.values.find { (it.npcId == npcId) && it.id.endsWith("_start") }
         return node?.let { applyEchoEffect(it) }
     }
 
@@ -29,7 +29,7 @@ object ConversationManager {
         
         // Simulating fractured memory/speech
         val echoedText = if (Random.nextFloat() < intensity) {
-            node.text.split(" ").map { word ->
+            node.text.split(" ").asSequence().map { word ->
                 if (Random.nextFloat() < intensity * 0.5f) "[...]" else word
             }.joinToString(" ") + " ...czy to się już wydarzyło?"
         } else {
@@ -40,16 +40,18 @@ object ConversationManager {
     }
     
     fun seedSampleDialogues() {
-        registerDialogue(DialogueNode(
-            id = "innkeeper_start",
-            npcId = "npc_innkeeper",
-            text = "Witaj podróżniku. Co cię sprowadza do naszej karczmy w tych mrocznych czasach?",
-            choices = listOf(
-                DialogueChoice("Szukam pracy", "innkeeper_work"),
-                DialogueChoice("Podaj mi piwa (5g)", "innkeeper_beer", onSelect = { it.gold -= 5 }),
-                DialogueChoice("Żegnaj", "innkeeper_end")
+        registerDialogue(
+            DialogueNode(
+                id = "innkeeper_start",
+                npcId = "npc_innkeeper",
+                text = "Witaj podróżniku. Co cię sprowadza do naszej karczmy w tych mrocznych czasach?",
+                choices = listOf(
+                    DialogueChoice("Szukam pracy", "innkeeper_work"),
+                    DialogueChoice("Podaj mi piwa (5g)", "innkeeper_beer") { it.gold -= 5 },
+                    DialogueChoice("Żegnaj", "innkeeper_end"),
+                )
             )
-        ))
+        )
         
         registerDialogue(DialogueNode(
             id = "innkeeper_work",

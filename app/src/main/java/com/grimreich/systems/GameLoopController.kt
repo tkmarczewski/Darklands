@@ -1,6 +1,7 @@
 package com.grimreich.systems
 
 import com.grimreich.core.CityScreenState
+import com.grimreich.core.GameRepository
 import com.grimreich.core.PlayerState
 import com.grimreich.core.ResolutionScreenState
 import com.grimreich.core.TravelScreenState
@@ -9,6 +10,8 @@ import com.grimreich.world.CityCatalogue
 
 object GameLoopController {
     fun bootstrap(seed: Int = 1): PlayerState {
+        GameRepository.seed()
+        
         CityCatalogue.clear()
         WorldMap.clear()
         QuestSystem.clear()
@@ -18,7 +21,10 @@ object GameLoopController {
         CityEventSystem.seedStage1Events()
         QuestSystem.seedIntegratedContent(seed)
         
-        return PlayerState(currentCityId = CityCatalogue.startingCityId)
+        val startingCityId = CityCatalogue.startingCityId
+        GameRepository.state.world.location = startingCityId
+        
+        return PlayerState(currentCityId = startingCityId)
     }
 
     fun cityScreen(playerState: PlayerState): CityScreenState {

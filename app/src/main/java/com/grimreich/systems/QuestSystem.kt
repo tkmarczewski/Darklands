@@ -1,6 +1,5 @@
 package com.grimreich.systems
 
-import com.grimreich.core.GameRepository
 import com.grimreich.world.CityCatalogue
 import com.grimreich.world.LocationType
 import com.grimreich.world.ProceduralLocation
@@ -26,7 +25,7 @@ data class QuestEntry(
     val originType: QuestOriginType,
     val originRefId: String,
     val rewardGold: Int,
-    val status: QuestStatus = QuestStatus.DOSTEPNE
+    val status: QuestStatus = QuestStatus.DOSTEPNE,
 )
 
 object QuestSystem {
@@ -39,7 +38,7 @@ object QuestSystem {
     }
 
     fun seedIntegratedContent(seed: Int = 1) {
-        if (quests.isNotEmpty() && currentSeed == seed) return
+        if (quests.isNotEmpty() && (currentSeed == seed)) return
         clear()
         currentSeed = seed
 
@@ -92,7 +91,7 @@ object QuestSystem {
     }
 
     private fun ProceduralLocation.toQuest(): QuestEntry = QuestEntry(
-        id = "quest_${id}",
+        id = "quest_$id",
         title = when (type) {
             LocationType.ZGLISZCZA      -> "Zbadaj Zgliszcza"
             LocationType.MROCZNY_ZAKON  -> "Oczyść Mroczny Zakon"
@@ -108,5 +107,5 @@ object QuestSystem {
     )
     
     // Legacy API removed to avoid confusion
-    fun activeList(): List<String> = quests.values.filter { it.status == QuestStatus.AKTYWNE }.map { it.id }
+    fun activeList(): List<String> = quests.values.asSequence().filter { it.status == QuestStatus.AKTYWNE }.map { it.id }.toList()
 }

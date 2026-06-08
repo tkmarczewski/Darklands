@@ -1,7 +1,6 @@
 package com.grimreich.systems
 
 import com.grimreich.core.GameRepository
-import com.grimreich.core.WorldState
 import kotlin.random.Random
 
 enum class CollapseScenario {
@@ -22,13 +21,13 @@ object CollapseEngine {
             ChronicleSystem.record("Początek Kolapsu: ${activeScenario?.name}")
         }
         
-        applyScenarioEffects(g.world)
+        applyScenarioEffects()
     }
     
     private fun decideScenario(): CollapseScenario {
         val s = GameRepository.state
         val faith = s.prayer.faith
-        val corruption = s.party.map { it.corruption }.average()
+        val corruption = s.party.asSequence().map { it.corruption }.average()
         
         return when {
             faith > 60 -> CollapseScenario.FULLNESS_ASCENSION
@@ -38,7 +37,7 @@ object CollapseEngine {
         }
     }
     
-    private fun applyScenarioEffects(world: WorldState) {
+    private fun applyScenarioEffects() {
         when (activeScenario) {
             CollapseScenario.MIST_OBLIVION -> {
                 // Mist grows

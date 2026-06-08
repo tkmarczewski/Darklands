@@ -1,7 +1,5 @@
 package com.grimreich.core
 
-import com.grimreich.world.CityCatalogue
-
 // ==================== TRADE GOOD TYPES ====================
 
 enum class TradeGoodType {

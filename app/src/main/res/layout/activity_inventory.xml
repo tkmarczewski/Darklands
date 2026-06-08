@@ -10,9 +10,10 @@
             android:fontFamily="monospace" android:textColor="#c8a96e" android:textSize="13sp"/>
     </ScrollView>
     <EditText android:id="@+id/etItemIndex" android:layout_width="match_parent" android:layout_height="wrap_content"
-        android:hint="Numer przedmiotu" android:inputType="number" android:textColor="#c8a96e"/>
-    <Button android:id="@+id/btnUse" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Uzyj"/>
+        android:hint="@string/hint_item_index" android:inputType="number" android:textColor="#c8a96e"
+        android:autofillHints="none"/>
+    <Button android:id="@+id/btnUse" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/btn_use"/>
     <TextView android:id="@+id/tvResult" android:layout_width="match_parent" android:layout_height="wrap_content"
         android:textColor="#a0e8a0" android:textSize="13sp"/>
-    <Button android:id="@+id/btnExitInventory" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Zamknij plecak"/>
+    <Button android:id="@+id/btnExitInventory" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/btn_close_inventory"/>
 </LinearLayout>
