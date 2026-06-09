@@ -96,5 +96,19 @@ object DialogueManager {
             )
         ))
         registerNode(DialogueNode(id = "mystic_lore", npcId = "procedural", text = "Absolut nie jest bogiem. To błąd w tkance, który chce zostać naprawiony naszym kosztem."))
+
+        // FUGITIVE DIALOGUES
+        registerNode(DialogueNode(
+            id = "fugitive_start",
+            npcId = "procedural",
+            text = "Nie patrz na mnie tak... ja tylko przechodzę. Czego chcesz?",
+            choices = listOf(
+                DialogueChoice("Dlaczego uciekasz?", "fugitive_reason"),
+                DialogueChoice("Widziałem strażników...", "fugitive_guards"),
+                DialogueChoice("Żegnaj", "end")
+            )
+        ))
+        registerNode(DialogueNode(id = "fugitive_reason", npcId = "procedural", text = "Zobaczyłem coś, czego nie powinienem. Mgła nie tylko zabiera, ona... pokazuje prawdę o nas."))
+        registerNode(DialogueNode(id = "fugitive_guards", npcId = "procedural", text = "Strażnicy? Oni są już martwi w środku, tylko jeszcze o tym nie wiedzą."))
     }
 }

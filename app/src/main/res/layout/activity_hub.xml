@@ -62,4 +62,17 @@
         </LinearLayout>
 
     </LinearLayout>
+
+    <TextView
+        android:id="@+id/tvDevMenuTrigger"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:padding="8dp"
+        android:text="DEV"
+        android:textColor="#33FFFFFF"
+        android:textSize="8sp"
+        android:clickable="true"
+        android:focusable="true" />
+
 </FrameLayout>

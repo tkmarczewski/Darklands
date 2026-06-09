@@ -7,7 +7,6 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.grimreich.R
 import com.grimreich.core.GameRepository
-import com.grimreich.grimreich.v1.DialogueNode
 import com.grimreich.systems.DialogueManager
 
 class DialogueActivity : AppCompatActivity() {
@@ -42,21 +41,37 @@ class DialogueActivity : AppCompatActivity() {
         val container = findViewById<LinearLayout>(R.id.choicesContainer)
         container.removeAllViews()
 
+        // Handle regular choices
         node.choices.forEach { choice ->
-            val btn = Button(this)
+            val btn = Button(this, null, 0, R.style.GrimCombatButton)
             btn.text = choice.text
             btn.setOnClickListener {
                 choice.onSelect(GameRepository.state)
                 displayNode(choice.targetNodeId)
             }
+            // Ensure button has layout params to be visible and clickable
+            val lp = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            ).apply {
+                setMargins(0, 0, 0, 8)
+            }
+            btn.layoutParams = lp
             container.addView(btn)
         }
         
-        // Always add an 'Exit' option if no choices
+        // Always add an 'Exit' option if no choices or if it's a terminal node
         if (node.choices.isEmpty()) {
-            val btn = Button(this)
-            btn.text = "Odejdź"
-            btn.setOnClickListener { finish() }
+            val btn = Button(this, null, 0, R.style.GrimCombatButton)
+            btn.text = "ODEJDŹ"
+            btn.setOnClickListener { 
+                finish() 
+            }
+            val lp = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            )
+            btn.layoutParams = lp
             container.addView(btn)
         }
     }

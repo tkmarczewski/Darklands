@@ -109,4 +109,10 @@
         <item name="android:gravity">center</item>
     </style>
 
+    <style name="GrimTextSmall">
+        <item name="android:textColor">@color/grimTextSecondary</item>
+        <item name="android:textSize">12sp</item>
+        <item name="android:fontFamily">serif</item>
+    </style>
+
 </resources>

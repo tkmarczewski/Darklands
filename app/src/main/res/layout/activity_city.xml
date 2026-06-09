@@ -57,7 +57,9 @@
 
             <Button android:id="@+id/btnExitCity"
                 style="@style/GrimBackButton"
-                android:text="← POWRÓT" />
+                android:text="← WYJDŹ Z MIASTA"
+                android:backgroundTint="@color/grimAccentGold"
+                android:textColor="@color/grimBgUltraDark" />
         </LinearLayout>
 
         <!-- Right: Status and NPCs -->

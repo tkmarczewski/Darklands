@@ -70,4 +70,6 @@
     <color name="colorGold">#D4AF37</color>
     <color name="colorBlood">#CC0000</color>
     <color name="colorSuccess">#A0E8A0</color>
+    <color name="grimBgDarker">#050505</color>
+    <color name="grimCombatDmg">#A01010</color>
 </resources>

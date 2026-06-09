@@ -6,14 +6,28 @@
         android:theme="@style/Theme.GrimReich"
         android:supportsRtl="true">
 
-        <activity android:name=".ui.MainActivity"
+        <activity android:name=".ui.SplashActivity"
             android:exported="true"
-            android:screenOrientation="landscape">
+            android:screenOrientation="landscape"
+            android:theme="@style/Theme.GrimReich">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
+
+        <activity android:name=".ui.MainMenuActivity"
+            android:exported="false"
+            android:screenOrientation="landscape">
+        </activity>
+
+        <activity android:name=".ui.MainActivity"
+            android:exported="false"
+            android:screenOrientation="landscape">
+        </activity>
+
+        <activity android:name=".ui.CharacterCreatorActivity" android:exported="false" android:screenOrientation="landscape"/>
+        <activity android:name=".ui.DevMenuActivity" android:exported="false" android:screenOrientation="landscape"/>
 
         <activity android:name=".ui.PartyActivity" android:exported="false" android:screenOrientation="landscape"/>
         <activity android:name=".ui.CharacterActivity" android:exported="false" android:screenOrientation="landscape"/>

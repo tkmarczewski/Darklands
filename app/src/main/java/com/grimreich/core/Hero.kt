@@ -32,6 +32,9 @@ data class Hero(
     // Kariera
     var currentCareer: Career? = null,
     var careerHistory: List<CareerEntry> = emptyList(),
+    // Cechy i zdolności
+    var trait: Trait? = null,
+    val abilities: MutableList<Ability> = mutableListOf(),
     // Umiejetnosci (mapa nazw HeroSkill -> wartosc 0-100)
     val skills: MutableMap<String, Int> = SkillSystem.defaultSkills(),
     // Ekwipunek (slot -> id przedmiotu)

@@ -51,6 +51,10 @@ class HubActivity : AppCompatActivity() {
                 Toast.makeText(this, "Brak zapisu!", Toast.LENGTH_SHORT).show()
             }
         }
+
+        findViewById<TextView>(R.id.tvDevMenuTrigger).setOnClickListener {
+            startActivity(Intent(this, DevMenuActivity::class.java))
+        }
     }
 
     override fun onResume() {

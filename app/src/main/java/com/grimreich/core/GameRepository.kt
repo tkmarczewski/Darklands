@@ -27,6 +27,14 @@ object GameRepository {
         }
         state.party.addAll(listOf(hero1, hero2))
         state.activeHeroId = hero1.id
+        
+        // Initial Hireable Heroes
+        state.hireableHeroes.addAll(listOf(
+            Hero(id = "rec_borg", name = "Borg Ironfoot", age = 34, strength = 15, endurance = 14, hp = 30, maxHp = 30),
+            Hero(id = "rec_elara", name = "Elara Shadow", age = 22, agility = 16, perception = 15, hp = 20, maxHp = 20),
+            Hero(id = "rec_silas", name = "Father Silas", age = 50, piety = 18, intelligence = 14, hp = 25, maxHp = 25)
+        ))
+
         state.inventory.addAll(listOf(
             Item("sword_01",  "Zelazny Miecz",    "weapon", "weapon", 50,  2.5, effects = mapOf("attack"  to 8)),
             Item("herb_01",   "Ziele Lecznicze",  "herb",   null,      5,  0.1, effects = mapOf("heal"    to 5)),

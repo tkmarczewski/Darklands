@@ -33,8 +33,16 @@ object ProceduralNpcGenerator {
     }
 
     private fun generateName(random: Random): String {
-        val prefixes = listOf("Gisbert", "Helga", "Ulrich", "Mira", "Roderick", "Elsa")
-        val suffixes = listOf("von Kalt", "the Broken", "of the Mist", "Soul-Stitched", "Grey")
+        val prefixes = listOf(
+            "Gisbert", "Helga", "Ulrich", "Mira", "Roderick", "Elsa", 
+            "Balthazar", "Ingrid", "Sigmund", "Freya", "Klaus", "Martha",
+            "Wilhelm", "Gerda", "Otto", "Beatrice", "Heinrich", "Lotte"
+        )
+        val suffixes = listOf(
+            "von Kalt", "the Broken", "of the Mist", "Soul-Stitched", "Grey",
+            "the Silent", "Iron-Hand", "of the Void", "Parchment-Skin", "the Blind",
+            "Shadow-Walker", "of Old Grimhold", "the Penitent", "Flesh-Weaver"
+        )
         return "${prefixes.random(random)} ${suffixes.random(random)}"
     }
 

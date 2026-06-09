@@ -9,6 +9,7 @@ data class GameState(
 
     // Core game state
     val party: MutableList<Hero> = mutableListOf(),
+    val hireableHeroes: MutableList<Hero> = mutableListOf(),
     var activeHeroId: String? = null,
     val inventory: MutableList<Item> = mutableListOf(),
     val logEntries: MutableList<String> = mutableListOf(),
