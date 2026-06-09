@@ -1,70 +1,46 @@
 package com.grimreich.ui
 
 import android.os.Bundle
+import android.widget.Button
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import com.grimreich.core.AgingSystem
-import com.grimreich.core.CareerChain
+import com.grimreich.R
 import com.grimreich.core.GameRepository
-import com.grimreich.databinding.ActivityCharacterBinding
 
-// Ekran postaci - wypisuje atrybuty pierwszego bohatera z druzyny + dostepne kariery.
-// Layout (activity_character.xml) ma jedno TextView (tvCharacter); kreacja postaci uruchamia sie z Hub.
 class CharacterActivity : AppCompatActivity() {
-
-    private lateinit var binding: ActivityCharacterBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityCharacterBinding.inflate(layoutInflater)
-        setContentView(binding.root)
-        render()
-    }
+        setContentView(R.layout.activity_character)
 
-    private fun render() {
-        val g = GameRepository.state
-        val hero = g.party.firstOrNull() ?: run {
-            binding.tvCharacter.text = "Brak bohatera w druzynie."
-            return
-        }
-        val sb = StringBuilder()
+        val heroId = intent.getStringExtra("heroId")
+        val hero = GameRepository.state.party.find { it.id == heroId } ?: GameRepository.state.party.firstOrNull()
 
-        sb.appendLine("=== POSTAC ===")
-        sb.appendLine()
-        sb.appendLine("Imie: ${hero.name}")
-        sb.appendLine("Wiek: ${hero.age} (${AgingSystem.ageDescription(hero.age)})")
-        sb.appendLine()
-
-        val careerName = hero.currentCareer?.displayName ?: "Brak"
-        sb.appendLine("Kariera: $careerName")
-        if (hero.careerHistory.isNotEmpty()) {
-            sb.appendLine("Historia karier: ${hero.careerHistory.joinToString(", ") { it.career.displayName }}")
-        }
-        sb.appendLine()
-
-        sb.appendLine("STATYSTYKI")
-        sb.appendLine("HP: ${hero.hp} / ${hero.maxHp}")
-        sb.appendLine("Sila: ${hero.strength}")
-        sb.appendLine("Zwinnosc: ${hero.agility}")
-        sb.appendLine("Inteligencja: ${hero.intelligence}")
-        sb.appendLine("Wytrzymalosc: ${hero.endurance}")
-        sb.appendLine("Charyzma: ${hero.charisma}")
-        sb.appendLine("Poboznosc: ${hero.piety}")
-        sb.appendLine("Cnota: ${hero.virtue}")
-        sb.appendLine("Poczytalnosc: ${hero.sanity}%")
-        sb.appendLine("Korupcja: ${hero.corruption}%")
-        sb.appendLine("Morale: ${hero.morale}%")
-        sb.appendLine()
-
-        val available = CareerChain.availableCareers(hero)
-        if (available.isNotEmpty()) {
-            sb.appendLine("DOSTEPNE KARIERY")
-            available.forEach { c ->
-                sb.appendLine("  ${c.displayName}: ${c.description}")
+        val tvDetail = findViewById<TextView>(R.id.tvCharacterDetail)
+        if (hero != null) {
+            tvDetail.text = buildString {
+                appendLine("BOHATER: ${hero.name.uppercase()}")
+                appendLine("Wiek: ${hero.age} | Poziom: ${hero.level}")
+                appendLine("HP: ${hero.hp}/${hero.maxHp}")
+                appendLine("Morale: ${hero.morale}% | Poczytalność: ${hero.sanity}%")
+                appendLine("Skażenie: ${hero.corruption}% | Uznanie: ${hero.divineFavor}")
+                appendLine()
+                appendLine("--- CECHY ---")
+                appendLine("Siła: ${hero.strength} | Zręczność: ${hero.agility}")
+                appendLine("Percepcja: ${hero.perception} | Inteligencja: ${hero.intelligence}")
+                appendLine("Wytrzymałość: ${hero.endurance} | Charyzma: ${hero.charisma}")
+                appendLine("Pobożność: ${hero.piety}")
+                appendLine()
+                appendLine("--- HISTORIA ---")
+                appendLine("To echo pękniętego świata, niosące w sobie iskry dawnej wielkości i cienie nadchodzącego upadku.")
+                appendLine("Z każdym krokiem po ziemiach Reichu, jego Cień gęstnieje, a Iskra staje się coraz bardziej niestabilna.")
             }
         } else {
-            sb.appendLine("Brak dostepnych karier dla tego bohatera.")
+            tvDetail.text = "Brak wybranego bohatera."
         }
 
-        binding.tvCharacter.text = sb.toString()
+        findViewById<Button>(R.id.btnBackFromChar).setOnClickListener {
+            finish()
+        }
     }
 }

@@ -1,58 +1,62 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/grimBg">
+    android:layout_height="match_parent">
 
-    <!-- THE WORLD MAP -->
+    <!-- THE WORLD MAP BACKGROUND -->
     <ImageView
         android:id="@+id/ivWorldMap"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:scaleType="centerCrop"
+        android:scaleType="fitCenter"
         android:src="@drawable/bg_map_candle" />
 
-    <!-- LOGO OVERLAY -->
-    <ImageView
-        android:layout_width="200dp"
-        android:layout_height="60dp"
-        android:layout_gravity="top|center_horizontal"
-        android:layout_marginTop="16dp"
-        android:src="@drawable/logo_grimreich_clean" />
-
-    <!-- INTERACTIVE POINTS CONTAINER -->
+    <!-- INTERACTIVE HOTSPOTS -->
     <RelativeLayout
         android:id="@+id/mapOverlay"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <!-- Invisible Hotspots (Example positions based on the provided map image) -->
-        <!-- These will be dynamically handled or hardcoded for the key cities -->
-
-        <View
+        <!-- Miasto Korony -->
+        <Button
             android:id="@+id/point_city_of_crowns"
-            android:layout_width="80dp"
-            android:layout_height="80dp"
+            android:layout_width="120dp"
+            android:layout_height="50dp"
             android:layout_centerInParent="true"
-            android:clickable="true"
-            android:focusable="true"
-            android:background="?attr/selectableItemBackgroundBorderless" />
+            android:text="Miasto Korony"
+            android:backgroundTint="#80000000"
+            android:textColor="@color/grimGold"
+            android:textSize="10sp" />
 
-        <View
-            android:id="@+id/point_northern_coast"
+        <!-- Port Mroźny -->
+        <Button
+            android:id="@+id/point_frost_port"
             android:layout_width="100dp"
-            android:layout_height="100dp"
+            android:layout_height="40dp"
             android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="150dp"
+            android:text="Port Mroźny"
+            android:backgroundTint="#80000000"
+            android:textColor="@color/grimGold"
+            android:textSize="10sp" />
+
+        <!-- Twierdza Zakonu -->
+        <Button
+            android:id="@+id/point_order_keep"
+            android:layout_width="120dp"
+            android:layout_height="50dp"
+            android:layout_alignParentBottom="true"
             android:layout_alignParentStart="true"
-            android:layout_marginTop="100dp"
+            android:layout_marginBottom="150dp"
             android:layout_marginStart="100dp"
-            android:clickable="true"
-            android:focusable="true"
-            android:background="?attr/selectableItemBackgroundBorderless" />
+            android:text="Twierdza Zakonu"
+            android:backgroundTint="#80000000"
+            android:textColor="@color/grimGold"
+            android:textSize="10sp" />
 
     </RelativeLayout>
 
-    <!-- BACK BUTTON -->
     <Button
         android:id="@+id/btnExitAtlas"
         style="@style/GrimBackButton"

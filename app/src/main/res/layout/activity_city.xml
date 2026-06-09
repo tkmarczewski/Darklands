@@ -5,90 +5,97 @@
     android:orientation="vertical"
     android:background="@color/grimBgMain">
 
-    <!-- Premium Header Area -->
-    <FrameLayout
+    <!-- Header -->
+    <TextView
+        android:id="@+id/cityTitle"
         android:layout_width="match_parent"
-        android:layout_height="80dp"
-        android:background="@drawable/premium_frame_gold"
-        android:padding="4dp">
+        android:layout_height="wrap_content"
+        style="@style/GrimTextHeader"
+        android:gravity="center"
+        android:padding="16dp"
+        android:background="@color/grimBgUltraDark" />
 
-        <TextView
-            android:id="@+id/cityTitle"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            style="@style/GrimTextHeader"
-            android:gravity="center"
-            android:text="MIASTO"
-            android:textAllCaps="true"
-            android:letterSpacing="0.1"/>
-    </FrameLayout>
-
-    <ScrollView
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1">
+        android:layout_weight="1"
+        android:orientation="horizontal"
+        android:padding="16dp">
 
+        <!-- Left: Actions -->
         <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="16dp">
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical">
 
-            <TextView
-                android:id="@+id/tvCityDesc"
+            <Button android:id="@+id/btnTavern"
+                style="@style/GrimCombatButton"
+                android:text="Odwiedź Karczmę"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                style="@style/GrimTextBody"
-                android:text="Opis miasta..."
-                android:paddingBottom="16dp"/>
+                android:layout_marginBottom="8dp" />
+
+            <Button android:id="@+id/btnMarket"
+                style="@style/GrimCombatButton"
+                android:text="Na Targ"
+                android:layout_width="match_parent"
+                android:layout_marginBottom="8dp" />
+
+            <Button android:id="@+id/btnChurch"
+                style="@style/GrimCombatButton"
+                android:text="Świątynia"
+                android:layout_width="match_parent"
+                android:layout_marginBottom="8dp" />
+
+            <Button android:id="@+id/btnRecruit"
+                style="@style/GrimCombatButton"
+                android:text="Werbunek"
+                android:layout_width="match_parent"
+                android:layout_marginBottom="8dp" />
+
+            <View android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" />
+
+            <Button android:id="@+id/btnExitCity"
+                style="@style/GrimBackButton"
+                android:text="← POWRÓT" />
+        </LinearLayout>
+
+        <!-- Right: Status and NPCs -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1.5"
+            android:orientation="vertical"
+            android:paddingStart="16dp">
 
             <TextView
                 android:id="@+id/cityStatus"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                style="@style/GrimTextMuted"
-                android:paddingBottom="16dp"/>
+                style="@style/GrimTextBody"
+                android:background="@color/grimBgSide"
+                android:padding="12dp"
+                android:layout_marginBottom="16dp" />
 
-            <Button android:id="@+id/btnTavern"
-                style="@style/GrimCombatButton"
-                android:text="Odwiedź Karczmę"
-                android:layout_marginBottom="8dp"/>
-
-            <Button android:id="@+id/btnChurch"
-                style="@style/GrimCombatButton"
-                android:text="Idź do Kościoła"
-                android:layout_marginBottom="8dp"/>
-
-            <Button android:id="@+id/btnMarket"
-                style="@style/GrimCombatButton"
-                android:text="Na Targ"
-                android:layout_marginBottom="8dp"/>
-
-            <Button android:id="@+id/btnRecruit"
-                style="@style/GrimCombatButton"
-                android:text="Zwerbuj Bohatera"
-                android:layout_marginBottom="8dp"/>
-
-            <LinearLayout
-                android:id="@+id/npcListContainer"
+            <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:paddingTop="16dp">
-                <TextView
+                style="@style/GrimTextHeader"
+                android:textSize="14sp"
+                android:text="SPOTKANIA:"
+                android:layout_marginBottom="8dp" />
+
+            <ScrollView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+                <LinearLayout
+                    android:id="@+id/npcListContainer"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    style="@style/GrimTextHeader"
-                    android:textSize="16sp"
-                    android:text="MIESZKAŃCY"
-                    android:paddingBottom="8dp"/>
-            </LinearLayout>
-
+                    android:orientation="vertical" />
+            </ScrollView>
         </LinearLayout>
-    </ScrollView>
 
-    <Button android:id="@+id/btnExitCity"
-        style="@style/GrimBackButton"
-        android:text="← POWRÓT DO HUBU"/>
+    </LinearLayout>
 
 </LinearLayout>

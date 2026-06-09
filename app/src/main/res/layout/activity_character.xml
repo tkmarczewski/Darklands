@@ -1,14 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#1a1a2e">
+    android:orientation="vertical"
+    android:background="@color/grimBgMain"
+    android:padding="16dp">
+
     <TextView
-        android:id="@+id/tvCharacter"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:fontFamily="monospace"
-        android:textColor="#c8a96e"
-        android:textSize="13sp"
-        android:padding="16dp" />
-</ScrollView>
+        style="@style/GrimTextHeader"
+        android:text="KARTA BOHATERA"
+        android:gravity="center"
+        android:layout_marginBottom="16dp" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <TextView
+            android:id="@+id/tvCharacterDetail"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            style="@style/GrimTextBody"
+            android:lineSpacingExtra="4dp" />
+    </ScrollView>
+
+    <Button
+        android:id="@+id/btnBackFromChar"
+        style="@style/GrimBackButton"
+        android:text="← POWRÓT"
+        android:layout_marginTop="16dp" />
+
+</LinearLayout>

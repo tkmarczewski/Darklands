@@ -5,6 +5,7 @@ import android.view.View
 import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
 import com.grimreich.R
+import com.grimreich.systems.TravelSystem
 
 class MapActivity : AppCompatActivity() {
 
@@ -24,15 +25,32 @@ class MapActivity : AppCompatActivity() {
             UiUtils.showNarrativePopup(
                 this, 
                 "MIASTO KORONY", 
-                "Serce Reichu, gdzie złoto i krew płyną tym samym strumieniem. Tu Solarian dyktuje Prawa, a Valdros wykonuje wyroki."
+                "Serce Reichu, gdzie złoto i krew płyną tym samym strumieniem. Czy chcesz wyruszyć w drogę?",
+                onDismiss = {
+                    TravelSystem.travelTo("miasto_korony", this)
+                }
             )
         }
 
-        findViewById<View>(R.id.point_northern_coast).setOnClickListener {
+        findViewById<View>(R.id.point_frost_port).setOnClickListener {
             UiUtils.showNarrativePopup(
                 this, 
-                "WYBRZEŻE PÓŁNOCNE", 
-                "Kraina skąpana w wiecznej Mgle. Miejsce, gdzie Pamięć zaciera się pod wpływem Proroka Aeliona."
+                "PORT MROŹNY", 
+                "Miejsce, gdzie Pamięć zaciera się pod wpływem Proroka Aeliona. Podróż zajmie wiele godzin.",
+                onDismiss = {
+                    TravelSystem.travelTo("port_mrozny", this)
+                }
+            )
+        }
+
+        findViewById<View>(R.id.point_order_keep).setOnClickListener {
+            UiUtils.showNarrativePopup(
+                this, 
+                "TWIERDZA ZAKONU", 
+                "Miejsce Próby. Tu ostrze Valdrosa dyktuje wyroki.",
+                onDismiss = {
+                    TravelSystem.travelTo("twierdza_zakonu", this)
+                }
             )
         }
     }
