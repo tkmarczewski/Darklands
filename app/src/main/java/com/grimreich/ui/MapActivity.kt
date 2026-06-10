@@ -6,12 +6,16 @@ import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
 import com.grimreich.R
 import com.grimreich.systems.TravelSystem
+import com.grimreich.world.CityCatalogue
 
 class MapActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_world_atlas)
+
+        // Ensure catalogue is seeded
+        CityCatalogue.seedCanonical()
 
         setupClickListeners()
 
@@ -32,14 +36,15 @@ class MapActivity : AppCompatActivity() {
         )
 
         mapping.forEach { (viewId, cityId) ->
-            findViewById<View>(viewId).setOnClickListener {
-                val city = com.grimreich.world.CityCatalogue.get(cityId)
+            findViewById<View>(viewId)?.setOnClickListener {
+                val city = CityCatalogue.get(cityId)
                 if (city != null) {
                     UiUtils.showNarrativePopup(
                         this, 
                         city.name.uppercase(), 
-                        "Domena: ${city.phenomenon}. Patron: ${city.prophet ?: "Nieznany"}. Czy wyruszasz w drogę?",
+                        "Domena: ${city.phenomenon}. Patron: ${city.prophet ?: "Nieznany"}.\n\nCzy wyruszasz w drogę do tego regionu?",
                         onDismiss = {
+                            // Only travel if confirmed (this simple popup uses dismiss as OK for now)
                             TravelSystem.travelTo(cityId, this)
                             finish()
                         }

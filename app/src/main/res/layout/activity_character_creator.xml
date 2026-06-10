@@ -56,14 +56,28 @@
                     android:text="LOSUJ" />
             </LinearLayout>
 
-            <TextView
-                android:id="@+id/tvPointsRemaining"
-                style="@style/GrimTextBody"
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Punkty do rozdania: 20"
-                android:textColor="@color/grimAccentGold"
-                android:layout_marginBottom="12dp"/>
+                android:orientation="horizontal"
+                android:layout_marginBottom="12dp">
+
+                <TextView
+                    android:id="@+id/tvPointsRemaining"
+                    style="@style/GrimTextBody"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Punkty do rozdania: 20"
+                    android:textColor="@color/grimAccentGold" />
+
+                <Button
+                    android:id="@+id/btnAutoAllocate"
+                    style="@style/GrimSmallButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="AUTO" />
+            </LinearLayout>
 
             <LinearLayout
                 android:layout_width="match_parent"

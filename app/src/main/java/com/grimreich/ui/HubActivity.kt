@@ -15,35 +15,53 @@ class HubActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_hub)
+        
+        setupNavigation()
+        setupSystems()
         render()
+    }
 
-        findViewById<Button>(R.id.openCity).setOnClickListener { 
+    private fun setupNavigation() {
+        findViewById<Button>(R.id.openCity)?.setOnClickListener { 
             startActivity(Intent(this, CityActivity::class.java)) 
         }
-        findViewById<Button>(R.id.openMap).setOnClickListener { 
+        findViewById<Button>(R.id.openMap)?.setOnClickListener { 
             startActivity(Intent(this, MapActivity::class.java)) 
         }
-        findViewById<Button>(R.id.openInventory).setOnClickListener { 
+        findViewById<Button>(R.id.openInventory)?.setOnClickListener { 
             startActivity(Intent(this, InventoryActivity::class.java)) 
         }
-        findViewById<Button>(R.id.openQuests).setOnClickListener { 
-            startActivity(Intent(this, QuestFinalActivity::class.java)) 
+        findViewById<Button>(R.id.openQuests)?.setOnClickListener { 
+            startActivity(Intent(this, QuestJournalActivity::class.java)) 
         }
-        findViewById<Button>(R.id.openCombatStatus).setOnClickListener { 
+        findViewById<Button>(R.id.openCombatStatus)?.setOnClickListener { 
             startActivity(Intent(this, CombatActivity::class.java)) 
         }
-        findViewById<Button>(R.id.openReputation).setOnClickListener { 
+        findViewById<Button>(R.id.openReputation)?.setOnClickListener { 
             startActivity(Intent(this, ReputationActivity::class.java)) 
         }
-        findViewById<Button>(R.id.openFinale).setOnClickListener { 
+        findViewById<Button>(R.id.openSaints)?.setOnClickListener { 
+            startActivity(Intent(this, SaintsActivity::class.java)) 
+        }
+        findViewById<Button>(R.id.openFinale)?.setOnClickListener { 
             startActivity(Intent(this, FinaleActivity::class.java)) 
         }
+        
+        // Secondary buttons from new landscape layout
+        findViewById<Button>(R.id.openCityEvents)?.setOnClickListener {
+             startActivity(Intent(this, CityEventsActivity::class.java))
+        }
+        findViewById<Button>(R.id.openTransfer)?.setOnClickListener {
+             startActivity(Intent(this, InventoryTransferActivity::class.java))
+        }
+    }
 
-        findViewById<Button>(R.id.btnSave).setOnClickListener {
+    private fun setupSystems() {
+        findViewById<Button>(R.id.btnSave)?.setOnClickListener {
             com.grimreich.systems.SaveLoadSystem.save(this)
             Toast.makeText(this, "Gra zapisana!", Toast.LENGTH_SHORT).show()
         }
-        findViewById<Button>(R.id.btnLoad).setOnClickListener {
+        findViewById<Button>(R.id.btnLoad)?.setOnClickListener {
             if (com.grimreich.systems.SaveLoadSystem.load(this)) {
                 Toast.makeText(this, "Gra wczytana!", Toast.LENGTH_SHORT).show()
                 render()
@@ -65,13 +83,13 @@ class HubActivity : AppCompatActivity() {
     private fun render() {
         val state = GameRepository.state
         val world = state.world
-        findViewById<TextView>(R.id.tvTime).text = "Lokacja: ${world.location}\nDzień ${world.day}, ${world.timeOfDay}"
+        findViewById<TextView>(R.id.tvTime)?.text = "Lokacja: ${world.location}\nDzień ${world.day}, ${world.timeOfDay}"
 
         // Dynamic Visibility
-        findViewById<Button>(R.id.openCombatStatus).visibility = 
+        findViewById<Button>(R.id.openCombatStatus)?.visibility = 
             if (state.combat.active) View.VISIBLE else View.GONE
             
-        findViewById<Button>(R.id.openFinale).visibility = 
+        findViewById<Button>(R.id.openFinale)?.visibility = 
             if (world.globalStability < 30) View.VISIBLE else View.GONE
 
         renderPartyStrip()
@@ -87,13 +105,12 @@ class HubActivity : AppCompatActivity() {
         )
 
         slots.forEachIndexed { i, (containerId, views) ->
-            val container = findViewById<View>(containerId)
+            val container = findViewById<View>(containerId) ?: return@forEachIndexed
             if (i < party.size) {
                 container.visibility = View.VISIBLE
                 val hero = party[i]
-                findViewById<TextView>(views.first).text = hero.name
-                findViewById<ProgressBar>(views.second).progress = (hero.hp * 100 / hero.maxHp)
-                // Add click listener to hero card?
+                findViewById<TextView>(views.first)?.text = hero.name
+                findViewById<ProgressBar>(views.second)?.progress = (hero.hp * 100 / hero.maxHp)
                 container.setOnClickListener {
                     startActivity(Intent(this, CharacterActivity::class.java).putExtra("heroId", hero.id))
                 }

@@ -2,14 +2,16 @@ package com.grimreich.systems
 
 import com.grimreich.core.GameRepository
 import com.grimreich.grimreich.v1.Item
+import com.grimreich.world.CityCatalogue
 
 object EconomySystem {
     
     fun priceInCity(cityId: String, basePrice: Int): Int {
-        // Uproszczona logika regionalna: w Grimhold drożej (stolica), w innych standardowo
-        val regionalModifier = if (cityId == "grimhold") 1.2f else 1.0f
+        // Canonical regional logic: price depends on CityCatalogue priceModifier
+        val city = CityCatalogue.get(cityId)
+        val regionalModifier = city?.priceModifier ?: 1.0f
         
-        // Integracja z reputacją
+        // Reputation integration
         val reputationModifier = ReputationSystem.priceModifier(cityId)
         
         val finalPrice = (basePrice * regionalModifier * reputationModifier).toInt()

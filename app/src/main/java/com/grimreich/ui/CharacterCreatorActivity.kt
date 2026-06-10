@@ -48,6 +48,10 @@ class CharacterCreatorActivity : AppCompatActivity() {
             hideKeyboard()
         }
 
+        findViewById<Button>(R.id.btnAutoAllocate).setOnClickListener {
+            autoAllocatePoints()
+        }
+
         findViewById<Button>(R.id.btnStartGame).setOnClickListener {
             val nameText = etName.text.toString().trim()
             if (nameText.isEmpty()) {
@@ -137,6 +141,20 @@ class CharacterCreatorActivity : AppCompatActivity() {
 
         attributes[attr] = current + delta
         pointsRemaining -= delta
+        updateUi()
+    }
+
+    private fun autoAllocatePoints() {
+        // Reset to base
+        attributes.keys.forEach { attributes[it] = 10 }
+        pointsRemaining = 20
+        
+        val keys = attributes.keys.toList()
+        repeat(20) {
+            val randomKey = keys.random()
+            attributes[randomKey] = attributes[randomKey]!! + 1
+            pointsRemaining--
+        }
         updateUi()
     }
 
