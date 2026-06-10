@@ -3,6 +3,7 @@ package com.grimreich.ui
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
+import android.view.inputmethod.InputMethodManager
 import android.widget.Button
 import android.widget.CheckBox
 import android.widget.EditText
@@ -30,6 +31,8 @@ class CharacterCreatorActivity : AppCompatActivity() {
     private var selectedTrait: Trait? = null
     private val specializedSkills = mutableSetOf<HeroSkill>()
 
+    private val names = listOf("Friedrich", "Hildegard", "Gunter", "Elsa", "Ulrich", "Marta", "Klaus", "Sigrid")
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_character_creator)
@@ -38,9 +41,16 @@ class CharacterCreatorActivity : AppCompatActivity() {
         setupTraitSelection()
         setupSkillSpecializations()
 
+        val etName = findViewById<EditText>(R.id.etHeroName)
+        
+        findViewById<Button>(R.id.btnRandomizeName).setOnClickListener {
+            etName.setText(names.random())
+            hideKeyboard()
+        }
+
         findViewById<Button>(R.id.btnStartGame).setOnClickListener {
-            val name = findViewById<EditText>(R.id.etHeroName).text.toString().trim()
-            if (name.isEmpty()) {
+            val nameText = etName.text.toString().trim()
+            if (nameText.isEmpty()) {
                 Toast.makeText(this, "Wpisz imię bohatera!", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
@@ -53,10 +63,15 @@ class CharacterCreatorActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
-            finalizeCharacter(name)
+            finalizeCharacter(nameText)
         }
         
         updateUi()
+    }
+
+    private fun hideKeyboard() {
+        val imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
+        imm.hideSoftInputFromWindow(currentFocus?.windowToken, 0)
     }
 
     private fun setupAttributeControls() {
@@ -88,6 +103,7 @@ class CharacterCreatorActivity : AppCompatActivity() {
                 else -> null
             }
             tvTraitDesc.text = selectedTrait?.description ?: "Wybierz cechę, aby zobaczyć opis."
+            hideKeyboard()
         }
     }
 
@@ -96,7 +112,7 @@ class CharacterCreatorActivity : AppCompatActivity() {
         HeroSkill.values().forEach { skill ->
             val cb = CheckBox(this).apply {
                 text = skill.displayName
-                setTextColor(resources.getColor(R.color.grimTextPrimary))
+                setTextColor(androidx.core.content.ContextCompat.getColor(this@CharacterCreatorActivity, R.color.grimTextPrimary))
                 setOnCheckedChangeListener { _, isChecked ->
                     if (isChecked) {
                         if (specializedSkills.size >= 3) {
@@ -159,7 +175,7 @@ class CharacterCreatorActivity : AppCompatActivity() {
             hero.skills[skill.name] = 15
         }
 
-        // Add starting abilities based on trait or default
+        // Add starting abilities based on trait
         hero.abilities.add(AbilityRegistry.IRON_SKIN)
         if (selectedTrait == Trait.SOLAR_EYE) {
             hero.abilities.add(AbilityRegistry.SOLARIAN_STRIKE)
@@ -173,7 +189,9 @@ class CharacterCreatorActivity : AppCompatActivity() {
         GameRepository.state.party.add(hero)
         GameRepository.state.activeHeroId = hero.id
         
-        startActivity(Intent(this, HubActivity::class.java))
+        val intent = Intent(this, HubActivity::class.java)
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        startActivity(intent)
         finish()
     }
 }

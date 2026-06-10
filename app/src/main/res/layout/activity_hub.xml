@@ -23,14 +23,29 @@
         android:orientation="vertical"
         android:padding="12dp">
 
-        <TextView
-            android:id="@+id/tvTime"
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            style="@style/GrimTextHeader"
-            android:gravity="center"
-            android:textSize="16sp"
-            android:layout_marginBottom="8dp" />
+            android:layout_marginBottom="8dp">
+
+            <TextView
+                android:id="@+id/tvTime"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="@style/GrimTextHeader"
+                android:layout_centerHorizontal="true"
+                android:textSize="16sp" />
+
+            <!-- Re-adding the ID correctly for the code to find it -->
+            <TextView
+                android:id="@+id/tvDevMenuTrigger"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:text="DEV"
+                android:textColor="#33FFFFFF"
+                android:padding="8dp" />
+        </RelativeLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -57,6 +72,7 @@
                 <Button android:id="@+id/openSaints" style="@style/GrimNavButton" android:text="PROROCY" />
 
                 <Button android:id="@+id/openReputation" style="@style/GrimNavButton" android:text="REPUTACJA" />
+                <!-- Added IDs to match HubActivity.kt -->
                 <Button android:id="@+id/openCityEvents" style="@style/GrimNavButton" android:text="WIEŚCI" />
                 <Button android:id="@+id/openTransfer" style="@style/GrimNavButton" android:text="TRANSFER" />
 

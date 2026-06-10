@@ -52,7 +52,7 @@ class HubActivity : AppCompatActivity() {
             }
         }
 
-        findViewById<TextView>(R.id.tvDevMenuTrigger).setOnClickListener {
+        findViewById<TextView>(R.id.tvDevMenuTrigger)?.setOnClickListener {
             startActivity(Intent(this, DevMenuActivity::class.java))
         }
     }

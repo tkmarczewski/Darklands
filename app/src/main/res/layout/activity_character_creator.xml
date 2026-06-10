@@ -27,16 +27,34 @@
                 android:text="KREACJA BOHATERA"
                 android:layout_marginBottom="16dp"/>
 
-            <EditText
-                android:id="@+id/etHeroName"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Wpisz imię..."
-                android:textColor="@color/grimTextPrimary"
-                android:textColorHint="@color/grimTextMuted"
-                android:backgroundTint="@color/grimAccentGold"
-                android:layout_marginBottom="16dp"
-                android:inputType="textPersonName" />
+                android:orientation="horizontal"
+                android:layout_marginBottom="16dp">
+
+                <!-- Restoration of EditText with fix for Handwriting overlay -->
+                <!-- textNoSuggestions + textVisiblePassword usually forces standard keyboard -->
+                <EditText
+                    android:id="@+id/etHeroName"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:hint="Wpisz imię..."
+                    android:textColor="@color/grimTextPrimary"
+                    android:textColorHint="@color/grimTextMuted"
+                    android:backgroundTint="@color/grimAccentGold"
+                    android:inputType="textNoSuggestions|textVisiblePassword"
+                    android:imeOptions="actionDone"
+                    android:text="Bohater" />
+
+                <Button
+                    android:id="@+id/btnRandomizeName"
+                    style="@style/GrimSmallButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="LOSUJ" />
+            </LinearLayout>
 
             <TextView
                 android:id="@+id/tvPointsRemaining"
@@ -47,7 +65,6 @@
                 android:textColor="@color/grimAccentGold"
                 android:layout_marginBottom="12dp"/>
 
-            <!-- Attributes in a single vertical list -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -109,7 +126,6 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:layout_marginBottom="24dp">
-                <!-- Checkboxes added programmatically -->
             </LinearLayout>
 
             <Button
