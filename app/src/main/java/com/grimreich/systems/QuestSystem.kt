@@ -42,7 +42,7 @@ object QuestSystem {
         clear()
         currentSeed = seed
 
-        CityCatalogue.seedSprint1()
+        CityCatalogue.seedCanonical()
         CityEventSystem.seedStage1Events()
 
         CityCatalogue.all().forEach { city ->

@@ -8,7 +8,7 @@
         android:id="@+id/ivWorldMap"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:scaleType="fitCenter"
+        android:scaleType="centerCrop"
         android:src="@drawable/bg_map_candle" />
 
     <!-- INTERACTIVE HOTSPOTS -->
@@ -17,46 +17,101 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <!-- Miasto Korony -->
+        <!-- 1. Wybrzeże Północne (Top Left) -->
         <Button
-            android:id="@+id/point_city_of_crowns"
+            android:id="@+id/point_north_coast"
             android:layout_width="120dp"
-            android:layout_height="50dp"
-            android:layout_centerInParent="true"
-            android:text="Miasto Korony"
-            android:backgroundTint="#80000000"
-            android:textColor="@color/grimGold"
-            android:textSize="10sp" />
-
-        <!-- Port Mroźny -->
-        <Button
-            android:id="@+id/point_frost_port"
-            android:layout_width="100dp"
             android:layout_height="40dp"
             android:layout_alignParentTop="true"
-            android:layout_centerHorizontal="true"
-            android:layout_marginTop="150dp"
-            android:text="Port Mroźny"
+            android:layout_alignParentStart="true"
+            android:layout_marginTop="80dp"
+            android:layout_marginStart="80dp"
+            android:text="Wybrzeże Północne"
             android:backgroundTint="#80000000"
             android:textColor="@color/grimGold"
             android:textSize="10sp" />
 
-        <!-- Twierdza Zakonu -->
+        <!-- 2. Równiny Koronne (Top Right) -->
         <Button
-            android:id="@+id/point_order_keep"
+            android:id="@+id/point_crown_plains"
             android:layout_width="120dp"
-            android:layout_height="50dp"
-            android:layout_alignParentBottom="true"
+            android:layout_height="40dp"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentEnd="true"
+            android:layout_marginTop="80dp"
+            android:layout_marginEnd="80dp"
+            android:text="Równiny Koronne"
+            android:backgroundTint="#80000000"
+            android:textColor="@color/grimGold"
+            android:textSize="10sp" />
+
+        <!-- 3. Serce Krainy (Center) -->
+        <Button
+            android:id="@+id/point_heartland"
+            android:layout_width="120dp"
+            android:layout_height="40dp"
+            android:layout_centerInParent="true"
+            android:text="Serce Krainy"
+            android:backgroundTint="#80000000"
+            android:textColor="@color/grimGold"
+            android:textSize="10sp" />
+
+        <!-- 4. Pogranicze Stepowe (Left Center) -->
+        <Button
+            android:id="@+id/point_steppe"
+            android:layout_width="120dp"
+            android:layout_height="40dp"
+            android:layout_centerVertical="true"
             android:layout_alignParentStart="true"
-            android:layout_marginBottom="150dp"
-            android:layout_marginStart="100dp"
-            android:text="Twierdza Zakonu"
+            android:layout_marginStart="40dp"
+            android:text="Pogranicze Stepowe"
+            android:backgroundTint="#80000000"
+            android:textColor="@color/grimGold"
+            android:textSize="10sp" />
+
+        <!-- 5. Południowe Ruiny (Bottom Right) -->
+        <Button
+            android:id="@+id/point_south_ruins"
+            android:layout_width="120dp"
+            android:layout_height="40dp"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentEnd="true"
+            android:layout_marginBottom="80dp"
+            android:layout_marginEnd="80dp"
+            android:text="Południowe Ruiny"
+            android:backgroundTint="#80000000"
+            android:textColor="@color/grimGold"
+            android:textSize="10sp" />
+
+        <!-- 6. Góry Południowe (Bottom Center) -->
+        <Button
+            android:id="@+id/point_south_mountains"
+            android:layout_width="120dp"
+            android:layout_height="40dp"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="60dp"
+            android:text="Góry Południowe"
+            android:backgroundTint="#80000000"
+            android:textColor="@color/grimGold"
+            android:textSize="10sp" />
+
+        <!-- 7. Ziemie Dzikie (Center Right) -->
+        <Button
+            android:id="@+id/point_wild_lands"
+            android:layout_width="120dp"
+            android:layout_height="40dp"
+            android:layout_centerVertical="true"
+            android:layout_alignParentEnd="true"
+            android:layout_marginEnd="40dp"
+            android:text="Ziemie Dzikie"
             android:backgroundTint="#80000000"
             android:textColor="@color/grimGold"
             android:textSize="10sp" />
 
     </RelativeLayout>
 
+    <!-- BACK BUTTON -->
     <Button
         android:id="@+id/btnExitAtlas"
         style="@style/GrimBackButton"

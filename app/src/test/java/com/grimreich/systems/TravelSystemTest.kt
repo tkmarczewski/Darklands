@@ -14,7 +14,7 @@ class TravelSystemTest {
     @Before
     fun setUp() {
         GameRepository.state = GameState()
-        CityCatalogue.seedSprint1()
+        CityCatalogue.seedCanonical()
     }
 
     @Test

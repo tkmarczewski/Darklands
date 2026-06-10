@@ -21,37 +21,31 @@ class MapActivity : AppCompatActivity() {
     }
 
     private fun setupClickListeners() {
-        findViewById<View>(R.id.point_city_of_crowns).setOnClickListener {
-            UiUtils.showNarrativePopup(
-                this, 
-                "MIASTO KORONY", 
-                "Serce Reichu, gdzie złoto i krew płyną tym samym strumieniem. Czy chcesz wyruszyć w drogę?",
-                onDismiss = {
-                    TravelSystem.travelTo("miasto_korony", this)
-                }
-            )
-        }
+        val mapping = mapOf(
+            R.id.point_north_coast to "wybrzeze_polnocne",
+            R.id.point_crown_plains to "rowniny_koronne",
+            R.id.point_heartland to "serce_krainy",
+            R.id.point_south_ruins to "poludniowe_ruiny",
+            R.id.point_south_mountains to "gory_poludniowe",
+            R.id.point_steppe to "pogranicze_stepowe",
+            R.id.point_wild_lands to "ziemie_dzikie"
+        )
 
-        findViewById<View>(R.id.point_frost_port).setOnClickListener {
-            UiUtils.showNarrativePopup(
-                this, 
-                "PORT MROŹNY", 
-                "Miejsce, gdzie Pamięć zaciera się pod wpływem Proroka Aeliona. Podróż zajmie wiele godzin.",
-                onDismiss = {
-                    TravelSystem.travelTo("port_mrozny", this)
+        mapping.forEach { (viewId, cityId) ->
+            findViewById<View>(viewId).setOnClickListener {
+                val city = com.grimreich.world.CityCatalogue.get(cityId)
+                if (city != null) {
+                    UiUtils.showNarrativePopup(
+                        this, 
+                        city.name.uppercase(), 
+                        "Domena: ${city.phenomenon}. Patron: ${city.prophet ?: "Nieznany"}. Czy wyruszasz w drogę?",
+                        onDismiss = {
+                            TravelSystem.travelTo(cityId, this)
+                            finish()
+                        }
+                    )
                 }
-            )
-        }
-
-        findViewById<View>(R.id.point_order_keep).setOnClickListener {
-            UiUtils.showNarrativePopup(
-                this, 
-                "TWIERDZA ZAKONU", 
-                "Miejsce Próby. Tu ostrze Valdrosa dyktuje wyroki.",
-                onDismiss = {
-                    TravelSystem.travelTo("twierdza_zakonu", this)
-                }
-            )
+            }
         }
     }
 }

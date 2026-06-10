@@ -13,17 +13,17 @@ class EconomySystemTest {
     @BeforeEach
     fun setUp() {
         GameRepository.state = GameState()
-        CityCatalogue.seedSprint1()
+        CityCatalogue.seedCanonical()
         ReputationSystem.clear()
     }
 
     @Test
     fun `priceInCity applies city price modifier`() {
-        // Grimhold: 1.2f
-        assertEquals(120, EconomySystem.priceInCity("grimhold", 100))
+        // wybrzeze_polnocne: 1.0f
+        assertEquals(100, EconomySystem.priceInCity("wybrzeze_polnocne", 100))
         
-        // Others: 1.0f
-        assertEquals(100, EconomySystem.priceInCity("serce_krainy", 100))
+        // serce_krainy: 1.2f
+        assertEquals(120, EconomySystem.priceInCity("serce_krainy", 100))
     }
 
     @Test
@@ -33,22 +33,22 @@ class EconomySystemTest {
 
     @Test
     fun `priceInCity never goes below 1`() {
-        assertEquals(1, EconomySystem.priceInCity("grimhold", 1))
+        assertEquals(1, EconomySystem.priceInCity("wybrzeze_polnocne", 1))
     }
 
     @Test
     fun `priceInCity integrates with ReputationSystem`() {
-        // High reputation in Grimhold (total >= 60 -> 0.8f)
-        ReputationSystem.modify("grimhold", CityFaction.COMMONERS, 60)
+        // High reputation in wybrzeze_polnocne (total >= 60 -> 0.8f)
+        ReputationSystem.modify("wybrzeze_polnocne", CityFaction.COMMONERS, 60)
         
-        // 100 * 1.2 (city) * 0.8 (rep) = 96
-        assertEquals(96, EconomySystem.priceInCity("grimhold", 100))
+        // 100 * 1.0 (city) * 0.8 (rep) = 80
+        assertEquals(80, EconomySystem.priceInCity("wybrzeze_polnocne", 100))
         
-        // Low reputation in Serce Krainy (total <= -60 -> 2.0f)
+        // Low reputation in serce_krainy (total <= -60 -> 2.0f)
         ReputationSystem.modify("serce_krainy", CityFaction.COMMONERS, -60)
         
-        // 100 * 1.0 (city) * 2.0 (rep) = 200
-        assertEquals(200, EconomySystem.priceInCity("serce_krainy", 100))
+        // 100 * 1.2 (city) * 2.0 (rep) = 240
+        assertEquals(240, EconomySystem.priceInCity("serce_krainy", 100))
     }
 
     @Test

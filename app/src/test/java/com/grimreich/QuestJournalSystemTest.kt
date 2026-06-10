@@ -20,7 +20,7 @@ class QuestJournalSystemTest {
         ReputationSystem.clear()
         CityEventSystem.clear()
         QuestSystem.clear()
-        CityCatalogue.seedSprint1()
+        CityCatalogue.seedCanonical()
         WorldMap.seedStage1()
         CityEventSystem.seedStage1Events()
         QuestSystem.seedIntegratedContent(seed = 12)

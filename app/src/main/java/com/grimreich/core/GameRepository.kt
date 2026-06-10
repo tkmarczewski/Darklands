@@ -1,6 +1,7 @@
 package com.grimreich.core
 
 import com.grimreich.grimreich.v1.Item
+import com.grimreich.world.CityCatalogue
 
 object GameRepository {
     var state = GameState()
@@ -27,6 +28,9 @@ object GameRepository {
         }
         state.party.addAll(listOf(hero1, hero2))
         state.activeHeroId = hero1.id
+        
+        CityCatalogue.seedCanonical()
+        state.world.location = "wybrzeze_polnocne"
         
         // Initial Hireable Heroes
         state.hireableHeroes.addAll(listOf(

@@ -111,13 +111,13 @@
                 android:columnCount="2"
                 android:alignmentMode="alignMargins">
 
-                <include layout="@layout/item_attribute_display" android:id="@+id/viewStr" />
-                <include layout="@layout/item_attribute_display" android:id="@+id/viewAgi" />
-                <include layout="@layout/item_attribute_display" android:id="@+id/viewPer" />
-                <include layout="@layout/item_attribute_display" android:id="@+id/viewInt" />
-                <include layout="@layout/item_attribute_display" android:id="@+id/viewEnd" />
-                <include layout="@layout/item_attribute_display" android:id="@+id/viewCha" />
-                <include layout="@layout/item_attribute_display" android:id="@+id/viewPie" />
+                <include layout="@layout/item_attribute_display" android:id="@+id/viewStr" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+                <include layout="@layout/item_attribute_display" android:id="@+id/viewAgi" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+                <include layout="@layout/item_attribute_display" android:id="@+id/viewPer" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+                <include layout="@layout/item_attribute_display" android:id="@+id/viewInt" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+                <include layout="@layout/item_attribute_display" android:id="@+id/viewEnd" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+                <include layout="@layout/item_attribute_display" android:id="@+id/viewCha" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+                <include layout="@layout/item_attribute_display" android:id="@+id/viewPie" android:layout_width="wrap_content" android:layout_height="wrap_content" />
 
             </GridLayout>
 

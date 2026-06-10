@@ -13,7 +13,7 @@ class ProceduralLocationsTest {
     @Before
     fun reset() {
         CityCatalogue.clear()
-        CityCatalogue.seedSprint1()
+        CityCatalogue.seedCanonical()
     }
 
     @Test

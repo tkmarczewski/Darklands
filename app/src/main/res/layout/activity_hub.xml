@@ -3,6 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <!-- BACKGROUND -->
     <ImageView
         android:id="@+id/ivHubBg"
         android:layout_width="match_parent"
@@ -10,16 +11,17 @@
         android:scaleType="centerCrop"
         android:src="@drawable/bg_party_castle" />
 
+    <!-- OVERLAY -->
     <View
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#A6000000" />
+        android:background="#99000000" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        android:padding="16dp">
+        android:padding="12dp">
 
         <TextView
             android:id="@+id/tvTime"
@@ -27,52 +29,74 @@
             android:layout_height="wrap_content"
             style="@style/GrimTextHeader"
             android:gravity="center"
-            android:layout_marginBottom="16dp" />
-
-        <!-- CORE NAVIGATION -->
-        <GridLayout
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:columnCount="3"
-            android:alignmentMode="alignMargins">
-
-            <Button android:id="@+id/openCity" style="@style/GrimNavButton" android:text="Wjedź do Miasta" />
-            <Button android:id="@+id/openMap" style="@style/GrimNavButton" android:text="Atlas Świata" />
-            <Button android:id="@+id/openInventory" style="@style/GrimNavButton" android:text="Ekwipunek" />
-
-            <Button android:id="@+id/openQuests" style="@style/GrimNavButton" android:text="Zadania" />
-            <Button android:id="@+id/openCombatStatus" style="@style/GrimNavButton" android:text="Walka" />
-            <Button android:id="@+id/openReputation" style="@style/GrimNavButton" android:text="Reputacja" />
-
-        </GridLayout>
-
-        <!-- PARTY STRIP VISIBILITY -->
-        <include layout="@layout/strip_party" />
+            android:textSize="16sp"
+            android:layout_marginBottom="8dp" />
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="0dp"
+            android:layout_weight="1"
             android:orientation="horizontal"
-            android:gravity="center"
-            android:layout_marginTop="8dp">
-            <Button android:id="@+id/btnSave" style="@style/GrimSmallButton" android:text="Zapisz" android:layout_width="100dp" />
-            <Button android:id="@+id/btnLoad" style="@style/GrimSmallButton" android:text="Wczytaj" android:layout_width="100dp" />
-            <Button android:id="@+id/openFinale" style="@style/GrimSmallButton" android:text="FINAŁ" android:layout_width="100dp" />
+            android:baselineAligned="false">
+
+            <!-- LEFT SIDE: NAVIGATION -->
+            <GridLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1.5"
+                android:columnCount="3"
+                android:rowCount="3"
+                android:alignmentMode="alignMargins">
+
+                <Button android:id="@+id/openCity" style="@style/GrimNavButton" android:text="MIASTO" />
+                <Button android:id="@+id/openMap" style="@style/GrimNavButton" android:text="MAPA" />
+                <Button android:id="@+id/openInventory" style="@style/GrimNavButton" android:text="PLECAK" />
+
+                <Button android:id="@+id/openQuests" style="@style/GrimNavButton" android:text="ZADANIA" />
+                <Button android:id="@+id/openCombatStatus" style="@style/GrimNavButton" android:text="WALKA" />
+                <Button android:id="@+id/openSaints" style="@style/GrimNavButton" android:text="PROROCY" />
+
+                <Button android:id="@+id/openReputation" style="@style/GrimNavButton" android:text="REPUTACJA" />
+                <Button android:id="@+id/openCityEvents" style="@style/GrimNavButton" android:text="WIEŚCI" />
+                <Button android:id="@+id/openTransfer" style="@style/GrimNavButton" android:text="TRANSFER" />
+
+            </GridLayout>
+
+            <!-- RIGHT SIDE: LOG & SAVE -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:paddingStart="12dp"
+                android:paddingEnd="0dp">
+
+                <TextView
+                    android:id="@+id/tvLogMini"
+                    style="@style/GrimTextMuted"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:background="#40000000"
+                    android:padding="8dp"
+                    android:text="Kroniki pękniętego świata..." />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="8dp">
+                    <Button android:id="@+id/btnSave" style="@style/GrimSmallButton" android:text="ZAPISZ" />
+                    <Button android:id="@+id/btnLoad" style="@style/GrimSmallButton" android:text="WCZYTAJ" />
+                </LinearLayout>
+
+                <Button android:id="@+id/openFinale" style="@style/GrimSmallButton" android:layout_width="match_parent" android:text="FINAŁ" android:visibility="gone" />
+
+            </LinearLayout>
         </LinearLayout>
 
+        <!-- BOTTOM: PARTY -->
+        <include layout="@layout/strip_party" android:layout_width="match_parent" android:layout_height="64dp" android:layout_marginTop="8dp" />
+
     </LinearLayout>
-
-    <TextView
-        android:id="@+id/tvDevMenuTrigger"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
-        android:padding="8dp"
-        android:text="DEV"
-        android:textColor="#33FFFFFF"
-        android:textSize="8sp"
-        android:clickable="true"
-        android:focusable="true" />
-
 </FrameLayout>

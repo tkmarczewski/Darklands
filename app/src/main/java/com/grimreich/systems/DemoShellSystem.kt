@@ -20,7 +20,7 @@ object DemoShellSystem {
     )
 
     fun build(): DemoShellState {
-        CityCatalogue.seedSprint1()
+        CityCatalogue.seedCanonical()
         val cities = CityCatalogue.all()
         
         val sliceItems = cities.map { city ->

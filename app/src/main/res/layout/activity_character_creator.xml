@@ -4,14 +4,16 @@
     android:layout_height="match_parent"
     android:background="@color/grimBgMain"
     android:orientation="horizontal"
-    android:padding="24dp">
+    android:padding="24dp"
+    android:baselineAligned="false">
 
-    <!-- Lewa strona: Imię i Atrybuty -->
+    <!-- LEFT SIDE: NAME & ATTRIBUTES -->
     <ScrollView
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_weight="1"
-        android:paddingEnd="12dp">
+        android:paddingEnd="12dp"
+        android:paddingStart="0dp">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -44,38 +46,32 @@
                 android:textColor="@color/grimAccentGold"
                 android:layout_marginBottom="12dp"/>
 
-            <!-- Atrybuty w układzie pionowym dla stabilności -->
+            <!-- Attributes in a single vertical list to ensure stability -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
 
-                <!-- Siła -->
-                <include layout="@layout/item_attribute_control" android:id="@+id/layoutStr" />
-                <!-- Zręczność -->
-                <include layout="@layout/item_attribute_control" android:id="@+id/layoutAgi" />
-                <!-- Percepcja -->
-                <include layout="@layout/item_attribute_control" android:id="@+id/layoutPer" />
-                <!-- Inteligencja -->
-                <include layout="@layout/item_attribute_control" android:id="@+id/layoutInt" />
-                <!-- Wytrzymałość -->
-                <include layout="@layout/item_attribute_control" android:id="@+id/layoutEnd" />
-                <!-- Charyzma -->
-                <include layout="@layout/item_attribute_control" android:id="@+id/layoutCha" />
-                <!-- Pobożność -->
-                <include layout="@layout/item_attribute_control" android:id="@+id/layoutPie" />
+                <include layout="@layout/item_attribute_control" android:id="@+id/layoutStr" android:layout_width="match_parent" android:layout_height="wrap_content" />
+                <include layout="@layout/item_attribute_control" android:id="@+id/layoutAgi" android:layout_width="match_parent" android:layout_height="wrap_content" />
+                <include layout="@layout/item_attribute_control" android:id="@+id/layoutPer" android:layout_width="match_parent" android:layout_height="wrap_content" />
+                <include layout="@layout/item_attribute_control" android:id="@+id/layoutInt" android:layout_width="match_parent" android:layout_height="wrap_content" />
+                <include layout="@layout/item_attribute_control" android:id="@+id/layoutEnd" android:layout_width="match_parent" android:layout_height="wrap_content" />
+                <include layout="@layout/item_attribute_control" android:id="@+id/layoutCha" android:layout_width="match_parent" android:layout_height="wrap_content" />
+                <include layout="@layout/item_attribute_control" android:id="@+id/layoutPie" android:layout_width="match_parent" android:layout_height="wrap_content" />
 
             </LinearLayout>
         </LinearLayout>
     </ScrollView>
 
-    <!-- Prawa strona: Cechy i Start -->
+    <!-- RIGHT SIDE: TRAITS & START -->
     <LinearLayout
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_weight="1"
         android:orientation="vertical"
-        android:paddingStart="12dp">
+        android:paddingStart="12dp"
+        android:paddingEnd="0dp">
 
         <TextView
             style="@style/GrimTextHeader"
@@ -120,7 +116,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
-                <!-- Checkboxy będą dodane programowo lub statycznie -->
+                <!-- Checkboxes added programmatically -->
             </LinearLayout>
         </ScrollView>
 

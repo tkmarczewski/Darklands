@@ -13,7 +13,7 @@ class QuestSystemTest {
     @Before
     fun setup() {
         GameRepository.state = GameState()
-        CityCatalogue.seedSprint1()
+        CityCatalogue.seedCanonical()
         QuestSystem.seedIntegratedContent(seed = 123)
     }
 

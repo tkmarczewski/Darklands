@@ -15,7 +15,7 @@ object CityEventSystem {
 
     fun seedStage1Events() {
         if (events.isNotEmpty()) return
-        CityCatalogue.seedSprint1()
+        CityCatalogue.seedCanonical()
         
         // Seed events based on CityCatalogue IDs
         CityCatalogue.all().forEach { city ->
@@ -26,9 +26,9 @@ object CityEventSystem {
                 cityId = city.id
             ))
             
-            // Add specific events based on city type or specific IDs
-            if (city.id == "grimhold") {
-                events.add(CityEvent("grimhold_guild_pressure", "Guild Pressure in Grimhold", "The guilds are demanding answers.", "grimhold", 75))
+            // Canonical specific events
+            if (city.id == "wybrzeze_polnocne") {
+                events.add(CityEvent("north_mist_vision", "Visions in the Mist", "Aelion speaks through the fog.", "wybrzeze_polnocne", 75))
             }
         }
     }

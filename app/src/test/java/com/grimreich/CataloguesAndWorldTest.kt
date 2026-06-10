@@ -11,7 +11,7 @@ class CataloguesAndWorldTest {
 
     @Before
     fun seed() {
-        CityCatalogue.seedSprint1()
+        CityCatalogue.seedCanonical()
         WorldMap.seedStage1()
     }
 

@@ -5,7 +5,7 @@ import com.grimreich.world.CityCatalogue
 object ExpandedContentSeeder {
 
     fun seedAll() {
-        CityCatalogue.seedSprint1()
+        CityCatalogue.seedCanonical()
         
         // Seed city events and quests using IDs from CityCatalogue
         CityCatalogue.all().forEach { city ->

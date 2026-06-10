@@ -34,10 +34,9 @@ object WorldMap {
 
     fun seedStage1() {
         if (connections.isNotEmpty()) return
-        CityCatalogue.seedSprint1()
+        CityCatalogue.seedCanonical()
 
-        // Syncing with GrimReich canonical regions:
-        // wybrzeze_polnocne, serce_krainy, rowniny_koronne, pogranicze_stepowe, poludniowe_ruiny, gory_poludniowe, ziemie_dzikie
+        // Connecting the 7 Canonical Regions:
         link("wybrzeze_polnocne", "serce_krainy",      TerrainType.ROAD)
         link("wybrzeze_polnocne", "ziemie_dzikie",     TerrainType.FOREST)
         link("serce_krainy",     "rowniny_koronne",    TerrainType.ROAD)
