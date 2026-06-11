@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <!-- BACKGROUND -->
+    <!-- CANONICAL BACKGROUND -->
     <ImageView
         android:id="@+id/ivHubBg"
         android:layout_width="match_parent"
@@ -15,36 +15,38 @@
     <View
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#99000000" />
+        android:background="#A0000000" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:padding="12dp">
+        android:orientation="vertical">
 
+        <!-- Header -->
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp">
+            android:padding="16dp"
+            android:background="@drawable/ui_frame_gold">
 
             <TextView
                 android:id="@+id/tvTime"
+                style="@style/GrimTextHeader"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                style="@style/GrimTextHeader"
                 android:layout_centerHorizontal="true"
-                android:textSize="16sp" />
+                android:text="Lokacja: Grimhold\nDzień 1, morning"
+                android:gravity="center" />
 
-            <!-- Re-adding the ID correctly for the code to find it -->
             <TextView
                 android:id="@+id/tvDevMenuTrigger"
+                style="@style/GrimTextBody"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
                 android:text="DEV"
-                android:textColor="#33FFFFFF"
-                android:padding="8dp" />
+                android:clickable="true"
+                android:focusable="true" />
         </RelativeLayout>
 
         <LinearLayout
@@ -52,67 +54,70 @@
             android:layout_height="0dp"
             android:layout_weight="1"
             android:orientation="horizontal"
-            android:baselineAligned="false">
+            android:padding="16dp">
 
-            <!-- LEFT SIDE: NAVIGATION -->
+            <!-- NAVIGATION GRID IN MAIN PANEL -->
             <GridLayout
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_weight="1.5"
+                android:layout_weight="1"
                 android:columnCount="3"
-                android:rowCount="3"
-                android:alignmentMode="alignMargins">
+                android:rowCount="4"
+                android:background="@drawable/ui_panel_main"
+                android:padding="12dp">
 
-                <Button android:id="@+id/openCity" style="@style/GrimNavButton" android:text="MIASTO" />
-                <Button android:id="@+id/openMap" style="@style/GrimNavButton" android:text="MAPA" />
-                <Button android:id="@+id/openInventory" style="@style/GrimNavButton" android:text="PLECAK" />
+                <Button android:id="@+id/openCity" style="@style/GrimCombatButton" android:text="MIASTO" />
+                <Button android:id="@+id/openMap" style="@style/GrimCombatButton" android:text="MAPA" />
+                <Button android:id="@+id/openInventory" style="@style/GrimCombatButton" android:text="PLECAK" />
 
-                <Button android:id="@+id/openQuests" style="@style/GrimNavButton" android:text="ZADANIA" />
-                <Button android:id="@+id/openCombatStatus" style="@style/GrimNavButton" android:text="WALKA" />
-                <Button android:id="@+id/openSaints" style="@style/GrimNavButton" android:text="PROROCY" />
+                <Button android:id="@+id/openQuests" style="@style/GrimCombatButton" android:text="ZADANIA" />
+                <Button android:id="@+id/openFinale" style="@style/GrimCombatButton" android:text="FINAŁ" android:visibility="gone" />
+                <Button android:id="@+id/openSaints" style="@style/GrimCombatButton" android:text="PROROCY" />
 
-                <Button android:id="@+id/openReputation" style="@style/GrimNavButton" android:text="REPUTACJA" />
-                <!-- Added IDs to match HubActivity.kt -->
-                <Button android:id="@+id/openCityEvents" style="@style/GrimNavButton" android:text="WIEŚCI" />
-                <Button android:id="@+id/openTransfer" style="@style/GrimNavButton" android:text="TRANSFER" />
-
+                <Button android:id="@+id/openReputation" style="@style/GrimCombatButton" android:text="REPUTACJA" />
+                <Button android:id="@+id/openCityEvents" style="@style/GrimCombatButton" android:text="WIEŚCI" />
+                <Button android:id="@+id/openTransfer" style="@style/GrimCombatButton" android:text="TRANSFER" />
             </GridLayout>
 
-            <!-- RIGHT SIDE: LOG & SAVE -->
+            <!-- STATUS/LOG IN SIDE PANEL -->
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_weight="1"
+                android:layout_weight="0.8"
                 android:orientation="vertical"
-                android:paddingStart="12dp"
-                android:paddingEnd="0dp">
+                android:paddingStart="16dp">
 
                 <TextView
                     android:id="@+id/tvLogMini"
-                    style="@style/GrimTextMuted"
+                    style="@style/GrimTextBody"
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
                     android:layout_weight="1"
-                    android:background="#40000000"
-                    android:padding="8dp"
-                    android:text="Kroniki pękniętego świata..." />
+                    android:background="@drawable/ui_panel_side"
+                    android:padding="16dp"
+                    android:text="Kroniki pękniętego świata..."
+                    android:textColor="@color/grimGold" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
                     android:layout_marginTop="8dp">
-                    <Button android:id="@+id/btnSave" style="@style/GrimSmallButton" android:text="ZAPISZ" />
-                    <Button android:id="@+id/btnLoad" style="@style/GrimSmallButton" android:text="WCZYTAJ" />
+                    <Button android:id="@+id/btnSave" style="@style/GrimSmallButton" android:layout_weight="1" android:text="ZAPISZ" />
+                    <Button android:id="@+id/btnLoad" style="@style/GrimSmallButton" android:layout_weight="1" android:text="WCZYTAJ" />
                 </LinearLayout>
 
-                <Button android:id="@+id/openFinale" style="@style/GrimSmallButton" android:layout_width="match_parent" android:text="FINAŁ" android:visibility="gone" />
-
+                <Button
+                    android:id="@+id/openCombatStatus"
+                    style="@style/GrimCombatButton"
+                    android:layout_width="match_parent"
+                    android:text="WALKA W TOKU"
+                    android:visibility="gone" />
             </LinearLayout>
         </LinearLayout>
 
-        <!-- BOTTOM: PARTY -->
-        <include layout="@layout/strip_party" android:layout_width="match_parent" android:layout_height="64dp" android:layout_marginTop="8dp" />
+        <!-- PARTY STRIP AT BOTTOM -->
+        <include layout="@layout/strip_party" />
 
     </LinearLayout>
 </FrameLayout>

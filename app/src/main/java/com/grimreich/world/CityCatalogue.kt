@@ -3,6 +3,7 @@ package com.grimreich.world
 /**
  * Central city and region catalogue for GrimReich.
  * Synchronized with canonical ontological lore (Chapters I-VIII).
+ * Linked to canonical high-res backgrounds.
  */
 data class CityData(
     val id: String,
@@ -11,6 +12,7 @@ data class CityData(
     val phenomenon: String,
     val rulingFaction: String,
     val priceModifier: Float,
+    val backgroundDrawable: String,
     val events: MutableList<String> = mutableListOf(),
     val prophet: String? = null
 )
@@ -40,6 +42,7 @@ object CityCatalogue {
             phenomenon = "Mgła",
             rulingFaction = "Zakon Świtu",
             priceModifier = 1.0f,
+            backgroundDrawable = "bg_region_north_coast",
             prophet = "Aelion",
             events = mutableListOf("port_mrozny", "zatoka_piracka", "latarnia_switu")
         ))
@@ -52,6 +55,7 @@ object CityCatalogue {
             phenomenon = "Krew",
             rulingFaction = "Twierdza Zakonu",
             priceModifier = 0.9f,
+            backgroundDrawable = "bg_region_crown_plains",
             prophet = "Xyrel",
             events = mutableListOf("miasto_korony", "cmentarzysko_krolow")
         ))
@@ -64,6 +68,7 @@ object CityCatalogue {
             phenomenon = "Odbicie",
             rulingFaction = "Klasztor Milczenia",
             priceModifier = 1.2f,
+            backgroundDrawable = "bg_region_heartland",
             prophet = "Mira",
             events = mutableListOf("dwor_zloty")
         ))
@@ -76,6 +81,7 @@ object CityCatalogue {
             phenomenon = "Pełnia",
             rulingFaction = "Zakon Świtu",
             priceModifier = 1.05f,
+            backgroundDrawable = "bg_region_south_ruins",
             prophet = "Sereth",
             events = mutableListOf("zlote_ruiny", "spalona_wies")
         ))
@@ -88,6 +94,7 @@ object CityCatalogue {
             phenomenon = "Głębia",
             rulingFaction = "Kopalnia Żelaza",
             priceModifier = 1.3f,
+            backgroundDrawable = "bg_region_south_mountains",
             prophet = "Ferrun",
             events = mutableListOf("czerwona_przelecz")
         ))
@@ -100,6 +107,7 @@ object CityCatalogue {
             phenomenon = "Pęknięcie",
             rulingFaction = "Ruiny Czarnej Paszczy",
             priceModifier = 1.1f,
+            backgroundDrawable = "bg_region_steppe",
             prophet = "Noctyros",
             events = mutableListOf("kamienna_przystan")
         ))
@@ -112,6 +120,7 @@ object CityCatalogue {
             phenomenon = "Anomalia",
             rulingFaction = "Brak",
             priceModifier = 0.8f,
+            backgroundDrawable = "bg_region_wild_lands",
             events = mutableListOf("las_cieni", "bagna_szeptow")
         ))
     }

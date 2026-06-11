@@ -3,6 +3,7 @@ package com.grimreich.ui
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
+import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
@@ -24,8 +25,18 @@ class CityActivity : AppCompatActivity() {
         val rawLocation = GameRepository.state.world.location
         val cityId = rawLocation.lowercase().replace(" ", "_")
         
-        // Match canonical name from ID if possible
         val cityData = CityCatalogue.get(cityId)
+        
+        // 1. SET CANONICAL BACKGROUND
+        val bgResId = resources.getIdentifier(
+            cityData?.backgroundDrawable ?: "bg_region_north_coast", 
+            "drawable", 
+            packageName
+        )
+        if (bgResId != 0) {
+            findViewById<ImageView>(R.id.ivCityBg).setImageResource(bgResId)
+        }
+
         findViewById<TextView>(R.id.cityTitle).text = (cityData?.name ?: rawLocation).uppercase()
 
         DialogueManager.seedBasicDialogues()
@@ -71,11 +82,17 @@ class CityActivity : AppCompatActivity() {
             val btn = Button(this).apply {
                 text = "${npc.name} (${npc.role})"
                 styleToGrim()
+                
+                // Set NPC portrait from role if available
+                val portraitId = DialogueManager.getPortrait(npc.role)
+                // In a real list we'd use icons, for now we keep simple buttons
+                
                 setOnClickListener {
                     val intent = Intent(this@CityActivity, DialogueActivity::class.java).apply {
                         putExtra("npcName", npc.name)
                         putExtra("npcRole", npc.role)
                         putExtra("startNodeId", npc.startNodeId)
+                        putExtra("portrait", portraitId)
                     }
                     startActivity(intent)
                 }
@@ -85,9 +102,8 @@ class CityActivity : AppCompatActivity() {
     }
 
     private fun Button.styleToGrim() {
-        // Basic styling for dynamically added buttons
         this.setTextColor(androidx.core.content.ContextCompat.getColor(context, R.color.grimGold))
-        this.setBackgroundColor(androidx.core.content.ContextCompat.getColor(context, R.color.grimBgUltraDark))
+        this.setBackgroundResource(R.drawable.ui_frame_gold)
         this.setPadding(16, 16, 16, 16)
         val params = LinearLayout.LayoutParams(
             LinearLayout.LayoutParams.MATCH_PARENT,

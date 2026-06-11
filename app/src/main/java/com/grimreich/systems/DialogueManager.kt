@@ -17,6 +17,29 @@ object DialogueManager {
         return applyWorldEffects(baseNode)
     }
 
+    /**
+     * Maps NPC roles to the new high-quality canonical portraits.
+     */
+    fun getPortrait(role: String): String {
+        return when (role.lowercase()) {
+            "alchemik" -> "port_alchemist"
+            "barbarzynca" -> "port_barbarian"
+            "kaplan" -> "port_priest"
+            "lowca" -> "port_ranger"
+            "rycerz" -> "port_knight"
+            "mag" -> "port_mage"
+            "ork" -> "port_orc"
+            "troll" -> "port_troll"
+            "szkielet" -> "port_skeleton"
+            "upior" -> "port_wraith"
+            "demon" -> "port_demon"
+            "smok" -> "port_dragon"
+            "wilk" -> "port_wolf"
+            "lotr" -> "port_rogue"
+            else -> "port_rogue"
+        }
+    }
+
     private fun applyWorldEffects(node: DialogueNode): DialogueNode {
         val world = GameRepository.state.world
         val stability = world.globalStability
@@ -40,7 +63,7 @@ object DialogueManager {
     }
     
     fun seedBasicDialogues() {
-        nodes.clear()
+        if (nodes.isNotEmpty()) return
 
         // MERCHANT DIALOGUES
         registerNode(DialogueNode(
