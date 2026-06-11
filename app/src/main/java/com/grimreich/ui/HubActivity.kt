@@ -4,20 +4,32 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.widget.Button
+import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.grimreich.R
 import com.grimreich.core.GameRepository
+import com.grimreich.systems.RealTimeEventManager
+import com.grimreich.systems.SaveLoadSystem
 
 class HubActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_hub)
         
+        // Zdarzenia czasu rzeczywistego przy wejściu do gry
+        val eventMessage = RealTimeEventManager.checkRealTimeEvents(this)
+        if (eventMessage != null) {
+            UiUtils.showNarrativePopup(this, "UPŁYW CZASU", eventMessage)
+        }
+
         setupNavigation()
-        setupSystems()
+        setupDevTrigger()
+        
+        // Zdarzenia losowe w HUBie
+        com.grimreich.systems.RandomEventManager.triggerHubEvent(this)
+
         render()
     }
 
@@ -43,11 +55,6 @@ class HubActivity : AppCompatActivity() {
         findViewById<Button>(R.id.openSaints)?.setOnClickListener { 
             startActivity(Intent(this, SaintsActivity::class.java)) 
         }
-        findViewById<Button>(R.id.openFinale)?.setOnClickListener { 
-            startActivity(Intent(this, FinaleActivity::class.java)) 
-        }
-        
-        // Secondary buttons from new landscape layout
         findViewById<Button>(R.id.openCityEvents)?.setOnClickListener {
              startActivity(Intent(this, CityEventsActivity::class.java))
         }
@@ -56,20 +63,7 @@ class HubActivity : AppCompatActivity() {
         }
     }
 
-    private fun setupSystems() {
-        findViewById<Button>(R.id.btnSave)?.setOnClickListener {
-            com.grimreich.systems.SaveLoadSystem.save(this)
-            Toast.makeText(this, "Gra zapisana!", Toast.LENGTH_SHORT).show()
-        }
-        findViewById<Button>(R.id.btnLoad)?.setOnClickListener {
-            if (com.grimreich.systems.SaveLoadSystem.load(this)) {
-                Toast.makeText(this, "Gra wczytana!", Toast.LENGTH_SHORT).show()
-                render()
-            } else {
-                Toast.makeText(this, "Brak zapisu!", Toast.LENGTH_SHORT).show()
-            }
-        }
-
+    private fun setupDevTrigger() {
         findViewById<TextView>(R.id.tvDevMenuTrigger)?.setOnClickListener {
             startActivity(Intent(this, DevMenuActivity::class.java))
         }
@@ -78,14 +72,29 @@ class HubActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         render()
+        // Automatyczny zapis przy powrocie do HUBa
+        SaveLoadSystem.save(this)
     }
 
     private fun render() {
         val state = GameRepository.state
         val world = state.world
-        findViewById<TextView>(R.id.tvTime)?.text = "Lokacja: ${world.location}\nDzień ${world.day}, ${world.timeOfDay}"
+        
+        // Czysty nagłówek bez etykiet
+        val timeLabel = when(world.timeOfDay.lowercase()) {
+            "morning" -> "Poranek"
+            "midday" -> "Południe"
+            "afternoon" -> "Popołudnie"
+            "dusk" -> "Zmierzch"
+            "evening" -> "Wieczór"
+            else -> world.timeOfDay
+        }
+        
+        // Formatowanie nazwy lokacji (usuwanie technicznych podkreśleń)
+        val locationFormatted = world.location.replace("_", " ").capitalize()
+        
+        findViewById<TextView>(R.id.tvTime)?.text = "$locationFormatted | Dzień ${world.day} | $timeLabel"
 
-        // Dynamic Visibility
         findViewById<Button>(R.id.openCombatStatus)?.visibility = 
             if (state.combat.active) View.VISIBLE else View.GONE
             
@@ -97,20 +106,29 @@ class HubActivity : AppCompatActivity() {
 
     private fun renderPartyStrip() {
         val party = GameRepository.state.party
-        val slots = listOf(
-            R.id.charSlot0 to (R.id.tvChar0Name to R.id.pbChar0HP),
-            R.id.charSlot1 to (R.id.tvChar1Name to R.id.pbChar1HP),
-            R.id.charSlot2 to (R.id.tvChar2Name to R.id.pbChar2HP),
-            R.id.charSlot3 to (R.id.tvChar3Name to R.id.pbChar3HP)
-        )
+        val slotIds = listOf(R.id.charSlot0, R.id.charSlot1, R.id.charSlot2, R.id.charSlot3)
+        val nameIds = listOf(R.id.tvChar0Name, R.id.tvChar1Name, R.id.tvChar2Name, R.id.tvChar3Name)
+        val hpIds = listOf(R.id.pbChar0HP, R.id.pbChar1HP, R.id.pbChar2HP, R.id.pbChar3HP)
+        val portIds = listOf(R.id.ivChar0Portrait, R.id.ivChar1Portrait, R.id.ivChar2Portrait, R.id.ivChar3Portrait)
 
-        slots.forEachIndexed { i, (containerId, views) ->
+        slotIds.forEachIndexed { i, containerId ->
             val container = findViewById<View>(containerId) ?: return@forEachIndexed
             if (i < party.size) {
                 container.visibility = View.VISIBLE
                 val hero = party[i]
-                findViewById<TextView>(views.first)?.text = hero.name
-                findViewById<ProgressBar>(views.second)?.progress = (hero.hp * 100 / hero.maxHp)
+                findViewById<TextView>(nameIds[i])?.text = hero.name
+                findViewById<ProgressBar>(hpIds[i])?.progress = (hero.hp * 100 / hero.maxHp)
+                
+                // Ustawianie portretu na podstawie klasy/cechy
+                val portrait = findViewById<ImageView>(portIds[i])
+                val resId = when {
+                    hero.portraitRes.isNotEmpty() -> resources.getIdentifier(hero.portraitRes, "drawable", packageName)
+                    hero.strength > 15 -> R.drawable.port_knight
+                    hero.intelligence > 15 -> R.drawable.port_mage
+                    else -> R.drawable.port_alchemist
+                }
+                if (resId != 0) portrait?.setImageResource(resId)
+
                 container.setOnClickListener {
                     startActivity(Intent(this, CharacterActivity::class.java).putExtra("heroId", hero.id))
                 }

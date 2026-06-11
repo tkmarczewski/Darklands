@@ -1,6 +1,7 @@
 package com.grimreich.systems
 
 import com.grimreich.core.GameRepository
+import com.grimreich.core.GrimConstants
 import com.grimreich.grimreich.v1.Item
 import com.grimreich.world.CityCatalogue
 
@@ -19,7 +20,7 @@ object EconomySystem {
     }
     
     fun sellItem(item: Item): Int {
-        val sellPrice = (item.value * 0.4).toInt()
+        val sellPrice = (item.value * GrimConstants.Economy.SELL_PRICE_MULTIPLIER).toInt()
         GameRepository.state.gold += sellPrice
         GameRepository.state.inventory.remove(item)
         return sellPrice

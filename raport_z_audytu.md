@@ -1,19 +1,26 @@
 # Raport z Audytu Projektu: Grimreich
 
-## 1. Status Budowania (Build)
-*   **Wynik:** SUKCES
-*   **Główny artefakt:** `app-debug.apk`
-*   **Uwagi:** Proces budowania jest stabilny. Projekt poprawnie wykorzystuje system Gradle oraz narzędzia do analizy kodu (Jacoco, Detekt).
+## 1. Status Budowania i Testów
+*   **Budowanie:** SUKCES (Gradle 9.2.1, Kotlin 2.2.10).
+*   **Testy Jednostkowe:** 21/21 zaliczonych. Skupione na kalkulatorach statystyk.
+*   **Pokrycie (Jacoco):** **~9.3%**. Bardzo niskie. Kluczowe systemy (`com.grimreich.systems`) nie są testowane automatycznie.
 
-## 2. Testy Jednostkowe i Pokrycie
-*   **Wynik testów:** 21/21 zaliczonych (100% sukcesu).
-*   **Pokrycie kodu (Coverage):** **~9.3%**
-*   **Analiza:** 
-    *   Testy skupiają się wyłącznie na logice matematycznej (system reputacji, ekonomia, generatory statystyk).
-    *   Całkowity brak testów jednostkowych dla widoków (Activities, ViewModels) oraz logiki NPC i Questów.
-    *   Większość klas w paczce `com.grimreich.grimreich.v1` ma 0% pokrycia.
+## 3. Analiza Statyczna i Jakość Kodu
 
-## 3. Wykryte Błędy Krytyczne (Crashes)
+### Android Lint (590 ostrzeżeń)
+*   **Problemy z Zasobami:** Ogromna liczba nieużywanych layoutów i grafik (drawables), co niepotrzebnie zwiększa rozmiar aplikacji.
+*   **Dostępność (Accessibility):** Prawie wszystkie elementy `ImageView` nie posiadają `contentDescription`.
+*   **Internacjonalizacja:** Większość tekstów jest zakodowana na sztywno (hardcoded) w plikach XML i kodzie Kotlin, co uniemożliwia łatwe tłumaczenie.
+*   **Wydajność UI:** Wykryto problemy z "overdraw" (wielokrotne rysowanie tła) oraz mało wydajne układy (zagnieżdżone `layout_weight`).
+*   **Splash Screen:** Używana jest przestarzała metoda `SplashActivity`, co na Androidzie 12+ powoduje wyświetlanie dwóch ekranów powitalnych.
+
+### Detekt (Problemy Architektoniczne)
+*   **Magic Numbers:** Powszechne użycie "magicznych liczb" w logice gry (balans walki, szanse na loot, ekonomia). Utrudnia to balansowanie gry i wprowadzanie zmian.
+*   **Złożoność metod:** Główne funkcje logiki (np. `resolveRound`, `resolvePlayerAction`) są zbyt długie i skomplikowane (wysoka złożoność cyklomatyczna).
+*   **Złe praktyki:** Wykryto połykanie wyjątków (Swallowed Exceptions) oraz łapanie zbyt ogólnych błędów (`Exception`), co może ukrywać realne bugi.
+*   **Konstruktor `Career`:** Posiada aż 12 parametrów, co narusza zasady czystego kodu.
+
+## 4. Wykryte Błędy Krytyczne (Crashes)
 
 ### Błąd 1: Crash przy otwieraniu okien (Brak atrybutu motywu)
 *   **Lokalizacja:** `styles.xml` / `UiUtils.showNarrativePopup`
@@ -33,8 +40,9 @@
 *   **Mapa Świata:** Wyświetla się poprawnie, ale interakcja z punktami na mapie powoduje crash (patrz Błąd 1).
 *   **Ekran Miasta:** Przyciski Karczmy i Sklepu nie działają przez błąd dialogów. Przycisk wyjścia z miasta działa.
 
-## 5. Rekomendacje
-1.  **Poprawka Motywu (Priorytet):** Dodać `<item name="colorSurface">?attr/colorBackground</item>` do głównego stylu w `styles.xml`.
-2.  **Bezpieczny dostęp do widoków:** Wprowadzić View Binding lub null-safe calls (`?.`) w `HubActivity`, aby zapobiec NPE.
-3.  **Zwiększenie Pokrycia:** Dodać testy dla systemów NPC oraz walki (obecnie 0% pokrycia).
-4.  **Usprawnienie Nawigacji:** Naprawić przejścia między Mapą a Hubem, aby zmiany lokalizacji były odświeżane bez konieczności restartu Activity.
+## 6. Rekomendacje
+1.  **Poprawka Motywu (KRYTYCZNE):** Dodać `colorSurface` do `Theme.GrimReich`, aby umożliwić nawigację po mapie i mieście.
+2.  **Refaktoryzacja Logiki:** Wydzielić magiczne liczby do stałych (Constants) w celu łatwiejszego balansu gry.
+3.  **Czyszczenie Zasobów:** Usunąć nieużywane layouty i grafiki wskazane przez Lint.
+4.  **Poprawa Obsługi Błędów:** Zastąpić ogólne bloki `catch (e: Exception)` konkretnymi wyjątkami i logowaniem błędów.
+5.  **Usprawnienie Kreatora:** Poprawić feedback w Kreatorze Postaci (obecnie trudno zgadnąć, że trzeba wybrać dokładnie 3 umiejętności).

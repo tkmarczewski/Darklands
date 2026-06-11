@@ -13,6 +13,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.grimreich.R
+import com.grimreich.core.*
 import com.grimreich.core.AbilityRegistry
 import com.grimreich.core.GameRepository
 import com.grimreich.core.Hero
@@ -23,10 +24,10 @@ import java.util.UUID
 
 class CharacterCreatorActivity : AppCompatActivity() {
 
-    private var pointsRemaining = 20
+    private var pointsRemaining = GrimConstants.Character.STARTING_POINTS
     private val attributes = mutableMapOf(
-        "str" to 10, "agi" to 10, "per" to 10, 
-        "int" to 10, "end" to 10, "cha" to 10, "pie" to 10
+        "str" to GrimConstants.Character.MIN_ATTRIBUTE_VALUE, "agi" to GrimConstants.Character.MIN_ATTRIBUTE_VALUE, "per" to GrimConstants.Character.MIN_ATTRIBUTE_VALUE, 
+        "int" to GrimConstants.Character.MIN_ATTRIBUTE_VALUE, "end" to GrimConstants.Character.MIN_ATTRIBUTE_VALUE, "cha" to GrimConstants.Character.MIN_ATTRIBUTE_VALUE, "pie" to GrimConstants.Character.MIN_ATTRIBUTE_VALUE
     )
     private var selectedTrait: Trait? = null
     private val specializedSkills = mutableSetOf<HeroSkill>()
@@ -62,8 +63,8 @@ class CharacterCreatorActivity : AppCompatActivity() {
                 Toast.makeText(this, "Wybierz cechę!", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
-            if (specializedSkills.size != 3) {
-                Toast.makeText(this, "Wybierz dokładnie 3 specjalizacje!", Toast.LENGTH_SHORT).show()
+            if (specializedSkills.size != GrimConstants.Character.SKILL_SPECIALIZATION_REQUIRED) {
+                Toast.makeText(this, "Wybierz dokładnie ${GrimConstants.Character.SKILL_SPECIALIZATION_REQUIRED} specjalizacje!", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
@@ -135,9 +136,10 @@ class CharacterCreatorActivity : AppCompatActivity() {
     }
 
     private fun changeAttr(attr: String, delta: Int) {
-        val current = attributes[attr] ?: 10
+        val current = attributes[attr] ?: GrimConstants.Character.MIN_ATTRIBUTE_VALUE
         if (delta > 0 && pointsRemaining <= 0) return
-        if (delta < 0 && current <= 5) return
+        if (delta > 0 && current >= GrimConstants.Character.MAX_ATTRIBUTE_VALUE) return
+        if (delta < 0 && current <= GrimConstants.Character.MIN_ATTRIBUTE_VALUE) return
 
         attributes[attr] = current + delta
         pointsRemaining -= delta

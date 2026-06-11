@@ -11,6 +11,12 @@
         android:scaleType="centerCrop"
         android:src="@drawable/bg_map_candle" />
 
+    <!-- DARK GRADIENT OVERLAY FOR BETTER CONTRAST -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#60000000" />
+
     <!-- INTERACTIVE HOTSPOTS -->
     <RelativeLayout
         android:id="@+id/mapOverlay"
@@ -20,94 +26,108 @@
         <!-- 1. Wybrzeże Północne (Top Left) -->
         <Button
             android:id="@+id/point_north_coast"
-            android:layout_width="120dp"
-            android:layout_height="40dp"
+            android:layout_width="160dp"
+            android:layout_height="60dp"
             android:layout_alignParentTop="true"
             android:layout_alignParentStart="true"
             android:layout_marginTop="80dp"
             android:layout_marginStart="80dp"
-            android:text="Wybrzeże Północne"
-            android:backgroundTint="#80000000"
+            android:text="Wybrzeże\nPółnocne"
+            android:backgroundTint="#AA000000"
             android:textColor="@color/grimGold"
-            android:textSize="10sp" />
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:fontFamily="serif" />
 
         <!-- 2. Równiny Koronne (Top Right) -->
         <Button
             android:id="@+id/point_crown_plains"
-            android:layout_width="120dp"
-            android:layout_height="40dp"
+            android:layout_width="160dp"
+            android:layout_height="60dp"
             android:layout_alignParentTop="true"
             android:layout_alignParentEnd="true"
             android:layout_marginTop="80dp"
             android:layout_marginEnd="80dp"
-            android:text="Równiny Koronne"
-            android:backgroundTint="#80000000"
+            android:text="Równiny\nKoronne"
+            android:backgroundTint="#AA000000"
             android:textColor="@color/grimGold"
-            android:textSize="10sp" />
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:fontFamily="serif" />
 
         <!-- 3. Serce Krainy (Center) -->
         <Button
             android:id="@+id/point_heartland"
-            android:layout_width="120dp"
-            android:layout_height="40dp"
+            android:layout_width="160dp"
+            android:layout_height="60dp"
             android:layout_centerInParent="true"
-            android:text="Serce Krainy"
-            android:backgroundTint="#80000000"
+            android:text="Serce\nKrainy"
+            android:backgroundTint="#AA000000"
             android:textColor="@color/grimGold"
-            android:textSize="10sp" />
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:fontFamily="serif" />
 
         <!-- 4. Pogranicze Stepowe (Left Center) -->
         <Button
             android:id="@+id/point_steppe"
-            android:layout_width="120dp"
-            android:layout_height="40dp"
+            android:layout_width="160dp"
+            android:layout_height="60dp"
             android:layout_centerVertical="true"
             android:layout_alignParentStart="true"
             android:layout_marginStart="40dp"
-            android:text="Pogranicze Stepowe"
-            android:backgroundTint="#80000000"
+            android:text="Pogranicze\nStepowe"
+            android:backgroundTint="#AA000000"
             android:textColor="@color/grimGold"
-            android:textSize="10sp" />
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:fontFamily="serif" />
 
         <!-- 5. Południowe Ruiny (Bottom Right) -->
         <Button
             android:id="@+id/point_south_ruins"
-            android:layout_width="120dp"
-            android:layout_height="40dp"
+            android:layout_width="160dp"
+            android:layout_height="60dp"
             android:layout_alignParentBottom="true"
             android:layout_alignParentEnd="true"
-            android:layout_marginBottom="80dp"
+            android:layout_marginBottom="100dp"
             android:layout_marginEnd="80dp"
-            android:text="Południowe Ruiny"
-            android:backgroundTint="#80000000"
+            android:text="Południowe\nRuiny"
+            android:backgroundTint="#AA000000"
             android:textColor="@color/grimGold"
-            android:textSize="10sp" />
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:fontFamily="serif" />
 
         <!-- 6. Góry Południowe (Bottom Center) -->
         <Button
             android:id="@+id/point_south_mountains"
-            android:layout_width="120dp"
-            android:layout_height="40dp"
+            android:layout_width="160dp"
+            android:layout_height="60dp"
             android:layout_alignParentBottom="true"
             android:layout_centerHorizontal="true"
-            android:layout_marginBottom="60dp"
-            android:text="Góry Południowe"
-            android:backgroundTint="#80000000"
+            android:layout_marginBottom="120dp"
+            android:text="Góry\nPołudniowe"
+            android:backgroundTint="#AA000000"
             android:textColor="@color/grimGold"
-            android:textSize="10sp" />
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:fontFamily="serif" />
 
         <!-- 7. Ziemie Dzikie (Center Right) -->
         <Button
             android:id="@+id/point_wild_lands"
-            android:layout_width="120dp"
-            android:layout_height="40dp"
+            android:layout_width="160dp"
+            android:layout_height="60dp"
             android:layout_centerVertical="true"
             android:layout_alignParentEnd="true"
             android:layout_marginEnd="40dp"
-            android:text="Ziemie Dzikie"
-            android:backgroundTint="#80000000"
+            android:text="Ziemie\nDzikie"
+            android:backgroundTint="#AA000000"
             android:textColor="@color/grimGold"
-            android:textSize="10sp" />
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:fontFamily="serif" />
 
     </RelativeLayout>
 
@@ -116,6 +136,6 @@
         android:id="@+id/btnExitAtlas"
         style="@style/GrimBackButton"
         android:layout_gravity="bottom"
-        android:text="POWRÓT DO HUBU" />
+        android:text="← POWRÓT" />
 
 </FrameLayout>

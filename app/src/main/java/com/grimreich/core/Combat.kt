@@ -26,10 +26,10 @@ enum class MoraleStatus {
 
 object MoraleSystem {
     fun computeStatus(morale: Int): MoraleStatus = when {
-        morale >= 80 -> MoraleStatus.HEROIC
-        morale >= 50 -> MoraleStatus.STEADY
-        morale >= 30 -> MoraleStatus.SHAKEN
-        morale >= 10 -> MoraleStatus.PANICKED
+        morale >= GrimConstants.Combat.MORALE_HEROIC_THRESHOLD -> MoraleStatus.HEROIC
+        morale >= GrimConstants.Combat.MORALE_STEADY_THRESHOLD -> MoraleStatus.STEADY
+        morale >= GrimConstants.Combat.MORALE_SHAKEN_THRESHOLD -> MoraleStatus.SHAKEN
+        morale >= GrimConstants.Combat.MORALE_PANICKED_THRESHOLD -> MoraleStatus.PANICKED
         else -> MoraleStatus.ROUTED
     }
 
@@ -37,10 +37,10 @@ object MoraleSystem {
         (morale - (dmgTaken / 2)).coerceAtLeast(0)
 
     fun moraleAfterKill(morale: Int): Int =
-        (morale + 15).coerceAtMost(100)
+        (morale + GrimConstants.Combat.KILL_MORALE_BONUS).coerceAtMost(GrimConstants.Combat.MAX_MORALE)
 
     fun moraleAfterFlee(morale: Int): Int =
-        (morale - 20).coerceAtLeast(0)
+        (morale - GrimConstants.Combat.FLEE_MORALE_PENALTY).coerceAtLeast(0)
 }
 
 // ==================== STATUS EFFECTS ====================
@@ -125,7 +125,7 @@ object CombatRound {
         val defenderStatus = MoraleSystem.computeStatus(defender.morale)
 
         // 2. Dodge Roll (Agility based)
-        val dodgeChance = 0.05f + (defender.agility * 0.02f)
+        val dodgeChance = GrimConstants.Combat.BASE_DODGE_CHANCE + (defender.agility * GrimConstants.Combat.AGILITY_DODGE_MODIFIER)
         val dodged = Random.nextFloat() < dodgeChance
 
         val dmgToDefender = if (dodged) {
@@ -235,7 +235,7 @@ object CombatRound {
     }
 
     private fun tryApplyStatus(attacker: CombatantState, defender: CombatantState, log: MutableList<String>) {
-        val statusChance = 0.1f + (attacker.intelligence * 0.03f)
+        val statusChance = GrimConstants.Combat.STATUS_CHANCE_BASE + (attacker.intelligence * GrimConstants.Combat.STATUS_CHANCE_INT_MOD)
         if (Random.nextFloat() < statusChance) {
             val effectType = StatusEffectType.entries.toTypedArray().random()
             val existing = defender.activeEffects.find { it.type == effectType }
@@ -252,8 +252,8 @@ object CombatRound {
         val hpPercent = if (state.maxHp > 0) state.hp.toFloat() / state.maxHp else 0f
         return when {
             hpPercent <= 0f -> WoundType.CRITICAL
-            hpPercent <= 0.2f && state.endurance < 5 -> WoundType.SERIOUS
-            hpPercent <= 0.4f && state.endurance < 10 -> WoundType.LIGHT
+            hpPercent <= GrimConstants.Combat.WOUND_THRESHOLD_LIGHT && state.endurance < 5 -> WoundType.SERIOUS
+            hpPercent <= GrimConstants.Combat.WOUND_THRESHOLD_SERIOUS && state.endurance < 10 -> WoundType.LIGHT
             else -> WoundType.NONE
         }
     }
@@ -262,11 +262,11 @@ object CombatRound {
         state.hp <= 0 || MoraleSystem.computeStatus(state.morale) == MoraleStatus.ROUTED
 
     fun postCombatRecovery(hero: CombatantState): String {
-        val healHp = (hero.maxHp * 0.1f).toInt().coerceAtLeast(1)
+        val healHp = (hero.maxHp * GrimConstants.Combat.HP_RECOVERY_RATIO).toInt().coerceAtLeast(1)
         hero.hp = (hero.hp + healHp).coerceAtMost(hero.maxHp)
-        hero.endurance = (hero.endurance + 5).coerceAtMost(20)
+        hero.endurance = (hero.endurance + GrimConstants.Combat.POST_COMBAT_HEAL_HP_MIN).coerceAtMost(20)
         hero.morale = MoraleSystem.moraleAfterKill(hero.morale)
-        if (hero.wounds.isNotEmpty()) hero.wounds.removeLast()
+        if (hero.wounds.isNotEmpty()) hero.wounds.removeAt(hero.wounds.lastIndex)
         return "Leczenie: +$healHp HP. Morale: ${hero.morale}. Rany: ${hero.wounds.size}"
     }
 }

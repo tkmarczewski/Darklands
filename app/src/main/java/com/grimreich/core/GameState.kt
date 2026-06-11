@@ -19,7 +19,8 @@ data class GameState(
     val reputation: ReputationState = ReputationState(),
     val prayer: PrayerState = PrayerState(),
     val world: WorldState = WorldState(),
-    val combat: CombatState = CombatState()
+    val combat: CombatState = CombatState(),
+    var lastSaveTimestamp: Long = System.currentTimeMillis()
 ) {
     fun deepCopy(): GameState = GameState(
         grimEngine = grimEngine,

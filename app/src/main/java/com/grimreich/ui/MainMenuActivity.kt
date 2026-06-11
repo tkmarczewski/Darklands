@@ -30,7 +30,7 @@ class MainMenuActivity : AppCompatActivity() {
             finishAffinity()
         }
 
-        findViewById<TextView>(R.id.tvDevMenuTrigger).setOnClickListener {
+        findViewById<TextView>(R.id.tvDevMenuTrigger)?.setOnClickListener {
             startActivity(Intent(this, DevMenuActivity::class.java))
         }
     }

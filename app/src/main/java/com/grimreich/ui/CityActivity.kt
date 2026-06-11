@@ -67,6 +67,9 @@ class CityActivity : AppCompatActivity() {
         findViewById<Button>(R.id.btnExitCity).setOnClickListener {
             finish()
         }
+
+        // Zdarzenia losowe w mieście
+        com.grimreich.systems.RandomEventManager.triggerCityEvent(this)
     }
 
     private fun updateCityStatus(text: String) {
@@ -103,7 +106,7 @@ class CityActivity : AppCompatActivity() {
 
     private fun Button.styleToGrim() {
         this.setTextColor(androidx.core.content.ContextCompat.getColor(context, R.color.grimGold))
-        this.setBackgroundResource(R.drawable.ui_frame_gold)
+        this.setBackgroundColor(android.graphics.Color.parseColor("#80000000"))
         this.setPadding(16, 16, 16, 16)
         val params = LinearLayout.LayoutParams(
             LinearLayout.LayoutParams.MATCH_PARENT,
