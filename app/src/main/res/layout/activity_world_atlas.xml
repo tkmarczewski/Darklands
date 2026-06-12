@@ -37,7 +37,7 @@
             android:textColor="@color/grimGold"
             android:textSize="12sp"
             android:textStyle="bold"
-            android:fontFamily="serif" />
+            android:fontFamily="monospace" />
 
         <!-- 2. Równiny Koronne (Top Right) -->
         <Button
@@ -53,7 +53,7 @@
             android:textColor="@color/grimGold"
             android:textSize="12sp"
             android:textStyle="bold"
-            android:fontFamily="serif" />
+            android:fontFamily="monospace" />
 
         <!-- 3. Serce Krainy (Center) -->
         <Button
@@ -66,7 +66,7 @@
             android:textColor="@color/grimGold"
             android:textSize="12sp"
             android:textStyle="bold"
-            android:fontFamily="serif" />
+            android:fontFamily="monospace" />
 
         <!-- 4. Pogranicze Stepowe (Left Center) -->
         <Button
@@ -81,7 +81,7 @@
             android:textColor="@color/grimGold"
             android:textSize="12sp"
             android:textStyle="bold"
-            android:fontFamily="serif" />
+            android:fontFamily="monospace" />
 
         <!-- 5. Południowe Ruiny (Bottom Right) -->
         <Button
@@ -97,7 +97,7 @@
             android:textColor="@color/grimGold"
             android:textSize="12sp"
             android:textStyle="bold"
-            android:fontFamily="serif" />
+            android:fontFamily="monospace" />
 
         <!-- 6. Góry Południowe (Bottom Center) -->
         <Button
@@ -112,7 +112,7 @@
             android:textColor="@color/grimGold"
             android:textSize="12sp"
             android:textStyle="bold"
-            android:fontFamily="serif" />
+            android:fontFamily="monospace" />
 
         <!-- 7. Ziemie Dzikie (Center Right) -->
         <Button
@@ -127,7 +127,7 @@
             android:textColor="@color/grimGold"
             android:textSize="12sp"
             android:textStyle="bold"
-            android:fontFamily="serif" />
+            android:fontFamily="monospace" />
 
     </RelativeLayout>
 

@@ -25,7 +25,7 @@
             android:textColor="@color/grimParchment"
             android:textSize="10sp"
             android:gravity="center"
-            android:fontFamily="serif"/>
+            android:fontFamily="monospace"/>
 
         <ProgressBar android:id="@+id/pbChar0HP"
             style="?android:attr/progressBarStyleHorizontal"
@@ -62,7 +62,7 @@
             android:textColor="@color/grimParchment"
             android:textSize="10sp"
             android:gravity="center"
-            android:fontFamily="serif"/>
+            android:fontFamily="monospace"/>
 
         <ProgressBar android:id="@+id/pbChar1HP"
             style="?android:attr/progressBarStyleHorizontal"
@@ -99,7 +99,7 @@
             android:textColor="@color/grimParchment"
             android:textSize="10sp"
             android:gravity="center"
-            android:fontFamily="serif"/>
+            android:fontFamily="monospace"/>
 
         <ProgressBar android:id="@+id/pbChar2HP"
             style="?android:attr/progressBarStyleHorizontal"
@@ -135,7 +135,7 @@
             android:textColor="@color/grimParchment"
             android:textSize="10sp"
             android:gravity="center"
-            android:fontFamily="serif"/>
+            android:fontFamily="monospace"/>
 
         <ProgressBar android:id="@+id/pbChar3HP"
             style="?android:attr/progressBarStyleHorizontal"

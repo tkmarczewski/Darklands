@@ -39,7 +39,7 @@
                 android:textColor="@color/grimParchment"
                 android:textSize="12sp"
                 android:textStyle="bold"
-                android:fontFamily="serif"/>
+                android:fontFamily="monospace"/>
 
             <ProgressBar android:id="@+id/pbChar0HP"
                 style="?android:attr/progressBarStyleHorizontal"

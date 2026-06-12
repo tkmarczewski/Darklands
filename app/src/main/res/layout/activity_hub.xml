@@ -22,18 +22,12 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <!-- Header -->
+        <!-- Header - CLEANED UP -->
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="12dp">
-
-            <!-- FRAME AS DECORATION ONLY, NOT WRAPPING CONTENT -->
-            <ImageView
-                android:layout_width="match_parent"
-                android:layout_height="64dp"
-                android:src="@drawable/ui_frame_gold"
-                android:scaleType="fitXY" />
+            android:padding="16dp"
+            android:background="#80000000">
 
             <TextView
                 android:id="@+id/tvTime"
@@ -66,13 +60,13 @@
             android:orientation="horizontal"
             android:padding="16dp">
 
-            <!-- NAVIGATION GRID -->
+            <!-- NAVIGATION GRID - NO DECORATIVE FRAME -->
             <GridLayout
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1.2"
                 android:columnCount="3"
-                android:background="@drawable/ui_panel_main"
+                android:background="#60000000"
                 android:padding="12dp">
 
                 <Button android:id="@+id/openCity" style="@style/GrimCombatButton" android:text="MIASTO" />
@@ -88,7 +82,7 @@
                 <Button android:id="@+id/openTransfer" style="@style/GrimCombatButton" android:text="TRANSFER" />
             </GridLayout>
 
-            <!-- STATUS/LOG -->
+            <!-- STATUS/LOG - NO DECORATIVE FRAME -->
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
@@ -102,7 +96,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
                     android:layout_weight="1"
-                    android:background="@drawable/ui_panel_side"
+                    android:background="#40000000"
                     android:padding="16dp"
                     android:text="Kroniki pękniętego świata..."
                     android:textColor="@color/grimGold" />

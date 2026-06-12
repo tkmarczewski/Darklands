@@ -6,11 +6,13 @@
     android:background="@color/grimBgMain"
     android:padding="16dp">
 
-    <!-- HEADER WITH GUARANTEED BACK BUTTON -->
+    <!-- HEADER - NO FRAME -->
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp">
+        android:layout_marginBottom="16dp"
+        android:background="#80000000"
+        android:padding="8dp">
 
         <Button
             android:id="@+id/btnExitJournal"
@@ -31,7 +33,7 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:background="@drawable/ui_panel_main"
+        android:background="#40000000"
         android:padding="16dp">
         <LinearLayout
             android:id="@+id/questListContainer"
