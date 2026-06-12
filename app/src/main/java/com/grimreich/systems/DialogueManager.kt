@@ -25,6 +25,7 @@ object DialogueManager {
             "sereth" -> "port_wraith"
             "ferrun" -> "port_barbarian"
             "noctyros" -> "port_demon"
+            "anomalia" -> "port_dragon"
             "alchemik" -> "port_alchemist"
             "barbarzynca" -> "port_barbarian"
             "kaplan" -> "port_priest"
@@ -50,9 +51,9 @@ object DialogueManager {
         if (stability >= 70) return node
         
         val fracturedText = if (stability < 30) {
-            glitchText(node.text) + " ...GŁOSY... ABSOLUT... [NIE SŁUCHAJ ICH]"
+            glitchText(node.text) + " ...GŁOSY... ABSOLUT... [NIE SŁUCHAJ ICH] ...CISZA..."
         } else {
-            node.text + " (czujesz pękanie tkanki świata)"
+            node.text + " (rzeczywistość wokół ciebie zaczyna tracić nasycenie)"
         }
         
         return node.copy(text = fracturedText)
@@ -60,112 +61,125 @@ object DialogueManager {
 
     private fun glitchText(text: String): String {
         return text.split(" ").map { word ->
-            if (Random.nextFloat() < 0.2f) "[WYMAZANO]" else word
+            if (Random.nextFloat() < 0.25f) "[BŁĄD_ONTOLOGICZNY]" else word
         }.joinToString(" ")
     }
     
     fun seedBasicDialogues() {
         if (nodes.isNotEmpty()) return
 
-        // 1. AELION - PROROK MGŁY
+        seedChapter1North()
+        seedChapter2East()
+        seedChapter3Central()
+        seedChapter4South()
+        seedChapter5FarSouth()
+        seedChapter6West()
+        seedChapter7Untamed()
+        seedMetaLore()
+    }
+
+    private fun seedChapter1North() {
         registerNode(DialogueNode(
             id = "aelion_start", npcId = "aelion",
-            text = "Witaj w oparach Wybrzeża. Twoje oczy wciąż widzą formy, ale Twoja dusza... Twoja dusza zaczyna się rozmywać. Czy szukasz swoich utraconych dni?",
+            text = "Mgła nie jest pogodą, wędrowcze. To skroplona niepamięć Absolutu. Czy czujesz, jak Twoje dzieciństwo wycieka Ci przez palce w tym białym oparze?",
             choices = listOf(
-                DialogueChoice("Pamiętam tylko zimną stal i zapach spalonej wsi.", "aelion_pain"),
-                DialogueChoice("Chcę odzyskać wspomnienia o mojej rodzinie.", "aelion_recovery"),
-                DialogueChoice("Czym dokładnie jest ta Mgła?", "aelion_lore")
+                DialogueChoice("Pamiętam imię mojej matki. To wystarczy.", "aelion_memory_strength"),
+                DialogueChoice("Wszystko co mam, to ta broń. Mgła jej nie zabierze.", "aelion_weapon"),
+                DialogueChoice("Kim są pozostali Prorocy?", "aelion_others")
             )
         ))
-        registerNode(DialogueNode(id = "aelion_pain", npcId = "aelion", text = "Ból to jedyna rzecz, której Mgła nie może strawić. Jest Twoją kotwicą. Jeśli go odrzucisz, staniesz się tylko kolejnym cieniem bez twarzy."))
-        registerNode(DialogueNode(id = "aelion_recovery", npcId = "aelion", text = "Rodzina? To tylko echa w Sferze Fenomenów. Prorocy dawno temu zamienili swoje więzi na wieczność w Pęknięciu. Ty zrobisz to samo."))
-        registerNode(DialogueNode(id = "aelion_lore", npcId = "aelion", text = "Mgła to nie woda. To skroplona pamięć świata, który nigdy nie istniał. Absolut roni łzy, a my w nich toniemy."))
+        registerNode(DialogueNode(id = "aelion_memory_strength", npcId = "aelion", text = "Imiona są kotwicami. Ale kotwice rdzewieją w słonej wodzie Wybrzeża. Wkrótce zostaniesz tylko Ty... i pustka, którą nazwiesz wolnością."))
+        registerNode(DialogueNode(id = "aelion_others", npcId = "aelion", text = "Jesteśmy siedmioma pęknięciami w jednym lustrze. Xyrel kocha krew, Mira kocha prawdę, a ja... ja kocham spokój, który nastaje, gdy wszystko zostaje zapomniane."))
+    }
 
-        // 2. XYREL - PROROK KRWI
+    private fun seedChapter2East() {
         registerNode(DialogueNode(
             id = "xyrel_start", npcId = "xyrel",
-            text = "Stoisz na ziemi, która pragnie Twojego życia. Słyszysz to? To bicie serca Równin. Każda kropla przelana tutaj karmi głód Absolutu.",
+            text = "Krew Równin jest gęstsza od wina. Każda wojna tutaj jest tylko próbą udowodnienia Absolutowi, że wciąż potrafimy czuć ból. Jesteś tu, by zabijać czy by umrzeć?",
             choices = listOf(
-                DialogueChoice("Moja broń jest gotowa na kolejną ofiarę.", "xyrel_battle"),
-                DialogueChoice("Zatrzymaj to szaleństwo. Dość już krwi.", "xyrel_peace"),
-                DialogueChoice("Czy ty też jesteś tylko ofiarą?", "xyrel_victim")
+                DialogueChoice("Jestem tu, by położyć kres temu cierpieniu.", "xyrel_end"),
+                DialogueChoice("Szukam Sztandaru Rozpaczy.", "xyrel_artifact"),
+                DialogueChoice("Twoja religia jest szaleństwem.", "xyrel_heresy")
             )
         ))
-        registerNode(DialogueNode(id = "xyrel_battle", npcId = "xyrel", text = "Wojownik! Twoja wola jest twarda jak stal Twierdzy Zakonu. Prowadź nas w głąb anomalii, aż nie zostanie nic prócz szkarłatu."))
-        registerNode(DialogueNode(id = "xyrel_peace", npcId = "xyrel", text = "Pokój? Pokój to stagnacja. Tylko w agonii walki rzeczywistość staje się prawdziwa. Absolut nienawidzi ciszy."))
+        registerNode(DialogueNode(id = "xyrel_artifact", npcId = "xyrel", text = "Sztandar? On nie wisi na maszcie. On jest wyszyty z nerwów tych, którzy odmówili walki. Chcesz go nieść? Przygotuj się na wieczny krzyk w uszach."))
+    }
 
-        // 3. MIRA - SĘDZIA ODBIĆ
+    private fun seedChapter3Central() {
         registerNode(DialogueNode(
             id = "mira_start", npcId = "mira",
-            text = "Spójrz w jezioro, wędrowcze. Nie widzisz tam siebie, prawda? Widzisz to, kim Absolut chciałby, żebyś był. Która wersja Ciebie zwycięży?",
+            text = "W Sercu Krainy nie ma prywatności. Jeziora widzą Twoje grzechy, a lustra pokazują to, co zrobisz za dziesięć lat. Czy boisz się swojego odbicia?",
             choices = listOf(
-                DialogueChoice("Jestem kowalem własnego losu.", "mira_truth"),
-                DialogueChoice("Świat jest tylko odbiciem snu.", "mira_lie"),
-                DialogueChoice("Jak mogę uciec z tej sali luster?", "mira_escape")
+                DialogueChoice("Moje sumienie jest czyste.", "mira_clean"),
+                DialogueChoice("Widzę w lustrze kogoś innego... potwora.", "mira_monster"),
+                DialogueChoice("Czym jest Sfera Fenomenów?", "mira_sphere")
             )
         ))
-        registerNode(DialogueNode(id = "mira_truth", npcId = "mira", text = "Kowal? Nawet młot, którym uderzasz, jest tylko cieniem idei. Twoja prawda pęka przy każdym dotyku."))
+        registerNode(DialogueNode(id = "mira_sphere", npcId = "mira", text = "To miejsce, gdzie idee mają wagę, a materia jest tylko sugestią. Nasz świat jest tylko jej nieudanym szkicem. Absolut próbuje go teraz wymazać."))
+    }
 
-        // 4. SERETH - STRAŻNIK PEŁNI
+    private fun seedChapter4South() {
         registerNode(DialogueNode(
             id = "sereth_start", npcId = "sereth",
-            text = "Jasność Pełni wypala kłamstwa. W tych ruinach nie ma cieni, bo światło dochodzi z samej głębi Twoich oczu. Czy jesteś gotów oślepnąć od prawdy?",
+            text = "Światło Pełni nie daje ciepła, ono daje świadomość. W tych ruinach każdy kamień wie, że jest tylko senną marą. Czy jesteś gotów obudzić się z tego koszmaru?",
             choices = listOf(
-                DialogueChoice("Przyjmuję światło.", "sereth_light"),
-                DialogueChoice("Mrok wewnątrz mnie jest silniejszy.", "sereth_dark"),
-                DialogueChoice("Odejdź w blasku.", "end")
+                DialogueChoice("Sen jest lepszy od nicości.", "sereth_dream"),
+                DialogueChoice("Chcę zobaczyć Absolut twarzą w twarz.", "sereth_face")
             )
         ))
+    }
 
-        // 5. FERRUN - PROROK GŁĘBI
+    private fun seedChapter5FarSouth() {
         registerNode(DialogueNode(
             id = "ferrun_start", npcId = "ferrun",
-            text = "Góra nie wybacza. Metal nie czuje litości. Głębia woła tych, którzy mają dość powierzchniowej ułudy. Czy Twoje kości wytrzymają ten ciężar?",
+            text = "Głębia to jedyne miejsce, które nie pęka, bo jest już dnem. Stal Ferruna nie rdzewieje, bo została wykuta z czystego cierpienia. Chcesz zostać przekuty?",
             choices = listOf(
-                DialogueChoice("Wykuję tu swój koniec.", "ferrun_forge"),
-                DialogueChoice("Szukam artefaktu Ferruna.", "ferrun_quest")
+                DialogueChoice("Uczyń mnie twardszym od rzeczywistości.", "ferrun_harden"),
+                DialogueChoice("Szukam wyjścia z tych kopalni.", "ferrun_exit")
             )
         ))
+    }
 
-        // 6. NOCTYROS - PROROK PĘKNIĘCIA
+    private fun seedChapter6West() {
         registerNode(DialogueNode(
             id = "noctyros_start", npcId = "noctyros",
-            text = "Cień już Cię dotknął. Pęknięcie nie jest w ziemi, ono jest w Twojej duszy. Słyszysz głosy? To nie szaleństwo. To rozmowa z Absolutem.",
+            text = "Pęknięcie na Zachodzie to brama. Cień, który z niego wycieka, to powrót do pierwotnej jedni. Dlaczego tak kurczowo trzymasz się swojego 'ja'?",
             choices = listOf(
-                DialogueChoice("Słyszę... szum.", "noctyros_noise"),
-                DialogueChoice("Rozkaż im przestać!", "noctyros_rage"),
-                DialogueChoice("Czego one chcą?", "noctyros_will")
+                DialogueChoice("Moja wola jest moją jedyną własnością.", "noctyros_will"),
+                DialogueChoice("Słyszę głosy z Pęknięcia... wołają mnie.", "noctyros_voices")
             )
         ))
-        registerNode(DialogueNode(id = "noctyros_will", npcId = "noctyros", text = "Chcą, żebyś przestał stawiać opór. Upadek jest piękny, gdy przestajesz bać się uderzenia o dno rzeczywistości."))
+        registerNode(DialogueNode(id = "noctyros_voices", npcId = "noctyros", text = "To nie głosy. To harmonia. Kiedyś cały świat był jednym dźwiękiem, zanim fenomeny go nie rozbiły na miliardy fałszywych nut."))
+    }
 
-        // NPC PROCEDURALNI - ROZBUDOWA
+    private fun seedChapter7Untamed() {
+        registerNode(DialogueNode(
+            id = "anomaly_start", npcId = "anomalia",
+            text = "Tu nie ma Proroka, bo tu nie ma już kogo okłamywać. Trawa rośnie wewnątrz Twoich płuc, a czas płynie w poprzek. Czy wciąż wierzysz, że jesteś człowiekiem?",
+            choices = listOf(
+                DialogueChoice("Jestem tym, który przetrwa.", "anomaly_survive"),
+                DialogueChoice("Ziemie Dzikie... to piękny koniec.", "anomaly_beauty")
+            )
+        ))
+    }
+
+    private fun seedMetaLore() {
+        // THE ABSOLUTE CLUES
+        registerNode(DialogueNode(
+            id = "absolute_echo", npcId = "procedural",
+            text = "Widziałem to w moich wizjach. Absolut to nie byt. To pusty pokój, w którym ktoś zostawił zapaloną świecę. My jesteśmy tylko tańczącymi cieniami na ścianie.",
+            choices = listOf(DialogueChoice("Kto zapalił świecę?", "absolute_candle"))
+        ))
+        registerNode(DialogueNode(id = "absolute_candle", npcId = "procedural", text = "Ty. Ja. My wszyscy. Przestaliśmy mrugać i teraz rzeczywistość wypala nam oczy."))
+
+        // CHRONICLER SECRETS
         registerNode(DialogueNode(
             id = "chronicler_deep", npcId = "procedural",
-            text = "Moje pióro krwawi czarnym atramentem. Każde słowo, które piszę, znika z pamięci świata. Jesteśmy w ostatnim rozdziale, nie sądzisz?",
+            text = "Znalazłem stronę w mojej kronice, która została zapisana Twoim charakterem pisma... ale tysiąc lat temu. Jak to wyjaśnisz, Kotwico?",
             choices = listOf(
-                DialogueChoice("Zapisz moje czyny.", "chronicler_deeds"),
-                DialogueChoice("Spal tę księgę.", "chronicler_burn")
+                DialogueChoice("To pętla czasu.", "chronicler_loop"),
+                DialogueChoice("To kłamstwo Mgły.", "chronicler_lie")
             )
         ))
-        
-        registerNode(DialogueNode(
-            id = "fugitive_horror", npcId = "procedural",
-            text = "Widziałem jak kamień stał się okiem i mrugnął do mnie! Nie wrócę tam... Ziemie Dzikie... tam trawa krzyczy...",
-            choices = listOf(
-                DialogueChoice("Uspokój się.", "fugitive_calm"),
-                DialogueChoice("Pokaż mi drogę.", "end")
-            )
-        ))
-        
-        registerNode(DialogueNode(
-            id = "mystic_absolute", npcId = "procedural",
-            text = "Absolut nie śpi. On czeka, aż wszyscy zamkniemy oczy, żeby mógł w końcu przestać udawać, że istniejemy.",
-            choices = listOf(
-                DialogueChoice("To nihilistyczne bzdury.", "end"),
-                DialogueChoice("Co się stanie, gdy się obudzi?", "mystic_wake")
-            )
-        ))
-        registerNode(DialogueNode(id = "mystic_wake", npcId = "procedural", text = "Wszystkie kolory zleją się w jeden. Wszystkie dźwięki w ciszę. Będziesz tam, ale nie będzie kogoś, kto mógłby to zauważyć."))
     }
 }
