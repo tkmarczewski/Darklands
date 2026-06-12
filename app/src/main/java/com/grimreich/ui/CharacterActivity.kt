@@ -2,6 +2,7 @@ package com.grimreich.ui
 
 import android.os.Bundle
 import android.widget.Button
+import android.widget.GridLayout
 import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
@@ -9,63 +10,71 @@ import androidx.appcompat.app.AppCompatActivity
 import com.grimreich.R
 import com.grimreich.core.GameRepository
 import com.grimreich.core.Hero
+import com.grimreich.systems.DialogueManager
 
 class CharacterActivity : AppCompatActivity() {
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_character)
 
-        val heroId = intent.getStringExtra("heroId") ?: GameRepository.state.activeHeroId
+        val heroId = intent.getStringExtra("heroId")
         val hero = GameRepository.state.party.find { it.id == heroId }
         
         if (hero != null) {
             renderHero(hero)
+        } else {
+            finish()
         }
 
-        findViewById<Button>(R.id.btnBackFromChar).setOnClickListener {
+        findViewById<Button>(R.id.btnExitCharacter).setOnClickListener {
             finish()
         }
     }
 
     private fun renderHero(hero: Hero) {
-        findViewById<TextView>(R.id.tvHeroName).text = hero.name.uppercase()
-        findViewById<TextView>(R.id.tvHeroLevel).text = "Poziom ${hero.level}"
-        
-        val hpPercent = (hero.hp * 100 / hero.maxHp).coerceIn(0, 100)
-        findViewById<TextView>(R.id.tvHpStatus).text = "HP: ${hero.hp}/${hero.maxHp}"
-        findViewById<ProgressBar>(R.id.pbHp).progress = hpPercent
+        findViewById<TextView>(R.id.tvHeroName).text = hero.name
+        findViewById<TextView>(R.id.tvHeroRole).text = hero.currentCareer?.name?.uppercase() ?: "WĘDROWIEC"
+        findViewById<ProgressBar>(R.id.pbHeroHP).progress = (hero.hp * 100 / hero.maxHp).coerceAtMost(100)
+        findViewById<ProgressBar>(R.id.pbHeroSanity).progress = hero.sanity
 
-        findViewById<TextView>(R.id.tvSanityStatus).text = "Poczytalność: ${hero.sanity}%"
-        findViewById<ProgressBar>(R.id.pbSanity).progress = hero.sanity
-
-        // Portrait
-        val portrait = findViewById<ImageView>(R.id.ivPortrait)
-        val resId = resources.getIdentifier(hero.portraitRes, "drawable", packageName).let {
-            if (it == 0) R.drawable.port_knight else it
+        // CANONICAL PORTRAIT MAPPING
+        val portraitName = DialogueManager.getPortrait(hero.currentCareer?.name ?: "rogue")
+        val portResId = resources.getIdentifier(portraitName, "drawable", packageName)
+        if (portResId != 0) {
+            findViewById<ImageView>(R.id.ivHeroPortrait).setImageResource(portResId)
         }
-        portrait.setImageResource(resId)
 
-        // Attributes
-        findViewById<TextView>(R.id.tvStatStr).text = "Siła: ${hero.strength}"
-        findViewById<TextView>(R.id.tvStatAgi).text = "Zręczność: ${hero.agility}"
-        findViewById<TextView>(R.id.tvStatPer).text = "Percepcja: ${hero.perception}"
-        findViewById<TextView>(R.id.tvStatInt).text = "Inteligencja: ${hero.intelligence}"
-        findViewById<TextView>(R.id.tvStatEnd).text = "Wytrzymałość: ${hero.endurance}"
-        findViewById<TextView>(R.id.tvStatCha).text = "Charyzma: ${hero.charisma}"
-        findViewById<TextView>(R.id.tvStatPie).text = "Pobożność: ${hero.piety}"
+        val grid = findViewById<GridLayout>(R.id.glStats)
+        grid.removeAllViews()
 
-        // Equipment
-        val inv = com.grimreich.systems.InventorySystem
-        val gear = inv.getEquippedItems(hero)
-        findViewById<TextView>(R.id.tvEquippedWeapon).text = "Broń: ${gear.weapon?.name ?: "Brak"}"
-        findViewById<TextView>(R.id.tvEquippedArmor).text = "Pancerz: ${gear.bodyArmor?.name ?: "Brak"}"
-        
-        // Traits & Skills
-        findViewById<TextView>(R.id.tvTrait).text = hero.trait?.name ?: "Brak cechy"
-        findViewById<TextView>(R.id.tvAbilities).text = if (hero.abilities.isEmpty()) "Brak zdolności" else hero.abilities.joinToString("\n") { it.name }
-        
-        val topSkills = hero.skills.entries.sortedByDescending { it.value }.take(5)
-        findViewById<TextView>(R.id.tvSkills).text = topSkills.joinToString("\n") { "${it.key}: ${it.value}%" }
+        val stats = mapOf(
+            "Siła" to hero.strength,
+            "Zręczność" to hero.agility,
+            "Percepcja" to hero.perception,
+            "Inteligencja" to hero.intelligence,
+            "Wytrzymałość" to hero.endurance,
+            "Charyzma" to hero.charisma,
+            "Pobożność" to hero.piety
+        )
+
+        stats.forEach { (key, value) ->
+            val label = TextView(this).apply {
+                text = "${key.uppercase()}: "
+                styleToGrim(true)
+            }
+            val valView = TextView(this).apply {
+                text = value.toString()
+                styleToGrim(false)
+            }
+            grid.addView(label)
+            grid.addView(valView)
+        }
+    }
+
+    private fun TextView.styleToGrim(isLabel: Boolean) {
+        this.setTextColor(androidx.core.content.ContextCompat.getColor(context, 
+            if (isLabel) R.color.grimTextPrimary else R.color.grimGold))
+        this.setPadding(8, 8, 32, 8)
+        this.textSize = 14f
     }
 }

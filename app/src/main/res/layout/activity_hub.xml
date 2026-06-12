@@ -22,12 +22,12 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <!-- Header - Modernized -->
+        <!-- Header -->
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="12dp"
-            android:background="#80000000">
+            android:padding="16dp"
+            android:background="@drawable/ui_frame_gold">
 
             <TextView
                 android:id="@+id/tvTime"
@@ -35,7 +35,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerHorizontal="true"
-                android:text="Grimhold | Dzień 1 | Poranek"
+                android:text="Lokacja: Grimhold\nDzień 1, morning"
                 android:gravity="center" />
 
             <TextView
@@ -53,47 +53,59 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:padding="16dp">
 
-            <!-- NAVIGATION GRID -->
+            <!-- NAVIGATION GRID IN MAIN PANEL -->
             <GridLayout
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_weight="1.2"
+                android:layout_weight="1"
                 android:columnCount="3"
                 android:rowCount="4"
-                android:background="#60000000"
-                android:padding="8dp">
+                android:background="@drawable/ui_panel_main"
+                android:padding="12dp">
 
                 <Button android:id="@+id/openCity" style="@style/GrimCombatButton" android:text="MIASTO" />
                 <Button android:id="@+id/openMap" style="@style/GrimCombatButton" android:text="MAPA" />
                 <Button android:id="@+id/openInventory" style="@style/GrimCombatButton" android:text="PLECAK" />
 
                 <Button android:id="@+id/openQuests" style="@style/GrimCombatButton" android:text="ZADANIA" />
-                <Button android:id="@+id/openSaints" style="@style/GrimCombatButton" android:text="KAPLICA" />
-                <Button android:id="@+id/openReputation" style="@style/GrimCombatButton" android:text="REPUTACJA" />
+                <Button android:id="@+id/openFinale" style="@style/GrimCombatButton" android:text="FINAŁ" android:visibility="gone" />
+                <Button android:id="@+id/openSaints" style="@style/GrimCombatButton" android:text="PROROCY" />
 
+                <Button android:id="@+id/openReputation" style="@style/GrimCombatButton" android:text="REPUTACJA" />
                 <Button android:id="@+id/openCityEvents" style="@style/GrimCombatButton" android:text="WIEŚCI" />
                 <Button android:id="@+id/openTransfer" style="@style/GrimCombatButton" android:text="TRANSFER" />
-                <Button android:id="@+id/openFinale" style="@style/GrimCombatButton" android:text="FINAŁ" android:visibility="gone" />
             </GridLayout>
 
-            <!-- STATUS/LOG -->
+            <!-- STATUS/LOG IN SIDE PANEL -->
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="0.8"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:paddingStart="16dp">
 
                 <TextView
                     android:id="@+id/tvLogMini"
                     style="@style/GrimTextBody"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:background="#40000000"
-                    android:padding="12dp"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/ui_panel_side"
+                    android:padding="16dp"
                     android:text="Kroniki pękniętego świata..."
                     android:textColor="@color/grimGold" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="8dp">
+                    <Button android:id="@+id/btnSave" style="@style/GrimSmallButton" android:layout_weight="1" android:text="ZAPISZ" />
+                    <Button android:id="@+id/btnLoad" style="@style/GrimSmallButton" android:layout_weight="1" android:text="WCZYTAJ" />
+                </LinearLayout>
 
                 <Button
                     android:id="@+id/openCombatStatus"
@@ -108,4 +120,11 @@
         <include layout="@layout/strip_party" />
 
     </LinearLayout>
+
+    <!-- REALITY LEAK OVERLAY -->
+    <com.grimreich.ui.view.GlitchOverlayView
+        android:id="@+id/glitchOverlay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
 </FrameLayout>

@@ -13,13 +13,14 @@ object SocialEventSystem {
         val city = CityCatalogue.get(cityId) ?: return "Miasto spowite mrokiem."
         return buildString {
             appendLine("=== AUDIENCJA: ${city.name.uppercase()} ===")
-            appendLine("Główny fenomen: ${city.phenomenon}")
-            appendLine("Rządząca frakcja: ${city.rulingFaction}")
-            if (saintId != null) {
-                appendLine("Obecny Prorok: $saintId")
-            }
+            appendLine("Domena: ${city.phenomenon}")
+            appendLine("Patron: ${city.prophet ?: "Brak"}")
             appendLine()
-            appendLine("Ludzie szepczą o nadchodzących pęknięciach rzeczywistości.")
+            appendLine(city.loreDescription)
+            appendLine()
+            appendLine("Główny Artefakt: ${city.primaryArtifact}")
+            appendLine()
+            appendLine("Rządząca frakcja: ${city.rulingFaction}")
         }
     }
 
@@ -33,14 +34,14 @@ object SocialEventSystem {
         return when(eventType) {
             SocialEventType.DRINKING -> {
                 g.party.forEach { it.morale = (it.morale + 10).coerceAtMost(100) }
-                "Picie z miejscowymi podniosło morale drużyny."
+                "Picie z miejscowymi podniosło morale drużyny. Przez chwilę świat wydawał się stabilniejszy."
             }
-            SocialEventType.GOSSIP -> "Usłyszeliście plotki o zbliżającej się mgle."
+            SocialEventType.GOSSIP -> "Usłyszeliście plotki o zbliżającej się mgle. Ktoś wspomniał o pęknięciu w regionie ${CityCatalogue.startingCityId}."
             SocialEventType.BRAWL -> {
                 g.party.forEach { it.hp -= 2 }
-                "Karczemna bójka! Kilka siniaków, ale respekt zdobyty."
+                "Karczemna bójka! Kilka siniaków, ale respekt zdobyty. Czuć nienaturalną siłę w każdym ciosie."
             }
-            SocialEventType.CEREMONY -> "W karczmie odbywa się dziwny, milczący rytuał."
+            SocialEventType.CEREMONY -> "W karczmie odbywa się dziwny, milczący rytuał ku czci Absolutu. Wszyscy patrzą na Ciebie z pustką w oczach."
         }
     }
 }

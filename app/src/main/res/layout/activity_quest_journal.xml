@@ -1,34 +1,55 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:background="@color/grimBgMain"
-    android:padding="16dp">
+    android:layout_height="match_parent">
 
-    <TextView
-        style="@style/GrimTextHeader"
+    <!-- THEMED BACKGROUND -->
+    <ImageView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="DZIENNIK PRZYGÓD"
-        android:gravity="center"
-        android:layout_marginBottom="16dp" />
+        android:layout_height="match_parent"
+        android:scaleType="centerCrop"
+        android:src="@drawable/bg_region_heartland" />
 
-    <ScrollView
+    <View
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1">
-        <LinearLayout
-            android:id="@+id/questListContainer"
+        android:layout_height="match_parent"
+        android:background="#D0000000" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:padding="24dp">
+
+        <TextView
+            style="@style/GrimTextHeader"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical" />
-    </ScrollView>
+            android:text="KRONIKI PĘKNIĘTEGO ŚWIATA"
+            android:gravity="center"
+            android:padding="12dp"
+            android:background="@drawable/ui_frame_gold"
+            android:layout_marginBottom="16dp" />
 
-    <Button
-        android:id="@+id/btnExitJournal"
-        style="@style/GrimBackButton"
-        android:layout_width="match_parent"
-        android:text="POWRÓT" />
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:background="@drawable/ui_panel_main"
+            android:padding="16dp">
+            <LinearLayout
+                android:id="@+id/questListContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" />
+        </ScrollView>
 
-</LinearLayout>
+        <Button
+            android:id="@+id/btnExitJournal"
+            style="@style/GrimBackButton"
+            android:layout_width="match_parent"
+            android:layout_marginTop="16dp"
+            android:text="POWRÓT" />
+
+    </LinearLayout>
+</FrameLayout>

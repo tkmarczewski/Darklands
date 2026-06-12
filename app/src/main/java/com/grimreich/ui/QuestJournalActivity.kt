@@ -27,31 +27,51 @@ class QuestJournalActivity : AppCompatActivity() {
         val allQuests = QuestSystem.all()
         if (allQuests.isEmpty()) {
             val tv = TextView(this).apply {
-                text = "Brak aktywnych zadań w tym pęknięciu świata."
-                styleToGrim()
+                text = "Twoje kroniki milczą. Nie podjęto jeszcze żadnych prób naprawy rzeczywistości."
+                styleToGrim(false)
             }
             container.addView(tv)
             return
         }
 
         allQuests.forEach { quest ->
-            val tv = TextView(this).apply {
-                text = "• ${quest.title}\n  ${quest.description}\n  Status: ${quest.status}"
-                styleToGrim()
+            val questView = LinearLayout(this).apply {
+                orientation = LinearLayout.VERTICAL
+                background = androidx.core.content.ContextCompat.getDrawable(context, R.drawable.ui_panel_side)
                 setPadding(24, 24, 24, 24)
+                val params = LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+                ).apply { setMargins(0, 0, 0, 24) }
+                layoutParams = params
             }
-            container.addView(tv)
+
+            val titleTv = TextView(this).apply {
+                text = quest.title.uppercase()
+                styleToGrim(true)
+            }
+            val descTv = TextView(this).apply {
+                text = quest.description
+                styleToGrim(false)
+            }
+            val statusTv = TextView(this).apply {
+                text = "STATUS: ${quest.status}"
+                styleToGrim(false)
+                setTextColor(android.graphics.Color.parseColor("#FFD700"))
+                textSize = 12f
+            }
+
+            questView.addView(titleTv)
+            questView.addView(descTv)
+            questView.addView(statusTv)
+            container.addView(questView)
         }
     }
 
-    private fun TextView.styleToGrim() {
-        this.setTextColor(androidx.core.content.ContextCompat.getColor(context, R.color.grimTextPrimary))
-        this.textSize = 14f
-        val params = LinearLayout.LayoutParams(
-            LinearLayout.LayoutParams.MATCH_PARENT,
-            LinearLayout.LayoutParams.WRAP_CONTENT
-        )
-        params.setMargins(0, 0, 0, 16)
-        this.layoutParams = params
+    private fun TextView.styleToGrim(isHeader: Boolean) {
+        this.setTextColor(androidx.core.content.ContextCompat.getColor(context, 
+            if (isHeader) R.color.grimAccentGold else R.color.grimTextPrimary))
+        this.textSize = if (isHeader) 16f else 14f
+        this.setPadding(0, 0, 0, 8)
     }
 }

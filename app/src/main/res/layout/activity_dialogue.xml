@@ -1,49 +1,87 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:background="#1a1a2e"
-    android:padding="24dp">
+    android:layout_height="match_parent">
 
-    <TextView
-        android:id="@+id/tvNpcName"
+    <!-- BACKGROUND -->
+    <ImageView
+        android:id="@+id/ivDialogueBg"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="NPC Name"
-        android:textColor="#e63946"
-        android:textSize="20sp"
-        android:fontFamily="monospace"
-        android:gravity="center"
-        android:layout_marginBottom="8dp" />
+        android:layout_height="match_parent"
+        android:scaleType="centerCrop"
+        android:src="@drawable/bg_region_north_coast" />
 
-    <TextView
-        android:id="@+id/tvNpcRole"
+    <View
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Role"
-        android:textColor="#c8a96e"
-        android:textSize="12sp"
-        android:gravity="center"
-        android:layout_marginBottom="24dp" />
-
-    <TextView
-        android:id="@+id/tvDialogueText"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:text="Dialogue content..."
-        android:textColor="#ffffff"
-        android:textSize="16sp"
-        android:fontFamily="serif"
-        android:padding="8dp"
-        android:background="#16213e" />
+        android:layout_height="match_parent"
+        android:background="#D0000000" />
 
     <LinearLayout
-        android:id="@+id/choicesContainer"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:orientation="vertical"
-        android:layout_marginTop="24dp" />
+        android:padding="24dp">
 
-</LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:orientation="horizontal">
+
+            <!-- PORTRAIT -->
+            <ImageView
+                android:id="@+id/ivNpcPortrait"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.4"
+                android:scaleType="centerInside"
+                android:src="@drawable/port_wraith"
+                android:background="@drawable/ui_frame_portrait"
+                android:padding="8dp" />
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.6"
+                android:orientation="vertical"
+                android:paddingStart="24dp">
+
+                <TextView
+                    android:id="@+id/tvNpcName"
+                    style="@style/GrimTextHeader"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="NPC Name"
+                    android:textSize="24sp" />
+
+                <TextView
+                    android:id="@+id/tvNpcRole"
+                    style="@style/GrimTextBody"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Echo"
+                    android:textColor="@color/grimGold"
+                    android:layout_marginBottom="16dp" />
+
+                <TextView
+                    android:id="@+id/tvDialogueText"
+                    style="@style/GrimTextBody"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:text="Dialogue content..."
+                    android:textSize="18sp"
+                    android:background="@drawable/ui_panel_side"
+                    android:padding="16dp" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/choicesContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginTop="24dp" />
+
+    </LinearLayout>
+</FrameLayout>

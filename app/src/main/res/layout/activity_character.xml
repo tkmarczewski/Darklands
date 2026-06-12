@@ -1,214 +1,156 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/grimBgMain"
-    android:orientation="vertical"
-    android:padding="16dp">
+    android:layout_height="match_parent">
 
-    <TextView
-        style="@style/GrimTextHeader"
+    <!-- THEMED BACKGROUND -->
+    <ImageView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:text="KARTA BOHATERA"
-        android:layout_marginBottom="12dp" />
+        android:layout_height="match_parent"
+        android:scaleType="centerCrop"
+        android:src="@drawable/bg_party_castle" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#B0000000" />
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:orientation="horizontal">
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
-        <!-- Kolumna lewa: Portret i Podstawy -->
+        <!-- HEADER -->
+        <TextView
+            android:id="@+id/tvHeroTitle"
+            style="@style/GrimTextHeader"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="KARTA BOHATERA"
+            android:gravity="center"
+            android:padding="16dp"
+            android:background="@drawable/ui_frame_gold" />
+
         <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
             android:layout_weight="1"
-            android:orientation="vertical"
-            android:paddingEnd="8dp">
+            android:orientation="horizontal"
+            android:padding="16dp">
 
-            <ImageView
-                android:id="@+id/ivPortrait"
-                android:layout_width="140dp"
-                android:layout_height="140dp"
-                android:layout_gravity="center_horizontal"
-                android:scaleType="centerCrop"
-                android:src="@drawable/port_knight"
-                android:background="#20FFFFFF"
-                android:layout_marginBottom="8dp" />
-
-            <TextView
-                android:id="@+id/tvHeroName"
-                style="@style/GrimTextHeader"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:text="ELARA SHADOW" />
-
-            <TextView
-                android:id="@+id/tvHeroLevel"
-                style="@style/GrimTextBody"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:text="Poziom 1"
-                android:textColor="@color/grimAccentGold" />
-
-            <Space android:layout_width="match_parent" android:layout_height="12dp" />
-
-            <TextView
-                android:id="@+id/tvHpStatus"
-                style="@style/GrimTextSmall"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="HP: 30/30" />
-            <ProgressBar
-                android:id="@+id/pbHp"
-                style="?android:attr/progressBarStyleHorizontal"
-                android:layout_width="match_parent"
-                android:layout_height="8dp"
-                android:progressTint="@color/grimBlood"
-                android:layout_marginBottom="8dp" />
-
-            <TextView
-                android:id="@+id/tvSanityStatus"
-                style="@style/GrimTextSmall"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Poczytalność: 100%" />
-            <ProgressBar
-                android:id="@+id/pbSanity"
-                style="?android:attr/progressBarStyleHorizontal"
-                android:layout_width="match_parent"
-                android:layout_height="8dp"
-                android:progressTint="@color/grimMist" />
-        </LinearLayout>
-
-        <!-- Kolumna środkowa: Atrybuty i Wyposażenie -->
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1.4"
-            android:orientation="vertical"
-            android:paddingStart="8dp"
-            android:paddingEnd="8dp">
-
-            <TextView
-                style="@style/GrimTextHeader"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="ATRYBUTY"
-                android:textSize="14sp"
-                android:layout_marginBottom="8dp" />
-
-            <GridLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:columnCount="2"
-                android:useDefaultMargins="true">
-                <!-- Atrybuty renderowane dynamicznie lub przez include bez ikon (usuniete) -->
-                <TextView android:id="@+id/tvStatStr" style="@style/GrimTextBody" android:text="Siła: 10" android:layout_width="wrap_content" android:layout_height="wrap_content" />
-                <TextView android:id="@+id/tvStatAgi" style="@style/GrimTextBody" android:text="Zręczność: 10" android:layout_width="wrap_content" android:layout_height="wrap_content" />
-                <TextView android:id="@+id/tvStatPer" style="@style/GrimTextBody" android:text="Percepcja: 10" android:layout_width="wrap_content" android:layout_height="wrap_content" />
-                <TextView android:id="@+id/tvStatInt" style="@style/GrimTextBody" android:text="Inteligencja: 10" android:layout_width="wrap_content" android:layout_height="wrap_content" />
-                <TextView android:id="@+id/tvStatEnd" style="@style/GrimTextBody" android:text="Wytrzymałość: 10" android:layout_width="wrap_content" android:layout_height="wrap_content" />
-                <TextView android:id="@+id/tvStatCha" style="@style/GrimTextBody" android:text="Charyzma: 10" android:layout_width="wrap_content" android:layout_height="wrap_content" />
-                <TextView android:id="@+id/tvStatPie" style="@style/GrimTextBody" android:text="Pobożność: 10" android:layout_width="wrap_content" android:layout_height="wrap_content" />
-            </GridLayout>
-
-            <Space android:layout_width="match_parent" android:layout_height="16dp" />
-
-            <TextView
-                style="@style/GrimTextHeader"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="WYPOSAŻENIE"
-                android:textSize="14sp"
-                android:layout_marginBottom="4dp" />
-
+            <!-- LEFT: PORTRAIT & VITALS -->
             <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
                 android:orientation="vertical"
-                android:background="#20FFFFFF"
-                android:padding="8dp">
-                <TextView android:id="@+id/tvEquippedWeapon" style="@style/GrimTextSmall" android:text="Broń: Brak" android:layout_width="match_parent" android:layout_height="wrap_content" />
-                <TextView android:id="@+id/tvEquippedArmor" style="@style/GrimTextSmall" android:text="Pancerz: Brak" android:layout_width="match_parent" android:layout_height="wrap_content" />
-                <TextView android:id="@+id/tvEquippedAcc" style="@style/GrimTextSmall" android:text="Akcesoria: Brak" android:layout_width="match_parent" android:layout_height="wrap_content" />
-            </LinearLayout>
+                android:background="@drawable/ui_panel_main"
+                android:padding="12dp">
 
-        </LinearLayout>
-
-        <!-- Kolumna prawa: Cechy i Zdolności -->
-        <ScrollView
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1.2"
-            android:paddingStart="8dp">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical">
+                <ImageView
+                    android:id="@+id/ivHeroPortrait"
+                    android:layout_width="match_parent"
+                    android:layout_height="180dp"
+                    android:src="@drawable/port_knight"
+                    android:scaleType="centerInside"
+                    android:background="@drawable/ui_frame_portrait"
+                    android:padding="8dp" />
 
                 <TextView
+                    android:id="@+id/tvHeroName"
                     style="@style/GrimTextHeader"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="CECHA"
-                    android:textSize="14sp"
-                    android:layout_marginBottom="4dp" />
+                    android:gravity="center"
+                    android:layout_marginTop="8dp" />
+
                 <TextView
-                    android:id="@+id/tvTrait"
+                    android:id="@+id/tvHeroRole"
                     style="@style/GrimTextBody"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Brak cechy"
-                    android:textColor="@color/grimAccentGold"
-                    android:layout_marginBottom="12dp" />
+                    android:gravity="center"
+                    android:textColor="@color/grimGold" />
 
-                <TextView
-                    style="@style/GrimTextHeader"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="ZDOLNOŚCI"
-                    android:textSize="14sp"
-                    android:layout_marginBottom="4dp" />
-                <TextView
-                    android:id="@+id/tvAbilities"
-                    style="@style/GrimTextSmall"
+                <Space android:layout_width="match_parent" android:layout_height="16dp" />
+
+                <TextView style="@style/GrimTextSmall" android:text="ŻYWOTNOŚĆ" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+                <ProgressBar
+                    android:id="@+id/pbHeroHP"
+                    style="?android:attr/progressBarStyleHorizontal"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Brak zdolności"
-                    android:layout_marginBottom="12dp" />
+                    android:layout_height="8dp"
+                    android:progress="80"
+                    android:progressTint="#FF0000" />
 
-                <TextView
-                    style="@style/GrimTextHeader"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="UMIEJĘTNOŚCI"
-                    android:textSize="14sp"
-                    android:layout_marginBottom="4dp" />
-                <TextView
-                    android:id="@+id/tvSkills"
-                    style="@style/GrimTextSmall"
+                <TextView style="@style/GrimTextSmall" android:text="POCZYTALNOŚĆ" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="8dp" />
+                <ProgressBar
+                    android:id="@+id/pbHeroSanity"
+                    style="?android:attr/progressBarStyleHorizontal"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="..." />
-
+                    android:layout_height="8dp"
+                    android:progress="60"
+                    android:progressTint="#00AAFF" />
             </LinearLayout>
-        </ScrollView>
+
+            <!-- CENTER: STATS PANEL -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:paddingStart="16dp">
+
+                <TextView
+                    style="@style/GrimTextHeader"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="ATRYBUTY"
+                    android:textSize="14sp"
+                    android:layout_marginBottom="8dp" />
+
+                <GridLayout
+                    android:id="@+id/glStats"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:columnCount="2"
+                    android:background="@drawable/ui_panel_stats"
+                    android:padding="16dp">
+                    <!-- Dynamic stats populated in Kotlin -->
+                </GridLayout>
+            </LinearLayout>
+
+            <!-- RIGHT: BIOGRAPHY & LORE -->
+            <ScrollView
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1.2"
+                android:paddingStart="16dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:background="@drawable/ui_panel_side"
+                    android:padding="12dp">
+
+                    <TextView style="@style/GrimTextHeader" android:text="HISTORIA" android:textSize="14sp" />
+                    <TextView
+                        android:id="@+id/tvHeroBio"
+                        style="@style/GrimTextBody"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Urodzony pod znakiem Pęknięcia..." />
+                </LinearLayout>
+            </ScrollView>
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/btnExitCharacter"
+            style="@style/GrimBackButton"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:text="POWRÓT" />
 
     </LinearLayout>
-
-    <Button
-        android:id="@+id/btnBackFromChar"
-        style="@style/GrimBackButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:text="← POWRÓT"
-        android:layout_marginTop="8dp" />
-
-</LinearLayout>
+</FrameLayout>

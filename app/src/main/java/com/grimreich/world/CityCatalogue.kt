@@ -13,6 +13,8 @@ data class CityData(
     val rulingFaction: String,
     val priceModifier: Float,
     val backgroundDrawable: String,
+    val loreDescription: String,
+    val primaryArtifact: String,
     val events: MutableList<String> = mutableListOf(),
     val prophet: String? = null
 )
@@ -43,6 +45,8 @@ object CityCatalogue {
             rulingFaction = "Zakon Świtu",
             priceModifier = 1.0f,
             backgroundDrawable = "bg_region_north_coast",
+            loreDescription = "Miejsce, gdzie rzeczywistość miesza się z sennym oparem. Ludzie tracą tu wspomnienia, a mróz nie jest temperaturą, lecz stanem duszy.",
+            primaryArtifact = "Kielich Zapomnienia",
             prophet = "Aelion",
             events = mutableListOf("port_mrozny", "zatoka_piracka", "latarnia_switu")
         ))
@@ -56,6 +60,8 @@ object CityCatalogue {
             rulingFaction = "Twierdza Zakonu",
             priceModifier = 0.9f,
             backgroundDrawable = "bg_region_crown_plains",
+            loreDescription = "Ziemia przesiąknięta szkarłatem. Tu wojna nigdy się nie kończy, a stal rdzewieje od nadmiaru życia wylewanego na polach bitew.",
+            primaryArtifact = "Sztandar Rozpaczy",
             prophet = "Xyrel",
             events = mutableListOf("miasto_korony", "cmentarzysko_krolow")
         ))
@@ -69,6 +75,8 @@ object CityCatalogue {
             rulingFaction = "Klasztor Milczenia",
             priceModifier = 1.2f,
             backgroundDrawable = "bg_region_heartland",
+            loreDescription = "Kraina luster i lśniących jezior. Każdy czyn znajduje tu swoje natychmiastowe odbicie, a kłamstwo jest fizycznie bolesne.",
+            primaryArtifact = "Lustro Absolutu",
             prophet = "Mira",
             events = mutableListOf("dwor_zloty")
         ))
@@ -82,6 +90,8 @@ object CityCatalogue {
             rulingFaction = "Zakon Świtu",
             priceModifier = 1.05f,
             backgroundDrawable = "bg_region_south_ruins",
+            loreDescription = "Wieczna jasność księżyca w pełni oświetla resztki dawnej chwały. Światło to jednak parzy tych, którzy skrywają mrok w sercu.",
+            primaryArtifact = "Maska Sereth",
             prophet = "Sereth",
             events = mutableListOf("zlote_ruiny", "spalona_wies")
         ))
@@ -95,6 +105,8 @@ object CityCatalogue {
             rulingFaction = "Kopalnia Żelaza",
             priceModifier = 1.3f,
             backgroundDrawable = "bg_region_south_mountains",
+            loreDescription = "Ciężkie góry, gdzie grawitacja wydaje się silniejsza. W kopalniach wydobywa się metal, który pamięta narodziny świata.",
+            primaryArtifact = "Młot Ferruna",
             prophet = "Ferrun",
             events = mutableListOf("czerwona_przelecz")
         ))
@@ -108,6 +120,8 @@ object CityCatalogue {
             rulingFaction = "Ruiny Czarnej Paszczy",
             priceModifier = 1.1f,
             backgroundDrawable = "bg_region_steppe",
+            loreDescription = "Przez te stepy przebiega Wielkie Pęknięcie. Cień nie pada tu od słońca, lecz wycieka z samej ziemi, pożerając kolory.",
+            primaryArtifact = "Oko Noctyrosa",
             prophet = "Noctyros",
             events = mutableListOf("kamienna_przystan")
         ))
@@ -121,6 +135,8 @@ object CityCatalogue {
             rulingFaction = "Brak",
             priceModifier = 0.8f,
             backgroundDrawable = "bg_region_wild_lands",
+            loreDescription = "Miejsce, gdzie natura oszalała. Rośliny rosną w kilka sekund, a zwierzęta mówią ludzkimi głosami, których nie chcielibyście usłyszeć.",
+            primaryArtifact = "Serce Anomalii",
             events = mutableListOf("las_cieni", "bagna_szeptow")
         ))
     }

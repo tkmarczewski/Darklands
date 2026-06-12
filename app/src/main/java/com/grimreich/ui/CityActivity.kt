@@ -80,6 +80,26 @@ class CityActivity : AppCompatActivity() {
         val container = findViewById<LinearLayout>(R.id.npcListContainer)
         container.removeAllViews()
 
+        val cityData = CityCatalogue.get(cityId)
+        
+        // Add PROPHET if exists in canonical data
+        cityData?.prophet?.let { prophetName ->
+            val prophetBtn = Button(this).apply {
+                text = "$prophetName (PROROK)"
+                styleToGrim()
+                setTextColor(android.graphics.Color.parseColor("#FFD700")) // GOLD
+                setOnClickListener {
+                    val intent = Intent(this@CityActivity, DialogueActivity::class.java).apply {
+                        putExtra("npcName", prophetName)
+                        putExtra("npcRole", prophetName)
+                        putExtra("startNodeId", "${prophetName.lowercase()}_start")
+                    }
+                    startActivity(intent)
+                }
+            }
+            container.addView(prophetBtn)
+        }
+
         val npcs = ProceduralNpcGenerator.generateForCity(cityId, 123)
         npcs.forEach { npc ->
             val btn = Button(this).apply {
