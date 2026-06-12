@@ -1,55 +1,43 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/grimBgMain"
+    android:padding="16dp">
 
-    <!-- THEMED BACKGROUND -->
-    <ImageView
+    <!-- HEADER WITH GUARANTEED BACK BUTTON -->
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:scaleType="centerCrop"
-        android:src="@drawable/bg_region_heartland" />
-
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="#D0000000" />
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:padding="24dp">
-
-        <TextView
-            style="@style/GrimTextHeader"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="KRONIKI PĘKNIĘTEGO ŚWIATA"
-            android:gravity="center"
-            android:padding="12dp"
-            android:background="@drawable/ui_frame_gold"
-            android:layout_marginBottom="16dp" />
-
-        <ScrollView
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:background="@drawable/ui_panel_main"
-            android:padding="16dp">
-            <LinearLayout
-                android:id="@+id/questListContainer"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical" />
-        </ScrollView>
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp">
 
         <Button
             android:id="@+id/btnExitJournal"
-            style="@style/GrimBackButton"
-            android:layout_width="match_parent"
-            android:layout_marginTop="16dp"
-            android:text="POWRÓT" />
+            style="@style/GrimSmallButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="← POWRÓT" />
 
-    </LinearLayout>
-</FrameLayout>
+        <TextView
+            style="@style/GrimTextHeader"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:text="KRONIKI ŚWIATA" />
+    </RelativeLayout>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:background="@drawable/ui_panel_main"
+        android:padding="16dp">
+        <LinearLayout
+            android:id="@+id/questListContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" />
+    </ScrollView>
+
+</LinearLayout>
