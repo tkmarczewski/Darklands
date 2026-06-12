@@ -20,6 +20,11 @@ object SaveLoadSystem {
             .edit()
             .putString(KEY_SAVE, json)
             .apply()
+
+        // PERSIST HEROES IN ETERNAL ECHOES
+        state.party.forEach { hero ->
+            com.grimreich.core.EchoSystem.recordHero(hero, context)
+        }
     }
 
     fun load(context: Context): Boolean {

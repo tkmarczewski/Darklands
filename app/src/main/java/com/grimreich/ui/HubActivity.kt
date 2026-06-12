@@ -24,6 +24,12 @@ class HubActivity : AppCompatActivity() {
             UiUtils.showNarrativePopup(this, "UPŁYW CZASU", eventMessage)
         }
 
+        // CALENDAR AURA
+        val aura = com.grimreich.systems.CalendarAuraSystem.getCurrentAura()
+        if (aura.name != "DZIEŃ FENOMENÓW") {
+            UiUtils.showNarrativePopup(this, "AURA: ${aura.name}", "${aura.description}\n\nEfekt: ${aura.effect}")
+        }
+
         setupNavigation()
         setupDevTrigger()
         
