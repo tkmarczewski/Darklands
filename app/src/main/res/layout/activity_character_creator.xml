@@ -31,7 +31,8 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:hint="Imię bohatera"
-                android:inputType="textPersonName"
+                android:inputType="textNoSuggestions|textVisiblePassword"
+                android:importantForAutofill="no"
                 android:backgroundTint="@color/grimGold" />
             <Button
                 android:id="@+id/btnRandomizeName"

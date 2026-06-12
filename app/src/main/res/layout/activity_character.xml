@@ -29,7 +29,7 @@
             android:text="KARTA BOHATERA"
             android:gravity="center"
             android:padding="16dp"
-            android:background="@drawable/ui_frame_gold" />
+            android:background="#80000000" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -44,7 +44,7 @@
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:orientation="vertical"
-                android:background="@drawable/ui_panel_main"
+                android:background="#60000000"
                 android:padding="12dp">
 
                 <ImageView
@@ -53,7 +53,7 @@
                     android:layout_height="180dp"
                     android:src="@drawable/port_knight"
                     android:scaleType="centerInside"
-                    android:background="@drawable/ui_frame_portrait"
+                    android:background="#20FFFFFF"
                     android:padding="8dp" />
 
                 <TextView
@@ -131,7 +131,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:background="@drawable/ui_panel_side"
+                    android:background="#40000000"
                     android:padding="12dp">
 
                     <TextView style="@style/GrimTextHeader" android:text="HISTORIA" android:textSize="14sp" />

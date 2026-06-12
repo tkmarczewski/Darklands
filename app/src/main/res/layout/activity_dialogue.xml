@@ -36,7 +36,7 @@
                 android:layout_weight="0.4"
                 android:scaleType="centerInside"
                 android:src="@drawable/port_wraith"
-                android:background="@drawable/ui_frame_portrait"
+                android:background="#20FFFFFF"
                 android:padding="8dp" />
 
             <LinearLayout
@@ -71,7 +71,7 @@
                     android:layout_weight="1"
                     android:text="Dialogue content..."
                     android:textSize="18sp"
-                    android:background="@drawable/ui_panel_side"
+                    android:background="#40000000"
                     android:padding="16dp" />
             </LinearLayout>
         </LinearLayout>
