@@ -130,42 +130,36 @@
         <Button android:id="@+id/btnCity"
             style="@style/GrimNavButton"
             android:text="Osada"
-            android:drawableTop="@drawable/ic_nav_placeholder"
             android:layout_columnWeight="1"
             android:layout_rowWeight="1"/>
 
         <Button android:id="@+id/btnTravel"
             style="@style/GrimNavButton"
             android:text="Podróż"
-            android:drawableTop="@drawable/ic_nav_placeholder"
             android:layout_columnWeight="1"
             android:layout_rowWeight="1"/>
 
         <Button android:id="@+id/btnInventory"
             style="@style/GrimNavButton"
             android:text="Ekwipunek"
-            android:drawableTop="@drawable/ic_nav_placeholder"
             android:layout_columnWeight="1"
             android:layout_rowWeight="1"/>
 
         <Button android:id="@+id/btnShrine"
             style="@style/GrimNavButton"
             android:text="Kaplica"
-            android:drawableTop="@drawable/ic_nav_placeholder"
             android:layout_columnWeight="1"
             android:layout_rowWeight="1"/>
 
         <Button android:id="@+id/btnAlchemy"
             style="@style/GrimNavButton"
             android:text="Alchemia"
-            android:drawableTop="@drawable/ic_nav_placeholder"
             android:layout_columnWeight="1"
             android:layout_rowWeight="1"/>
 
         <Button android:id="@+id/btnMap"
             style="@style/GrimNavButton"
             android:text="Atlas"
-            android:drawableTop="@drawable/ic_nav_placeholder"
             android:layout_columnWeight="1"
             android:layout_rowWeight="1"/>
 

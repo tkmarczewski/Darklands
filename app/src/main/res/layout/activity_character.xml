@@ -12,7 +12,7 @@
         android:layout_height="wrap_content"
         android:gravity="center"
         android:text="KARTA BOHATERA"
-        android:layout_marginBottom="16dp" />
+        android:layout_marginBottom="12dp" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -20,7 +20,7 @@
         android:layout_weight="1"
         android:orientation="horizontal">
 
-        <!-- Kolumna lewa: Portret i Główne Info -->
+        <!-- Kolumna lewa: Portret i Podstawy -->
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="match_parent"
@@ -30,13 +30,13 @@
 
             <ImageView
                 android:id="@+id/ivPortrait"
-                android:layout_width="120dp"
-                android:layout_height="120dp"
+                android:layout_width="140dp"
+                android:layout_height="140dp"
                 android:layout_gravity="center_horizontal"
-                android:src="@drawable/ic_stats_cha"
-                android:scaleType="centerInside"
-                android:background="@color/grimBgDarker"
-                android:layout_marginBottom="12dp" />
+                android:scaleType="centerCrop"
+                android:src="@drawable/port_knight"
+                android:background="#20FFFFFF"
+                android:layout_marginBottom="8dp" />
 
             <TextView
                 android:id="@+id/tvHeroName"
@@ -44,7 +44,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
-                android:text="IMIĘ" />
+                android:text="ELARA SHADOW" />
 
             <TextView
                 android:id="@+id/tvHeroLevel"
@@ -55,11 +55,11 @@
                 android:text="Poziom 1"
                 android:textColor="@color/grimAccentGold" />
 
-            <Space android:layout_width="match_parent" android:layout_height="16dp" />
+            <Space android:layout_width="match_parent" android:layout_height="12dp" />
 
             <TextView
                 android:id="@+id/tvHpStatus"
-                style="@style/GrimTextBody"
+                style="@style/GrimTextSmall"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="HP: 30/30" />
@@ -68,13 +68,12 @@
                 style="?android:attr/progressBarStyleHorizontal"
                 android:layout_width="match_parent"
                 android:layout_height="8dp"
-                android:progress="100"
-                android:progressTint="@color/grimCombatDmg"
+                android:progressTint="@color/grimBlood"
                 android:layout_marginBottom="8dp" />
 
             <TextView
                 android:id="@+id/tvSanityStatus"
-                style="@style/GrimTextBody"
+                style="@style/GrimTextSmall"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Poczytalność: 100%" />
@@ -83,17 +82,14 @@
                 style="?android:attr/progressBarStyleHorizontal"
                 android:layout_width="match_parent"
                 android:layout_height="8dp"
-                android:progress="100"
-                android:progressTint="#3F51B5"
-                android:layout_marginBottom="16dp" />
-
+                android:progressTint="@color/grimMist" />
         </LinearLayout>
 
-        <!-- Kolumna środkowa: Atrybuty -->
+        <!-- Kolumna środkowa: Atrybuty i Wyposażenie -->
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="1.2"
+            android:layout_weight="1.4"
             android:orientation="vertical"
             android:paddingStart="8dp"
             android:paddingEnd="8dp">
@@ -103,23 +99,44 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="ATRYBUTY"
+                android:textSize="14sp"
                 android:layout_marginBottom="8dp" />
 
             <GridLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:columnCount="2"
-                android:alignmentMode="alignMargins">
-
-                <include layout="@layout/item_attribute_display" android:id="@+id/viewStr" android:layout_width="wrap_content" android:layout_height="wrap_content" />
-                <include layout="@layout/item_attribute_display" android:id="@+id/viewAgi" android:layout_width="wrap_content" android:layout_height="wrap_content" />
-                <include layout="@layout/item_attribute_display" android:id="@+id/viewPer" android:layout_width="wrap_content" android:layout_height="wrap_content" />
-                <include layout="@layout/item_attribute_display" android:id="@+id/viewInt" android:layout_width="wrap_content" android:layout_height="wrap_content" />
-                <include layout="@layout/item_attribute_display" android:id="@+id/viewEnd" android:layout_width="wrap_content" android:layout_height="wrap_content" />
-                <include layout="@layout/item_attribute_display" android:id="@+id/viewCha" android:layout_width="wrap_content" android:layout_height="wrap_content" />
-                <include layout="@layout/item_attribute_display" android:id="@+id/viewPie" android:layout_width="wrap_content" android:layout_height="wrap_content" />
-
+                android:useDefaultMargins="true">
+                <!-- Atrybuty renderowane dynamicznie lub przez include bez ikon (usuniete) -->
+                <TextView android:id="@+id/tvStatStr" style="@style/GrimTextBody" android:text="Siła: 10" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+                <TextView android:id="@+id/tvStatAgi" style="@style/GrimTextBody" android:text="Zręczność: 10" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+                <TextView android:id="@+id/tvStatPer" style="@style/GrimTextBody" android:text="Percepcja: 10" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+                <TextView android:id="@+id/tvStatInt" style="@style/GrimTextBody" android:text="Inteligencja: 10" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+                <TextView android:id="@+id/tvStatEnd" style="@style/GrimTextBody" android:text="Wytrzymałość: 10" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+                <TextView android:id="@+id/tvStatCha" style="@style/GrimTextBody" android:text="Charyzma: 10" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+                <TextView android:id="@+id/tvStatPie" style="@style/GrimTextBody" android:text="Pobożność: 10" android:layout_width="wrap_content" android:layout_height="wrap_content" />
             </GridLayout>
+
+            <Space android:layout_width="match_parent" android:layout_height="16dp" />
+
+            <TextView
+                style="@style/GrimTextHeader"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="WYPOSAŻENIE"
+                android:textSize="14sp"
+                android:layout_marginBottom="4dp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="#20FFFFFF"
+                android:padding="8dp">
+                <TextView android:id="@+id/tvEquippedWeapon" style="@style/GrimTextSmall" android:text="Broń: Brak" android:layout_width="match_parent" android:layout_height="wrap_content" />
+                <TextView android:id="@+id/tvEquippedArmor" style="@style/GrimTextSmall" android:text="Pancerz: Brak" android:layout_width="match_parent" android:layout_height="wrap_content" />
+                <TextView android:id="@+id/tvEquippedAcc" style="@style/GrimTextSmall" android:text="Akcesoria: Brak" android:layout_width="match_parent" android:layout_height="wrap_content" />
+            </LinearLayout>
 
         </LinearLayout>
 
@@ -127,7 +144,7 @@
         <ScrollView
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="1.5"
+            android:layout_weight="1.2"
             android:paddingStart="8dp">
 
             <LinearLayout
@@ -140,6 +157,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="CECHA"
+                    android:textSize="14sp"
                     android:layout_marginBottom="4dp" />
                 <TextView
                     android:id="@+id/tvTrait"
@@ -148,27 +166,29 @@
                     android:layout_height="wrap_content"
                     android:text="Brak cechy"
                     android:textColor="@color/grimAccentGold"
-                    android:layout_marginBottom="16dp" />
+                    android:layout_marginBottom="12dp" />
 
                 <TextView
                     style="@style/GrimTextHeader"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="ZDOLNOŚCI"
+                    android:textSize="14sp"
                     android:layout_marginBottom="4dp" />
                 <TextView
                     android:id="@+id/tvAbilities"
-                    style="@style/GrimTextBody"
+                    style="@style/GrimTextSmall"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="Brak zdolności"
-                    android:layout_marginBottom="16dp" />
+                    android:layout_marginBottom="12dp" />
 
                 <TextView
                     style="@style/GrimTextHeader"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="UMIEJĘTNOŚCI"
+                    android:textSize="14sp"
                     android:layout_marginBottom="4dp" />
                 <TextView
                     android:id="@+id/tvSkills"

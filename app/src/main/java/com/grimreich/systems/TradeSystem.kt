@@ -33,7 +33,7 @@ object TradeSystem {
         if (!g.inventory.contains(item)) return "Nie masz tego przedmiotu."
         
         val baseValue = item.value
-        val sellPrice = (baseValue * 0.6).toInt() // Standard sell price 60%
+        val sellPrice = (baseValue * com.grimreich.core.GrimConstants.Economy.SELL_PRICE_MULTIPLIER).toInt()
         
         g.gold += sellPrice
         g.inventory.remove(item)

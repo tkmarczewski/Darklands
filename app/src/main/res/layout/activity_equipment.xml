@@ -34,7 +34,7 @@
                 android:id="@+id/ivWeaponSlot"
                 android:layout_width="64dp"
                 android:layout_height="64dp"
-                android:src="@drawable/ic_equipment_sword"
+                android:src="@drawable/ic_item_sword_1h"
                 android:background="#16213e"
                 android:padding="8dp" />
             <TextView
@@ -56,7 +56,7 @@
                 android:id="@+id/ivArmorSlot"
                 android:layout_width="64dp"
                 android:layout_height="64dp"
-                android:src="@drawable/ic_equipment_armor"
+                android:src="@drawable/ic_item_armor_mail"
                 android:background="#16213e"
                 android:padding="8dp" />
             <TextView

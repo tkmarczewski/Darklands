@@ -9,7 +9,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:scaleType="centerCrop"
-        android:src="@drawable/bg_map_candle" />
+        android:src="@drawable/bg_world_map" />
 
     <!-- DARK GRADIENT OVERLAY FOR BETTER CONTRAST -->
     <View

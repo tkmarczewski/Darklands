@@ -41,16 +41,14 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Módl się"
-            android:drawableTop="@drawable/ic_status_bless" />
+            android:text="Módl się" />
 
         <Button
             android:id="@+id/btnCleanse"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Oczyść z mroku"
-            android:drawableTop="@drawable/ic_sigil_light" />
+            android:text="Oczyść z mroku" />
     </LinearLayout>
 
     <Button

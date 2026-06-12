@@ -10,7 +10,7 @@ import java.util.concurrent.TimeUnit
  */
 object RealTimeEventManager {
 
-    fun checkRealTimeEvents(context: Context): String? {
+    fun checkRealTimeEvents(context: Context?): String? {
         val state = GameRepository.state
         val now = System.currentTimeMillis()
         val diffMillis = now - state.lastSaveTimestamp

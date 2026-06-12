@@ -1,45 +1,99 @@
 package com.grimreich.ui
 
+import android.content.Intent
 import android.os.Bundle
+import android.view.View
+import android.widget.Button
+import android.widget.LinearLayout
+import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.RecyclerView
+import com.grimreich.R
 import com.grimreich.core.GameRepository
-import com.grimreich.databinding.ActivityInventoryBinding
+import com.grimreich.core.Hero
 import com.grimreich.systems.InventorySystem
+import com.grimreich.grimreich.v1.Item
 
-// Ekran ekwipunku - lista przedmiotow z numeracja, podstawowe info i akcja "uzyj".
-// Uzytkownik podaje 1-indeksowany numer przedmiotu, aktywujemy przez InventorySystem.useItem(itemId).
 class InventoryActivity : AppCompatActivity() {
 
-    private lateinit var binding: ActivityInventoryBinding
+    private var selectedHeroId: String? = null
+    private lateinit var adapter: InventoryAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityInventoryBinding.inflate(layoutInflater)
-        setContentView(binding.root)
-        render()
+        setContentView(R.layout.activity_inventory)
 
-        binding.btnUse.setOnClickListener {
-            val idx = binding.etItemIndex.text.toString().toIntOrNull()
-            val items = GameRepository.state.inventory
-            if (idx != null && idx in 1..items.size) {
-                val itemId = items[idx - 1].id
-                val result = InventorySystem.useItem(itemId)
-                binding.tvResult.text = result
-                render()
-            } else {
-                binding.tvResult.text = "Bledny numer przedmiotu"
-            }
-        }
-
-        binding.btnExitInventory.setOnClickListener {
+        selectedHeroId = GameRepository.state.activeHeroId ?: GameRepository.state.party.firstOrNull()?.id
+        
+        setupHeroSelector()
+        setupRecyclerView()
+        
+        findViewById<Button>(R.id.btnBackFromInv).setOnClickListener {
             finish()
+        }
+        
+        render()
+    }
+
+    private fun setupHeroSelector() {
+        val container = findViewById<LinearLayout>(R.id.llHeroSelector)
+        container.removeAllViews()
+        
+        GameRepository.state.party.forEach { hero ->
+            val btn = Button(this).apply {
+                text = hero.name
+                layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1.0f)
+                setOnClickListener {
+                    selectedHeroId = hero.id
+                    render()
+                }
+            }
+            container.addView(btn)
         }
     }
 
-    private fun render() {
-        binding.tvInventory.text = buildString {
-            append("=== EKWIPUNEK ===\n\n")
-            append(InventorySystem.listInventory())
+    private fun setupRecyclerView() {
+        val rv = findViewById<RecyclerView>(R.id.rvInventory)
+        adapter = InventoryAdapter(emptyList()) { item ->
+            showItemActions(item)
         }
+        rv.adapter = adapter
+    }
+
+    private fun showItemActions(item: Item) {
+        val hero = GameRepository.state.party.find { it.id == selectedHeroId } ?: return
+        
+        val actions = mutableListOf("Użyj")
+        if (item.type == "weapon" || item.type == "armor" || item.slot != null) {
+            actions.add("Wyposaż")
+        }
+        
+        val options = actions.toTypedArray()
+        
+        androidx.appcompat.app.AlertDialog.Builder(this)
+            .setTitle(item.name)
+            .setItems(options) { _, which ->
+                when (options[which]) {
+                    "Użyj" -> {
+                        val res = InventorySystem.useItem(item.id)
+                        Toast.makeText(this, res, Toast.LENGTH_SHORT).show()
+                        render()
+                    }
+                    "Wyposaż" -> {
+                        val res = InventorySystem.equip(hero.id, item.id)
+                        Toast.makeText(this, res, Toast.LENGTH_SHORT).show()
+                        render()
+                    }
+                }
+            }
+            .show()
+    }
+
+    private fun render() {
+        val hero = GameRepository.state.party.find { it.id == selectedHeroId }
+        findViewById<TextView>(R.id.tvActiveHeroInfo).text = "Bohater: ${hero?.name ?: "Brak"}"
+        
+        adapter.updateItems(GameRepository.state.inventory)
     }
 }

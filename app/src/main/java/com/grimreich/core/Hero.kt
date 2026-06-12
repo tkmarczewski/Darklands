@@ -24,7 +24,7 @@ data class Hero(
     var level: Int        = 1,
     var xp: Int           = 0,
     var attributePoints: Int = 0,
-    var portraitRes: String = "ic_stats_cha", // Default portrait
+    var portraitRes: String = "port_knight", // Default portrait
 
     // Punkty zycia
     var hp: Int           = 30,

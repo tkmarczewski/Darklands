@@ -53,7 +53,7 @@
         <item name="android:layout_height">72dp</item>
         <item name="android:layout_columnWeight">1</item>
         <item name="android:layout_margin">3dp</item>
-        <item name="android:background">@drawable/btn_nav_bg</item>
+        <item name="android:background">#80000000</item>
         <item name="android:textColor">@color/grimTextPrimary</item>
         <item name="android:textSize">11sp</item>
         <item name="android:textAllCaps">true</item>
@@ -67,7 +67,7 @@
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">52dp</item>
         <item name="android:layout_marginBottom">6dp</item>
-        <item name="android:background">@drawable/btn_region_bg</item>
+        <item name="android:background">#60000000</item>
         <item name="android:textColor">@color/grimTextPrimary</item>
         <item name="android:textSize">13sp</item>
         <item name="android:fontFamily">serif</item>
@@ -80,7 +80,7 @@
         <item name="android:layout_height">56dp</item>
         <item name="android:layout_columnWeight">1</item>
         <item name="android:layout_margin">3dp</item>
-        <item name="android:background">@drawable/btn_nav_bg</item>
+        <item name="android:background">#80000000</item>
         <item name="android:textColor">@color/grimTextPrimary</item>
         <item name="android:textSize">12sp</item>
         <item name="android:fontFamily">serif</item>
@@ -92,7 +92,7 @@
         <item name="android:layout_height">36dp</item>
         <item name="android:layout_weight">1</item>
         <item name="android:layout_marginEnd">4dp</item>
-        <item name="android:background">@drawable/btn_nav_bg</item>
+        <item name="android:background">#40000000</item>
         <item name="android:textColor">@color/grimTextPrimary</item>
         <item name="android:textSize">11sp</item>
         <item name="android:fontFamily">serif</item>

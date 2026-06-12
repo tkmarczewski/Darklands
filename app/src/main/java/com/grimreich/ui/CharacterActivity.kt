@@ -1,7 +1,6 @@
 package com.grimreich.ui
 
 import android.os.Bundle
-import android.view.View
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.ProgressBar
@@ -17,9 +16,9 @@ class CharacterActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_character)
 
-        val heroId = intent.getStringExtra("heroId")
-        val hero = GameRepository.state.party.find { it.id == heroId } ?: GameRepository.state.party.firstOrNull()
-
+        val heroId = intent.getStringExtra("heroId") ?: GameRepository.state.activeHeroId
+        val hero = GameRepository.state.party.find { it.id == heroId }
+        
         if (hero != null) {
             renderHero(hero)
         }
@@ -33,42 +32,40 @@ class CharacterActivity : AppCompatActivity() {
         findViewById<TextView>(R.id.tvHeroName).text = hero.name.uppercase()
         findViewById<TextView>(R.id.tvHeroLevel).text = "Poziom ${hero.level}"
         
+        val hpPercent = (hero.hp * 100 / hero.maxHp).coerceIn(0, 100)
         findViewById<TextView>(R.id.tvHpStatus).text = "HP: ${hero.hp}/${hero.maxHp}"
-        findViewById<ProgressBar>(R.id.pbHp).progress = (hero.hp * 100 / hero.maxHp)
-        
+        findViewById<ProgressBar>(R.id.pbHp).progress = hpPercent
+
         findViewById<TextView>(R.id.tvSanityStatus).text = "Poczytalność: ${hero.sanity}%"
         findViewById<ProgressBar>(R.id.pbSanity).progress = hero.sanity
 
-        // Attributes
-        renderAttr(R.id.viewStr, "Siła", hero.strength, R.drawable.ic_stats_str)
-        renderAttr(R.id.viewAgi, "Zręczność", hero.agility, R.drawable.ic_stats_dex)
-        renderAttr(R.id.viewPer, "Percepcja", hero.perception, R.drawable.ic_stats_perception)
-        renderAttr(R.id.viewInt, "Inteligencja", hero.intelligence, R.drawable.ic_stats_know)
-        renderAttr(R.id.viewEnd, "Wytrzymałość", hero.endurance, R.drawable.ic_stats_endurance)
-        renderAttr(R.id.viewCha, "Charyzma", hero.charisma, R.drawable.ic_stats_cha)
-        renderAttr(R.id.viewPie, "Pobożność", hero.piety, R.drawable.ic_stats_will)
-
-        // Trait
-        findViewById<TextView>(R.id.tvTrait).text = hero.trait?.let { "${it.displayName}: ${it.description}" } ?: "Brak cechy"
-
-        // Abilities
-        findViewById<TextView>(R.id.tvAbilities).text = if (hero.abilities.isEmpty()) {
-            "Brak zdolności"
-        } else {
-            hero.abilities.joinToString("\n") { "- ${it.name}: ${it.description}" }
+        // Portrait
+        val portrait = findViewById<ImageView>(R.id.ivPortrait)
+        val resId = resources.getIdentifier(hero.portraitRes, "drawable", packageName).let {
+            if (it == 0) R.drawable.port_knight else it
         }
+        portrait.setImageResource(resId)
 
-        // Skills
-        findViewById<TextView>(R.id.tvSkills).text = hero.skills.entries
-            .filter { it.value > 5 }
-            .joinToString(", ") { "${it.key}: ${it.value}%" }
-            .ifEmpty { "Wszystkie umiejętności na poziomie podstawowym." }
-    }
+        // Attributes
+        findViewById<TextView>(R.id.tvStatStr).text = "Siła: ${hero.strength}"
+        findViewById<TextView>(R.id.tvStatAgi).text = "Zręczność: ${hero.agility}"
+        findViewById<TextView>(R.id.tvStatPer).text = "Percepcja: ${hero.perception}"
+        findViewById<TextView>(R.id.tvStatInt).text = "Inteligencja: ${hero.intelligence}"
+        findViewById<TextView>(R.id.tvStatEnd).text = "Wytrzymałość: ${hero.endurance}"
+        findViewById<TextView>(R.id.tvStatCha).text = "Charyzma: ${hero.charisma}"
+        findViewById<TextView>(R.id.tvStatPie).text = "Pobożność: ${hero.piety}"
 
-    private fun renderAttr(viewId: Int, label: String, value: Int, iconRes: Int) {
-        val view = findViewById<View>(viewId)
-        view.findViewById<TextView>(R.id.tvAttrName).text = label
-        view.findViewById<TextView>(R.id.tvAttrValue).text = value.toString()
-        view.findViewById<ImageView>(R.id.ivAttrIcon).setImageResource(iconRes)
+        // Equipment
+        val inv = com.grimreich.systems.InventorySystem
+        val gear = inv.getEquippedItems(hero)
+        findViewById<TextView>(R.id.tvEquippedWeapon).text = "Broń: ${gear.weapon?.name ?: "Brak"}"
+        findViewById<TextView>(R.id.tvEquippedArmor).text = "Pancerz: ${gear.bodyArmor?.name ?: "Brak"}"
+        
+        // Traits & Skills
+        findViewById<TextView>(R.id.tvTrait).text = hero.trait?.name ?: "Brak cechy"
+        findViewById<TextView>(R.id.tvAbilities).text = if (hero.abilities.isEmpty()) "Brak zdolności" else hero.abilities.joinToString("\n") { it.name }
+        
+        val topSkills = hero.skills.entries.sortedByDescending { it.value }.take(5)
+        findViewById<TextView>(R.id.tvSkills).text = topSkills.joinToString("\n") { "${it.key}: ${it.value}%" }
     }
 }

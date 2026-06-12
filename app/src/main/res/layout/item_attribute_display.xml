@@ -6,11 +6,11 @@
     android:gravity="center_vertical"
     android:layout_marginBottom="8dp">
 
-    <ImageView
-        android:id="@+id/ivAttrIcon"
-        android:layout_width="24dp"
-        android:layout_height="24dp"
-        android:src="@drawable/ic_stats_str"
+    <!-- Ikony usunięte - używamy czystego tekstu lub uniwersalnej kropki -->
+    <View
+        android:layout_width="4dp"
+        android:layout_height="4dp"
+        android:background="@color/grimAccentGold"
         android:layout_marginEnd="8dp" />
 
     <TextView
