@@ -12,6 +12,8 @@ import com.grimreich.R
 import com.grimreich.core.GameRepository
 import com.grimreich.systems.RealTimeEventManager
 import com.grimreich.systems.SaveLoadSystem
+import com.grimreich.systems.CalendarAuraSystem
+import com.grimreich.world.CityCatalogue
 
 class HubActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -25,7 +27,7 @@ class HubActivity : AppCompatActivity() {
         }
 
         // CALENDAR AURA
-        val aura = com.grimreich.systems.CalendarAuraSystem.getCurrentAura()
+        val aura = CalendarAuraSystem.getCurrentAura()
         if (aura.name != "DZIEŃ FENOMENÓW") {
             UiUtils.showNarrativePopup(this, "AURA: ${aura.name}", "${aura.description}\n\nEfekt: ${aura.effect}")
         }
@@ -52,9 +54,6 @@ class HubActivity : AppCompatActivity() {
         findViewById<Button>(R.id.openQuests)?.setOnClickListener { 
             startActivity(Intent(this, QuestJournalActivity::class.java)) 
         }
-        findViewById<Button>(R.id.openCombatStatus)?.setOnClickListener { 
-            startActivity(Intent(this, CombatActivity::class.java)) 
-        }
         findViewById<Button>(R.id.openReputation)?.setOnClickListener { 
             startActivity(Intent(this, ReputationActivity::class.java)) 
         }
@@ -67,6 +66,12 @@ class HubActivity : AppCompatActivity() {
         findViewById<Button>(R.id.openTransfer)?.setOnClickListener {
              startActivity(Intent(this, InventoryTransferActivity::class.java))
         }
+        findViewById<Button>(R.id.openFinale)?.setOnClickListener {
+             startActivity(Intent(this, FinaleActivity::class.java))
+        }
+        findViewById<Button>(R.id.openCombatStatus)?.setOnClickListener { 
+             startActivity(Intent(this, CombatActivity::class.java)) 
+        }
     }
 
     private fun setupDevTrigger() {
@@ -78,7 +83,6 @@ class HubActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         render()
-        // Automatyczny zapis przy powrocie do HUBa
         SaveLoadSystem.save(this)
     }
 
@@ -86,7 +90,6 @@ class HubActivity : AppCompatActivity() {
         val state = GameRepository.state
         val world = state.world
         
-        // Czysty nagłówek bez etykiet
         val timeLabel = when(world.timeOfDay.lowercase()) {
             "morning" -> "Poranek"
             "midday" -> "Południe"
@@ -96,10 +99,10 @@ class HubActivity : AppCompatActivity() {
             else -> world.timeOfDay
         }
         
-        // Formatowanie nazwy lokacji (usuwanie technicznych podkreśleń)
-        val locationFormatted = world.location.replace("_", " ").capitalize()
+        val cityData = CityCatalogue.get(state.grimCurrentRegion)
+        val locationName = cityData?.name ?: world.location.replace("_", " ")
         
-        findViewById<TextView>(R.id.tvTime)?.text = "$locationFormatted | Dzień ${world.day} | $timeLabel"
+        findViewById<TextView>(R.id.tvTime)?.text = "${locationName.uppercase()} | DZIEŃ ${world.day} | $timeLabel"
 
         findViewById<Button>(R.id.openCombatStatus)?.visibility = 
             if (state.combat.active) View.VISIBLE else View.GONE
@@ -117,30 +120,25 @@ class HubActivity : AppCompatActivity() {
         val hpIds = listOf(R.id.pbChar0HP, R.id.pbChar1HP, R.id.pbChar2HP, R.id.pbChar3HP)
         val portIds = listOf(R.id.ivChar0Portrait, R.id.ivChar1Portrait, R.id.ivChar2Portrait, R.id.ivChar3Portrait)
 
-        slotIds.forEachIndexed { i, containerId ->
-            val container = findViewById<View>(containerId) ?: return@forEachIndexed
-            val container = findViewById<View>(containerId) ?: return@forEachIndexed
+        slotIds.forEachIndexed { i, slotId ->
+            val slotContainer = findViewById<View>(slotId) ?: return@forEachIndexed
             if (i < party.size) {
-                container.visibility = View.VISIBLE
+                slotContainer.visibility = View.VISIBLE
                 val hero = party[i]
                 findViewById<TextView>(nameIds[i])?.text = hero.name
-                findViewById<ProgressBar>(hpIds[i])?.progress = (hero.hp * 100 / hero.maxHp)
+                findViewById<ProgressBar>(hpIds[i])?.progress = (hero.hp * 100 / hero.maxHp).coerceAtMost(100)
                 
-                // Ustawianie portretu na podstawie klasy/cechy
                 val portrait = findViewById<ImageView>(portIds[i])
-                val resId = when {
-                    hero.portraitRes.isNotEmpty() -> resources.getIdentifier(hero.portraitRes, "drawable", packageName)
-                    hero.strength > 15 -> R.drawable.port_knight
-                    hero.intelligence > 15 -> R.drawable.port_mage
-                    else -> R.drawable.port_alchemist
-                }
+                val resId = resources.getIdentifier(hero.portraitRes, "drawable", packageName)
                 if (resId != 0) portrait?.setImageResource(resId)
 
-                container.setOnClickListener {
-                    startActivity(Intent(this, CharacterActivity::class.java).putExtra("heroId", hero.id))
+                slotContainer.setOnClickListener {
+                    val intent = Intent(this, CharacterActivity::class.java)
+                    intent.putExtra("heroId", hero.id)
+                    startActivity(intent)
                 }
             } else {
-                container.visibility = View.INVISIBLE
+                slotContainer.visibility = View.INVISIBLE
             }
         }
     }

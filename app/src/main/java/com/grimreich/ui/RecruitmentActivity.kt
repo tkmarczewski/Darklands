@@ -1,13 +1,11 @@
 package com.grimreich.ui
 
 import android.os.Bundle
-import android.view.View
 import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat
-import com.google.android.material.snackbar.Snackbar
 import com.grimreich.R
 import com.grimreich.core.GameRepository
 import com.grimreich.core.Hero
@@ -19,34 +17,26 @@ class RecruitmentActivity : AppCompatActivity() {
 
         render()
 
-        findViewById<Button>(R.id.btnBackFromRecruit).setOnClickListener {
+        findViewById<Button>(R.id.btnExitRecruit).setOnClickListener {
             finish()
         }
     }
 
     private fun render() {
-        val container = findViewById<LinearLayout>(R.id.recruitContainer)
+        val container = findViewById<LinearLayout>(R.id.recruitListContainer)
         container.removeAllViews()
 
-        val state = GameRepository.state
-        val candidates = state.hireableHeroes
-
-        if (candidates.isEmpty()) {
-            val tv = TextView(this)
-            tv.text = "Karczma jest pusta... nikt nie szuka obecnie przygód."
-            tv.setTextAppearance(androidx.appcompat.R.style.TextAppearance_AppCompat_Body1)
-            tv.setTextColor(ContextCompat.getColor(this, R.color.grimTextPrimary))
-            tv.textAlignment = View.TEXT_ALIGNMENT_CENTER
-            tv.setPadding(0, 50, 0, 0)
-            container.addView(tv)
+        val hireables = GameRepository.state.hireableHeroes
+        if (hireables.isEmpty()) {
+            findViewById<TextView>(R.id.tvRecruitStatus).text = "Karczma jest pusta... nikt nie szuka obecnie przygód."
             return
         }
 
-        candidates.forEach { cand ->
-            val btn = Button(this, null, 0, R.style.GrimCombatButton)
-            btn.text = "Wynajmij ${cand.name} (50G)"
-            btn.setOnClickListener {
-                tryHire(cand)
+        hireables.forEach { hero ->
+            val btn = Button(this).apply {
+                text = "${hero.name} (${hero.currentCareer?.name ?: "Wędrowiec"}) - 100 G"
+                styleToGrim()
+                setOnClickListener { tryHire(hero) }
             }
             container.addView(btn)
         }
@@ -54,29 +44,31 @@ class RecruitmentActivity : AppCompatActivity() {
 
     private fun tryHire(hero: Hero) {
         val state = GameRepository.state
-        
+        if (state.gold < 100) {
+            Toast.makeText(this, "Brak złota!", Toast.LENGTH_SHORT).show()
+            return
+        }
         if (state.party.size >= 4) {
-            showNotice("Drużyna jest pełna! (Max 4 osoby)")
+            Toast.makeText(this, "Drużyna jest pełna!", Toast.LENGTH_SHORT).show()
             return
         }
 
-        if (state.gold >= 50) {
-            state.gold -= 50
-            state.party.add(hero)
-            state.hireableHeroes.remove(hero)
-            
-            showNotice("Zrekrutowano: ${hero.name}")
-            render() // Refresh list
-        } else {
-            showNotice("Brak złota!")
-        }
+        state.gold -= 100
+        state.hireableHeroes.remove(hero)
+        state.party.add(hero)
+        render()
+        Toast.makeText(this, "${hero.name} dołączył do drużyny!", Toast.LENGTH_SHORT).show()
     }
 
-    private fun showNotice(msg: String) {
-        val view = findViewById<View>(android.R.id.content)
-        val snack = Snackbar.make(view, msg, Snackbar.LENGTH_SHORT)
-        snack.setBackgroundTint(ContextCompat.getColor(this, R.color.grimBgSide))
-        snack.setTextColor(ContextCompat.getColor(this, R.color.grimAccentGold))
-        snack.show()
+    private fun Button.styleToGrim() {
+        this.setTextColor(androidx.core.content.ContextCompat.getColor(context, R.color.grimGold))
+        this.setBackgroundColor(android.graphics.Color.parseColor("#80000000"))
+        this.setPadding(16, 16, 16, 16)
+        this.typeface = android.graphics.Typeface.MONOSPACE
+        val params = LinearLayout.LayoutParams(
+            LinearLayout.LayoutParams.MATCH_PARENT,
+            LinearLayout.LayoutParams.WRAP_CONTENT
+        ).apply { setMargins(0, 0, 0, 12) }
+        this.layoutParams = params
     }
 }

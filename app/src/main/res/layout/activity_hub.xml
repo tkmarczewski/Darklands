@@ -3,7 +3,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <!-- CANONICAL BACKGROUND -->
     <ImageView
         android:id="@+id/ivHubBg"
         android:layout_width="match_parent"
@@ -21,7 +20,7 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <!-- Minimal Header -->
+        <!-- Header -->
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -60,7 +59,6 @@
             android:orientation="horizontal"
             android:padding="12dp">
 
-            <!-- MAIN NAVIGATION -->
             <GridLayout
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
@@ -72,12 +70,18 @@
                 <Button android:id="@+id/openCity" style="@style/GrimCombatButton" android:text="MIASTO" android:fontFamily="monospace" />
                 <Button android:id="@+id/openMap" style="@style/GrimCombatButton" android:text="MAPA" android:fontFamily="monospace" />
                 <Button android:id="@+id/openInventory" style="@style/GrimCombatButton" android:text="PLECAK" android:fontFamily="monospace" />
+
                 <Button android:id="@+id/openQuests" style="@style/GrimCombatButton" android:text="ZADANIA" android:fontFamily="monospace" />
                 <Button android:id="@+id/openReputation" style="@style/GrimCombatButton" android:text="REPUTACJA" android:fontFamily="monospace" />
                 <Button android:id="@+id/openSaints" style="@style/GrimCombatButton" android:text="PROROCY" android:fontFamily="monospace" />
+
+                <Button android:id="@+id/openCityEvents" style="@style/GrimCombatButton" android:text="WIEŚCI" android:fontFamily="monospace" />
+                <Button android:id="@+id/openTransfer" style="@style/GrimCombatButton" android:text="TRANSFER" android:fontFamily="monospace" />
+                <Button android:id="@+id/openFinale" style="@style/GrimCombatButton" android:text="FINAŁ" android:fontFamily="monospace" android:visibility="gone" />
+
+                <Button android:id="@+id/openCombatStatus" style="@style/GrimCombatButton" android:text="WALKA" android:fontFamily="monospace" android:visibility="gone" />
             </GridLayout>
 
-            <!-- LOG PANEL (NO SAVE/LOAD BUTTONS) -->
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
@@ -98,7 +102,6 @@
             </LinearLayout>
         </LinearLayout>
 
-        <!-- PARTY STRIP -->
         <include layout="@layout/strip_party" />
 
     </LinearLayout>
