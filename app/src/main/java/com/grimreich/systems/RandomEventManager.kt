@@ -5,46 +5,65 @@ import com.grimreich.core.GameRepository
 import com.grimreich.ui.UiUtils
 import kotlin.random.Random
 
-/**
- * Zarządza zdarzeniami losowymi występującymi podczas nawigacji.
- */
 object RandomEventManager {
 
-    fun triggerHubEvent(context: Context) {
-        if (Random.nextInt(100) < 15) { // 15% szansy
-            val event = hubEvents.random()
-            applyEffect(event)
-            UiUtils.showNarrativePopup(context, event.title, event.description)
-        }
-    }
-
     fun triggerCityEvent(context: Context) {
-        if (Random.nextInt(100) < 25) { // 25% szansy w mieście
-            val event = cityEvents.random()
-            applyEffect(event)
-            UiUtils.showNarrativePopup(context, event.title, event.description)
-        }
+        if (Random.nextInt(100) > 40) return // 40% szansy na zdarzenie przy wejściu
+
+        val event = cityEvents.random()
+        applyEventEffects(event)
+        UiUtils.showNarrativePopup(context, "MIEJSKIE WIEŚCI", event.description)
     }
 
-    private fun applyEffect(event: RandomEvent) {
+    fun triggerTravelEvent(context: Context) {
+        val event = travelEvents.random()
+        applyEventEffects(event)
+        UiUtils.showNarrativePopup(context, "DROGA", event.description)
+    }
+
+    private fun applyEventEffects(event: GameEvent) {
         val state = GameRepository.state
-        state.gold = (state.gold + event.goldChange).coerceAtLeast(0)
+        state.world.globalStability += event.stabilityDelta
+        state.gold += event.goldDelta
         state.party.forEach { 
-            it.hp = (it.hp + event.hpChange).coerceIn(0, it.maxHp)
+            it.hp = (it.hp + event.hpDelta).coerceIn(0, it.maxHp)
+            it.sanity = (it.sanity + event.sanityDelta).coerceIn(0, 100)
+            it.morale = (it.morale + event.moraleDelta).coerceIn(0, 100)
         }
     }
 
-    private val hubEvents = listOf(
-        RandomEvent("ZNALEZISKO", "Podczas porządkowania obozowiska znaleziono sakiewkę ze srebrem.", 20, 0),
-        RandomEvent("DOBRE WIEŚCI", "Wędrowny kupiec podzielił się zapasami. Drużyna odzyskała siły.", 0, 15),
-        RandomEvent("MGŁA GĘSTNIEJE", "Dziwne szepty zza mgły sprawiły, że noc była niespokojna. Drużyna czuje zmęczenie.", 0, -5)
+    data class GameEvent(
+        val description: String,
+        val hpDelta: Int = 0,
+        val sanityDelta: Int = 0,
+        val goldDelta: Int = 0,
+        val stabilityDelta: Int = 0,
+        val moraleDelta: Int = 0
     )
 
     private val cityEvents = listOf(
-        RandomEvent("KIESZONKOWIEC", "W tłumie na targu ktoś przeciął Twoją sakiewkę!", -30, 0),
-        RandomEvent("BŁOGOSŁAWIEŃSTWO", "Lokalny kapłan pobłogosławił Waszą wyprawę.", 0, 10),
-        RandomEvent("STARCIE W ZAUŁKU", "Zostaliście napadnięci przez rzezimieszków. Udało się uciec, ale nie bez ran.", 10, -15)
+        GameEvent("Uliczny kaznodzieja krzyczy o nadchodzącym wymazaniu. Jego słowa budzą niepokój.", sanityDelta = -5),
+        GameEvent("Znalazłeś porzuconą sakiewkę w cieniu pękniętego muru.", goldDelta = 25),
+        GameEvent("Lokalna straż wymusza 'podatek za istnienie'.", goldDelta = -15),
+        GameEvent("Poczułeś nagły przypływ wiary patrząc na symbol Proroka.", sanityDelta = 10, moraleDelta = 5),
+        GameEvent("Widziałeś jak szczur zmienił się w pył na Twoich oczach. Rzeczywistość pęka.", stabilityDelta = -2, sanityDelta = -3),
+        GameEvent("Ktoś zostawił ciepły posiłek na progu karczmy. Zjedliście go w milczeniu.", hpDelta = 5),
+        GameEvent("Słyszysz śpiew dochodzący z wnętrza studni. Jest piękny i przerażający.", sanityDelta = -10, stabilityDelta = -1),
+        GameEvent("Kupiec pomylił się przy wydawaniu reszty na Twoją korzyść.", goldDelta = 10),
+        GameEvent("Mgła wdarła się do miasta wcześniej niż zwykle.", moraleDelta = -10),
+        GameEvent("Dziecko narysowało Twoją twarz na piasku... ze skrzydłami z ognia.", sanityDelta = 5)
     )
 
-    data class RandomEvent(val title: String, val description: String, val goldChange: Int, val hpChange: Int)
+    private val travelEvents = listOf(
+        GameEvent("Napotkaliście grupę uchodźców uciekających przed Mgłą.", moraleDelta = -5),
+        GameEvent("Odkryliście starożytny menhir, który pulsuje rytmem serca.", sanityDelta = 15, stabilityDelta = 1),
+        GameEvent("Zasadzka! Musieliście salwować się ucieczką przez cierniste krzewy.", hpDelta = -10),
+        GameEvent("Znalazłeś grzyby o smaku starych wspomnień.", sanityDelta = 5, hpDelta = 2),
+        GameEvent("Niebo zmieniło kolor na purpurowy. Czas wydaje się stać w miejscu.", stabilityDelta = -3),
+        GameEvent("Kruki śledzą każdy Wasz krok, powtarzając Wasze imiona.", sanityDelta = -15),
+        GameEvent("Deszcz czarnej wody obmył Wasze pancerze. Stal wydaje się cięższa.", hpDelta = -2),
+        GameEvent("Napotkany pustelnik podzielił się z Wami wiedzą o Sferze Fenomenów.", sanityDelta = 10, stabilityDelta = 1),
+        GameEvent("Ziemia zatrzęsła się pod stopami. To nie był wstrząs, to był oddech.", stabilityDelta = -5, sanityDelta = -5),
+        GameEvent("Odnaleźliście zapomniany obóz z zapasami.", hpDelta = 10, goldDelta = 15)
+    )
 }

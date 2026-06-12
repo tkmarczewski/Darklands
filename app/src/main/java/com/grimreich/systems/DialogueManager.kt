@@ -76,6 +76,106 @@ object DialogueManager {
         seedChapter6West()
         seedChapter7Untamed()
         seedMetaLore()
+        seedExtendedNpcDialogues()
+        seedV21ExtraDialogues()
+    }
+
+    private fun seedV21ExtraDialogues() {
+        // SEER
+        registerNode(DialogueNode(
+            id = "seer_start", npcId = "procedural",
+            text = "Gwiazdy zgasły, ale ich poświata wciąż nas okłamuje. Widzę Twoją nić... jest zapętlona. Ile razy już tu byłeś, Kotwico?",
+            choices = listOf(
+                DialogueChoice("To mój pierwszy raz tutaj.", "seer_first"),
+                DialogueChoice("Czuję, że znam tę ścieżkę.", "seer_familiar")
+            )
+        ))
+        registerNode(DialogueNode(id = "seer_familiar", npcId = "procedural", text = "Dejà vu to tylko usterka w Sferze Fenomenów. Absolut zapomniał wymazać Twoje poprzednie kroki."))
+
+        // SOLDIER
+        registerNode(DialogueNode(
+            id = "soldier_start", npcId = "procedural",
+            text = "Trzymaj gardę wysoko. We mgle nie walczysz z ludźmi, tylko z tym, co po nich zostało. Masz dość odwagi, by przelać krew?",
+            choices = listOf(
+                DialogueChoice("Moja stal nie zna strachu.", "end"),
+                DialogueChoice("Dla kogo walczysz?", "soldier_faction")
+            )
+        ))
+
+        // HERETIC
+        registerNode(DialogueNode(
+            id = "heretic_start", npcId = "procedural",
+            text = "Prorocy to tylko pasożyty na ranie świata! Prawdziwa wolność jest w Pęknięciu, tam gdzie nikt nie narzuca nam formy.",
+            choices = listOf(
+                DialogueChoice("Twoje słowa to szaleństwo.", "end"),
+                DialogueChoice("Opowiedz mi o wolności Pęknięcia.", "heretic_freedom")
+            )
+        ))
+
+        // BEGGAR
+        registerNode(DialogueNode(
+            id = "beggar_start", npcId = "procedural",
+            text = "Miedziaka dla nędzarza, który stracił wszystko... nawet własne imię. Sprzedałem je mgle za bochenek chleba, który okazał się kamieniem.",
+            choices = listOf(
+                DialogueChoice("Daj 5 złota (Gold-5)", "beggar_give", onSelect = { it.gold -= 5 }),
+                DialogueChoice("Idź precz.", "end")
+            )
+        ))
+        registerNode(DialogueNode(id = "beggar_give", npcId = "procedural", text = "Dziękuję... Niech Absolut mrugnie, gdy będziesz przechodził przez bramę."))
+    }
+
+    private fun seedExtendedNpcDialogues() {
+        // GRAVEDIGGER
+        registerNode(DialogueNode(
+            id = "gravedigger_start", npcId = "procedural",
+            text = "Kopię płytkie doły, bo ziemia wkrótce i tak ich wypluje. Czy szukasz kogoś, kto już odszedł?",
+            choices = listOf(
+                DialogueChoice("Szukam prawdy o tym świecie.", "gravedigger_truth"),
+                DialogueChoice("Po prostu wykonuj swoją pracę.", "end")
+            )
+        ))
+        registerNode(DialogueNode(id = "gravedigger_truth", npcId = "procedural", text = "Prawda jest taka, że pod tą ziemią nie ma robaków. Jest tylko czyste światło Absolutu, które czeka na naszą śmierć."))
+
+        // INQUISITOR
+        registerNode(DialogueNode(
+            id = "inquisitor_start", npcId = "procedural",
+            text = "Twoja obecność tutaj jest anomalią. Czy Twoja wola jest zgodna z dogmatem Proroka, czy niesiesz w sobie zarazę Pęknięcia?",
+            choices = listOf(
+                DialogueChoice("Jestem wierny Absolutowi.", "inquisitor_loyal"),
+                DialogueChoice("Nie uznaję Waszych dogmatów.", "inquisitor_heresy")
+            )
+        ))
+
+        // ORPHAN
+        registerNode(DialogueNode(
+            id = "orphan_start", npcId = "procedural",
+            text = "Panie... dlaczego słońce ma oczy? Moja mama powiedziała, że to Prorok Sereth, ale ja widzę tam coś innego...",
+            choices = listOf(
+                DialogueChoice("Nie patrz w niebo, mały.", "end"),
+                DialogueChoice("Co widzisz?", "orphan_vision")
+            )
+        ))
+        registerNode(DialogueNode(id = "orphan_vision", npcId = "procedural", text = "Widzę... pusty pokój. Bez ścian. I słyszę jak ktoś płacze, bo nikt go nie kocha. Nawet Absolut."))
+
+        // BLACKSMITH
+        registerNode(DialogueNode(
+            id = "blacksmith_start", npcId = "procedural",
+            text = "Młot uderza, ale metal się nie poddaje. W tym regionie stal staje się miękka jak masło, gdy tylko pomyślisz o Mgle. Czego potrzebujesz?",
+            choices = listOf(
+                DialogueChoice("Napraw moją broń.", "blacksmith_repair"),
+                DialogueChoice("Opowiedz mi o tutejszym kruszcu.", "blacksmith_lore")
+            )
+        ))
+
+        // AMNESIAC
+        registerNode(DialogueNode(
+            id = "amnesiac_start", npcId = "procedural",
+            text = "Kim... kim jesteś? Kim JA jestem? Pamiętam tylko biały pokój i głos, który kazał mi mrugać...",
+            choices = listOf(
+                DialogueChoice("Jesteś w GrimReich. Pamiętasz to?", "amnesiac_name"),
+                DialogueChoice("Odejdź, nieszczęśniku.", "end")
+            )
+        ))
     }
 
     private fun seedChapter1North() {

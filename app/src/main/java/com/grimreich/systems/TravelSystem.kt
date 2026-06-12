@@ -97,6 +97,9 @@ object TravelSystem {
                 EncounterSystem.activeEncounter = encounter
                 context.startActivity(Intent(context, EncounterActivity::class.java))
             }
+        } else if (context != null) {
+            // Trigger a narrative random event if no combat encounter
+            RandomEventManager.triggerTravelEvent(context)
         }
         
         return "Podróż do $regionId zakończona."
