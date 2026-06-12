@@ -5,7 +5,7 @@ enum class HeroSkill(val displayName: String, val group: SkillGroup) {
     // BRON
     W_EDG("Bron sieczna",     SkillGroup.WEAPON),
     W_IMP("Bron obuchowa",    SkillGroup.WEAPON),
-    W_FLL("Cepal",            SkillGroup.WEAPON),
+    W_FLL("Cep bojowy",     SkillGroup.WEAPON),
     W_POL("Drzewce",          SkillGroup.WEAPON),
     W_THR("Rzucanie",         SkillGroup.WEAPON),
     W_BOW("Luk",              SkillGroup.WEAPON),

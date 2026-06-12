@@ -36,4 +36,9 @@ class GlitchOverlayView @JvmOverloads constructor(
         // Trigger next frame for animation
         postDelayed(updateRunnable, 100)
     }
+
+    override fun onDetachedFromWindow() {
+        super.onDetachedFromWindow()
+        removeCallbacks(updateRunnable)
+    }
 }

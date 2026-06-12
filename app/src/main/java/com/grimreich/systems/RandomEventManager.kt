@@ -21,6 +21,13 @@ object RandomEventManager {
         UiUtils.showNarrativePopup(context, "DROGA", event.description)
     }
 
+    fun triggerHubEvent(context: Context) {
+        if (Random.nextInt(100) > 30) return // 30% chance in Hub
+        val event = cityEvents.random() // Hub uses city events for now
+        applyEventEffects(event)
+        UiUtils.showNarrativePopup(context, "ECHA HUB'U", event.description)
+    }
+
     private fun applyEventEffects(event: GameEvent) {
         val state = GameRepository.state
         state.world.globalStability += event.stabilityDelta
