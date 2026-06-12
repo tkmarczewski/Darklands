@@ -23,7 +23,7 @@ class CityActivity : AppCompatActivity() {
         CityCatalogue.seedCanonical()
 
         val rawLocation = GameRepository.state.world.location
-        val cityId = rawLocation.lowercase().replace(" ", "_")
+        val cityId = GameRepository.state.grimCurrentRegion ?: rawLocation.lowercase().replace(" ", "_")
         
         val cityData = CityCatalogue.get(cityId)
         
@@ -37,7 +37,7 @@ class CityActivity : AppCompatActivity() {
             findViewById<ImageView>(R.id.ivCityBg).setImageResource(bgResId)
         }
 
-        findViewById<TextView>(R.id.cityTitle).text = (cityData?.name ?: rawLocation).uppercase()
+        findViewById<TextView>(R.id.cityTitle).text = (cityData?.name ?: rawLocation.replace("_", " ")).uppercase()
 
         DialogueManager.seedBasicDialogues()
         renderNpcs(cityId)

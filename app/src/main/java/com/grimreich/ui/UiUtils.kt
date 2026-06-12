@@ -1,29 +1,68 @@
 package com.grimreich.ui
 
 import android.content.Context
-import android.view.LayoutInflater
+import androidx.appcompat.app.AlertDialog
+import android.view.View
 import android.widget.Button
 import android.widget.TextView
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.grimreich.R
 
 object UiUtils {
     
-    fun showNarrativePopup(context: Context, title: String, message: String, onDismiss: (() -> Unit)? = null) {
-        val view = LayoutInflater.from(context).inflate(R.layout.dialog_narrative, null)
-        val dialog = MaterialAlertDialogBuilder(context)
-            .setView(view)
-            .setCancelable(false)
-            .create()
-
-        view.findViewById<TextView>(R.id.dialogTitle).text = title
+    fun showNarrativePopup(
+        context: Context, 
+        title: String, 
+        message: String, 
+        onDismiss: (() -> Unit)? = null
+    ) {
+        val dialog = AlertDialog.Builder(context, R.style.Theme_GrimReich).create()
+        val view = android.view.LayoutInflater.from(context).inflate(R.layout.dialog_narrative, null)
+        
+        view.findViewById<TextView>(R.id.dialogTitle).text = title.uppercase()
         view.findViewById<TextView>(R.id.dialogMessage).text = message
         
-        view.findViewById<Button>(R.id.btnDismiss).setOnClickListener {
+        val btn = view.findViewById<Button>(R.id.btnDismiss)
+        btn.text = "ROZUMIEM"
+        btn.setOnClickListener {
             dialog.dismiss()
             onDismiss?.invoke()
         }
+        
+        dialog.setView(view)
+        dialog.setCancelable(false) // Force click
+        dialog.show()
+    }
 
+    fun showChoicePopup(
+        context: Context,
+        title: String,
+        message: String,
+        positiveText: String = "TAK",
+        negativeText: String = "NIE",
+        onPositive: () -> Unit
+    ) {
+        val dialog = AlertDialog.Builder(context, R.style.Theme_GrimReich).create()
+        val view = android.view.LayoutInflater.from(context).inflate(R.layout.dialog_narrative, null)
+        
+        view.findViewById<TextView>(R.id.dialogTitle).text = title.uppercase()
+        view.findViewById<TextView>(R.id.dialogMessage).text = message
+        
+        val btnPos = view.findViewById<Button>(R.id.btnDismiss)
+        btnPos.text = positiveText
+        btnPos.setOnClickListener {
+            dialog.dismiss()
+            onPositive()
+        }
+        
+        val btnNeg = view.findViewById<Button>(R.id.btnCancel)
+        btnNeg.visibility = View.VISIBLE
+        btnNeg.text = negativeText
+        btnNeg.setOnClickListener {
+            dialog.dismiss()
+        }
+        
+        dialog.setView(view)
+        dialog.setCancelable(false)
         dialog.show()
     }
 }

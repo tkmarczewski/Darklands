@@ -119,6 +119,7 @@ class HubActivity : AppCompatActivity() {
 
         slotIds.forEachIndexed { i, containerId ->
             val container = findViewById<View>(containerId) ?: return@forEachIndexed
+            val container = findViewById<View>(containerId) ?: return@forEachIndexed
             if (i < party.size) {
                 container.visibility = View.VISIBLE
                 val hero = party[i]

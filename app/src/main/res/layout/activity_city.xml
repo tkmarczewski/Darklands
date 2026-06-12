@@ -3,7 +3,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <!-- REGIONAL BACKGROUND -->
     <ImageView
         android:id="@+id/ivCityBg"
         android:layout_width="match_parent"
@@ -11,112 +10,95 @@
         android:scaleType="centerCrop"
         android:src="@drawable/bg_region_north_coast" />
 
-    <!-- DARK OVERLAY -->
     <View
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#99000000" />
+        android:background="#B0000000" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:padding="12dp">
 
-        <!-- Header - Clean -->
+        <!-- Compact Header -->
         <TextView
             android:id="@+id/cityTitle"
+            style="@style/GrimTextHeader"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            style="@style/GrimTextHeader"
+            android:text="LOKACJA"
             android:gravity="center"
-            android:padding="16dp"
-            android:background="#80000000" />
+            android:background="#D0000000"
+            android:padding="8dp"
+            android:fontFamily="monospace" />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:layout_marginTop="8dp">
 
-            <!-- Actions - Unified terminology -->
+            <!-- LEFT: Navigation -->
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:orientation="vertical"
-                android:background="#60000000"
-                android:padding="8dp">
+                android:layout_weight="0.4"
+                android:orientation="vertical">
 
-                <Button android:id="@+id/btnTavern"
-                    style="@style/GrimCombatButton"
-                    android:text="Karczma"
-                    android:layout_width="match_parent"
-                    android:layout_marginBottom="8dp" />
+                <Button android:id="@+id/btnTavern" style="@style/GrimNavButton" android:layout_width="match_parent" android:layout_height="48dp" android:text="KARCZMA" android:fontFamily="monospace" />
+                <Button android:id="@+id/btnMarket" style="@style/GrimNavButton" android:layout_width="match_parent" android:layout_height="48dp" android:text="TARG" android:fontFamily="monospace" />
+                <Button android:id="@+id/btnChurch" style="@style/GrimNavButton" android:layout_width="match_parent" android:layout_height="48dp" android:text="KAPLICA" android:fontFamily="monospace" />
+                <Button android:id="@+id/btnRecruit" style="@style/GrimNavButton" android:layout_width="match_parent" android:layout_height="48dp" android:text="WERBUNEK" android:fontFamily="monospace" />
 
-                <Button android:id="@+id/btnMarket"
-                    style="@style/GrimCombatButton"
-                    android:text="Targ"
-                    android:layout_width="match_parent"
-                    android:layout_marginBottom="8dp" />
+                <Space android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" />
 
-                <Button android:id="@+id/btnChurch"
-                    style="@style/GrimCombatButton"
-                    android:text="Kaplica"
-                    android:layout_width="match_parent"
-                    android:layout_marginBottom="8dp" />
-
-                <Button android:id="@+id/btnRecruit"
-                    style="@style/GrimCombatButton"
-                    android:text="Werbunek"
-                    android:layout_width="match_parent"
-                    android:layout_marginBottom="8dp" />
-
-                <View android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" />
-
-                <Button android:id="@+id/btnExitCity"
-                    style="@style/GrimBackButton"
-                    android:text="← POWRÓT" />
+                <Button android:id="@+id/btnExitCity" style="@style/GrimBackButton" android:layout_width="match_parent" android:text="← POWRÓT" android:fontFamily="monospace" />
             </LinearLayout>
 
-            <!-- Status and NPCs -->
+            <!-- RIGHT: NPC List & Lore -->
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_weight="1.5"
-                android:orientation="vertical">
+                android:layout_weight="0.6"
+                android:orientation="vertical"
+                android:paddingStart="12dp">
 
                 <TextView
                     android:id="@+id/cityStatus"
+                    style="@style/GrimTextBody"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    style="@style/GrimTextBody"
-                    android:background="#40000000"
-                    android:padding="12dp"
-                    android:layout_marginBottom="8dp"
-                    android:textColor="@color/grimGold" />
+                    android:background="#60000000"
+                    android:padding="8dp"
+                    android:textColor="@color/grimGold"
+                    android:textSize="12sp"
+                    android:fontFamily="monospace"
+                    android:text="Miasto spowite mrokiem." />
 
                 <TextView
+                    style="@style/GrimTextHeader"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    style="@style/GrimTextHeader"
-                    android:textSize="14sp"
                     android:text="MIESZKAŃCY I WĘDROWCY:"
-                    android:layout_marginBottom="8dp"
-                    android:paddingStart="12dp"/>
+                    android:textSize="11sp"
+                    android:layout_marginTop="8dp"
+                    android:fontFamily="monospace" />
 
                 <ScrollView
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent">
+                    android:layout_height="match_parent"
+                    android:layout_marginTop="4dp"
+                    android:background="#20FFFFFF">
                     <LinearLayout
                         android:id="@+id/npcListContainer"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="vertical"
-                        android:padding="8dp" />
+                        android:padding="4dp" />
                 </ScrollView>
             </LinearLayout>
-
         </LinearLayout>
-
     </LinearLayout>
 </FrameLayout>
