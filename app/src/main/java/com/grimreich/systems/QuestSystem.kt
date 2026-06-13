@@ -72,6 +72,21 @@ object QuestSystem {
         generatedLocations.forEach { location ->
             register(location.toQuest())
         }
+
+        // SEED ENDGAME QUESTS
+        EndgameQuestChain.quests.forEach { eq ->
+            register(
+                QuestEntry(
+                    id = eq.id,
+                    title = "[GŁÓWNY WĄTEK] ${eq.title}",
+                    description = eq.description,
+                    cityId = "serce_krainy", // Default to heartland for main plot
+                    originType = QuestOriginType.ZDARZENIE_MIEJSKIE,
+                    originRefId = eq.id,
+                    rewardGold = eq.rewards.gold
+                )
+            )
+        }
     }
 
     fun register(entry: QuestEntry) {

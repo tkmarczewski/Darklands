@@ -121,7 +121,7 @@ class HubActivity : AppCompatActivity() {
             if (state.combat.active) View.VISIBLE else View.GONE
             
         findViewById<Button>(R.id.openFinale)?.visibility = 
-            if (world.globalStability < 30) View.VISIBLE else View.GONE
+            if (world.globalStability < 30 || com.grimreich.systems.QuestSystem.all().find { it.id == "eq3_pilgrimage" }?.status == com.grimreich.systems.QuestStatus.UKONCZONE) View.VISIBLE else View.GONE
 
         renderPartyStrip()
     }

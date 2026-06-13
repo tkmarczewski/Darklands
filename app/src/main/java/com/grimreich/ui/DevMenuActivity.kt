@@ -24,6 +24,14 @@ class DevMenuActivity : AppCompatActivity() {
             Toast.makeText(this, "Ralwing dołączył do drużyny!", Toast.LENGTH_SHORT).show()
         }
 
+        findViewById<Button>(R.id.btnInstantEndgame).apply {
+            text = "INSTANT ENDGAME"
+            setOnClickListener {
+                instantEndgame()
+                Toast.makeText(context, "Warunki finału spełnione!", Toast.LENGTH_SHORT).show()
+            }
+        }
+
         findViewById<Button>(R.id.jumpHub).setOnClickListener { jumpTo(HubActivity::class.java) }
         findViewById<Button>(R.id.jumpCreator).setOnClickListener { jumpTo(CharacterCreatorActivity::class.java) }
         findViewById<Button>(R.id.jumpCity).setOnClickListener { jumpTo(CityActivity::class.java) }
@@ -63,6 +71,21 @@ class DevMenuActivity : AppCompatActivity() {
         GameRepository.state.party.add(ralwing)
         GameRepository.state.activeHeroId = ralwing.id
         GameRepository.state.gold = 5000
+    }
+
+    private fun instantEndgame() {
+        if (GameRepository.state.party.isEmpty()) devBootstrap()
+        val s = GameRepository.state
+        s.world.globalStability = 95
+        s.prayer.faith = 80
+        s.prayer.virtue = 70
+        s.prayer.sins = 0
+        s.gold = 9999
+        com.grimreich.systems.QuestSystem.seedIntegratedContent()
+        com.grimreich.systems.QuestSystem.complete("eq1_signs")
+        com.grimreich.systems.QuestSystem.complete("eq2_alliances")
+        com.grimreich.systems.QuestSystem.complete("eq3_pilgrimage")
+        com.grimreich.systems.ChronicleSystem.record("Kotwica odnalazła prawdę w Sercu Krainy.", 5)
     }
 
     private fun jumpTo(activityClass: Class<*>) {
