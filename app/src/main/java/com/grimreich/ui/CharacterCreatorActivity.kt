@@ -194,9 +194,15 @@ class CharacterCreatorActivity : AppCompatActivity() {
             portraitRes = DialogueManager.getPortrait(selectedCareer.name)
         )
         
+        // Apply skill specializations
+        specializedSkills.forEach { skill ->
+            hero.skills[skill.name] = 30 // Higher base for specialized skills
+        }
+        
         GameRepository.state = GameState().apply {
             party.clear()
             party.add(hero)
+            activeHeroId = hero.id
         }
         
         startActivity(android.content.Intent(this, HubActivity::class.java))
