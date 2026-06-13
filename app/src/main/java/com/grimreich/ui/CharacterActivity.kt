@@ -18,12 +18,21 @@ class CharacterActivity : AppCompatActivity() {
         setContentView(R.layout.activity_character)
 
         val heroId = intent.getStringExtra("heroId")
+        android.util.Log.d("GrimReich", "Opening character sheet for ID: $heroId")
+        
         val hero = GameRepository.state.party.find { it.id == heroId }
         
         if (hero != null) {
             renderHero(hero)
         } else {
-            finish()
+            android.util.Log.e("GrimReich", "Hero NOT FOUND in party!")
+            // Fallback: try first hero
+            val firstHero = GameRepository.state.party.firstOrNull()
+            if (firstHero != null) {
+                renderHero(firstHero)
+            } else {
+                finish()
+            }
         }
 
         findViewById<Button>(R.id.btnExitCharacter).setOnClickListener {
@@ -34,7 +43,7 @@ class CharacterActivity : AppCompatActivity() {
     private fun renderHero(hero: Hero) {
         findViewById<TextView>(R.id.tvHeroName).text = hero.name
         findViewById<TextView>(R.id.tvHeroRole).text = hero.currentCareer?.name?.uppercase() ?: "WĘDROWIEC"
-        findViewById<ProgressBar>(R.id.pbHeroHP).progress = (hero.hp * 100 / hero.maxHp).coerceAtMost(100)
+        findViewById<ProgressBar>(R.id.pbHeroHP).progress = if (hero.maxHp > 0) (hero.hp * 100 / hero.maxHp).coerceAtMost(100) else 0
         findViewById<ProgressBar>(R.id.pbHeroSanity).progress = hero.sanity
 
         // CANONICAL PORTRAIT MAPPING

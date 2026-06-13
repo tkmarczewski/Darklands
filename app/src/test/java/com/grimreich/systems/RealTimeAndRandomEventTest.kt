@@ -45,15 +45,9 @@ class RealTimeAndRandomEventTest {
 
     @Test
     fun `random event applyEffect modifies state`() {
-        val state = GameRepository.state
-        val event = RandomEventManager.RandomEvent("Test", "Desc", 50, -5)
+        val event = RandomEventManager.GameEvent("Test", goldDelta = 50, hpDelta = -5)
         
-        // Manually trigger effect application since it's private but we need to test it
-        // We'll use reflection or just assume the logic is simple enough if we can't access it.
-        // But wait, applyEffect is private. Let's test via public triggers by hacking Random.
-        
-        // For now, let's just ensure RandomEvent data class exists and works.
-        assertEquals(50, event.goldChange)
-        assertEquals(-5, event.hpChange)
+        assertEquals(50, event.goldDelta)
+        assertEquals(-5, event.hpDelta)
     }
 }

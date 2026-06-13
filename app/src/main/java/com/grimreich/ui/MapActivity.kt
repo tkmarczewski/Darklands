@@ -39,12 +39,13 @@ class MapActivity : AppCompatActivity() {
             findViewById<View>(viewId)?.setOnClickListener {
                 val city = CityCatalogue.get(cityId)
                 if (city != null) {
-                    UiUtils.showNarrativePopup(
+                    UiUtils.showChoicePopup(
                         this, 
                         city.name.uppercase(), 
                         "Domena: ${city.phenomenon}. Patron: ${city.prophet ?: "Nieznany"}.\n\nCzy wyruszasz w drogę do tego regionu?",
-                        onDismiss = {
-                            // Only travel if confirmed (this simple popup uses dismiss as OK for now)
+                        positiveText = "TAK",
+                        negativeText = "NIE",
+                        onPositive = {
                             TravelSystem.travelTo(cityId, this)
                             finish()
                         }

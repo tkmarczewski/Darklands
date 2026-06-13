@@ -47,14 +47,14 @@
                 android:layout_weight="0.4"
                 android:orientation="vertical">
 
-                <Button android:id="@+id/btnTavern" style="@style/GrimNavButton" android:layout_width="match_parent" android:layout_height="48dp" android:text="KARCZMA" android:fontFamily="monospace" />
-                <Button android:id="@+id/btnMarket" style="@style/GrimNavButton" android:layout_width="match_parent" android:layout_height="48dp" android:text="TARG" android:fontFamily="monospace" />
-                <Button android:id="@+id/btnChurch" style="@style/GrimNavButton" android:layout_width="match_parent" android:layout_height="48dp" android:text="KAPLICA" android:fontFamily="monospace" />
-                <Button android:id="@+id/btnRecruit" style="@style/GrimNavButton" android:layout_width="match_parent" android:layout_height="48dp" android:text="WERBUNEK" android:fontFamily="monospace" />
+                <Button android:id="@+id/btnTavern" style="@style/GrimNavButton" android:layout_width="match_parent" android:layout_height="48dp" android:text="@string/city_tavern" android:fontFamily="monospace" />
+                <Button android:id="@+id/btnMarket" style="@style/GrimNavButton" android:layout_width="match_parent" android:layout_height="48dp" android:text="@string/city_market" android:fontFamily="monospace" />
+                <Button android:id="@+id/btnChurch" style="@style/GrimNavButton" android:layout_width="match_parent" android:layout_height="48dp" android:text="@string/city_temple" android:fontFamily="monospace" />
+                <Button android:id="@+id/btnRecruit" style="@style/GrimNavButton" android:layout_width="match_parent" android:layout_height="48dp" android:text="@string/city_recruit" android:fontFamily="monospace" />
 
                 <Space android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" />
 
-                <Button android:id="@+id/btnExitCity" style="@style/GrimBackButton" android:layout_width="match_parent" android:text="← POWRÓT" android:fontFamily="monospace" />
+                <Button android:id="@+id/btnExitCity" style="@style/GrimBackButton" android:layout_width="match_parent" android:text="@string/btn_back" android:fontFamily="monospace" />
             </LinearLayout>
 
             <!-- RIGHT: NPC List & Lore -->

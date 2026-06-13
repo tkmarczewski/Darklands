@@ -20,16 +20,26 @@ class HubActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_hub)
         
-        // Zdarzenia czasu rzeczywistego przy wejściu do gry
-        val eventMessage = RealTimeEventManager.checkRealTimeEvents(this)
-        if (eventMessage != null) {
-            UiUtils.showNarrativePopup(this, "UPŁYW CZASU", eventMessage)
-        }
-
-        // CALENDAR AURA
+        // Ensure content is seeded if missing (fixes missing quests after load)
+        com.grimreich.systems.QuestSystem.seedIntegratedContent()
+        
+        // CONSOLIDATED ONTOLOGICAL STATUS
+        val realTimeEvent = RealTimeEventManager.checkRealTimeEvents(this)
         val aura = CalendarAuraSystem.getCurrentAura()
-        if (aura.name != "DZIEŃ FENOMENÓW") {
-            UiUtils.showNarrativePopup(this, "AURA: ${aura.name}", "${aura.description}\n\nEfekt: ${aura.effect}")
+        
+        if (realTimeEvent != null || aura.name != "DZIEŃ FENOMENÓW") {
+            val message = buildString {
+                if (realTimeEvent != null) {
+                    append(realTimeEvent)
+                    append("\n\n")
+                }
+                if (aura.name != "DZIEŃ FENOMENÓW") {
+                    append("AURA DNIA: ${aura.name}\n")
+                    append("${aura.description}\n")
+                    append("Efekt: ${aura.effect}")
+                }
+            }
+            UiUtils.showNarrativePopup(this, "ONTOLOGIA DNIA", message)
         }
 
         setupNavigation()
@@ -64,6 +74,8 @@ class HubActivity : AppCompatActivity() {
              startActivity(Intent(this, CityEventsActivity::class.java))
         }
         findViewById<Button>(R.id.openTransfer)?.setOnClickListener {
+             // CRITICAL: Refresh seeding before opening transfer to ensure names/state are fresh
+             com.grimreich.systems.QuestSystem.seedIntegratedContent()
              startActivity(Intent(this, InventoryTransferActivity::class.java))
         }
         findViewById<Button>(R.id.openFinale)?.setOnClickListener {
@@ -99,10 +111,11 @@ class HubActivity : AppCompatActivity() {
             else -> world.timeOfDay
         }
         
-        val cityData = CityCatalogue.get(state.grimCurrentRegion)
+        val cityData = com.grimreich.world.CityCatalogue.get(state.grimCurrentRegion)
         val locationName = cityData?.name ?: world.location.replace("_", " ")
+        val formattedName = locationName.uppercase(java.util.Locale.ROOT)
         
-        findViewById<TextView>(R.id.tvTime)?.text = "${locationName.uppercase()} | DZIEŃ ${world.day} | $timeLabel"
+        findViewById<TextView>(R.id.tvTime)?.text = "$formattedName | DZIEŃ ${world.day} | $timeLabel"
 
         findViewById<Button>(R.id.openCombatStatus)?.visibility = 
             if (state.combat.active) View.VISIBLE else View.GONE
@@ -126,7 +139,7 @@ class HubActivity : AppCompatActivity() {
                 slotContainer.visibility = View.VISIBLE
                 val hero = party[i]
                 findViewById<TextView>(nameIds[i])?.text = hero.name
-                findViewById<ProgressBar>(hpIds[i])?.progress = (hero.hp * 100 / hero.maxHp).coerceAtMost(100)
+                findViewById<ProgressBar>(hpIds[i])?.progress = if (hero.maxHp > 0) (hero.hp * 100 / hero.maxHp).coerceAtMost(100) else 0
                 
                 val portrait = findViewById<ImageView>(portIds[i])
                 val resId = resources.getIdentifier(hero.portraitRes, "drawable", packageName)

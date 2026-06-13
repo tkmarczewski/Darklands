@@ -29,6 +29,7 @@ class AlchemyActivity : AppCompatActivity() {
                 binding.tvResult.text = "Nieprawidłowy numer receptury"
             }
         }
+        binding.btnBackAlchemy.setOnClickListener { finish() }
     }
 
     private fun render() {

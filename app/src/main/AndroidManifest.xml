@@ -27,7 +27,7 @@
         </activity>
 
         <activity android:name=".ui.CharacterCreatorActivity" android:exported="false" android:screenOrientation="landscape"/>
-        <activity android:name=".ui.DevMenuActivity" android:exported="false" android:screenOrientation="landscape"/>
+        <activity android:name=".ui.DevMenuActivity" android:exported="true" android:screenOrientation="landscape"/>
 
         <activity android:name=".ui.PartyActivity" android:exported="false" android:screenOrientation="landscape"/>
         <activity android:name=".ui.CharacterActivity" android:exported="false" android:screenOrientation="landscape"/>

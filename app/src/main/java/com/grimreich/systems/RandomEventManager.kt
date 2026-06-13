@@ -8,24 +8,34 @@ import kotlin.random.Random
 object RandomEventManager {
 
     fun triggerCityEvent(context: Context) {
-        if (Random.nextInt(100) > 40) return // 40% szansy na zdarzenie przy wejściu
+        if (Random.nextInt(100) > 40) return 
 
         val event = cityEvents.random()
         applyEventEffects(event)
-        UiUtils.showNarrativePopup(context, "MIEJSKIE WIEŚCI", event.description)
+        
+        // Ensure UI thread and force non-cancelable by requiring explicit click
+        (context as? android.app.Activity)?.runOnUiThread {
+            UiUtils.showNarrativePopup(context, "MIEJSKIE WIEŚCI", event.description)
+        }
     }
 
     fun triggerTravelEvent(context: Context) {
         val event = travelEvents.random()
         applyEventEffects(event)
-        UiUtils.showNarrativePopup(context, "DROGA", event.description)
+        
+        (context as? android.app.Activity)?.runOnUiThread {
+            UiUtils.showNarrativePopup(context, "WYDARZENIE W PODRÓŻY", event.description)
+        }
     }
 
     fun triggerHubEvent(context: Context) {
-        if (Random.nextInt(100) > 30) return // 30% chance in Hub
-        val event = cityEvents.random() // Hub uses city events for now
+        if (Random.nextInt(100) > 30) return 
+        val event = cityEvents.random() 
         applyEventEffects(event)
-        UiUtils.showNarrativePopup(context, "ECHA HUB'U", event.description)
+        
+        (context as? android.app.Activity)?.runOnUiThread {
+            UiUtils.showNarrativePopup(context, "ECHA HUB'U", event.description)
+        }
     }
 
     private fun applyEventEffects(event: GameEvent) {

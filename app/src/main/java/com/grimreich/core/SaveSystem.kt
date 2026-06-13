@@ -81,13 +81,13 @@ object SaveSystem {
     fun validate(snapshot: SaveSnapshot): ValidationResult {
         val compatible = isCompatible(snapshot)
         return ValidationResult(
-            isValid = snapshot.state != null,
+            isValid = true, // snapshot.state is non-nullable
             version = snapshot.version,
             isCompatible = compatible,
-            message = when {
-                !compatible -> "Niezgodna wersja zapisu (${snapshot.version} vs $SAVE_VERSION)"
-                snapshot.state == null -> "Zapis jest pusty lub uszkodzony"
-                else -> "Zapis poprawny (wersja ${snapshot.version})"
+            message = if (!compatible) {
+                "Niezgodna wersja zapisu (${snapshot.version} vs $SAVE_VERSION)"
+            } else {
+                "Zapis poprawny (wersja ${snapshot.version})"
             }
         )
     }

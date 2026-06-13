@@ -69,7 +69,7 @@ class CombatActivity : AppCompatActivity() {
         
         if (party.isNotEmpty()) {
             findViewById<TextView>(R.id.tvChar0Name).text = party[0].name
-            findViewById<android.widget.ProgressBar>(R.id.pbChar0HP).progress = (party[0].hp * 100 / party[0].maxHp)
+            findViewById<android.widget.ProgressBar>(R.id.pbChar0HP).progress = if (party[0].maxHp > 0) (party[0].hp * 100 / party[0].maxHp).coerceAtMost(100) else 0
         }
         
         if (!c.active) {

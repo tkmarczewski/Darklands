@@ -19,6 +19,25 @@ object CalendarAuraSystem {
         if (month == Calendar.OCTOBER && dayOfMonth == 31) {
             return Aura("PRZENIKANIE", "Wycieki rzeczywistości +50%", "Granica między sferami zanika. Echa przeszłości są niemal materialne.")
         }
+        if (month == Calendar.JULY && dayOfMonth == 2) {
+            return Aura("DZIEŃ ARCHITEKTA", "Wszystkie statystyki +5", "Twórca tego świata przyszedł na świat. Rzeczywistość kłania się w pas.")
+        }
+        if (month == Calendar.JULY && dayOfMonth == 8) {
+            return Aura("DZIEŃ MUZY", "Regeneracja HP +100%", "Ciepło płynące z serca Świata leczy rany, o których istnieniu zapomniano.")
+        }
+        if (month == Calendar.JULY && dayOfMonth == 12) {
+            return Aura("DZIEŃ ISKIERKI", "Szansa na unik +25%", "Młodość i energia rozjaśniają mrok. Nawet los nie potrafi jej dogonić.")
+        }
+        if (month == Calendar.SEPTEMBER && dayOfMonth == 27) {
+            return Aura("DZIEŃ GWIAZDY", "Inteligencja +10", "Dojrzałość i blask prawdy. Wiedza staje się najostrzejszą bronią.")
+        }
+        if (month == Calendar.MARCH && dayOfMonth == 11) {
+            return Aura("WSPOMNIENIE KORZENI", "Stabilność Świata +50", "Dzień narodzin ojca Architekta. Fundamenty świata są dziś niewzruszone.")
+        }
+        if (month == Calendar.NOVEMBER && dayOfMonth == 5) {
+            return Aura("CISZA PRZODKA", "Damage -50%, Faith +50", "W rocznicę odejścia ojca, stal traci wolę walki, ustępując miejsca modlitwie.")
+        }
+
         if (dayOfMonth == 13) {
             return Aura("DZIEŃ PĘKNIĘCIA", "Stabilność Świata -20", "W trzynastym dniu miesiąca Absolut mruga częściej.")
         }

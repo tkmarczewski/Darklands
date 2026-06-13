@@ -48,7 +48,7 @@ class AuditLogicTest {
         DialogueManager.seedBasicDialogues()
         GameRepository.state.world.globalStability = 20
         
-        val node = DialogueManager.getNode("merchant_start")
+        val node = DialogueManager.getNode("aelion_start")
         assertNotNull(node)
         assertTrue(node!!.text.contains("GŁOSY"), "Text should contain voices at low stability")
     }

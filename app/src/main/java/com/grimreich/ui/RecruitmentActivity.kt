@@ -27,6 +27,26 @@ class RecruitmentActivity : AppCompatActivity() {
         container.removeAllViews()
 
         val hireables = GameRepository.state.hireableHeroes
+        
+        // SEED IF EMPTY
+        if (hireables.isEmpty()) {
+            repeat(4) {
+                val name = com.grimreich.world.ProceduralNpcGenerator.generateName()
+                val age = 18 + (Math.random() * 40).toInt()
+                val career = com.grimreich.core.Career.values().filter { it.minAge <= age }.random()
+                
+                hireables.add(com.grimreich.core.Hero(
+                    id = java.util.UUID.randomUUID().toString(),
+                    name = name,
+                    age = age,
+                    currentCareer = career,
+                    hp = 25 + (Math.random() * 15).toInt(),
+                    maxHp = 40,
+                    portraitRes = com.grimreich.systems.DialogueManager.getPortrait(career.name)
+                ))
+            }
+        }
+
         if (hireables.isEmpty()) {
             findViewById<TextView>(R.id.tvRecruitStatus).text = "Karczma jest pusta... nikt nie szuka obecnie przygód."
             return

@@ -26,20 +26,20 @@ object DialogueManager {
             "ferrun" -> "port_barbarian"
             "noctyros" -> "port_demon"
             "anomalia" -> "port_dragon"
-            "alchemik" -> "port_alchemist"
-            "barbarzynca" -> "port_barbarian"
-            "kaplan" -> "port_priest"
-            "lowca" -> "port_ranger"
-            "rycerz" -> "port_knight"
-            "mag" -> "port_mage"
-            "ork" -> "port_orc"
+            "alchemik", "alchemist" -> "port_alchemist"
+            "barbarzynca", "barbarian" -> "port_barbarian"
+            "kaplan", "priest" -> "port_priest"
+            "lowca", "ranger" -> "port_ranger"
+            "rycerz", "knight" -> "port_knight"
+            "mag", "scholar" -> "port_mage"
+            "ork", "orc" -> "port_orc"
             "troll" -> "port_troll"
-            "szkielet" -> "port_skeleton"
-            "upior" -> "port_wraith"
+            "szkielet", "skeleton" -> "port_skeleton"
+            "upior", "wraith" -> "port_wraith"
             "demon" -> "port_demon"
-            "smok" -> "port_dragon"
-            "wilk" -> "port_wolf"
-            "lotr" -> "port_rogue"
+            "smok", "dragon" -> "port_dragon"
+            "wilk", "wolf" -> "port_wolf"
+            "lotr", "rogue", "thief" -> "port_rogue"
             else -> "port_rogue"
         }
     }
@@ -77,51 +77,68 @@ object DialogueManager {
         seedChapter7Untamed()
         seedMetaLore()
         seedExtendedNpcDialogues()
-        seedV21ExtraDialogues()
+        seedProceduralBase()
     }
 
-    private fun seedV21ExtraDialogues() {
-        // SEER
+    private fun seedProceduralBase() {
+        // ZEALOT
         registerNode(DialogueNode(
-            id = "seer_start", npcId = "procedural",
-            text = "Gwiazdy zgasły, ale ich poświata wciąż nas okłamuje. Widzę Twoją nić... jest zapętlona. Ile razy już tu byłeś, Kotwico?",
+            id = "zealot_start", npcId = "procedural",
+            text = "Prorocy patrzą! Czy Twoja dusza jest czysta, wędrowcze?",
             choices = listOf(
-                DialogueChoice("To mój pierwszy raz tutaj.", "seer_first"),
-                DialogueChoice("Czuję, że znam tę ścieżkę.", "seer_familiar")
+                DialogueChoice("Jestem wierny.", "end"),
+                DialogueChoice("Ofiaruj krew (HP-5)", "zealot_sacrifice", onSelect = { 
+                    it.party.forEach { h -> h.hp -= 5 }
+                })
             )
         ))
-        registerNode(DialogueNode(id = "seer_familiar", npcId = "procedural", text = "Dejà vu to tylko usterka w Sferze Fenomenów. Absolut zapomniał wymazać Twoje poprzednie kroki."))
+        registerNode(DialogueNode(id = "zealot_sacrifice", npcId = "procedural", text = "Twoja ofiara została przyjęta. Czuć mrowienie w kościach."))
 
+        // MERCHANT
+        registerNode(DialogueNode(
+            id = "merchant_start", npcId = "procedural",
+            text = "Mam towary z Drugiej Strony. Złoto jest tu jedyną prawdą.",
+            choices = listOf(DialogueChoice("Pokaż ofertę", "end"))
+        ))
+
+        // CHRONICLER
+        registerNode(DialogueNode(
+            id = "chronicler_start", npcId = "procedural",
+            text = "Wszystko pęka, a ja wciąż zapisuję te błędy. Chcesz usłyszeć o końcu?",
+            choices = listOf(DialogueChoice("Opowiedz mi.", "chronicler_deep"))
+        ))
+
+        // FUGITIVE
+        registerNode(DialogueNode(
+            id = "fugitive_start", npcId = "procedural",
+            text = "Nie patrz na mnie... widziałem jak słońce mrugnęło. To nie był sen.",
+            choices = listOf(DialogueChoice("Uspokój się.", "end"))
+        ))
+
+        // MYSTIC
+        registerNode(DialogueNode(
+            id = "mystic_start", npcId = "procedural",
+            text = "Cień w Tobie rośnie. Absolut Cię woła, Kotwico.",
+            choices = listOf(DialogueChoice("Kim jesteś?", "mystic_absolute"))
+        ))
+        
         // SOLDIER
-        registerNode(DialogueNode(
-            id = "soldier_start", npcId = "procedural",
-            text = "Trzymaj gardę wysoko. We mgle nie walczysz z ludźmi, tylko z tym, co po nich zostało. Masz dość odwagi, by przelać krew?",
-            choices = listOf(
-                DialogueChoice("Moja stal nie zna strachu.", "end"),
-                DialogueChoice("Dla kogo walczysz?", "soldier_faction")
-            )
-        ))
+        registerNode(DialogueNode(id = "soldier_start", npcId = "procedural", text = "Stal to jedyna modlitwa, jaką znam.", choices = listOf(DialogueChoice("Prowadź nas.", "end"))))
+        
+        // AMNESIAC
+        registerNode(DialogueNode(id = "amnesiac_start", npcId = "procedural", text = "Gdzie jest mój dom? Pamiętam tylko białą pustkę...", choices = listOf(DialogueChoice("Nie ma już domu.", "end"))))
+        
+        // SEER
+        registerNode(DialogueNode(id = "seer_start", npcId = "procedural", text = "Widzę Twoją pętlę. Znów tu jesteś.", choices = listOf(DialogueChoice("To niemożliwe.", "end"))))
 
+        // PENITENT
+        registerNode(DialogueNode(id = "penitent_start", npcId = "procedural", text = "Moje winy są cięższe od gór Ferruna.", choices = listOf(DialogueChoice("Pokuta Cię wyzwoli.", "end"))))
+        
         // HERETIC
-        registerNode(DialogueNode(
-            id = "heretic_start", npcId = "procedural",
-            text = "Prorocy to tylko pasożyty na ranie świata! Prawdziwa wolność jest w Pęknięciu, tam gdzie nikt nie narzuca nam formy.",
-            choices = listOf(
-                DialogueChoice("Twoje słowa to szaleństwo.", "end"),
-                DialogueChoice("Opowiedz mi o wolności Pęknięcia.", "heretic_freedom")
-            )
-        ))
-
+        registerNode(DialogueNode(id = "heretic_start", npcId = "procedural", text = "Prorocy kłamią! Absolut to wolność!", choices = listOf(DialogueChoice("Ucisz się.", "end"))))
+        
         // BEGGAR
-        registerNode(DialogueNode(
-            id = "beggar_start", npcId = "procedural",
-            text = "Miedziaka dla nędzarza, który stracił wszystko... nawet własne imię. Sprzedałem je mgle za bochenek chleba, który okazał się kamieniem.",
-            choices = listOf(
-                DialogueChoice("Daj 5 złota (Gold-5)", "beggar_give", onSelect = { it.gold -= 5 }),
-                DialogueChoice("Idź precz.", "end")
-            )
-        ))
-        registerNode(DialogueNode(id = "beggar_give", npcId = "procedural", text = "Dziękuję... Niech Absolut mrugnie, gdy będziesz przechodził przez bramę."))
+        registerNode(DialogueNode(id = "beggar_start", npcId = "procedural", text = "Daj miedziaka dla bytu, który znika.", choices = listOf(DialogueChoice("Proszę (Gold-5)", "end", onSelect = { it.gold -= 5 }))))
     }
 
     private fun seedExtendedNpcDialogues() {
@@ -141,8 +158,8 @@ object DialogueManager {
             id = "inquisitor_start", npcId = "procedural",
             text = "Twoja obecność tutaj jest anomalią. Czy Twoja wola jest zgodna z dogmatem Proroka, czy niesiesz w sobie zarazę Pęknięcia?",
             choices = listOf(
-                DialogueChoice("Jestem wierny Absolutowi.", "inquisitor_loyal"),
-                DialogueChoice("Nie uznaję Waszych dogmatów.", "inquisitor_heresy")
+                DialogueChoice("Jestem wierny Absolutowi.", "end"),
+                DialogueChoice("Nie uznaję Waszych dogmatów.", "end")
             )
         ))
 
@@ -162,18 +179,8 @@ object DialogueManager {
             id = "blacksmith_start", npcId = "procedural",
             text = "Młot uderza, ale metal się nie poddaje. W tym regionie stal staje się miękka jak masło, gdy tylko pomyślisz o Mgle. Czego potrzebujesz?",
             choices = listOf(
-                DialogueChoice("Napraw moją broń.", "blacksmith_repair"),
-                DialogueChoice("Opowiedz mi o tutejszym kruszcu.", "blacksmith_lore")
-            )
-        ))
-
-        // AMNESIAC
-        registerNode(DialogueNode(
-            id = "amnesiac_start", npcId = "procedural",
-            text = "Kim... kim jesteś? Kim JA jestem? Pamiętam tylko biały pokój i głos, który kazał mi mrugać...",
-            choices = listOf(
-                DialogueChoice("Jesteś w GrimReich. Pamiętasz to?", "amnesiac_name"),
-                DialogueChoice("Odejdź, nieszczęśniku.", "end")
+                DialogueChoice("Napraw moją broń.", "end"),
+                DialogueChoice("Opowiedz mi o tutejszym kruszcu.", "end")
             )
         ))
     }
@@ -197,9 +204,9 @@ object DialogueManager {
             id = "xyrel_start", npcId = "xyrel",
             text = "Krew Równin jest gęstsza od wina. Każda wojna tutaj jest tylko próbą udowodnienia Absolutowi, że wciąż potrafimy czuć ból. Jesteś tu, by zabijać czy by umrzeć?",
             choices = listOf(
-                DialogueChoice("Jestem tu, by położyć kres temu cierpieniu.", "xyrel_end"),
+                DialogueChoice("Jestem tu, by położyć kres temu cierpieniu.", "end"),
                 DialogueChoice("Szukam Sztandaru Rozpaczy.", "xyrel_artifact"),
-                DialogueChoice("Twoja religia jest szaleństwem.", "xyrel_heresy")
+                DialogueChoice("Twoja religia jest szaleństwem.", "end")
             )
         ))
         registerNode(DialogueNode(id = "xyrel_artifact", npcId = "xyrel", text = "Sztandar? On nie wisi na maszcie. On jest wyszyty z nerwów tych, którzy odmówili walki. Chcesz go nieść? Przygotuj się na wieczny krzyk w uszach."))
@@ -210,8 +217,8 @@ object DialogueManager {
             id = "mira_start", npcId = "mira",
             text = "W Sercu Krainy nie ma prywatności. Jeziora widzą Twoje grzechy, a lustra pokazują to, co zrobisz za dziesięć lat. Czy boisz się swojego odbicia?",
             choices = listOf(
-                DialogueChoice("Moje sumienie jest czyste.", "mira_clean"),
-                DialogueChoice("Widzę w lustrze kogoś innego... potwora.", "mira_monster"),
+                DialogueChoice("Moje sumienie jest czyste.", "end"),
+                DialogueChoice("Widzę w lustrze kogoś innego... potwora.", "end"),
                 DialogueChoice("Czym jest Sfera Fenomenów?", "mira_sphere")
             )
         ))
@@ -223,8 +230,8 @@ object DialogueManager {
             id = "sereth_start", npcId = "sereth",
             text = "Światło Pełni nie daje ciepła, ono daje świadomość. W tych ruinach każdy kamień wie, że jest tylko senną marą. Czy jesteś gotów obudzić się z tego koszmaru?",
             choices = listOf(
-                DialogueChoice("Sen jest lepszy od nicości.", "sereth_dream"),
-                DialogueChoice("Chcę zobaczyć Absolut twarzą w twarz.", "sereth_face")
+                DialogueChoice("Sen jest lepszy od nicości.", "end"),
+                DialogueChoice("Chcę zobaczyć Absolut twarzą w twarz.", "end")
             )
         ))
     }
@@ -234,8 +241,8 @@ object DialogueManager {
             id = "ferrun_start", npcId = "ferrun",
             text = "Głębia to jedyne miejsce, które nie pęka, bo jest już dnem. Stal Ferruna nie rdzewieje, bo została wykuta z czystego cierpienia. Chcesz zostać przekuty?",
             choices = listOf(
-                DialogueChoice("Uczyń mnie twardszym od rzeczywistości.", "ferrun_harden"),
-                DialogueChoice("Szukam wyjścia z tych kopalni.", "ferrun_exit")
+                DialogueChoice("Uczyń mnie twardszym od rzeczywistości.", "end"),
+                DialogueChoice("Szukam wyjścia z tych kopalni.", "end")
             )
         ))
     }
@@ -245,11 +252,10 @@ object DialogueManager {
             id = "noctyros_start", npcId = "noctyros",
             text = "Pęknięcie na Zachodzie to brama. Cień, który z niego wycieka, to powrót do pierwotnej jedni. Dlaczego tak kurczowo trzymasz się swojego 'ja'?",
             choices = listOf(
-                DialogueChoice("Moja wola jest moją jedyną własnością.", "noctyros_will"),
-                DialogueChoice("Słyszę głosy z Pęknięcia... wołają mnie.", "noctyros_voices")
+                DialogueChoice("Moja wola jest moją jedyną własnością.", "end"),
+                DialogueChoice("Słyszę głosy z Pęknięcia... wołają mnie.", "end")
             )
         ))
-        registerNode(DialogueNode(id = "noctyros_voices", npcId = "noctyros", text = "To nie głosy. To harmonia. Kiedyś cały świat był jednym dźwiękiem, zanim fenomeny go nie rozbiły na miliardy fałszywych nut."))
     }
 
     private fun seedChapter7Untamed() {
@@ -257,14 +263,13 @@ object DialogueManager {
             id = "anomaly_start", npcId = "anomalia",
             text = "Tu nie ma Proroka, bo tu nie ma już kogo okłamywać. Trawa rośnie wewnątrz Twoich płuc, a czas płynie w poprzek. Czy wciąż wierzysz, że jesteś człowiekiem?",
             choices = listOf(
-                DialogueChoice("Jestem tym, który przetrwa.", "anomaly_survive"),
-                DialogueChoice("Ziemie Dzikie... to piękny koniec.", "anomaly_beauty")
+                DialogueChoice("Jestem tym, który przetrwa.", "end"),
+                DialogueChoice("Ziemie Dzikie... to piękny koniec.", "end")
             )
         ))
     }
 
     private fun seedMetaLore() {
-        // THE ABSOLUTE CLUES
         registerNode(DialogueNode(
             id = "absolute_echo", npcId = "procedural",
             text = "Widziałem to w moich wizjach. Absolut to nie byt. To pusty pokój, w którym ktoś zostawił zapaloną świecę. My jesteśmy tylko tańczącymi cieniami na ścianie.",
@@ -272,13 +277,12 @@ object DialogueManager {
         ))
         registerNode(DialogueNode(id = "absolute_candle", npcId = "procedural", text = "Ty. Ja. My wszyscy. Przestaliśmy mrugać i teraz rzeczywistość wypala nam oczy."))
 
-        // CHRONICLER SECRETS
         registerNode(DialogueNode(
             id = "chronicler_deep", npcId = "procedural",
             text = "Znalazłem stronę w mojej kronice, która została zapisana Twoim charakterem pisma... ale tysiąc lat temu. Jak to wyjaśnisz, Kotwico?",
             choices = listOf(
-                DialogueChoice("To pętla czasu.", "chronicler_loop"),
-                DialogueChoice("To kłamstwo Mgły.", "chronicler_lie")
+                DialogueChoice("To pętla czasu.", "end"),
+                DialogueChoice("To kłamstwo Mgły.", "end")
             )
         ))
     }

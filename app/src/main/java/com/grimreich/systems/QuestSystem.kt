@@ -38,6 +38,7 @@ object QuestSystem {
     }
 
     fun seedIntegratedContent(seed: Int = 1) {
+        // Force seeding if quests are empty - crucial for first load
         if (quests.isNotEmpty() && (currentSeed == seed)) return
         clear()
         currentSeed = seed
@@ -45,8 +46,13 @@ object QuestSystem {
         CityCatalogue.seedCanonical()
         CityEventSystem.seedStage1Events()
 
-        CityCatalogue.all().forEach { city ->
-            CityEventSystem.getEventsForCity(city.id).forEach { event ->
+        val allCities = CityCatalogue.all()
+        android.util.Log.d("QuestSystem", "Seeding quests for ${allCities.size} cities")
+
+        allCities.forEach { city ->
+            val cityEvents = CityEventSystem.getEventsForCity(city.id)
+            android.util.Log.d("QuestSystem", "City ${city.id} has ${cityEvents.size} events")
+            cityEvents.forEach { event ->
                 register(
                     QuestEntry(
                         id = "quest_${event.id}",
@@ -61,7 +67,8 @@ object QuestSystem {
             }
         }
 
-        val generatedLocations = ProceduralLocationGenerator.generate(seed = seed, count = 8)
+        val generatedLocations = ProceduralLocationGenerator.generate(seed = seed, count = 12)
+        android.util.Log.d("QuestSystem", "Generated ${generatedLocations.size} locations")
         generatedLocations.forEach { location ->
             register(location.toQuest())
         }

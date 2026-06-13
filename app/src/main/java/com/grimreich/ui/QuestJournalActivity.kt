@@ -37,12 +37,12 @@ class QuestJournalActivity : AppCompatActivity() {
         allQuests.forEach { quest ->
             val questView = LinearLayout(this).apply {
                 orientation = LinearLayout.VERTICAL
-                background = androidx.core.content.ContextCompat.getDrawable(context, R.drawable.ui_panel_side)
-                setPadding(24, 24, 24, 24)
+                background = android.graphics.drawable.ColorDrawable(android.graphics.Color.parseColor("#40FFFFFF"))
+                setPadding(32, 32, 32, 32)
                 val params = LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.MATCH_PARENT,
                     LinearLayout.LayoutParams.WRAP_CONTENT
-                ).apply { setMargins(0, 0, 0, 24) }
+                ).apply { setMargins(0, 0, 0, 32) }
                 layoutParams = params
             }
 
@@ -54,6 +54,14 @@ class QuestJournalActivity : AppCompatActivity() {
                 text = quest.description
                 styleToGrim(false)
             }
+            
+            val goalTv = TextView(this).apply {
+                text = "CEL: ${quest.cityId.replace("_", " ").uppercase()}"
+                styleToGrim(false)
+                setTextColor(android.graphics.Color.parseColor("#00AAFF"))
+                textSize = 12f
+            }
+
             val statusTv = TextView(this).apply {
                 text = "STATUS: ${quest.status}"
                 styleToGrim(false)
@@ -63,7 +71,23 @@ class QuestJournalActivity : AppCompatActivity() {
 
             questView.addView(titleTv)
             questView.addView(descTv)
+            questView.addView(goalTv)
             questView.addView(statusTv)
+
+            if (quest.status == com.grimreich.systems.QuestStatus.DOSTEPNE) {
+                val acceptBtn = Button(this).apply {
+                    text = "PRZYJMIJ ZADANIE"
+                    setBackgroundColor(android.graphics.Color.parseColor("#80000000"))
+                    setTextColor(android.graphics.Color.WHITE)
+                    setOnClickListener {
+                        com.grimreich.systems.QuestSystem.activate(quest.id)
+                        android.widget.Toast.makeText(context, "Zadanie podjęte!", android.widget.Toast.LENGTH_SHORT).show()
+                        renderQuests()
+                    }
+                }
+                questView.addView(acceptBtn)
+            }
+
             container.addView(questView)
         }
     }

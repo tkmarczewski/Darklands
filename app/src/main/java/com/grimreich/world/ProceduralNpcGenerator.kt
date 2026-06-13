@@ -38,18 +38,21 @@ object ProceduralNpcGenerator {
         }
     }
 
-    private fun generateName(random: Random): String {
+    fun generateName(random: Random = Random.Default): String {
         val prefixes = listOf(
             "Gisbert", "Helga", "Ulrich", "Mira", "Roderick", "Elsa", 
             "Balthazar", "Ingrid", "Sigmund", "Freya", "Klaus", "Martha",
             "Wilhelm", "Gerda", "Otto", "Beatrice", "Heinrich", "Lotte",
-            "Siegfried", "Ursula", "Kaspar", "Greta", "Elias", "Anselm"
+            "Siegfried", "Ursula", "Kaspar", "Greta", "Elias", "Anselm",
+            "Ralwing", "Aldric", "Brunhilda", "Dieter", "Emmeline", "Friedrich",
+            "Gunter", "Hilde", "Ignatz", "Jutta", "Konrad", "Lorelei"
         )
         val suffixes = listOf(
             "von Kalt", "the Broken", "of the Mist", "Soul-Stitched", "Grey",
             "the Silent", "Iron-Hand", "of the Void", "Parchment-Skin", "the Blind",
             "Shadow-Walker", "of Old Grimhold", "the Penitent", "Flesh-Weaver",
-            "the Drowned", "of the Ash", "Twice-Born", "Void-Touched", "Sun-Eater"
+            "the Drowned", "of the Ash", "Twice-Born", "Void-Touched", "Sun-Eater",
+            "the Cruel", "of the Black Rose", "the Forgiven", "Stone-Heart"
         )
         return "${prefixes.random(random)} ${suffixes.random(random)}"
     }

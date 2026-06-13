@@ -11,11 +11,17 @@ import java.util.*
 class CharacterCreatorActivity : AppCompatActivity() {
 
     private var pointsRemaining = 20
+    private var specializationPointsRemaining = 3
     private val attributes = mutableMapOf(
         "Str" to 10, "Agi" to 10, "Per" to 10, "Int" to 10, "End" to 10, "Cha" to 10, "Pie" to 10
     )
     private val specializedSkills = mutableSetOf<HeroSkill>()
     private var selectedCareer: Career = Career.KNIGHT
+
+    private val forbiddenNames = setOf(
+        "Ralwing", "Aelion", "Xyrel", "Mira", "Sereth", "Ferrun", "Noctyros",
+        "Aldric", "Lorelei", "Silas", "Klaus", "Hildegard", "Friedrich", "Borg", "Elara", "Hans"
+    )
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -26,8 +32,15 @@ class CharacterCreatorActivity : AppCompatActivity() {
         setupSkillSpecializations()
 
         findViewById<Button>(R.id.btnRandomizeName).setOnClickListener {
-            val names = listOf("Heinrich", "Elias", "Sigmund", "Mira", "Lotte", "Gerda")
-            findViewById<EditText>(R.id.etName).setText(names.random())
+            val availableNames = listOf(
+                "Heinrich", "Elias", "Sigmund", "Lotte", "Gerda",
+                "Wilhelm", "Ulrich", "Greta", "Knut", "Otto",
+                "Kurt", "Bertha", "Helga", "Erich", "Bruno",
+                "Marta", "Stefan", "Viktor", "Klara", "Emil",
+                "Karl", "Rosa", "Adler", "Berta", "Gunter",
+                "Hilda", "Karin", "Ludwig", "Olga", "Rolf"
+            ).filter { name -> !forbiddenNames.any { it.equals(name, ignoreCase = true) } }
+            findViewById<EditText>(R.id.etName).setText(availableNames.random())
         }
 
         findViewById<Button>(R.id.btnAutoAllocate).setOnClickListener {
@@ -35,9 +48,11 @@ class CharacterCreatorActivity : AppCompatActivity() {
         }
 
         findViewById<Button>(R.id.btnStartGame).setOnClickListener {
-            val name = findViewById<EditText>(R.id.etName).text.toString()
+            val name = findViewById<EditText>(R.id.etName).text.toString().trim()
             if (name.isBlank()) {
                 Toast.makeText(this, "Podaj imię swojej Kotwicy", Toast.LENGTH_SHORT).show()
+            } else if (forbiddenNames.any { it.equals(name, ignoreCase = true) }) {
+                Toast.makeText(this, "To imię jest zarezerwowane dla sił wyższych...", Toast.LENGTH_SHORT).show()
             } else if (specializedSkills.size < 3) {
                 Toast.makeText(this, "Wybierz 3 specjalizacje", Toast.LENGTH_SHORT).show()
             } else {
@@ -125,14 +140,19 @@ class CharacterCreatorActivity : AppCompatActivity() {
                 setTextColor(androidx.core.content.ContextCompat.getColor(context, R.color.grimTextPrimary))
                 setOnCheckedChangeListener { _, isChecked ->
                     if (isChecked) {
-                        if (specializedSkills.size < 3) {
+                        if (specializationPointsRemaining > 0) {
                             specializedSkills.add(skill)
+                            specializationPointsRemaining--
                         } else {
                             this.isChecked = false
                         }
                     } else {
-                        specializedSkills.remove(skill)
+                        if (specializedSkills.contains(skill)) {
+                            specializedSkills.remove(skill)
+                            specializationPointsRemaining++
+                        }
                     }
+                    updateUi()
                 }
             }
             container.addView(cb)
@@ -141,6 +161,8 @@ class CharacterCreatorActivity : AppCompatActivity() {
 
     private fun updateUi() {
         findViewById<TextView>(R.id.tvPointsRemaining).text = "Punkty do rozdania: $pointsRemaining"
+        findViewById<TextView>(R.id.tvSkillsTitle).text = "SPECJALIZACJA (WYBIERZ $specializationPointsRemaining)"
+
         updateAttrValue(R.id.layoutStr, "Str")
         updateAttrValue(R.id.layoutAgi, "Agi")
         updateAttrValue(R.id.layoutPer, "Per")

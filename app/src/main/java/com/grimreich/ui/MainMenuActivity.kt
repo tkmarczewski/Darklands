@@ -18,6 +18,7 @@ class MainMenuActivity : AppCompatActivity() {
 
         findViewById<Button>(R.id.btnNewGame).setOnClickListener {
             SaveLoadSystem.clear(this) // Reset for new game
+            com.grimreich.systems.QuestSystem.seedIntegratedContent() // SEED QUESTS ON NEW GAME
             startActivity(Intent(this, CharacterCreatorActivity::class.java))
         }
 

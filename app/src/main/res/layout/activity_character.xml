@@ -114,7 +114,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:columnCount="2"
-                    android:background="@drawable/ui_panel_stats"
+                    android:background="#40000000"
                     android:padding="16dp">
                     <!-- Dynamic stats populated in Kotlin -->
                 </GridLayout>
@@ -134,7 +134,12 @@
                     android:background="#40000000"
                     android:padding="12dp">
 
-                    <TextView style="@style/GrimTextHeader" android:text="HISTORIA" android:textSize="14sp" />
+                    <TextView
+                        style="@style/GrimTextHeader"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="HISTORIA"
+                        android:textSize="14sp" />
                     <TextView
                         android:id="@+id/tvHeroBio"
                         style="@style/GrimTextBody"
