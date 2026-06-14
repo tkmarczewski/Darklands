@@ -15,7 +15,15 @@ class CombatActivity : AppCompatActivity() {
         setContentView(R.layout.activity_combat)
 
         if (!GameRepository.state.combat.active) {
-            findViewById<TextView>(R.id.tvCombatLog).text = "Brak aktywnego starcia w tym miejscu."
+            // No active combat - start a random encounter if triggered from quest
+            val questId = GameRepository.state.pendingQuestId
+            if (questId != null) {
+                // Start a combat encounter for this quest
+                CombatSystem.startEncounterForQuest(questId)
+            } else {
+                // Start a default random encounter
+                CombatSystem.startRandomEncounter()
+            }
         }
 
         render()
@@ -56,29 +64,61 @@ class CombatActivity : AppCompatActivity() {
         }
 
         findViewById<Button>(R.id.btnFlee).setOnClickListener {
+            // Clear pending quest if fleeing (quest not completed)
+            GameRepository.state.pendingQuestId = null
             finish()
         }
     }
 
     private fun render() {
         val c = GameRepository.state.combat
-        val party = GameRepository.state.party
-        
-        findViewById<TextView>(R.id.tvCombatLog).text = c.log.takeLast(5).joinToString("\n")
-        findViewById<TextView>(R.id.tvCombatTitle).text = if (c.active) "⚔ WALKA: ${c.enemyName}" else "⚔ KONIEC WALKI"
-        
-        if (party.isNotEmpty()) {
-            findViewById<TextView>(R.id.tvChar0Name).text = party[0].name
-            findViewById<android.widget.ProgressBar>(R.id.pbChar0HP).progress = if (party[0].maxHp > 0) (party[0].hp * 100 / party[0].maxHp).coerceAtMost(100) else 0
-        }
-        
+        val log = c.log.takeLast(8).joinToString("\n")
+        findViewById<TextView>(R.id.tvCombatLog).text = log
+        findViewById<TextView>(R.id.tvCombatTitle).text =
+            if (c.active) "⚔ WALKA: ${c.enemyName}" else "⚔ KONIEC WALKI"
+
+        val btnAttack = findViewById<Button>(R.id.btnAttack)
+        val btnDefend = findViewById<Button>(R.id.btnDefend)
+        val btnMist = findViewById<Button>(R.id.btnUseMist)
+        val btnBlood = findViewById<Button>(R.id.btnUseBlood)
+        val btnReflection = findViewById<Button>(R.id.btnUseReflection)
+        val btnFlee = findViewById<Button>(R.id.btnFlee)
+
         if (!c.active) {
-            findViewById<Button>(R.id.btnAttack).isEnabled = false
-            findViewById<Button>(R.id.btnDefend).isEnabled = false
-            findViewById<Button>(R.id.btnUseMist).isEnabled = false
-            findViewById<Button>(R.id.btnUseBlood).isEnabled = false
-            findViewById<Button>(R.id.btnUseReflection).isEnabled = false
-            findViewById<Button>(R.id.btnFlee).text = "POWRÓT"
+            btnAttack.isEnabled = false
+            btnDefend.isEnabled = false
+            btnMist.isEnabled = false
+            btnBlood.isEnabled = false
+            btnReflection.isEnabled = false
+            btnFlee.text = "POWRÓT"
+
+            // Check victory: all enemies dead (log contains win message or enemy hp <= 0)
+            val playerAlive = GameRepository.state.party.any { it.hp > 0 }
+            if (playerAlive) {
+                // Victory - complete pending quest if any
+                val pendingId = GameRepository.state.pendingQuestId
+                if (pendingId != null) {
+                    try {
+                        val completed = com.grimreich.systems.QuestSystem.complete(pendingId)
+                        GameRepository.state.pendingQuestId = null
+                        val reward = completed.rewardGold
+                        val msg = "⚔ ZWY CIĘSTWO!\n\nZadanie ukończone: ${completed.title}\n+$reward złota otrzymano."
+                        UiUtils.showNarrativePopup(this, "ZADANIE UKOŃCZONE", msg)
+                    } catch (_: Exception) {
+                        GameRepository.state.pendingQuestId = null
+                    }
+                }
+            } else {
+                // Defeat - clear pending quest
+                GameRepository.state.pendingQuestId = null
+            }
+        } else {
+            btnAttack.isEnabled = true
+            btnDefend.isEnabled = true
+            btnMist.isEnabled = true
+            btnBlood.isEnabled = true
+            btnReflection.isEnabled = true
+            btnFlee.text = "UCIECZKA"
         }
     }
 }
