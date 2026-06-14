@@ -4,22 +4,54 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:background="#1a1a2e"
-    android:padding="24dp"
-    android:gravity="center">
+    android:padding="16dp">
 
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="QUESTY GŁÓWNE"
+        android:textColor="#c8a96e"
+        android:textSize="22sp"
+        android:fontFamily="monospace"
+        android:gravity="center"
+        android:layout_marginBottom="4dp" />
+
+    <TextView
+        android:id="@+id/tvPlayerStats"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="#AAAAAA"
+        android:textSize="12sp"
+        android:fontFamily="monospace"
+        android:gravity="center"
+        android:layout_marginBottom="16dp" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <LinearLayout
+            android:id="@+id/mainQuestContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" />
+
+    </ScrollView>
+
+    <!-- kept for backward compat, hidden -->
     <TextView
         android:id="@+id/questFinalText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textColor="#c8a96e"
-        android:textSize="18sp"
-        android:fontFamily="monospace"
-        android:gravity="center"
-        android:layout_marginBottom="32dp" />
+        android:visibility="gone" />
 
     <Button
         android:id="@+id/btnExitQuestFinal"
-        style="@style/GrimBackButton"
-        android:text="POWRÓT" />
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="POWRÓT"
+        android:layout_marginTop="16dp"
+        style="@style/GrimBackButton" />
 
 </LinearLayout>
