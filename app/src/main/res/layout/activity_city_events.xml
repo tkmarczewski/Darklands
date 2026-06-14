@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/cityEventsRoot"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
@@ -20,13 +21,24 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1">
-        <TextView
-            android:id="@+id/cityEventsStatus"
+
+        <LinearLayout
+            android:id="@+id/cityEventsScrollContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:fontFamily="monospace"
-            android:textColor="#c8a96e"
-            android:textSize="13sp" />
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/cityEventsStatus"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="monospace"
+                android:textColor="#c8a96e"
+                android:textSize="13sp"
+                android:layout_marginBottom="16dp" />
+
+            <!-- Dynamic quest action buttons inserted here by CityEventsActivity -->
+        </LinearLayout>
     </ScrollView>
 
     <Button
