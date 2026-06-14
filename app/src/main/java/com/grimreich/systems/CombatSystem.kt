@@ -159,3 +159,40 @@ object CombatSystem {
         return "$header\n$hpLine\n\n$tail"
     }
 }
+
+    // Convenience methods for encounter-starting from CombatActivity
+    fun startRandomEncounter() {
+        val encounters = listOf(
+            Triple("Bandyci na drodze", 40, 8),
+            Triple("Szkielety w ruinach", 35, 7),
+            Triple("Wataha wilk\u00f3w", 30, 6),
+            Triple("Kultysta - Fanατyk Mgly", 45, 9),
+            Triple("Straż miejska - Inkwizytor", 50, 10),
+            Triple("Rozb\u00f3jnik Raubrittera", 55, 12)
+        )
+        val enc = encounters.random()
+        startCombat(enc.first, enc.second, enc.third, enc.third / 2)
+    }
+
+    fun startEncounterForQuest(questId: String) {
+        // Select encounter based on quest type/origin
+        val (name, hp, atk) = when {
+            questId.contains("blood") || questId.contains("korwi") ->
+                Triple("Demon Krwi", 60, 14)
+            questId.contains("shadow") || questId.contains("cien") || questId.contains("twierdza") ->
+                Triple("Stra\u017cnik Cienia", 55, 12)
+            questId.contains("cult") || questId.contains("kapliczka") ->
+                Triple("Kap\u0142an Kultu", 45, 10)
+            questId.contains("skeleton") || questId.contains("katakomby") ->
+                Triple("Szkielet-Wojownik", 40, 9)
+            questId.contains("zgliszcza") || questId.contains("ruins") ->
+                Triple("Strzyga z Zgliszcz", 50, 11)
+            questId.contains("zakon") || questId.contains("order") ->
+                Triple("Rycerz Ciemno\u015bci", 65, 13)
+            questId.contains("eq") -> // Endgame quests
+                Triple("Arcydemon Korupcji", 80, 16)
+            else ->
+                Triple("Potworna Istota", 45, 10)
+        }
+        startCombat(name, hp, atk, atk / 2)
+    }
