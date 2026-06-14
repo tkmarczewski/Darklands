@@ -65,6 +65,44 @@ object EncounterSystem {
                 }
             )
         )
+                ,
+        // === COMBAT ENCOUNTERS ===
+        Encounter(
+            "bandits_road",
+            "Bandyci na drodze!",
+            "Z krzaków wyskakuje grupa uzbrojon ych bandytów. Jeden krzyczy: 'Portmonetka albo życie!'",
+            EncounterType.COMBAT
+        ),
+        Encounter(
+            "wolves_attack",
+            "Wataha wilków!",
+            "Watacha wilków otacza Wasz obóz. Ich ślepie błyszczą wśród drzew. Atak jest nieuchronny.",
+            EncounterType.COMBAT
+        ),
+        Encounter(
+            "cultists_ambush",
+            "Zasadzka kultystów!",
+            "Zakapturzeni kultysts wyskakują z ukrycia. Ich rytuałne symbole płoną w mrokach nocy.",
+            EncounterType.COMBAT
+        ),
+        Encounter(
+            "undead_patrol",
+            "Nieożywe patrole!",
+            "Szkielety w zardziałej zbroi zastgrają Wam drogę. Puste oczodoły wpatrzone w Was bez litości.",
+            EncounterType.COMBAT
+        ),
+        Encounter(
+            "raubritter_scout",
+            "Zwiadowcy Raubrittera!",
+            "Konni żołnierze Raubrittera odcinają Wam odwrót. Ich herby płoną na tarczach.",
+            EncounterType.COMBAT
+        ),
+        Encounter(
+            "demon_minor",
+            "Pomniejszy demon!",
+            "Z rozstępu w rzeczywistości wyłania się zniekształcona postać. Mgła kręci się wokół jej nóg.",
+            EncounterType.COMBAT
+        )
     )
 
     fun rollEncounter(random: Random): Encounter? {
