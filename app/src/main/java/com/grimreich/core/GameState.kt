@@ -36,7 +36,9 @@ data class GameState(
         quest = quest.copy(
             activeQuests = quest.activeQuests.toMutableList(),
             completedQuests = quest.completedQuests.toMutableList(),
-            questProgress = quest.questProgress.toMutableMap()
+            questProgress = quest.questProgress.toMutableMap(),
+            activeEndgameQuests = quest.activeEndgameQuests.toMutableList(),
+            completedEndgameQuests = quest.completedEndgameQuests.toMutableList()
         ),
         reputation = reputation.copy(
             city = reputation.city.toMutableMap()
