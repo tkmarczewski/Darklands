@@ -6,6 +6,7 @@ data class GameState(
     @Transient val grimEngine: GrimWorldEngine = GrimWorldEngineFactory.create(),
     var grimCurrentRegion: String = "Wybrzeże Północne",
     var grimPendingExpeditionName: String? = null,
+        var pendingQuestId: String? = null,
 
     // Core game state
     val party: MutableList<Hero> = mutableListOf(),
@@ -26,6 +27,7 @@ data class GameState(
         grimEngine = grimEngine,
         grimCurrentRegion = grimCurrentRegion,
         grimPendingExpeditionName = grimPendingExpeditionName,
+                pendingQuestId = pendingQuestId,
         party = party.toMutableList(),
         activeHeroId = activeHeroId,
         inventory = inventory.toMutableList(),
