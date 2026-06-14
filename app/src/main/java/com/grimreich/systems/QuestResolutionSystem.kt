@@ -23,16 +23,17 @@ data class QuestRewardResult(
 object QuestResolutionSystem {
     fun completeQuestWithRewards(
         questId: String,
-        partyState: TravelPartyState,
+        partyState: TravelPartyState? = null,
         faction: CityFaction = CityFaction.COMMONERS,
         reputationDelta: Int = 5
     ): QuestRewardResult {
         val completedQuest = QuestSystem.complete(questId)
         val updatedReputation = ReputationSystem.modify(completedQuest.cityId, faction, reputationDelta)
+        GameRepository.state.gold += completedQuest.rewardGold
 
-        val updatedParty = partyState.copy(
+        val updatedParty = partyState?.copy(
             lastEncounterId = "quest_complete:${completedQuest.id}"
-        )
+        ) ?: TravelPartyState(lastEncounterId = "quest_complete:${completedQuest.id}")
         
         // Random loot
         val items = mutableListOf<Item>()

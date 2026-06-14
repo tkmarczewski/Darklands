@@ -117,6 +117,14 @@ class HubActivity : AppCompatActivity() {
         
         findViewById<TextView>(R.id.tvTime)?.text = "$formattedName | DZIEŃ ${world.day} | $timeLabel"
 
+        // Active Quest Log Mini
+        val activeQuest = com.grimreich.systems.QuestSystem.all().find { it.status == com.grimreich.systems.QuestStatus.AKTYWNE }
+        findViewById<TextView>(R.id.tvLogMini)?.text = if (activeQuest != null) {
+            "AKTYWNE: ${activeQuest.title}\nZADANIE: ${activeQuest.objective}"
+        } else {
+            "Kroniki pękniętego świata..."
+        }
+
         findViewById<Button>(R.id.openCombatStatus)?.visibility = 
             if (state.combat.active) View.VISIBLE else View.GONE
             

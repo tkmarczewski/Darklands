@@ -1,5 +1,6 @@
 package com.grimreich.systems
 
+import com.grimreich.core.GameRepository
 import com.grimreich.world.CityCatalogue
 import com.grimreich.world.LocationType
 import com.grimreich.world.ProceduralLocation
@@ -26,6 +27,7 @@ data class QuestEntry(
     val originRefId: String,
     val rewardGold: Int,
     val status: QuestStatus = QuestStatus.DOSTEPNE,
+    val objective: String = "Brak szczegółowych wytycznych."
 )
 
 object QuestSystem {
@@ -53,6 +55,14 @@ object QuestSystem {
             val cityEvents = CityEventSystem.getEventsForCity(city.id)
             android.util.Log.d("QuestSystem", "City ${city.id} has ${cityEvents.size} events")
             cityEvents.forEach { event ->
+                val obj = when(event.id) {
+                    "north_mist_vision" -> "Udaj się na Wybrzeże i porozmawiaj z Aelionem we mgle."
+                    "north_lost_echo" -> "Zbadaj linię brzegową w poszukiwaniu echa."
+                    "crown_blood_toll" -> "Pokonaj wrogów na Równinach i złóż ofiarę z krwi."
+                    "crown_iron_forge" -> "Dostarcz rzadką rudę do Ferruna na Równinach."
+                    "heart_mirror_truth" -> "Spójrz w lustro w Sercu Krainy i pokonaj swoje odbicie."
+                    else -> "Zbadaj wydarzenie: ${event.title}"
+                }
                 register(
                     QuestEntry(
                         id = "quest_${event.id}",
@@ -61,7 +71,8 @@ object QuestSystem {
                         cityId = event.cityId,
                         originType = QuestOriginType.ZDARZENIE_MIEJSKIE,
                         originRefId = event.id,
-                        rewardGold = event.rewardGold
+                        rewardGold = event.rewardGold,
+                        objective = obj
                     )
                 )
             }
@@ -75,6 +86,12 @@ object QuestSystem {
 
         // SEED ENDGAME QUESTS
         EndgameQuestChain.quests.forEach { eq ->
+            val obj = when(eq.id) {
+                "eq1_signs" -> "Odszukaj 3 kapliczki korupcji w Sercu Krainy."
+                "eq2_alliances" -> "Przekonaj frakcję Rycerzy do wsparcia Twojej sprawy."
+                "eq3_pilgrimage" -> "Dotrzyj do Bramy Absolutu i dokonaj ostatecznego wyboru."
+                else -> "Kontynuuj wątek główny."
+            }
             register(
                 QuestEntry(
                     id = eq.id,
@@ -83,7 +100,8 @@ object QuestSystem {
                     cityId = "serce_krainy", // Default to heartland for main plot
                     originType = QuestOriginType.ZDARZENIE_MIEJSKIE,
                     originRefId = eq.id,
-                    rewardGold = eq.rewards.gold
+                    rewardGold = eq.rewards.gold,
+                    objective = obj
                 )
             )
         }
@@ -107,8 +125,18 @@ object QuestSystem {
 
     fun complete(questId: String): QuestEntry {
         val quest = quests[questId] ?: error("Nieznane zadanie: $questId")
+        if (quest.status == QuestStatus.UKONCZONE) return quest
+        
         val updated = quest.copy(status = QuestStatus.UKONCZONE)
         quests[questId] = updated
+        
+        // DISTRIBUTE REWARDS
+        GameRepository.state.gold += quest.rewardGold
+        ReputationSystem.modify(quest.cityId, CityFaction.COMMONERS, 5)
+        
+        // Record in chronicle
+        ChronicleSystem.record("Ukończono zadanie: ${quest.title}. Zyskano ${quest.rewardGold} złota.", importance = 2)
+        
         return updated
     }
 
@@ -125,7 +153,8 @@ object QuestSystem {
         cityId = nearestCityId,
         originType = QuestOriginType.LOKACJA_PROCEDURALNA,
         originRefId = id,
-        rewardGold = rewardGold
+        rewardGold = rewardGold,
+        objective = "Udaj się do lokalizacji i przetrwaj starcie."
     )
     
     // Legacy API removed to avoid confusion

@@ -55,6 +55,13 @@ class QuestJournalActivity : AppCompatActivity() {
                 styleToGrim(false)
             }
             
+            val objTv = TextView(this).apply {
+                text = "ZADANIE: ${quest.objective}"
+                styleToGrim(false)
+                setTextColor(android.graphics.Color.parseColor("#ADFF2F")) // GreenYellow
+                textSize = 12f
+            }
+            
             val goalTv = TextView(this).apply {
                 text = "CEL: ${quest.cityId.replace("_", " ").uppercase()}"
                 styleToGrim(false)
@@ -68,11 +75,20 @@ class QuestJournalActivity : AppCompatActivity() {
                 setTextColor(android.graphics.Color.parseColor("#FFD700"))
                 textSize = 12f
             }
+            
+            val rewardTv = TextView(this).apply {
+                text = "NAGRODA: ${quest.rewardGold} złota"
+                styleToGrim(false)
+                setTextColor(android.graphics.Color.parseColor("#FFD700"))
+                textSize = 12f
+            }
 
             questView.addView(titleTv)
             questView.addView(descTv)
+            questView.addView(objTv)
             questView.addView(goalTv)
             questView.addView(statusTv)
+            questView.addView(rewardTv)
 
             if (quest.status == com.grimreich.systems.QuestStatus.DOSTEPNE) {
                 val acceptBtn = Button(this).apply {

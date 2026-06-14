@@ -192,7 +192,18 @@ object DialogueManager {
             choices = listOf(
                 DialogueChoice("Pamiętam imię mojej matki. To wystarczy.", "aelion_memory_strength"),
                 DialogueChoice("Wszystko co mam, to ta broń. Mgła jej nie zabierze.", "aelion_weapon"),
-                DialogueChoice("Kim są pozostali Prorocy?", "aelion_others")
+                DialogueChoice("Kim są pozostali Prorocy?", "aelion_others"),
+                DialogueChoice("Szukam wizji we mgle (ZADANIE).", "aelion_quest_complete")
+            )
+        ))
+        registerNode(DialogueNode(
+            id = "aelion_quest_complete", npcId = "aelion", 
+            text = "Wizja jest tuż przed Tobą. Widzisz to, co zostało zapomniane. Twoje zadanie na tym brzegu dobiegło końca.",
+            choices = listOf(
+                DialogueChoice("Przyjmuję prawdę.", "end", onSelect = {
+                    com.grimreich.systems.QuestSystem.complete("quest_north_mist_vision")
+                    it.gold += 100
+                })
             )
         ))
         registerNode(DialogueNode(id = "aelion_memory_strength", npcId = "aelion", text = "Imiona są kotwicami. Ale kotwice rdzewieją w słonej wodzie Wybrzeża. Wkrótce zostaniesz tylko Ty... i pustka, którą nazwiesz wolnością."))
@@ -219,7 +230,17 @@ object DialogueManager {
             choices = listOf(
                 DialogueChoice("Moje sumienie jest czyste.", "end"),
                 DialogueChoice("Widzę w lustrze kogoś innego... potwora.", "end"),
-                DialogueChoice("Czym jest Sfera Fenomenów?", "mira_sphere")
+                DialogueChoice("Czym jest Sfera Fenomenów?", "mira_sphere"),
+                DialogueChoice("Szukam znaków korupcji (ZADANIE).", "mira_signs")
+            )
+        ))
+        registerNode(DialogueNode(
+            id = "mira_signs", npcId = "mira",
+            text = "Prawda boli, Kotwico. Znaki są wszędzie, ale Ty szukasz tych trzech kapliczek. Jedna jest na dnie jeziora, dwie w Twoim sercu. Możesz uznać je za zbadane.",
+            choices = listOf(
+                DialogueChoice("Dziękuję za wiedzę.", "end", onSelect = {
+                    com.grimreich.systems.QuestSystem.complete("eq1_signs")
+                })
             )
         ))
         registerNode(DialogueNode(id = "mira_sphere", npcId = "mira", text = "To miejsce, gdzie idee mają wagę, a materia jest tylko sugestią. Nasz świat jest tylko jej nieudanym szkicem. Absolut próbuje go teraz wymazać."))
