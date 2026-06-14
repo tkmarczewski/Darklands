@@ -4,7 +4,6 @@ import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
 import android.widget.LinearLayout
-import android.widget.ScrollView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.grimreich.R
@@ -12,7 +11,6 @@ import com.grimreich.systems.CityEventSystem
 import com.grimreich.systems.QuestSystem
 import com.grimreich.systems.QuestStatus
 import com.grimreich.core.GameRepository
-import com.grimreich.core.BattleEncounter
 
 class CityEventsActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -34,6 +32,7 @@ class CityEventsActivity : AppCompatActivity() {
         val availableQuests = allQuests.filter { it.cityId == cityId && it.status == QuestStatus.DOSTEPNE }
         val activeQuests = allQuests.filter { it.cityId == cityId && it.status == QuestStatus.AKTYWNE }
 
+        // Set the scrollable text info
         val tv = findViewById<TextView>(R.id.cityEventsStatus)
         tv.text = buildString {
             appendLine("=== WYDARZENIA: ${cityId.replace("_", " ").uppercase()} ===")
@@ -49,9 +48,9 @@ class CityEventsActivity : AppCompatActivity() {
             if (availableQuests.isNotEmpty()) {
                 appendLine("=== DOSTĘPNE ZADANIA ===")
                 availableQuests.forEach { quest ->
-                    appendLine("- ${quest.title}")
+                    appendLine("▶ ${quest.title}")
                     appendLine("  ZADANIE: ${quest.objective}")
-                    appendLine("  CEL: ${quest.cityId.replace("_", " ").uppercase()}")
+                    appendLine("  MIEJSCE: ${quest.cityId.replace("_", " ").uppercase()}")
                     appendLine("  NAGRODA: ${quest.rewardGold} złota")
                     appendLine()
                 }
@@ -59,85 +58,73 @@ class CityEventsActivity : AppCompatActivity() {
             if (activeQuests.isNotEmpty()) {
                 appendLine("=== AKTYWNE ZADANIA ===")
                 activeQuests.forEach { quest ->
-                    appendLine("- ${quest.title}")
+                    appendLine("★ ${quest.title}")
                     appendLine("  ZADANIE: ${quest.objective}")
                     appendLine()
                 }
             }
         }
 
-        // Dynamic action buttons
-        val layout = tv.parent as? LinearLayout ?: return
-        // Remove old dynamic buttons (keep tv and exit button)
-        val toRemove = mutableListOf<android.view.View>()
-        for (i in 0 until layout.childCount) {
-            val child = layout.getChildAt(i)
-            if (child is Button && child.id != R.id.btnExitCityEvents) {
-                toRemove.add(child)
-            }
+        // Use the dedicated scroll container for dynamic buttons
+        val container = findViewById<LinearLayout>(R.id.cityEventsScrollContainer)
+        // Remove all dynamic buttons (keep tv = first child)
+        while (container.childCount > 1) {
+            container.removeViewAt(container.childCount - 1)
         }
-        toRemove.forEach { layout.removeView(it) }
 
-        val exitBtn = findViewById<Button>(R.id.btnExitCityEvents)
-        val exitIndex = layout.indexOfChild(exitBtn)
-
-        // Buttons for available quests: PRZYJMIJ
+        // Buttons for available quests
         availableQuests.forEach { quest ->
             val btn = Button(this).apply {
-                text = "PRZYJMIJ: ${quest.title}"
+                text = "✔ PRZYJMIJ ZADANIE: ${quest.title}"
                 setBackgroundColor(android.graphics.Color.parseColor("#80001A00"))
                 setTextColor(android.graphics.Color.parseColor("#ADFF2F"))
                 setPadding(16, 16, 16, 16)
-                val p = LinearLayout.LayoutParams(
+                layoutParams = LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.MATCH_PARENT,
                     LinearLayout.LayoutParams.WRAP_CONTENT
                 ).also { it.setMargins(0, 0, 0, 8) }
-                layoutParams = p
                 setOnClickListener {
                     QuestSystem.activate(quest.id)
-                    android.widget.Toast.makeText(context, "Zadanie podjęte: ${quest.title}", android.widget.Toast.LENGTH_SHORT).show()
+                    android.widget.Toast.makeText(context, "Zadanie podjęte!", android.widget.Toast.LENGTH_SHORT).show()
                     render()
                 }
             }
-            layout.addView(btn, exitIndex)
+            container.addView(btn)
         }
 
-        // Buttons for active quests with combat objective -> launch CombatActivity
-        // Buttons for active quests with dialogue objective -> launch CityActivity (NPC)
+        // Buttons for active quests
         activeQuests.forEach { quest ->
             val isCombat = quest.originType == com.grimreich.systems.QuestOriginType.LOKACJA_PROCEDURALNA ||
                 quest.objective.contains("przetrwaj", ignoreCase = true) ||
                 quest.objective.contains("pokonaj", ignoreCase = true) ||
-                quest.objective.contains("walka", ignoreCase = true) ||
                 quest.objective.contains("uderz", ignoreCase = true) ||
                 quest.objective.contains("złóż ofiarę", ignoreCase = true)
             val isDialogue = quest.objective.contains("porozmawiaj", ignoreCase = true) ||
                 quest.objective.contains("przekonaj", ignoreCase = true)
 
             val btn = Button(this).apply {
-                text = if (isCombat) "⚔ WYKONAJ (WALKA): ${quest.title}"
-                       else if (isDialogue) "🗣 WYKONAJ (NPC): ${quest.title}"
-                       else "✔ WYKONAJ: ${quest.title}"
+                text = when {
+                    isCombat -> "⚔ WYKONAJ (WALKA): ${quest.title}"
+                    isDialogue -> "🗣 WYKONAJ (NPC): ${quest.title}"
+                    else -> "➤ WYKONAJ: ${quest.title}"
+                }
                 setBackgroundColor(
                     if (isCombat) android.graphics.Color.parseColor("#80330000")
                     else android.graphics.Color.parseColor("#80000033")
                 )
                 setTextColor(android.graphics.Color.parseColor("#FFD700"))
                 setPadding(16, 16, 16, 16)
-                val p = LinearLayout.LayoutParams(
+                layoutParams = LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.MATCH_PARENT,
                     LinearLayout.LayoutParams.WRAP_CONTENT
                 ).also { it.setMargins(0, 0, 0, 8) }
-                layoutParams = p
                 setOnClickListener {
                     when {
                         isCombat -> {
-                            // Store quest id for completion after combat
                             GameRepository.state.pendingQuestId = quest.id
                             startActivity(Intent(this@CityEventsActivity, CombatActivity::class.java))
                         }
                         isDialogue -> {
-                            // Go to city to find the NPC
                             val npcHint = quest.objective
                                 .substringAfter("porozmawiaj z ", "")
                                 .substringAfter("Przekonaj ", "")
@@ -145,7 +132,7 @@ class CityEventsActivity : AppCompatActivity() {
                             UiUtils.showNarrativePopup(
                                 this@CityEventsActivity,
                                 "WSKAŻÓWKA",
-                                "Udaj się do miasta ${quest.cityId.replace("_", " ").uppercase()} i odszukaj NPC: $npcHint.\n\nZadanie: ${quest.objective}"
+                                "Udaj się do: ${quest.cityId.replace("_"," ").uppercase()}\nOdszukaj NPC: $npcHint\n\nZadanie: ${quest.objective}"
                             )
                         }
                         else -> {
@@ -156,7 +143,7 @@ class CityEventsActivity : AppCompatActivity() {
                     }
                 }
             }
-            layout.addView(btn, exitIndex)
+            container.addView(btn)
         }
     }
 }
