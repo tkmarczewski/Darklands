@@ -157,5 +157,40 @@ class CityActivity : AppCompatActivity() {
                 }
             }
             container.addView(coastBtn)
+
+        // Check for additional location-based quests with progressive unlock
+        // Quest locations unlock based on completed quests (progressive discovery)
+        
+        // Plains quest - unlocks after completing initial Coastline quest
+        val hasPlainsQuest = state.quest.activeQuests.contains("quest_heartland_grain_mystery") ||
+                             state.quest.completedQuests.contains("quest_north_mist_vision")
+        if (hasPlainsQuest) {
+            val plainsBtn = Button(this).apply {
+                text = "⚠ IDZ NA RÓWNINY [QUEST]"
+                styleToGrim()
+                setOnClickListener {
+                    val intent = Intent(this@CityActivity, QuestLocationActivity::class.java)
+                    intent.putExtra("location_type", "plains")
+                    startActivity(intent)
+                }
+            }
+            container.addView(plainsBtn)
+        }
+        
+        // Forest quest - unlocks after Plains quest progress
+        val hasForestQuest = state.quest.activeQuests.contains("quest_forest_ancient_grove") ||
+                            state.quest.completedQuests.contains("quest_heartland_grain_mystery")
+        if (hasForestQuest) {
+            val forestBtn = Button(this).apply {
+                text = "⚠ IDZ DO LASU [QUEST]"
+                styleToGrim()
+                setOnClickListener {
+                    val intent = Intent(this@CityActivity, QuestLocationActivity::class.java)
+                    intent.putExtra("location_type", "forest")
+                    startActivity(intent)
+                }
+            }
+            container.addView(forestBtn)
+        }
         }
     }
