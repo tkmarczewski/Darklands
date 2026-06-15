@@ -200,7 +200,7 @@ class CharacterCreatorActivity : AppCompatActivity() {
         
         // Apply skill specializations
         specializedSkills.forEach { skill ->
-            hero.skills[skill.name] = 30 // Higher base for specialized skills
+            hero.skills[skill.name] = com.grimreich.core.GrimConstants.Character.SPECIALIZED_SKILL_BASE_VALUE
         }
         
         GameRepository.state = GameState().apply {

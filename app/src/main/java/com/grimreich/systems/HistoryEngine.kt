@@ -1,19 +1,17 @@
 package com.grimreich.systems
 
-data class HistoryTimeline(
-    val id: String,
-    val name: String,
-    var active: Boolean = true,
-)
+import com.grimreich.contracts.WorldSnapshot
+import com.grimreich.contracts.SimulationTickContext
 
+/**
+ * Program 7: History Engine 2.0.
+ * Manages timelines, paradoxes, and the shifting 'truth' of the world.
+ */
 object HistoryEngine {
-    private val timelines = mutableListOf(HistoryTimeline("prime", "Główna Oś"))
-    
-    fun splitHistory(name: String) {
-        val newId = "split_${timelines.size}"
-        timelines.add(HistoryTimeline(newId, name))
-        ChronicleSystem.record("Historia rozszczepiła się: $name")
+
+    fun processHistory(snapshot: WorldSnapshot, context: SimulationTickContext) {
+        if (snapshot.historyState.openParadoxes > 5) {
+            com.grimreich.systems.ChronicleSystem.record("Paradoks czasowy rozdziera lokalną linię czasu.", 2)
+        }
     }
-    
-    fun getActiveTimelines(): List<HistoryTimeline> = timelines.asSequence().filter { it.active }.toList()
 }

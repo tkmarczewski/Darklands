@@ -103,7 +103,7 @@ class CityActivity : AppCompatActivity() {
             container.addView(prophetBtn)
         }
 
-        val npcs = ProceduralNpcGenerator.generateForCity(cityId, 123)
+        val npcs = ProceduralNpcGenerator.generateForCity(cityId, com.grimreich.core.GrimConstants.World.NPC_GENERATION_SEED_OFFSET)
         npcs.forEach { npc ->
             val btn = Button(this).apply {
                 text = "${npc.name} (${npc.role})"
@@ -128,8 +128,9 @@ class CityActivity : AppCompatActivity() {
 
         // 2. MATERIALIZE ECHOES OF PAST HEROES
         val stability = GameRepository.state.world.globalStability
-        if (stability < 80) {
-            val echoChance = (100 - stability) / 200f // Up to 50% chance at stability 0
+        if (stability < com.grimreich.core.GrimConstants.World.ECHO_MANIFESTATION_THRESHOLD) {
+            val maxChance = com.grimreich.core.GrimConstants.World.ECHO_MAX_CHANCE
+            val echoChance = (100 - stability) * (maxChance / 100f)
             if (kotlin.random.Random.nextFloat() < echoChance) {
                 com.grimreich.core.EchoSystem.getRandomEcho()?.let { echo ->
                     val echoBtn = Button(this).apply {

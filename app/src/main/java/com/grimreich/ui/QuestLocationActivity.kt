@@ -137,7 +137,7 @@ class QuestLocationActivity : AppCompatActivity() {
                     val newProgress = progress + 1
                     state.quest.questProgress[questId] = newProgress
                     if (newProgress >= 3) {
-                        completeQuest(120, 5)
+                        completeQuest(com.grimreich.core.GrimConstants.Economy.QUEST_REWARD_GOLD_ENDGAME_MID, 5)
                     } else {
                         state.logEntries.add(0, "Oczyszczono kapliczkę ($newProgress/3)")
                         finish()
@@ -150,7 +150,7 @@ class QuestLocationActivity : AppCompatActivity() {
                 text = "UKOŃCZ QUEST"
                 styleToGrim()
                 setOnClickListener {
-                    completeQuest(120, 5)
+                    completeQuest(com.grimreich.core.GrimConstants.Economy.QUEST_REWARD_GOLD_ENDGAME_MID, 5)
                 }
             }
             container.addView(btnComplete)
@@ -170,7 +170,7 @@ class QuestLocationActivity : AppCompatActivity() {
                     .setTitle("Dowódca Rycerzy")
                     .setMessage("\"Twoje słowa brzmią szczerze, wędrowcze. Widzieliśmy znaki korupcji na naszych ziemiach. Jeśli naprawdę walczysz przeciw ciemności, Rycerze staną u twojego boku.\"\n\nOtrzymujesz wsparcie Rycerzy!")
                     .setPositiveButton("Dziękuję") { _, _ ->
-                        completeQuest(80, 5)
+                        completeQuest(com.grimreich.core.GrimConstants.Economy.QUEST_REWARD_GOLD_ENDGAME_LIGHT, 5)
                     }
                     .show()
             }
@@ -191,10 +191,10 @@ class QuestLocationActivity : AppCompatActivity() {
                     .setTitle("Brama Absolutu")
                     .setMessage("Przekraczasz próg Bramy. Światłość ogłusza cię, a czas zdaje się zatrzymywać.\n\nGłos rozlega się w twojej głowie: \"Dokonaj wyboru, śmiertelniku. Przyjąć dar czy odrzucić światło?\"\n\nTo jest koniec twojej podróży.")
                     .setPositiveButton("PRZYJMIJ DAR") { _, _ ->
-                        completeQuest(200, 10)
+                        completeQuest(com.grimreich.core.GrimConstants.Economy.QUEST_REWARD_GOLD_ENDGAME_HEAVY, 10)
                     }
                     .setNegativeButton("ODRZUĆ") { _, _ ->
-                        completeQuest(150, 5)
+                        completeQuest(com.grimreich.core.GrimConstants.Economy.QUEST_REWARD_GOLD_CROWN, 5)
                     }
                     .show()
             }

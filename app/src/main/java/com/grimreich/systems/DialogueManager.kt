@@ -61,7 +61,7 @@ object DialogueManager {
 
     private fun glitchText(text: String): String {
         return text.split(" ").map { word ->
-            if (Random.nextFloat() < 0.25f) "[BŁĄD_ONTOLOGICZNY]" else word
+            if (Random.nextFloat() < com.grimreich.core.GrimConstants.Narrative.GLITCH_CHANCE_BASE) "[BŁĄD_ONTOLOGICZNY]" else word
         }.joinToString(" ")
     }
     
@@ -95,7 +95,7 @@ object DialogueManager {
             text = "To tylko cień tego, co posiadałem. Niech Ci służy w walce z Absolutem.",
             choices = listOf(
                 DialogueChoice("Przyjmuję dar.", "end", onSelect = {
-                    it.gold += 50
+                    it.gold += com.grimreich.core.GrimConstants.Narrative.ECHO_GIFT_GOLD
                     com.grimreich.systems.ChronicleSystem.record("Otrzymano dar od Echa przeszłości.", 2)
                 })
             )

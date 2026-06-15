@@ -72,7 +72,7 @@ object QuestSystem {
                         cityId = event.cityId,
                         originType = QuestOriginType.ZDARZENIE_MIEJSKIE,
                         originRefId = event.id,
-                        rewardGold = event.rewardGold,
+                        rewardGold = com.grimreich.core.GrimConstants.Economy.QUEST_REWARD_GOLD_STANDARD,
                         objective = obj
                     )
                 )
@@ -95,7 +95,7 @@ object QuestSystem {
                 cityId = "bremen",
                 originType = QuestOriginType.LOKACJA_PROCEDURALNA,
                 originRefId = "plains_mystery",
-                rewardGold = 150,
+                rewardGold = com.grimreich.core.GrimConstants.Economy.QUEST_REWARD_GOLD_CROWN,
                 objective = "Udaj się na równiny i zbadaj tajemnicze znaki.",
                 requiredQuestIds = listOf("quest_north_mist_vision")
             )
@@ -110,7 +110,7 @@ object QuestSystem {
                 cityId = "bremen",
                 originType = QuestOriginType.LOKACJA_PROCEDURALNA,
                 originRefId = "forest_grove",
-                rewardGold = 200,
+                rewardGold = com.grimreich.core.GrimConstants.Economy.QUEST_REWARD_GOLD_FOREST,
                 objective = "Znajdź pradawny gaj ukryty w głębi lasu.",
                 requiredQuestIds = listOf("quest_heartland_grain_mystery")
             )

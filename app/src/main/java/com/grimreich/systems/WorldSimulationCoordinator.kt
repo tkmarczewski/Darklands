@@ -42,12 +42,12 @@ object WorldSimulationCoordinator {
     }
 
     private fun updatePhenomena(snapshot: WorldSnapshot, context: SimulationTickContext) {
-        // Logic for Program 4
+        PhenomenaEngine.processPhenomena(snapshot, context)
     }
 
     private fun updateCollapse(snapshot: WorldSnapshot, context: SimulationTickContext) {
         // Logic for Program 3
-        if (snapshot.regionState.stability < 0.2f) {
+        if (snapshot.regionState.stability < (com.grimreich.core.GrimConstants.World.STABILITY_CRITICAL_THRESHOLD / 100f)) {
             ChronicleSystem.record("KOLAPS: Rzeczywistość zaczyna się zapadać.", 3)
         }
     }
@@ -57,6 +57,7 @@ object WorldSimulationCoordinator {
     }
 
     private fun updateOntology(snapshot: WorldSnapshot, context: SimulationTickContext) {
-        // Logic for Program 7 & 8
+        HistoryEngine.processHistory(snapshot, context)
+        MutationEngine.processMutations(snapshot, context)
     }
 }
