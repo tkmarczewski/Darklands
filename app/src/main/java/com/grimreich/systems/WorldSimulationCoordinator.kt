@@ -19,7 +19,7 @@ object WorldSimulationCoordinator {
             deltaTime = 1.0f,
             worldSeed = snapshot.worldSeed,
             currentDay = GameRepository.state.world.day,
-            totalTicks = 0L // To be tracked
+            totalTicks = 0L
         )
 
         android.util.Log.d("GrimSimulation", "Executing Tick: $scale (Stability: ${snapshot.regionState.stability})")

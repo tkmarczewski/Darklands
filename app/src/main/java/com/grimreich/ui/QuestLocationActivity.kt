@@ -11,6 +11,7 @@ import com.grimreich.R
 import com.grimreich.core.GameRepository
 import com.grimreich.systems.QuestSystem
 import com.grimreich.systems.CombatSystem
+import com.grimreich.ui.UiUtils.styleToGrim
 
 class QuestLocationActivity : AppCompatActivity() {
     private lateinit var questId: String

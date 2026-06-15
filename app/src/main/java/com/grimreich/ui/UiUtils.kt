@@ -65,4 +65,16 @@ object UiUtils {
         dialog.setCancelable(false)
         dialog.show()
     }
+
+    fun Button.styleToGrim() {
+        this.setTextColor(androidx.core.content.ContextCompat.getColor(context, R.color.grimGold))
+        this.setBackgroundColor(android.graphics.Color.parseColor("#80000000"))
+        this.setPadding(16, 16, 16, 16)
+        val params = android.widget.LinearLayout.LayoutParams(
+            android.widget.LinearLayout.LayoutParams.MATCH_PARENT,
+            android.widget.LinearLayout.LayoutParams.WRAP_CONTENT
+        )
+        params.setMargins(0, 0, 0, 8)
+        this.layoutParams = params
+    }
 }
