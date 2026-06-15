@@ -13,6 +13,7 @@ import com.grimreich.systems.SocialEventSystem
 import com.grimreich.systems.DialogueManager
 import com.grimreich.world.ProceduralNpcGenerator
 import com.grimreich.world.CityCatalogue
+import com.grimreich.ui.CoastlineActivity
 
 class CityActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -45,6 +46,7 @@ class CityActivity : AppCompatActivity() {
 
         findViewById<Button>(R.id.btnTavern).setOnClickListener {
             try {
+                        renderQuestButtons()
                 val result = SocialEventSystem.runTavernEvent()
                 UiUtils.showNarrativePopup(this, "KARCZMA", result)
             } catch (e: Exception) {
@@ -136,3 +138,24 @@ class CityActivity : AppCompatActivity() {
         this.layoutParams = params
     }
 }
+
+    private fun renderQuestButtons() {
+        val state = GameRepository.state
+        val container = findViewById<LinearLayout>(R.id.npcListContainer)
+
+        // Check if coastline quests are active
+        val hasCoastlineQuest = state.quest.activeQuests.contains("quest_north_mist_vision") ||
+                                 state.quest.activeQuests.contains("quest_north_lost_echo")
+
+        if (hasCoastlineQuest) {
+            val coastBtn = Button(this).apply {
+                text = "⚠ IDZ NA WYBRZEŻE [QUEST]"
+                styleToGrim()
+                setOnClickListener {
+                    val intent = Intent(this@CityActivity, CoastlineActivity::class.java)
+                    startActivity(intent)
+                }
+            }
+            container.addView(coastBtn)
+        }
+    }
