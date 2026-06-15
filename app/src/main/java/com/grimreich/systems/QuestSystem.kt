@@ -85,6 +85,37 @@ object QuestSystem {
             register(location.toQuest())
         }
 
+        // CUSTOM LOCATION QUESTS - Progressive unlock system
+        // Plains quest - unlocks after first Coastline quest completed
+        register(
+            QuestEntry(
+                id = "quest_heartland_grain_mystery",
+                title = "Tajemnica Zboża",
+                description = "Rolnicy mówią o dziwnych znakach na polach. Zbadaj równiny i odkryj prawdę.",
+                cityId = "bremen",
+                originType = QuestOriginType.LOKACJA_PROCEDURALNA,
+                originRefId = "plains_mystery",
+                rewardGold = 150,
+                objective = "Udaj się na równiny i zbadaj tajemnicze znaki.",
+                requiredQuestIds = listOf("quest_north_mist_vision")
+            )
+        )
+        
+        // Forest quest - unlocks after Plains quest completed  
+        register(
+            QuestEntry(
+                id = "quest_forest_ancient_grove",
+                title = "Pradawny Gaj",
+                description = "Stary drwal opowiada o zaginionym gaju, gdzie rosną drzewa pamiętające czasy przed Imperium.",
+                cityId = "bremen",
+                originType = QuestOriginType.LOKACJA_PROCEDURALNA,
+                originRefId = "forest_grove",
+                rewardGold = 200,
+                objective = "Znajdź pradawny gaj ukryty w głębi lasu.",
+                requiredQuestIds = listOf("quest_heartland_grain_mystery")
+            )
+        )
+
         // SEED ENDGAME QUESTS
         EndgameQuestChain.quests.forEach { eq ->
             val obj = when(eq.id) {
