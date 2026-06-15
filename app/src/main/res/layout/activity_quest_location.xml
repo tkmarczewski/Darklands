@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#1a1a2e"
+    android:padding="16dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/tvQuestLocationTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="#c8a96e"
+            android:textSize="22sp"
+            android:fontFamily="monospace"
+            android:gravity="center"
+            android:layout_marginBottom="16dp" />
+
+        <TextView
+            android:id="@+id/tvQuestLocationDescription"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="#AAAAAA"
+            android:textSize="14sp"
+            android:fontFamily="monospace"
+            android:layout_marginBottom="24dp" />
+
+        <LinearLayout
+            android:id="@+id/questLocationActionsContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" />
+
+        <Button
+            android:id="@+id/btnExitQuestLocation"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="POWRÓT"
+            android:layout_marginTop="16dp"
+            style="@style/GrimBackButton" />
+
+    </LinearLayout>
+</ScrollView>
