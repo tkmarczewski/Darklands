@@ -31,7 +31,7 @@
         android:layout_height="wrap_content"
         android:text="Porozmawiaj z Aelionem"
         android:layout_marginBottom="12dp"
-        style="@style/GrimButton" />
+        style="@style/GrimNavButton" />
 
     <Button
         android:id="@+id/btnExploreCoastline"
@@ -39,7 +39,7 @@
         android:layout_height="wrap_content"
         android:text="Zbadaj linię brzegową"
         android:layout_marginBottom="12dp"
-        style="@style/GrimButton" />
+        style="@style/GrimNavButton" />
 
     <Button
         android:id="@+id/btnExitCoastline"

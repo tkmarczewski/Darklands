@@ -42,13 +42,14 @@ class CityActivity : AppCompatActivity() {
 
         DialogueManager.seedBasicDialogues()
         renderNpcs(cityId)
+        renderQuestButtons()
         updateCityStatus(SocialEventSystem.cityAudience(cityId, null))
 
         findViewById<Button>(R.id.btnTavern).setOnClickListener {
             try {
-                        renderQuestButtons()
                 val result = SocialEventSystem.runTavernEvent()
                 UiUtils.showNarrativePopup(this, "KARCZMA", result)
+                renderQuestButtons() // Update buttons after tavern event
             } catch (e: Exception) {
                 UiUtils.showNarrativePopup(this, "KARCZMA", "Karczmarz milczy, wpatrzony w pęknięcie na ścianie.")
             }
@@ -124,6 +125,31 @@ class CityActivity : AppCompatActivity() {
             }
             container.addView(btn)
         }
+
+        // 2. MATERIALIZE ECHOES OF PAST HEROES
+        val stability = GameRepository.state.world.globalStability
+        if (stability < 80) {
+            val echoChance = (100 - stability) / 200f // Up to 50% chance at stability 0
+            if (kotlin.random.Random.nextFloat() < echoChance) {
+                com.grimreich.core.EchoSystem.getRandomEcho()?.let { echo ->
+                    val echoBtn = Button(this).apply {
+                        text = "ECHO: ${echo.name} (${echo.currentCareer?.name ?: "Brak"})"
+                        styleToGrim()
+                        setTextColor(android.graphics.Color.parseColor("#40FFFFFF")) // Ghostly white
+                        setOnClickListener {
+                            val intent = Intent(this@CityActivity, DialogueActivity::class.java).apply {
+                                putExtra("npcName", echo.name)
+                                putExtra("npcRole", "ECHO")
+                                putExtra("startNodeId", "echo_start")
+                                putExtra("portrait", echo.portraitRes)
+                            }
+                            startActivity(intent)
+                        }
+                    }
+                    container.addView(echoBtn, 0) // Always at top
+                }
+            }
+        }
     }
 
     private fun Button.styleToGrim() {
@@ -137,7 +163,6 @@ class CityActivity : AppCompatActivity() {
         params.setMargins(0, 0, 0, 8)
         this.layoutParams = params
     }
-}
 
     private fun renderQuestButtons() {
         val state = GameRepository.state
@@ -149,7 +174,7 @@ class CityActivity : AppCompatActivity() {
 
         if (hasCoastlineQuest) {
             val coastBtn = Button(this).apply {
-                text = "⚠ IDZ NA WYBRZEŻE [QUEST]"
+                text = "⚠ IDŹ NA WYBRZEŻE [QUEST]"
                 styleToGrim()
                 setOnClickListener {
                     val intent = Intent(this@CityActivity, CoastlineActivity::class.java)
@@ -157,20 +182,19 @@ class CityActivity : AppCompatActivity() {
                 }
             }
             container.addView(coastBtn)
+        }
 
         // Check for additional location-based quests with progressive unlock
-        // Quest locations unlock based on completed quests (progressive discovery)
-        
         // Plains quest - unlocks after completing initial Coastline quest
         val hasPlainsQuest = state.quest.activeQuests.contains("quest_heartland_grain_mystery") ||
                              state.quest.completedQuests.contains("quest_north_mist_vision")
         if (hasPlainsQuest) {
             val plainsBtn = Button(this).apply {
-                text = "⚠ IDZ NA RÓWNINY [QUEST]"
+                text = "⚠ IDŹ NA RÓWNINY [QUEST]"
                 styleToGrim()
                 setOnClickListener {
                     val intent = Intent(this@CityActivity, QuestLocationActivity::class.java)
-                    intent.putExtra("location_type", "plains")
+                    intent.putExtra("questId", "quest_heartland_grain_mystery")
                     startActivity(intent)
                 }
             }
@@ -182,15 +206,15 @@ class CityActivity : AppCompatActivity() {
                             state.quest.completedQuests.contains("quest_heartland_grain_mystery")
         if (hasForestQuest) {
             val forestBtn = Button(this).apply {
-                text = "⚠ IDZ DO LASU [QUEST]"
+                text = "⚠ IDŹ DO LASU [QUEST]"
                 styleToGrim()
                 setOnClickListener {
                     val intent = Intent(this@CityActivity, QuestLocationActivity::class.java)
-                    intent.putExtra("location_type", "forest")
+                    intent.putExtra("questId", "quest_forest_ancient_grove")
                     startActivity(intent)
                 }
             }
             container.addView(forestBtn)
         }
-        }
     }
+}

@@ -62,7 +62,8 @@ class QuestLocationActivity : AppCompatActivity() {
             setOnClickListener {
                 // Start combat encounter
                 GameRepository.state.pendingQuestId = questId
-                CombatSystem.startEncounterForQuest(this@QuestLocationActivity, questId)
+                CombatSystem.startEncounterForQuest(questId)
+                startActivity(Intent(this@QuestLocationActivity, CombatActivity::class.java))
             }
         }
         container.addView(btnFight)
@@ -103,7 +104,8 @@ class QuestLocationActivity : AppCompatActivity() {
                     .setMessage("Patrzysz w lustro. Twoje odbicie uśmiecha się złowrogo i wychodzi z powierzchni lustra!\n\nMusisz walczyć ze sobą!")
                     .setPositiveButton("WALCZ!") { _, _ ->
                         GameRepository.state.pendingQuestId = questId
-                        CombatSystem.startEncounterForQuest(this@QuestLocationActivity, questId)
+                        CombatSystem.startEncounterForQuest(questId)
+                        startActivity(Intent(this@QuestLocationActivity, CombatActivity::class.java))
                     }
                     .show()
             }
@@ -197,6 +199,18 @@ class QuestLocationActivity : AppCompatActivity() {
             }
         }
         container.addView(btnEnter)
+    }
+
+    private fun Button.styleToGrim() {
+        this.setTextColor(androidx.core.content.ContextCompat.getColor(context, R.color.grimGold))
+        this.setBackgroundColor(android.graphics.Color.parseColor("#80000000"))
+        this.setPadding(16, 16, 16, 16)
+        val params = LinearLayout.LayoutParams(
+            LinearLayout.LayoutParams.MATCH_PARENT,
+            LinearLayout.LayoutParams.WRAP_CONTENT
+        )
+        params.setMargins(0, 0, 0, 8)
+        this.layoutParams = params
     }
 
     private fun completeQuest(gold: Int, reputation: Int) {

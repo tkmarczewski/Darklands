@@ -26,8 +26,8 @@ data class QuestEntry(
     val originType: QuestOriginType,
     val originRefId: String,
     val rewardGold: Int,
-    val status: QuestStatus = QuestStatus.DOSTEPNE,,
-    val requiredQuestIds: List<String> = emptyList()
+    val status: QuestStatus = QuestStatus.DOSTEPNE,
+    val requiredQuestIds: List<String> = emptyList(),
     val objective: String = "Brak szczegółowych wytycznych."
 )
 

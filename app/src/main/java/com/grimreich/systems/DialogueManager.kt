@@ -78,6 +78,28 @@ object DialogueManager {
         seedMetaLore()
         seedExtendedNpcDialogues()
         seedProceduralBase()
+        seedEchoDialogues()
+    }
+
+    private fun seedEchoDialogues() {
+        registerNode(DialogueNode(
+            id = "echo_start", npcId = "echo",
+            text = "Widzę... pęknięcia. Moja Kotwica została zerwana, ale wciąż tu jestem. Czy pamiętasz moje imię?",
+            choices = listOf(
+                DialogueChoice("Twój czas minął, duchu.", "end"),
+                DialogueChoice("Daj mi znak z tamtej strony.", "echo_gift")
+            )
+        ))
+        registerNode(DialogueNode(
+            id = "echo_gift", npcId = "echo",
+            text = "To tylko cień tego, co posiadałem. Niech Ci służy w walce z Absolutem.",
+            choices = listOf(
+                DialogueChoice("Przyjmuję dar.", "end", onSelect = {
+                    it.gold += 50
+                    com.grimreich.systems.ChronicleSystem.record("Otrzymano dar od Echa przeszłości.", 2)
+                })
+            )
+        ))
     }
 
     private fun seedProceduralBase() {
