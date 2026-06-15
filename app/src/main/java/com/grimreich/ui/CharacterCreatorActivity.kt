@@ -27,6 +27,10 @@ class CharacterCreatorActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_character_creator)
 
+        // NOTE: Character shadow rendering temporarily disabled to reduce visual clutter
+        // TODO: Re-implement party member portrait shadows with configurable visibility
+        // renderCharacterShadows() // COMMENTED OUT
+
         setupCareerSelection()
         setupAttributeControls()
         setupSkillSpecializations()
