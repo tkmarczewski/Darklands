@@ -170,6 +170,32 @@ class CityActivity : AppCompatActivity() {
         val container = findViewById<LinearLayout>(R.id.npcListContainer)
 
         // Check if coastline quests are active
+        // CITY-BASED QUESTS - Quests that can be completed within the city
+        // Check for city NPC quests (e.g., Aelion)
+        val cityQuests = state.quest.activeQuests.filter { questId ->
+            val questEntry = com.grimreich.systems.QuestSystem.getQuest(questId)
+            questEntry?.originType == com.grimreich.systems.QuestOriginType.LOKACJA_NPC
+        }
+        
+        cityQuests.forEach { questId ->
+            val questEntry = com.grimreich.systems.QuestSystem.getQuest(questId)
+            if (questEntry != null) {
+                val questBtn = Button(this).apply {
+                    text = "⚠ PRZEJDŹ DO QUESTA: ${questEntry.title}"
+                    styleToGrim()
+                    setOnClickListener {
+                        // Start quest-specific dialogue or activity
+                        val intent = Intent(this@CityActivity, DialogueActivity::class.java)
+                        intent.putExtra("questId", questId)
+                        intent.putExtra("npcName", questEntry.originRefId)
+                        intent.putExtra("startNodeId", "${questEntry.originRefId}_quest_start")
+                        startActivity(intent)
+                    }
+                }
+                container.addView(questBtn)
+            }
+        }
+
         val hasCoastlineQuest = state.quest.activeQuests.contains("quest_north_mist_vision") ||
                                  state.quest.activeQuests.contains("quest_north_lost_echo")
 
