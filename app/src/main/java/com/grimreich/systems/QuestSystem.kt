@@ -93,7 +93,7 @@ object QuestSystem {
                 id = "quest_heartland_grain_mystery",
                 title = "Tajemnica Zboża",
                 description = "Rolnicy mówią o dziwnych znakach na polach. Zbadaj równiny i odkryj prawdę.",
-                cityId = "bremen",
+                cityId = "serce_krainy",
                 originType = QuestOriginType.LOKACJA_PROCEDURALNA,
                 originRefId = "plains_mystery",
                 rewardGold = com.grimreich.core.GrimConstants.Economy.QUEST_REWARD_GOLD_CROWN,
@@ -102,13 +102,13 @@ object QuestSystem {
             )
         )
         
-        // Forest quest - unlocks after Plains quest completed  
+        // Forest quest - unlocks after Plains quest progress
         register(
             QuestEntry(
                 id = "quest_forest_ancient_grove",
                 title = "Pradawny Gaj",
                 description = "Stary drwal opowiada o zaginionym gaju, gdzie rosną drzewa pamiętające czasy przed Imperium.",
-                cityId = "bremen",
+                cityId = "serce_krainy",
                 originType = QuestOriginType.LOKACJA_PROCEDURALNA,
                 originRefId = "forest_grove",
                 rewardGold = com.grimreich.core.GrimConstants.Economy.QUEST_REWARD_GOLD_FOREST,
@@ -142,10 +142,10 @@ object QuestSystem {
         // EXAMPLE CITY NPC QUEST - Aelion's request
         register(
             QuestEntry(
-                id = "quest_bremen_aelion_relic",
+                id = "quest_heartland_aelion_relic",
                 title = "Poszukiwanie Relikwii Aeliona",
                 description = "Tajemniczy mędrzec Aelion prosi o odnalezienie zaginionej relikwii.",
-                cityId = "bremen",
+                cityId = "serce_krainy",
                 originType = QuestOriginType.LOKACJA_NPC,
                 originRefId = "aelion",
                 rewardGold = 250,
@@ -159,6 +159,8 @@ object QuestSystem {
     }
 
     fun all(): List<QuestEntry> = quests.values.toList()
+
+    fun getQuest(id: String): QuestEntry? = quests[id]
 
     fun availableForCity(cityId: String): List<QuestEntry> =
         quests.values.filter { it.cityId == cityId && it.status == QuestStatus.DOSTEPNE }
