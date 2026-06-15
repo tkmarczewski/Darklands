@@ -9,10 +9,13 @@ import com.grimreich.R
 import com.grimreich.systems.QuestSystem
 
 class QuestJournalActivity : AppCompatActivity() {
+    private var currentFilter: com.grimreich.systems.QuestStatus = com.grimreich.systems.QuestStatus.AKTYWNE
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_quest_journal)
 
+        setupTabs()
         renderQuests()
 
         findViewById<Button>(R.id.btnExitJournal).setOnClickListener {
@@ -20,14 +23,37 @@ class QuestJournalActivity : AppCompatActivity() {
         }
     }
 
+    private fun setupTabs() {
+        findViewById<Button>(R.id.tabAvailable).setOnClickListener {
+            currentFilter = com.grimreich.systems.QuestStatus.DOSTEPNE
+            renderQuests()
+        }
+        findViewById<Button>(R.id.tabActive).setOnClickListener {
+            currentFilter = com.grimreich.systems.QuestStatus.AKTYWNE
+            renderQuests()
+        }
+        findViewById<Button>(R.id.tabCompleted).setOnClickListener {
+            currentFilter = com.grimreich.systems.QuestStatus.UKONCZONE
+            renderQuests()
+        }
+    }
+
     private fun renderQuests() {
         val container = findViewById<LinearLayout>(R.id.questListContainer)
         container.removeAllViews()
 
-        val allQuests = QuestSystem.all()
+        // Visual feedback for active tab
+        updateTabStyles()
+
+        val allQuests = QuestSystem.all().filter { it.status == currentFilter }
         if (allQuests.isEmpty()) {
             val tv = TextView(this).apply {
-                text = "Twoje kroniki milczą. Nie podjęto jeszcze żadnych prób naprawy rzeczywistości."
+                text = when(currentFilter) {
+                    com.grimreich.systems.QuestStatus.DOSTEPNE -> "Brak nowych zadań w okolicy."
+                    com.grimreich.systems.QuestStatus.AKTYWNE -> "Nie podjęto obecnie żadnych zadań."
+                    com.grimreich.systems.QuestStatus.UKONCZONE -> "Twoje kroniki milczą o ukończonych czynach."
+                    else -> "Brak danych."
+                }
                 styleToGrim(false)
             }
             container.addView(tv)
@@ -106,6 +132,15 @@ class QuestJournalActivity : AppCompatActivity() {
 
             container.addView(questView)
         }
+    }
+
+    private fun updateTabStyles() {
+        val gold = android.graphics.Color.parseColor("#FFD700")
+        val grey = android.graphics.Color.parseColor("#888888")
+
+        findViewById<Button>(R.id.tabAvailable).setTextColor(if (currentFilter == com.grimreich.systems.QuestStatus.DOSTEPNE) gold else grey)
+        findViewById<Button>(R.id.tabActive).setTextColor(if (currentFilter == com.grimreich.systems.QuestStatus.AKTYWNE) gold else grey)
+        findViewById<Button>(R.id.tabCompleted).setTextColor(if (currentFilter == com.grimreich.systems.QuestStatus.UKONCZONE) gold else grey)
     }
 
     private fun TextView.styleToGrim(isHeader: Boolean) {
