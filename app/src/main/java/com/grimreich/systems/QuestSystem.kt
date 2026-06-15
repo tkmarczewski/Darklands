@@ -8,7 +8,8 @@ import com.grimreich.world.ProceduralLocationGenerator
 
 enum class QuestOriginType {
     ZDARZENIE_MIEJSKIE,
-    LOKACJA_PROCEDURALNA
+    LOKACJA_PROCEDURALNA,
+    LOKACJA_NPC
 }
 
 enum class QuestStatus {
@@ -137,6 +138,20 @@ object QuestSystem {
                 )
             )
         }
+
+        // EXAMPLE CITY NPC QUEST - Aelion's request
+        register(
+            QuestEntry(
+                id = "quest_bremen_aelion_relic",
+                title = "Poszukiwanie Relikwii Aeliona",
+                description = "Tajemniczy mędrzec Aelion prosi o odnalezienie zaginionej relikwii.",
+                cityId = "bremen",
+                originType = QuestOriginType.LOKACJA_NPC,
+                originRefId = "aelion",
+                rewardGold = 250,
+                objective = "Porozmawiaj z Aelionem i dowiedz się więcej o relikwii."
+            )
+        )
     }
 
     fun register(entry: QuestEntry) {
