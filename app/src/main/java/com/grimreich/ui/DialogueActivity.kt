@@ -84,7 +84,7 @@ class DialogueActivity : AppCompatActivity() {
         container.removeAllViews()
 
         node.choices.forEach { choice ->
-            val btn = Button(this, null, 0, R.style.GrimCombatButton)
+            val btn = Button(androidx.appcompat.view.ContextThemeWrapper(this, R.style.GrimCombatButton), null, 0)
             btn.text = choice.text
             btn.setOnClickListener {
                 choice.onSelect(GameRepository.state)
@@ -101,7 +101,7 @@ class DialogueActivity : AppCompatActivity() {
         }
         
         if (node.choices.isEmpty()) {
-            val btn = Button(this, null, 0, R.style.GrimBackButton)
+            val btn = Button(androidx.appcompat.view.ContextThemeWrapper(this, R.style.GrimBackButton), null, 0)
             btn.text = "ODEJDŹ"
             btn.setOnClickListener { finish() }
             val lp = LinearLayout.LayoutParams(

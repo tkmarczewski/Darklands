@@ -22,6 +22,7 @@ class CityActivity : AppCompatActivity() {
 
         // Ensure canonical data is available
         CityCatalogue.seedCanonical()
+        com.grimreich.systems.QuestSystem.seedIntegratedContent()
 
         val rawLocation = GameRepository.state.world.location
         val cityId = GameRepository.state.grimCurrentRegion ?: rawLocation.lowercase().replace(" ", "_")
@@ -75,6 +76,14 @@ class CityActivity : AppCompatActivity() {
         com.grimreich.systems.RandomEventManager.triggerCityEvent(this)
     }
 
+    override fun onResume() {
+        super.onResume()
+        val rawLocation = GameRepository.state.world.location
+        val cityId = GameRepository.state.grimCurrentRegion ?: rawLocation.lowercase().replace(" ", "_")
+        renderNpcs(cityId)
+        renderQuestButtons()
+    }
+
     private fun updateCityStatus(text: String) {
         findViewById<TextView>(R.id.cityStatus).text = text
     }
@@ -87,27 +96,32 @@ class CityActivity : AppCompatActivity() {
         
         // Add PROPHET if exists in canonical data
         cityData?.prophet?.let { prophetName ->
-            val prophetBtn = Button(this).apply {
-                text = "$prophetName (PROROK)"
-                styleToGrim()
-                setTextColor(android.graphics.Color.parseColor("#FFD700")) // GOLD
-                setOnClickListener {
-                    val intent = Intent(this@CityActivity, DialogueActivity::class.java).apply {
-                        putExtra("npcName", prophetName)
-                        putExtra("npcRole", prophetName)
-                        putExtra("startNodeId", "${prophetName.lowercase()}_start")
-                    }
-                    startActivity(intent)
-                }
+            // Special logic for one-time quest givers
+            val mainQuestDone = com.grimreich.systems.QuestSystem.all().any { 
+                it.cityId == cityId && it.originRefId == prophetName.lowercase() && it.status == com.grimreich.systems.QuestStatus.UKONCZONE 
             }
-            container.addView(prophetBtn)
+            
+            if (!mainQuestDone) {
+                val prophetBtn = Button(androidx.appcompat.view.ContextThemeWrapper(this, R.style.GrimRegionButton), null, 0).apply {
+                    text = "$prophetName (PROROK)"
+                    setTextColor(android.graphics.Color.parseColor("#FFD700")) // GOLD
+                    setOnClickListener {
+                        val intent = Intent(this@CityActivity, DialogueActivity::class.java).apply {
+                            putExtra("npcName", prophetName)
+                            putExtra("npcRole", prophetName)
+                            putExtra("startNodeId", "${prophetName.lowercase()}_start")
+                        }
+                        startActivity(intent)
+                    }
+                }
+                container.addView(prophetBtn)
+            }
         }
 
         val npcs = ProceduralNpcGenerator.generateForCity(cityId, com.grimreich.core.GrimConstants.World.NPC_GENERATION_SEED_OFFSET)
         npcs.forEach { npc ->
-            val btn = Button(this).apply {
+            val btn = Button(androidx.appcompat.view.ContextThemeWrapper(this, R.style.GrimRegionButton), null, 0).apply {
                 text = "${npc.name} (${npc.role})"
-                styleToGrim()
                 
                 // Set NPC portrait from role if available
                 val portraitId = DialogueManager.getPortrait(npc.role)
@@ -133,9 +147,8 @@ class CityActivity : AppCompatActivity() {
             val echoChance = (100 - stability) * (maxChance / 100f)
             if (kotlin.random.Random.nextFloat() < echoChance) {
                 com.grimreich.core.EchoSystem.getRandomEcho()?.let { echo ->
-                    val echoBtn = Button(this).apply {
+                    val echoBtn = Button(androidx.appcompat.view.ContextThemeWrapper(this, R.style.GrimRegionButton), null, 0).apply {
                         text = "ECHO: ${echo.name} (${echo.currentCareer?.name ?: "Brak"})"
-                        styleToGrim()
                         setTextColor(android.graphics.Color.parseColor("#40FFFFFF")) // Ghostly white
                         setOnClickListener {
                             val intent = Intent(this@CityActivity, DialogueActivity::class.java).apply {
@@ -153,95 +166,72 @@ class CityActivity : AppCompatActivity() {
         }
     }
 
-    private fun Button.styleToGrim() {
-        this.setTextColor(androidx.core.content.ContextCompat.getColor(context, R.color.grimGold))
-        this.setBackgroundColor(android.graphics.Color.parseColor("#80000000"))
-        this.setPadding(16, 16, 16, 16)
-        val params = LinearLayout.LayoutParams(
-            LinearLayout.LayoutParams.MATCH_PARENT,
-            LinearLayout.LayoutParams.WRAP_CONTENT
-        )
-        params.setMargins(0, 0, 0, 8)
-        this.layoutParams = params
-    }
-
     private fun renderQuestButtons() {
         val state = GameRepository.state
         val container = findViewById<LinearLayout>(R.id.npcListContainer)
 
-        // Check if coastline quests are active
-        // CITY-BASED QUESTS - Quests that can be completed within the city
-        // Check for city NPC quests (e.g., Aelion)
-        val cityQuests = state.quest.activeQuests.filter { questId ->
-            val questEntry = com.grimreich.systems.QuestSystem.getQuest(questId)
-            questEntry?.originType == com.grimreich.systems.QuestOriginType.LOKACJA_NPC
-        }
+        // 1. CITY-BASED NPC QUESTS (e.g., Aelion's request)
+        val activeCityQuests = state.quest.activeQuests.mapNotNull { com.grimreich.systems.QuestSystem.getQuest(it) }
+            .filter { it.cityId == (state.grimCurrentRegion ?: "") && it.originType == com.grimreich.systems.QuestOriginType.LOKACJA_NPC }
         
-        cityQuests.forEach { questId ->
-            val questEntry = com.grimreich.systems.QuestSystem.getQuest(questId)
-            if (questEntry != null) {
-                val questBtn = Button(this).apply {
-                    text = "⚠ PRZEJDŹ DO QUESTA: ${questEntry.title}"
-                    styleToGrim()
-                    setOnClickListener {
-                        // Start quest-specific dialogue or activity
-                        val intent = Intent(this@CityActivity, DialogueActivity::class.java)
-                        intent.putExtra("questId", questId)
-                        intent.putExtra("npcName", questEntry.originRefId)
-                        intent.putExtra("startNodeId", "${questEntry.originRefId}_quest_start")
-                        startActivity(intent)
+        activeCityQuests.forEach { quest ->
+            val questBtn = Button(androidx.appcompat.view.ContextThemeWrapper(this, R.style.GrimRegionButton), null, 0).apply {
+                text = "⚠ PRZEJDŹ DO QUESTA: ${quest.title}"
+                setTextColor(android.graphics.Color.parseColor("#ADFF2F"))
+                setOnClickListener {
+                    val intent = Intent(this@CityActivity, DialogueActivity::class.java).apply {
+                        putExtra("npcName", quest.originRefId)
+                        putExtra("npcRole", "QUEST")
+                        putExtra("startNodeId", "${quest.originRefId}_quest_start")
                     }
+                    startActivity(intent)
                 }
-                container.addView(questBtn)
             }
+            container.addView(questBtn, 0)
         }
 
+        // 2. FIELD QUESTS (Coastline, Plains, Forest)
         val hasCoastlineQuest = state.quest.activeQuests.contains("quest_north_mist_vision") ||
                                  state.quest.activeQuests.contains("quest_north_lost_echo")
 
         if (hasCoastlineQuest) {
-            val coastBtn = Button(this).apply {
+            val coastBtn = Button(androidx.appcompat.view.ContextThemeWrapper(this, R.style.GrimRegionButton), null, 0).apply {
                 text = "⚠ IDŹ NA WYBRZEŻE [QUEST]"
-                styleToGrim()
                 setOnClickListener {
-                    val intent = Intent(this@CityActivity, CoastlineActivity::class.java)
-                    startActivity(intent)
+                    startActivity(Intent(this@CityActivity, CoastlineActivity::class.java))
                 }
             }
-            container.addView(coastBtn)
+            container.addView(coastBtn, 0)
         }
 
-        // Check for additional location-based quests with progressive unlock
-        // Plains quest - unlocks after completing initial Coastline quest
         val hasPlainsQuest = state.quest.activeQuests.contains("quest_heartland_grain_mystery") ||
                              state.quest.completedQuests.contains("quest_north_mist_vision")
         if (hasPlainsQuest) {
-            val plainsBtn = Button(this).apply {
+            val plainsBtn = Button(androidx.appcompat.view.ContextThemeWrapper(this, R.style.GrimRegionButton), null, 0).apply {
                 text = "⚠ IDŹ NA RÓWNINY [QUEST]"
-                styleToGrim()
                 setOnClickListener {
-                    val intent = Intent(this@CityActivity, QuestLocationActivity::class.java)
-                    intent.putExtra("questId", "quest_heartland_grain_mystery")
+                    val intent = Intent(this@CityActivity, QuestLocationActivity::class.java).apply {
+                        putExtra("questId", "quest_heartland_grain_mystery")
+                    }
                     startActivity(intent)
                 }
             }
-            container.addView(plainsBtn)
+            container.addView(plainsBtn, 0)
         }
         
-        // Forest quest - unlocks after Plains quest progress
         val hasForestQuest = state.quest.activeQuests.contains("quest_forest_ancient_grove") ||
                             state.quest.completedQuests.contains("quest_heartland_grain_mystery")
         if (hasForestQuest) {
-            val forestBtn = Button(this).apply {
+            val forestBtn = Button(androidx.appcompat.view.ContextThemeWrapper(this, R.style.GrimRegionButton), null, 0).apply {
                 text = "⚠ IDŹ DO LASU [QUEST]"
-                styleToGrim()
                 setOnClickListener {
-                    val intent = Intent(this@CityActivity, QuestLocationActivity::class.java)
-                    intent.putExtra("questId", "quest_forest_ancient_grove")
+                    val intent = Intent(this@CityActivity, QuestLocationActivity::class.java).apply {
+                        putExtra("questId", "quest_forest_ancient_grove")
+                    }
                     startActivity(intent)
                 }
             }
-            container.addView(forestBtn)
+            container.addView(forestBtn, 0)
         }
     }
 }

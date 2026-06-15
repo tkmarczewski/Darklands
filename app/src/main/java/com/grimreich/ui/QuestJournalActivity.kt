@@ -9,7 +9,7 @@ import com.grimreich.R
 import com.grimreich.systems.QuestSystem
 
 class QuestJournalActivity : AppCompatActivity() {
-    private var currentFilter: com.grimreich.systems.QuestStatus = com.grimreich.systems.QuestStatus.AKTYWNE
+    private var currentFilter: com.grimreich.systems.QuestStatus = com.grimreich.systems.QuestStatus.DOSTEPNE
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -117,10 +117,8 @@ class QuestJournalActivity : AppCompatActivity() {
             questView.addView(rewardTv)
 
             if (quest.status == com.grimreich.systems.QuestStatus.DOSTEPNE) {
-                val acceptBtn = Button(this).apply {
+                val acceptBtn = Button(androidx.appcompat.view.ContextThemeWrapper(this, R.style.GrimSmallButton), null, 0).apply {
                     text = "PRZYJMIJ ZADANIE"
-                    setBackgroundColor(android.graphics.Color.parseColor("#80000000"))
-                    setTextColor(android.graphics.Color.WHITE)
                     setOnClickListener {
                         com.grimreich.systems.QuestSystem.activate(quest.id)
                         android.widget.Toast.makeText(context, "Zadanie podjęte!", android.widget.Toast.LENGTH_SHORT).show()

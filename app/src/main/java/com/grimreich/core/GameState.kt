@@ -4,7 +4,7 @@ import com.grimreich.grimreich.v1.*
 
 data class GameState(
     @Transient val grimEngine: GrimWorldEngine = GrimWorldEngineFactory.create(),
-    var grimCurrentRegion: String = "Wybrzeże Północne",
+    var grimCurrentRegion: String = "wybrzeze_polnocne",
     var grimPendingExpeditionName: String? = null,
         var pendingQuestId: String? = null,
 

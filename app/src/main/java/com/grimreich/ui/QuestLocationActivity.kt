@@ -42,14 +42,56 @@ class QuestLocationActivity : AppCompatActivity() {
             "quest_crown_blood_toll" -> renderBloodToll(tvTitle, tvDesc, container)
             "quest_crown_iron_forge" -> renderIronForge(tvTitle, tvDesc, container)
             "quest_heart_mirror_truth" -> renderMirrorTruth(tvTitle, tvDesc, container)
+            "quest_heartland_grain_mystery" -> renderGrainMystery(tvTitle, tvDesc, container)
+            "quest_forest_ancient_grove" -> renderAncientGrove(tvTitle, tvDesc, container)
             "quest_eq1_signs" -> renderSigns(tvTitle, tvDesc, container)
             "quest_eq2_alliances" -> renderAlliances(tvTitle, tvDesc, container)
             "quest_eq3_pilgrimage" -> renderPilgrimage(tvTitle, tvDesc, container)
             else -> {
-                tvTitle.text = "NIEZNANA LOKACJA"
-                tvDesc.text = "Nie można odnaleźć tej lokacji."
+                tvTitle.text = "ZADANIE PROCEDURALNE"
+                tvDesc.text = "Eksplorujesz obszar związany z Twoim zadaniem."
+                renderGenericProcedural(tvTitle, tvDesc, container)
             }
         }
+    }
+
+    private fun renderGrainMystery(title: TextView, desc: TextView, container: LinearLayout) {
+        title.text = "RÓWNINY - TAJEMNICZE ZNAKI"
+        desc.text = "Znajdujesz ogromne piktogramy wypalone w zbożu. Kłosy są nienaturalnie wygięte."
+        val btn = Button(this).apply {
+            text = "ZADAJ PYTANIE ZIEMI"
+            styleToGrim()
+            setOnClickListener {
+                completeQuest(com.grimreich.core.GrimConstants.Economy.QUEST_REWARD_GOLD_CROWN, 3)
+            }
+        }
+        container.addView(btn)
+    }
+
+    private fun renderAncientGrove(title: TextView, desc: TextView, container: LinearLayout) {
+        title.text = "LAS - PRADAWNY GAJ"
+        desc.text = "Drzewa tutaj szeptają w języku, którego nie rozumiesz, ale czujesz jego ciężar."
+        val btn = Button(this).apply {
+            text = "ZŁÓŻ OFIARĘ Z KRWI"
+            styleToGrim()
+            setOnClickListener {
+                GameRepository.state.party.forEach { it.hp = (it.hp - 10).coerceAtLeast(1) }
+                completeQuest(com.grimreich.core.GrimConstants.Economy.QUEST_REWARD_GOLD_FOREST, 5)
+            }
+        }
+        container.addView(btn)
+    }
+
+    private fun renderGenericProcedural(title: TextView, desc: TextView, container: LinearLayout) {
+        val btn = Button(this).apply {
+            text = "PRZESZUKAJ OBSZAR"
+            styleToGrim()
+            setOnClickListener {
+                CombatSystem.startEncounterForQuest(questId)
+                startActivity(Intent(this@QuestLocationActivity, CombatActivity::class.java))
+            }
+        }
+        container.addView(btn)
     }
 
     // CROWN: Blood Toll - Równiny, pokonaj wrogów i złóż ofiarę

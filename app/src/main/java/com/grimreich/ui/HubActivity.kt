@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.View
 import android.widget.Button
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
@@ -131,7 +132,75 @@ class HubActivity : AppCompatActivity() {
         findViewById<Button>(R.id.openFinale)?.visibility = 
             if (world.globalStability < 30 || com.grimreich.systems.QuestSystem.all().find { it.id == "eq3_pilgrimage" }?.status == com.grimreich.systems.QuestStatus.UKONCZONE) View.VISIBLE else View.GONE
 
+        renderFieldQuestButtons()
         renderPartyStrip()
+    }
+
+    private fun renderFieldQuestButtons() {
+        val state = GameRepository.state
+        val container = findViewById<LinearLayout>(R.id.fieldQuestContainer) ?: return
+        container.removeAllViews()
+
+        // 1. COASTLINE QUESTS
+        val hasCoastlineQuest = state.quest.activeQuests.contains("quest_north_mist_vision") ||
+                                 state.quest.activeQuests.contains("quest_north_lost_echo")
+
+        if (hasCoastlineQuest) {
+            val btn = Button(this).apply {
+                text = "⚠ WYBRZEŻE [QUEST]"
+                styleToGrim()
+                setOnClickListener {
+                    startActivity(Intent(this@HubActivity, CoastlineActivity::class.java))
+                }
+            }
+            container.addView(btn)
+        }
+
+        // 2. HEARTLAND QUESTS (Plains/Forest)
+        val hasPlainsQuest = state.quest.activeQuests.contains("quest_heartland_grain_mystery") ||
+                             state.quest.completedQuests.contains("quest_north_mist_vision")
+        if (hasPlainsQuest) {
+            val btn = Button(this).apply {
+                text = "⚠ RÓWNINY [QUEST]"
+                styleToGrim()
+                setOnClickListener {
+                    val intent = Intent(this@HubActivity, QuestLocationActivity::class.java).apply {
+                        putExtra("questId", "quest_heartland_grain_mystery")
+                    }
+                    startActivity(intent)
+                }
+            }
+            container.addView(btn)
+        }
+        
+        val hasForestQuest = state.quest.activeQuests.contains("quest_forest_ancient_grove") ||
+                            state.quest.completedQuests.contains("quest_heartland_grain_mystery")
+        if (hasForestQuest) {
+            val btn = Button(this).apply {
+                text = "⚠ LAS [QUEST]"
+                styleToGrim()
+                setOnClickListener {
+                    val intent = Intent(this@HubActivity, QuestLocationActivity::class.java).apply {
+                        putExtra("questId", "quest_forest_ancient_grove")
+                    }
+                    startActivity(intent)
+                }
+            }
+            container.addView(btn)
+        }
+    }
+
+    private fun Button.styleToGrim() {
+        this.setTextColor(androidx.core.content.ContextCompat.getColor(context, R.color.grimGold))
+        this.setBackgroundColor(android.graphics.Color.parseColor("#80000000"))
+        this.setPadding(8, 8, 8, 8)
+        this.textSize = 10f
+        val params = LinearLayout.LayoutParams(
+            LinearLayout.LayoutParams.MATCH_PARENT,
+            LinearLayout.LayoutParams.WRAP_CONTENT
+        )
+        params.setMargins(0, 0, 0, 4)
+        this.layoutParams = params
     }
 
     private fun renderPartyStrip() {

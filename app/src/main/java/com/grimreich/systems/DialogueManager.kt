@@ -219,6 +219,16 @@ object DialogueManager {
             )
         ))
         registerNode(DialogueNode(
+            id = "aelion_quest_start", npcId = "aelion",
+            text = "Relikwia... pęknięty odłamek pierwszego lustra. Został skradziony przez upiory na północy. Odzyskaj go, a może mgła oszczędzi Twoje imię.",
+            choices = listOf(
+                DialogueChoice("Zrobię to.", "end", onSelect = {
+                    com.grimreich.systems.QuestSystem.activate("quest_aelion_relic")
+                }),
+                DialogueChoice("Może innym razem.", "end")
+            )
+        ))
+        registerNode(DialogueNode(
             id = "aelion_quest_complete", npcId = "aelion", 
             text = "Wizja jest tuż przed Tobą. Widzisz to, co zostało zapomniane. Twoje zadanie na tym brzegu dobiegło końca.",
             choices = listOf(
@@ -229,6 +239,7 @@ object DialogueManager {
             )
         ))
         registerNode(DialogueNode(id = "aelion_memory_strength", npcId = "aelion", text = "Imiona są kotwicami. Ale kotwice rdzewieją w słonej wodzie Wybrzeża. Wkrótce zostaniesz tylko Ty... i pustka, którą nazwiesz wolnością."))
+        registerNode(DialogueNode(id = "aelion_weapon", npcId = "aelion", text = "Stal jest twarda, ale rzeczywistość jest twardsza. Twoja broń wygnie się pod ciężarem prawd, których nie chcesz poznać."))
         registerNode(DialogueNode(id = "aelion_others", npcId = "aelion", text = "Jesteśmy siedmioma pęknięciami w jednym lustrze. Xyrel kocha krew, Mira kocha prawdę, a ja... ja kocham spokój, który nastaje, gdy wszystko zostaje zapomniane."))
     }
 

@@ -142,14 +142,14 @@ object QuestSystem {
         // EXAMPLE CITY NPC QUEST - Aelion's request
         register(
             QuestEntry(
-                id = "quest_heartland_aelion_relic",
-                title = "Poszukiwanie Relikwii Aeliona",
+                id = "quest_aelion_relic",
+                title = "Relikwia Aeliona",
                 description = "Tajemniczy mędrzec Aelion prosi o odnalezienie zaginionej relikwii.",
-                cityId = "serce_krainy",
+                cityId = "wybrzeze_polnocne",
                 originType = QuestOriginType.LOKACJA_NPC,
                 originRefId = "aelion",
                 rewardGold = 250,
-                objective = "Porozmawiaj z Aelionem i dowiedz się więcej o relikwii."
+                objective = "Porozmawiaj z Aelionem na Wybrzeżu o jego relikwii."
             )
         )
     }

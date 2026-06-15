@@ -23,11 +23,16 @@ class MainMenuActivity : AppCompatActivity() {
         }
 
         val btnContinue = findViewById<Button>(R.id.btnContinue)
-        if (SaveLoadSystem.hasSave(this)) {
-            btnContinue.visibility = View.VISIBLE
+        val hasSave = SaveLoadSystem.hasSave(this)
+        btnContinue.visibility = View.VISIBLE // Always show
+        if (hasSave) {
+            btnContinue.isEnabled = true
+            btnContinue.alpha = 1.0f
             btnContinue.text = "KONTYNUUJ PRZYGODĘ"
         } else {
-            btnContinue.visibility = View.GONE
+            btnContinue.isEnabled = false
+            btnContinue.alpha = 0.5f
+            btnContinue.text = "KONTYNUACJA (BRAK ZAPISU)"
         }
 
         btnContinue.setOnClickListener {
