@@ -4,7 +4,7 @@ import com.grimreich.grimreich.v1.NPC
 import kotlin.random.Random
 
 object ProceduralNpcGenerator {
-    
+
     private val roles = listOf(
         "Chronicler", "Zealot", "Merchant", "Fugitive", "Mystic",
         "Gravedigger", "Penitent", "Heretic", "Soldier", "Orphan",
@@ -12,10 +12,12 @@ object ProceduralNpcGenerator {
     )
 
     fun generateForCity(cityId: String, seed: Int): List<NPC> {
-        val random = Random(seed + cityId.hashCode())
-        val count = random.nextInt(4, 7) // Zwiększono liczbę NPC
+        // Use dynamic seed based on current time to ensure different NPCs each visit
+        val dynamicSeed = System.currentTimeMillis().toInt() + cityId.hashCode()
+        val random = Random(dynamicSeed)
+        val count = random.nextInt(4, 7)
         val generatedNames = mutableSetOf<String>()
-        
+
         return (0 until count).mapNotNull { i ->
             var name = generateName(random)
             var attempts = 0
@@ -28,7 +30,7 @@ object ProceduralNpcGenerator {
 
             val role = roles.random(random)
             NPC(
-                id = "npc_${cityId}_$i",
+                id = "npc_${cityId}_${dynamicSeed}_$i",
                 name = name,
                 role = role,
                 factionId = decideFaction(cityId, random),
