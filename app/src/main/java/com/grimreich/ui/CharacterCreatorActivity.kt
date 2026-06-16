@@ -78,6 +78,7 @@ class CharacterCreatorActivity : AppCompatActivity() {
                 else -> Career.KNIGHT
             }
             applyCareerBonuses()
+            setupSkillSpecializations() // REFRESH SKILLS BASED ON CAREER
         }
         findViewById<RadioButton>(R.id.rbKnight).isChecked = true
     }
@@ -137,8 +138,22 @@ class CharacterCreatorActivity : AppCompatActivity() {
 
     private fun setupSkillSpecializations() {
         val container = findViewById<LinearLayout>(R.id.llSkillSpecializations)
+        container.removeAllViews() // Ensure clean slate on re-selection
+
         val allSkills = HeroSkill.values()
-        allSkills.forEach { skill ->
+        val availableSkills = when (selectedCareer) {
+            Career.KNIGHT -> allSkills.filter { it.group == SkillGroup.WEAPON || it.group == SkillGroup.ARMOR }
+            Career.ALCHEMIST -> allSkills.filter { it.group == SkillGroup.ACADEMIC || it.name == "ALCH" }
+            Career.GUARD -> allSkills.filter { it.group == SkillGroup.WEAPON || it.group == SkillGroup.SURVIVAL }
+            Career.SCHOLAR -> allSkills.filter { it.group == SkillGroup.ACADEMIC }
+            Career.THIEF -> allSkills.filter { it.group == SkillGroup.INTRIGUE || it.name == "STL_H" }
+            Career.PRIEST, Career.MONK -> allSkills.filter { it.group == SkillGroup.ACADEMIC || it.group == SkillGroup.SPIRITUAL }
+            Career.MERCENARY -> allSkills.filter { it.group == SkillGroup.WEAPON || it.group == SkillGroup.SURVIVAL }
+            Career.MERCHANT -> allSkills.filter { it.group == SkillGroup.INTRIGUE || it.name == "STR_W" }
+            else -> allSkills.toList()
+        }
+
+        availableSkills.forEach { skill ->
             val cb = CheckBox(this).apply {
                 text = skill.displayName
                 setTextColor(androidx.core.content.ContextCompat.getColor(context, R.color.grimTextPrimary))

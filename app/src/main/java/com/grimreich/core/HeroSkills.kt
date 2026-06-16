@@ -23,10 +23,24 @@ enum class HeroSkill(val displayName: String, val group: SkillGroup) {
     STL_H("Skradanie",        SkillGroup.SURVIVAL),
     STR_W("Ulice",            SkillGroup.SURVIVAL),
     RIDE ("Jezdziectwo",      SkillGroup.SURVIVAL),
-    WD_WS("Dzicz",            SkillGroup.SURVIVAL)
+    WD_WS("Dzicz",            SkillGroup.SURVIVAL),
+    // INTRYGA
+    PERS ("Perswazja",        SkillGroup.INTRIGUE),
+    INTI ("Zastraszanie",     SkillGroup.INTRIGUE),
+    DECP ("Oszustwo",         SkillGroup.INTRIGUE),
+    SOCI ("Etykieta",         SkillGroup.INTRIGUE),
+    INVN ("Sledztwo",         SkillGroup.INTRIGUE),
+    // DUCHOWOŚĆ
+    PRAY ("Modlitwa",         SkillGroup.SPIRITUAL),
+    MEDI ("Medytacja",        SkillGroup.SPIRITUAL),
+    EXOR ("Egzorcyzmy",       SkillGroup.SPIRITUAL),
+    // PANCERZ
+    L_ARM("Lekki pancerz",    SkillGroup.ARMOR),
+    H_ARM("Ciezki pancerz",   SkillGroup.ARMOR),
+    SHLD ("Tarcza",           SkillGroup.ARMOR)
 }
 
-enum class SkillGroup { WEAPON, ACADEMIC, SURVIVAL }
+enum class SkillGroup { WEAPON, ACADEMIC, SURVIVAL, INTRIGUE, SPIRITUAL, ARMOR }
 
 // Encumbrance (obciazenie) wg oryginalnych zasad
 enum class EncumbranceLevel(val label: String, val agilityMult: Float, val speedPenalty: Int) {

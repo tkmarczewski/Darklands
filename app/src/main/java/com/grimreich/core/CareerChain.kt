@@ -125,6 +125,22 @@ enum class Career(
         requiredStrength = 0, requiredAgility = 1, requiredIntelligence = 1,
         agiBonus = 1,
         description = "Nauka rzemiosła. Pierwszy krok kariery."
+    ),
+    INQUISITOR(
+        displayName = "Inkwizytor",
+        minAge = 25, maxAge = 60,
+        requiredVirtue = 7,
+        requiredStrength = 4, requiredAgility = 2, requiredIntelligence = 6,
+        strBonus = 1, intBonus = 2, virtueBonus = 3,
+        description = "Młot na heretyków. Wiara i stal."
+    ),
+    ROGUE(
+        displayName = "Łotr",
+        minAge = 16, maxAge = 40,
+        requiredVirtue = 0,
+        requiredStrength = 2, requiredAgility = 6, requiredIntelligence = 3,
+        agiBonus = 3, intBonus = 2,
+        description = "Cień w zaułkach. Spryt i kradzież."
     )
 }
 
