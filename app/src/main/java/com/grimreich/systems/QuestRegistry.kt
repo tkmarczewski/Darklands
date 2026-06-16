@@ -31,9 +31,9 @@ object QuestRegistry {
 
     val allTemplates = listOf(
         // I. Intrigues, Treasons, Sects
-        QuestTemplate("q_blood_icon", "Szept Krwawej Ikony", "Wioska czci posąg, który zaczyna… odpowiadać.", "Intrigue", 100, "Zbadaj źródło głosu w wiosce.", enemyStats = EnemyStats("Opętany Posąg", 60, 12, 15)),
+        QuestTemplate("q_blood_icon", "Szept Krwawej Ikony", "Wioska Raskhold czci posąg, który zaczyna… odpowiadać.", "Intrigue", 100, "Zbadaj źródło głosu w wiosce.", enemyStats = EnemyStats("Opętany Posąg", 60, 12, 15)),
         QuestTemplate("q_lost_apostle", "Zaginiony Apostoł", "Jeden z kapłanów Absolutu uciekł z zakazanym manuskryptem.", "Intrigue", 120, "Odnajdź kapłana i manuskrypt.", enemyStats = EnemyStats("Upadły Kapłan", 45, 14, 5)),
-        QuestTemplate("q_three_masks", "Trzy Maski Zdrajcy", "Ktoś podszywa się pod bohatera, popełniając zbrodnie w jego imieniu.", "Intrigue", 150, "Oczyść swoje imię i powstrzymaj oszusta.", enemyStats = EnemyStats("Oszust w Masce", 55, 16, 8)),
+        QuestTemplate("q_three_masks", "Trzy Maski Zdrajcy", "Ktoś podszywa się pod bohatera w Varenshold.", "Intrigue", 150, "Oczyść swoje imię i powstrzymaj oszusta.", enemyStats = EnemyStats("Oszust w Masce", 55, 16, 8)),
         QuestTemplate("q_altar_silence", "Krew na Ołtarzu Ciszy", "Klasztor milczenia ukrywa ofiary w podziemiach.", "Intrigue", 130, "Zbadaj podziemia klasztoru.", enemyStats = EnemyStats("Strażnik Ciszy", 50, 10, 10)),
         QuestTemplate("q_raven_oath", "Złamana Przysięga Kruka", "Bractwo zabójców żąda spłaty dawnego długu.", "Intrigue", 140, "Rozwiąż sprawę długu z bractwem.", enemyStats = EnemyStats("Kruk Zabójca", 40, 20, 4)),
         QuestTemplate("q_ritualist_seal", "Ostatnia Pieczęć Rytualisty", "Rytualista twierdzi, że bohater jest „ostatnim elementem”.", "Intrigue", 160, "Przetrwaj rytuał lub go powstrzymaj.", enemyStats = EnemyStats("Arcy-Rytualista", 70, 15, 12)),
@@ -77,6 +77,18 @@ object QuestRegistry {
         QuestTemplate("q_faceless_wanderer", "Wędrowiec Bez Twarzy", "Człowiek bez twarzy prosi o pomoc w odzyskaniu „swojego ja”.", "Drama", 130, "Odnajdź twarz wędrowca."),
         QuestTemplate("q_blood_dowry", "Dziewczyna z Krwawym Wianem", "Panna młoda uciekła sprzed ołtarza, bo her narzeczony „nie jest człowiekiem”.", "Drama", 140, "Zdemaskuj narzeczonego."),
         QuestTemplate("q_jester_laugh", "Ostatni Śmiech Błazna", "Błazen zna sekrety całego dworu i chce je sprzedać.", "Drama", 120, "Zdobądź sekrety błazna.")
+    )
+
+    val verdictChain = QuestChain(
+        id = "chain_verdict",
+        title = "Wyrok, którego nikt nie wydał",
+        stages = listOf(
+            QuestTemplate("q_verdict_1", "Gabinet bez śladów", "Zbadaj miejsce zbrodni wysokiego urzędnika.", "Verdict", 150, "Znajdź dowody w gabinecie urzędnika."),
+            QuestTemplate("q_verdict_2", "Mieszkanie, które nie pamięta", "Archiwistka Imperium zniknęła. Jej dom jest pusty.", "Verdict", 150, "Odszukaj ślady Liry Voss."),
+            QuestTemplate("q_verdict_3", "Fabryka, która zabiła sama siebie", "WINNI. Tak brzmi wyrok na ścianie fabryki.", "Verdict", 200, "Zbadaj ruiny fabryki zbrojeniowej."),
+            QuestTemplate("q_verdict_4", "Sala, która pamięta wyroki", "Dawna sala sądowa Imperium kryje sekret Trybunału.", "Verdict", 250, "Wejdź do sali wyroku i przetrwaj wizję."),
+            QuestTemplate("q_verdict_5", "Proces, którego nikt nie prowadzi", "Stoisz w kręgu oskarżonych. Trybunał patrzy.", "Verdict", 500, "Dokonaj ostatecznego wyboru wobec Trybunału.")
+        )
     )
 
     val bloodChain = QuestChain(

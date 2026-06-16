@@ -87,7 +87,16 @@ object QuestSystem {
             ))
         }
 
-        // 4. RESTORE PERSISTENT STATUSES
+        // 4. REGISTER CHAIN: THE VERDICT NO ONE ISSUED
+        QuestRegistry.verdictChain.stages.forEachIndexed { index, s ->
+            register(QuestEntry(
+                id = s.id, title = s.title, description = s.description, cityId = "serce_krainy",
+                originType = QuestOriginType.LOKACJA_PROCEDURALNA, originRefId = "Verdict", rewardGold = s.baseReward, objective = s.objective,
+                requiredQuestIds = if (index > 0) listOf(QuestRegistry.verdictChain.stages[index-1].id) else emptyList()
+            ))
+        }
+
+        // 5. RESTORE PERSISTENT STATUSES
         quests.values.toList().forEach { q ->
             val status = when {
                 completedIds.contains(q.id) -> QuestStatus.UKONCZONE
@@ -130,8 +139,14 @@ object QuestSystem {
         quests[questId] = updated
         
         // Sync with GameState
-        if (!GameRepository.state.quest.activeQuests.contains(questId)) {
-            GameRepository.state.quest.activeQuests.add(questId)
+        val state = GameRepository.state
+        if (!state.quest.activeQuests.contains(questId)) {
+            state.quest.activeQuests.add(questId)
+        }
+        
+        // DYNAMIC LOCATION: If quest has a preferred city, "discover" it if not already there
+        if (!state.world.discoveredLocations.contains(quest.cityId)) {
+            state.world.discoveredLocations.add(quest.cityId)
         }
         
         return updated

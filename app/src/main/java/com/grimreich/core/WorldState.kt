@@ -14,5 +14,6 @@ data class WorldState(
     var weather: WeatherType = WeatherType.CLEAR,
     var echoIntensity: Float = 0.0f, // 0.0 - 1.0 (Era of Fracture)
     var collapseProgress: Float = 0.0f, // 0.0 - 1.0 (Transition to 2.0)
-    var ontologicalLevel: OntologicalLevel = OntologicalLevel.MATERIAL
+    var ontologicalLevel: OntologicalLevel = OntologicalLevel.MATERIAL,
+    val discoveredLocations: MutableList<String> = mutableListOf()
 )
