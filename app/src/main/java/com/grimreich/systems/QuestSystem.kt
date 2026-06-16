@@ -37,6 +37,7 @@ data class QuestEntry(
 object QuestSystem {
     private val quests = linkedMapOf<String, QuestEntry>()
     private var currentSeed: Int = 0
+    private const val MAX_AVAILABLE_QUESTS = 5
 
     fun clear() {
         quests.clear()
@@ -44,116 +45,72 @@ object QuestSystem {
     }
 
     fun seedIntegratedContent(seed: Int = 1) {
-        // Force seeding if quests are empty - crucial for first load
         if (quests.isNotEmpty() && (currentSeed == seed)) return
+        
+        // CRITICAL: Capture current persistent status from GameState
+        val completedIds = GameRepository.state.quest.completedQuests.toSet()
+        val activeIds = GameRepository.state.quest.activeQuests.toSet()
+
         clear()
         currentSeed = seed
 
         CityCatalogue.seedCanonical()
         CityEventSystem.seedStage1Events()
 
-        val allCities = CityCatalogue.all()
-        android.util.Log.d("QuestSystem", "Seeding quests for ${allCities.size} cities")
+        // 1. REGISTER CANONICAL PROPHECY QUESTS
+        register(QuestEntry(
+            id = "quest_north_mist_vision", title = "Wizje we Mgle", description = "Aelion przemawia przez mgłę.", cityId = "wybrzeze_polnocne",
+            originType = QuestOriginType.LOKACJA_NPC, originRefId = "aelion", rewardGold = 75, objective = "Odszukaj Aeliona we mgle."
+        ))
+        register(QuestEntry(
+            id = "quest_aelion_relic", title = "Relikwia Aeliona", description = "Odzyskaj skradziony odłamek.", cityId = "wybrzeze_polnocne",
+            originType = QuestOriginType.LOKACJA_NPC, originRefId = "aelion", rewardGold = 250, objective = "Zwróć relikwię Aelionowi."
+        ))
 
-        allCities.forEach { city ->
-            val cityEvents = CityEventSystem.getEventsForCity(city.id)
-            android.util.Log.d("QuestSystem", "City ${city.id} has ${cityEvents.size} events")
-            cityEvents.forEach { event ->
-                val obj = when(event.id) {
-                    "north_mist_vision" -> "Udaj się na Wybrzeże i porozmawiaj z Aelionem we mgle."
-                    "north_lost_echo" -> "Zbadaj linię brzegową w poszukiwaniu echa."
-                    "crown_blood_toll" -> "Pokonaj wrogów na Równinach i złóż ofiarę z krwi."
-                    "crown_iron_forge" -> "Dostarcz rzadką rudę do Ferruna na Równinach."
-                    "heart_mirror_truth" -> "Spójrz w lustro w Sercu Krainy i pokonaj swoje odbicie."
-                    else -> "Zbadaj wydarzenie: ${event.title}"
-                }
-                register(
-                    QuestEntry(
-                        id = "quest_${event.id}",
-                        title = event.title,
-                        description = event.description,
-                        cityId = event.cityId,
-                        originType = QuestOriginType.ZDARZENIE_MIEJSKIE,
-                        originRefId = event.id,
-                        rewardGold = com.grimreich.core.GrimConstants.Economy.QUEST_REWARD_GOLD_STANDARD,
-                        objective = obj
-                    )
-                )
+        // 2. REGISTER 40+ NARRATIVE TEMPLATES (shuffled by seed)
+        val rand = java.util.Random(seed.toLong())
+        val templates = QuestRegistry.allTemplates.shuffled(rand)
+        templates.forEach { t ->
+            register(QuestEntry(
+                id = t.id, title = t.title, description = t.description, 
+                cityId = t.preferredCityId ?: CityCatalogue.all().random(kotlin.random.Random(seed + t.id.hashCode())).id,
+                originType = QuestOriginType.LOKACJA_PROCEDURALNA, originRefId = t.category, rewardGold = t.baseReward, objective = t.objective
+            ))
+        }
+
+        // 3. REGISTER CHAIN: BLOOD THAT WON'T DRY
+        QuestRegistry.bloodChain.stages.forEachIndexed { index, s ->
+            register(QuestEntry(
+                id = s.id, title = s.title, description = s.description, cityId = "rowniny_koronne",
+                originType = QuestOriginType.LOKACJA_PROCEDURALNA, originRefId = "Chain", rewardGold = s.baseReward, objective = s.objective,
+                requiredQuestIds = if (index > 0) listOf(QuestRegistry.bloodChain.stages[index-1].id) else emptyList()
+            ))
+        }
+
+        // 4. RESTORE PERSISTENT STATUSES
+        quests.values.toList().forEach { q ->
+            val status = when {
+                completedIds.contains(q.id) -> QuestStatus.UKONCZONE
+                activeIds.contains(q.id) -> QuestStatus.AKTYWNE
+                else -> QuestStatus.DOSTEPNE
             }
+            quests[q.id] = q.copy(status = status)
         }
 
-        val generatedLocations = ProceduralLocationGenerator.generate(seed = seed, count = 12)
-        android.util.Log.d("QuestSystem", "Generated ${generatedLocations.size} locations")
-        generatedLocations.forEach { location ->
-            register(location.toQuest())
-        }
+        // 5. LIMIT AVAILABLE POOL (Only 5 random available quests visible)
+        limitAvailablePool(seed)
+    }
 
-        // CUSTOM LOCATION QUESTS - Progressive unlock system
-        // Plains quest - unlocks after first Coastline quest completed
-        register(
-            QuestEntry(
-                id = "quest_heartland_grain_mystery",
-                title = "Tajemnica Zboża",
-                description = "Rolnicy mówią o dziwnych znakach na polach. Zbadaj równiny i odkryj prawdę.",
-                cityId = "serce_krainy",
-                originType = QuestOriginType.LOKACJA_PROCEDURALNA,
-                originRefId = "plains_mystery",
-                rewardGold = com.grimreich.core.GrimConstants.Economy.QUEST_REWARD_GOLD_CROWN,
-                objective = "Udaj się na równiny i zbadaj tajemnicze znaki.",
-                requiredQuestIds = listOf("quest_north_mist_vision")
-            )
-        )
+    private fun limitAvailablePool(seed: Int) {
+        val available = quests.values.filter { it.status == QuestStatus.DOSTEPNE }
+        if (available.size <= MAX_AVAILABLE_QUESTS) return
+
+        val rand = java.util.Random(seed.toLong())
+        val toKeep = available.shuffled(rand).take(MAX_AVAILABLE_QUESTS).map { it.id }.toSet()
         
-        // Forest quest - unlocks after Plains quest progress
-        register(
-            QuestEntry(
-                id = "quest_forest_ancient_grove",
-                title = "Pradawny Gaj",
-                description = "Stary drwal opowiada o zaginionym gaju, gdzie rosną drzewa pamiętające czasy przed Imperium.",
-                cityId = "serce_krainy",
-                originType = QuestOriginType.LOKACJA_PROCEDURALNA,
-                originRefId = "forest_grove",
-                rewardGold = com.grimreich.core.GrimConstants.Economy.QUEST_REWARD_GOLD_FOREST,
-                objective = "Znajdź pradawny gaj ukryty w głębi lasu.",
-                requiredQuestIds = listOf("quest_heartland_grain_mystery")
-            )
-        )
-
-        // SEED ENDGAME QUESTS
-        EndgameQuestChain.quests.forEach { eq ->
-            val obj = when(eq.id) {
-                "eq1_signs" -> "Odszukaj 3 kapliczki korupcji w Sercu Krainy."
-                "eq2_alliances" -> "Przekonaj frakcję Rycerzy do wsparcia Twojej sprawy."
-                "eq3_pilgrimage" -> "Dotrzyj do Bramy Absolutu i dokonaj ostatecznego wyboru."
-                else -> "Kontynuuj wątek główny."
-            }
-            register(
-                QuestEntry(
-                    id = eq.id,
-                    title = "[GŁÓWNY WĄTEK] ${eq.title}",
-                    description = eq.description,
-                    cityId = "serce_krainy", // Default to heartland for main plot
-                    originType = QuestOriginType.ZDARZENIE_MIEJSKIE,
-                    originRefId = eq.id,
-                    rewardGold = eq.rewards.gold,
-                    objective = obj
-                )
-            )
-        }
-
-        // EXAMPLE CITY NPC QUEST - Aelion's request
-        register(
-            QuestEntry(
-                id = "quest_aelion_relic",
-                title = "Relikwia Aeliona",
-                description = "Tajemniczy mędrzec Aelion prosi o odnalezienie zaginionej relikwii.",
-                cityId = "wybrzeze_polnocne",
-                originType = QuestOriginType.LOKACJA_NPC,
-                originRefId = "aelion",
-                rewardGold = 250,
-                objective = "Porozmawiaj z Aelionem na Wybrzeżu o jego relikwii."
-            )
-        )
+        // Temporarily hide available quests that weren't picked for this "turn"
+        val keysToRemove = available.filter { !toKeep.contains(it.id) }.map { it.id }
+        keysToRemove.forEach { quests.remove(it) }
     }
 
     fun register(entry: QuestEntry) {
@@ -223,7 +180,8 @@ object QuestSystem {
         originType = QuestOriginType.LOKACJA_PROCEDURALNA,
         originRefId = id,
         rewardGold = rewardGold,
-        objective = "Udaj się do lokalizacji i przetrwaj starcie."
+        objective = "Udaj się do lokalizacji i przetrwaj starcie.",
+        stabilityImpact = 0.05f
     )
     
     // Legacy API removed to avoid confusion
