@@ -5,64 +5,73 @@
     android:background="@color/grimBgUltraDark"
     android:fillViewport="true">
 
-    <FrameLayout
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
+            android:layout_centerInParent="true"
             android:orientation="vertical"
             android:gravity="center_horizontal"
-            android:paddingTop="64dp"
-            android:paddingBottom="64dp">
+            android:padding="16dp">
 
-        <ImageView
-            android:id="@+id/ivMainMenuLogo"
-            android:layout_width="400dp"
-            android:layout_height="250dp"
-            android:src="@drawable/logo_grimreich_full"
-            android:scaleType="fitCenter"
-            android:layout_marginBottom="48dp"
-            android:contentDescription="GrimReich Logo" />
+            <ImageView
+                android:id="@+id/ivMainMenuLogo"
+                android:layout_width="320dp"
+                android:layout_height="180dp"
+                android:src="@drawable/logo_grimreich_full"
+                android:scaleType="fitCenter"
+                android:layout_marginBottom="16dp"
+                android:contentDescription="GrimReich Logo" />
 
-        <Button
-            android:id="@+id/btnNewGame"
-            style="@style/GrimCombatButton"
-            android:layout_width="280dp"
-            android:layout_height="56dp"
-            android:text="NOWA GRA" />
+            <!-- HORIZONTAL BUTTON ROW -->
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center">
 
-        <Button
-            android:id="@+id/btnContinue"
-            style="@style/GrimCombatButton"
-            android:layout_width="280dp"
-            android:layout_height="56dp"
-            android:layout_marginTop="12dp"
-            android:text="KONTYNUACJA" />
+                <Button
+                    android:id="@+id/btnNewGame"
+                    style="@style/GrimCombatButton"
+                    android:layout_width="200dp"
+                    android:layout_height="64dp"
+                    android:text="NOWA GRA" />
 
-        <Button
-            android:id="@+id/btnExit"
-            style="@style/GrimCombatButton"
-            android:layout_width="280dp"
-            android:layout_height="56dp"
-            android:layout_marginTop="12dp"
-            android:text="WYJŚCIE" />
+                <Button
+                    android:id="@+id/btnContinue"
+                    style="@style/GrimCombatButton"
+                    android:layout_width="200dp"
+                    android:layout_height="64dp"
+                    android:layout_marginStart="8dp"
+                    android:text="KONTYNUACJA" />
 
-    </LinearLayout>
+                <Button
+                    android:id="@+id/btnExit"
+                    style="@style/GrimCombatButton"
+                    android:layout_width="200dp"
+                    android:layout_height="64dp"
+                    android:layout_marginStart="8dp"
+                    android:text="WYJŚCIE" />
 
-    <TextView
-        android:id="@+id/tvDevMenuTrigger"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
-        android:padding="16dp"
-        android:text="DEV"
-        android:textColor="@color/grimTextMuted"
-        android:textSize="10sp"
-        android:clickable="true"
-        android:focusable="true" />
+            </LinearLayout>
 
-    </FrameLayout>
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/tvDevMenuTrigger"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentEnd="true"
+            android:padding="24dp"
+            android:text="DEV"
+            android:textColor="@color/grimTextMuted"
+            android:textSize="14sp"
+            android:clickable="true"
+            android:focusable="true" />
+
+    </RelativeLayout>
 </ScrollView>

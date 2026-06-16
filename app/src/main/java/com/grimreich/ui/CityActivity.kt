@@ -96,12 +96,14 @@ class CityActivity : AppCompatActivity() {
         
         // Add PROPHET if exists in canonical data
         cityData?.prophet?.let { prophetName ->
-            // Special logic for one-time quest givers
-            val mainQuestDone = com.grimreich.systems.QuestSystem.all().any { 
-                it.cityId == cityId && it.originRefId == prophetName.lowercase() && it.status == com.grimreich.systems.QuestStatus.UKONCZONE 
+            // Robust logic for one-time NPCs: check if ANY quest from this NPC is completed
+            val isNpcFinished = com.grimreich.systems.QuestSystem.all().any { 
+                it.cityId == cityId && 
+                (it.originRefId == prophetName.lowercase() || it.id.contains(prophetName.lowercase())) && 
+                it.status == com.grimreich.systems.QuestStatus.UKONCZONE 
             }
             
-            if (!mainQuestDone) {
+            if (!isNpcFinished) {
                 val prophetBtn = Button(androidx.appcompat.view.ContextThemeWrapper(this, R.style.GrimRegionButton), null, 0).apply {
                     text = "$prophetName (PROROK)"
                     setTextColor(android.graphics.Color.parseColor("#FFD700")) // GOLD

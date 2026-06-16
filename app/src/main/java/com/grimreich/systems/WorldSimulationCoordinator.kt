@@ -46,7 +46,7 @@ object WorldSimulationCoordinator {
     }
 
     private fun updateCollapse(snapshot: WorldSnapshot, context: SimulationTickContext) {
-        // Logic for Program 3
+        CollapseAI2_0.processCollapse(snapshot, context)
         if (snapshot.regionState.stability < (com.grimreich.core.GrimConstants.World.STABILITY_CRITICAL_THRESHOLD / 100f)) {
             ChronicleSystem.record("KOLAPS: Rzeczywistość zaczyna się zapadać.", 3)
         }

@@ -29,7 +29,9 @@ data class QuestEntry(
     val rewardGold: Int,
     val status: QuestStatus = QuestStatus.DOSTEPNE,
     val requiredQuestIds: List<String> = emptyList(),
-    val objective: String = "Brak szczegółowych wytycznych."
+    val objective: String = "Brak szczegółowych wytycznych.",
+    val stabilityImpact: Float = 0.02f, // Positive increases stability
+    val collapseSlowdown: Float = 0.01f  // Reduces progress
 )
 
 object QuestSystem {
@@ -180,11 +182,17 @@ object QuestSystem {
         quests[questId] = updated
         
         // DISTRIBUTE REWARDS
-        GameRepository.state.gold += quest.rewardGold
+        val state = GameRepository.state
+        state.gold += quest.rewardGold
         ReputationSystem.modify(quest.cityId, CityFaction.COMMONERS, 5)
         
+        // APPLY WORLD IMPACT
+        val stabilityGain = (quest.stabilityImpact * 100).toInt()
+        state.world.globalStability = (state.world.globalStability + stabilityGain).coerceIn(0, 100)
+        state.world.collapseProgress = (state.world.collapseProgress - quest.collapseSlowdown).coerceAtLeast(0f)
+        
         // Record in chronicle
-        ChronicleSystem.record("Ukończono zadanie: ${quest.title}. Zyskano ${quest.rewardGold} złota.", importance = 2)
+        ChronicleSystem.record("Ukończono zadanie: ${quest.title}. Stabilność świata: ${state.world.globalStability}%", importance = 2)
         
         return updated
     }
