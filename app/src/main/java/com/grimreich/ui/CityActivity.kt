@@ -183,7 +183,7 @@ class CityActivity : AppCompatActivity() {
                 setOnClickListener {
                     val intent = Intent(this@CityActivity, DialogueActivity::class.java).apply {
                         putExtra("npcName", quest.originRefId)
-                        putExtra("npcRole", "QUEST")
+                        putExtra("npcRole", quest.originRefId) // USE NPC ID AS ROLE FOR PORTRAITS
                         putExtra("startNodeId", "${quest.originRefId}_quest_start")
                     }
                     startActivity(intent)
@@ -192,48 +192,6 @@ class CityActivity : AppCompatActivity() {
             container.addView(questBtn, 0)
         }
 
-        // 2. FIELD QUESTS (Coastline, Plains, Forest)
-        val hasCoastlineQuest = state.quest.activeQuests.contains("quest_north_mist_vision") ||
-                                 state.quest.activeQuests.contains("quest_north_lost_echo")
-
-        if (hasCoastlineQuest) {
-            val coastBtn = Button(androidx.appcompat.view.ContextThemeWrapper(this, R.style.GrimRegionButton), null, 0).apply {
-                text = "⚠ IDŹ NA WYBRZEŻE [QUEST]"
-                setOnClickListener {
-                    startActivity(Intent(this@CityActivity, CoastlineActivity::class.java))
-                }
-            }
-            container.addView(coastBtn, 0)
-        }
-
-        val hasPlainsQuest = state.quest.activeQuests.contains("quest_heartland_grain_mystery") ||
-                             state.quest.completedQuests.contains("quest_north_mist_vision")
-        if (hasPlainsQuest) {
-            val plainsBtn = Button(androidx.appcompat.view.ContextThemeWrapper(this, R.style.GrimRegionButton), null, 0).apply {
-                text = "⚠ IDŹ NA RÓWNINY [QUEST]"
-                setOnClickListener {
-                    val intent = Intent(this@CityActivity, QuestLocationActivity::class.java).apply {
-                        putExtra("questId", "quest_heartland_grain_mystery")
-                    }
-                    startActivity(intent)
-                }
-            }
-            container.addView(plainsBtn, 0)
-        }
-        
-        val hasForestQuest = state.quest.activeQuests.contains("quest_forest_ancient_grove") ||
-                            state.quest.completedQuests.contains("quest_heartland_grain_mystery")
-        if (hasForestQuest) {
-            val forestBtn = Button(androidx.appcompat.view.ContextThemeWrapper(this, R.style.GrimRegionButton), null, 0).apply {
-                text = "⚠ IDŹ DO LASU [QUEST]"
-                setOnClickListener {
-                    val intent = Intent(this@CityActivity, QuestLocationActivity::class.java).apply {
-                        putExtra("questId", "quest_forest_ancient_grove")
-                    }
-                    startActivity(intent)
-                }
-            }
-            container.addView(forestBtn, 0)
-        }
+        // 2. FIELD QUESTS REMOVED FROM CITY - Moved to Hub exclusively
     }
 }

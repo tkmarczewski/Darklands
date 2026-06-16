@@ -87,6 +87,7 @@ object TravelSystem {
         } ?: TravelPartyState())
         
         w.location = com.grimreich.world.CityCatalogue.get(regionId)?.name ?: regionId
+        g.grimCurrentRegion = regionId // UPDATE CANONICAL REGION ID
         w.fatigue = newParty.fatigue
         w.day += (travelResult.hoursSpent / 12).coerceAtLeast(1)
         w.timeOfDay = if (newParty.totalHoursTraveled % 24 > 12) "evening" else "afternoon"

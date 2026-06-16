@@ -222,10 +222,20 @@ object DialogueManager {
             id = "aelion_quest_start", npcId = "aelion",
             text = "Relikwia... pęknięty odłamek pierwszego lustra. Został skradziony przez upiory na północy. Odzyskaj go, a może mgła oszczędzi Twoje imię.",
             choices = listOf(
+                DialogueChoice("Odzyskałem relikwię (ODDAJ).", "aelion_quest_finish"),
                 DialogueChoice("Zrobię to.", "end", onSelect = {
                     com.grimreich.systems.QuestSystem.activate("quest_aelion_relic")
                 }),
                 DialogueChoice("Może innym razem.", "end")
+            )
+        ))
+        registerNode(DialogueNode(
+            id = "aelion_quest_finish", npcId = "aelion",
+            text = "Cisza... słyszysz ją? To relikwia znów spoczywa w moich dłoniach. Twoja rola tutaj dobiegła końca, wędrowcze. Moja obecność w tym miejscu również wygasa.",
+            choices = listOf(
+                DialogueChoice("Do zobaczenia w Absolucie.", "end", onSelect = {
+                    com.grimreich.systems.QuestSystem.complete("quest_aelion_relic")
+                })
             )
         ))
         registerNode(DialogueNode(
