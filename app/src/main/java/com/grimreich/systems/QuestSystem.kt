@@ -171,6 +171,12 @@ object QuestSystem {
         val quest = quests[questId] ?: error("Nieznane zadanie: $questId")
         val updated = quest.copy(status = QuestStatus.AKTYWNE)
         quests[questId] = updated
+        
+        // Sync with GameState
+        if (!GameRepository.state.quest.activeQuests.contains(questId)) {
+            GameRepository.state.quest.activeQuests.add(questId)
+        }
+        
         return updated
     }
 
@@ -181,8 +187,14 @@ object QuestSystem {
         val updated = quest.copy(status = QuestStatus.UKONCZONE)
         quests[questId] = updated
         
-        // DISTRIBUTE REWARDS
+        // Sync with GameState
         val state = GameRepository.state
+        state.quest.activeQuests.remove(questId)
+        if (!state.quest.completedQuests.contains(questId)) {
+            state.quest.completedQuests.add(questId)
+        }
+        
+        // DISTRIBUTE REWARDS
         state.gold += quest.rewardGold
         ReputationSystem.modify(quest.cityId, CityFaction.COMMONERS, 5)
         

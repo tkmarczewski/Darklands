@@ -141,13 +141,11 @@ class HubActivity : AppCompatActivity() {
         val container = findViewById<LinearLayout>(R.id.fieldQuestContainer) ?: return
         container.removeAllViews()
 
-        // 1. COASTLINE QUESTS
-        val hasCoastlineQuest = state.quest.activeQuests.contains("quest_north_mist_vision") ||
-                                 state.quest.activeQuests.contains("quest_north_lost_echo")
-
-        if (hasCoastlineQuest) {
+        // 1. COASTLINE QUESTS - Only show if ACTIVE
+        if (state.quest.activeQuests.contains("quest_north_mist_vision") || 
+            state.quest.activeQuests.contains("quest_north_lost_echo")) {
             val btn = Button(this).apply {
-                text = "⚠ WYBRZEŻE [QUEST]"
+                text = "⚠ WYBRZEŻE [AKTYWNE]"
                 styleToGrim()
                 setOnClickListener {
                     startActivity(Intent(this@HubActivity, CoastlineActivity::class.java))
@@ -156,12 +154,10 @@ class HubActivity : AppCompatActivity() {
             container.addView(btn)
         }
 
-        // 2. HEARTLAND QUESTS (Plains/Forest)
-        val hasPlainsQuest = state.quest.activeQuests.contains("quest_heartland_grain_mystery") ||
-                             state.quest.completedQuests.contains("quest_north_mist_vision")
-        if (hasPlainsQuest) {
+        // 2. HEARTLAND QUESTS (Plains/Forest) - Only show if ACTIVE
+        if (state.quest.activeQuests.contains("quest_heartland_grain_mystery")) {
             val btn = Button(this).apply {
-                text = "⚠ RÓWNINY [QUEST]"
+                text = "⚠ RÓWNINY [AKTYWNE]"
                 styleToGrim()
                 setOnClickListener {
                     val intent = Intent(this@HubActivity, QuestLocationActivity::class.java).apply {
@@ -173,11 +169,9 @@ class HubActivity : AppCompatActivity() {
             container.addView(btn)
         }
         
-        val hasForestQuest = state.quest.activeQuests.contains("quest_forest_ancient_grove") ||
-                            state.quest.completedQuests.contains("quest_heartland_grain_mystery")
-        if (hasForestQuest) {
+        if (state.quest.activeQuests.contains("quest_forest_ancient_grove")) {
             val btn = Button(this).apply {
-                text = "⚠ LAS [QUEST]"
+                text = "⚠ LAS [AKTYWNE]"
                 styleToGrim()
                 setOnClickListener {
                     val intent = Intent(this@HubActivity, QuestLocationActivity::class.java).apply {

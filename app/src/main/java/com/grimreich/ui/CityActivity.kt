@@ -96,10 +96,9 @@ class CityActivity : AppCompatActivity() {
         
         // Add PROPHET if exists in canonical data
         cityData?.prophet?.let { prophetName ->
-            // Robust logic for one-time NPCs: check if ANY quest from this NPC is completed
+            // UNIVERSAL HIDING LOGIC: Hide NPC if their specific associated quest is finished
             val isNpcFinished = com.grimreich.systems.QuestSystem.all().any { 
-                it.cityId == cityId && 
-                (it.originRefId == prophetName.lowercase() || it.id.contains(prophetName.lowercase())) && 
+                (it.originRefId.lowercase() == prophetName.lowercase() || it.id.contains(prophetName.lowercase())) &&
                 it.status == com.grimreich.systems.QuestStatus.UKONCZONE 
             }
             
