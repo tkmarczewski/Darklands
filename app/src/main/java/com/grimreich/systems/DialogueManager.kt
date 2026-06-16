@@ -79,6 +79,47 @@ object DialogueManager {
         seedExtendedNpcDialogues()
         seedProceduralBase()
         seedEchoDialogues()
+        seedVerdictDialogues()
+    }
+
+    private fun seedVerdictDialogues() {
+        // ELDRAN - ACCUSER
+        registerNode(DialogueNode(
+            id = "verdict_accuse_start", npcId = "eldran",
+            text = "[WYMAZANO]... Twoje imię widnieje w aktach Projektu Arcturus. Masz wiedzę o sprawach, które zostały zamknięte przez Trybunał. To czyni Cię winnym kwestionowania porządku Absolutu.",
+            choices = listOf(
+                DialogueChoice("Nie boję się Twoich cieni.", "verdict_accuse_defy"),
+                DialogueChoice("O jakich sprawach mówisz?", "verdict_accuse_info")
+            )
+        ))
+        registerNode(DialogueNode(
+            id = "verdict_accuse_info", npcId = "eldran",
+            text = "Urzędnik, Archiwistka, Fabryka... każda z tych osób była WINNA. Trybunał wydał wyrok, a Ty drążysz w popiele. Jeśli chcesz uniknąć wymazania, znajdź dowód na swój błąd w gabinecie urzędnika.",
+            choices = listOf(
+                DialogueChoice("Zrobię to.", "end", onSelect = {
+                    com.grimreich.systems.QuestSystem.activate("q_verdict_1")
+                })
+            )
+        ))
+
+        // RAVENN - INVITER
+        registerNode(DialogueNode(
+            id = "verdict_invite_start", npcId = "ravenn",
+            text = "Słyszałem, że nie boisz się patrzeć tam, gdzie inni odwracają wzrok. Ktoś tu wydaje wyroki, których nikt nie podpisał. Nie ma sędziów, są tylko autorzy.",
+            choices = listOf(
+                DialogueChoice("Pomogę Ci to zbadać.", "verdict_invite_accept"),
+                DialogueChoice("To nie moja sprawa.", "end")
+            )
+        ))
+        registerNode(DialogueNode(
+            id = "verdict_invite_accept", npcId = "ravenn",
+            text = "Zacznij od gabinetu urzędnika. Zobacz, co zostało z jego cienia. Trybunał nie zabija ciał, on zabija tożsamości.",
+            choices = listOf(
+                DialogueChoice("Idę tam.", "end", onSelect = {
+                    com.grimreich.systems.QuestSystem.activate("q_verdict_1")
+                })
+            )
+        ))
     }
 
     private fun seedEchoDialogues() {

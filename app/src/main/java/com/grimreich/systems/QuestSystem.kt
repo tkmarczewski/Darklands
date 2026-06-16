@@ -88,6 +88,7 @@ object QuestSystem {
         }
 
         // 4. REGISTER CHAIN: THE VERDICT NO ONE ISSUED
+        // NOTE: These are NOT part of the random pool, they are triggered by city visits
         QuestRegistry.verdictChain.stages.forEachIndexed { index, s ->
             register(QuestEntry(
                 id = s.id, title = s.title, description = s.description, cityId = "serce_krainy",
@@ -112,13 +113,16 @@ object QuestSystem {
 
     private fun limitAvailablePool(seed: Int) {
         val available = quests.values.filter { it.status == QuestStatus.DOSTEPNE }
-        if (available.size <= MAX_AVAILABLE_QUESTS) return
+        // DONT HIDE CHAIN QUESTS OR CANONICAL ONES
+        val pool = available.filter { it.originType == QuestOriginType.LOKACJA_PROCEDURALNA && !it.id.contains("verdict") }
+        
+        if (pool.size <= MAX_AVAILABLE_QUESTS) return
 
         val rand = java.util.Random(seed.toLong())
-        val toKeep = available.shuffled(rand).take(MAX_AVAILABLE_QUESTS).map { it.id }.toSet()
+        val toKeep = pool.shuffled(rand).take(MAX_AVAILABLE_QUESTS).map { it.id }.toSet()
         
         // Temporarily hide available quests that weren't picked for this "turn"
-        val keysToRemove = available.filter { !toKeep.contains(it.id) }.map { it.id }
+        val keysToRemove = pool.filter { !toKeep.contains(it.id) }.map { it.id }
         keysToRemove.forEach { quests.remove(it) }
     }
 
@@ -145,6 +149,12 @@ object QuestSystem {
         }
         
         // DYNAMIC LOCATION: If quest has a preferred city, "discover" it if not already there
+        val template = QuestRegistry.allTemplates.find { it.id == questId } ?: QuestRegistry.verdictChain.stages.find { it.id == questId }
+        template?.preferredCityId?.let { cityId ->
+            if (!state.world.discoveredLocations.contains(cityId)) {
+                state.world.discoveredLocations.add(cityId)
+            }
+        }
         if (!state.world.discoveredLocations.contains(quest.cityId)) {
             state.world.discoveredLocations.add(quest.cityId)
         }

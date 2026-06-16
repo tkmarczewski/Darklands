@@ -15,5 +15,6 @@ data class WorldState(
     var echoIntensity: Float = 0.0f, // 0.0 - 1.0 (Era of Fracture)
     var collapseProgress: Float = 0.0f, // 0.0 - 1.0 (Transition to 2.0)
     var ontologicalLevel: OntologicalLevel = OntologicalLevel.MATERIAL,
-    val discoveredLocations: MutableList<String> = mutableListOf()
+    val discoveredLocations: MutableList<String> = mutableListOf(),
+    var cityEntryCount: Int = 0 // TRACKS VISITS FOR VERDICT CAMPAIGN
 )

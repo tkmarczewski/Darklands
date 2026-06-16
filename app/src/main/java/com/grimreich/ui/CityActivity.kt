@@ -79,6 +79,20 @@ class CityActivity : AppCompatActivity() {
 
         // Zdarzenia losowe w mieście
         com.grimreich.systems.RandomEventManager.triggerCityEvent(this)
+
+        // VERDICT CAMPAIGN BREADCRUMBS
+        handleVerdictBreadcrumbs()
+    }
+
+    private fun handleVerdictBreadcrumbs() {
+        val state = GameRepository.state
+        state.world.cityEntryCount++
+        
+        when (state.world.cityEntryCount) {
+            1 -> UiUtils.showNarrativePopup(this, "WIEŚCI Z MIASTA", "Przy bramie strażnik rzuca mimochodem: \"Ostatnio u nas niespokojnie… jednego urzędnika znaleźli martwego w gabinecie. Bez śladów. Na ścianie wypalono: WYROK WYKONANY.\"")
+            3 -> UiUtils.showNarrativePopup(this, "KRONIKA ZAGINIĘĆ", "Na tablicy ogłoszeń widzisz świeży pergamin: ZAGINĘŁA ARCHIWISTKA IMPERIUM. Mieszkanie puste, na drzwiach runa: WYMAZANA.")
+            5 -> UiUtils.showNarrativePopup(this, "TRAGEDIA W FABRYCE", "Ludzie szepczą o eksplozji w fabryce zbrojeniowej. Dziewiętnaście trupów bez ran. Na ścianie wypalono jedno słowo: WINNI.")
+        }
     }
 
     override fun onResume() {
@@ -97,8 +111,28 @@ class CityActivity : AppCompatActivity() {
         val container = findViewById<LinearLayout>(R.id.npcListContainer)
         container.removeAllViews()
 
+        val state = GameRepository.state
         val cityData = CityCatalogue.get(cityId)
         
+        // CHECK FOR VERDICT TRIGGER NPC
+        if (state.world.cityEntryCount >= 7 && !state.quest.completedQuests.contains("q_verdict_1")) {
+            val isAccused = (state.world.cityEntryCount % 2 == 0) // Randomly choose variant
+            val npcName = if (isAccused) "Eldran" else "Ravenn"
+            val npcBtn = Button(androidx.appcompat.view.ContextThemeWrapper(this, R.style.GrimRegionButton), null, 0).apply {
+                text = if (isAccused) "$npcName (STRAŻNIK)" else "$npcName (ŚLEDCZY)"
+                setTextColor(android.graphics.Color.RED)
+                setOnClickListener {
+                    val intent = Intent(this@CityActivity, DialogueActivity::class.java).apply {
+                        putExtra("npcName", npcName)
+                        putExtra("npcRole", if (isAccused) "soldier" else "priest")
+                        putExtra("startNodeId", if (isAccused) "verdict_accuse_start" else "verdict_invite_start")
+                    }
+                    startActivity(intent)
+                }
+            }
+            container.addView(npcBtn)
+        }
+
         // Add PROPHET if exists in canonical data
         cityData?.prophet?.let { prophetName ->
             // UNIVERSAL HIDING LOGIC: Hide NPC if their specific associated quest is finished
@@ -137,51 +171,50 @@ class CityActivity : AppCompatActivity() {
 
             if (!isKnownQuestGiver || hasActiveTasks) {
                 val btn = Button(androidx.appcompat.view.ContextThemeWrapper(this, R.style.GrimRegionButton), null, 0).apply {
-                text = "${npc.name} (${npc.role})"
-                
-                // Set NPC portrait from role if available
-                val portraitId = DialogueManager.getPortrait(npc.role)
-                // In a real list we'd use icons, for now we keep simple buttons
-                
-                setOnClickListener {
-                    val intent = Intent(this@CityActivity, DialogueActivity::class.java).apply {
-                        putExtra("npcName", npc.name)
-                        putExtra("npcRole", npc.role)
-                        putExtra("startNodeId", npc.startNodeId)
-                        putExtra("portrait", portraitId)
-                    }
-                    startActivity(intent)
-                }
-            }
-            container.addView(btn)
-        }
-    }
-
-    // 2. MATERIALIZE ECHOES OF PAST HEROES
-    val stability = GameRepository.state.world.globalStability
-    if (stability < com.grimreich.core.GrimConstants.World.ECHO_MANIFESTATION_THRESHOLD) {
-        val maxChance = com.grimreich.core.GrimConstants.World.ECHO_MAX_CHANCE
-        val echoChance = (100 - stability) * (maxChance / 100f)
-        if (kotlin.random.Random.nextFloat() < echoChance) {
-            com.grimreich.core.EchoSystem.getRandomEcho()?.let { echo ->
-                val echoBtn = Button(androidx.appcompat.view.ContextThemeWrapper(this, R.style.GrimRegionButton), null, 0).apply {
-                    text = "ECHO: ${echo.name} (${echo.currentCareer?.name ?: "Brak"})"
-                    setTextColor(android.graphics.Color.parseColor("#40FFFFFF")) // Ghostly white
+                    text = "${npc.name} (${npc.role})"
+                    
+                    // Set NPC portrait from role if available
+                    val portraitId = DialogueManager.getPortrait(npc.role)
+                    
                     setOnClickListener {
                         val intent = Intent(this@CityActivity, DialogueActivity::class.java).apply {
-                            putExtra("npcName", echo.name)
-                            putExtra("npcRole", "ECHO")
-                            putExtra("startNodeId", "echo_start")
-                            putExtra("portrait", echo.portraitRes)
+                            putExtra("npcName", npc.name)
+                            putExtra("npcRole", npc.role)
+                            putExtra("startNodeId", npc.startNodeId)
+                            putExtra("portrait", portraitId)
                         }
                         startActivity(intent)
                     }
                 }
-                findViewById<LinearLayout>(R.id.npcListContainer).addView(echoBtn, 0) // Always at top
+                container.addView(btn)
+            }
+        }
+
+        // 2. MATERIALIZE ECHOES OF PAST HEROES
+        val stability = GameRepository.state.world.globalStability
+        if (stability < com.grimreich.core.GrimConstants.World.ECHO_MANIFESTATION_THRESHOLD) {
+            val maxChance = com.grimreich.core.GrimConstants.World.ECHO_MAX_CHANCE
+            val echoChance = (100 - stability) * (maxChance / 100f)
+            if (kotlin.random.Random.nextFloat() < echoChance) {
+                com.grimreich.core.EchoSystem.getRandomEcho()?.let { echo ->
+                    val echoBtn = Button(androidx.appcompat.view.ContextThemeWrapper(this, R.style.GrimRegionButton), null, 0).apply {
+                        text = "ECHO: ${echo.name} (${echo.currentCareer?.name ?: "Brak"})"
+                        setTextColor(android.graphics.Color.parseColor("#40FFFFFF")) // Ghostly white
+                        setOnClickListener {
+                            val intent = Intent(this@CityActivity, DialogueActivity::class.java).apply {
+                                putExtra("npcName", echo.name)
+                                putExtra("npcRole", "ECHO")
+                                putExtra("startNodeId", "echo_start")
+                                putExtra("portrait", echo.portraitRes)
+                            }
+                            startActivity(intent)
+                        }
+                    }
+                    container.addView(echoBtn, 0) // Always at top
+                }
             }
         }
     }
-}
 
     private fun renderQuestButtons() {
         val state = GameRepository.state

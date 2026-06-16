@@ -35,14 +35,15 @@ class MapActivity : AppCompatActivity() {
             R.id.point_wild_lands to "ziemie_dzikie"
         )
 
-        val discovered = com.grimreich.core.GameRepository.state.world.discoveredLocations
+        val state = com.grimreich.core.GameRepository.state
+        val discovered = state.world.discoveredLocations
 
         mapping.forEach { (viewId, cityId) ->
             val view = findViewById<View>(viewId)
             
-            // DYNAMIC VISIBILITY: Show only discovered or canonical locations
-            // For now, canonical are always visible, but we can extend this
-            // view?.visibility = if (discovered.contains(cityId) || isCanonical(cityId)) View.VISIBLE else View.GONE
+            // DYNAMIC VISIBILITY: Show only discovered locations (except starting area)
+            val isPermanent = cityId == "wybrzeze_polnocne" || cityId == "serce_krainy"
+            view?.visibility = if (isPermanent || discovered.contains(cityId)) View.VISIBLE else View.GONE
 
             view?.setOnClickListener {
                 val city = CityCatalogue.get(cityId)
