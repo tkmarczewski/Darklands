@@ -53,5 +53,6 @@
         <activity android:name=".ui.DialogueActivity" android:exported="false" android:screenOrientation="landscape"/>
         <activity android:name=".ui.RecruitmentActivity" android:exported="false" android:screenOrientation="landscape"/>
         <activity android:name=".ui.QuestJournalActivity" android:exported="false" android:screenOrientation="landscape"/>
+        <activity android:name=".ui.QuestLocationActivity" android:exported="false" android:screenOrientation="landscape"/>
     </application>
 </manifest>
