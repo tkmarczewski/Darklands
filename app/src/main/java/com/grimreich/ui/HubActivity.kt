@@ -141,43 +141,30 @@ class HubActivity : AppCompatActivity() {
         val container = findViewById<LinearLayout>(R.id.fieldQuestContainer) ?: return
         container.removeAllViews()
 
-        // 1. COASTLINE QUESTS - Only show if ACTIVE
-        if (state.quest.activeQuests.contains("quest_north_mist_vision") || 
-            state.quest.activeQuests.contains("quest_north_lost_echo")) {
+        // 1. COLLECT ALL ACTIVE FIELD QUESTS
+        val activeFieldQuests = state.quest.activeQuests.mapNotNull { com.grimreich.systems.QuestSystem.getQuest(it) }
+            .filter { it.originType == com.grimreich.systems.QuestOriginType.LOKACJA_PROCEDURALNA }
+
+        activeFieldQuests.forEach { quest ->
             val btn = Button(this).apply {
-                text = "⚠ WYBRZEŻE [AKTYWNE]"
+                text = "⚠ EKSPEDYCJA: ${quest.title}"
                 styleToGrim()
                 setOnClickListener {
-                    startActivity(Intent(this@HubActivity, CoastlineActivity::class.java))
+                    // Logic to start combat or location activity
+                    state.pendingQuestId = quest.id
+                    startActivity(Intent(this@HubActivity, CombatActivity::class.java))
                 }
             }
             container.addView(btn)
         }
 
-        // 2. HEARTLAND QUESTS (Plains/Forest) - Only show if ACTIVE
-        if (state.quest.activeQuests.contains("quest_heartland_grain_mystery")) {
+        // 2. NARRATIVE CANONICALS (Manual check for legacy ones if not in QuestSystem)
+        if (state.quest.activeQuests.contains("quest_north_mist_vision")) {
             val btn = Button(this).apply {
-                text = "⚠ RÓWNINY [AKTYWNE]"
+                text = "⚠ WYBRZEŻE [AKTYWNE]"
                 styleToGrim()
                 setOnClickListener {
-                    val intent = Intent(this@HubActivity, QuestLocationActivity::class.java).apply {
-                        putExtra("questId", "quest_heartland_grain_mystery")
-                    }
-                    startActivity(intent)
-                }
-            }
-            container.addView(btn)
-        }
-        
-        if (state.quest.activeQuests.contains("quest_forest_ancient_grove")) {
-            val btn = Button(this).apply {
-                text = "⚠ LAS [AKTYWNE]"
-                styleToGrim()
-                setOnClickListener {
-                    val intent = Intent(this@HubActivity, QuestLocationActivity::class.java).apply {
-                        putExtra("questId", "quest_forest_ancient_grove")
-                    }
-                    startActivity(intent)
+                    startActivity(Intent(this@HubActivity, CoastlineActivity::class.java))
                 }
             }
             container.addView(btn)

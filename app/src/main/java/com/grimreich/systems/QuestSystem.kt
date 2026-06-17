@@ -165,31 +165,35 @@ object QuestSystem {
     }
 
     private fun limitQuestPool(seed: Int) {
-        val specialIds = setOf("quest_north_mist_vision", "quest_aelion_relic")
-        val verdictIds = QuestRegistry.verdictChain.stages.map { it.id }.toSet()
-        val bloodIds = QuestRegistry.bloodChain.stages.map { it.id }.toSet()
-
-        // Policz aktualnie widoczne (DOSTEPNE + AKTYWNE)
+        // 1. Identify "Protected" quests (Active ones or critical chains already started)
         val active = quests.values.filter { it.status == QuestStatus.AKTYWNE }
-        val available = quests.values.filter { it.status == QuestStatus.DOSTEPNE }
-
-        val totalVisible = active.size + available.size
-
-        if (totalVisible <= MAX_TOTAL_QUESTS) return
-
-        // Kandydaci do usuniecia: proceduralne (nie specjalne, nie Verdict, nie Blood aktywne/ukonczone)
-        val removable = available.filter {
-            !specialIds.contains(it.id) &&
-            !verdictIds.contains(it.id) &&
-            !bloodIds.contains(it.id)
+        val specialIds = setOf("quest_north_mist_vision", "quest_aelion_relic")
+        
+        // 2. Available candidates for the pool (Available procedural or unstarted chains)
+        val availableCandidates = quests.values.filter { it.status == QuestStatus.DOSTEPNE }
+        
+        // 3. Strictly limit Total (Active + Available) to 5
+        val maxAvailable = (MAX_TOTAL_QUESTS - active.size).coerceAtLeast(0)
+        
+        if (availableCandidates.size > maxAvailable) {
+            val rand = java.util.Random(seed.toLong())
+            // Prioritize special/chain quests if they are available
+            val prioritized = availableCandidates.filter { specialIds.contains(it.id) || it.originRefId == "Verdict" || it.originRefId == "Chain" }
+            val others = availableCandidates.filter { !prioritized.contains(it) }
+            
+            val toKeep = (prioritized + others.shuffled(rand)).take(maxAvailable).map { it.id }.toSet()
+            
+            availableCandidates.forEach { if (!toKeep.contains(it.id)) quests.remove(it.id) }
         }
 
-        val toRemoveCount = totalVisible - MAX_TOTAL_QUESTS
-        if (removable.isEmpty()) return
-
-        val rand = java.util.Random(seed.toLong())
-        val toRemove = removable.shuffled(rand).take(toRemoveCount)
-        toRemove.forEach { quests.remove(it.id) }
+        // 4. VERDICT HIDER: Hide Verdict quests unless triggered by NPC (visit 7+)
+        val cityCount = GameRepository.state.world.cityEntryCount
+        QuestRegistry.verdictChain.stages.forEach { stage ->
+            val q = quests[stage.id] ?: return@forEach
+            if (q.status == QuestStatus.DOSTEPNE && cityCount < 7) {
+                quests.remove(q.id) 
+            }
+        }
     }
 
     fun register(entry: QuestEntry) {

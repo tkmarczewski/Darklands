@@ -75,7 +75,10 @@ class RecruitmentActivity : AppCompatActivity() {
 
         state.gold -= 100
         state.hireableHeroes.remove(hero)
+        
+        // CRITICAL: Ensure we don't accidentally replace the active hero if list is manipulated
         state.party.add(hero)
+
         render()
         Toast.makeText(this, "${hero.name} dołączył do drużyny!", Toast.LENGTH_SHORT).show()
     }

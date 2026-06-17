@@ -174,25 +174,21 @@ object CombatSystem {
     }
 
     fun startEncounterForQuest(questId: String) {
-        // Select encounter based on quest type/origin
-        val (name, hp, atk) = when {
-            questId.contains("blood") || questId.contains("korwi") ->
-                Triple("Demon Krwi", 60, 14)
-            questId.contains("shadow") || questId.contains("cien") || questId.contains("twierdza") ->
-                Triple("Strażnik Cienia", 55, 12)
-            questId.contains("cult") || questId.contains("kapliczka") ->
-                Triple("Kapłan Kultu", 45, 10)
-            questId.contains("skeleton") || questId.contains("katakomby") ->
-                Triple("Szkielet-Wojownik", 40, 9)
-            questId.contains("zgliszcza") || questId.contains("ruins") ->
-                Triple("Strzyga z Zgliszcz", 50, 11)
-            questId.contains("zakon") || questId.contains("order") ->
-                Triple("Rycerz Ciemności", 65, 13)
-            questId.contains("eq") -> // Endgame quests
-                Triple("Arcydemon Korupcji", 80, 16)
-            else ->
-                Triple("Potworna Istota", 45, 10)
+        val template = QuestRegistry.allTemplates.find { it.id == questId }
+            ?: QuestRegistry.bloodChain.stages.find { it.id == questId }
+            ?: QuestRegistry.verdictChain.stages.find { it.id == questId }
+
+        if (template != null) {
+            val stats = template.enemyStats ?: QuestRegistry.EnemyStats("Potworna Istota", 45, 10, 5)
+            startCombat(stats.name, stats.hp, stats.atk, stats.def)
+        } else {
+            // Fallback for legacy or untemplated quests
+            val (name, hp, atk) = when {
+                questId.contains("blood") || questId.contains("korwi") -> Triple("Demon Krwi", 60, 14)
+                questId.contains("shadow") || questId.contains("cien") -> Triple("Strażnik Cienia", 55, 12)
+                else -> Triple("Potworna Istota", 45, 10)
+            }
+            startCombat(name, hp, atk, atk / 2)
         }
-        startCombat(name, hp, atk, atk / 2)
     }
 }

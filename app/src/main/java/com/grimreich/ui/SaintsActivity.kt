@@ -18,14 +18,16 @@ class SaintsActivity : AppCompatActivity() {
         render()
 
         findViewById<Button>(R.id.btnPray).setOnClickListener {
-            val hero = GameRepository.state.party.firstOrNull() ?: return@setOnClickListener
+            val state = GameRepository.state
+            val hero = state.party.find { it.id == state.activeHeroId } ?: state.party.firstOrNull() ?: return@setOnClickListener
             val msg = ChurchSystem.pray(hero)
             Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
             render()
         }
 
         findViewById<Button>(R.id.btnCleanse).setOnClickListener {
-            val hero = GameRepository.state.party.firstOrNull() ?: return@setOnClickListener
+            val state = GameRepository.state
+            val hero = state.party.find { it.id == state.activeHeroId } ?: state.party.firstOrNull() ?: return@setOnClickListener
             val msg = ChurchSystem.cleanseRelic(hero)
             Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
             render()
