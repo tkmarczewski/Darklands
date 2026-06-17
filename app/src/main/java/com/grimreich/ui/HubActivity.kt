@@ -72,7 +72,7 @@ class HubActivity : AppCompatActivity() {
             startActivity(Intent(this, SaintsActivity::class.java)) 
         }
         findViewById<Button>(R.id.openCityEvents)?.setOnClickListener {
-             startActivity(Intent(this, CityEventsActivity::class.java))
+             startActivity(Intent(this, WorldLogActivity::class.java))
         }
         findViewById<Button>(R.id.openTransfer)?.setOnClickListener {
              // CRITICAL: Refresh seeding before opening transfer to ensure names/state are fresh

@@ -52,13 +52,7 @@ class CityActivity : AppCompatActivity() {
         updateCityStatus(SocialEventSystem.cityAudience(cityId, null))
 
         findViewById<Button>(R.id.btnTavern).setOnClickListener {
-            try {
-                val result = SocialEventSystem.runTavernEvent()
-                UiUtils.showNarrativePopup(this, "KARCZMA", result)
-                renderQuestButtons() // Update buttons after tavern event
-            } catch (e: Exception) {
-                UiUtils.showNarrativePopup(this, "KARCZMA", "Karczmarz milczy, wpatrzony w pęknięcie na ścianie.")
-            }
+            startActivity(Intent(this, TavernActivity::class.java))
         }
 
         findViewById<Button>(R.id.btnChurch).setOnClickListener {

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="#0A0A0A"
+    android:padding="16dp">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="KRONIKI PĘKNIĘTEGO ŚWIATA"
+        android:textColor="#C8A96E"
+        android:textSize="18sp"
+        android:fontFamily="monospace"
+        android:gravity="center"
+        android:layout_marginBottom="16dp" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:padding="8dp">
+        <TextView
+            android:id="@+id/tvWorldLogContent"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="#E0E0E0"
+            android:textSize="14sp"
+            android:fontFamily="serif"
+            android:lineSpacingExtra="4dp" />
+    </ScrollView>
+
+    <Button
+        android:id="@+id/btnBackFromLog"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="POWRÓT"
+        android:layout_marginTop="12dp" />
+
+</LinearLayout>
