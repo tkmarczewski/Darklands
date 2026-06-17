@@ -51,6 +51,7 @@
                 <Button android:id="@+id/btnMarket" style="@style/GrimNavButton" android:layout_width="match_parent" android:layout_height="48dp" android:text="@string/city_market" android:fontFamily="monospace" />
                 <Button android:id="@+id/btnChurch" style="@style/GrimNavButton" android:layout_width="match_parent" android:layout_height="48dp" android:text="@string/city_temple" android:fontFamily="monospace" />
                 <Button android:id="@+id/btnRecruit" style="@style/GrimNavButton" android:layout_width="match_parent" android:layout_height="48dp" android:text="@string/city_recruit" android:fontFamily="monospace" />
+                <Button android:id="@+id/btnCityQuest" style="@style/GrimNavButton" android:layout_width="match_parent" android:layout_height="48dp" android:text="QUEST" android:fontFamily="monospace" android:textColor="#ADFF2F" />
 
                 <Space android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" />
 
@@ -76,6 +77,13 @@
                     android:textSize="12sp"
                     android:fontFamily="monospace"
                     android:text="Miasto spowite mrokiem." />
+
+                <LinearLayout
+                    android:id="@+id/cityQuestContainer"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_marginTop="4dp" />
 
                 <TextView
                     style="@style/GrimTextHeader"

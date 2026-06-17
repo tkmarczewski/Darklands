@@ -77,6 +77,8 @@
 
                 <Button android:id="@+id/openCityEvents" style="@style/GrimCombatButton" android:text="@string/menu_news" android:fontFamily="monospace" />
                 <Button android:id="@+id/openTransfer" style="@style/GrimCombatButton" android:text="@string/menu_transfer" android:fontFamily="monospace" />
+                <Button android:id="@+id/btnHubQuest" style="@style/GrimCombatButton" android:text="EKSPEDYCJA" android:fontFamily="monospace" android:textColor="#ADFF2F" />
+
                 <Button android:id="@+id/openFinale" style="@style/GrimCombatButton" android:text="@string/menu_finale" android:fontFamily="monospace" android:visibility="gone" />
 
                 <Button android:id="@+id/openCombatStatus" style="@style/GrimCombatButton" android:text="@string/menu_combat" android:fontFamily="monospace" android:visibility="gone" />

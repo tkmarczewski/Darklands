@@ -1,0 +1,116 @@
+package com.grimreich.ui.saints
+
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material3.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+
+@Composable
+fun SaintsScreen(viewModel: SaintsViewModel, onExit: () -> Unit) {
+    val state by viewModel.uiState.collectAsState()
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color(0xFF1A1A2E))
+            .padding(16.dp)
+    ) {
+        // HEADER
+        Text(
+            text = "ŚWIĘCI I KOŚCIÓŁ",
+            color = Color(0xFFC8A96E),
+            style = MaterialTheme.typography.titleLarge,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.align(Alignment.CenterHorizontally)
+        )
+
+        Spacer(modifier = Modifier.height(24.dp))
+
+        Row(modifier = Modifier.fillMaxSize()) {
+            // LEFT: Status and Actions
+            Column(modifier = Modifier.weight(1f)) {
+                Surface(
+                    color = Color(0x40000000),
+                    modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp)
+                ) {
+                    Column(modifier = Modifier.padding(12.dp)) {
+                        Text("TWOJA DRUŻYNA", color = Color.Gray, fontSize = 10.sp, fontWeight = FontWeight.Bold)
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(text = state.partyStatus, color = Color(0xFFC8A96E), fontSize = 12.sp, fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace)
+                    }
+                }
+
+                Button(
+                    onClick = { viewModel.pray() },
+                    modifier = Modifier.fillMaxWidth().height(48.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF3D2B1F)),
+                    shape = MaterialTheme.shapes.extraSmall
+                ) {
+                    Text("MÓDL SIĘ", color = Color(0xFFE0C080), fontWeight = FontWeight.Bold)
+                }
+                
+                Spacer(modifier = Modifier.height(8.dp))
+                
+                Button(
+                    onClick = { viewModel.cleanse() },
+                    modifier = Modifier.fillMaxWidth().height(48.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF3D2B1F)),
+                    shape = MaterialTheme.shapes.extraSmall
+                ) {
+                    Text("OCZYŚĆ Z MROKU", color = Color(0xFFE0C080), fontWeight = FontWeight.Bold)
+                }
+
+                Spacer(modifier = Modifier.weight(1f))
+                
+                Button(
+                    onClick = onExit,
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2A2A2A))
+                ) {
+                    Text("ODEJDŹ SPOD OŁTARZA", color = Color(0xFFE0C080))
+                }
+            }
+
+            Spacer(modifier = Modifier.width(16.dp))
+
+            // RIGHT: Saints Catalog and Log
+            Column(modifier = Modifier.weight(1.2f)) {
+                Surface(
+                    color = Color(0x20FFFFFF),
+                    modifier = Modifier.fillMaxWidth().weight(1f)
+                ) {
+                    LazyColumn(modifier = Modifier.padding(12.dp)) {
+                        item {
+                            Text("KATALOG ŚWIĘTYCH", color = Color.Gray, fontSize = 10.sp, fontWeight = FontWeight.Bold)
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Text(text = state.saintsText, color = Color(0xFFC8A96E), fontSize = 12.sp)
+                        }
+                    }
+                }
+                
+                Spacer(modifier = Modifier.height(8.dp))
+                
+                Surface(
+                    color = Color(0x60000000),
+                    modifier = Modifier.fillMaxWidth().height(60.dp)
+                ) {
+                    Text(
+                        text = state.log,
+                        color = Color.White,
+                        fontSize = 12.sp,
+                        modifier = Modifier.padding(8.dp)
+                    )
+                }
+            }
+        }
+    }
+}

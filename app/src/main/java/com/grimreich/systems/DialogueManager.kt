@@ -120,6 +120,29 @@ object DialogueManager {
                 })
             )
         ))
+
+        // STANDARDIZED QUEST START NODES (Actionable from Button)
+        registerNode(DialogueNode(
+            id = "q_verdict_1_start", npcId = "Verdict",
+            text = "Gabinet urzędnika jest zapieczętowany, ale pieczęć jest zimna. W środku cień ofiary stoi pod ścianą, wpatrzony w puste biurko. Na ścianie wypalono: WYROK WYKONANY.",
+            choices = listOf(
+                DialogueChoice("Zbadaj cień.", "end", onSelect = {
+                    GameRepository.state.pendingQuestId = "q_verdict_1"
+                    // Start combat with the shadow
+                    // Normally we'd launch combat activity here, but let's assume the button triggers it
+                })
+            )
+        ))
+        
+        registerNode(DialogueNode(
+            id = "quest_north_mist_vision_start", npcId = "aelion",
+            text = "Mgła gęstnieje wokół Ciebie. Słyszysz głos Aeliona: 'Nie szukaj prawdy w tym, co widzisz oczami. Szukaj jej w tym, co pamięta Twoja dusza.'",
+            choices = listOf(
+                DialogueChoice("Odszukaj go.", "end", onSelect = {
+                    // Start expedition logic
+                })
+            )
+        ))
     }
 
     private fun seedEchoDialogues() {
