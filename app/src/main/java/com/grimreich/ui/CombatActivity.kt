@@ -7,6 +7,8 @@ import androidx.appcompat.app.AppCompatActivity
 import com.grimreich.R
 import com.grimreich.core.GameRepository
 import com.grimreich.systems.CombatSystem
+import com.grimreich.systems.QuestSystem
+import com.grimreich.ui.UiUtils
 
 class CombatActivity : AppCompatActivity() {
 
@@ -15,19 +17,24 @@ class CombatActivity : AppCompatActivity() {
         setContentView(R.layout.activity_combat)
 
         if (!GameRepository.state.combat.active) {
-            // No active combat - start a random encounter if triggered from quest
             val questId = GameRepository.state.pendingQuestId
             if (questId != null) {
-                // Start a combat encounter for this quest
                 CombatSystem.startEncounterForQuest(questId)
             } else {
-                // Start a default random encounter
                 CombatSystem.startRandomEncounter()
             }
         }
 
+        setupButtons()
         render()
+    }
 
+    override fun onResume() {
+        super.onResume()
+        render()
+    }
+
+    private fun setupButtons() {
         findViewById<Button>(R.id.btnAttack).setOnClickListener {
             if (GameRepository.state.combat.active) {
                 CombatSystem.playerAttack()
@@ -44,39 +51,40 @@ class CombatActivity : AppCompatActivity() {
 
         findViewById<Button>(R.id.btnUseMist).setOnClickListener {
             if (GameRepository.state.combat.active) {
-                CombatSystem.playerUseSpecial("MIST")
+                CombatSystem.playerUseMist()
                 render()
             }
         }
 
         findViewById<Button>(R.id.btnUseBlood).setOnClickListener {
             if (GameRepository.state.combat.active) {
-                CombatSystem.playerUseSpecial("BLOOD")
+                CombatSystem.playerUseBlood()
                 render()
             }
         }
 
         findViewById<Button>(R.id.btnUseReflection).setOnClickListener {
             if (GameRepository.state.combat.active) {
-                CombatSystem.playerUseSpecial("REFLECTION")
+                CombatSystem.playerUseReflection()
                 render()
             }
         }
 
         findViewById<Button>(R.id.btnFlee).setOnClickListener {
-            // Clear pending quest if fleeing (quest not completed)
-            GameRepository.state.pendingQuestId = null
-            finish()
+            val c = GameRepository.state.combat
+            if (c.active) {
+                CombatSystem.playerFlee()
+                render()
+            } else {
+                finish()
+            }
         }
     }
 
     private fun render() {
         val c = GameRepository.state.combat
-        val log = c.log.takeLast(8).joinToString("\n")
-        findViewById<TextView>(R.id.tvCombatLog).text = log
-        findViewById<TextView>(R.id.tvCombatTitle).text =
-            if (c.active) "⚔ WALKA: ${c.enemyName}" else "⚔ KONIEC WALKI"
 
+        val tvTitle = findViewById<TextView>(R.id.tvCombatTitle)
         val btnAttack = findViewById<Button>(R.id.btnAttack)
         val btnDefend = findViewById<Button>(R.id.btnDefend)
         val btnMist = findViewById<Button>(R.id.btnUseMist)
@@ -84,41 +92,58 @@ class CombatActivity : AppCompatActivity() {
         val btnReflection = findViewById<Button>(R.id.btnUseReflection)
         val btnFlee = findViewById<Button>(R.id.btnFlee)
 
-        if (!c.active) {
-            btnAttack.isEnabled = false
-            btnDefend.isEnabled = false
-            btnMist.isEnabled = false
-            btnBlood.isEnabled = false
-            btnReflection.isEnabled = false
-            btnFlee.text = "POWRÓT"
+        if (c.active) {
+            val enemy = c.enemies.firstOrNull { it.hp > 0 }
+            tvTitle.text = if (enemy != null) "% WALKA: ${enemy.name}" else "% KONIEC WALKI"
 
-            // Check victory: all enemies dead (log contains win message or enemy hp <= 0)
-            val playerAlive = GameRepository.state.party.any { it.hp > 0 }
-            if (playerAlive) {
-                // Victory - complete pending quest if any
-                val pendingId = GameRepository.state.pendingQuestId
-                if (pendingId != null) {
-                    try {
-                        val completed = com.grimreich.systems.QuestSystem.complete(pendingId)
-                        GameRepository.state.pendingQuestId = null
-                        val reward = completed.rewardGold
-                        val msg = "⚔ ZWY CIĘSTWO!\n\nZadanie ukończone: ${completed.title}\n+$reward złota otrzymano."
-                        UiUtils.showNarrativePopup(this, "ZADANIE UKOŃCZONE", msg)
-                    } catch (_: Exception) {
-                        GameRepository.state.pendingQuestId = null
-                    }
-                }
-            } else {
-                // Defeat - clear pending quest
-                GameRepository.state.pendingQuestId = null
-            }
-        } else {
             btnAttack.isEnabled = true
             btnDefend.isEnabled = true
             btnMist.isEnabled = true
             btnBlood.isEnabled = true
             btnReflection.isEnabled = true
             btnFlee.text = "UCIECZKA"
+            btnFlee.isEnabled = true
+
+            // Check for end-of-combat
+            val allEnemiesDead = c.enemies.all { it.hp <= 0 }
+            val playerAlive = GameRepository.state.party.any { it.hp > 0 }
+
+            if (allEnemiesDead || !playerAlive) {
+                btnAttack.isEnabled = false
+                btnDefend.isEnabled = false
+                btnMist.isEnabled = false
+                btnBlood.isEnabled = false
+                btnReflection.isEnabled = false
+                btnFlee.text = "POWROT"
+
+                if (allEnemiesDead && playerAlive) {
+                    // Victory
+                    val pendingId = GameRepository.state.pendingQuestId
+                    if (pendingId != null) {
+                        try {
+                            val completed = com.grimreich.systems.QuestSystem.complete(pendingId)
+                            GameRepository.state.pendingQuestId = null
+                            val reward = completed.rewardGold
+                            val msg = "% ZWY CIESTWO!\n\nZadanie ukonczone: ${completed.title}\n+$reward zlota otrzymano."
+                            UiUtils.showNarrativePopup(this, "ZADANIE UKONCZONE", msg)
+                        } catch (_: Exception) {
+                            GameRepository.state.pendingQuestId = null
+                        }
+                    }
+                } else if (!playerAlive) {
+                    // Defeat
+                    GameRepository.state.pendingQuestId = null
+                }
+            }
+        } else {
+            tvTitle.text = "% KONIEC WALKI"
+            btnAttack.isEnabled = false
+            btnDefend.isEnabled = false
+            btnMist.isEnabled = false
+            btnBlood.isEnabled = false
+            btnReflection.isEnabled = false
+            btnFlee.text = "POWROT"
+            btnFlee.isEnabled = true
         }
     }
 }
