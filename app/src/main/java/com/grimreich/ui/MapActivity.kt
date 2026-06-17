@@ -41,9 +41,9 @@ class MapActivity : AppCompatActivity() {
         mapping.forEach { (viewId, cityId) ->
             val view = findViewById<View>(viewId)
             
-            // DYNAMIC VISIBILITY: Show only discovered locations (except starting area)
-            val isPermanent = cityId == "wybrzeze_polnocne" || cityId == "serce_krainy"
-            view?.visibility = if (isPermanent || discovered.contains(cityId)) View.VISIBLE else View.GONE
+            // DYNAMIC VISIBILITY: Canonical locations are always visible. Others on discovery.
+            val isCanonical = setOf("wybrzeze_polnocne", "rowniny_koronne", "serce_krainy", "poludniowe_ruiny", "gory_poludniowe", "pogranicze_stepowe", "ziemie_dzikie")
+            view?.visibility = if (isCanonical.contains(cityId) || discovered.contains(cityId)) View.VISIBLE else View.GONE
 
             view?.setOnClickListener {
                 val city = CityCatalogue.get(cityId)

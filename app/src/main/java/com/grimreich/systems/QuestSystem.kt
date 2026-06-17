@@ -67,10 +67,8 @@ object QuestSystem {
             originType = QuestOriginType.LOKACJA_NPC, originRefId = "aelion", rewardGold = 250, objective = "Zwróć relikwię Aelionowi."
         ))
 
-        // 2. REGISTER 40+ NARRATIVE TEMPLATES (shuffled by seed)
-        val rand = java.util.Random(seed.toLong())
-        val templates = QuestRegistry.allTemplates.shuffled(rand)
-        templates.forEach { t ->
+        // 2. REGISTER 40+ NARRATIVE TEMPLATES (categorized)
+        QuestRegistry.allTemplates.forEach { t ->
             register(QuestEntry(
                 id = t.id, title = t.title, description = t.description, 
                 cityId = t.preferredCityId ?: CityCatalogue.all().random(kotlin.random.Random(seed + t.id.hashCode())).id,
@@ -78,7 +76,7 @@ object QuestSystem {
             ))
         }
 
-        // 3. REGISTER CHAIN: BLOOD THAT WON'T DRY
+        // 3. REGISTER BLOOD CHAIN
         QuestRegistry.bloodChain.stages.forEachIndexed { index, s ->
             register(QuestEntry(
                 id = s.id, title = s.title, description = s.description, cityId = "rowniny_koronne",
@@ -88,7 +86,6 @@ object QuestSystem {
         }
 
         // 4. REGISTER CHAIN: THE VERDICT NO ONE ISSUED
-        // NOTE: These are NOT part of the random pool, they are triggered by city visits
         QuestRegistry.verdictChain.stages.forEachIndexed { index, s ->
             register(QuestEntry(
                 id = s.id, title = s.title, description = s.description, cityId = "serce_krainy",
@@ -107,23 +104,42 @@ object QuestSystem {
             quests[q.id] = q.copy(status = status)
         }
 
-        // 5. LIMIT AVAILABLE POOL (Only 5 random available quests visible)
-        limitAvailablePool(seed)
+        // 6. LIMIT POOL (Limit available + active to 5 TOTAL)
+        limitQuestPool(seed)
     }
 
-    private fun limitAvailablePool(seed: Int) {
+    private fun limitQuestPool(seed: Int) {
+        val active = quests.values.filter { it.status == QuestStatus.AKTYWNE }
         val available = quests.values.filter { it.status == QuestStatus.DOSTEPNE }
-        // DONT HIDE CHAIN QUESTS OR CANONICAL ONES
-        val pool = available.filter { it.originType == QuestOriginType.LOKACJA_PROCEDURALNA && !it.id.contains("verdict") }
         
-        if (pool.size <= MAX_AVAILABLE_QUESTS) return
-
-        val rand = java.util.Random(seed.toLong())
-        val toKeep = pool.shuffled(rand).take(MAX_AVAILABLE_QUESTS).map { it.id }.toSet()
+        // Narrative chains (Blood/Verdict) and canonical ones are ALWAYS preserved if active
+        // But if they are just AVAILABLE, they count towards the pool or are hidden by logic
+        val specialIds = setOf("quest_north_mist_vision", "quest_aelion_relic")
         
-        // Temporarily hide available quests that weren't picked for this "turn"
-        val keysToRemove = pool.filter { !toKeep.contains(it.id) }.map { it.id }
-        keysToRemove.forEach { quests.remove(it) }
+        // Procedural ones and available chains are the pool
+        val poolCandidate = available.filter { 
+            !specialIds.contains(it.id) && !it.id.contains("verdict") && it.originRefId != "Chain" 
+        }
+        
+        // Total allowed available = 5 - currently active
+        val slotsRemaining = (MAX_AVAILABLE_QUESTS - active.size).coerceAtLeast(0)
+        
+        if (poolCandidate.size > slotsRemaining) {
+            val rand = java.util.Random(seed.toLong())
+            val toKeep = poolCandidate.shuffled(rand).take(slotsRemaining).map { it.id }.toSet()
+            
+            poolCandidate.forEach { if (!toKeep.contains(it.id)) quests.remove(it.id) }
+        }
+        
+        // VERDICT HIDER: Hide Verdict quests unless their Stage 4 NPC trigger has happened (visit 7+)
+        val cityCount = GameRepository.state.world.cityEntryCount
+        QuestRegistry.verdictChain.stages.forEach { stage ->
+            val q = quests[stage.id] ?: return@forEach
+            // Only hide if it's NOT already started (Active or Done)
+            if (q.status == QuestStatus.DOSTEPNE && cityCount < 7) {
+                quests.remove(q.id)
+            }
+        }
     }
 
     fun register(entry: QuestEntry) {
@@ -142,7 +158,7 @@ object QuestSystem {
         val updated = quest.copy(status = QuestStatus.AKTYWNE)
         quests[questId] = updated
         
-        // Sync with GameState
+        // Sync with GameState - Ensure it's added to the actual persistent list
         val state = GameRepository.state
         if (!state.quest.activeQuests.contains(questId)) {
             state.quest.activeQuests.add(questId)

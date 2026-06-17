@@ -56,7 +56,7 @@ object CombatSystem {
 
     private fun resolvePlayerAction(actionType: String): String {
         val c    = GameRepository.state.combat
-        val hero = PartyRepository.activeHero() ?: return "Brak bohatera"
+        val hero = GameRepository.state.party.find { it.id == GameRepository.state.activeHeroId } ?: return "Brak bohatera"
         if (!c.active) return "Brak aktywnej walki"
 
         val heroState = heroToCombatant() ?: return "Brak bohatera"
