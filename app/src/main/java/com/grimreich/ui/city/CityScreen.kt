@@ -40,7 +40,7 @@ fun CityScreen(
     val context = LocalContext.current
     
     val currentCityId = GameRepository.state.grimCurrentRegion ?: ""
-    val npcs = ProceduralNpcGenerator.generateForCity(currentCityId, 1)
+    val npcs = state.npcs
 
     Box(modifier = Modifier.fillMaxSize()) {
         // BACKGROUND
@@ -74,7 +74,7 @@ fun CityScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            Row(modifier = Modifier.fillMaxSize()) {
+            Row(modifier = Modifier.weight(1f)) {
                 // LEFT: Nav Actions
                 Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     CityNavButton("TARG", onClick = onMarket)
@@ -88,10 +88,11 @@ fun CityScreen(
                         color = if (state.activeQuestsCount > 0) Color(0xFFADFF2F) else Color(0xFF2A2A2A), 
                         enabled = state.activeQuestsCount > 0,
                         onClick = { 
-                            val currentCityId = GameRepository.state.grimCurrentRegion ?: ""
+                            val cityId = GameRepository.state.grimCurrentRegion ?: ""
                             val quest = com.grimreich.core.GameRepository.state.quest.activeQuests
                                 .mapNotNull { com.grimreich.systems.QuestSystem.getQuest(it) }
-                                .find { it.cityId == currentCityId }
+                                .find { it.cityId == cityId }
+                                ?: com.grimreich.systems.QuestSystem.availableForCity(cityId).firstOrNull()
                                 
                             if (quest != null) {
                                 onNpcClick(quest.originRefId, quest.originRefId, "${quest.id}_start")
@@ -103,8 +104,9 @@ fun CityScreen(
                     
                     Button(
                         onClick = onExit,
-                        modifier = Modifier.fillMaxWidth(),
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF5A1A1A))
+                        modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF5A1A1A)),
+                        shape = MaterialTheme.shapes.extraSmall
                     ) {
                         Text("WYJDŹ Z MIASTA", color = Color.White)
                     }

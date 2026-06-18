@@ -73,8 +73,8 @@ object GameLoopController {
     fun resolveActiveQuest(
         playerState: PlayerState,
         faction: CityFaction = CityFaction.COMMONERS
-    ): Pair<PlayerState, ResolutionScreenState> {
-        val questId = playerState.activeQuestId ?: error("Brak zadania do wykonania")
+    ): Pair<PlayerState, ResolutionScreenState>? {
+        val questId = playerState.activeQuestId ?: return null
         val goldBefore = playerState.gold
         val reward = QuestResolutionSystem.completeQuestWithRewards(
             questId = questId,

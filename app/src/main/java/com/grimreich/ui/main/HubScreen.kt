@@ -68,8 +68,11 @@ fun HubScreen(
                     }
                     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         HubNavButton("ZADANIA", modifier = Modifier.weight(1f), onClick = onQuests)
+                        HubNavButton("DRUŻYNA", modifier = Modifier.weight(1f), color = Color(0xFF4A0000), onClick = { /* Logic for team view */ })
                         HubNavButton("KRONIKA", modifier = Modifier.weight(1f), onClick = onWorldLog)
-                        
+                    }
+                    
+                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         val expeditionText = if (state.activeQuestsCount > 0) "EKSPEDYCJA (${state.activeQuestsCount})" else "BRAK WYPRAW"
                         HubNavButton(
                             text = expeditionText,

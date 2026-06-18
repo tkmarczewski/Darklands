@@ -39,6 +39,8 @@
         <activity android:name=".ui.EndgameActivity" android:exported="false" android:screenOrientation="landscape"/>
         <activity android:name=".ui.HubActivity" android:exported="true" android:screenOrientation="landscape"/>
         <activity android:name=".ui.CityActivity" android:exported="false" android:screenOrientation="landscape"/>
+        <activity android:name=".ui.TavernActivity" android:exported="false" android:screenOrientation="landscape"/>
+        <activity android:name=".ui.WorldLogActivity" android:exported="false" android:screenOrientation="landscape"/>
         <activity android:name=".ui.ReputationActivity" android:exported="false" android:screenOrientation="landscape"/>
                 <activity android:name=".ui.CoastlineActivity" android:exported="false" android:screenOrientation="landscape"/>
         <activity android:name=".ui.SaintsActivity" android:exported="false" android:screenOrientation="landscape"/>

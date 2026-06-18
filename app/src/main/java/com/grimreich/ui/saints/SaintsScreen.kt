@@ -25,13 +25,25 @@ fun SaintsScreen(viewModel: SaintsViewModel, onExit: () -> Unit) {
             .padding(16.dp)
     ) {
         // HEADER
-        Text(
-            text = "ŚWIĘCI I KOŚCIÓŁ",
-            color = Color(0xFFC8A96E),
-            style = MaterialTheme.typography.titleLarge,
-            fontWeight = FontWeight.Bold,
-            modifier = Modifier.align(Alignment.CenterHorizontally)
-        )
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = "ŚWIĘCI I KOŚCIÓŁ",
+                color = Color(0xFFC8A96E),
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Bold
+            )
+            Button(
+                onClick = onExit,
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2A2A2A)),
+                shape = MaterialTheme.shapes.extraSmall
+            ) {
+                Text("POWRÓT", color = Color(0xFFE0C080), fontSize = 10.sp)
+            }
+        }
 
         Spacer(modifier = Modifier.height(24.dp))
 

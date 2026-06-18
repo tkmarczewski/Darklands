@@ -47,7 +47,7 @@ class CombatViewModel : ViewModel() {
         }
     }
 
-    private fun refresh() {
+    fun refresh() {
         _uiState.update { GameRepository.state.combat.copy() }
     }
 }

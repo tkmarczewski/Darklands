@@ -30,7 +30,11 @@ object GameRepository {
         state.activeHeroId = hero1.id
         
         CityCatalogue.seedCanonical()
-        state.world.location = "wybrzeze_polnocne"
+        state.world.location = "Wybrzeże Północne"
+        state.grimCurrentRegion = "wybrzeze_polnocne"
+        
+        com.grimreich.systems.QuestSystem.seedIntegratedContent(state.world.day + 1)
+        com.grimreich.systems.DialogueManager.seedBasicDialogues()
         
         // Initial Hireable Heroes
         state.hireableHeroes.addAll(listOf(

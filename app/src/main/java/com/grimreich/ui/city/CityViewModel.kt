@@ -4,6 +4,8 @@ import androidx.lifecycle.ViewModel
 import com.grimreich.core.GameRepository
 import com.grimreich.world.CityCatalogue
 import com.grimreich.systems.SocialEventSystem
+import com.grimreich.world.ProceduralNpcGenerator
+import com.grimreich.grimreich.v1.NPC
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -13,7 +15,8 @@ data class CityUiState(
     val cityName: String = "",
     val cityStatus: String = "Miasto spowite mrokiem.",
     val backgroundDrawable: String = "bg_region_north_coast",
-    val activeQuestsCount: Int = 0
+    val activeQuestsCount: Int = 0,
+    val npcs: List<NPC> = emptyList()
 )
 
 class CityViewModel : ViewModel() {
@@ -32,13 +35,19 @@ class CityViewModel : ViewModel() {
         
         val activeCityQuests = state.quest.activeQuests.mapNotNull { com.grimreich.systems.QuestSystem.getQuest(it) }
             .filter { it.cityId == cityId }
+            
+        val availableCityQuests = com.grimreich.systems.QuestSystem.availableForCity(cityId)
+        
+        val sessionSeed = state.world.day + cityId.hashCode()
+        val npcs = ProceduralNpcGenerator.generateForCity(cityId, sessionSeed)
 
         _uiState.update { 
             it.copy(
                 cityName = (cityData?.name ?: cityId.replace("_", " ")).uppercase(),
                 cityStatus = SocialEventSystem.cityAudience(cityId, null),
                 backgroundDrawable = cityData?.backgroundDrawable ?: "bg_region_north_coast",
-                activeQuestsCount = activeCityQuests.size
+                activeQuestsCount = activeCityQuests.size + availableCityQuests.size,
+                npcs = npcs
             )
         }
     }

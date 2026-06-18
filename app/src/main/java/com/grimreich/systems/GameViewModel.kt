@@ -45,11 +45,14 @@ class GameViewModel {
     }
 
     fun resolveActiveQuest(context: Context) {
-        val (updatedPlayer, resolutionState) = GameLoopController.resolveActiveQuest(playerState)
-        playerState = updatedPlayer
-        resolutionScreenState = resolutionState
-        refreshCityScreen()
-        SaveLoadSystem.save(context)
+        val result = GameLoopController.resolveActiveQuest(playerState)
+        if (result != null) {
+            val (updatedPlayer, resolutionState) = result
+            playerState = updatedPlayer
+            resolutionScreenState = resolutionState
+            refreshCityScreen()
+            SaveLoadSystem.save(context)
+        }
     }
 
     fun saveGame(context: Context) {
