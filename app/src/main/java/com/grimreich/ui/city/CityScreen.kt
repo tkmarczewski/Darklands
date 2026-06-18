@@ -22,7 +22,7 @@ import androidx.compose.ui.unit.sp
 import com.grimreich.R
 import com.grimreich.core.GameRepository
 import com.grimreich.systems.QuestSystem
-import com.grimreich.world.ProceduralNpcGenerator
+import com.grimreich.systems.QuestStatus
 
 @Composable
 fun CityScreen(
@@ -38,7 +38,7 @@ fun CityScreen(
     val context = LocalContext.current
 
     Box(modifier = Modifier.fillMaxSize().background(Color.Black)) {
-        // BACKGROUND - Force Fill
+        // BACKGROUND
         val bgResId = context.resources.getIdentifier(state.backgroundDrawable, "drawable", context.packageName)
         if (bgResId != 0) {
             Image(
@@ -53,7 +53,7 @@ fun CityScreen(
         Box(modifier = Modifier.fillMaxSize().background(Color(0x90000000)))
 
         Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
-            // HEADER (FIXED HEIGHT)
+            // HEADER
             Surface(
                 modifier = Modifier.fillMaxWidth().height(60.dp),
                 color = Color(0xCC000000),
@@ -73,7 +73,7 @@ fun CityScreen(
             Spacer(modifier = Modifier.height(16.dp))
 
             Row(modifier = Modifier.weight(1f).fillMaxWidth()) {
-                // LEFT: Nav Actions (RIGID WIDTH)
+                // LEFT: Nav Actions - RIGID SIDEBAR
                 Column(
                     modifier = Modifier.width(180.dp).fillMaxHeight(),
                     verticalArrangement = Arrangement.spacedBy(10.dp)
@@ -87,9 +87,15 @@ fun CityScreen(
                     CityNavBtn(
                         text = if (qCount > 0) "QUEST ($qCount)" else "BRAK ZADAŃ",
                         onClick = {
-                            val cityId = GameRepository.state.grimCurrentRegion ?: "wybrzeze_polnocne"
+                            val rawCity = GameRepository.state.grimCurrentRegion ?: "wybrzeze_polnocne"
+                            val cityId = rawCity.lowercase()
+                                .replace("ą", "a").replace("ć", "c").replace("ę", "e")
+                                .replace("ł", "l").replace("ń", "n").replace("ó", "o")
+                                .replace("ś", "s").replace("ź", "z").replace("ż", "z")
+                                .replace(" ", "_")
+
                             val quest = QuestSystem.availableForCity(cityId).firstOrNull()
-                                ?: QuestSystem.all().find { it.status == com.grimreich.systems.QuestStatus.AKTYWNE && it.cityId == cityId }
+                                ?: QuestSystem.all().find { it.status == QuestStatus.AKTYWNE && it.cityId == cityId }
                             
                             if (quest != null) {
                                 val node = if (quest.id.startsWith("q_start")) "aelion_start" else "mystic_start"

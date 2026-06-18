@@ -11,23 +11,21 @@ import com.grimreich.systems.GameLoopController
 import com.grimreich.systems.DialogueManager
 import com.grimreich.systems.QuestSystem
 import com.grimreich.ui.theme.GrimTheme
+import com.grimreich.world.CityCatalogue
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // Only bootstrap if the game state is empty (e.g. not loaded or just started)
+        // Only bootstrap if the game state is empty
         if (GameRepository.state.party.isEmpty()) {
             GameLoopController.bootstrap(seed = 1)
         }
         
-        // Ensure static data is always ready
+        // GLOBAL SEEDING ON START
+        CityCatalogue.seedCanonical()
         DialogueManager.seedBasicDialogues()
-        
-        // Ensure quest pool is ready if state is fresh
-        if (QuestSystem.all().isEmpty()) {
-            QuestSystem.seedIntegratedContent(seed = 1)
-        }
+        QuestSystem.seedIntegratedContent(seed = 1)
 
         setContent {
             GrimTheme {

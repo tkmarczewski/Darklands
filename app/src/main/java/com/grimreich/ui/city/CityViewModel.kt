@@ -32,22 +32,27 @@ class CityViewModel : ViewModel() {
     fun refresh() {
         val state = GameRepository.state
         
-        // Ensure canonical data is ALWAYS available in memory
+        // Ensure canonical data
         CityCatalogue.seedCanonical()
         
-        val rawId = state.grimCurrentRegion ?: "wybrzeze_polnocne"
-        val cityId = rawId.lowercase().replace(" ", "_")
-        
+        val rawId = state.grimCurrentRegion
+        // STRICT NORMALIZATION
+        val cityId = rawId.lowercase()
+            .replace("ą", "a").replace("ć", "c").replace("ę", "e")
+            .replace("ł", "l").replace("ń", "n").replace("ó", "o")
+            .replace("ś", "s").replace("ź", "z").replace("ż", "z")
+            .replace(" ", "_")
+
         val cityData = CityCatalogue.get(cityId)
         
-        // RECALCULATE QUESTS FOR UI 2.0
-        QuestSystem.seedIntegratedContent(state.world.day + 1)
+        // FORCE SEED QUESTS FOR THE SESSION
+        QuestSystem.seedIntegratedContent()
         
         val activeCount = state.quest.activeQuests.mapNotNull { QuestSystem.getQuest(it) }.count { it.cityId == cityId }
         val availableCount = QuestSystem.availableForCity(cityId).size
         val totalCount = activeCount + availableCount
 
-        // GENERATE NPCs (Guaranteed deterministic list)
+        // GENERATE NPCs (Deterministic per day/city)
         val seed = state.world.day + cityId.hashCode()
         val generatedNpcs = ProceduralNpcGenerator.generateForCity(cityId, seed)
 

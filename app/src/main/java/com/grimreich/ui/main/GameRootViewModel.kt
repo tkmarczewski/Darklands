@@ -3,7 +3,7 @@ package com.grimreich.ui.main
 import androidx.lifecycle.ViewModel
 import com.grimreich.core.GameRepository
 import com.grimreich.core.GameRootStateSaver
-import com.grimreich.core.GameState
+import com.grimreich.core.Hero
 import com.grimreich.ui.city.CityViewModel
 import com.grimreich.ui.combat.CombatViewModel
 import com.grimreich.ui.dialogue.DialogueViewModel
@@ -15,7 +15,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
 enum class GameScreenMode {
-    WORLD_MAP, CITY, COMBAT, TAVERN, TEMPLE, ALCHEMY, EVENTS, HUB, DIALOGUE, INVENTORY, QUESTS, WORLD_LOG, RECRUIT
+    WORLD_MAP, CITY, COMBAT, TAVERN, TEMPLE, ALCHEMY, EVENTS, HUB, DIALOGUE, INVENTORY, QUESTS, WORLD_LOG, RECRUIT, CHAR_DETAIL
 }
 
 class GameRootViewModel(
@@ -24,6 +24,9 @@ class GameRootViewModel(
 
     private val _mode = MutableStateFlow(GameScreenMode.HUB)
     val mode: StateFlow<GameScreenMode> = _mode
+
+    private val _inspectedHero = MutableStateFlow<Hero?>(null)
+    val inspectedHero: StateFlow<Hero?> = _inspectedHero
 
     // Sub-ViewModels
     val hubVM = HubViewModel()
@@ -37,16 +40,12 @@ class GameRootViewModel(
 
     fun setMode(newMode: GameScreenMode) {
         _mode.value = newMode
-        // REFRESH on mode change to ensure UI 2.0 consistency
-        when (newMode) {
-            GameScreenMode.HUB -> hubVM.refresh()
-            GameScreenMode.CITY -> cityVM.refresh()
-            GameScreenMode.TAVERN -> tavernVM.refresh()
-            GameScreenMode.TEMPLE -> saintsVM.refresh()
-            GameScreenMode.WORLD_MAP -> worldMapVM.refresh()
-            GameScreenMode.QUESTS -> hubVM.refresh() // Quests are driven by hub state counts
-            else -> {}
-        }
+        refreshForMode(newMode)
+    }
+
+    fun inspectHero(heroId: String) {
+        _inspectedHero.value = GameRepository.state.party.find { it.id == heroId }
+        setMode(GameScreenMode.CHAR_DETAIL)
     }
 
     fun saveGame() {
@@ -57,6 +56,17 @@ class GameRootViewModel(
         saver?.load()?.let { loaded ->
             GameRepository.state = loaded
             refreshAll()
+        }
+    }
+
+    private fun refreshForMode(mode: GameScreenMode) {
+        when (mode) {
+            GameScreenMode.HUB -> hubVM.refresh()
+            GameScreenMode.CITY -> cityVM.refresh()
+            GameScreenMode.TAVERN -> tavernVM.refresh()
+            GameScreenMode.TEMPLE -> saintsVM.refresh()
+            GameScreenMode.WORLD_MAP -> worldMapVM.refresh()
+            else -> {}
         }
     }
 

@@ -1,7 +1,6 @@
 package com.grimreich.systems
 
 import com.grimreich.core.GameRepository
-import com.grimreich.world.CityCatalogue
 
 enum class QuestOriginType {
     ZDARZENIE_MIEJSKIE,
@@ -25,31 +24,31 @@ data class QuestEntry(
     val originRefId: String,
     val rewardGold: Int,
     val status: QuestStatus = QuestStatus.DOSTEPNE,
-    val requiredQuestIds: List<String> = emptyList(),
-    val objective: String = "Brak szczegółowych wytycznych.",
-    val stabilityImpact: Float = 0.02f,
-    val collapseSlowdown: Float = 0.01f
+    val objective: String = "Brak szczegółowych wytycznych."
 )
 
 object QuestSystem {
-    private val quests = linkedMapOf<String, QuestEntry>()
-    private var currentSeed: Int = 0
+    private val quests = mutableMapOf<String, QuestEntry>()
 
     fun clear() {
         quests.clear()
-        currentSeed = 0
+    }
+
+    private fun normalize(id: String): String {
+        return id.lowercase()
+            .replace("ą", "a").replace("ć", "c").replace("ę", "e")
+            .replace("ł", "l").replace("ń", "n").replace("ó", "o")
+            .replace("ś", "s").replace("ź", "z").replace("ż", "z")
+            .replace(" ", "_")
     }
 
     fun seedIntegratedContent(seed: Int = 1) {
-        if (quests.isNotEmpty() && currentSeed == seed) return
-
         clear()
-        currentSeed = seed
-
-        // 1. STARTING QUEST (FIXED ID MATCHING)
+        
+        // 1. STARTING QUEST - Force register for normalized starting city
         register(QuestEntry(
             id = "q_start_01",
-            title = "Pustka na Wybrzeżu",
+            title = "Cisza Przed Burzą",
             description = "Aelion czeka na kogoś, kto potrafi słuchać mgły.",
             cityId = "wybrzeze_polnocne",
             originType = QuestOriginType.LOKACJA_NPC,
@@ -58,17 +57,14 @@ object QuestSystem {
             objective = "Porozmawiaj z Aelionem."
         ))
 
-        // 2. TEMPLATE QUESTS
-        val rand = kotlin.random.Random(seed)
-        val cities = CityCatalogue.all()
-        
-        QuestRegistry.allTemplates.take(15).forEach { t ->
-            val assignedCity = t.preferredCityId ?: if (cities.isNotEmpty()) cities.random(rand).id else "wybrzeze_polnocne"
+        // 2. Add variety from Registry with normalized assigned cities
+        QuestRegistry.allTemplates.forEach { t ->
+            val rawCity = t.preferredCityId ?: "wybrzeze_polnocne"
             register(QuestEntry(
                 id = t.id,
                 title = t.title,
                 description = t.description,
-                cityId = assignedCity,
+                cityId = normalize(rawCity),
                 originType = QuestOriginType.LOKACJA_PROCEDURALNA,
                 originRefId = t.category,
                 rewardGold = t.baseReward,
@@ -76,13 +72,13 @@ object QuestSystem {
             ))
         }
 
-        // RESTORE STATUSES
+        // SYNC WITH PERSISTENT STATE
         val state = GameRepository.state
         state.quest.activeQuests.forEach { id ->
-            quests[id]?.let { quests[id] = it.copy(status = QuestStatus.AKTYWNE) }
+            quests[id] = quests[id]?.copy(status = QuestStatus.AKTYWNE) ?: return@forEach
         }
         state.quest.completedQuests.forEach { id ->
-            quests[id]?.let { quests[id] = it.copy(status = QuestStatus.UKONCZONE) }
+            quests[id] = quests[id]?.copy(status = QuestStatus.UKONCZONE) ?: return@forEach
         }
     }
 
@@ -95,15 +91,14 @@ object QuestSystem {
     fun getQuest(id: String): QuestEntry? = quests[id]
 
     fun availableForCity(cityId: String): List<QuestEntry> {
-        val normalized = cityId.lowercase().replace(" ", "_")
-        return quests.values.filter { it.cityId == normalized && it.status == QuestStatus.DOSTEPNE }
+        val target = normalize(cityId)
+        return quests.values.filter { it.cityId == target && it.status == QuestStatus.DOSTEPNE }
     }
 
     fun activate(questId: String): QuestEntry {
-        val quest = quests[questId] ?: error("Nieznane zadanie: $questId")
+        val quest = quests[questId] ?: error("Unknown quest: $questId")
         val updated = quest.copy(status = QuestStatus.AKTYWNE)
         quests[questId] = updated
-        
         if (!GameRepository.state.quest.activeQuests.contains(questId)) {
             GameRepository.state.quest.activeQuests.add(questId)
         }
@@ -111,16 +106,14 @@ object QuestSystem {
     }
 
     fun complete(questId: String): QuestEntry {
-        val quest = quests[questId] ?: error("Nieznane zadanie: $questId")
+        val quest = quests[questId] ?: error("Unknown quest: $questId")
         val updated = quest.copy(status = QuestStatus.UKONCZONE)
         quests[questId] = updated
-
-        val state = GameRepository.state
-        state.quest.activeQuests.remove(questId)
-        if (!state.quest.completedQuests.contains(questId)) {
-            state.quest.completedQuests.add(questId)
+        GameRepository.state.quest.activeQuests.remove(questId)
+        if (!GameRepository.state.quest.completedQuests.contains(questId)) {
+            GameRepository.state.quest.completedQuests.add(questId)
         }
-        state.gold += updated.rewardGold
+        GameRepository.state.gold += updated.rewardGold
         return updated
     }
 }

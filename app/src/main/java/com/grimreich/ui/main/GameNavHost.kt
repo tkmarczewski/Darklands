@@ -31,6 +31,7 @@ sealed class GameRoute(val route: String) {
     object Dialogue : GameRoute("dialogue")
     object Quests : GameRoute("quests")
     object Recruit : GameRoute("recruit")
+    object CharDetail : GameRoute("char_detail")
 }
 
 @Composable
@@ -39,6 +40,7 @@ fun GameNavHost(
     navController: NavHostController = rememberNavController()
 ) {
     val mode by root.mode.collectAsState()
+    val inspectedHero by root.inspectedHero.collectAsState()
 
     LaunchedEffect(mode) {
         val route = when (mode) {
@@ -51,6 +53,7 @@ fun GameNavHost(
             GameScreenMode.DIALOGUE -> GameRoute.Dialogue.route
             GameScreenMode.QUESTS -> GameRoute.Quests.route
             GameScreenMode.RECRUIT -> GameRoute.Recruit.route
+            GameScreenMode.CHAR_DETAIL -> GameRoute.CharDetail.route
             else -> GameRoute.Hub.route
         }
         navController.navigate(route) {
@@ -70,7 +73,7 @@ fun GameNavHost(
                 onInventory = { root.setMode(GameScreenMode.INVENTORY) },
                 onQuests = { root.setMode(GameScreenMode.QUESTS) },
                 onWorldLog = { root.setMode(GameScreenMode.WORLD_LOG) },
-                onCharacter = { heroId -> /* Character detail */ }
+                onCharacter = { heroId -> root.inspectHero(heroId) }
             )
         }
 
@@ -135,6 +138,12 @@ fun GameNavHost(
             RecruitmentScreen(
                 onBack = { root.setMode(GameScreenMode.CITY) }
             )
+        }
+
+        composable(GameRoute.CharDetail.route) {
+            inspectedHero?.let { hero ->
+                CharacterDetailScreen(hero = hero, onBack = { root.setMode(GameScreenMode.HUB) })
+            } ?: root.setMode(GameScreenMode.HUB)
         }
 
         composable(GameScreenMode.INVENTORY.name) {
