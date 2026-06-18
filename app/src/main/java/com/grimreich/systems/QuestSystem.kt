@@ -37,7 +37,7 @@ data class QuestEntry(
 object QuestSystem {
     private val quests = linkedMapOf<String, QuestEntry>()
     private var currentSeed: Int = 0
-    private const val MAX_TOTAL_QUESTS = 5
+    private const val MAX_TOTAL_QUESTS = 8 // Increased for variety
 
     fun clear() {
         quests.clear()
@@ -54,9 +54,8 @@ object QuestSystem {
         currentSeed = seed
 
         CityCatalogue.seedCanonical()
-        CityEventSystem.seedStage1Events()
-
-        // 1. CANONICAL QUESTS - always available
+        
+        // 1. CANONICAL QUESTS
         register(QuestEntry(
             id = "quest_north_mist_vision",
             title = "Wizje we Mgle",
@@ -67,24 +66,18 @@ object QuestSystem {
             rewardGold = 75,
             objective = "Odszukaj Aeliona we mgle."
         ))
-        register(QuestEntry(
-            id = "quest_aelion_relic",
-            title = "Relikwia Aeliona",
-            description = "Odzyskaj skradziony odlamek.",
-            cityId = "wybrzeze_polnocne",
-            originType = QuestOriginType.LOKACJA_NPC,
-            originRefId = "aelion",
-            rewardGold = 250,
-            objective = "Zwroc relikwie Aelionowi."
-        ))
-
+        
         // 2. NARRATIVE TEMPLATES
+        val rand = kotlin.random.Random(seed)
+        val cityList = CityCatalogue.all()
+        
         QuestRegistry.allTemplates.forEach { t ->
+            val assignedCityId = t.preferredCityId ?: cityList.random(rand).id
             register(QuestEntry(
                 id = t.id,
                 title = t.title,
                 description = t.description,
-                cityId = t.preferredCityId ?: CityCatalogue.all().random(kotlin.random.Random(seed + t.id.hashCode())).id,
+                cityId = assignedCityId,
                 originType = QuestOriginType.LOKACJA_PROCEDURALNA,
                 originRefId = t.category,
                 rewardGold = t.baseReward,
@@ -107,92 +100,29 @@ object QuestSystem {
             ))
         }
 
-        // 4. VERDICT CHAIN - rejestrujemy wszystkie etapy jako PRZERWANE;
-        //    tylko etap 0 staje sie DOSTEPNE gdy cityCount >= 7 (auto-trigger w fazie 4)
-        //    kolejne etapy odblokowuja sie po ukonczeniu poprzedniego w activate()
-        QuestRegistry.verdictChain.stages.forEachIndexed { index, s ->
-            register(QuestEntry(
-                id = s.id,
-                title = s.title,
-                description = s.description,
-                cityId = "serce_krainy",
-                originType = QuestOriginType.LOKACJA_PROCEDURALNA,
-                originRefId = "Verdict",
-                rewardGold = s.baseReward,
-                objective = s.objective,
-                status = QuestStatus.PRZERWANE, // domyslnie ukryte
-                requiredQuestIds = if (index > 0) listOf(QuestRegistry.verdictChain.stages[index - 1].id) else emptyList()
-            ))
-        }
-
-        // 5. PRZYWROC STATUSY
+        // 5. RESTORE STATUSES
         quests.values.toList().forEach { q ->
             val status = when {
                 completedIds.contains(q.id) -> QuestStatus.UKONCZONE
                 activeIds.contains(q.id) -> QuestStatus.AKTYWNE
-                else -> q.status // zachowaj domyslny (np. PRZERWANE dla Verdict)
+                else -> q.status
             }
             quests[q.id] = q.copy(status = status)
         }
 
-        // 6. VERDICT PHASE 4 AUTO-TRIGGER:
-        //    jesli juz odwiedzono >= 7 miast I etap 0 Verdict nie jest jeszcze aktywny/ukonczony,
-        //    udostepnij etap 0 jako DOSTEPNE
-        val cityCount = GameRepository.state.world.cityEntryCount
-        if (cityCount >= 7) {
-            unlockNextVerdictStage(completedIds)
-        }
-
-        // 7. LIMIT PULI - lacznie max MAX_TOTAL_QUESTS widocznych (DOSTEPNE + AKTYWNE)
         limitQuestPool(seed)
     }
 
-    /**
-     * Odblokowuje kolejny etap Verdict: jesli poprzedni etap jest ukonczony
-     * (lub nie ma poprzedniego), ustaw status na DOSTEPNE.
-     */
-    fun unlockNextVerdictStage(completedIds: Set<String> = GameRepository.state.quest.completedQuests.toSet()) {
-        QuestRegistry.verdictChain.stages.forEachIndexed { index, s ->
-            val q = quests[s.id] ?: return@forEachIndexed
-            if (q.status == QuestStatus.PRZERWANE) {
-                val prereqMet = index == 0 || completedIds.contains(QuestRegistry.verdictChain.stages[index - 1].id)
-                if (prereqMet) {
-                    quests[s.id] = q.copy(status = QuestStatus.DOSTEPNE)
-                    return // odblokowuj tylko jeden etap na raz
-                }
-            }
-        }
-    }
-
     private fun limitQuestPool(seed: Int) {
-        // 1. Identify "Protected" quests (Active ones or critical chains already started)
         val active = quests.values.filter { it.status == QuestStatus.AKTYWNE }
-        val specialIds = setOf("quest_north_mist_vision", "quest_aelion_relic")
-        
-        // 2. Available candidates for the pool (Available procedural or unstarted chains)
         val availableCandidates = quests.values.filter { it.status == QuestStatus.DOSTEPNE }
         
-        // 3. Strictly limit Total (Active + Available) to 5
-        val maxAvailable = (MAX_TOTAL_QUESTS - active.size).coerceAtLeast(0)
+        val maxAvailable = (MAX_TOTAL_QUESTS - active.size).coerceAtLeast(3) // Ensure at least some are available
         
         if (availableCandidates.size > maxAvailable) {
             val rand = java.util.Random(seed.toLong())
-            // Prioritize special/chain quests if they are available
-            val prioritized = availableCandidates.filter { specialIds.contains(it.id) || it.originRefId == "Verdict" || it.originRefId == "Chain" }
-            val others = availableCandidates.filter { !prioritized.contains(it) }
-            
-            val toKeep = (prioritized + others.shuffled(rand)).take(maxAvailable).map { it.id }.toSet()
-            
+            val toKeep = availableCandidates.shuffled(rand).take(maxAvailable).map { it.id }.toSet()
             availableCandidates.forEach { if (!toKeep.contains(it.id)) quests.remove(it.id) }
-        }
-
-        // 4. VERDICT HIDER: Hide Verdict quests unless triggered by NPC (visit 7+)
-        val cityCount = GameRepository.state.world.cityEntryCount
-        QuestRegistry.verdictChain.stages.forEach { stage ->
-            val q = quests[stage.id] ?: return@forEach
-            if (q.status == QuestStatus.DOSTEPNE && cityCount < 7) {
-                quests.remove(q.id) 
-            }
         }
     }
 
@@ -216,36 +146,11 @@ object QuestSystem {
         if (!state.quest.activeQuests.contains(questId)) {
             state.quest.activeQuests.add(questId)
         }
-
-        // ODKRYJ LOKACJE: canonical city questa
-        if (!state.world.discoveredLocations.contains(quest.cityId)) {
-            state.world.discoveredLocations.add(quest.cityId)
-        }
-
-        // ODKRYJ LOKACJE: preferowana city z template (dla procedural)
-        val template = QuestRegistry.allTemplates.find { it.id == questId }
-            ?: QuestRegistry.verdictChain.stages.find { it.id == questId }
-        template?.preferredCityId?.let { cityId ->
-            if (!state.world.discoveredLocations.contains(cityId)) {
-                state.world.discoveredLocations.add(cityId)
-            }
-        }
-
-        // ODKRYJ LOKACJE NIEKANONICZNE: jesli quest jest procedural lokacja, dodaj originRefId jako lokacje
-        if (quest.originType == QuestOriginType.LOKACJA_PROCEDURALNA && quest.originRefId.isNotBlank()) {
-            val locId = quest.originRefId
-            if (!state.world.discoveredLocations.contains(locId)) {
-                state.world.discoveredLocations.add(locId)
-            }
-        }
-
         return updated
     }
 
     fun complete(questId: String): QuestEntry {
         val quest = quests[questId] ?: error("Nieznane zadanie: $questId")
-        if (quest.status == QuestStatus.UKONCZONE) return quest
-
         val updated = quest.copy(status = QuestStatus.UKONCZONE)
         quests[questId] = updated
 
@@ -254,46 +159,9 @@ object QuestSystem {
         if (!state.quest.completedQuests.contains(questId)) {
             state.quest.completedQuests.add(questId)
         }
-
         state.gold += quest.rewardGold
-        ReputationSystem.modify(quest.cityId, CityFaction.COMMONERS, 5)
-
-        val stabilityGain = (quest.stabilityImpact * 100).toInt()
-        state.world.globalStability = (state.world.globalStability + stabilityGain).coerceIn(0, 100)
-        state.world.collapseProgress = (state.world.collapseProgress - quest.collapseSlowdown).coerceAtLeast(0f)
-
-        ChronicleSystem.record(
-            "Ukonczono zadanie: ${quest.title}. Stabilnosc swiata: ${state.world.globalStability}%",
-            importance = 2
-        )
-
-        // Po ukonczeniu etapu Verdict - odblokuj kolejny
-        if (quest.originRefId == "Verdict") {
-            unlockNextVerdictStage()
-        }
-        // Po ukonczeniu etapu Blood - odblokuj kolejny etap lancucha
-        if (quest.originRefId == "Chain") {
-            unlockNextBloodStage()
-        }
-
         return updated
     }
 
-    fun unlockNextBloodStage(completedIds: Set<String> = GameRepository.state.quest.completedQuests.toSet()) {
-        QuestRegistry.bloodChain.stages.forEachIndexed { index, s ->
-            val q = quests[s.id] ?: return@forEachIndexed
-            if (q.status == QuestStatus.PRZERWANE) {
-                val prereqMet = index == 0 || completedIds.contains(QuestRegistry.bloodChain.stages[index - 1].id)
-                if (prereqMet) {
-                    quests[s.id] = q.copy(status = QuestStatus.DOSTEPNE)
-                    return
-                }
-            }
-        }
-    }
-
-    fun activeList(): List<String> = quests.values.asSequence()
-        .filter { it.status == QuestStatus.AKTYWNE }
-        .map { it.id }
-        .toList()
+    fun activeList(): List<String> = quests.values.filter { it.status == QuestStatus.AKTYWNE }.map { it.id }
 }

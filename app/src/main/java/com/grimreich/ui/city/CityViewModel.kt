@@ -30,7 +30,14 @@ class CityViewModel : ViewModel() {
 
     fun refresh() {
         val state = GameRepository.state
-        val cityId = state.grimCurrentRegion ?: state.world.location.lowercase().replace(" ", "_")
+        // NORMALIZE cityId to avoid Polish character mismatches in matching
+        val rawId = state.grimCurrentRegion ?: state.world.location
+        val cityId = rawId.lowercase()
+            .replace("ą", "a").replace("ć", "c").replace("ę", "e")
+            .replace("ł", "l").replace("ń", "n").replace("ó", "o")
+            .replace("ś", "s").replace("ź", "z").replace("ż", "z")
+            .replace(" ", "_")
+
         val cityData = CityCatalogue.get(cityId)
         
         val activeCityQuests = state.quest.activeQuests.mapNotNull { com.grimreich.systems.QuestSystem.getQuest(it) }
@@ -38,6 +45,7 @@ class CityViewModel : ViewModel() {
             
         val availableCityQuests = com.grimreich.systems.QuestSystem.availableForCity(cityId)
         
+        // Use static seed based on day to avoid flickering npcs on rotation/recomposition
         val sessionSeed = state.world.day + cityId.hashCode()
         val npcs = ProceduralNpcGenerator.generateForCity(cityId, sessionSeed)
 
