@@ -37,6 +37,16 @@ class GameRootViewModel(
 
     fun setMode(newMode: GameScreenMode) {
         _mode.value = newMode
+        // REFRESH on mode change to ensure UI 2.0 consistency
+        when (newMode) {
+            GameScreenMode.HUB -> hubVM.refresh()
+            GameScreenMode.CITY -> cityVM.refresh()
+            GameScreenMode.TAVERN -> tavernVM.refresh()
+            GameScreenMode.TEMPLE -> saintsVM.refresh()
+            GameScreenMode.WORLD_MAP -> worldMapVM.refresh()
+            GameScreenMode.QUESTS -> hubVM.refresh() // Quests are driven by hub state counts
+            else -> {}
+        }
     }
 
     fun saveGame() {

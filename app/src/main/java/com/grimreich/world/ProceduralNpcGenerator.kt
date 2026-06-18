@@ -12,9 +12,8 @@ object ProceduralNpcGenerator {
     )
 
     fun generateForCity(cityId: String, seed: Int): List<NPC> {
-        // Use dynamic seed based on current time to ensure different NPCs each visit
-        val dynamicSeed = System.currentTimeMillis().toInt() + cityId.hashCode()
-        val random = Random(dynamicSeed)
+        // FIXED SEED: Ensure NPCs are stable for the session/day
+        val random = Random(seed.toLong())
         val count = random.nextInt(4, 7)
         val generatedNames = mutableSetOf<String>()
 
@@ -30,7 +29,7 @@ object ProceduralNpcGenerator {
 
             val role = roles.random(random)
             NPC(
-                id = "npc_${cityId}_${dynamicSeed}_$i",
+                id = "npc_${cityId}_${seed}_$i",
                 name = name,
                 role = role,
                 factionId = decideFaction(cityId, random),

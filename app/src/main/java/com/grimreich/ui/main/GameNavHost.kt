@@ -70,14 +70,14 @@ fun GameNavHost(
                 onInventory = { root.setMode(GameScreenMode.INVENTORY) },
                 onQuests = { root.setMode(GameScreenMode.QUESTS) },
                 onWorldLog = { root.setMode(GameScreenMode.WORLD_LOG) },
-                onCharacter = { heroId -> /* Show character detail in future */ }
+                onCharacter = { heroId -> /* Character detail */ }
             )
         }
 
         composable(GameRoute.City.route) {
             CityScreen(
                 viewModel = root.cityVM,
-                onMarket = { /* Navigate to Market */ },
+                onMarket = { /* Market */ },
                 onTavern = { root.setMode(GameScreenMode.TAVERN) },
                 onTemple = { root.setMode(GameScreenMode.TEMPLE) },
                 onRecruit = { root.setMode(GameScreenMode.RECRUIT) },

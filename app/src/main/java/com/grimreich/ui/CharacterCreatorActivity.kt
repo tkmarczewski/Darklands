@@ -6,6 +6,8 @@ import androidx.appcompat.app.AppCompatActivity
 import com.grimreich.R
 import com.grimreich.core.*
 import com.grimreich.systems.DialogueManager
+import com.grimreich.systems.QuestSystem
+import com.grimreich.world.CityCatalogue
 import java.util.*
 
 class CharacterCreatorActivity : AppCompatActivity() {
@@ -26,10 +28,6 @@ class CharacterCreatorActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_character_creator)
-
-        // NOTE: Character shadow rendering temporarily disabled to reduce visual clutter
-        // TODO: Re-implement party member portrait shadows with configurable visibility
-        // renderCharacterShadows() // COMMENTED OUT
 
         setupCareerSelection()
         setupAttributeControls()
@@ -78,13 +76,12 @@ class CharacterCreatorActivity : AppCompatActivity() {
                 else -> Career.KNIGHT
             }
             applyCareerBonuses()
-            setupSkillSpecializations() // REFRESH SKILLS BASED ON CAREER
+            setupSkillSpecializations()
         }
         findViewById<RadioButton>(R.id.rbKnight).isChecked = true
     }
 
     private fun applyCareerBonuses() {
-        // Reset to base 10
         attributes.keys.forEach { attributes[it] = 10 }
         pointsRemaining = 20
 
@@ -138,7 +135,7 @@ class CharacterCreatorActivity : AppCompatActivity() {
 
     private fun setupSkillSpecializations() {
         val container = findViewById<LinearLayout>(R.id.llSkillSpecializations)
-        container.removeAllViews() // Ensure clean slate on re-selection
+        container.removeAllViews()
 
         val allSkills = HeroSkill.values()
         val availableSkills = when (selectedCareer) {
@@ -146,10 +143,6 @@ class CharacterCreatorActivity : AppCompatActivity() {
             Career.ALCHEMIST -> allSkills.filter { it.group == SkillGroup.ACADEMIC || it.name == "ALCH" }
             Career.GUARD -> allSkills.filter { it.group == SkillGroup.WEAPON || it.group == SkillGroup.SURVIVAL }
             Career.SCHOLAR -> allSkills.filter { it.group == SkillGroup.ACADEMIC }
-            Career.THIEF -> allSkills.filter { it.group == SkillGroup.INTRIGUE || it.name == "STL_H" }
-            Career.PRIEST, Career.MONK -> allSkills.filter { it.group == SkillGroup.ACADEMIC || it.group == SkillGroup.SPIRITUAL }
-            Career.MERCENARY -> allSkills.filter { it.group == SkillGroup.WEAPON || it.group == SkillGroup.SURVIVAL }
-            Career.MERCHANT -> allSkills.filter { it.group == SkillGroup.INTRIGUE || it.name == "STR_W" }
             else -> allSkills.toList()
         }
 
@@ -196,6 +189,13 @@ class CharacterCreatorActivity : AppCompatActivity() {
     }
 
     private fun finalizeCharacter(name: String) {
+        // BOOTSTRAP SYSTEMS
+        CityCatalogue.clear()
+        CityCatalogue.seedCanonical()
+        QuestSystem.clear()
+        QuestSystem.seedIntegratedContent(seed = 1)
+        DialogueManager.seedBasicDialogues()
+
         val hero = Hero(
             id = UUID.randomUUID().toString(),
             name = name,
@@ -213,7 +213,6 @@ class CharacterCreatorActivity : AppCompatActivity() {
             portraitRes = DialogueManager.getPortrait(selectedCareer.name)
         )
         
-        // Apply skill specializations
         specializedSkills.forEach { skill ->
             hero.skills[skill.name] = com.grimreich.core.GrimConstants.Character.SPECIALIZED_SKILL_BASE_VALUE
         }
@@ -222,6 +221,8 @@ class CharacterCreatorActivity : AppCompatActivity() {
             party.clear()
             party.add(hero)
             activeHeroId = hero.id
+            grimCurrentRegion = "wybrzeze_polnocne"
+            world.location = "wybrzeze_polnocne"
         }
         
         startActivity(android.content.Intent(this, MainActivity::class.java))

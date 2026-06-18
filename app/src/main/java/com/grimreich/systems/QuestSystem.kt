@@ -41,13 +41,12 @@ object QuestSystem {
     }
 
     fun seedIntegratedContent(seed: Int = 1) {
-        // ALWAYS SEED IF EMPTY
         if (quests.isNotEmpty() && currentSeed == seed) return
 
         clear()
         currentSeed = seed
 
-        // 1. STARTING QUEST (MANDATORY)
+        // 1. STARTING QUEST (FIXED ID MATCHING)
         register(QuestEntry(
             id = "q_start_01",
             title = "Pustka na Wybrzeżu",
@@ -64,11 +63,12 @@ object QuestSystem {
         val cities = CityCatalogue.all()
         
         QuestRegistry.allTemplates.take(15).forEach { t ->
+            val assignedCity = t.preferredCityId ?: if (cities.isNotEmpty()) cities.random(rand).id else "wybrzeze_polnocne"
             register(QuestEntry(
                 id = t.id,
                 title = t.title,
                 description = t.description,
-                cityId = t.preferredCityId ?: cities.random(rand).id,
+                cityId = assignedCity,
                 originType = QuestOriginType.LOKACJA_PROCEDURALNA,
                 originRefId = t.category,
                 rewardGold = t.baseReward,
@@ -76,7 +76,7 @@ object QuestSystem {
             ))
         }
 
-        // FORCE PERSISTENCE RESTORE
+        // RESTORE STATUSES
         val state = GameRepository.state
         state.quest.activeQuests.forEach { id ->
             quests[id]?.let { quests[id] = it.copy(status = QuestStatus.AKTYWNE) }
@@ -99,23 +99,28 @@ object QuestSystem {
         return quests.values.filter { it.cityId == normalized && it.status == QuestStatus.DOSTEPNE }
     }
 
-    fun activate(questId: String) {
-        quests[questId]?.let {
-            quests[questId] = it.copy(status = QuestStatus.AKTYWNE)
-            if (!GameRepository.state.quest.activeQuests.contains(questId)) {
-                GameRepository.state.quest.activeQuests.add(questId)
-            }
+    fun activate(questId: String): QuestEntry {
+        val quest = quests[questId] ?: error("Nieznane zadanie: $questId")
+        val updated = quest.copy(status = QuestStatus.AKTYWNE)
+        quests[questId] = updated
+        
+        if (!GameRepository.state.quest.activeQuests.contains(questId)) {
+            GameRepository.state.quest.activeQuests.add(questId)
         }
+        return updated
     }
 
-    fun complete(questId: String) {
-        quests[questId]?.let {
-            quests[questId] = it.copy(status = QuestStatus.UKONCZONE)
-            GameRepository.state.quest.activeQuests.remove(questId)
-            if (!GameRepository.state.quest.completedQuests.contains(questId)) {
-                GameRepository.state.quest.completedQuests.add(questId)
-            }
-            GameRepository.state.gold += it.rewardGold
+    fun complete(questId: String): QuestEntry {
+        val quest = quests[questId] ?: error("Nieznane zadanie: $questId")
+        val updated = quest.copy(status = QuestStatus.UKONCZONE)
+        quests[questId] = updated
+
+        val state = GameRepository.state
+        state.quest.activeQuests.remove(questId)
+        if (!state.quest.completedQuests.contains(questId)) {
+            state.quest.completedQuests.add(questId)
         }
+        state.gold += updated.rewardGold
+        return updated
     }
 }

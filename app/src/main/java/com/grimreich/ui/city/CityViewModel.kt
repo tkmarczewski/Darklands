@@ -13,8 +13,8 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 
 data class CityUiState(
-    val cityName: String = "Ładowanie...",
-    val cityStatus: String = "Skanowanie rzeczywistości...",
+    val cityName: String = "Ladowanie...",
+    val cityStatus: String = "Skanowanie rzeczywistosci...",
     val backgroundDrawable: String = "bg_region_north_coast",
     val activeQuestsCount: Int = 0,
     val npcs: List<NPC> = emptyList()
@@ -31,22 +31,23 @@ class CityViewModel : ViewModel() {
 
     fun refresh() {
         val state = GameRepository.state
-        // NORMALIZE ID: Force ASCII matching for CityCatalogue
+        
+        // Ensure canonical data is ALWAYS available in memory
+        CityCatalogue.seedCanonical()
+        
         val rawId = state.grimCurrentRegion ?: "wybrzeze_polnocne"
-        val cityId = rawId.lowercase()
-            .replace("ą", "a").replace("ć", "c").replace("ę", "e")
-            .replace("ł", "l").replace("ń", "n").replace("ó", "o")
-            .replace("ś", "s").replace("ź", "z").replace("ż", "z")
-            .replace(" ", "_")
-
+        val cityId = rawId.lowercase().replace(" ", "_")
+        
         val cityData = CityCatalogue.get(cityId)
         
-        // RECALCULATE QUESTS
+        // RECALCULATE QUESTS FOR UI 2.0
         QuestSystem.seedIntegratedContent(state.world.day + 1)
-        val cityQuests = QuestSystem.availableForCity(cityId).size +
-                         state.quest.activeQuests.mapNotNull { QuestSystem.getQuest(it) }.count { it.cityId == cityId }
+        
+        val activeCount = state.quest.activeQuests.mapNotNull { QuestSystem.getQuest(it) }.count { it.cityId == cityId }
+        val availableCount = QuestSystem.availableForCity(cityId).size
+        val totalCount = activeCount + availableCount
 
-        // GENERATE NPCs (Deterministic per day/city)
+        // GENERATE NPCs (Guaranteed deterministic list)
         val seed = state.world.day + cityId.hashCode()
         val generatedNpcs = ProceduralNpcGenerator.generateForCity(cityId, seed)
 
@@ -55,7 +56,7 @@ class CityViewModel : ViewModel() {
                 cityName = (cityData?.name ?: "Nieznane Miejsce").uppercase(),
                 cityStatus = SocialEventSystem.cityAudience(cityId, null),
                 backgroundDrawable = cityData?.backgroundDrawable ?: "bg_region_north_coast",
-                activeQuestsCount = cityQuests,
+                activeQuestsCount = totalCount,
                 npcs = generatedNpcs
             )
         }

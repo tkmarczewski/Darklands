@@ -38,7 +38,7 @@ fun CityScreen(
     val context = LocalContext.current
 
     Box(modifier = Modifier.fillMaxSize().background(Color.Black)) {
-        // BACKGROUND - Forced fill
+        // BACKGROUND - Force Fill
         val bgResId = context.resources.getIdentifier(state.backgroundDrawable, "drawable", context.packageName)
         if (bgResId != 0) {
             Image(
@@ -73,7 +73,7 @@ fun CityScreen(
             Spacer(modifier = Modifier.height(16.dp))
 
             Row(modifier = Modifier.weight(1f).fillMaxWidth()) {
-                // LEFT: Nav Actions (FIXED WIDTH TO PREVENT PUSHING)
+                // LEFT: Nav Actions (RIGID WIDTH)
                 Column(
                     modifier = Modifier.width(180.dp).fillMaxHeight(),
                     verticalArrangement = Arrangement.spacedBy(10.dp)
@@ -92,7 +92,6 @@ fun CityScreen(
                                 ?: QuestSystem.all().find { it.status == com.grimreich.systems.QuestStatus.AKTYWNE && it.cityId == cityId }
                             
                             if (quest != null) {
-                                // Match start node based on quest type
                                 val node = if (quest.id.startsWith("q_start")) "aelion_start" else "mystic_start"
                                 onNpcClick(quest.originRefId, quest.originRefId, node)
                             }
@@ -117,7 +116,7 @@ fun CityScreen(
 
                 Spacer(modifier = Modifier.width(16.dp))
 
-                // RIGHT: NPC List & Lore (FLEXIBLE SCROLL)
+                // RIGHT: NPC List & Lore
                 Column(modifier = Modifier.weight(1f).fillMaxHeight()) {
                     Surface(
                         color = Color(0x60000000),
