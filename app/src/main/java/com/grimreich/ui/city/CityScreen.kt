@@ -21,10 +21,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.grimreich.R
 import com.grimreich.core.GameRepository
-import com.grimreich.world.ProceduralNpcGenerator
-import com.grimreich.systems.QuestRegistry
 import com.grimreich.systems.QuestSystem
-import com.grimreich.world.CityCatalogue
+import com.grimreich.world.ProceduralNpcGenerator
 
 @Composable
 fun CityScreen(
@@ -38,12 +36,9 @@ fun CityScreen(
 ) {
     val state by viewModel.uiState.collectAsState()
     val context = LocalContext.current
-    
-    val currentCityId = GameRepository.state.grimCurrentRegion ?: "wybrzeze_polnocne"
-    val npcs = state.npcs
 
     Box(modifier = Modifier.fillMaxSize().background(Color.Black)) {
-        // BACKGROUND
+        // BACKGROUND - Forced fill
         val bgResId = context.resources.getIdentifier(state.backgroundDrawable, "drawable", context.packageName)
         if (bgResId != 0) {
             Image(
@@ -51,106 +46,106 @@ fun CityScreen(
                 contentDescription = null,
                 modifier = Modifier.fillMaxSize(),
                 contentScale = ContentScale.Crop,
-                alpha = 0.6f
+                alpha = 0.5f
             )
         }
         
-        Box(modifier = Modifier.fillMaxSize().background(Color(0xB0000000)))
+        Box(modifier = Modifier.fillMaxSize().background(Color(0x90000000)))
 
         Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
-            // HEADER
+            // HEADER (FIXED HEIGHT)
             Surface(
-                modifier = Modifier.fillMaxWidth(),
-                color = Color(0xD0000000),
+                modifier = Modifier.fillMaxWidth().height(60.dp),
+                color = Color(0xCC000000),
                 shape = MaterialTheme.shapes.extraSmall,
                 border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFFC0A060))
             ) {
-                Text(
-                    text = state.cityName,
-                    color = Color(0xFFE0C080),
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 22.sp,
-                    modifier = Modifier.padding(8.dp).align(Alignment.CenterHorizontally)
-                )
+                Box(contentAlignment = Alignment.Center) {
+                    Text(
+                        text = state.cityName,
+                        color = Color(0xFFE0C080),
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 24.sp
+                    )
+                }
             }
 
             Spacer(modifier = Modifier.height(16.dp))
 
             Row(modifier = Modifier.weight(1f).fillMaxWidth()) {
-                // LEFT: Nav Actions
+                // LEFT: Nav Actions (FIXED WIDTH TO PREVENT PUSHING)
                 Column(
-                    modifier = Modifier.weight(1f).fillMaxHeight(),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                    modifier = Modifier.width(180.dp).fillMaxHeight(),
+                    verticalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
-                    CityNavButton("TARG", onClick = onMarket)
-                    CityNavButton("KARCZMA", onClick = onTavern)
-                    CityNavButton("KAPLICA", onClick = onTemple)
-                    CityNavButton("WERBUNEK", onClick = onRecruit)
+                    CityNavBtn("TARG", onMarket)
+                    CityNavBtn("KARCZMA", onTavern)
+                    CityNavBtn("KAPLICA", onTemple)
+                    CityNavBtn("WERBUNEK", onRecruit)
                     
-                    val questBtnText = if (state.activeQuestsCount > 0) "QUEST (${state.activeQuestsCount})" else "BRAK ZADAŃ"
-                    CityNavButton(
-                        text = questBtnText, 
-                        color = if (state.activeQuestsCount > 0) Color(0xFFADFF2F) else Color(0xFF2A2A2A), 
-                        enabled = state.activeQuestsCount > 0,
-                        onClick = { 
-                            val quest = com.grimreich.core.GameRepository.state.quest.activeQuests
-                                .mapNotNull { com.grimreich.systems.QuestSystem.getQuest(it) }
-                                .find { it.cityId == currentCityId }
-                                ?: com.grimreich.systems.QuestSystem.availableForCity(currentCityId).firstOrNull()
-                                
+                    val qCount = state.activeQuestsCount
+                    CityNavBtn(
+                        text = if (qCount > 0) "QUEST ($qCount)" else "BRAK ZADAŃ",
+                        onClick = {
+                            val cityId = GameRepository.state.grimCurrentRegion ?: "wybrzeze_polnocne"
+                            val quest = QuestSystem.availableForCity(cityId).firstOrNull()
+                                ?: QuestSystem.all().find { it.status == com.grimreich.systems.QuestStatus.AKTYWNE && it.cityId == cityId }
+                            
                             if (quest != null) {
-                                // Dynamic node resolution
-                                val node = when {
-                                    quest.id.startsWith("q_verdict") -> "${quest.id}_start"
-                                    quest.originRefId == "aelion" -> "aelion_start"
-                                    else -> "mystic_start" // Fallback to mystic for procedural
-                                }
+                                // Match start node based on quest type
+                                val node = if (quest.id.startsWith("q_start")) "aelion_start" else "mystic_start"
                                 onNpcClick(quest.originRefId, quest.originRefId, node)
                             }
-                        }
+                        },
+                        color = if (qCount > 0) Color(0xFF4A6000) else Color(0xFF1A1A1A),
+                        enabled = qCount > 0
                     )
                     
                     Spacer(modifier = Modifier.weight(1f))
                     
+                    // EXIT BUTTON - Guaranteed Position
                     Button(
                         onClick = onExit,
-                        modifier = Modifier.fillMaxWidth().height(48.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF5A1A1A)),
+                        modifier = Modifier.fillMaxWidth().height(50.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF800000)),
                         shape = MaterialTheme.shapes.extraSmall,
-                        border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFF900000))
+                        border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFFFF0000))
                     ) {
-                        Text("WYJDŹ Z MIASTA", color = Color.White, fontWeight = FontWeight.Bold)
+                        Text("WYJDŹ", color = Color.White, fontWeight = FontWeight.Bold)
                     }
                 }
 
                 Spacer(modifier = Modifier.width(16.dp))
 
-                // RIGHT: NPC List and Lore
-                Column(modifier = Modifier.weight(1.5f).fillMaxHeight()) {
+                // RIGHT: NPC List & Lore (FLEXIBLE SCROLL)
+                Column(modifier = Modifier.weight(1f).fillMaxHeight()) {
                     Surface(
                         color = Color(0x60000000),
-                        modifier = Modifier.fillMaxWidth(),
+                        modifier = Modifier.fillMaxWidth().padding(bottom = 12.dp),
                         shape = MaterialTheme.shapes.extraSmall
                     ) {
                         Text(
                             text = state.cityStatus,
-                            color = Color(0xFFE0C080),
+                            color = Color.LightGray,
                             fontSize = 12.sp,
-                            modifier = Modifier.padding(12.dp)
+                            modifier = Modifier.padding(10.dp)
                         )
                     }
                     
-                    Spacer(modifier = Modifier.height(12.dp))
-                    
-                    Text("MIESZKAŃCY:", color = Color.Gray, fontSize = 10.sp, fontWeight = FontWeight.Bold)
-                    
-                    LazyColumn(
-                        modifier = Modifier.weight(1f).padding(top = 4.dp),
-                        verticalArrangement = Arrangement.spacedBy(4.dp)
-                    ) {
-                        items(npcs) { npc ->
-                            NpcListItem(name = npc.name, role = npc.role) {
-                                onNpcClick(npc.name, npc.role, npc.startNodeId ?: "end")
+                    Text("MIESZKAŃCY:", color = Color(0xFFC0A060), fontSize = 10.sp, fontWeight = FontWeight.Bold)
+                    Spacer(modifier = Modifier.height(4.dp))
+
+                    if (state.npcs.isEmpty()) {
+                        Text("Ulice są puste...", color = Color.DarkGray, fontSize = 14.sp)
+                    } else {
+                        LazyColumn(
+                            modifier = Modifier.fillMaxSize(),
+                            verticalArrangement = Arrangement.spacedBy(6.dp)
+                        ) {
+                            items(state.npcs) { npc ->
+                                NpcRow(npc.name, npc.role) {
+                                    onNpcClick(npc.name, npc.role, npc.startNodeId ?: "end")
+                                }
                             }
                         }
                     }
@@ -161,17 +156,17 @@ fun CityScreen(
 }
 
 @Composable
-fun CityNavButton(text: String, color: Color = Color(0xFF1A1A1A), enabled: Boolean = true, onClick: () -> Unit) {
+private fun CityNavBtn(text: String, onClick: () -> Unit, color: Color = Color(0xFF1A1A1A), enabled: Boolean = true) {
     Button(
         onClick = onClick,
         enabled = enabled,
-        modifier = Modifier.fillMaxWidth().height(48.dp),
+        modifier = Modifier.fillMaxWidth().height(44.dp),
         colors = ButtonDefaults.buttonColors(
-            containerColor = color, 
-            disabledContainerColor = Color(0xFF0A0A0A)
+            containerColor = color,
+            disabledContainerColor = Color(0xFF0F0F0F)
         ),
         shape = MaterialTheme.shapes.extraSmall,
-        border = androidx.compose.foundation.BorderStroke(1.dp, if (enabled) Color(0xFF444444) else Color(0xFF222222))
+        border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFF333333))
     ) {
         Text(
             text = text, 
@@ -183,16 +178,16 @@ fun CityNavButton(text: String, color: Color = Color(0xFF1A1A1A), enabled: Boole
 }
 
 @Composable
-fun NpcListItem(name: String, role: String, onClick: () -> Unit) {
+private fun NpcRow(name: String, role: String, onClick: () -> Unit) {
     Surface(
         modifier = Modifier.fillMaxWidth().clickable { onClick() },
-        color = Color(0xFF151515),
+        color = Color(0xFF111111),
         shape = MaterialTheme.shapes.extraSmall,
-        border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFF252525))
+        border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFF222222))
     ) {
         Column(modifier = Modifier.padding(12.dp)) {
-            Text(text = name, color = Color.White, fontWeight = FontWeight.Bold, fontSize = 14.sp)
-            Text(text = role.uppercase(), color = Color(0xFFC0A060), fontSize = 10.sp, fontWeight = FontWeight.SemiBold)
+            Text(text = name, color = Color.White, fontWeight = FontWeight.SemiBold, fontSize = 15.sp)
+            Text(text = role.uppercase(), color = Color(0xFFC0A060), fontSize = 9.sp, fontWeight = FontWeight.Bold)
         }
     }
 }

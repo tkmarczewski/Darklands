@@ -6,14 +6,15 @@ import com.grimreich.world.CityCatalogue
 import com.grimreich.systems.SocialEventSystem
 import com.grimreich.world.ProceduralNpcGenerator
 import com.grimreich.grimreich.v1.NPC
+import com.grimreich.systems.QuestSystem
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 
 data class CityUiState(
-    val cityName: String = "",
-    val cityStatus: String = "Miasto spowite mrokiem.",
+    val cityName: String = "Ładowanie...",
+    val cityStatus: String = "Skanowanie rzeczywistości...",
     val backgroundDrawable: String = "bg_region_north_coast",
     val activeQuestsCount: Int = 0,
     val npcs: List<NPC> = emptyList()
@@ -30,8 +31,8 @@ class CityViewModel : ViewModel() {
 
     fun refresh() {
         val state = GameRepository.state
-        // NORMALIZE cityId to avoid Polish character mismatches in matching
-        val rawId = state.grimCurrentRegion ?: state.world.location
+        // NORMALIZE ID: Force ASCII matching for CityCatalogue
+        val rawId = state.grimCurrentRegion ?: "wybrzeze_polnocne"
         val cityId = rawId.lowercase()
             .replace("ą", "a").replace("ć", "c").replace("ę", "e")
             .replace("ł", "l").replace("ń", "n").replace("ó", "o")
@@ -40,22 +41,22 @@ class CityViewModel : ViewModel() {
 
         val cityData = CityCatalogue.get(cityId)
         
-        val activeCityQuests = state.quest.activeQuests.mapNotNull { com.grimreich.systems.QuestSystem.getQuest(it) }
-            .filter { it.cityId == cityId }
-            
-        val availableCityQuests = com.grimreich.systems.QuestSystem.availableForCity(cityId)
-        
-        // Use static seed based on day to avoid flickering npcs on rotation/recomposition
-        val sessionSeed = state.world.day + cityId.hashCode()
-        val npcs = ProceduralNpcGenerator.generateForCity(cityId, sessionSeed)
+        // RECALCULATE QUESTS
+        QuestSystem.seedIntegratedContent(state.world.day + 1)
+        val cityQuests = QuestSystem.availableForCity(cityId).size +
+                         state.quest.activeQuests.mapNotNull { QuestSystem.getQuest(it) }.count { it.cityId == cityId }
+
+        // GENERATE NPCs (Deterministic per day/city)
+        val seed = state.world.day + cityId.hashCode()
+        val generatedNpcs = ProceduralNpcGenerator.generateForCity(cityId, seed)
 
         _uiState.update { 
             it.copy(
-                cityName = (cityData?.name ?: cityId.replace("_", " ")).uppercase(),
+                cityName = (cityData?.name ?: "Nieznane Miejsce").uppercase(),
                 cityStatus = SocialEventSystem.cityAudience(cityId, null),
                 backgroundDrawable = cityData?.backgroundDrawable ?: "bg_region_north_coast",
-                activeQuestsCount = activeCityQuests.size + availableCityQuests.size,
-                npcs = npcs
+                activeQuestsCount = cityQuests,
+                npcs = generatedNpcs
             )
         }
     }
