@@ -7,9 +7,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -36,6 +34,14 @@ fun CityScreen(
 ) {
     val state by viewModel.uiState.collectAsState()
     val context = LocalContext.current
+
+    // Normalize cityId for strict matching
+    val rawCity = GameRepository.state.grimCurrentRegion
+    val cityId = rawCity.lowercase()
+        .replace("ą", "a").replace("ć", "c").replace("ę", "e")
+        .replace("ł", "l").replace("ń", "n").replace("ó", "o")
+        .replace("ś", "s").replace("ź", "z").replace("ż", "z")
+        .replace(" ", "_")
 
     Box(modifier = Modifier.fillMaxSize().background(Color.Black)) {
         // BACKGROUND
@@ -73,7 +79,7 @@ fun CityScreen(
             Spacer(modifier = Modifier.height(16.dp))
 
             Row(modifier = Modifier.weight(1f).fillMaxWidth()) {
-                // LEFT: Nav Actions - RIGID SIDEBAR
+                // LEFT: Nav Actions - FIXED WIDTH FOR VISIBILITY
                 Column(
                     modifier = Modifier.width(180.dp).fillMaxHeight(),
                     verticalArrangement = Arrangement.spacedBy(10.dp)
@@ -87,13 +93,6 @@ fun CityScreen(
                     CityNavBtn(
                         text = if (qCount > 0) "QUEST ($qCount)" else "BRAK ZADAŃ",
                         onClick = {
-                            val rawCity = GameRepository.state.grimCurrentRegion ?: "wybrzeze_polnocne"
-                            val cityId = rawCity.lowercase()
-                                .replace("ą", "a").replace("ć", "c").replace("ę", "e")
-                                .replace("ł", "l").replace("ń", "n").replace("ó", "o")
-                                .replace("ś", "s").replace("ź", "z").replace("ż", "z")
-                                .replace(" ", "_")
-
                             val quest = QuestSystem.availableForCity(cityId).firstOrNull()
                                 ?: QuestSystem.all().find { it.status == QuestStatus.AKTYWNE && it.cityId == cityId }
                             

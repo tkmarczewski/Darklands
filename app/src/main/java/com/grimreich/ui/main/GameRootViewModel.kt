@@ -66,11 +66,12 @@ class GameRootViewModel(
             GameScreenMode.TAVERN -> tavernVM.refresh()
             GameScreenMode.TEMPLE -> saintsVM.refresh()
             GameScreenMode.WORLD_MAP -> worldMapVM.refresh()
+            GameScreenMode.INVENTORY -> inventoryVM.refresh()
             else -> {}
         }
     }
 
-    private fun refreshAll() {
+    fun refreshAll() {
         hubVM.refresh()
         cityVM.refresh()
         combatVM.refresh()

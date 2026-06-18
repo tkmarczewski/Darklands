@@ -3,95 +3,63 @@ package com.grimreich.ui
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
-import android.widget.Toast
+import android.widget.LinearLayout
 import androidx.appcompat.app.AppCompatActivity
 import com.grimreich.R
-import com.grimreich.core.AbilityRegistry
 import com.grimreich.core.GameRepository
-import com.grimreich.core.Hero
-import com.grimreich.core.Trait
-import com.grimreich.systems.GameLoopController
-import java.util.UUID
+import com.grimreich.systems.QuestSystem
 
 class DevMenuActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_dev_menu)
-
-        findViewById<Button>(R.id.btnDevBootstrap).setOnClickListener {
-            devBootstrap()
-            Toast.makeText(this, "Ralwing dołączył do drużyny!", Toast.LENGTH_SHORT).show()
+        val layout = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding(32, 32, 32, 32)
+            setBackgroundColor(android.graphics.Color.BLACK)
         }
 
-        findViewById<Button>(R.id.btnInstantEndgame).apply {
-            text = "INSTANT ENDGAME"
-            setOnClickListener {
-                instantEndgame()
-                Toast.makeText(context, "Warunki finału spełnione!", Toast.LENGTH_SHORT).show()
-            }
-        }
-
-        findViewById<Button>(R.id.jumpHub).setOnClickListener { jumpTo(HubActivity::class.java) }
-        findViewById<Button>(R.id.jumpCreator).setOnClickListener { jumpTo(CharacterCreatorActivity::class.java) }
-        findViewById<Button>(R.id.jumpCity).setOnClickListener { jumpTo(CityActivity::class.java) }
-        findViewById<Button>(R.id.jumpCombat).setOnClickListener { jumpTo(CombatActivity::class.java) }
-        findViewById<Button>(R.id.jumpMap).setOnClickListener { jumpTo(MapActivity::class.java) }
-        findViewById<Button>(R.id.jumpInv).setOnClickListener { jumpTo(InventoryActivity::class.java) }
-        findViewById<Button>(R.id.jumpChar).setOnClickListener { jumpTo(CharacterActivity::class.java) }
-        findViewById<Button>(R.id.jumpTrade).setOnClickListener { jumpTo(TradeActivity::class.java) }
-        findViewById<Button>(R.id.jumpSaints).setOnClickListener { jumpTo(SaintsActivity::class.java) }
-        findViewById<Button>(R.id.jumpAlchemy).setOnClickListener { jumpTo(AlchemyActivity::class.java) }
-
-        findViewById<Button>(R.id.btnBackFromDev).setOnClickListener {
+        layout.addView(devButton("RESET & START") {
+            GameRepository.seed()
+            val intent = Intent(this, MainActivity::class.java)
+            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            startActivity(intent)
             finish()
-        }
+        })
+
+        layout.addView(devButton("ADD 1000 GOLD") {
+            GameRepository.state.gold += 1000
+        })
+
+        layout.addView(devButton("INSTANT ENDGAME") {
+            instantEndgame()
+        })
+
+        layout.addView(devButton("POWRÓT") {
+            finish()
+        })
+
+        setContentView(layout)
     }
 
-    private fun devBootstrap() {
-        GameLoopController.bootstrap(seed = 1)
-        
-        val ralwing = Hero(
-            id = "hero_ralwing",
-            name = "Ralwing",
-            age = 33,
-            strength = 18,
-            agility = 15,
-            piety = 12,
-            endurance = 14,
-            intelligence = 13,
-            perception = 16,
-            charisma = 11,
-            trait = Trait.SHADOW_BORN
-        )
-        ralwing.abilities.add(AbilityRegistry.SOLARIAN_STRIKE)
-        ralwing.abilities.add(AbilityRegistry.SHADOW_VEIL)
-
-        GameRepository.state.party.clear()
-        GameRepository.state.party.add(ralwing)
-        GameRepository.state.activeHeroId = ralwing.id
-        GameRepository.state.gold = 5000
+    private fun devButton(txt: String, onClick: () -> Unit): Button {
+        return Button(this).apply {
+            text = txt
+            setOnClickListener { onClick() }
+        }
     }
 
     private fun instantEndgame() {
-        if (GameRepository.state.party.isEmpty()) devBootstrap()
-        val s = GameRepository.state
-        s.world.globalStability = 95
-        s.prayer.faith = 80
-        s.prayer.virtue = 70
-        s.prayer.sins = 0
-        s.gold = 9999
-        com.grimreich.systems.QuestSystem.seedIntegratedContent()
-        com.grimreich.systems.QuestSystem.complete("eq1_signs")
-        com.grimreich.systems.QuestSystem.complete("eq2_alliances")
-        com.grimreich.systems.QuestSystem.complete("eq3_pilgrimage")
-        com.grimreich.systems.ChronicleSystem.record("Kotwica odnalazła prawdę w Sercu Krainy.", 5)
-    }
-
-    private fun jumpTo(activityClass: Class<*>) {
-        if (GameRepository.state.party.isEmpty()) {
-            devBootstrap()
+        val state = GameRepository.state
+        QuestSystem.seedIntegratedContent()
+        
+        // Complete some dummy quests to trigger endgame logic if any exists
+        val first = QuestSystem.all().firstOrNull()?.id
+        if (first != null) {
+            QuestSystem.complete(first)
         }
-        startActivity(Intent(this, activityClass))
+        
+        startActivity(Intent(this, MainActivity::class.java))
+        finish()
     }
 }

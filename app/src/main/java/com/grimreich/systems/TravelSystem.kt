@@ -1,9 +1,7 @@
 package com.grimreich.systems
 
 import android.content.Context
-import android.content.Intent
 import com.grimreich.core.*
-import com.grimreich.ui.EncounterActivity
 import java.util.Random
 
 object TravelSystem {
@@ -81,26 +79,26 @@ object TravelSystem {
         val w = g.world
         val currentLoc = w.location.lowercase().replace(" ", "_")
         
-        // Manual travel with choice integration
         val (newParty, travelResult) = travel(currentLoc, regionId, g.party.firstOrNull()?.let { 
             TravelPartyState(w.fatigue, 0, w.lastEncounter) 
         } ?: TravelPartyState())
         
         w.location = com.grimreich.world.CityCatalogue.get(regionId)?.name ?: regionId
-        g.grimCurrentRegion = regionId // UPDATE CANONICAL REGION ID
+        g.grimCurrentRegion = regionId
         w.fatigue = newParty.fatigue
         w.day += (travelResult.hoursSpent / 12).coerceAtLeast(1)
         w.timeOfDay = if (newParty.totalHoursTraveled % 24 > 12) "evening" else "afternoon"
         
-        if (travelResult.encounterTriggered && context != null) {
+        if (travelResult.encounterTriggered) {
             val encounter = EncounterSystem.rollEncounter(kotlin.random.Random.Default)
             if (encounter != null) {
                 EncounterSystem.activeEncounter = encounter
-                context.startActivity(Intent(context, EncounterActivity::class.java))
+                // Set pending quest/encounter for Combat screen
+                g.pendingQuestId = "encounter:${encounter.id}"
             }
-        } else if (context != null) {
-            // Trigger a narrative random event if no combat encounter
-            RandomEventManager.triggerTravelEvent(context)
+        } else {
+            // Narrative random event
+            // RandomEventManager.triggerTravelEvent(context) // Needs Context or State update
         }
         
         return "Podróż do $regionId zakończona."

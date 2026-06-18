@@ -1,8 +1,15 @@
-<resources xmlns:tools="http://schemas.android.com/tools">
+<resources>
+    <!-- FINAL UNIFIED THEME -->
     <style name="Theme.GrimReich" parent="Theme.Material3.DayNight.NoActionBar">
         <item name="android:windowNoTitle">true</item>
         <item name="android:windowFullscreen">true</item>
         <item name="android:windowContentOverlay">@null</item>
         <item name="android:windowBackground">@color/grimBgMain</item>
+        <item name="android:textColor">@color/grimTextPrimary</item>
+        <item name="colorPrimary">@color/grimBgMain</item>
+        <item name="colorPrimaryDark">@color/grimBgUltraDark</item>
+        <item name="colorAccent">@color/grimAccentGold</item>
+        <item name="colorSurface">@color/grimBgSide</item>
+        <item name="android:fontFamily">monospace</item>
     </style>
 </resources>

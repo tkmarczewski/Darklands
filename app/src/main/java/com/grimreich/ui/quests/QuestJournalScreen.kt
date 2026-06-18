@@ -21,16 +21,17 @@ import com.grimreich.systems.QuestSystem
 fun QuestJournalScreen(
     onBack: () -> Unit
 ) {
-    // FORCE SEED REFRESH
+    // FORCE SEED ON ENTER
     LaunchedEffect(Unit) {
         QuestSystem.seedIntegratedContent()
     }
 
-    val state = GameRepository.state
-    val activeQuests = state.quest.activeQuests.mapNotNull { QuestSystem.getQuest(it) }
-    val completedQuests = state.quest.completedQuests.mapNotNull { QuestSystem.getQuest(it) }
+    var refreshToggle by remember { mutableStateOf(0) }
     
-    // Also show available quests in current city
+    val state = GameRepository.state
+    val activeQuests = remember(refreshToggle) { state.quest.activeQuests.mapNotNull { QuestSystem.getQuest(it) } }
+    val completedQuests = remember(refreshToggle) { state.quest.completedQuests.mapNotNull { QuestSystem.getQuest(it) } }
+    
     val rawCity = state.grimCurrentRegion
     val cityId = rawCity.lowercase()
         .replace("ą", "a").replace("ć", "c").replace("ę", "e")
@@ -38,7 +39,7 @@ fun QuestJournalScreen(
         .replace("ś", "s").replace("ź", "z").replace("ż", "z")
         .replace(" ", "_")
     
-    val availableQuests = QuestSystem.availableForCity(cityId)
+    val availableQuests = remember(refreshToggle) { QuestSystem.availableForCity(cityId) }
 
     Column(
         modifier = Modifier
@@ -66,7 +67,10 @@ fun QuestJournalScreen(
                 item { EmptyLabel("Brak nowych ogłoszeń.") }
             } else {
                 items(availableQuests) { quest ->
-                    QuestCard(quest, canAccept = true)
+                    QuestCard(quest, canAccept = true) {
+                        QuestSystem.activate(quest.id)
+                        refreshToggle++
+                    }
                 }
             }
 
@@ -111,9 +115,12 @@ private fun EmptyLabel(text: String) {
 }
 
 @Composable
-private fun QuestCard(quest: QuestEntry, isCompleted: Boolean = false, canAccept: Boolean = false) {
-    var accepted by remember { mutableStateOf(false) }
-
+private fun QuestCard(
+    quest: QuestEntry, 
+    isCompleted: Boolean = false, 
+    canAccept: Boolean = false,
+    onAccept: () -> Unit = {}
+) {
     Card(
         modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
         colors = CardDefaults.cardColors(containerColor = Color(0xFF0A0A0A)),
@@ -127,12 +134,9 @@ private fun QuestCard(quest: QuestEntry, isCompleted: Boolean = false, canAccept
                     color = if (isCompleted) Color.Gray else Color(0xFFC0A060),
                     modifier = Modifier.weight(1f)
                 )
-                if (canAccept && !accepted) {
+                if (canAccept) {
                     Button(
-                        onClick = {
-                            QuestSystem.activate(quest.id)
-                            accepted = true
-                        },
+                        onClick = onAccept,
                         colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2A4000)),
                         contentPadding = PaddingValues(horizontal = 8.dp, vertical = 0.dp),
                         modifier = Modifier.height(28.dp)

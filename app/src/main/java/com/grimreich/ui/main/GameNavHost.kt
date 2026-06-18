@@ -1,14 +1,11 @@
 package com.grimreich.ui.main
 
-import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.material3.Text
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -39,7 +36,6 @@ sealed class GameRoute(val route: String) {
     object CharDetail : GameRoute("char_detail")
     object Inventory : GameRoute("inventory")
     object WorldLog : GameRoute("world_log")
-    object Alchemy : GameRoute("alchemy")
 }
 
 @Composable
@@ -64,7 +60,6 @@ fun GameNavHost(
             GameScreenMode.CHAR_DETAIL -> GameRoute.CharDetail.route
             GameScreenMode.INVENTORY -> GameRoute.Inventory.route
             GameScreenMode.WORLD_LOG -> GameRoute.WorldLog.route
-            GameScreenMode.ALCHEMY -> GameRoute.Alchemy.route
             else -> GameRoute.Hub.route
         }
         navController.navigate(route) {
@@ -91,7 +86,7 @@ fun GameNavHost(
         composable(GameRoute.City.route) {
             CityScreen(
                 viewModel = root.cityVM,
-                onMarket = { /* Market placeholder */ },
+                onMarket = { /* Market flow */ },
                 onTavern = { root.setMode(GameScreenMode.TAVERN) },
                 onTemple = { root.setMode(GameScreenMode.TEMPLE) },
                 onRecruit = { root.setMode(GameScreenMode.RECRUIT) },
@@ -169,10 +164,6 @@ fun GameNavHost(
                  logEntries = ChronicleSystem.getAll().reversed(),
                  onBack = { root.setMode(GameScreenMode.HUB) }
              )
-        }
-
-        composable(GameRoute.Alchemy.route) {
-            Text("KOCIOŁ ALCHEMICZNY (TBD)", color = Color(0xFFC0A060), modifier = Modifier.padding(16.dp))
         }
     }
 }

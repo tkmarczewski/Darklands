@@ -17,12 +17,13 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // Only bootstrap if the game state is empty
+        // Bootstrap if empty
         if (GameRepository.state.party.isEmpty()) {
             GameLoopController.bootstrap(seed = 1)
         }
         
-        // GLOBAL SEEDING ON START
+        // MANDATORY SESSION SEEDING
+        CityCatalogue.clear()
         CityCatalogue.seedCanonical()
         DialogueManager.seedBasicDialogues()
         QuestSystem.seedIntegratedContent(seed = 1)

@@ -43,6 +43,8 @@ object QuestSystem {
     }
 
     fun seedIntegratedContent(seed: Int = 1) {
+        if (quests.isNotEmpty()) return
+
         clear()
         
         // 1. STARTING QUEST - Force register for normalized starting city
