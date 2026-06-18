@@ -6,10 +6,10 @@
         android:theme="@style/Theme.GrimReich"
         android:supportsRtl="true">
 
+        <!-- INITIAL LAUNCHER: Splash -> Main Menu -->
         <activity android:name=".ui.SplashActivity"
             android:exported="true"
-            android:screenOrientation="landscape"
-            android:theme="@style/Theme.GrimReich">
+            android:screenOrientation="landscape">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
@@ -21,40 +21,21 @@
             android:screenOrientation="landscape">
         </activity>
 
+        <!-- SINGLE ACTIVITY ROOT: ALL GAMEPLAY HAPPENS HERE -->
         <activity android:name=".ui.MainActivity"
             android:exported="false"
+            android:configChanges="orientation|screenSize|keyboardHidden"
             android:screenOrientation="landscape">
         </activity>
 
-        <activity android:name=".ui.CharacterCreatorActivity" android:exported="false" android:screenOrientation="landscape"/>
-        <activity android:name=".ui.DevMenuActivity" android:exported="true" android:screenOrientation="landscape"/>
+        <activity android:name=".ui.CharacterCreatorActivity"
+            android:exported="false"
+            android:screenOrientation="landscape"/>
 
-        <activity android:name=".ui.PartyActivity" android:exported="false" android:screenOrientation="landscape"/>
-        <activity android:name=".ui.CharacterActivity" android:exported="false" android:screenOrientation="landscape"/>
-        <activity android:name=".ui.InventoryActivity" android:exported="false" android:screenOrientation="landscape"/>
-        <activity android:name=".ui.MapActivity" android:exported="false" android:screenOrientation="landscape"/>
-        <activity android:name=".ui.PrayerActivity" android:exported="false" android:screenOrientation="landscape"/>
-        <activity android:name=".ui.AlchemyActivity" android:exported="false" android:screenOrientation="landscape"/>
-        <activity android:name=".ui.CombatActivity" android:exported="false" android:screenOrientation="landscape"/>
-        <activity android:name=".ui.EndgameActivity" android:exported="false" android:screenOrientation="landscape"/>
-        <activity android:name=".ui.HubActivity" android:exported="true" android:screenOrientation="landscape"/>
-        <activity android:name=".ui.CityActivity" android:exported="false" android:screenOrientation="landscape"/>
-        <activity android:name=".ui.TavernActivity" android:exported="false" android:screenOrientation="landscape"/>
-        <activity android:name=".ui.WorldLogActivity" android:exported="false" android:screenOrientation="landscape"/>
-        <activity android:name=".ui.ReputationActivity" android:exported="false" android:screenOrientation="landscape"/>
-                <activity android:name=".ui.CoastlineActivity" android:exported="false" android:screenOrientation="landscape"/>
-        <activity android:name=".ui.SaintsActivity" android:exported="false" android:screenOrientation="landscape"/>
-        <activity android:name=".ui.CityEventsActivity" android:exported="false" android:screenOrientation="landscape"/>
-        <activity android:name=".ui.TradeActivity" android:exported="false" android:screenOrientation="landscape"/>
-        <activity android:name=".ui.InventoryTransferActivity" android:exported="false" android:screenOrientation="landscape"/>
-        <activity android:name=".ui.InventoryDetailActivity" android:exported="false" android:screenOrientation="landscape"/>
-        <activity android:name=".ui.CombatStatusActivity" android:exported="false" android:screenOrientation="landscape"/>
-        <activity android:name=".ui.QuestFinalActivity" android:exported="false" android:screenOrientation="landscape"/>
-        <activity android:name=".ui.FinaleActivity" android:exported="false" android:screenOrientation="landscape"/>
-        <activity android:name=".ui.EncounterActivity" android:exported="false" android:screenOrientation="landscape"/>
-        <activity android:name=".ui.DialogueActivity" android:exported="false" android:screenOrientation="landscape"/>
-        <activity android:name=".ui.RecruitmentActivity" android:exported="false" android:screenOrientation="landscape"/>
-        <activity android:name=".ui.QuestJournalActivity" android:exported="false" android:screenOrientation="landscape"/>
-        <activity android:name=".ui.QuestLocationActivity" android:exported="false" android:screenOrientation="landscape"/>
+        <activity android:name=".ui.DevMenuActivity"
+            android:exported="true"
+            android:screenOrientation="landscape"/>
+
+        <!-- LEGACY ACTIVITIES PURGED FROM MANIFEST -->
     </application>
 </manifest>

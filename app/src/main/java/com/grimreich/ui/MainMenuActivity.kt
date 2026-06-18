@@ -2,7 +2,6 @@ package com.grimreich.ui
 
 import android.content.Intent
 import android.os.Bundle
-import android.view.View
 import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
@@ -17,14 +16,13 @@ class MainMenuActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main_menu)
 
         findViewById<Button>(R.id.btnNewGame).setOnClickListener {
-            SaveLoadSystem.clear(this) // Reset for new game
-            com.grimreich.systems.QuestSystem.seedIntegratedContent() // SEED QUESTS ON NEW GAME
+            SaveLoadSystem.clear(this) 
             startActivity(Intent(this, CharacterCreatorActivity::class.java))
         }
 
         val btnContinue = findViewById<Button>(R.id.btnContinue)
         val hasSave = SaveLoadSystem.hasSave(this)
-        btnContinue.visibility = View.VISIBLE // Always show
+        
         if (hasSave) {
             btnContinue.isEnabled = true
             btnContinue.alpha = 1.0f
@@ -37,7 +35,10 @@ class MainMenuActivity : AppCompatActivity() {
 
         btnContinue.setOnClickListener {
             if (SaveLoadSystem.load(this)) {
-                startActivity(Intent(this, MainActivity::class.java))
+                // REDIRECT TO SINGLE ACTIVITY
+                val intent = Intent(this, MainActivity::class.java)
+                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                startActivity(intent)
                 finish()
             } else {
                 Toast.makeText(this, "Brak zapisu gry!", Toast.LENGTH_SHORT).show()

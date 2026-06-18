@@ -189,7 +189,7 @@ class CharacterCreatorActivity : AppCompatActivity() {
     }
 
     private fun finalizeCharacter(name: String) {
-        // BOOTSTRAP SYSTEMS
+        // RESET SYSTEMS BEFORE START
         CityCatalogue.clear()
         CityCatalogue.seedCanonical()
         QuestSystem.clear()
@@ -225,7 +225,10 @@ class CharacterCreatorActivity : AppCompatActivity() {
             world.location = "wybrzeze_polnocne"
         }
         
-        startActivity(android.content.Intent(this, MainActivity::class.java))
+        // REDIRECT TO SINGLE ACTIVITY
+        val intent = android.content.Intent(this, MainActivity::class.java)
+        intent.flags = android.content.Intent.FLAG_ACTIVITY_NEW_TASK or android.content.Intent.FLAG_ACTIVITY_CLEAR_TASK
+        startActivity(intent)
         finish()
     }
 }

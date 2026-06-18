@@ -1,11 +1,14 @@
 package com.grimreich.ui.main
 
+import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.material3.Text
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -20,6 +23,8 @@ import com.grimreich.ui.tavern.TavernScreen
 import com.grimreich.ui.saints.SaintsScreen
 import com.grimreich.ui.quests.QuestJournalScreen
 import com.grimreich.ui.tavern.RecruitmentScreen
+import com.grimreich.ui.inventory.InventoryScreen
+import com.grimreich.systems.ChronicleSystem
 
 sealed class GameRoute(val route: String) {
     object Hub : GameRoute("hub")
@@ -32,6 +37,9 @@ sealed class GameRoute(val route: String) {
     object Quests : GameRoute("quests")
     object Recruit : GameRoute("recruit")
     object CharDetail : GameRoute("char_detail")
+    object Inventory : GameRoute("inventory")
+    object WorldLog : GameRoute("world_log")
+    object Alchemy : GameRoute("alchemy")
 }
 
 @Composable
@@ -54,6 +62,9 @@ fun GameNavHost(
             GameScreenMode.QUESTS -> GameRoute.Quests.route
             GameScreenMode.RECRUIT -> GameRoute.Recruit.route
             GameScreenMode.CHAR_DETAIL -> GameRoute.CharDetail.route
+            GameScreenMode.INVENTORY -> GameRoute.Inventory.route
+            GameScreenMode.WORLD_LOG -> GameRoute.WorldLog.route
+            GameScreenMode.ALCHEMY -> GameRoute.Alchemy.route
             else -> GameRoute.Hub.route
         }
         navController.navigate(route) {
@@ -80,7 +91,7 @@ fun GameNavHost(
         composable(GameRoute.City.route) {
             CityScreen(
                 viewModel = root.cityVM,
-                onMarket = { /* Market */ },
+                onMarket = { /* Market placeholder */ },
                 onTavern = { root.setMode(GameScreenMode.TAVERN) },
                 onTemple = { root.setMode(GameScreenMode.TEMPLE) },
                 onRecruit = { root.setMode(GameScreenMode.RECRUIT) },
@@ -146,12 +157,22 @@ fun GameNavHost(
             } ?: root.setMode(GameScreenMode.HUB)
         }
 
-        composable(GameScreenMode.INVENTORY.name) {
-             Text("Ekran Ekwipunku (TBD)", color = Color.White)
+        composable(GameRoute.Inventory.route) {
+             InventoryScreen(
+                 viewModel = root.inventoryVM,
+                 onBack = { root.setMode(GameScreenMode.HUB) }
+             )
         }
-        
-        composable(GameScreenMode.WORLD_LOG.name) {
-             Text("Ekran Kroniki (TBD)", color = Color.White)
+
+        composable(GameRoute.WorldLog.route) {
+             WorldLogScreen(
+                 logEntries = ChronicleSystem.getAll().reversed(),
+                 onBack = { root.setMode(GameScreenMode.HUB) }
+             )
+        }
+
+        composable(GameRoute.Alchemy.route) {
+            Text("KOCIOŁ ALCHEMICZNY (TBD)", color = Color(0xFFC0A060), modifier = Modifier.padding(16.dp))
         }
     }
 }

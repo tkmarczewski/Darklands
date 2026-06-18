@@ -14,7 +14,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -33,7 +32,6 @@ fun HubScreen(
     onCharacter: (String) -> Unit
 ) {
     val state by viewModel.uiState.collectAsState()
-    val context = LocalContext.current
 
     Box(modifier = Modifier.fillMaxSize().background(Color.Black)) {
         // BACKGROUND
@@ -68,10 +66,12 @@ fun HubScreen(
                     }
                     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         HubNavButton("ZADANIA", modifier = Modifier.weight(1f), onClick = onQuests)
-                        HubNavButton("DRUŻYNA", modifier = Modifier.weight(1f), color = Color(0xFF4A0000), onClick = { /* Logic for team view */ })
+                        HubNavButton("DRUŻYNA", modifier = Modifier.weight(1f), color = Color(0xFF4A0000), onClick = { 
+                            state.party.firstOrNull()?.id?.let { onCharacter(it) }
+                        })
                         HubNavButton("KRONIKA", modifier = Modifier.weight(1f), onClick = onWorldLog)
                     }
-                    
+
                     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         val expeditionText = if (state.activeQuestsCount > 0) "EKSPEDYCJA (${state.activeQuestsCount})" else "BRAK WYPRAW"
                         HubNavButton(
@@ -79,18 +79,12 @@ fun HubScreen(
                             modifier = Modifier.weight(1.5f),
                             color = if (state.activeQuestsCount > 0) Color(0xFFADFF2F) else Color(0xFF1A1A1A),
                             enabled = state.activeQuestsCount > 0,
-                            onClick = { 
-                                val firstQuest = com.grimreich.core.GameRepository.state.quest.activeQuests.firstOrNull()
-                                if (firstQuest != null) {
-                                    com.grimreich.core.GameRepository.state.pendingQuestId = firstQuest
-                                    context.startActivity(android.content.Intent(context, com.grimreich.ui.CombatActivity::class.java))
-                                }
-                            }
+                            onClick = { /* Expedition logic */ }
                         )
                     }
-                    
+
                     Spacer(modifier = Modifier.height(16.dp))
-                    
+
                     // WORLD STATUS LOG MINI
                     Surface(
                         color = Color(0x40000000),
@@ -98,9 +92,9 @@ fun HubScreen(
                         modifier = Modifier.fillMaxWidth().weight(1f)
                     ) {
                         Column(modifier = Modifier.padding(12.dp)) {
-                            Text("AKTYWNE WYDARZENIA", color = Color.Gray, fontSize = 10.sp, fontWeight = FontWeight.Bold)
+                            Text("STATUS ŚWIATA", color = Color.Gray, fontSize = 10.sp, fontWeight = FontWeight.Bold)
                             Spacer(modifier = Modifier.height(8.dp))
-                            Text("Kroniki pękniętego świata...", color = Color.DarkGray, fontSize = 12.sp)
+                            Text("Rzeczywistość w ${state.locationName} pozostaje stabilna.", color = Color.DarkGray, fontSize = 12.sp)
                         }
                     }
                 }
@@ -109,12 +103,13 @@ fun HubScreen(
 
                 // RIGHT: World Log Summary
                 Surface(
-                    color = Color(0x20FFFFFF),
+                    color = Color(0x10FFFFFF),
                     modifier = Modifier.weight(1f).fillMaxHeight()
                 ) {
                     Column(modifier = Modifier.padding(12.dp)) {
                         Text("OSTATNIE WIEŚCI:", color = Color.Gray, fontSize = 10.sp)
-                        // ...
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text("Karczmarze szepczą o powrocie Proroka Aeliona na Wybrzeże Północne.", color = Color.LightGray, fontSize = 11.sp)
                     }
                 }
             }
@@ -122,7 +117,7 @@ fun HubScreen(
             Spacer(modifier = Modifier.height(16.dp))
 
             // BOTTOM: Party Strip
-            Text("TWOJA DRUŻYNA", color = Color.Gray, fontSize = 10.sp, fontWeight = FontWeight.Bold)
+            Text("TWOJA DRUŻYNA (kliknij by podejrzeć)", color = Color.Gray, fontSize = 10.sp, fontWeight = FontWeight.Bold)
             Spacer(modifier = Modifier.height(4.dp))
             LazyRow(
                 modifier = Modifier.fillMaxWidth(),
@@ -142,29 +137,29 @@ fun HubNavButton(text: String, modifier: Modifier = Modifier, color: Color = Col
         onClick = onClick,
         enabled = enabled,
         modifier = modifier.height(60.dp),
-        colors = ButtonDefaults.buttonColors(containerColor = color, disabledContainerColor = color.copy(alpha = 0.5f)),
+        colors = ButtonDefaults.buttonColors(containerColor = color, disabledContainerColor = Color(0xFF0F0F0F)),
         shape = MaterialTheme.shapes.extraSmall,
         border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFF333333))
     ) {
-        Text(text = text, color = if (enabled) Color(0xFFE0C080) else Color.Gray, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+        Text(text = text, color = if (enabled) Color(0xFFE0C080) else Color.DarkGray, fontSize = 12.sp, fontWeight = FontWeight.Bold)
     }
 }
 
 @Composable
 fun PartyMemberCard(hero: Hero, onClick: () -> Unit) {
     Surface(
-        modifier = Modifier.width(120.dp).clickable { onClick() },
-        color = Color(0xFF1A1A1A),
+        modifier = Modifier.width(140.dp).clickable { onClick() },
+        color = Color(0xFF151515),
         shape = MaterialTheme.shapes.extraSmall,
         border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFF444444))
     ) {
-        Column(modifier = Modifier.padding(8.dp)) {
-            Text(text = hero.name, color = Color(0xFFE0C080), fontWeight = FontWeight.Bold, fontSize = 12.sp)
+        Column(modifier = Modifier.padding(10.dp)) {
+            Text(text = hero.name, color = Color(0xFFE0C080), fontWeight = FontWeight.Bold, fontSize = 13.sp)
             LinearProgressIndicator(
                 progress = if (hero.maxHp > 0) hero.hp.toFloat() / hero.maxHp else 0f,
-                modifier = Modifier.fillMaxWidth().height(4.dp).padding(vertical = 4.dp),
+                modifier = Modifier.fillMaxWidth().height(4.dp).padding(vertical = 6.dp),
                 color = Color(0xFFB22222),
-                trackColor = Color(0xFF333333)
+                trackColor = Color(0xFF222222)
             )
             Text(text = "${hero.hp}/${hero.maxHp} HP", color = Color.Gray, fontSize = 10.sp)
         }
