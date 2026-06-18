@@ -37,7 +37,8 @@ class MainMenuActivity : AppCompatActivity() {
 
         btnContinue.setOnClickListener {
             if (SaveLoadSystem.load(this)) {
-                startActivity(Intent(this, HubActivity::class.java))
+                startActivity(Intent(this, MainActivity::class.java))
+                finish()
             } else {
                 Toast.makeText(this, "Brak zapisu gry!", Toast.LENGTH_SHORT).show()
             }

@@ -224,7 +224,7 @@ class CharacterCreatorActivity : AppCompatActivity() {
             activeHeroId = hero.id
         }
         
-        startActivity(android.content.Intent(this, HubActivity::class.java))
+        startActivity(android.content.Intent(this, MainActivity::class.java))
         finish()
     }
 }

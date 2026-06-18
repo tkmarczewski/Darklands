@@ -70,7 +70,7 @@ fun GameNavHost(
                 onInventory = { root.setMode(GameScreenMode.INVENTORY) },
                 onQuests = { root.setMode(GameScreenMode.QUESTS) },
                 onWorldLog = { root.setMode(GameScreenMode.WORLD_LOG) },
-                onCharacter = { heroId -> /* Show character detail */ }
+                onCharacter = { heroId -> /* Show character detail in future */ }
             )
         }
 
@@ -137,8 +137,12 @@ fun GameNavHost(
             )
         }
 
-        composable(GameRoute.Hub.route + "/inventory") {
+        composable(GameScreenMode.INVENTORY.name) {
              Text("Ekran Ekwipunku (TBD)", color = Color.White)
+        }
+        
+        composable(GameScreenMode.WORLD_LOG.name) {
+             Text("Ekran Kroniki (TBD)", color = Color.White)
         }
     }
 }
