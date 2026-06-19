@@ -1,23 +1,19 @@
 package com.grimreich.systems
 
 import com.grimreich.core.GameRepository
-import com.grimreich.core.GameState
-import kotlin.random.Random
+import javax.inject.Inject
+import javax.inject.Singleton
 
-/**
- * Orchestrates global AI agents (Patrols, Caravans) and world state transitions.
- */
-object WorldAIDirector {
-
+@Singleton
+class WorldAIDirector @Inject constructor(
+    private val gameRepository: GameRepository,
+    private val stabilitySystem: StabilitySystem
+) {
     fun onTick() {
-        val state = GameRepository.state
-        
-        // Dynamic patrol movement
-        if (Random.nextFloat() < 0.1f) {
-            state.logEntries.add("Patrole frakcji przegrupowują się w sąsiednim regionie.")
+        val state = gameRepository.currentState()
+        if (state.gold > 1000) {
+            stabilitySystem.updateStability(-1)
         }
-        
-        // Faction conflict resolution
-        // (Hidden calculations that affect town statuses)
+        gameRepository.persistCurrentState()
     }
 }

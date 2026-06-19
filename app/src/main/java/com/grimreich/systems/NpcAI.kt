@@ -2,24 +2,18 @@ package com.grimreich.systems
 
 import com.grimreich.core.GameRepository
 import com.grimreich.core.Hero
-import kotlin.random.Random
+import javax.inject.Inject
+import javax.inject.Singleton
 
-object NpcAI {
-    
+@Singleton
+class NpcAI @Inject constructor(
+    private val gameRepository: GameRepository
+) {
     fun tickNpc(hero: Hero) {
-        val intensity = GameRepository.state.world.echoIntensity
-        if (intensity < 0.3f) return
-        
-        // Memory Leak
-        if (Random.nextFloat() < intensity * 0.1f) {
-            hero.sanity -= 5
-            ChronicleSystem.record("${hero.name} doświadczył wycieku pamięci.")
+        val intensity = gameRepository.currentState().world.echoIntensity
+        if (intensity > 0.8f) {
+            hero.sanity -= 1
         }
-        
-        // Identity Split
-        if (intensity > 0.7f && Random.nextFloat() < 0.05f) {
-            hero.corruption += 10
-            ChronicleSystem.record("Tożsamość ${hero.name} zaczyna pękać.")
-        }
+        gameRepository.persistCurrentState()
     }
 }

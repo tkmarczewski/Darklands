@@ -1,29 +1,17 @@
 package com.grimreich.core
 
-/**
- * Implements advanced tactical layers: Mutation Synergies and Action Economy.
- */
-object AdvancedTactics {
+import javax.inject.Inject
+import javax.inject.Singleton
 
+@Singleton
+class AdvancedTactics @Inject constructor(
+    private val gameRepository: GameRepository
+) {
     fun applySynergies(hero: Hero) {
-        val activeMutationTypes = hero.abilities.map { it.id.uppercase() }.toSet()
-        
-        // Example Synergy: BLOOD + SHADOW = BLOOD MIST
-        if (activeMutationTypes.contains("BLOOD") && activeMutationTypes.contains("SHADOW")) {
-            hero.morale += 15
-            hero.agility += 2
+        if (hero.skills.getOrDefault("ALCH", 0) > 20 && hero.intelligence > 12) {
+            gameRepository.log("${hero.name} odkrył synergię alchemiczną!")
         }
     }
-
-    fun handleReaction(state: CombatState, trigger: ReactionTrigger, entityId: String): CombatState {
-        // Logic for processing Parry/Dodge/Counter reactions
-        return state
-    }
 }
 
-enum class ReactionTrigger {
-    ON_MELEE_HIT,
-    ON_RANGED_HIT,
-    ON_DAMAGE_TAKEN,
-    ON_SPELL_CAST
-}
+enum class ReactionTrigger { ON_MELEE_HIT, ON_RANGED_HIT, ON_DAMAGE_TAKEN, ON_SPELL_CAST }

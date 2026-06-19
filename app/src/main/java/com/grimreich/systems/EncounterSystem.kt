@@ -1,7 +1,8 @@
 package com.grimreich.systems
 
-import com.grimreich.core.GameRepository
 import com.grimreich.core.GameState
+import javax.inject.Inject
+import javax.inject.Singleton
 import kotlin.random.Random
 
 enum class EncounterType {
@@ -19,99 +20,32 @@ data class Encounter(
     val title: String,
     val description: String,
     val type: EncounterType,
-    val choices: List<EncounterChoice> = emptyList()
+    val choices: List<EncounterChoice>
 )
 
-object EncounterSystem {
+@Singleton
+class EncounterSystem @Inject constructor(
+    private val lootSystem: LootSystem
+) {
     private val encounters = listOf(
         Encounter(
-            "abandoned_cart", 
-            "Porzucony wóz", 
-            "W przydrożnym rowie leży rozbity wóz handlowy. Nie widać żywej duszy.", 
+            "enc_01", "Cienie w zaułku", "Widzisz migoczące światło w głębi uliczki.",
             EncounterType.INTERACTIVE,
             listOf(
-                EncounterChoice("Przeszukaj", "Szukasz cennych przedmiotów.") { state ->
-                    val gold = Random.nextInt(20, 60)
-                    state.gold += gold
-                    state.party.forEach { it.corruption += 1 }
-                    val lootMsg = LootSystem.awardLoot(0.3f)
-                    "Znalazłeś $gold złota, ale sumienie cię gryzie (+1 Korupcja).$lootMsg"
+                EncounterChoice("Sprawdź", "Znalazłeś porzuconą torbę.") { state ->
+                    lootSystem.awardLoot(1.0f)
                 },
-                EncounterChoice("Módl się", "Odmawiasz modlitwę za właścicieli.") { state ->
-                    state.prayer.virtue += 2
-                    state.party.forEach { it.sanity += 5 }
-                    "Poczuliście spokój (+2 Cnota, +5 Poczytalność)."
-                },
-                EncounterChoice("Zignoruj", "Omijasz wóz szerokim łukiem.") { "Zostawiliście to miejsce w mroku." }
+                EncounterChoice("Ignoruj", "Przeszedłeś obok.") { "Bezpieczeństwo przede wszystkim." }
             )
-        ),
-        Encounter(
-            "mysterious_shrine",
-            "Mroczna kapliczka",
-            "Na rozstajach dróg stoi kapliczka spowita czarną mgłą.",
-            EncounterType.INTERACTIVE,
-            listOf(
-                EncounterChoice("Złóż ofiarę", "Poświęcasz odrobinę krwi.") { state ->
-                    state.party.forEach { 
-                        it.hp -= 5
-                        it.corruption += 5
-                    }
-                    "Mrok cię zauważył (+5 Korupcja, -5 HP)."
-                },
-                EncounterChoice("Oczyść ją", "Używasz świętej wody i modlitwy.") { state ->
-                    state.prayer.faith += 5
-                    state.prayer.virtue += 5
-                    "Mgła nieco rzednie (+5 Wiara, +5 Cnota)."
-                }
-            )
-        )
-                ,
-        // === COMBAT ENCOUNTERS ===
-        Encounter(
-            "bandits_road",
-            "Bandyci na drodze!",
-            "Z krzaków wyskakuje grupa uzbrojon ych bandytów. Jeden krzyczy: 'Portmonetka albo życie!'",
-            EncounterType.COMBAT
-        ),
-        Encounter(
-            "wolves_attack",
-            "Wataha wilków!",
-            "Watacha wilków otacza Wasz obóz. Ich ślepie błyszczą wśród drzew. Atak jest nieuchronny.",
-            EncounterType.COMBAT
-        ),
-        Encounter(
-            "cultists_ambush",
-            "Zasadzka kultystów!",
-            "Zakapturzeni kultysts wyskakują z ukrycia. Ich rytuałne symbole płoną w mrokach nocy.",
-            EncounterType.COMBAT
-        ),
-        Encounter(
-            "undead_patrol",
-            "Nieożywe patrole!",
-            "Szkielety w zardziałej zbroi zastgrają Wam drogę. Puste oczodoły wpatrzone w Was bez litości.",
-            EncounterType.COMBAT
-        ),
-        Encounter(
-            "raubritter_scout",
-            "Zwiadowcy Raubrittera!",
-            "Konni żołnierze Raubrittera odcinają Wam odwrót. Ich herby płoną na tarczach.",
-            EncounterType.COMBAT
-        ),
-        Encounter(
-            "demon_minor",
-            "Pomniejszy demon!",
-            "Z rozstępu w rzeczywistości wyłania się zniekształcona postać. Mgła kręci się wokół jej nóg.",
-            EncounterType.COMBAT
         )
     )
 
-    fun rollEncounter(random: Random): Encounter? {
-        val chance = 0.5f 
-        if (random.nextFloat() > chance) return null
-        return encounters.random(random)
-    }
-
     var activeEncounter: Encounter? = null
+
+    fun rollEncounter(random: Random): Encounter? {
+        if (random.nextFloat() > 0.3f) return null
+        return encounters.random()
+    }
 
     fun selectEncounter(encounter: Encounter) {
         activeEncounter = encounter

@@ -1,19 +1,23 @@
 package com.grimreich.systems
 
+import com.grimreich.core.GameRepository
 import com.grimreich.core.Hero
+import javax.inject.Inject
+import javax.inject.Singleton
 
-object ExperienceSystem {
-    
+@Singleton
+class ExperienceSystem @Inject constructor(
+    private val gameRepository: GameRepository
+) {
     fun addXp(hero: Hero, amount: Int): String {
         hero.xp += amount
-        val threshold = hero.level * 100
-        return if (hero.xp >= threshold) {
-            hero.level += 1
-            hero.xp -= threshold
-            hero.attributePoints += 2
-            "${hero.name} awansuje na poziom ${hero.level}! Zyskał 2 punkty atrybutów."
-        } else {
-            "${hero.name} zyskał $amount XP."
-        }
+        val leveledUp = if (hero.xp >= hero.level * 100) {
+            hero.level++
+            hero.xp = 0
+            true
+        } else false
+
+        gameRepository.persistCurrentState()
+        return if (leveledUp) "Awans! ${hero.name} osiągnął poziom ${hero.level}." else "Zdobyto $amount XP."
     }
 }

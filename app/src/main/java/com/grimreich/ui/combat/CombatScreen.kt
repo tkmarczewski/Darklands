@@ -4,7 +4,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -15,13 +14,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.grimreich.core.CombatState
-import com.grimreich.core.GameRepository
 
 @Composable
 fun CombatScreen(viewModel: CombatViewModel, onExit: () -> Unit) {
-    val state by viewModel.uiState.collectAsState()
-    val party = GameRepository.state.party
+    val uiState by viewModel.uiState.collectAsState()
+    val state = uiState.combat
+    val party = uiState.party
 
     Column(
         modifier = Modifier
@@ -29,7 +27,6 @@ fun CombatScreen(viewModel: CombatViewModel, onExit: () -> Unit) {
             .background(Color(0xFF0E0E0E))
             .padding(16.dp)
     ) {
-        // HEADER: Combat Status
         Text(
             text = if (state.active) "⚔ WALKA: ${state.enemyName}" else "⚔ KONIEC WALKI",
             color = Color(0xFFE0C080),
@@ -39,9 +36,7 @@ fun CombatScreen(viewModel: CombatViewModel, onExit: () -> Unit) {
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // CENTER: Enemies and Party
         Row(modifier = Modifier.weight(1f)) {
-            // LEFT: Party
             Column(modifier = Modifier.weight(1f)) {
                 Text("TWOJA DRUŻYNA", color = Color.Gray, fontSize = 10.sp)
                 Spacer(modifier = Modifier.height(4.dp))
@@ -52,7 +47,6 @@ fun CombatScreen(viewModel: CombatViewModel, onExit: () -> Unit) {
 
             Spacer(modifier = Modifier.width(16.dp))
 
-            // RIGHT: Enemy Strip (RecyclerView equivalent in Compose)
             Column(modifier = Modifier.weight(1f)) {
                 Text("PRZECIWNICY", color = Color.Gray, fontSize = 10.sp, modifier = Modifier.align(Alignment.End))
                 Spacer(modifier = Modifier.height(4.dp))
@@ -65,7 +59,6 @@ fun CombatScreen(viewModel: CombatViewModel, onExit: () -> Unit) {
             }
         }
 
-        // COMBAT LOG
         Surface(
             modifier = Modifier
                 .fillMaxWidth()
@@ -81,7 +74,6 @@ fun CombatScreen(viewModel: CombatViewModel, onExit: () -> Unit) {
             }
         }
 
-        // ACTIONS
         if (state.active) {
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
                 CombatButton("ATAK", onClick = { viewModel.attack() })
@@ -114,7 +106,7 @@ fun CombatantRow(name: String, hp: Int, maxHp: Int, isEnemy: Boolean) {
             Text(text = name, color = Color.White, fontWeight = FontWeight.Bold, fontSize = 12.sp)
         }
         LinearProgressIndicator(
-            progress = if (maxHp > 0) hp.toFloat() / maxHp else 0f,
+            progress = { if (maxHp > 0) hp.toFloat() / maxHp else 0f },
             modifier = Modifier.fillMaxWidth().height(4.dp),
             color = barColor,
             trackColor = Color(0xFF333333)

@@ -1,176 +1,64 @@
 package com.grimreich.core
 
+import javax.inject.Inject
+import javax.inject.Singleton
+
 enum class Career(
     val displayName: String,
     val minAge: Int,
     val maxAge: Int,
-    val requiredVirtue: Int,
-    val requiredStrength: Int,
-    val requiredAgility: Int,
-    val requiredIntelligence: Int,
+    val requiredVirtue: Int = 0,
+    val requiredStrength: Int = 0,
+    val requiredAgility: Int = 0,
+    val requiredIntelligence: Int = 0,
     val strBonus: Int = 0,
     val agiBonus: Int = 0,
     val intBonus: Int = 0,
     val virtueBonus: Int = 0,
     val description: String = ""
 ) {
-    PAGE(
-        displayName = "Paź",
-        minAge = 7, maxAge = 14,
-        requiredVirtue = 0,
-        requiredStrength = 0, requiredAgility = 0, requiredIntelligence = 0,
-        agiBonus = 1, virtueBonus = 1,
-        description = "Służba na dworze. Podstawy etykiety i walki."
-    ),
-    SQUIRE(
-        displayName = "Giermek",
-        minAge = 14, maxAge = 21,
-        requiredVirtue = 2,
-        requiredStrength = 3, requiredAgility = 2, requiredIntelligence = 1,
-        strBonus = 2, agiBonus = 1,
-        description = "Szkolenie rycerskie. Walka, jazda konna, honor."
-    ),
-    KNIGHT(
-        displayName = "Rycerz",
-        minAge = 21, maxAge = 50,
-        requiredVirtue = 5,
-        requiredStrength = 6, requiredAgility = 4, requiredIntelligence = 2,
-        strBonus = 3, agiBonus = 1, virtueBonus = 2,
-        description = "Pełny rycerz. Kodeks honoru, walka w zbroi."
-    ),
-    MERCENARY(
-        displayName = "Najemnik",
-        minAge = 16, maxAge = 45,
-        requiredVirtue = 0,
-        requiredStrength = 4, requiredAgility = 3, requiredIntelligence = 0,
-        strBonus = 2, agiBonus = 2,
-        description = "Walka za pieniądze. Bez honoru, z doświadczeniem."
-    ),
-    SCHOLAR(
-        displayName = "Uczony",
-        minAge = 14, maxAge = 60,
-        requiredVirtue = 1,
-        requiredStrength = 0, requiredAgility = 0, requiredIntelligence = 4,
-        intBonus = 3, virtueBonus = 1,
-        description = "Nauka, alchemia, teologia. Słaby fizycznie, silny umysłem."
-    ),
-    MONK(
-        displayName = "Mnich",
-        minAge = 16, maxAge = 60,
-        requiredVirtue = 4,
-        requiredStrength = 0, requiredAgility = 0, requiredIntelligence = 3,
-        intBonus = 2, virtueBonus = 3,
-        description = "Życie klasztorne. Modlitwa, wiedza, asceza."
-    ),
-    THIEF(
-        displayName = "Złodziej",
-        minAge = 12, maxAge = 40,
-        requiredVirtue = 0,
-        requiredStrength = 1, requiredAgility = 5, requiredIntelligence = 2,
-        agiBonus = 3, intBonus = 1,
-        description = "Życie poza prawem. Zwinność i spryt kosztem honoru."
-    ),
-    ALCHEMIST(
-        displayName = "Alchemik",
-        minAge = 20, maxAge = 60,
-        requiredVirtue = 1,
-        requiredStrength = 0, requiredAgility = 1, requiredIntelligence = 5,
-        intBonus = 3,
-        description = "Nauka tajemna. Mikstury, transmutacje, eksperymenty."
-    ),
-    CRAFTSMAN(
-        displayName = "Rzemieślnik",
-        minAge = 14, maxAge = 50,
-        requiredVirtue = 0,
-        requiredStrength = 2, requiredAgility = 2, requiredIntelligence = 1,
-        strBonus = 1, agiBonus = 1,
-        description = "Praca w warsztacie. Stolarz, kowal, garncarz."
-    ),
-    MERCHANT(
-        displayName = "Kupiec",
-        minAge = 18, maxAge = 60,
-        requiredVirtue = 1,
-        requiredStrength = 0, requiredAgility = 1, requiredIntelligence = 3,
-        intBonus = 2,
-        description = "Handel i biznes. Umiejętność negocjacji."
-    ),
-    GUARD(
-        displayName = "Strażnik",
-        minAge = 18, maxAge = 45,
-        requiredVirtue = 2,
-        requiredStrength = 4, requiredAgility = 2, requiredIntelligence = 0,
-        strBonus = 2, agiBonus = 1, virtueBonus = 1,
-        description = "Służba miejska. Porządek i prawo."
-    ),
-    PRIEST(
-        displayName = "Ksiądz",
-        minAge = 22, maxAge = 65,
-        requiredVirtue = 5,
-        requiredStrength = 0, requiredAgility = 0, requiredIntelligence = 3,
-        intBonus = 2, virtueBonus = 3,
-        description = "Służba Kościoła. Modlitwa i nauczanie."
-    ),
-    PHYSICIAN(
-        displayName = "Lekarz",
-        minAge = 20, maxAge = 60,
-        requiredVirtue = 1,
-        requiredStrength = 0, requiredAgility = 1, requiredIntelligence = 5,
-        intBonus = 3,
-        description = "Medycyna i leczenie. Znajomość ciała."
-    ),
-    APPRENTICE(
-        displayName = "Uczeń",
-        minAge = 10, maxAge = 18,
-        requiredVirtue = 0,
-        requiredStrength = 0, requiredAgility = 1, requiredIntelligence = 1,
-        agiBonus = 1,
-        description = "Nauka rzemiosła. Pierwszy krok kariery."
-    ),
-    INQUISITOR(
-        displayName = "Inkwizytor",
-        minAge = 25, maxAge = 60,
-        requiredVirtue = 7,
-        requiredStrength = 4, requiredAgility = 2, requiredIntelligence = 6,
-        strBonus = 1, intBonus = 2, virtueBonus = 3,
-        description = "Młot na heretyków. Wiara i stal."
-    ),
-    ROGUE(
-        displayName = "Łotr",
-        minAge = 16, maxAge = 40,
-        requiredVirtue = 0,
-        requiredStrength = 2, requiredAgility = 6, requiredIntelligence = 3,
-        agiBonus = 3, intBonus = 2,
-        description = "Cień w zaułkach. Spryt i kradzież."
-    )
+    PAGE("Paź", 7, 14, strBonus = 1, agiBonus = 1, description = "Młody sługa uczący się podstaw rycerskiego rzemiosła."),
+    SQUIRE("Giermek", 14, 21, requiredStrength = 10, strBonus = 2, agiBonus = 1, description = "Pomocnik rycerza, szkolący się w walce i etykiecie."),
+    KNIGHT("Rycerz", 21, 60, requiredVirtue = 30, requiredStrength = 12, strBonus = 3, virtueBonus = 5, description = "Zakonny wojownik, obrońca wiary i tradycji."),
+    MERCENARY("Najemnik", 16, 60, requiredStrength = 11, strBonus = 2, agiBonus = 2, description = "Wojownik do wynajęcia, znający realia wojny."),
+    SCHOLAR("Uczony", 14, 80, requiredIntelligence = 12, intBonus = 4, description = "Poszukiwacz wiedzy, badający starożytne pisma."),
+    MONK("Mnich", 14, 80, requiredVirtue = 20, virtueBonus = 5, intBonus = 1, description = "Sługa kościoła, oddany modlitwie i kontemplacji."),
+    THIEF("Złodziej", 12, 50, requiredAgility = 12, agiBonus = 3, description = "Cień miejskich zaułków, mistrz manipulacji."),
+    ALCHEMIST("Alchemik", 18, 70, requiredIntelligence = 14, intBonus = 3, description = "Mistrz eliksirów i przemian materii."),
+    CRAFTSMAN("Rzemieślnik", 14, 70, requiredStrength = 10, strBonus = 2, description = "Twórca przedmiotów, znający się na metalurgii."),
+    MERCHANT("Kupiec", 16, 75, requiredIntelligence = 10, description = "Handlarz, znający wartość towarów i ludzi."),
+    GUARD("Strażnik", 16, 60, requiredStrength = 10, strBonus = 1, agiBonus = 1, description = "Obrońca porządku miejskiego."),
+    PRIEST("Kapłan", 21, 80, requiredVirtue = 40, virtueBonus = 10, intBonus = 2, description = "Ustanowiony sługa wiary, prowadzący wiernych."),
+    PHYSICIAN("Cyrulik", 18, 70, requiredIntelligence = 11, intBonus = 2, description = "Uzdrowiciel, znający anatomię i zioła."),
+    APPRENTICE("Uczeń", 7, 18, intBonus = 1, description = "Młody adept sztuki lub rzemiosła."),
+    INQUISITOR("Inkwizytor", 25, 60, requiredVirtue = 50, requiredIntelligence = 12, virtueBonus = 15, description = "Łowca heretyków i tępiciel mroku."),
+    ROGUE("Łotr", 14, 50, requiredAgility = 11, agiBonus = 2, description = "Awanturnik żyjący na krawędzi prawa.")
 }
 
-// Wpis w historii kariery bohatera - jaka kariera i ile lat sluzyl.
 data class CareerEntry(
     val career: Career,
     val yearsServed: Int
 )
 
-object CareerChain {
+@Singleton
+class CareerChain @Inject constructor() {
     fun isEligible(career: Career, hero: Hero): Boolean {
-        return hero.age >= career.minAge &&
-            hero.age <= career.maxAge &&
-            hero.virtue >= career.requiredVirtue &&
-            hero.strength >= career.requiredStrength &&
-            hero.agility >= career.requiredAgility &&
-            hero.intelligence >= career.requiredIntelligence
+        return hero.age in career.minAge..career.maxAge &&
+                hero.virtue >= career.requiredVirtue &&
+                hero.strength >= career.requiredStrength &&
+                hero.agility >= career.requiredAgility &&
+                hero.intelligence >= career.requiredIntelligence
     }
 
-    fun availableCareers(hero: Hero): List<Career> =
-        Career.values().filter { isEligible(it, hero) }
+    fun availableCareers(hero: Hero): List<Career> = Career.values().filter { isEligible(it, hero) }
 
     fun applyCareer(career: Career, hero: Hero): Hero {
-        return hero.copy(
-            currentCareer = career,
-            strength = hero.strength + career.strBonus,
-            agility = hero.agility + career.agiBonus,
-            intelligence = hero.intelligence + career.intBonus,
-            virtue = hero.virtue + career.virtueBonus,
-            careerHistory = hero.careerHistory + CareerEntry(career, 0)
-        )
+        hero.currentCareer = career
+        hero.strength += career.strBonus
+        hero.agility += career.agiBonus
+        hero.intelligence += career.intBonus
+        hero.virtue += career.virtueBonus
+        // Add to history if not exists
+        return hero
     }
 }

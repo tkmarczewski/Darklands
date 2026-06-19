@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#121212">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="KREATOR POSTACI"
+            android:textSize="24sp"
+            android:textColor="#C0A060"
+            android:gravity="center"
+            android:textStyle="bold"
+            android:layout_marginBottom="16dp" />
+
+        <EditText
+            android:id="@+id/etName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Imię bohatera"
+            android:textColor="#FFFFFF"
+            android:textColorHint="#666666" />
+
+        <Button
+            android:id="@+id/btnRandomizeName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="LOSUJ IMIĘ"
+            android:backgroundTint="#2A2A2A"
+            android:layout_marginBottom="16dp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="KARIERA"
+            android:textColor="#800000"
+            android:textStyle="bold" />
+
+        <RadioGroup
+            android:id="@+id/rgCareers"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginBottom="16dp">
+            <RadioButton android:id="@+id/rbKnight" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Rycerz" android:textColor="#FFFFFF" />
+            <RadioButton android:id="@+id/rbAlchemist" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Alchemik" android:textColor="#FFFFFF" />
+            <RadioButton android:id="@+id/rbRanger" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Strażnik" android:textColor="#FFFFFF" />
+            <RadioButton android:id="@+id/rbMage" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Uczony" android:textColor="#FFFFFF" />
+        </RadioGroup>
+
+        <TextView
+            android:id="@+id/tvPointsRemaining"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Punkty do rozdania: 20"
+            android:textColor="#C0A060"
+            android:layout_marginBottom="8dp" />
+
+        <!-- ATTRIBUTES -->
+        <include android:id="@+id/layoutStr" layout="@layout/attr_row" />
+        <include android:id="@+id/layoutAgi" layout="@layout/attr_row" />
+        <include android:id="@+id/layoutPer" layout="@layout/attr_row" />
+        <include android:id="@+id/layoutInt" layout="@layout/attr_row" />
+        <include android:id="@+id/layoutEnd" layout="@layout/attr_row" />
+        <include android:id="@+id/layoutCha" layout="@layout/attr_row" />
+        <include android:id="@+id/layoutPie" layout="@layout/attr_row" />
+
+        <Button
+            android:id="@+id/btnAutoAllocate"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="AUTOROZDAŃ"
+            android:backgroundTint="#2A2A2A"
+            android:layout_marginTop="16dp" />
+
+        <TextView
+            android:id="@+id/tvSkillsTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="SPECJALIZACJA"
+            android:textColor="#800000"
+            android:textStyle="bold"
+            android:layout_marginTop="16dp" />
+
+        <LinearLayout
+            android:id="@+id/llSkillSpecializations"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginBottom="16dp" />
+
+        <Button
+            android:id="@+id/btnRandomAndStart"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="LOSUJ I START"
+            android:backgroundTint="#4A6000"
+            android:layout_marginBottom="8dp" />
+
+        <Button
+            android:id="@+id/btnStartGame"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="ROZPOCZNIJ PRZYGODĘ"
+            android:backgroundTint="#800000" />
+
+    </LinearLayout>
+</ScrollView>

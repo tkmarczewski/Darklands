@@ -1,9 +1,9 @@
-plugins {
-    id 'com.android.application'
-    id 'org.jetbrains.kotlin.plugin.compose'
-    id 'jacoco'
-    id 'io.gitlab.arturbosch.detekt'
-}
+apply plugin: 'com.android.application'
+apply plugin: 'org.jetbrains.kotlin.android'
+apply plugin: 'org.jetbrains.kotlin.plugin.compose'
+apply plugin: 'org.jetbrains.kotlin.plugin.serialization'
+apply plugin: 'jacoco'
+apply plugin: 'io.gitlab.arturbosch.detekt'
 
 android {
     namespace = 'com.grimreich'
@@ -23,6 +23,10 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
+    }
+
+    kotlinOptions {
+        jvmTarget = '17'
     }
 
     buildTypes {
@@ -85,6 +89,14 @@ dependencies {
     implementation 'androidx.activity:activity-compose'
     implementation 'androidx.lifecycle:lifecycle-viewmodel-compose'
     implementation "androidx.navigation:navigation-compose:2.7.7"
+    implementation "androidx.hilt:hilt-navigation-compose:1.2.0"
+
+    // DI - Manual Dagger/Hilt setup (plugin application failed due to kotlin version conflict)
+    implementation "com.google.dagger:hilt-android:2.51"
+    annotationProcessor "com.google.dagger:hilt-android-compiler:2.51"
+    
+    // SERIALIZATION
+    implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3"
 
     testImplementation 'junit:junit:4.13.2'
     testImplementation 'org.jetbrains.kotlin:kotlin-test'

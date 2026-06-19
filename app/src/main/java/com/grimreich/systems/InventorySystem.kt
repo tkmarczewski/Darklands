@@ -1,58 +1,64 @@
 package com.grimreich.systems
 
-import com.grimreich.core.GameRepository
-import com.grimreich.core.PartyRepository
+import com.grimreich.core.*
 import com.grimreich.grimreich.v1.Item
+import javax.inject.Inject
+import javax.inject.Singleton
 
-// Inventory operuje na top-levelowym `Item` (Item.kt), gdzie typ broni/zbroi jest stringiem,
-// a statystyki (attack/defense) trzymane sa w mapie `effects`. Slot trzymany jako string ("weapon", "armor", ...).
-object InventorySystem {
+@Singleton
+class InventorySystem @Inject constructor(
+    private val gameRepository: GameRepository,
+    private val partyRepository: PartyRepository
+) {
 
     fun equip(heroId: String, itemId: String): String {
-        val state = GameRepository.state
-        val hero  = state.party.firstOrNull { it.id == heroId } ?: return "Brak bohatera: $heroId"
-        val item  = state.inventory.firstOrNull { it.id == itemId }
+        val state = gameRepository.currentState()
+        val hero   = state.party.firstOrNull { it.id == heroId } ?: return "Brak bohatera: $heroId"
+        val item   = state.inventory.firstOrNull { it.id == itemId }
             ?: return "Nie znaleziono: $itemId"
 
         val slot = item.slot ?: return "${item.name} nie ma slotu"
-
-        // Niektore bronie wymagaja minimalnej sily - efekt "minStrength" pelni te funkcje.
+        
         val minStr = item.effects["minStrength"] ?: 0
         if (minStr > 0 && hero.strength < minStr) {
-            return "${hero.name} za slaby (sila ${hero.strength}, wymaga $minStr)"
+            return "${hero.name} za słaby (siła ${hero.strength}, wymaga $minStr)"
         }
 
         hero.equipment[slot] = itemId
-        GameRepository.log("${hero.name} zalozyl ${item.name} [$slot]")
-        return "${hero.name} zalozyl ${item.name} (slot: $slot)"
+        gameRepository.log("${hero.name} założył ${item.name} [$slot]")
+        gameRepository.persistCurrentState()
+        return "${hero.name} założył ${item.name} (slot: $slot)"
     }
 
     fun unequip(heroId: String, slot: String): String {
-        val hero   = GameRepository.state.party.firstOrNull { it.id == heroId } ?: return "Brak bohatera: $heroId"
+        val state = gameRepository.currentState()
+        val hero = state.party.firstOrNull { it.id == heroId } ?: return "Brak bohatera: $heroId"
         val itemId = hero.equipment[slot] ?: return "Slot $slot jest pusty"
-        val item   = GameRepository.state.inventory.firstOrNull { it.id == itemId }
+        val item = state.inventory.firstOrNull { it.id == itemId }
         hero.equipment[slot] = null
-        return "${hero.name} zdjal ${item?.name ?: itemId}"
+
+        gameRepository.persistCurrentState()
+        return "${hero.name} zdjął ${item?.name ?: itemId}"
     }
 
     fun listInventory(): String {
-        val items = GameRepository.state.inventory
+        val items = gameRepository.currentState().inventory
         if (items.isEmpty()) return "Ekwipunek jest pusty"
         return items.joinToString("\n") { item ->
             val rarityLabel = if (item.rarity != "normal") " [${item.rarity.uppercase()}]" else ""
             val extra = when (item.type) {
                 "weapon" -> " (ATK:${item.effects["attack"] ?: 0})"
-                "armor"  -> " (DEF:${item.effects["defense"] ?: 0})"
+                "armor" -> " (DEF:${item.effects["defense"] ?: 0})"
                 "potion" -> " (HEAL:${item.effects["heal"] ?: 0})"
-                else     -> " (${item.type})"
+                else -> " (${item.type})"
             }
             "- ${item.name}$rarityLabel$extra | ${item.weight}kg"
         }
     }
 
     fun totalWeight(heroId: String): Float {
-        val hero  = GameRepository.state.party.firstOrNull { it.id == heroId } ?: return 0f
-        val state = GameRepository.state
+        val state = gameRepository.currentState()
+        val hero  = state.party.firstOrNull { it.id == heroId } ?: return 0f
         return hero.equipment.values
             .filterNotNull()
             .mapNotNull { id -> state.inventory.firstOrNull { it.id == id } }
@@ -60,28 +66,26 @@ object InventorySystem {
             .toFloat()
     }
 
-    // Sprint 12: logiczny transfer przedmiotu miedzy postaciami w obrebie wspolnego inventory druzyny.
-    // Jesli przedmiot jest aktualnie zalozony przez nadawce, zostaje najpierw zdjety.
     fun transferItem(fromHeroId: String, toHeroId: String, itemId: String): String {
-        val party = GameRepository.state.party
-        val from  = party.firstOrNull { it.id == fromHeroId } ?: return "Brak bohatera: $fromHeroId"
-        val to    = party.firstOrNull { it.id == toHeroId }   ?: return "Brak bohatera: $toHeroId"
-        val item  = GameRepository.state.inventory.firstOrNull { it.id == itemId }
+        val state = gameRepository.currentState()
+        val party = state.party
+        val from = party.firstOrNull { it.id == fromHeroId } ?: return "Brak bohatera: $fromHeroId"
+        val to   = party.firstOrNull { it.id == toHeroId } ?: return "Brak bohatera: $toHeroId"
+        val item = state.inventory.firstOrNull { it.id == itemId }
             ?: return "Nie znaleziono: $itemId"
 
-        // Detach item from sender's equipment slots if currently equipped
         val equippedSlot = from.equipment.entries.firstOrNull { it.value == itemId }?.key
         if (equippedSlot != null) {
             from.equipment[equippedSlot] = null
         }
 
-        GameRepository.log("Transfer ${item.name}: ${from.name} -> ${to.name}")
+        gameRepository.log("Transfer ${item.name}: ${from.name} -> ${to.name}")
+        gameRepository.persistCurrentState()
         return "Transfer ${item.name}: ${from.name} -> ${to.name}"
     }
 
-    // Sprint 12: zwraca skrocone szczegoly pojedynczego przedmiotu (lub komunikat).
     fun itemDetail(itemId: String): String {
-        val item = GameRepository.state.inventory.firstOrNull { it.id == itemId }
+        val item = gameRepository.currentState().inventory.firstOrNull { it.id == itemId }
             ?: return "Nie znaleziono: $itemId"
         val effects = item.effects.entries.joinToString(", ") { (k, v) -> "$k=$v" }
         return buildString {
@@ -92,22 +96,26 @@ object InventorySystem {
         }.trim()
     }
 
-    // Aktywne uzycie itemu (eliksir, ziolo) - zdejmuje przedmiot z inventory, leczy aktywnego bohatera.
     fun useItem(itemId: String): String {
-        val state = GameRepository.state
-        val item  = state.inventory.firstOrNull { it.id == itemId } ?: return "Nie znaleziono: $itemId"
-        val hero  = PartyRepository.activeHero() ?: return "Brak aktywnego bohatera."
-        val heal  = item.effects["heal"] ?: 0
+        val state = gameRepository.currentState()
+        val item = state.inventory.firstOrNull { it.id == itemId } ?: return "Nie znaleziono: $itemId"
+        val hero = partyRepository.activeHero() ?: return "Brak aktywnego bohatera."
+        
+        val targetHero = state.party.firstOrNull { it.id == hero.id } ?: return "Brak bohatera w stanie sesji."
+
+        val heal = item.effects["heal"] ?: 0
         if (heal > 0) {
-            hero.hp = (hero.hp + heal).coerceAtMost(hero.maxHp)
+            targetHero.hp = (targetHero.hp + heal).coerceAtMost(targetHero.maxHp)
         }
+
         state.inventory.remove(item)
-        return "${hero.name} uzyl ${item.name}. +$heal HP"
+        gameRepository.persistCurrentState()
+        return "${targetHero.name} użył ${item.name}. +$heal HP"
     }
 
-    fun getEquippedItems(hero: com.grimreich.core.Hero): com.grimreich.core.EquippedItems {
-        val state = GameRepository.state
-        val gear = com.grimreich.core.EquippedItems()
+    fun getEquippedItems(hero: Hero): EquippedItems {
+        val state = gameRepository.currentState()
+        val gear = EquippedItems()
         hero.equipment["weapon"]?.let { id -> gear.weapon = state.inventory.firstOrNull { it.id == id } }
         hero.equipment["armor"]?.let { id -> gear.bodyArmor = state.inventory.firstOrNull { it.id == id } }
         hero.equipment["helmet"]?.let { id -> gear.helmet = state.inventory.firstOrNull { it.id == id } }

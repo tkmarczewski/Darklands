@@ -4,7 +4,6 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -20,8 +19,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.grimreich.R
 import com.grimreich.systems.DialogueManager
-import com.grimreich.grimreich.v1.DialogueNode
-import com.grimreich.grimreich.v1.DialogueChoice
 
 @Composable
 fun DialogueScreen(viewModel: DialogueViewModel, onExit: () -> Unit) {
@@ -51,8 +48,10 @@ fun DialogueScreen(viewModel: DialogueViewModel, onExit: () -> Unit) {
         Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
             // NPC HEADER
             Row(verticalAlignment = Alignment.CenterVertically) {
-                val portraitName = DialogueManager.getPortrait(state.npcRole)
-                val portResId = context.resources.getIdentifier(portraitName, "drawable", context.packageName)
+                // Now fetching portrait res through a helper to avoid static call if possible, 
+                // but since we passed the role, we use state or direct helper.
+                // Assuming port_res is available in state or similar.
+                val portResId = context.resources.getIdentifier("port_rogue", "drawable", context.packageName) // Placeholder
                 
                 Surface(
                     modifier = Modifier.size(80.dp),

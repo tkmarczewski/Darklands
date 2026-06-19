@@ -1,17 +1,19 @@
 package com.grimreich.systems
 
-import com.grimreich.contracts.WorldSnapshot
-import com.grimreich.contracts.SimulationTickContext
+import com.grimreich.core.GameRepository
+import javax.inject.Inject
+import javax.inject.Singleton
 
-/**
- * Program 7: History Engine 2.0.
- * Manages timelines, paradoxes, and the shifting 'truth' of the world.
- */
-object HistoryEngine {
-
-    fun processHistory(snapshot: WorldSnapshot, context: SimulationTickContext) {
-        if (snapshot.historyState.openParadoxes > 5) {
-            com.grimreich.systems.ChronicleSystem.record("Paradoks czasowy rozdziera lokalną linię czasu.", 2)
+@Singleton
+class HistoryEngine @Inject constructor(
+    private val gameRepository: GameRepository,
+    private val chronicleSystem: ChronicleSystem
+) {
+    fun processHistory() {
+        val state = gameRepository.currentState()
+        if (state.world.day % 10 == 0) {
+            chronicleSystem.record("Kolejna dekada mroku za nami.", 2)
         }
+        gameRepository.persistCurrentState()
     }
 }

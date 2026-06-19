@@ -2,23 +2,30 @@ package com.grimreich.systems
 
 import com.grimreich.core.GameRepository
 import com.grimreich.core.Hero
+import com.grimreich.core.WeatherType
+import javax.inject.Inject
+import javax.inject.Singleton
 
-object AbsoluteSystem {
-    
+@Singleton
+class AbsoluteSystem @Inject constructor(
+    private val gameRepository: GameRepository,
+    private val chronicleSystem: ChronicleSystem
+) {
     fun lyssaWhisper(hero: Hero): String? {
-        val g = GameRepository.state
-        if (g.world.collapseProgress > 0.5f) {
-            return "Lyssa szepcze: 'Widziałam ten koniec już wiele razy...'"
+        val g = gameRepository.currentState()
+        return if (g.world.collapseProgress > 0.5f) {
+            "Lyssa szepcze: 'Widziałam ten koniec już wiele razy...'"
+        } else {
+            null
         }
-        return null
     }
-    
+
     fun applyAbsoluteOverride() {
-        // High priority override logic
-        val g = GameRepository.state
+        val g = gameRepository.currentState()
         if (g.world.globalStability < 5) {
-            g.world.weather = com.grimreich.core.WeatherType.ECLIPSE
-            ChronicleSystem.record("Absolut przejmuje kontrolę nad pogodą.")
+            g.world.weather = WeatherType.ECLIPSE
+            chronicleSystem.record("Absolut przejmuje kontrolę nad pogodą.")
+            gameRepository.persistCurrentState()
         }
     }
 }

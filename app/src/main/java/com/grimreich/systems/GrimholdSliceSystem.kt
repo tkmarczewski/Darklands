@@ -1,34 +1,26 @@
 package com.grimreich.systems
 
-import com.grimreich.core.*
-import com.grimreich.world.CityCatalogue
+import com.grimreich.core.PlayerState
+import javax.inject.Inject
+import javax.inject.Singleton
 
-object GrimholdSliceSystem {
+data class GrimholdSliceViewData(
+    val title: String,
+    val description: String,
+    val availableQuests: List<String>
+)
 
+@Singleton
+class GrimholdSliceSystem @Inject constructor(
+    private val questSystem: QuestSystem
+) {
     fun view(playerState: PlayerState): GrimholdSliceViewData {
-        val currentCity = playerState.currentCityId
-        val displayCityName = CityCatalogue.get(currentCity)?.name ?: currentCity.uppercase()
-
-        val activeQuests = QuestSystem.availableForCity(currentCity).take(3).map { q ->
-            SliceQuestDetail(
-                questId = q.id,
-                title = q.title,
-                rewardGold = q.rewardGold,
-                difficultyLabel = "Hard",
-                shortBrief = q.description
-            )
-        }
-
+        val quests = questSystem.availableForCity("grimhold")
+        
         return GrimholdSliceViewData(
-            cityId = currentCity,
-            cityTitle = displayCityName,
-            backgroundUrl = "bg_grimhold_main",
-            referenceTitle = displayCityName,
-            sourceLabel = "GrimReich 1.0 Vertical Slice",
-            moodText = "The air is heavy with the scent of old parchment and dry blood.",
-            gold = playerState.gold,
-            activeQuestId = playerState.activeQuestId,
-            quests = activeQuests
+            title = "Grimhold - Sektor 4",
+            description = "Dzielnica spowita gęstą mgłą.",
+            availableQuests = quests.map { it.title }
         )
     }
 }

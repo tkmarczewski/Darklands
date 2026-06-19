@@ -5,11 +5,16 @@ import android.os.Bundle
 import android.widget.Button
 import android.widget.LinearLayout
 import androidx.appcompat.app.AppCompatActivity
-import com.grimreich.R
 import com.grimreich.core.GameRepository
 import com.grimreich.systems.QuestSystem
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class DevMenuActivity : AppCompatActivity() {
+
+    @Inject lateinit var gameRepository: GameRepository
+    @Inject lateinit var questSystem: QuestSystem
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -20,7 +25,7 @@ class DevMenuActivity : AppCompatActivity() {
         }
 
         layout.addView(devButton("RESET & START") {
-            GameRepository.seed()
+            gameRepository.seed()
             val intent = Intent(this, MainActivity::class.java)
             intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
             startActivity(intent)
@@ -28,7 +33,8 @@ class DevMenuActivity : AppCompatActivity() {
         })
 
         layout.addView(devButton("ADD 1000 GOLD") {
-            GameRepository.state.gold += 1000
+            gameRepository.currentState().gold += 1000
+            gameRepository.persistCurrentState()
         })
 
         layout.addView(devButton("INSTANT ENDGAME") {
@@ -50,13 +56,11 @@ class DevMenuActivity : AppCompatActivity() {
     }
 
     private fun instantEndgame() {
-        val state = GameRepository.state
-        QuestSystem.seedIntegratedContent()
+        questSystem.seedIntegratedContent()
         
-        // Complete some dummy quests to trigger endgame logic if any exists
-        val first = QuestSystem.all().firstOrNull()?.id
+        val first = questSystem.all().firstOrNull()?.id
         if (first != null) {
-            QuestSystem.complete(first)
+            questSystem.complete(first)
         }
         
         startActivity(Intent(this, MainActivity::class.java))

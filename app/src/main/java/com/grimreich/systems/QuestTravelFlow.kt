@@ -1,28 +1,35 @@
 package com.grimreich.systems
 
 import com.grimreich.core.TravelPartyState
+import javax.inject.Inject
+import javax.inject.Singleton
 
 /**
  * Lightweight glue for traveling to a quest city, then resolving the quest.
  */
-object QuestTravelFlow {
+@Singleton
+class QuestTravelFlow @Inject constructor(
+    private val questSystem: QuestSystem,
+    private val questResolutionSystem: QuestResolutionSystem,
+    private val travelSystem: TravelSystem
+) {
     fun travelAndResolve(
         fromCityId: String,
         questId: String,
         partyState: TravelPartyState,
         faction: CityFaction = CityFaction.COMMONERS
     ): QuestRewardResult {
-        val quest = QuestSystem.all().firstOrNull { it.id == questId }
+        val quest = questSystem.all().firstOrNull { it.id == questId }
             ?: error("Unknown quest: $questId")
 
-        val active = QuestSystem.activate(quest.id)
+        val active = questSystem.activate(quest.id)
         val traveledState = if (fromCityId != active.cityId) {
-            TravelSystem.travel(fromCityId, active.cityId, partyState).first
+            travelSystem.travel(fromCityId, active.cityId, partyState).first
         } else {
             partyState
         }
 
-        return QuestResolutionSystem.completeQuestWithRewards(
+        return questResolutionSystem.completeQuestWithRewards(
             questId = active.id,
             partyState = traveledState,
             faction = faction,

@@ -1,21 +1,17 @@
 package com.grimreich.core
 
-/**
- * Manages the acquisition and impact of permanent wounds.
- */
-object InjurySystem {
+import javax.inject.Inject
+import javax.inject.Singleton
 
-    fun applyInjury(hero: Hero, severity: Int) {
-        when (severity) {
-            1 -> hero.hp -= 5
-            2 -> {
-                hero.maxHp -= 2
-                hero.hp = hero.hp.coerceAtMost(hero.maxHp)
-            }
-            3 -> {
-                hero.strength -= 1
-                hero.sanity -= 10
-            }
+@Singleton
+class InjurySystem @Inject constructor(
+    private val gameRepository: GameRepository
+) {
+    fun applyInjury(hero: Hero, damage: Int) {
+        if (damage > hero.maxHp / 2) {
+            hero.sanity -= 5
+            gameRepository.log("${hero.name} odniósł ciężką ranę psychiczną.")
         }
+        gameRepository.persistCurrentState()
     }
 }

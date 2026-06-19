@@ -46,8 +46,8 @@ class MainQuestProgressionTest {
         hero.piety += quest.rewards.faithBonus
         hero.virtue += quest.rewards.divineFavorBonus
         val currentCity = state.grimCurrentRegion
-        val currentRep = state.reputation.city[currentCity] ?: 0
-        state.reputation.city[currentCity] = currentRep + quest.rewards.reputationBonus
+        
+        ReputationSystem.modify(currentCity, CityFaction.COMMONERS, quest.rewards.reputationBonus)
 
         state.quest.activeEndgameQuests.remove(quest.id)
         state.quest.completedEndgameQuests.add(quest.id)
@@ -55,7 +55,7 @@ class MainQuestProgressionTest {
         assertEquals(initialGold + quest.rewards.gold, state.gold)
         assertEquals(initialPiety + quest.rewards.faithBonus, hero.piety)
         assertEquals(initialVirtue + quest.rewards.divineFavorBonus, hero.virtue)
-        assertEquals(quest.rewards.reputationBonus, state.reputation.city[currentCity])
+        assertEquals(quest.rewards.reputationBonus, ReputationSystem.score(currentCity, CityFaction.COMMONERS))
         assertFalse(state.quest.activeEndgameQuests.contains(quest.id))
         assertTrue(state.quest.completedEndgameQuests.contains(quest.id))
     }
@@ -66,16 +66,16 @@ class MainQuestProgressionTest {
         val quest = EndgameQuestChain.quests[0] // eq1_signs: minFaith=3, minCityReputation=2
         val hero = state.party.first()
 
-        // Initial state: 10 piety, 0 reputation
+        // Initial state: 1 piety, 0 reputation
         hero.piety = 1
-        state.reputation.city[state.grimCurrentRegion] = 0
+        ReputationSystem.modify(state.grimCurrentRegion, CityFaction.COMMONERS, -ReputationSystem.score(state.grimCurrentRegion, CityFaction.COMMONERS))
         
         assertFalse("Should fail due to low piety", checkRequirements(quest, state))
 
         hero.piety = 10
         assertFalse("Should fail due to low reputation", checkRequirements(quest, state))
 
-        state.reputation.city[state.grimCurrentRegion] = 5
+        ReputationSystem.modify(state.grimCurrentRegion, CityFaction.COMMONERS, 5)
         assertTrue("Should pass now", checkRequirements(quest, state))
     }
     
@@ -87,8 +87,7 @@ class MainQuestProgressionTest {
         
         // Meet stats but not prerequisite
         hero.piety = 50
-        state.reputation.city[state.grimCurrentRegion] = 50
-        // eq2 also requires faction rep 3 (max of all cities)
+        ReputationSystem.modify(state.grimCurrentRegion, CityFaction.COMMONERS, 50)
         
         assertFalse("Should fail due to missing prerequisite eq1_signs", checkRequirements(quest2, state))
         
@@ -99,8 +98,8 @@ class MainQuestProgressionTest {
     // Helper to mirror QuestFinalActivity.meetsRequirements
     private fun checkRequirements(quest: EndgameQuest, state: GameState): Boolean {
         val hero = state.party.firstOrNull() ?: return false
-        val cityRep = state.reputation.city[state.grimCurrentRegion] ?: 0
-        val maxRep = state.reputation.city.values.maxOrNull() ?: 0
+        val cityRep = ReputationSystem.getCityRep(state.grimCurrentRegion)
+        val maxRep = ReputationSystem.allCities().values.maxOrNull() ?: 0
 
         if (hero.piety < quest.requirements.minFaith) return false
         if (hero.virtue < quest.requirements.minVirtue) return false

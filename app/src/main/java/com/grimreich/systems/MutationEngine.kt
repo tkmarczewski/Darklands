@@ -1,17 +1,19 @@
 package com.grimreich.systems
 
-import com.grimreich.contracts.WorldSnapshot
-import com.grimreich.contracts.SimulationTickContext
+import com.grimreich.core.GameRepository
+import javax.inject.Inject
+import javax.inject.Singleton
 
-/**
- * Program 8: Mutation Engine 2.0.
- * Orchestrates ontological transformations across regions and NPCs.
- */
-object MutationEngine {
-
-    fun processMutations(snapshot: WorldSnapshot, context: SimulationTickContext) {
-        if (snapshot.mutationState.mutationIntensity > 0.8f) {
-            com.grimreich.systems.ChronicleSystem.record("Intensywne mutacje zniekształcają formę istnienia.", 2)
+@Singleton
+class MutationEngine @Inject constructor(
+    private val gameRepository: GameRepository,
+    private val chronicleSystem: ChronicleSystem
+) {
+    fun processMutations() {
+        val state = gameRepository.currentState()
+        if (state.world.echoIntensity > 0.6f) {
+            chronicleSystem.record("Miejscowa fauna zaczyna mutować pod wpływem Echa.", 3)
         }
+        gameRepository.persistCurrentState()
     }
 }

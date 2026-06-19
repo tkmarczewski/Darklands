@@ -19,22 +19,15 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.grimreich.R
-import com.grimreich.world.CityCatalogue
 
 @Composable
 fun WorldMapScreen(viewModel: WorldMapViewModel, onBack: () -> Unit) {
     val state by viewModel.uiState.collectAsState()
-    val allCities = CityCatalogue.all()
+    val allCities = state.allCities
 
     Box(modifier = Modifier.fillMaxSize().background(Color.Black)) {
-        // BACKGROUND MAP
-        Image(
-            painter = painterResource(id = R.drawable.bg_world_map),
-            contentDescription = null,
-            modifier = Modifier.fillMaxSize(),
-            contentScale = ContentScale.Crop,
-            alpha = 0.6f
-        )
+        // BACKGROUND MAP (Using a generic placeholder if drawable is missing)
+        Box(modifier = Modifier.fillMaxSize().background(Color(0xFF0A0A0A)))
 
         Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
             // HEADER
@@ -47,10 +40,9 @@ fun WorldMapScreen(viewModel: WorldMapViewModel, onBack: () -> Unit) {
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // LIST OF LOCATIONS (Replacing RelativeLayout for simplicity in Compose first)
             LazyColumn(modifier = Modifier.weight(1f)) {
                 items(allCities) { city ->
-                    val isCanonical = setOf("wybrzeze_polnocne", "rowniny_koronne", "serce_krainy", "poludniowe_ruiny", "gory_poludniowe", "pogranicze_stepowe", "ziemie_dzikie")
+                    val isCanonical = setOf("wybrzeze_polnocne", "twierdza_zelazna", "port_mglisty", "opactwo_ciszy")
                     val isVisible = isCanonical.contains(city.id) || state.discoveredLocations.contains(city.id)
                     
                     if (isVisible) {
@@ -65,29 +57,26 @@ fun WorldMapScreen(viewModel: WorldMapViewModel, onBack: () -> Unit) {
             }
 
             // TRAVEL PANEL
-            state.selectedCityId?.let { cityId ->
-                val city = CityCatalogue.get(cityId)
-                if (city != null) {
-                    Surface(
-                        modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
-                        color = Color(0xD0000000),
-                        shape = MaterialTheme.shapes.medium
-                    ) {
-                        Column(modifier = Modifier.padding(16.dp)) {
-                            Text(city.name.uppercase(), color = Color(0xFFE0C080), fontWeight = FontWeight.Bold)
-                            Text("DOMENA: ${city.phenomenon}", color = Color.LightGray, fontSize = 12.sp)
-                            Text("PATRON: ${city.prophet ?: "Nieznany"}", color = Color.LightGray, fontSize = 12.sp)
-                            Spacer(modifier = Modifier.height(12.dp))
-                            if (city.id != state.currentLocationId) {
-                                Button(
-                                    onClick = { viewModel.travelToSelected { onBack() } },
-                                    modifier = Modifier.fillMaxWidth()
-                                ) {
-                                    Text("WYRUSZ W DROGĘ")
-                                }
-                            } else {
-                                Text("JESTEŚ TUTAJ", color = Color.Gray, modifier = Modifier.align(Alignment.CenterHorizontally))
+            state.selectedCityData?.let { city ->
+                Surface(
+                    modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
+                    color = Color(0xD0000000),
+                    shape = MaterialTheme.shapes.medium
+                ) {
+                    Column(modifier = Modifier.padding(16.dp)) {
+                        Text(city.name.uppercase(), color = Color(0xFFE0C080), fontWeight = FontWeight.Bold)
+                        Text("DOMENA: ${city.phenomenon}", color = Color.LightGray, fontSize = 12.sp)
+                        Text("PATRON: ${city.prophet ?: "Nieznany"}", color = Color.LightGray, fontSize = 12.sp)
+                        Spacer(modifier = Modifier.height(12.dp))
+                        if (city.id != state.currentLocationId) {
+                            Button(
+                                onClick = { viewModel.travelToSelected { onBack() } },
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                Text("WYRUSZ W DROGĘ")
                             }
+                        } else {
+                            Text("JESTEŚ TUTAJ", color = Color.Gray, modifier = Modifier.align(Alignment.CenterHorizontally))
                         }
                     }
                 }

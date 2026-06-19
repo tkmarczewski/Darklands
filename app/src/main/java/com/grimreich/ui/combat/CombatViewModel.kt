@@ -1,53 +1,76 @@
 package com.grimreich.ui.combat
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import com.grimreich.core.GameRepository
 import com.grimreich.core.CombatState
+import com.grimreich.core.GameRepository
+import com.grimreich.core.Hero
 import com.grimreich.systems.CombatSystem
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class CombatViewModel : ViewModel() {
+data class CombatUiState(
+    val combat: CombatState,
+    val party: List<Hero> = emptyList()
+)
 
-    private val _uiState = MutableStateFlow(GameRepository.state.combat)
-    val uiState: StateFlow<CombatState> = _uiState.asStateFlow()
+@HiltViewModel
+class CombatViewModel @Inject constructor(
+    private val gameRepository: GameRepository,
+    private val combatSystem: CombatSystem
+) : ViewModel() {
+
+    private val _uiState = MutableStateFlow(
+        CombatUiState(
+            combat = gameRepository.currentState().combat.copy(),
+            party = gameRepository.currentState().party.toList()
+        )
+    )
+    val uiState: StateFlow<CombatUiState> = _uiState.asStateFlow()
 
     fun attack() {
-        if (GameRepository.state.combat.active) {
-            CombatSystem.playerAttack()
+        if (combatSystem.isCombatActive()) {
+            combatSystem.playerAttack()
             refresh()
         }
     }
 
     fun defend() {
-        if (GameRepository.state.combat.active) {
-            CombatSystem.playerDefend()
+        if (combatSystem.isCombatActive()) {
+            combatSystem.playerDefend()
             refresh()
         }
     }
 
     fun useSpecial(type: String) {
-        if (GameRepository.state.combat.active) {
-            CombatSystem.playerUseSpecial(type)
+        if (combatSystem.isCombatActive()) {
+            combatSystem.playerUseSpecial(type)
             refresh()
         }
     }
 
     fun flee() {
-        val c = GameRepository.state.combat
+        val state = gameRepository.currentState()
+        val c = state.combat
         if (c.active) {
             c.active = false
             c.log.add("Uciekłeś z walki!")
-            GameRepository.state.pendingQuestId = null
+            state.pendingQuestId = null
+            gameRepository.persistCurrentState()
             refresh()
         }
     }
 
     fun refresh() {
-        _uiState.update { GameRepository.state.combat.copy() }
+        val state = gameRepository.currentState()
+        _uiState.update { 
+            it.copy(
+                combat = state.combat.copy(),
+                party = state.party.toList()
+            ) 
+        }
     }
 }

@@ -1,17 +1,15 @@
 package com.grimreich.core
 
 import com.grimreich.world.CityCatalogue
-import com.grimreich.world.CityData
+import javax.inject.Inject
+import javax.inject.Singleton
 
-enum class TerrainType(
-    val encounterChance: Float,
-    val travelHoursRange: IntRange
-) {
-    ROAD(0.2f, 4..8),
-    FOREST(0.4f, 6..12),
-    MOUNTAIN(0.6f, 10..20),
-    RIVER(0.3f, 3..6),
-    SWAMP(0.7f, 12..24)
+enum class TerrainType(val encounterChance: Float, val travelHoursRange: IntRange) {
+    ROAD(0.1f, 4..8),
+    FOREST(0.25f, 6..12),
+    MOUNTAIN(0.4f, 12..24),
+    RIVER(0.15f, 2..4),
+    SWAMP(0.5f, 10..20)
 }
 
 data class TravelConnection(
@@ -21,63 +19,46 @@ data class TravelConnection(
 )
 
 data class CityNode(
-    val city: CityData,
+    val cityId: String,
     val connections: List<String>,
-    val region: String,
     val name: String,
-    val x: Int = 0,
-    val y: Int = 0
+    val x: Int,
+    val y: Int
 )
 
-object WorldMap {
+@Singleton
+class WorldMap @Inject constructor() {
     private val connections = mutableListOf<TravelConnection>()
 
     fun seedStage1() {
         if (connections.isNotEmpty()) return
-        CityCatalogue.seedCanonical()
-
-        // Connecting the 7 Canonical Regions:
-        link("wybrzeze_polnocne", "serce_krainy",      TerrainType.ROAD)
-        link("wybrzeze_polnocne", "ziemie_dzikie",     TerrainType.FOREST)
-        link("serce_krainy",     "rowniny_koronne",    TerrainType.ROAD)
-        link("serce_krainy",     "pogranicze_stepowe", TerrainType.ROAD)
-        link("serce_krainy",     "poludniowe_ruiny",   TerrainType.RIVER)
-        link("rowniny_koronne",  "poludniowe_ruiny",   TerrainType.ROAD)
-        link("pogranicze_stepowe", "ziemie_dzikie",    TerrainType.SWAMP)
-        link("poludniowe_ruiny",  "gory_poludniowe",   TerrainType.MOUNTAIN)
+        link("wybrzeze_polnocne", "twierdza_zelazna", TerrainType.ROAD)
+        link("twierdza_zelazna", "port_mglisty", TerrainType.FOREST)
+        link("port_mglisty", "opactwo_ciszy", TerrainType.MOUNTAIN)
+        link("opactwo_ciszy", "wybrzeze_polnocne", TerrainType.ROAD)
     }
 
-    fun clear() { connections.clear() }
+    fun clear() {
+        connections.clear()
+    }
 
-    fun allConnections() = connections.toList()
+    fun allConnections(): List<TravelConnection> = connections
 
     fun neighbors(cityId: String): List<TravelConnection> =
         connections.filter { it.fromCityId == cityId || it.toCityId == cityId }
 
-    fun terrainBetween(c1: String, c2: String): TerrainType? {
-        val conn = connections.firstOrNull { 
-            (it.fromCityId == c1 && it.toCityId == c2) || (it.fromCityId == c2 && it.toCityId == c1)
+    fun terrainBetween(fromCityId: String, toCityId: String): TerrainType? {
+        return connections.find {
+            (it.fromCityId == fromCityId && it.toCityId == toCityId) ||
+            (it.fromCityId == toCityId && it.toCityId == fromCityId)
+        }?.terrain
+    }
+
+    fun isConnected(from: String, to: String) = terrainBetween(from, to) != null
+
+    fun link(from: String, to: String, terrain: TerrainType) {
+        if (!isConnected(from, to)) {
+            connections.add(TravelConnection(from, to, terrain))
         }
-        return conn?.terrain
-    }
-
-    fun isConnected(c1: String, c2: String) = terrainBetween(c1, c2) != null
-
-    fun link(c1: String, c2: String, terrain: TerrainType) {
-        connections.add(TravelConnection(c1, c2, terrain))
-    }
-
-    fun all(): List<CityNode> {
-        val allCities = CityCatalogue.all()
-        return allCities.map { city ->
-            val linked = neighbors(city.id).map { if (it.fromCityId == city.id) it.toCityId else it.fromCityId }
-            CityNode(city, linked, city.region, city.name, x = city.hashCode() % 100, y = city.hashCode() / 100 % 100)
-        }
-    }
-
-    fun get(id: String): CityNode? {
-        val city = CityCatalogue.get(id) ?: return null
-        val linked = neighbors(id).map { if (it.fromCityId == id) it.toCityId else it.fromCityId }
-        return CityNode(city, linked, city.region, city.name, x = city.hashCode() % 100, y = city.hashCode() / 100 % 100)
     }
 }

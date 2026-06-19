@@ -1,6 +1,8 @@
 package com.grimreich.systems
 
 import com.grimreich.core.*
+import javax.inject.Inject
+import javax.inject.Singleton
 
 enum class EndingType {
     GOOD, PRAGMATIC, REDEMPTION, CORRUPTED
@@ -12,11 +14,15 @@ data class Ending(
     val description: String
 )
 
-object EndingSystem {
+@Singleton
+class EndingSystem @Inject constructor(
+    private val gameRepository: GameRepository,
+    private val chronicleSystem: ChronicleSystem
+) {
     fun resolveEnding(gameState: GameState): Ending {
         val faith = gameState.prayer.faith
         val virtue = gameState.prayer.virtue
-        val cityRep = gameState.reputation.city.values.sum()
+        val cityRep = gameState.reputation.cityFactions.values.sumOf { it.values.sum() }
         val sins = gameState.prayer.sins
         val stability = gameState.world.globalStability
         
@@ -32,7 +38,7 @@ object EndingSystem {
         }
     }
 
-    fun getHeroEpilogue(hero: com.grimreich.core.Hero): String {
+    fun getHeroEpilogue(hero: Hero): String {
         return when {
             hero.corruption >= 80 -> "${hero.name} stał się naczyniem dla mroku, błąkając się wiecznie po Drugiej Stronie."
             hero.sanity <= 20 -> "${hero.name} popadł w obłęd, widząc rzeczy, których śmiertelnik nie powinien znać."
@@ -42,7 +48,7 @@ object EndingSystem {
     }
 
     fun finaleStatus(): String {
-        val s = GameRepository.state
+        val s = gameRepository.currentState()
         val faith = s.prayer.faith
         val sins = s.prayer.sins
         val stability = s.world.globalStability
@@ -59,7 +65,7 @@ object EndingSystem {
             Grzechy: $sins
             Średnia Poczytalność: $avgSanity%
             
-            Kronika zawiera ${ChronicleSystem.getAll().size} kluczowych wpisów.
+            Kronika zawiera ${chronicleSystem.getAll().size} kluczowych wpisów.
         """.trimIndent()
     }
 }

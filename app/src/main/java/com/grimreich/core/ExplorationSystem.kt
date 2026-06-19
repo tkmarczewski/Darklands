@@ -1,24 +1,20 @@
 package com.grimreich.core
 
-import kotlin.random.Random
+import javax.inject.Inject
+import javax.inject.Singleton
 
-/**
- * Manages world exploration, movement progress, and environmental triggers.
- */
-object ExplorationSystem {
-
-    fun tick(state: GameState) {
-        // Advance time
-        DayNightSystem.advanceHours(DayNightState(state.world.day, 12), 1) // Simple tick
-        
-        // Random events
-        if (Random.nextFloat() < 0.05f) {
-            state.logEntries.add("Dostrzeżono coś niepokojącego na horyzoncie...")
-        }
-    }
-
+@Singleton
+class ExplorationSystem @Inject constructor(
+    private val worldMap: WorldMap
+) {
     fun calculateTravelCost(from: String, to: String): Int {
-        val terrain = WorldMap.terrainBetween(from, to) ?: TerrainType.ROAD
-        return TravelRules.computeSegmentHours(terrain)
+        val terrain = worldMap.terrainBetween(from, to) ?: TerrainType.ROAD
+        return when (terrain) {
+            TerrainType.ROAD -> 5
+            TerrainType.FOREST -> 10
+            TerrainType.MOUNTAIN -> 20
+            TerrainType.RIVER -> 8
+            TerrainType.SWAMP -> 15
+        }
     }
 }

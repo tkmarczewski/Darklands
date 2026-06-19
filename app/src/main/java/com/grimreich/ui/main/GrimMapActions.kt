@@ -1,22 +1,21 @@
 package com.grimreich.ui.main
 
-import android.content.Context
-import android.content.Intent
 import com.grimreich.core.GameRepository
+import javax.inject.Inject
+import javax.inject.Singleton
 
-/**
- * DEPRECATED Helper: Map actions now handled via GameRootViewModel.setMode().
- * Legacy startActivity calls replaced with state-driven navigation.
- */
-object GrimMapActions {
-    
+@Singleton
+class GrimMapActions @Inject constructor(
+    private val gameRepository: GameRepository
+) {
     fun openRegion(root: GameRootViewModel, regionId: String) {
-        GameRepository.state.grimCurrentRegion = regionId
+        val state = gameRepository.currentState()
+        state.grimCurrentRegion = regionId
+        gameRepository.persistCurrentState()
         root.setMode(GameScreenMode.CITY)
     }
 
     fun openOtherSide(root: GameRootViewModel) {
-        // Logic for Other Side phenomenon
         root.setMode(GameScreenMode.COMBAT)
     }
 }

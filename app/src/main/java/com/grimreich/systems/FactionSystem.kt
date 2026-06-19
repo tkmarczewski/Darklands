@@ -1,24 +1,37 @@
 package com.grimreich.systems
 
-import com.grimreich.core.GameRepository
+import javax.inject.Inject
+import javax.inject.Singleton
 
 enum class FactionId {
     CHURCH, ALCHEMISTS, NOBILITY, COMMONERS
 }
 
-object FactionSystem {
+/**
+ * Legacy faction support. Note: FactionId and CityFaction are slightly different.
+ */
+@Singleton
+class FactionSystem @Inject constructor(
+    private val reputationSystem: ReputationSystem
+) {
     
+    private fun getCityId(): String = "wybrzeze_polnocne" 
+
     fun getReputation(faction: FactionId): Int {
-        val g = GameRepository.state
-        val factionKey = faction.name.lowercase()
-        return g.reputation.city.getOrDefault(factionKey, 0)
+        val cityFaction = mapToCityFaction(faction)
+        return reputationSystem.score(getCityId(), cityFaction)
     }
 
     fun modifyReputation(faction: FactionId, delta: Int) {
-        val g = GameRepository.state
-        val factionKey = faction.name.lowercase()
-        val current = g.reputation.city.getOrDefault(factionKey, 0)
-        g.reputation.city[factionKey] = current + delta
+        val cityFaction = mapToCityFaction(faction)
+        reputationSystem.modify(getCityId(), cityFaction, delta)
+    }
+
+    private fun mapToCityFaction(faction: FactionId): CityFaction = when (faction) {
+        FactionId.CHURCH -> CityFaction.CHURCH
+        FactionId.COMMONERS -> CityFaction.COMMONERS
+        FactionId.NOBILITY -> CityFaction.KNIGHTS
+        FactionId.ALCHEMISTS -> CityFaction.MERCHANTS
     }
     
     fun getFactionLabel(faction: FactionId): String = when (faction) {

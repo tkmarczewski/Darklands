@@ -1,5 +1,7 @@
 package com.grimreich.core
 
+import javax.inject.Inject
+import javax.inject.Singleton
 import kotlin.random.Random
 
 // ==================== MORALE SYSTEM ====================
@@ -24,7 +26,8 @@ enum class MoraleStatus {
     }
 }
 
-object MoraleSystem {
+@Singleton
+class MoraleSystem @Inject constructor() {
     fun computeStatus(morale: Int): MoraleStatus = when {
         morale >= GrimConstants.Combat.MORALE_HEROIC_THRESHOLD -> MoraleStatus.HEROIC
         morale >= GrimConstants.Combat.MORALE_STEADY_THRESHOLD -> MoraleStatus.STEADY
@@ -108,7 +111,10 @@ data class CombatVisualEvent(
     val label: String = ""
 )
 
-object CombatRound {
+@Singleton
+class CombatRound @Inject constructor(
+    private val moraleSystem: MoraleSystem
+) {
 
     fun resolveRound(
         attacker: CombatantState,
@@ -117,14 +123,12 @@ object CombatRound {
     ): RoundResult {
         val log = mutableListOf<String>()
 
-        // 1. Tick Status Effects for attacker
         applyStatusTick(attacker, log)
         if (isDefeated(attacker)) return RoundResult(0, 0, attacker.morale, defender.morale, WoundType.NONE, WoundType.NONE, log)
 
-        val attackerStatus = MoraleSystem.computeStatus(attacker.morale)
-        val defenderStatus = MoraleSystem.computeStatus(defender.morale)
+        val attackerStatus = moraleSystem.computeStatus(attacker.morale)
+        val defenderStatus = moraleSystem.computeStatus(defender.morale)
 
-        // 2. Dodge Roll (Agility based)
         val dodgeChance = GrimConstants.Combat.BASE_DODGE_CHANCE + (defender.agility * GrimConstants.Combat.AGILITY_DODGE_MODIFIER)
         val dodged = Random.nextFloat() < dodgeChance
 
@@ -132,10 +136,8 @@ object CombatRound {
             log.add("${defender.name} unika ataku!")
             0
         } else {
-            // Atak
             var rawAtk = attacker.attackBase + (attacker.strength / 2) + attackerEquipped.totalAttack()
             
-            // Synergy check
             if (defender.activeEffects.any { it.type == StatusEffectType.WET } && 
                 attacker.activeEffects.any { it.type == StatusEffectType.SHOCK }) {
                 rawAtk = (rawAtk * 1.5f).toInt()
@@ -152,15 +154,13 @@ object CombatRound {
             val dmg = maxOf(1, attackRoll - defendRoll)
             defender.hp -= dmg
             defender.endurance = (defender.endurance - dmg / 2).coerceAtLeast(0)
-            defender.morale = MoraleSystem.moraleAfterHit(defender.morale, dmg)
+            defender.morale = moraleSystem.moraleAfterHit(defender.morale, dmg)
             log.add("${attacker.name} atakuje ${defender.name}: $dmg obrażeń.")
 
-            // 3. Status application (Knowledge based)
             tryApplyStatus(attacker, defender, log)
             dmg
         }
 
-        // 4. Counterattack
         var dmgToAttacker = 0
         if (!isDefeated(defender)) {
             val counterAtk = (defender.attackBase * defenderStatus.attackModifier() *
@@ -170,11 +170,10 @@ object CombatRound {
             dmgToAttacker = maxOf(0, counterAtk - attackerDef)
             attacker.hp -= dmgToAttacker
             attacker.endurance = (attacker.endurance - dmgToAttacker / 2).coerceAtLeast(0)
-            attacker.morale = MoraleSystem.moraleAfterHit(attacker.morale, dmgToAttacker)
+            attacker.morale = moraleSystem.moraleAfterHit(attacker.morale, dmgToAttacker)
             if (dmgToAttacker > 0) log.add("${defender.name} kontratakuje: $dmgToAttacker obrażeń.")
         }
 
-        // 5. Wounds
         val defenderWound = computeWound(defender)
         val attackerWound = computeWound(attacker)
         if (defenderWound != WoundType.NONE) {
@@ -221,7 +220,6 @@ object CombatRound {
                     log.add("${combatant.name} jest przemarznięty.")
                 }
                 StatusEffectType.WET -> {
-                    // No direct dmg, but affects synergies
                     log.add("${combatant.name} jest przemoczony.")
                 }
                 StatusEffectType.SHOCK -> {
@@ -259,13 +257,13 @@ object CombatRound {
     }
 
     fun isDefeated(state: CombatantState): Boolean =
-        state.hp <= 0 || MoraleSystem.computeStatus(state.morale) == MoraleStatus.ROUTED
+        state.hp <= 0 || moraleSystem.computeStatus(state.morale) == MoraleStatus.ROUTED
 
     fun postCombatRecovery(hero: CombatantState): String {
         val healHp = (hero.maxHp * GrimConstants.Combat.HP_RECOVERY_RATIO).toInt().coerceAtLeast(1)
         hero.hp = (hero.hp + healHp).coerceAtMost(hero.maxHp)
         hero.endurance = (hero.endurance + GrimConstants.Combat.POST_COMBAT_HEAL_HP_MIN).coerceAtMost(20)
-        hero.morale = MoraleSystem.moraleAfterKill(hero.morale)
+        hero.morale = moraleSystem.moraleAfterKill(hero.morale)
         if (hero.wounds.isNotEmpty()) hero.wounds.removeAt(hero.wounds.lastIndex)
         return "Leczenie: +$healHp HP. Morale: ${hero.morale}. Rany: ${hero.wounds.size}"
     }

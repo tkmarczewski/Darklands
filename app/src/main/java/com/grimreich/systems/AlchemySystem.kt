@@ -3,44 +3,46 @@ package com.grimreich.systems
 import com.grimreich.core.GameRepository
 import com.grimreich.grimreich.v1.Item
 import com.grimreich.world.ItemCatalogue
+import javax.inject.Inject
+import javax.inject.Singleton
 
 data class Recipe(
     val id: String,
     val resultName: String,
-    val ingredients: Map<String, Int>, // itemId -> count
+    val ingredients: Map<String, Int>,
     val resultItem: Item
 )
 
-object AlchemySystem {
-    
-    val recipes = listOf(
-        Recipe(
-            "brew_hp", 
-            "Mikstura Zdrowia", 
-            mapOf("ing_herb" to 1, "ing_water" to 1),
-            ItemCatalogue.findById("potion_hp") ?: Item("potion_hp", "Mikstura Zdrowia", "potion", effects = mapOf("heal" to 15))
-        )
+@Singleton
+class AlchemySystem @Inject constructor(
+    private val gameRepository: GameRepository,
+    private val itemCatalogue: ItemCatalogue
+) {
+    fun getRecipes() = listOf(
+        Recipe("rec_heal", "Mikstura Leczenia", mapOf("herb_green" to 2), itemCatalogue.get("potion_hp")!!),
+        Recipe("rec_sanity", "Eliksir Jasności", mapOf("crystal_clear" to 1), itemCatalogue.get("potion_hp")!!) // Placeholder
     )
-    
+
     fun canBrew(recipe: Recipe): Boolean {
-        val inventory = GameRepository.state.inventory
-        return recipe.ingredients.all { (id, count) ->
-            inventory.count { it.id == id } >= count
+        val inventory = gameRepository.currentState().inventory
+        return recipe.ingredients.all { (id, qty) ->
+            inventory.count { it.id == id } >= qty
         }
     }
-    
+
     fun brew(recipe: Recipe): String {
         if (!canBrew(recipe)) return "Brak składników!"
-        
-        val inventory = GameRepository.state.inventory
-        recipe.ingredients.forEach { (id, count) ->
-            repeat(count) {
-                val item = inventory.firstOrNull { it.id == id }
-                if (item != null) inventory.remove(item)
+
+        val state = gameRepository.currentState()
+        recipe.ingredients.forEach { (id, qty) ->
+            repeat(qty) {
+                val item = state.inventory.first { it.id == id }
+                state.inventory.remove(item)
             }
         }
-        
-        inventory.add(recipe.resultItem)
-        return "Pomyślnie uwarzono: ${recipe.resultName}."
+
+        state.inventory.add(recipe.resultItem)
+        gameRepository.persistCurrentState()
+        return "Uwarzono: ${recipe.resultName}"
     }
 }

@@ -2,21 +2,27 @@ package com.grimreich.ui.saints
 
 import androidx.lifecycle.ViewModel
 import com.grimreich.core.GameRepository
-import com.grimreich.core.Hero
-import com.grimreich.core.SaintCatalogue
 import com.grimreich.systems.ChurchSystem
+import com.grimreich.systems.ReligionSystem
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import javax.inject.Inject
 
 data class SaintsUiState(
     val partyStatus: String = "",
     val saintsText: String = "",
-    val log: String = "Stoisz przed ołtarzem Absolutu..."
+    val log: String = ""
 )
 
-class SaintsViewModel : ViewModel() {
+@HiltViewModel
+class SaintsViewModel @Inject constructor(
+    private val gameRepository: GameRepository,
+    private val churchSystem: ChurchSystem,
+    private val religionSystem: ReligionSystem
+) : ViewModel() {
 
     private val _uiState = MutableStateFlow(SaintsUiState())
     val uiState: StateFlow<SaintsUiState> = _uiState.asStateFlow()
@@ -26,40 +32,39 @@ class SaintsViewModel : ViewModel() {
     }
 
     fun pray() {
-        val state = GameRepository.state
-        val hero = state.party.find { it.id == state.activeHeroId } ?: state.party.firstOrNull() ?: return
-        val msg = ChurchSystem.pray(hero)
+        val hero = gameRepository.currentState().party.firstOrNull() ?: return
+        val msg = churchSystem.pray(hero)
         updateLog(msg)
         refresh()
     }
 
     fun cleanse() {
-        val state = GameRepository.state
-        val hero = state.party.find { it.id == state.activeHeroId } ?: state.party.firstOrNull() ?: return
-        val msg = ChurchSystem.cleanseRelic(hero)
+        val hero = gameRepository.currentState().party.firstOrNull() ?: return
+        val msg = churchSystem.cleanseRelic(hero)
         updateLog(msg)
         refresh()
     }
 
-    private fun updateLog(text: String) {
-        _uiState.update { it.copy(log = text) }
+    fun updateLog(msg: String) {
+        _uiState.update { it.copy(log = msg) }
     }
 
     fun refresh() {
-        val g = GameRepository.state
-        val partyStatus = g.party.joinToString("\n") { h ->
-            "${h.name}: Favor=${h.divineFavor}, Virtue=${h.virtue}, Corruption=${h.corruption}, Sanity=${h.sanity}%"
-        }
+        val g = gameRepository.currentState()
+        val faith = g.prayer.faith
+        val virtue = g.prayer.virtue
         
-        val saintsList = SaintCatalogue.all()
-        val saintsText = if (saintsList.isEmpty()) "Brak świętych." else saintsList.joinToString("\n\n") { saint ->
-            "${saint.name}\n  domain: ${saint.domain}\n  patronage: ${saint.patronage}"
-        }
+        val status = "Wiara: $faith | Cnota: $virtue"
+        
+        val saints = """
+            SZEPTY PROROKÓW:
+            ${religionSystem.getSaintsIntercession()}
+        """.trimIndent()
 
         _uiState.update { 
             it.copy(
-                partyStatus = if (partyStatus.isBlank()) "Brak bohaterów." else partyStatus,
-                saintsText = saintsText
+                partyStatus = status,
+                saintsText = saints
             )
         }
     }

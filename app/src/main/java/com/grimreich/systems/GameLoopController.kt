@@ -1,34 +1,29 @@
 package com.grimreich.systems
 
-import com.grimreich.core.CityScreenState
-import com.grimreich.core.GameRepository
-import com.grimreich.core.PlayerState
-import com.grimreich.core.ResolutionScreenState
-import com.grimreich.core.TravelScreenState
-import com.grimreich.core.WorldMap
+import com.grimreich.core.*
 import com.grimreich.world.CityCatalogue
+import javax.inject.Inject
+import javax.inject.Singleton
 
-object GameLoopController {
+@Singleton
+class GameLoopController @Inject constructor(
+    private val gameRepository: GameRepository,
+    private val gameBootstrapper: GameBootstrapper,
+    private val questSystem: QuestSystem,
+    private val questResolutionSystem: QuestResolutionSystem,
+    private val travelSystem: TravelSystem,
+    private val cityCatalogue: CityCatalogue
+) {
     fun bootstrap(seed: Int = 1): PlayerState {
-        GameRepository.seed()
-        
-        CityCatalogue.clear()
-        WorldMap.clear()
-        QuestSystem.clear()
-        
-        CityCatalogue.seedCanonical()
-        WorldMap.seedStage1()
-        CityEventSystem.seedStage1Events()
-        QuestSystem.seedIntegratedContent(seed)
-        
-        val startingCityId = CityCatalogue.startingCityId
-        GameRepository.state.world.location = startingCityId
-        
+        gameRepository.clearSessionAndReset()
+        gameBootstrapper.bootstrapFreshWorld(seed)
+
+        val startingCityId = cityCatalogue.startingCityId
         return PlayerState(currentCityId = startingCityId)
     }
 
     fun cityScreen(playerState: PlayerState): CityScreenState {
-        val quests = QuestSystem.availableForCity(playerState.currentCityId)
+        val quests = questSystem.availableForCity(playerState.currentCityId)
         return CityScreenState(
             cityId = playerState.currentCityId,
             availableQuests = quests,
@@ -38,18 +33,18 @@ object GameLoopController {
     }
 
     fun acceptQuest(playerState: PlayerState, questId: String): PlayerState {
-        QuestSystem.activate(questId)
+        questSystem.activate(questId)
         return playerState.copy(activeQuestId = questId)
     }
 
     fun travelToQuest(playerState: PlayerState): Pair<PlayerState, TravelScreenState> {
         val questId = playerState.activeQuestId ?: error("Brak aktywnego zadania")
-        val quest = QuestSystem.all().find { it.id == questId } ?: error("Nieznane zadanie: $questId")
+        val quest = questSystem.all().find { it.id == questId } ?: error("Nieznane zadanie: $questId")
 
         val destinationCity = quest.cityId
 
         val traveledState = if (playerState.currentCityId != destinationCity) {
-            TravelSystem.travel(playerState.currentCityId, destinationCity, playerState.travelState).first
+            travelSystem.travel(playerState.currentCityId, destinationCity, playerState.travelState).first
         } else {
             playerState.travelState
         }
@@ -76,7 +71,8 @@ object GameLoopController {
     ): Pair<PlayerState, ResolutionScreenState>? {
         val questId = playerState.activeQuestId ?: return null
         val goldBefore = playerState.gold
-        val reward = QuestResolutionSystem.completeQuestWithRewards(
+
+        val reward = questResolutionSystem.completeQuestWithRewards(
             questId = questId,
             partyState = playerState.travelState,
             faction = faction,
@@ -90,9 +86,11 @@ object GameLoopController {
             travelState = reward.updatedPartyState
         )
 
-        val itemMsg = if (reward.itemsAwarded.isNotEmpty()) 
+        val itemMsg = if (reward.itemsAwarded.isNotEmpty()) {
             "\nZnalezione artefakty: " + reward.itemsAwarded.joinToString { it.name }
-        else ""
+        } else {
+            ""
+        }
 
         val resolutionState = ResolutionScreenState(
             questId = reward.questId,

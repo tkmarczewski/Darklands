@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <application
+        android:name=".GrimReichApp"
         android:allowBackup="true"
         android:label="@string/app_name"
         android:theme="@style/Theme.GrimReich"
@@ -21,6 +22,11 @@
             android:screenOrientation="landscape">
         </activity>
 
+        <activity android:name=".ui.PlayerIdentityActivity"
+            android:exported="false"
+            android:screenOrientation="landscape">
+        </activity>
+
         <!-- SINGLE ACTIVITY ROOT: ALL GAMEPLAY HAPPENS HERE -->
         <activity android:name=".ui.MainActivity"
             android:exported="false"
@@ -36,6 +42,5 @@
             android:exported="true"
             android:screenOrientation="landscape"/>
 
-        <!-- LEGACY ACTIVITIES PURGED FROM MANIFEST -->
     </application>
 </manifest>

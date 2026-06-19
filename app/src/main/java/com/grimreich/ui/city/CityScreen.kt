@@ -18,9 +18,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.grimreich.R
-import com.grimreich.core.GameRepository
-import com.grimreich.systems.QuestSystem
-import com.grimreich.systems.QuestStatus
 
 @Composable
 fun CityScreen(
@@ -29,19 +26,11 @@ fun CityScreen(
     onTavern: () -> Unit,
     onTemple: () -> Unit,
     onRecruit: () -> Unit,
-    onNpcClick: (String, String, String) -> Unit,
+    onDialogue: () -> Unit,
     onExit: () -> Unit
 ) {
     val state by viewModel.uiState.collectAsState()
     val context = LocalContext.current
-
-    // Normalize cityId for strict matching
-    val rawCity = GameRepository.state.grimCurrentRegion
-    val cityId = rawCity.lowercase()
-        .replace("ą", "a").replace("ć", "c").replace("ę", "e")
-        .replace("ł", "l").replace("ń", "n").replace("ó", "o")
-        .replace("ś", "s").replace("ź", "z").replace("ż", "z")
-        .replace(" ", "_")
 
     Box(modifier = Modifier.fillMaxSize().background(Color.Black)) {
         // BACKGROUND
@@ -79,7 +68,7 @@ fun CityScreen(
             Spacer(modifier = Modifier.height(16.dp))
 
             Row(modifier = Modifier.weight(1f).fillMaxWidth()) {
-                // LEFT: Nav Actions - FIXED WIDTH FOR VISIBILITY
+                // LEFT: Nav Actions
                 Column(
                     modifier = Modifier.width(180.dp).fillMaxHeight(),
                     verticalArrangement = Arrangement.spacedBy(10.dp)
@@ -93,12 +82,8 @@ fun CityScreen(
                     CityNavBtn(
                         text = if (qCount > 0) "QUEST ($qCount)" else "BRAK ZADAŃ",
                         onClick = {
-                            val quest = QuestSystem.availableForCity(cityId).firstOrNull()
-                                ?: QuestSystem.all().find { it.status == QuestStatus.AKTYWNE && it.cityId == cityId }
-                            
-                            if (quest != null) {
-                                val node = if (quest.id.startsWith("q_start")) "aelion_start" else "mystic_start"
-                                onNpcClick(quest.originRefId, quest.originRefId, node)
+                            viewModel.openQuestNode { name, role, node ->
+                                viewModel.startDialogue(name, role, node, onDialogue)
                             }
                         },
                         color = if (qCount > 0) Color(0xFF4A6000) else Color(0xFF1A1A1A),
@@ -107,7 +92,7 @@ fun CityScreen(
                     
                     Spacer(modifier = Modifier.weight(1f))
                     
-                    // EXIT BUTTON - Guaranteed Position
+                    // EXIT BUTTON
                     Button(
                         onClick = onExit,
                         modifier = Modifier.fillMaxWidth().height(50.dp),
@@ -148,7 +133,7 @@ fun CityScreen(
                         ) {
                             items(state.npcs) { npc ->
                                 NpcRow(npc.name, npc.role) {
-                                    onNpcClick(npc.name, npc.role, npc.startNodeId ?: "end")
+                                    viewModel.startDialogue(npc.name, npc.role, npc.startNodeId ?: "end", onDialogue)
                                 }
                             }
                         }

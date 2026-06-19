@@ -8,17 +8,22 @@ import androidx.appcompat.app.AppCompatActivity
 import com.grimreich.R
 import com.grimreich.core.EchoSystem
 import com.grimreich.world.CityCatalogue
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class SplashActivity : AppCompatActivity() {
+
+    @Inject lateinit var echoSystem: EchoSystem
+    @Inject lateinit var cityCatalogue: CityCatalogue
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_splash)
 
-        // INITIALIZE PERSISTENT SYSTEMS
-        EchoSystem.init(this)
-        CityCatalogue.seedCanonical()
+        echoSystem.init(this)
+        cityCatalogue.seedCanonical()
 
-        // Show splash for 2 seconds then move to Main Menu
         Handler(Looper.getMainLooper()).postDelayed({
             startActivity(Intent(this, MainMenuActivity::class.java))
             finish()

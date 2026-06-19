@@ -2,19 +2,24 @@ package com.grimreich.ui.tavern
 
 import androidx.lifecycle.ViewModel
 import com.grimreich.core.GameRepository
-import com.grimreich.systems.SocialEventSystem
-import com.grimreich.systems.SaveLoadSystem
+import com.grimreich.systems.TravelSystem
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import javax.inject.Inject
 
 data class TavernUiState(
     val gold: Int = 0,
-    val log: String = "Karczmarz poleruje blat brudną szmatą..."
+    val log: String = ""
 )
 
-class TavernViewModel : ViewModel() {
+@HiltViewModel
+class TavernViewModel @Inject constructor(
+    private val gameRepository: GameRepository,
+    private val travelSystem: TravelSystem
+) : ViewModel() {
 
     private val _uiState = MutableStateFlow(TavernUiState())
     val uiState: StateFlow<TavernUiState> = _uiState.asStateFlow()
@@ -24,37 +29,27 @@ class TavernViewModel : ViewModel() {
     }
 
     fun rest() {
-        val state = GameRepository.state
-        if (state.gold < 50) {
-            updateLog("Nie stać cię na nocleg. Karczmarz wskazuje na stajnię...")
+        val state = gameRepository.currentState()
+        if (state.gold < 10) {
+            updateLog("Brak złota na nocleg (10g).")
             return
         }
-
-        state.gold -= 50
-        state.party.forEach { hero ->
-            val healAmount = hero.maxHp / 2
-            hero.hp = (hero.hp + healAmount).coerceAtMost(hero.maxHp)
-            hero.endurance = 20 
-            hero.sanity = (hero.sanity + 10).coerceAtMost(100)
-        }
         
-        state.world.day += 1
-        state.world.timeOfDay = "Morning"
-        
-        updateLog("Przespałeś noc w miarę czystym łóżku. Twoje rany się podgoiły, a umysł odpoczął. Jest nowy dzień.")
+        state.gold -= 10
+        val msg = travelSystem.rest()
+        updateLog(msg)
         refresh()
     }
 
     fun listenToGossip() {
-        val gossip = SocialEventSystem.runTavernEvent()
-        updateLog(gossip)
+        updateLog("Karczmarz szepcze: 'Mgła gęstnieje na północy... tam, gdzie nic już nie ma.'")
     }
 
-    private fun updateLog(text: String) {
-        _uiState.update { it.copy(log = text) }
+    fun updateLog(msg: String) {
+        _uiState.update { it.copy(log = msg) }
     }
 
     fun refresh() {
-        _uiState.update { it.copy(gold = GameRepository.state.gold) }
+        _uiState.update { it.copy(gold = gameRepository.currentState().gold) }
     }
 }

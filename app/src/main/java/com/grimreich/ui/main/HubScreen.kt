@@ -157,11 +157,11 @@ fun PartyMemberCard(hero: Hero, onClick: () -> Unit) {
         Column(modifier = Modifier.padding(10.dp)) {
             Text(text = hero.name, color = Color(0xFFE0C080), fontWeight = FontWeight.Bold, fontSize = 13.sp)
             LinearProgressIndicator(
-                progress = if (hero.maxHp > 0) hero.hp.toFloat() / hero.maxHp else 0f,
-                modifier = Modifier.fillMaxWidth().height(4.dp).padding(vertical = 6.dp),
-                color = Color(0xFFB22222),
-                trackColor = Color(0xFF222222)
-            )
+            progress = { if (hero.maxHp > 0) hero.hp.toFloat() / hero.maxHp else 0f },
+            modifier = Modifier.fillMaxWidth().height(4.dp).padding(vertical = 6.dp),
+            color = Color(0xFFB22222),
+            trackColor = Color(0xFF222222)
+        )
             Text(text = "${hero.hp}/${hero.maxHp} HP", color = Color.Gray, fontSize = 10.sp)
         }
     }

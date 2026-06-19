@@ -1,42 +1,29 @@
 package com.grimreich.systems
 
 import com.grimreich.core.GameRepository
-import com.grimreich.core.TradeGoodCatalog
-import com.grimreich.core.TradeGoodType
-import com.grimreich.core.CityMarketCatalog
 import com.grimreich.grimreich.v1.Item
+import javax.inject.Inject
+import javax.inject.Singleton
 
-object TradeSystem {
-    
-    fun buyGood(cityId: String, type: TradeGoodType): String {
-        val g = GameRepository.state
-        val market = CityMarketCatalog.getMarket(cityId) ?: return "Brak handlu w tym miejscu."
-        val price = market.getPrice(type)
+@Singleton
+class TradeSystem @Inject constructor(
+    private val gameRepository: GameRepository,
+    private val economySystem: EconomySystem
+) {
+    fun buyGood(cityId: String, item: Item): String {
+        val state = gameRepository.currentState()
+        val price = economySystem.priceInCity(cityId, item.value)
         
-        if (g.gold < price) return "Brak złota! (Potrzeba $price)"
+        if (state.gold < price) return "Brak złota!"
         
-        g.gold -= price
-        val good = TradeGoodCatalog.findByType(type)!!
-        val item = Item(
-            id = "trade_${type.name.lowercase()}",
-            name = good.name,
-            type = "trade_good",
-            value = good.basePrice,
-            weight = good.weight.toDouble() / 10.0
-        )
-        g.inventory.add(item)
-        return "Kupiono ${good.name} za $price złota."
+        state.gold -= price
+        state.inventory.add(item)
+        gameRepository.persistCurrentState()
+        return "Kupiono ${item.name} za $price zł."
     }
 
     fun sellItem(item: Item, cityId: String): String {
-        val g = GameRepository.state
-        if (!g.inventory.contains(item)) return "Nie masz tego przedmiotu."
-        
-        val baseValue = item.value
-        val sellPrice = (baseValue * com.grimreich.core.GrimConstants.Economy.SELL_PRICE_MULTIPLIER).toInt()
-        
-        g.gold += sellPrice
-        g.inventory.remove(item)
-        return "Sprzedano ${item.name} za $sellPrice złota."
+        val sellPrice = economySystem.sellItem(item)
+        return "Sprzedano ${item.name} za $sellPrice zł."
     }
 }

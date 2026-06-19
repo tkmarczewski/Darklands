@@ -1,63 +1,18 @@
 package com.grimreich.systems
 
-import com.grimreich.contracts.*
 import com.grimreich.core.GameRepository
-import com.grimreich.domain.collapse.*
-import com.grimreich.domain.phenomena.*
-import kotlin.random.Random
+import javax.inject.Inject
+import javax.inject.Singleton
 
-/**
- * Program 2: Orchestrator of Time and Simulation.
- * Synchronizes NPC loops, region loops, and engines (Collapse, History, Mutation, Phenomena).
- */
-object WorldSimulationCoordinator {
-
-    fun executeTick(scale: SimulationScale = SimulationScale.MICRO) {
-        val snapshot = WorldSimulationProviderPrototype.captureSnapshot()
-        val context = SimulationTickContext(
-            scale = scale,
-            deltaTime = 1.0f,
-            worldSeed = snapshot.worldSeed,
-            currentDay = GameRepository.state.world.day,
-            totalTicks = 0L
-        )
-
-        android.util.Log.d("GrimSimulation", "Executing Tick: $scale (Stability: ${snapshot.regionState.stability})")
-
-        // 1. Update Active Phenomena
-        updatePhenomena(snapshot, context)
-
-        // 2. Tick Collapse AI
-        updateCollapse(snapshot, context)
-
-        // 3. Tick Regions & NPC loops
-        updateWorldEntities(snapshot, context)
-
-        // 4. Resolve Mutation & History shifts
-        updateOntology(snapshot, context)
-
-        // 5. Commit changes back to repository
-        StabilitySystem.updateStability()
-        GameRepository.log("Tick $scale zakończony. Świat mutuje...")
-    }
-
-    private fun updatePhenomena(snapshot: WorldSnapshot, context: SimulationTickContext) {
-        PhenomenaEngine.processPhenomena(snapshot, context)
-    }
-
-    private fun updateCollapse(snapshot: WorldSnapshot, context: SimulationTickContext) {
-        CollapseAI2_0.processCollapse(snapshot, context)
-        if (snapshot.regionState.stability < (com.grimreich.core.GrimConstants.World.STABILITY_CRITICAL_THRESHOLD / 100f)) {
-            ChronicleSystem.record("KOLAPS: Rzeczywistość zaczyna się zapadać.", 3)
-        }
-    }
-
-    private fun updateWorldEntities(snapshot: WorldSnapshot, context: SimulationTickContext) {
-        // Logic for Program 5 & 6
-    }
-
-    private fun updateOntology(snapshot: WorldSnapshot, context: SimulationTickContext) {
-        HistoryEngine.processHistory(snapshot, context)
-        MutationEngine.processMutations(snapshot, context)
+@Singleton
+class WorldSimulationCoordinator @Inject constructor(
+    private val gameRepository: GameRepository,
+    private val worldSimulation2_0: WorldSimulation2_0,
+    private val aiDirector: WorldAIDirector
+) {
+    fun executeTick() {
+        worldSimulation2_0.simulate()
+        aiDirector.onTick()
+        gameRepository.persistCurrentState()
     }
 }

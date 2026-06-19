@@ -1,51 +1,48 @@
 package com.grimreich.systems
 
 import com.grimreich.core.GameRepository
-import kotlin.random.Random
+import javax.inject.Inject
+import javax.inject.Singleton
 
 enum class CollapseScenario {
     MIST_OBLIVION, BLOOD_RUIN, REFLECTION_RECKONING, FULLNESS_ASCENSION, CHAOS_DOMINION, ZERO_END
 }
 
-object CollapseEngine {
-    
+@Singleton
+class CollapseEngine @Inject constructor(
+    private val gameRepository: GameRepository
+) {
     var activeScenario: CollapseScenario? = null
-    
+
     fun tick() {
-        val g = GameRepository.state
-        if (g.world.collapseProgress <= 0.0f) return
+        val g = gameRepository.currentState()
+        g.world.collapseProgress += 0.01f
         
-        // Decide scenario if not set
-        if (activeScenario == null) {
+        if (g.world.collapseProgress > 0.5f && activeScenario == null) {
             activeScenario = decideScenario()
-            ChronicleSystem.record("Początek Kolapsu: ${activeScenario?.name}")
         }
         
         applyScenarioEffects()
+        gameRepository.persistCurrentState()
     }
-    
+
     private fun decideScenario(): CollapseScenario {
-        val s = GameRepository.state
+        val s = gameRepository.currentState()
         val faith = s.prayer.faith
-        val corruption = s.party.asSequence().map { it.corruption }.average()
-        
         return when {
-            faith > 60 -> CollapseScenario.FULLNESS_ASCENSION
-            corruption > 70 -> CollapseScenario.BLOOD_RUIN
-            Random.nextBoolean() -> CollapseScenario.MIST_OBLIVION
-            else -> CollapseScenario.CHAOS_DOMINION
+            faith > 70 -> CollapseScenario.FULLNESS_ASCENSION
+            s.world.globalStability < 30 -> CollapseScenario.CHAOS_DOMINION
+            else -> CollapseScenario.values().random()
         }
     }
-    
+
     private fun applyScenarioEffects() {
-        when (activeScenario) {
-            CollapseScenario.MIST_OBLIVION -> {
-                // Mist grows
+        activeScenario?.let {
+            when (it) {
+                CollapseScenario.MIST_OBLIVION -> gameRepository.currentState().world.echoIntensity += 0.02f
+                CollapseScenario.BLOOD_RUIN -> gameRepository.currentState().party.forEach { h -> h.hp -= 1 }
+                else -> {}
             }
-            CollapseScenario.BLOOD_RUIN -> {
-                // Organic growth
-            }
-            else -> {}
         }
     }
 }

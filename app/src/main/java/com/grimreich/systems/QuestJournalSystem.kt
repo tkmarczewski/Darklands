@@ -3,20 +3,22 @@ package com.grimreich.systems
 import com.grimreich.core.PlayerState
 import com.grimreich.core.QuestJournalState
 import com.grimreich.core.QuestLogEntry
+import javax.inject.Inject
+import javax.inject.Singleton
 
-object QuestJournalSystem {
+@Singleton
+class QuestJournalSystem @Inject constructor(
+    private val questSystem: QuestSystem
+) {
     fun build(playerState: PlayerState): QuestJournalState {
-        val entries = QuestSystem.all().map { quest ->
-            val status = when {
-                quest.id == playerState.activeQuestId -> "ACTIVE"
-                quest.id in playerState.completedQuestIds -> "COMPLETED"
-                else -> quest.status.name
-            }
+        val activeQuests = questSystem.all().filter { it.status == QuestStatus.AKTYWNE }
+        
+        val entries = activeQuests.map {
             QuestLogEntry(
-                questId = quest.id,
-                title = quest.title,
-                status = status,
-                notes = "City: ${quest.cityId}, reward: ${quest.rewardGold} gold"
+                questId = it.id,
+                title = it.title,
+                status = "W TOKU",
+                notes = it.description
             )
         }
 

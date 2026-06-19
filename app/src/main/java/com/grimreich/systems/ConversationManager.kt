@@ -1,70 +1,59 @@
 package com.grimreich.systems
 
 import com.grimreich.core.GameRepository
-import com.grimreich.grimreich.v1.DialogueNode
 import com.grimreich.grimreich.v1.DialogueChoice
-import kotlin.random.Random
+import com.grimreich.grimreich.v1.DialogueNode
+import javax.inject.Inject
+import javax.inject.Singleton
 
-object ConversationManager {
+@Singleton
+class ConversationManager @Inject constructor(
+    private val gameRepository: GameRepository
+) {
     private val dialogueNodes = mutableMapOf<String, DialogueNode>()
 
     fun registerDialogue(node: DialogueNode) {
         dialogueNodes[node.id] = node
     }
 
-    fun start(npcId: String): DialogueNode? {
-        val node = dialogueNodes.values.find { (it.npcId == npcId) && it.id.endsWith("_start") }
+    fun start(nodeId: String): DialogueNode? {
+        val node = dialogueNodes[nodeId]
         return node?.let { applyEchoEffect(it) }
     }
 
     fun makeChoice(choice: DialogueChoice): DialogueNode? {
-        choice.onSelect(GameRepository.state)
-        val node = dialogueNodes[choice.targetNodeId]
-        return node?.let { applyEchoEffect(it) }
+        choice.onSelect(gameRepository.currentState())
+        gameRepository.persistCurrentState()
+        return start(choice.targetNodeId)
     }
-    
+
     private fun applyEchoEffect(node: DialogueNode): DialogueNode {
-        val intensity = GameRepository.state.world.echoIntensity
-        if (intensity <= 0.1f) return node
-        
-        // Simulating fractured memory/speech
-        val echoedText = if (Random.nextFloat() < intensity) {
-            node.text.split(" ").asSequence().map { word ->
-                if (Random.nextFloat() < intensity * 0.5f) "[...]" else word
-            }.joinToString(" ") + " ...czy to się już wydarzyło?"
-        } else {
-            node.text
-        }
-        
-        return node.copy(text = echoedText)
+        val intensity = gameRepository.currentState().world.echoIntensity
+        if (intensity < 0.3f) return node
+
+        return node.copy(text = node.text + " ... " + generateEchoDistortion(intensity))
     }
-    
+
+    private fun generateEchoDistortion(intensity: Float): String {
+        return if (intensity > 0.7f) "[BŁĄD RZECZYWISTOŚCI]" else "Czy to Ty, Kotwico?"
+    }
+
     fun seedSampleDialogues() {
-        registerDialogue(
-            DialogueNode(
-                id = "innkeeper_start",
-                npcId = "npc_innkeeper",
-                text = "Witaj podróżniku. Co cię sprowadza do naszej karczmy w tych mrocznych czasach?",
-                choices = listOf(
-                    DialogueChoice("Szukam pracy", "innkeeper_work"),
-                    DialogueChoice("Podaj mi piwa (5g)", "innkeeper_beer") { it.gold -= 5 },
-                    DialogueChoice("Żegnaj", "innkeeper_end"),
-                )
-            )
-        )
-        
+        if (dialogueNodes.isNotEmpty()) return
+
         registerDialogue(DialogueNode(
-            id = "innkeeper_work",
-            npcId = "npc_innkeeper",
-            text = "Zawsze znajdzie się robota dla kogoś z mieczem. Podobno w ruinach na wschodzie zalęgły się cienie...",
+            id = "start", npcId = "narrator",
+            text = "Mgła otacza miasto. Czujesz chłód.",
             choices = listOf(
-                DialogueChoice("Zajmę się tym", "innkeeper_end", onSelect = { 
-                    // Add quest
-                }),
-                DialogueChoice("To brzmi zbyt niebezpiecznie", "innkeeper_start")
+                DialogueChoice("Idź dalej", "intro_2"),
+                DialogueChoice("Zatrzymaj się", "end")
             )
         ))
         
-        registerDialogue(DialogueNode("innkeeper_end", "npc_innkeeper", "Powodzenia. Niech światło cię prowadzi."))
+        registerDialogue(DialogueNode(
+            id = "intro_2", npcId = "narrator",
+            text = "Widzisz sylwetkę Aeliona w oddali.",
+            choices = listOf(DialogueChoice("Podejdź", "aelion_start"))
+        ))
     }
 }

@@ -4,60 +4,45 @@ import android.content.Context
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import java.io.File
+import javax.inject.Inject
+import javax.inject.Singleton
 
-/**
- * System of Eternal Echoes. 
- * Remembers every hero that ever existed in any playthrough.
- */
-object EchoSystem {
-    private const val ECHO_FILE = "eternal_echoes.json"
+@Singleton
+class EchoSystem @Inject constructor(
+    private val gameRepository: GameRepository
+) {
+    private val ECHO_FILE = "eternal_echoes.json"
     private val gson = Gson()
-    
-    // Persistent list of heroes from all past games
-    private var eternalHeroes: MutableList<Hero> = mutableListOf()
+    private val eternalHeroes = mutableListOf<Hero>()
 
-    /**
-     * Loads all historical heroes from the global persistent file.
-     */
     fun init(context: Context) {
         val file = File(context.filesDir, ECHO_FILE)
         if (file.exists()) {
             try {
                 val json = file.readText()
                 val type = object : TypeToken<MutableList<Hero>>() {}.type
-                eternalHeroes = gson.fromJson(json, type) ?: mutableListOf()
+                val loaded: MutableList<Hero> = gson.fromJson(json, type)
+                eternalHeroes.clear()
+                eternalHeroes.addAll(loaded)
             } catch (e: Exception) {
-                eternalHeroes = mutableListOf()
+                e.printStackTrace()
             }
         }
     }
 
-    /**
-     * Call this when a game ends or a hero is "lost" to save them to the echoes.
-     */
     fun recordHero(hero: Hero, context: Context) {
-        if (eternalHeroes.any { it.id == hero.id }) return
-        
-        eternalHeroes.add(hero)
-        save(context)
+        if (eternalHeroes.none { it.id == hero.id }) {
+            eternalHeroes.add(hero)
+            save(context)
+        }
     }
 
-    /**
-     * Saves the current list of eternal heroes to the file.
-     */
     private fun save(context: Context) {
         val file = File(context.filesDir, ECHO_FILE)
-        val json = gson.toJson(eternalHeroes)
-        file.writeText(json)
+        file.writeText(gson.toJson(eternalHeroes))
     }
 
-    /**
-     * Returns a random hero from a previous playthrough to appear as an NPC.
-     */
     fun getRandomEcho(): Hero? {
-        if (eternalHeroes.isEmpty()) return null
-        return eternalHeroes.random()
+        return if (eternalHeroes.isNotEmpty()) eternalHeroes.random() else null
     }
-    
-    fun getAllEchoes(): List<Hero> = eternalHeroes
 }

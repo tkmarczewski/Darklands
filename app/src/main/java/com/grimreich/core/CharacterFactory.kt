@@ -1,8 +1,14 @@
 package com.grimreich.core
 
 import java.util.UUID
+import javax.inject.Inject
+import javax.inject.Singleton
 
-object CharacterFactory {
+@Singleton
+class CharacterFactory @Inject constructor(
+    private val careerChain: CareerChain,
+    private val agingSystem: AgingSystem
+) {
 
     fun createHero(
         name: String,
@@ -24,38 +30,44 @@ object CharacterFactory {
             hp = 30,
             maxHp = 30
         )
-        return CareerChain.applyCareer(startingCareer, base)
+        return careerChain.applyCareer(startingCareer, base)
     }
 
     fun createKnight(name: String): Hero {
         var hero = createHero(name, startingAge = 7, startingCareer = Career.PAGE)
-        hero = AgingSystem.applyAging(hero, 7).first
-        hero = CareerChain.applyCareer(Career.SQUIRE, hero)
-        hero = AgingSystem.applyAging(hero, 7).first
-        if (CareerChain.isEligible(Career.KNIGHT, hero)) {
-            hero = CareerChain.applyCareer(Career.KNIGHT, hero)
+        // Manual aging logic as placeholder or refactored call
+        hero.age += 7
+        agingSystem.applyAging(hero)
+        hero = careerChain.applyCareer(Career.SQUIRE, hero)
+        hero.age += 7
+        agingSystem.applyAging(hero)
+        if (careerChain.isEligible(Career.KNIGHT, hero)) {
+            hero = careerChain.applyCareer(Career.KNIGHT, hero)
         }
         return hero
     }
 
     fun createScholar(name: String): Hero {
         var hero = createHero(name, startingAge = 14, startingCareer = Career.SCHOLAR)
-        hero = AgingSystem.applyAging(hero, 6).first
-        if (CareerChain.isEligible(Career.ALCHEMIST, hero)) {
-            hero = CareerChain.applyCareer(Career.ALCHEMIST, hero)
+        hero.age += 6
+        agingSystem.applyAging(hero)
+        if (careerChain.isEligible(Career.ALCHEMIST, hero)) {
+            hero = careerChain.applyCareer(Career.ALCHEMIST, hero)
         }
         return hero
     }
 
     fun createMercenary(name: String): Hero {
         var hero = createHero(name, startingAge = 16, startingCareer = Career.MERCENARY)
-        hero = AgingSystem.applyAging(hero, 5).first
+        hero.age += 5
+        agingSystem.applyAging(hero)
         return hero
     }
 
     fun createMonk(name: String): Hero {
         var hero = createHero(name, startingAge = 16, startingCareer = Career.MONK)
-        hero = AgingSystem.applyAging(hero, 5).first
+        hero.age += 5
+        agingSystem.applyAging(hero)
         return hero
     }
 

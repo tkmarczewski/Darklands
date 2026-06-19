@@ -2,9 +2,18 @@ package com.grimreich.systems
 
 import android.content.Context
 import com.grimreich.core.*
+import com.grimreich.world.CityCatalogue
 import java.util.Random
+import javax.inject.Inject
+import javax.inject.Singleton
 
-object TravelSystem {
+@Singleton
+class TravelSystem @Inject constructor(
+    private val gameRepository: GameRepository,
+    private val worldMap: WorldMap,
+    private val cityCatalogue: CityCatalogue,
+    private val encounterSystem: EncounterSystem
+) {
 
     fun travel(
         fromCityId: String,
@@ -12,7 +21,7 @@ object TravelSystem {
         partyState: TravelPartyState,
         random: kotlin.random.Random = kotlin.random.Random.Default
     ): Pair<TravelPartyState, TravelResult> {
-        val terrain = WorldMap.terrainBetween(fromCityId, toCityId) ?: TerrainType.ROAD
+        val terrain = worldMap.terrainBetween(fromCityId, toCityId) ?: TerrainType.ROAD
         val hoursSpent = terrain.travelHoursRange.random(random)
         val fatigueGain = hoursSpent * 2
         
@@ -23,7 +32,7 @@ object TravelSystem {
         
         val encounterTriggered = random.nextFloat() < terrain.encounterChance
         val encounterId = if (encounterTriggered) {
-            EncounterSystem.rollEncounter(random)?.id
+            encounterSystem.rollEncounter(random)?.id
         } else null
         
         val result = TravelResult(
@@ -47,16 +56,17 @@ object TravelSystem {
     }
 
     fun rest(): String {
-        val w = GameRepository.state.world
+        val w = gameRepository.currentState().world
         w.fatigue = 0
         w.day += 1
         w.timeOfDay = "morning"
         advanceSeason()
+        gameRepository.persistCurrentState()
         return "Wypoczynek zakończony. Siły zregenerowane."
     }
 
     fun advanceSeason() {
-        val w = GameRepository.state.world
+        val w = gameRepository.currentState().world
         w.season = when (w.day % 120) {
             in 0..29 -> Season.SPRING
             in 30..59 -> Season.SUMMER
@@ -75,7 +85,7 @@ object TravelSystem {
     }
 
     fun travelTo(regionId: String, context: Context? = null): String {
-        val g = GameRepository.state
+        val g = gameRepository.currentState()
         val w = g.world
         val currentLoc = w.location.lowercase().replace(" ", "_")
         
@@ -83,29 +93,26 @@ object TravelSystem {
             TravelPartyState(w.fatigue, 0, w.lastEncounter) 
         } ?: TravelPartyState())
         
-        w.location = com.grimreich.world.CityCatalogue.get(regionId)?.name ?: regionId
+        w.location = cityCatalogue.get(regionId)?.name ?: regionId
         g.grimCurrentRegion = regionId
         w.fatigue = newParty.fatigue
         w.day += (travelResult.hoursSpent / 12).coerceAtLeast(1)
         w.timeOfDay = if (newParty.totalHoursTraveled % 24 > 12) "evening" else "afternoon"
         
         if (travelResult.encounterTriggered) {
-            val encounter = EncounterSystem.rollEncounter(kotlin.random.Random.Default)
+            val encounter = encounterSystem.rollEncounter(kotlin.random.Random.Default)
             if (encounter != null) {
-                EncounterSystem.activeEncounter = encounter
-                // Set pending quest/encounter for Combat screen
+                encounterSystem.activeEncounter = encounter
                 g.pendingQuestId = "encounter:${encounter.id}"
             }
-        } else {
-            // Narrative random event
-            // RandomEventManager.triggerTravelEvent(context) // Needs Context or State update
         }
         
+        gameRepository.persistCurrentState()
         return "Podróż do $regionId zakończona."
     }
 
     fun getSeasonDisplay(): String {
-        val g = GameRepository.state
+        val g = gameRepository.currentState()
         return when (currentSeason(g.world.day)) {
             Season.SPRING -> "Wiosna"
             Season.SUMMER -> "Lato"

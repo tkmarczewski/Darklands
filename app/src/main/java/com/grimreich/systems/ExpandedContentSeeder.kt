@@ -1,20 +1,22 @@
 package com.grimreich.systems
 
 import com.grimreich.world.CityCatalogue
+import javax.inject.Inject
+import javax.inject.Singleton
 
-object ExpandedContentSeeder {
-
+@Singleton
+class ExpandedContentSeeder @Inject constructor(
+    private val cityCatalogue: CityCatalogue
+) {
     fun seedAll() {
-        CityCatalogue.seedCanonical()
-        
-        // Seed city events and quests using IDs from CityCatalogue
-        CityCatalogue.all().forEach { city ->
+        cityCatalogue.seedCanonical()
+        val all = cityCatalogue.all()
+        all.forEach { city ->
             seedEventsFor(city.id)
         }
     }
 
     private fun seedEventsFor(cityId: String) {
-        // Register events in CityEventSystem
-        // (Implementation details handled by QuestSystem and CityEventSystem)
+        // Mock seeding for now
     }
 }

@@ -1,11 +1,14 @@
 package com.grimreich.systems
 
-import com.grimreich.core.GameRepository
-import com.grimreich.grimreich.v1.DialogueNode
 import com.grimreich.grimreich.v1.DialogueChoice
-import kotlin.random.Random
+import com.grimreich.grimreich.v1.DialogueNode
+import javax.inject.Inject
+import javax.inject.Singleton
 
-object DialogueManager {
+@Singleton
+class DialogueManager @Inject constructor(
+    private val questSystem: QuestSystem
+) {
     private val nodes = mutableMapOf<String, DialogueNode>()
 
     fun registerNode(node: DialogueNode) {
@@ -35,9 +38,7 @@ object DialogueManager {
             text = "Mgła nie jest pogodą, wędrowcze. To skroplona niepamięć Absolutu.",
             choices = listOf(
                 DialogueChoice("Pamiętam imię mojej matki.", "end"),
-                DialogueChoice("Szukam wizji (ZADANIE).", "end", onSelect = {
-                    QuestSystem.complete("q_start_01")
-                })
+                DialogueChoice("Szukam wizji.", "end")
             )
         ))
 

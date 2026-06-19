@@ -1,14 +1,24 @@
 package com.grimreich.core
 
-object PartyRepository {
+import javax.inject.Inject
+import javax.inject.Singleton
+
+@Singleton
+class PartyRepository @Inject constructor(
+    private val gameRepository: GameRepository
+) {
     var activeHeroId: String?
-        get() = GameRepository.state.activeHeroId
-        set(value) { GameRepository.state.activeHeroId = value }
+        get() = gameRepository.currentState().activeHeroId
+        set(value) {
+            val state = gameRepository.currentState()
+            state.activeHeroId = value
+            gameRepository.persistCurrentState()
+        }
 
     fun activeHero(): Hero? =
         activeHeroId?.let { id ->
-            GameRepository.state.party.firstOrNull { it.id == id }
+            gameRepository.currentState().party.firstOrNull { it.id == id }
         }
 
-    fun all(): List<Hero> = GameRepository.state.party
+    fun all(): List<Hero> = gameRepository.currentState().party
 }

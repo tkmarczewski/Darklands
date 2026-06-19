@@ -4,9 +4,17 @@ import com.grimreich.grimreich.v1.*
 
 data class GameState(
     @Transient val grimEngine: GrimWorldEngine = GrimWorldEngineFactory.create(),
+
+    var playerName: String? = null,
+    var characterNameLocked: Boolean = false,
+    var metaAwarenessLevel: Int = 0,
+
     var grimCurrentRegion: String = "wybrzeze_polnocne",
     var grimPendingExpeditionName: String? = null,
-        var pendingQuestId: String? = null,
+    var pendingQuestId: String? = null,
+    var pendingDialogueNpcName: String? = null,
+    var pendingDialogueNpcRole: String? = null,
+    var pendingDialogueNodeId: String? = null,
 
     // Core game state
     val party: MutableList<Hero> = mutableListOf(),
@@ -25,10 +33,14 @@ data class GameState(
 ) {
     fun deepCopy(): GameState = GameState(
         grimEngine = grimEngine,
+        playerName = playerName,
+        characterNameLocked = characterNameLocked,
+        metaAwarenessLevel = metaAwarenessLevel,
         grimCurrentRegion = grimCurrentRegion,
         grimPendingExpeditionName = grimPendingExpeditionName,
-                pendingQuestId = pendingQuestId,
+        pendingQuestId = pendingQuestId,
         party = party.toMutableList(),
+        hireableHeroes = hireableHeroes.toMutableList(),
         activeHeroId = activeHeroId,
         inventory = inventory.toMutableList(),
         logEntries = logEntries.toMutableList(),
@@ -41,14 +53,19 @@ data class GameState(
             completedEndgameQuests = quest.completedEndgameQuests.toMutableList()
         ),
         reputation = reputation.copy(
-            city = reputation.city.toMutableMap()
+            cityFactions = reputation.cityFactions.mapValues { it.value.toMutableMap() }.toMutableMap()
         ),
-        prayer = prayer.copy(),
-        world = world.copy(),
+        prayer = prayer.copy(
+            blessings = prayer.blessings.toMutableList()
+        ),
+        world = world.copy(
+            discoveredLocations = world.discoveredLocations.toMutableList()
+        ),
         combat = combat.copy(
             log = combat.log.toMutableList(),
             enemyEffects = combat.enemyEffects.toMutableList(),
             heroEffects = combat.heroEffects.toMutableList()
-        )
+        ),
+        lastSaveTimestamp = lastSaveTimestamp
     )
 }

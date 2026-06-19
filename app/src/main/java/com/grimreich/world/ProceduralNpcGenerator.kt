@@ -1,65 +1,34 @@
 package com.grimreich.world
 
 import com.grimreich.grimreich.v1.NPC
-import kotlin.random.Random
+import java.util.Random
+import javax.inject.Inject
+import javax.inject.Singleton
 
-object ProceduralNpcGenerator {
-
-    private val roles = listOf(
-        "Chronicler", "Zealot", "Merchant", "Fugitive", "Mystic",
-        "Gravedigger", "Penitent", "Heretic", "Soldier", "Orphan",
-        "Seer", "Blacksmith", "Beggar", "Inquisitor", "Amnesiac"
-    )
+@Singleton
+class ProceduralNpcGenerator @Inject constructor(
+    private val cityCatalogue: CityCatalogue
+) {
+    private val roles = listOf("Kupiec", "Żebrak", "Strażnik", "Alchemik", "Mieszczanin", "Pielgrzym")
 
     fun generateForCity(cityId: String, seed: Int): List<NPC> {
-        // FIXED SEED: Ensure NPCs are stable for the session/day
         val random = Random(seed.toLong())
-        val count = random.nextInt(4, 7)
-        val generatedNames = mutableSetOf<String>()
-
-        return (0 until count).mapNotNull { i ->
-            var name = generateName(random)
-            var attempts = 0
-            while (generatedNames.contains(name) && (attempts < 10)) {
-                name = generateName(random)
-                attempts++
-            }
-            if (generatedNames.contains(name)) return@mapNotNull null
-            generatedNames.add(name)
-
-            val role = roles.random(random)
+        val count = 2 + random.nextInt(4)
+        
+        return List(count) {
+            val role = roles[random.nextInt(roles.size)]
             NPC(
-                id = "npc_${cityId}_${seed}_$i",
-                name = name,
+                id = "npc_${cityId}_${it}",
+                name = generateName(random),
                 role = role,
-                factionId = decideFaction(cityId, random),
-                stability = 0.3f + (random.nextFloat() * 0.7f),
-                startNodeId = "${role.lowercase()}_start",
+                startNodeId = "end"
             )
         }
     }
 
-    fun generateName(random: Random = Random.Default): String {
-        val prefixes = listOf(
-            "Gisbert", "Helga", "Ulrich", "Mira", "Roderick", "Elsa", 
-            "Balthazar", "Ingrid", "Sigmund", "Freya", "Klaus", "Martha",
-            "Wilhelm", "Gerda", "Otto", "Beatrice", "Heinrich", "Lotte",
-            "Siegfried", "Ursula", "Kaspar", "Greta", "Elias", "Anselm",
-            "Ralwing", "Aldric", "Brunhilda", "Dieter", "Emmeline", "Friedrich",
-            "Gunter", "Hilde", "Ignatz", "Jutta", "Konrad", "Lorelei"
-        )
-        val suffixes = listOf(
-            "von Kalt", "the Broken", "of the Mist", "Soul-Stitched", "Grey",
-            "the Silent", "Iron-Hand", "of the Void", "Parchment-Skin", "the Blind",
-            "Shadow-Walker", "of Old Grimhold", "the Penitent", "Flesh-Weaver",
-            "the Drowned", "of the Ash", "Twice-Born", "Void-Touched", "Sun-Eater",
-            "the Cruel", "of the Black Rose", "the Forgiven", "Stone-Heart"
-        )
-        return "${prefixes.random(random)} ${suffixes.random(random)}"
-    }
-
-    private fun decideFaction(cityId: String, random: Random): String? {
-        val city = CityCatalogue.get(cityId) ?: return null
-        return if (random.nextFloat() < 0.7f) city.rulingFaction else "Commoners"
+    private fun generateName(random: Random): String {
+        val first = listOf("Klaus", "Hans", "Helga", "Greta", "Otto", "Bruno", "Marta", "Erich")
+        val last = listOf("von Weber", "Schmidt", "Müller", "Wagner", "Becker", "Hoffmann")
+        return "${first[random.nextInt(first.size)]} ${last[random.nextInt(last.size)]}"
     }
 }

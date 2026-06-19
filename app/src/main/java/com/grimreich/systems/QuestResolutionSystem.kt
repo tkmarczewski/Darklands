@@ -2,8 +2,8 @@ package com.grimreich.systems
 
 import com.grimreich.core.*
 import com.grimreich.grimreich.v1.Item
-import com.grimreich.world.ItemCatalogue
-import kotlin.random.Random
+import javax.inject.Inject
+import javax.inject.Singleton
 
 data class QuestRewardResult(
     val questId: String,
@@ -17,30 +17,34 @@ data class QuestRewardResult(
     val itemsAwarded: List<Item> = emptyList()
 )
 
-/**
- * Resolves quest completion into rewards, local reputation and optional travel progression.
- */
-object QuestResolutionSystem {
+@Singleton
+class QuestResolutionSystem @Inject constructor(
+    private val gameRepository: GameRepository,
+    private val questSystem: QuestSystem,
+    private val lootSystem: LootSystem,
+    private val reputationSystem: ReputationSystem
+) {
     fun completeQuestWithRewards(
         questId: String,
         partyState: TravelPartyState? = null,
         faction: CityFaction = CityFaction.COMMONERS,
         reputationDelta: Int = 5
     ): QuestRewardResult {
-        val completedQuest = QuestSystem.complete(questId)
-        val updatedReputation = ReputationSystem.modify(completedQuest.cityId, faction, reputationDelta)
-        GameRepository.state.gold += completedQuest.rewardGold
+        val completedQuest = questSystem.complete(questId)
+        
+        val updatedReputation = reputationSystem.modify(completedQuest.cityId, faction, reputationDelta)
 
         val updatedParty = partyState?.copy(
             lastEncounterId = "quest_complete:${completedQuest.id}"
         ) ?: TravelPartyState(lastEncounterId = "quest_complete:${completedQuest.id}")
         
-        // Random loot
         val items = mutableListOf<Item>()
-        LootSystem.rollLoot(0.4f)?.let { 
+        lootSystem.rollLoot(0.4f)?.let {
             items.add(it)
-            GameRepository.state.inventory.add(it)
+            gameRepository.currentState().inventory.add(it)
         }
+
+        gameRepository.persistCurrentState()
 
         return QuestRewardResult(
             questId = completedQuest.id,

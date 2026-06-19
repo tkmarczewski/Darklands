@@ -12,34 +12,19 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.grimreich.core.GameRepository
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.grimreich.systems.QuestEntry
-import com.grimreich.systems.QuestStatus
-import com.grimreich.systems.QuestSystem
 
 @Composable
 fun QuestJournalScreen(
-    onBack: () -> Unit
+    onBack: () -> Unit,
+    viewModel: QuestJournalViewModel = hiltViewModel()
 ) {
-    // FORCE SEED ON ENTER
-    LaunchedEffect(Unit) {
-        QuestSystem.seedIntegratedContent()
-    }
+    val uiState by viewModel.uiState.collectAsState()
 
-    var refreshToggle by remember { mutableStateOf(0) }
-    
-    val state = GameRepository.state
-    val activeQuests = remember(refreshToggle) { state.quest.activeQuests.mapNotNull { QuestSystem.getQuest(it) } }
-    val completedQuests = remember(refreshToggle) { state.quest.completedQuests.mapNotNull { QuestSystem.getQuest(it) } }
-    
-    val rawCity = state.grimCurrentRegion
-    val cityId = rawCity.lowercase()
-        .replace("ą", "a").replace("ć", "c").replace("ę", "e")
-        .replace("ł", "l").replace("ń", "n").replace("ó", "o")
-        .replace("ś", "s").replace("ź", "z").replace("ż", "z")
-        .replace(" ", "_")
-    
-    val availableQuests = remember(refreshToggle) { QuestSystem.availableForCity(cityId) }
+    LaunchedEffect(Unit) {
+        viewModel.refresh()
+    }
 
     Column(
         modifier = Modifier
@@ -56,29 +41,28 @@ fun QuestJournalScreen(
 
         LazyColumn(modifier = Modifier.weight(1f)) {
             item { SectionHeader("AKTYWNE") }
-            if (activeQuests.isEmpty()) {
+            if (uiState.activeQuests.isEmpty()) {
                 item { EmptyLabel("Brak podjętych zadań.") }
             } else {
-                items(activeQuests) { quest -> QuestCard(quest) }
+                items(uiState.activeQuests) { quest -> QuestCard(quest) }
             }
 
             item { Spacer(modifier = Modifier.height(20.dp)); SectionHeader("DOSTĘPNE W OKOLICY") }
-            if (availableQuests.isEmpty()) {
+            if (uiState.availableQuests.isEmpty()) {
                 item { EmptyLabel("Brak nowych ogłoszeń.") }
             } else {
-                items(availableQuests) { quest ->
+                items(uiState.availableQuests) { quest ->
                     QuestCard(quest, canAccept = true) {
-                        QuestSystem.activate(quest.id)
-                        refreshToggle++
+                        viewModel.acceptQuest(quest.id)
                     }
                 }
             }
 
             item { Spacer(modifier = Modifier.height(20.dp)); SectionHeader("UKOŃCZONE") }
-            if (completedQuests.isEmpty()) {
+            if (uiState.completedQuests.isEmpty()) {
                 item { EmptyLabel("Twoja legenda dopiero się zaczyna.") }
             } else {
-                items(completedQuests) { quest -> QuestCard(quest, isCompleted = true) }
+                items(uiState.completedQuests) { quest -> QuestCard(quest, isCompleted = true) }
             }
         }
 
