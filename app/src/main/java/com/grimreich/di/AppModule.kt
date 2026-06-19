@@ -54,8 +54,8 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideDialogueManager(questSystem: QuestSystem): DialogueManager {
-        return DialogueManager(questSystem)
+    fun provideDialogueManager: DialogueManager {
+        return DialogueManager()
     }
 
     @Provides
