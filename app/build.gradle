@@ -4,6 +4,7 @@ apply plugin: 'org.jetbrains.kotlin.plugin.compose'
 apply plugin: 'org.jetbrains.kotlin.plugin.serialization'
 apply plugin: 'jacoco'
 apply plugin: 'io.gitlab.arturbosch.detekt'
+apply plugin: 'kotlin-kapt'
 
 android {
     namespace = 'com.grimreich'
@@ -93,7 +94,7 @@ dependencies {
 
     // DI - Manual Dagger/Hilt setup (plugin application failed due to kotlin version conflict)
     implementation "com.google.dagger:hilt-android:2.51"
-    annotationProcessor "com.google.dagger:hilt-android-compiler:2.51"
+    kapt "com.google.dagger:hilt-android-compiler:2.51"
     
     // SERIALIZATION
     implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3"
