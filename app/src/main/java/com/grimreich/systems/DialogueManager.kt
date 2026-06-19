@@ -6,8 +6,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class DialogueManager @Inject constructor(
-    private val questSystem: QuestSystem
+class DialogueManager @Inject constructor(    
 ) {
     private val nodes = mutableMapOf<String, DialogueNode>()
 
