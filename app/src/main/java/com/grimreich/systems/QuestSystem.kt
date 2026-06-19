@@ -2,6 +2,7 @@ package com.grimreich.systems
 
 import com.grimreich.core.GameRepository
 import com.grimreich.world.CityCatalogue
+import kotlin.Lazy
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -20,7 +21,7 @@ data class QuestEntry(
 
 @Singleton
 class QuestSystem @Inject constructor(
-    private val gameRepository: GameRepository,
+    private val gameRepository: Lazy<GameRepository>,
     private val cityCatalogue: CityCatalogue
 ) {
     private val allQuests = mutableMapOf<String, QuestEntry>()
@@ -36,24 +37,24 @@ class QuestSystem @Inject constructor(
     fun activate(questId: String): QuestEntry {
         val quest = allQuests[questId] ?: error("Nie znaleziono zadania: $questId")
         quest.status = QuestStatus.AKTYWNE
-        val state = gameRepository.currentState()
+        val state = gameRepository.value.currentState()
         if (!state.quest.activeQuests.contains(questId)) {
             state.quest.activeQuests.add(questId)
         }
-        gameRepository.persistCurrentState()
+        gameRepository.value.persistCurrentState()
         return quest
     }
 
     fun complete(questId: String): QuestEntry {
         val quest = allQuests[questId] ?: error("Nie znaleziono zadania: $questId")
         quest.status = QuestStatus.UKONCZONE
-        val state = gameRepository.currentState()
+        val state = gameRepository.value.currentState()
         state.quest.activeQuests.remove(questId)
         if (!state.quest.completedQuests.contains(questId)) {
             state.quest.completedQuests.add(questId)
         }
         state.gold += quest.rewardGold
-        gameRepository.persistCurrentState()
+        gameRepository.value.persistCurrentState()
         return quest
     }
 
