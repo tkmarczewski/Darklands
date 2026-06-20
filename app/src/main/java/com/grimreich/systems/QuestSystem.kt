@@ -74,11 +74,35 @@ class QuestSystem @Inject constructor(
             QuestEntry(
                 id = "q_start_01",
                 title = "Początek Końca",
-                description = "Znajdź Aeliona na Wybrzeżu Północnym.",
+                description = "Znajdź Aeliona na Wybrzeżu Północnym. Szepczą, że mgła go nie dotyka.",
                 objective = "Porozmawiaj z Aelionem",
                 cityId = "wybrzeze_polnocne",
                 rewardGold = 50,
                 originRefId = "aelion",
+            )
+        )
+
+        register(
+            QuestEntry(
+                id = "q_start_02",
+                title = "Szept w Ciemności",
+                description = "W Twierdzy Żelaznej słyszano głosy dochodzące z zamarzniętych studni.",
+                objective = "Zbadaj studnie w Twierdzy",
+                cityId = "twierdza_zelazna",
+                rewardGold = 75,
+                originRefId = "guard",
+            )
+        )
+
+        register(
+            QuestEntry(
+                id = "q_start_03",
+                title = "Ostatnia Wieczerza",
+                description = "W Porcie Mglistym brakuje zapasów. Ktoś kradnie ryby prosto z sieci.",
+                objective = "Złap złodzieja w Porcie",
+                cityId = "port_mglisty",
+                rewardGold = 40,
+                originRefId = "merchant",
             )
         )
     }

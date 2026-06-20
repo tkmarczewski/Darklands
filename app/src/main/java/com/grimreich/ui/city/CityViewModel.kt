@@ -93,7 +93,13 @@ class CityViewModel @Inject constructor(
             ?: questSystem.all().find { it.status == QuestStatus.AKTYWNE && it.cityId == cityId }
         
         if (quest != null) {
-            val node = if (quest.id.startsWith("q_start")) "aelion_start" else "mystic_start"
+            val node = when (quest.originRefId) {
+                "aelion" -> "aelion_start"
+                "merchant" -> "merchant_start"
+                "zealot" -> "zealot_start"
+                "mystic" -> "mystic_start"
+                else -> "mystic_start"
+            }
             onNpcClick(quest.originRefId, quest.originRefId, node)
         }
     }

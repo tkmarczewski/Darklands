@@ -27,7 +27,7 @@ class SplashActivity : AppCompatActivity() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 delay(2000)
-                startActivity(Intent(this@SplashActivity, MainMenuActivity::class.java))
+                startActivity(Intent(this@SplashActivity, MainActivity::class.java))
                 finish()
             }
         }

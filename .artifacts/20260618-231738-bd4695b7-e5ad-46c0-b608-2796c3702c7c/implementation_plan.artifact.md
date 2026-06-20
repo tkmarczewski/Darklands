@@ -1,44 +1,42 @@
-# Resolve Startup Crash, Circular Dependencies, and EchoSystem Initialization
+# Resolve UI Freezes and Navigation Inconsistency
 
-The application crashes at startup because of two intertwined issues:
-1. **Circular Dependency Loop**: `GameRepository` <-> `QuestSystem` <-> `GameRepository` (and others) prevents the Hilt graph from resolving.
-2. **EchoSystem Crash**: `GrimReichApp` attempts to use `echoSystem` before Hilt has injected it, resulting in `UninitializedPropertyAccessException`.
+The app successfully starts but suffers from heavy main thread blocking and a fragmented navigation flow between legacy Activities and Compose.
 
 ## Proposed Changes
 
-### DI Configuration
+### Core Systems (Performance)
 
-#### [AppModule.kt](file:///C:/repo2/app/src/main/java/com/grimreich/di/AppModule.kt)
-- Update `provideQuestSystem` to accept `Provider<GameRepository>`.
-- Update `provideGameRepository` to accept `Provider<QuestSystem>` and `Provider<DialogueManager>`.
-- This breaks the cyclic dependency at the factory level.
-
-### Core Systems
-
-#### [QuestSystem.kt](file:///C:/repo2/app/src/main/java/com/grimreich/systems/QuestSystem.kt)
-- Update constructor to use `Provider<GameRepository>`.
-- Use `private val gameRepository get() = gameRepositoryProvider.get()` for lazy access.
+#### [GameBootstrapper.kt](file:///C:/repo2/app/src/main/java/com/grimreich/core/GameBootstrapper.kt)
+- Convert `bootstrapFreshWorld` to a `suspend` function.
+- Wrap internal seeding calls in `withContext(Dispatchers.IO)`.
 
 #### [GameRepository.kt](file:///C:/repo2/app/src/main/java/com/grimreich/core/GameRepository.kt)
-- Update constructor to use `Provider<QuestSystem>` and `Provider<DialogueManager>`.
-- Access these systems via lazy getters to ensure they are only retrieved when the graph is ready.
+- Move `persistCurrentState` logic to a background thread to prevent frame skips during auto-saves.
 
-### Application Lifecycle (Critical Fix)
+### Navigation & UI Architecture
 
-#### [GrimReichApp.kt](file:///C:/repo2/app/src/main/java/com/grimreich/GrimReichApp.kt)
-- Change `echoSystem` to `Provider<EchoSystem>`.
-- In `onCreate`, use `echoSystemProvider.get().init(this)`.
-- **Why?** This implements "Variant C" (Lazy/Deferred creation). By using a `Provider`, we don't force Hilt to resolve the entire (potentially broken) graph immediately when the `Application` object is created.
+#### [GameNavHost.kt](file:///C:/repo2/app/src/main/java/com/grimreich/ui/main/GameNavHost.kt)
+- Add new routes for `MainMenu`, `PlayerIdentity`, and `CharacterCreator`.
+- Implement Compose versions of these screens (migrating logic from legacy Activities).
+
+#### [MainActivity.kt](file:///C:/repo2/app/src/main/java/com/grimreich/ui/MainActivity.kt)
+- Set `GameScreenMode.MAIN_MENU` as the default starting state.
+- Remove Activity-switching logic; all flow will now be within `GameNavHost`.
+
+### Content Seeding
+
+#### [QuestSystem.kt](file:///C:/repo2/app/src/main/java/com/grimreich/systems/QuestSystem.kt)
+- Audit `seedIntegratedContent` to ensure Aelion's quest and subsequent nodes are correctly registered.
 
 ---
 
 ## Verification Plan
 
 ### Automated Tests
-- Run `./gradlew app:assembleDebug`.
-- If it passes, the DI graph is at least theoretically resolvable.
+- `./gradlew app:assembleDebug`
+- Unit tests for seeding logic consistency.
 
 ### Manual Verification
-- Deploy to device/emulator.
-- **Success Criteria**: App shows Splash screen, then transitions to Main Menu.
-- **Logcat Check**: No `UninitializedPropertyAccessException` on start.
+- Launch app from Splash.
+- Verify smooth transition between screens without "Davey!" (long frame) warnings in Logcat.
+- Complete character creation and ensure the game state persists correctly in `MainActivity`.

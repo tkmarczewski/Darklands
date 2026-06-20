@@ -4,6 +4,8 @@ import com.grimreich.systems.DialogueManager
 import com.grimreich.systems.QuestSystem
 import com.grimreich.world.CityCatalogue
 import com.grimreich.world.ItemCatalogue
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -16,7 +18,7 @@ class GameBootstrapper @Inject constructor(
     private val itemCatalogue: ItemCatalogue,
     private val worldMap: WorldMap
 ) {
-    fun bootstrapFreshWorld(seed: Int = 1) {
+    suspend fun bootstrapFreshWorld(seed: Int = 1) = withContext(Dispatchers.IO) {
         // Clear all session volatile caches
         cityCatalogue.clear()
         cityCatalogue.seedCanonical()

@@ -14,7 +14,7 @@ class GameLoopController @Inject constructor(
     private val travelSystem: TravelSystem,
     private val cityCatalogue: CityCatalogue
 ) {
-    fun bootstrap(seed: Int = 1): PlayerState {
+    suspend fun bootstrap(seed: Int = 1): PlayerState {
         gameRepository.clearSessionAndReset()
         gameBootstrapper.bootstrapFreshWorld(seed)
 

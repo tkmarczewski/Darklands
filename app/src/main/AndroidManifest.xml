@@ -7,7 +7,7 @@
         android:theme="@style/Theme.GrimReich"
         android:supportsRtl="true">
 
-        <!-- INITIAL LAUNCHER: Splash -> Main Menu -->
+        <!-- INITIAL LAUNCHER -->
         <activity android:name=".ui.SplashActivity"
             android:exported="true"
             android:screenOrientation="landscape">
@@ -17,30 +17,12 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".ui.MainMenuActivity"
-            android:exported="false"
-            android:screenOrientation="landscape">
-        </activity>
-
-        <activity android:name=".ui.PlayerIdentityActivity"
-            android:exported="false"
-            android:screenOrientation="landscape">
-        </activity>
-
         <!-- SINGLE ACTIVITY ROOT: ALL GAMEPLAY HAPPENS HERE -->
         <activity android:name=".ui.MainActivity"
             android:exported="false"
             android:configChanges="orientation|screenSize|keyboardHidden"
             android:screenOrientation="landscape">
         </activity>
-
-        <activity android:name=".ui.CharacterCreatorActivity"
-            android:exported="false"
-            android:screenOrientation="landscape"/>
-
-        <activity android:name=".ui.DevMenuActivity"
-            android:exported="true"
-            android:screenOrientation="landscape"/>
 
     </application>
 </manifest>

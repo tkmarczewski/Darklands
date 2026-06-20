@@ -7,6 +7,10 @@ import com.grimreich.systems.StatePersistenceManager
 import com.grimreich.world.CityCatalogue
 import com.grimreich.world.ItemCatalogue
 import dagger.Lazy
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -18,6 +22,7 @@ class GameRepository @Inject constructor(
     private val cityCatalogue: CityCatalogue,
     private val itemCatalogue: ItemCatalogue,
 ) {
+    private val repositoryScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
     private val questSystem get() = questSystemProvider.get()
     private val dialogueManager get() = dialogueManagerProvider.get()
     private var state: GameState = GameState()
@@ -35,19 +40,7 @@ class GameRepository @Inject constructor(
 
     fun seed() {
         state = GameState()
-
-        val hero1 = Hero(
-            id = "hero_1", name = "Friedrich", age = 25,
-            strength = 14, agility = 10, intelligence = 12,
-            endurance = 13, charisma = 9, piety = 8,
-            hp = 35, maxHp = 35
-        ).also {
-            it.skills["sword"] = 40
-            it.skills["riding"] = 20
-        }
-
-        state.party.add(hero1)
-        state.activeHeroId = hero1.id
+        // No default party here, we'll set it in CharacterCreator logic
         state.gold = 100
 
         cityCatalogue.clear()
@@ -89,7 +82,15 @@ class GameRepository @Inject constructor(
     }
 
     fun persistCurrentState() {
-        persistence.persist(state.toDto())
+        val stateSnapshot = state.deepCopy()
+        repositoryScope.launch {
+            try {
+                val dto = stateSnapshot.toDto()
+                persistence.persist(dto)
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
     }
 
     fun hasSession(): Boolean = persistence.exists()

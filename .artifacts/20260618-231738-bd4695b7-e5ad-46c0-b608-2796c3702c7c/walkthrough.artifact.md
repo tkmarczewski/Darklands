@@ -1,27 +1,26 @@
-# Fix Startup Crash and DI Architecture Cleanup
+# Fix Startup Crash, Performance ANRs, and Unified Navigation
 
-I have resolved the critical startup crash and stabilized the Hilt dependency injection graph.
+I have completed a comprehensive overhaul of the application's core architecture to resolve crashes, severe lag, and navigation inconsistencies.
 
-## Key Fixes
+## Key Accomplishments
 
-### 1. Hilt Compilation & KSP Migration
-- **Problem**: The project was using `annotationProcessor` for Hilt with Kotlin 2.x, which caused Hilt annotations to be ignored. This led to `UninitializedPropertyAccessException` at runtime.
-- **Solution**: Migrated Hilt to use **KSP (Kotlin Symbol Processing)** and upgraded Hilt to version **2.59.2**. This ensures full compatibility with the latest Kotlin versions and correct code generation for `@AndroidEntryPoint` and `@HiltAndroidApp`.
+### 1. Stability & DI Fixes
+- **Hilt KSP Migration**: Upgraded Hilt to 2.59.2 and switched to **KSP** (Kotlin Symbol Processing). This was the root cause of the `UninitializedPropertyAccessException` as the previous setup was incompatible with Kotlin 2.x.
+- **Breaking Circular Dependencies**: Resolved the `GameRepository` <-> `QuestSystem` loop using `dagger.Lazy`.
 
-### 2. Breaking Circular Dependencies
-- **Problem**: A hard dependency loop existed between `GameRepository` and `QuestSystem`.
-- **Solution**: Used `dagger.Lazy` in constructors for `QuestSystem` and `GameRepository` to break the cyclic dependency, allowing Hilt to initialize these singletons correctly.
+### 2. Performance Optimization
+- **Background Operations**: Refactored `GameBootstrapper` and `GameRepository` to move world seeding and state serialization (JSON saving) to **IO threads**. This eliminated the 1-6 second UI freezes (ANRs) reported in logcat.
+- **Async Persistence**: `persistCurrentState()` now uses a background scope with a thread-safe `GameState` snapshot to ensure the UI remains smooth during auto-saves.
 
-### 3. EchoSystem Self-Initialization
-- **Problem**: `GrimReichApp` was manually initializing `EchoSystem` in `onCreate`, which triggered the crash when injection failed.
-- **Solution**: Refactored `EchoSystem` to use `@ApplicationContext` and self-initialize in its `init` block. Removed all manual `init` calls from `GrimReichApp` and `SplashActivity`.
+### 3. Navigation Consolidation
+- **Single-Activity Architecture**: Migrated `MainMenu`, `PlayerIdentity`, and `CharacterCreator` from legacy Android Activities to **Jetpack Compose** screens integrated within `MainActivity`.
+- **Unified Flow**: `SplashActivity` now routes directly to `MainActivity`, where `GameNavHost` manages the entire user journey. This significantly improves state management and reduces startup overhead.
 
-### 4. Code Cleanup & Warning Removal
-- **AppModule Cleanup**: Removed almost all redundant `@Provides` methods, relying on `@Inject constructor` on individual classes. This simplifies the DI graph and reduces maintenance overhead.
-- **Deprecated Patterns**: Replaced deprecated `lifecycleScope.launchWhenCreated` with `repeatOnLifecycle` in `SplashActivity`.
-- **Naming Conventions**: Renamed `@Provides` methods (before removal) to follow Kotlin CamelCase conventions.
+### 4. Quest & Content Refinement
+- **Dynamic Quest Dialogues**: Fixed a logic error in `CityViewModel` where all start quests defaulted to Aelion's dialogue. It now dynamically maps quests to the correct NPC nodes (Aelion, Merchant, Zealot, Mystic).
+- **Expanded Seed**: Added new introductory quests (`q_start_02`, `q_start_03`) to enrich the early-game experience on the North Coast.
 
 ## Verification Summary
-- **Build Status**: `./gradlew app:assembleDebug` completes successfully with ZERO errors.
-- **Runtime Verification**: The app launches, displays the Splash screen for 2 seconds, and successfully transitions to the Main Menu without crashing.
-- **Logcat**: Verified that no `UninitializedPropertyAccessException` or Hilt-related errors occur during startup.
+- **Zero Errors**: `./gradlew app:assembleDebug` passes with no errors.
+- **Responsive UI**: Verified manually that the app launches, transitions through the menu/creator, and reaches the `HubScreen` without frame skips or freezes.
+- **Correct Logic**: Confirmed that Aelion's quest is correctly seeded and triggers the intended interaction in the city.

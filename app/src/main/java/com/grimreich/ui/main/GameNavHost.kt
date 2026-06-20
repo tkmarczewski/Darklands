@@ -1,11 +1,16 @@
 package com.grimreich.ui.main
 
 import androidx.compose.runtime.*
+import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.grimreich.core.GameBootstrapper
+import com.grimreich.core.GameState
+import com.grimreich.core.Hero
+import com.grimreich.grimreich.v1.Item
 import com.grimreich.ui.city.CityScreen
 import com.grimreich.ui.city.CityViewModel
 import com.grimreich.ui.combat.CombatScreen
@@ -22,8 +27,13 @@ import com.grimreich.ui.saints.SaintsViewModel
 import com.grimreich.ui.tavern.TavernScreen
 import com.grimreich.ui.tavern.TavernViewModel
 import com.grimreich.ui.tavern.RecruitmentScreen
+import kotlinx.coroutines.launch
+import java.util.*
 
 sealed class GameRoute(val route: String) {
+    object MainMenu : GameRoute("main_menu")
+    object PlayerIdentity : GameRoute("player_identity")
+    object CharacterCreator : GameRoute("character_creator")
     object Hub : GameRoute("hub")
     object WorldMap : GameRoute("map")
     object City : GameRoute("city")
@@ -42,9 +52,13 @@ fun GameNavHost(
     navController: NavHostController = rememberNavController()
 ) {
     val mode by root.mode.collectAsState()
+    val scope = rememberCoroutineScope()
 
     LaunchedEffect(mode) {
         val target = when (mode) {
+            GameScreenMode.MAIN_MENU -> GameRoute.MainMenu.route
+            GameScreenMode.PLAYER_IDENTITY -> GameRoute.PlayerIdentity.route
+            GameScreenMode.CHARACTER_CREATOR -> GameRoute.CharacterCreator.route
             GameScreenMode.HUB -> GameRoute.Hub.route
             GameScreenMode.WORLD_MAP -> GameRoute.WorldMap.route
             GameScreenMode.CITY -> GameRoute.City.route
@@ -59,12 +73,76 @@ fun GameNavHost(
         }
         if (navController.currentBackStackEntry?.destination?.route != target) {
             navController.navigate(target) {
-                popUpTo(GameRoute.Hub.route) { inclusive = false }
+                // When switching between core modes (Menu vs Game), clear the backstack
+                if (mode == GameScreenMode.MAIN_MENU || mode == GameScreenMode.HUB) {
+                    popUpTo(0) { inclusive = true }
+                } else {
+                    popUpTo(GameRoute.Hub.route) { inclusive = false }
+                }
             }
         }
     }
 
-    NavHost(navController = navController, startDestination = GameRoute.Hub.route) {
+    NavHost(navController = navController, startDestination = GameRoute.MainMenu.route) {
+        composable(GameRoute.MainMenu.route) {
+            val context = LocalContext.current
+            MainMenuScreen(
+                onNewGame = {
+                    root.gameRepository.clearSessionAndReset()
+                    root.setMode(GameScreenMode.PLAYER_IDENTITY)
+                },
+                onContinue = {
+                    if (root.gameRepository.restoreIfAvailable()) {
+                        root.setMode(GameScreenMode.HUB)
+                    }
+                },
+                onExit = { (context as? android.app.Activity)?.finish() },
+                onDevMenu = { /* root.setMode(GameScreenMode.DEV_MENU) */ }
+            )
+        }
+        composable(GameRoute.PlayerIdentity.route) {
+            PlayerIdentityScreen(
+                onContinue = { name ->
+                    root.gameRepository.currentState().playerName = name
+                    root.setMode(GameScreenMode.CHARACTER_CREATOR)
+                },
+                onBack = { root.setMode(GameScreenMode.MAIN_MENU) }
+            )
+        }
+        composable(GameRoute.CharacterCreator.route) {
+            CharacterCreatorScreen(
+                onStartGame = { name, career, attrs, skills ->
+                    scope.launch {
+                        root.gameBootstrapper.bootstrapFreshWorld(seed = 1)
+                        // Then customize with the data from creator
+                        val state = root.gameRepository.currentState()
+                        state.playerName = root.gameRepository.currentState().playerName
+                        state.party.clear()
+                        val hero = Hero(
+                            id = UUID.randomUUID().toString(),
+                            name = name,
+                            age = 25,
+                            strength = attrs["Str"] ?: 10,
+                            agility = attrs["Agi"] ?: 10,
+                            perception = attrs["Per"] ?: 10,
+                            intelligence = attrs["Int"] ?: 10,
+                            endurance = attrs["End"] ?: 10,
+                            charisma = attrs["Cha"] ?: 10,
+                            piety = attrs["Pie"] ?: 10,
+                            hp = (attrs["End"] ?: 10) * 2 + 20,
+                            maxHp = (attrs["End"] ?: 10) * 2 + 20,
+                            currentCareer = career
+                        )
+                        skills.forEach { hero.skills[it.name] = 30 }
+                        state.party.add(hero)
+                        state.activeHeroId = hero.id
+                        root.gameRepository.persistCurrentState()
+                        root.setMode(GameScreenMode.HUB)
+                    }
+                },
+                onBack = { root.setMode(GameScreenMode.PLAYER_IDENTITY) }
+            )
+        }
         composable(GameRoute.Hub.route) {
             HubScreen(
                 viewModel = hiltViewModel(),
