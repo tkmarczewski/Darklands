@@ -2,6 +2,7 @@ package com.grimreich.systems
 
 import android.content.Context
 import com.grimreich.core.SessionStateDto
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.serialization.json.Json
 import java.io.File
 import javax.inject.Inject
@@ -9,7 +10,7 @@ import javax.inject.Singleton
 
 @Singleton
 class StatePersistenceManager @Inject constructor(
-    private val context: Context
+    @ApplicationContext private val context: Context
 ) {
     private val json = Json {
         ignoreUnknownKeys = true

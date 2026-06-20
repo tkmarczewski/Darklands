@@ -1,12 +1,11 @@
 package com.grimreich.systems
 
 import com.grimreich.core.GameRepository
-import com.grimreich.world.CityCatalogue
-import kotlin.Lazy
+import dagger.Lazy
 import javax.inject.Inject
 import javax.inject.Singleton
 
-enum class QuestStatus { DOSTEPNE, AKTYWNE, UKONCZONE, ODRZUCONE }
+enum class QuestStatus { DOSTEPNE, AKTYWNE, UKONCZONE }
 
 data class QuestEntry(
     val id: String,
@@ -21,9 +20,9 @@ data class QuestEntry(
 
 @Singleton
 class QuestSystem @Inject constructor(
-    private val gameRepository: Lazy<GameRepository>,
-    private val cityCatalogue: CityCatalogue
+    private val gameRepositoryProvider: Lazy<GameRepository>
 ) {
+    private val gameRepository get() = gameRepositoryProvider.get()
     private val allQuests = mutableMapOf<String, QuestEntry>()
 
     fun register(quest: QuestEntry) {
@@ -37,30 +36,30 @@ class QuestSystem @Inject constructor(
     fun activate(questId: String): QuestEntry {
         val quest = allQuests[questId] ?: error("Nie znaleziono zadania: $questId")
         quest.status = QuestStatus.AKTYWNE
-        val state = gameRepository.value.currentState()
+        val state = gameRepository.currentState()
         if (!state.quest.activeQuests.contains(questId)) {
             state.quest.activeQuests.add(questId)
         }
-        gameRepository.value.persistCurrentState()
+        gameRepository.persistCurrentState()
         return quest
     }
 
     fun complete(questId: String): QuestEntry {
         val quest = allQuests[questId] ?: error("Nie znaleziono zadania: $questId")
         quest.status = QuestStatus.UKONCZONE
-        val state = gameRepository.value.currentState()
+        val state = gameRepository.currentState()
         state.quest.activeQuests.remove(questId)
         if (!state.quest.completedQuests.contains(questId)) {
             state.quest.completedQuests.add(questId)
         }
         state.gold += quest.rewardGold
-        gameRepository.value.persistCurrentState()
+        gameRepository.persistCurrentState()
         return quest
     }
 
     fun availableForCity(cityId: String): List<QuestEntry> {
         return allQuests.values.filter { 
-            it.cityId == cityId && it.status == QuestStatus.DOSTEPNE 
+            (it.cityId == cityId) && (it.status == QuestStatus.DOSTEPNE)
         }
     }
 
@@ -68,17 +67,19 @@ class QuestSystem @Inject constructor(
         allQuests.clear()
     }
 
-    fun seedIntegratedContent(seed: Int = 1) {
+    fun seedIntegratedContent() {
         if (allQuests.isNotEmpty()) return
         
-        register(QuestEntry(
-            id = "q_start_01",
-            title = "Początek Końca",
-            description = "Znajdź Aeliona na Wybrzeżu Północnym.",
-            objective = "Porozmawiaj z Aelionem",
-            cityId = "wybrzeze_polnocne",
-            rewardGold = 50,
-            originRefId = "aelion"
-        ))
+        register(
+            QuestEntry(
+                id = "q_start_01",
+                title = "Początek Końca",
+                description = "Znajdź Aeliona na Wybrzeżu Północnym.",
+                objective = "Porozmawiaj z Aelionem",
+                cityId = "wybrzeze_polnocne",
+                rewardGold = 50,
+                originRefId = "aelion",
+            )
+        )
     }
 }

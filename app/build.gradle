@@ -1,10 +1,13 @@
-apply plugin: 'com.android.application'
-apply plugin: 'org.jetbrains.kotlin.android'
-apply plugin: 'org.jetbrains.kotlin.plugin.compose'
-apply plugin: 'org.jetbrains.kotlin.plugin.serialization'
-apply plugin: 'jacoco'
-apply plugin: 'io.gitlab.arturbosch.detekt'
-apply plugin: 'kotlin-kapt'
+plugins {
+    id 'com.android.application'
+    id 'org.jetbrains.kotlin.android'
+    id 'org.jetbrains.kotlin.plugin.compose'
+    id 'org.jetbrains.kotlin.plugin.serialization'
+    id 'com.google.dagger.hilt.android'
+    id 'com.google.devtools.ksp'
+    id 'jacoco'
+    id 'io.gitlab.arturbosch.detekt'
+}
 
 android {
     namespace = 'com.grimreich'
@@ -52,25 +55,6 @@ jacoco {
     toolVersion = "0.8.12"
 }
 
-tasks.register('jacocoTestReport', JacocoReport) {
-    dependsOn 'testDebugUnitTest'
-    reports {
-        xml.required = true
-        html.required = true
-    }
-
-    def fileFilter = ['**/R.class', '**/R$*.class', '**/BuildConfig.*', '**/Manifest*.*', '**/*Test*.*', 'android/**/*.*']
-    def buildDir = layout.buildDirectory.get().asFile
-    def debugTree = fileTree(dir: "$buildDir/tmp/kotlin-classes/debug", excludes: fileFilter)
-    def mainSrc = "$project.projectDir/src/main/java"
-
-    sourceDirectories.setFrom(files([mainSrc]))
-    classDirectories.setFrom(files([debugTree]))
-    executionData.setFrom(fileTree(dir: buildDir, includes: [
-            'jacoco/testDebugUnitTest.exec', 'outputs/code_coverage/debugAndroidTest/connected/*coverage.ec'
-    ]))
-}
-
 dependencies {
     implementation 'androidx.core:core-ktx:1.12.0'
     implementation 'androidx.appcompat:appcompat:1.6.1'
@@ -92,9 +76,9 @@ dependencies {
     implementation "androidx.navigation:navigation-compose:2.7.7"
     implementation "androidx.hilt:hilt-navigation-compose:1.2.0"
 
-    // DI - Manual Dagger/Hilt setup (plugin application failed due to kotlin version conflict)
-    implementation "com.google.dagger:hilt-android:2.51"
-    kapt "com.google.dagger:hilt-android-compiler:2.51"
+    // DI
+    implementation "com.google.dagger:hilt-android:2.59.2"
+    ksp "com.google.dagger:hilt-android-compiler:2.59.2"
     
     // SERIALIZATION
     implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3"

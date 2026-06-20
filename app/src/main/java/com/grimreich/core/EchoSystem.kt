@@ -3,19 +3,25 @@ package com.grimreich.core
 import android.content.Context
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import dagger.hilt.android.qualifiers.ApplicationContext
 import java.io.File
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class EchoSystem @Inject constructor(
+    @ApplicationContext private val context: Context,
     private val gameRepository: GameRepository
 ) {
     private val ECHO_FILE = "eternal_echoes.json"
     private val gson = Gson()
     private val eternalHeroes = mutableListOf<Hero>()
 
-    fun init(context: Context) {
+    init {
+        loadEchoes()
+    }
+
+    private fun loadEchoes() {
         val file = File(context.filesDir, ECHO_FILE)
         if (file.exists()) {
             try {
@@ -29,6 +35,9 @@ class EchoSystem @Inject constructor(
             }
         }
     }
+
+    // Kept for backward compatibility but made no-op
+    fun init(context: Context) {}
 
     fun recordHero(hero: Hero, context: Context) {
         if (eternalHeroes.none { it.id == hero.id }) {

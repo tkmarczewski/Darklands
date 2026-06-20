@@ -6,17 +6,20 @@ import com.grimreich.systems.QuestSystem
 import com.grimreich.systems.StatePersistenceManager
 import com.grimreich.world.CityCatalogue
 import com.grimreich.world.ItemCatalogue
+import dagger.Lazy
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class GameRepository @Inject constructor(
-    private val questSystem: QuestSystem,
-    private val dialogueManager: DialogueManager,
+    private val questSystemProvider: Lazy<QuestSystem>,
+    private val dialogueManagerProvider: Lazy<DialogueManager>,
     private val persistence: StatePersistenceManager,
     private val cityCatalogue: CityCatalogue,
-    private val itemCatalogue: ItemCatalogue
+    private val itemCatalogue: ItemCatalogue,
 ) {
+    private val questSystem get() = questSystemProvider.get()
+    private val dialogueManager get() = dialogueManagerProvider.get()
     private var state: GameState = GameState()
 
     fun currentState(): GameState = state
@@ -56,7 +59,7 @@ class GameRepository @Inject constructor(
         state.world.location = "wybrzeze_polnocne"
 
         questSystem.clear()
-        questSystem.seedIntegratedContent(seed = 1)
+        questSystem.seedIntegratedContent()
         dialogueManager.seedBasicDialogues()
 
         state.hireableHeroes.addAll(
