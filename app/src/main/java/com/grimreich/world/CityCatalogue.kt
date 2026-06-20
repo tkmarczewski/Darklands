@@ -44,7 +44,8 @@ class CityCatalogue @Inject constructor() {
             phenomenon = "Echo Przeszłości",
             priceModifier = 1.0f,
             backgroundDrawable = "bg_region_north_coast",
-            loreDescription = "Miejsce, gdzie zaczyna się mgła."
+            loreDescription = "Miejsce, gdzie zaczyna się mgła.",
+            prophet = "Aelion"
         ))
         
         register(CityData(
@@ -54,7 +55,30 @@ class CityCatalogue @Inject constructor() {
             phenomenon = "Zamarznięty Czas",
             priceModifier = 1.2f,
             backgroundDrawable = "bg_region_iron_fortress",
-            loreDescription = "Ostatni bastion ludzkości."
+            loreDescription = "Ostatni bastion ludzkości.",
+            prophet = "Ferrum"
+        ))
+
+        register(CityData(
+            id = "port_mglisty",
+            name = "Port Mglisty",
+            region = "Coast",
+            phenomenon = "Wieczna Mgła",
+            priceModifier = 0.9f,
+            backgroundDrawable = "bg_region_north_coast",
+            loreDescription = "Stare miasto portowe spowite mgłą.",
+            prophet = "Navigatrix"
+        ))
+
+        register(CityData(
+            id = "opactwo_ciszy",
+            name = "Opactwo Ciszy",
+            region = "Mountains",
+            phenomenon = "Cisza Absolutna",
+            priceModifier = 1.1f,
+            backgroundDrawable = "bg_region_iron_fortress",
+            loreDescription = "Klasztor milczących mnichów.",
+            prophet = "Silentius"
         ))
     }
 }

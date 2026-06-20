@@ -57,9 +57,9 @@ class QuestSystem @Inject constructor(
         return quest
     }
 
-    fun availableForCity(cityId: String): List<QuestEntry> {
+    fun availableForCity(cityId: String, excludeIds: Set<String> = emptySet()): List<QuestEntry> {
         return allQuests.values.filter { 
-            (it.cityId == cityId) && (it.status == QuestStatus.DOSTEPNE)
+            (it.cityId == cityId) && (it.status == QuestStatus.DOSTEPNE) && !excludeIds.contains(it.id)
         }
     }
 
@@ -70,18 +70,6 @@ class QuestSystem @Inject constructor(
     fun seedIntegratedContent() {
         if (allQuests.isNotEmpty()) return
         
-        register(
-            QuestEntry(
-                id = "q_start_01",
-                title = "Początek Końca",
-                description = "Znajdź Aeliona na Wybrzeżu Północnym. Szepczą, że mgła go nie dotyka.",
-                objective = "Porozmawiaj z Aelionem",
-                cityId = "wybrzeze_polnocne",
-                rewardGold = 50,
-                originRefId = "aelion",
-            )
-        )
-
         register(
             QuestEntry(
                 id = "q_start_02",
@@ -103,6 +91,54 @@ class QuestSystem @Inject constructor(
                 cityId = "port_mglisty",
                 rewardGold = 40,
                 originRefId = "merchant",
+            )
+        )
+
+        register(
+            QuestEntry(
+                id = "q_rand_01",
+                title = "Milcząca Modlitwa",
+                description = "Mnisi z Opactwa Ciszy szukają kogoś, kto odzyska skradziony dzwon.",
+                objective = "Odzyskaj dzwon Opactwa",
+                cityId = "opactwo_ciszy",
+                rewardGold = 60,
+                originRefId = "mystic",
+            )
+        )
+
+        register(
+            QuestEntry(
+                id = "q_rand_02",
+                title = "Cień Przeszłości",
+                description = "Ktoś widział statek widmo dryfujący u wybrzeży.",
+                objective = "Zbadaj wrak na Wybrzeżu",
+                cityId = "wybrzeze_polnocne",
+                rewardGold = 55,
+                originRefId = "aelion",
+            )
+        )
+
+        register(
+            QuestEntry(
+                id = "q_rand_03",
+                title = "Zatruta Mgła",
+                description = "Gęsta, nienaturalna mgła dusi mieszkańców Portu.",
+                objective = "Oczyść opary w Porcie",
+                cityId = "port_mglisty",
+                rewardGold = 90,
+                originRefId = "zealot",
+            )
+        )
+
+        register(
+            QuestEntry(
+                id = "q_rand_04",
+                title = "Zamarznięta Groza",
+                description = "Potwór z lodu terroryzuje bramy Twierdzy.",
+                objective = "Zgładź lodową bestię",
+                cityId = "twierdza_zelazna",
+                rewardGold = 45,
+                originRefId = "guard",
             )
         )
     }

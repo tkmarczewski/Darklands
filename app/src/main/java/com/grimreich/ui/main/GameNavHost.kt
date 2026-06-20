@@ -13,6 +13,8 @@ import com.grimreich.core.Hero
 import com.grimreich.grimreich.v1.Item
 import com.grimreich.ui.city.CityScreen
 import com.grimreich.ui.city.CityViewModel
+import com.grimreich.ui.city.MarketScreen
+import com.grimreich.ui.city.MarketViewModel
 import com.grimreich.ui.combat.CombatScreen
 import com.grimreich.ui.combat.CombatViewModel
 import com.grimreich.ui.dialogue.DialogueScreen
@@ -22,6 +24,7 @@ import com.grimreich.ui.inventory.InventoryViewModel
 import com.grimreich.ui.map.WorldMapScreen
 import com.grimreich.ui.map.WorldMapViewModel
 import com.grimreich.ui.quests.QuestJournalScreen
+import com.grimreich.ui.quests.QuestJournalViewModel
 import com.grimreich.ui.saints.SaintsScreen
 import com.grimreich.ui.saints.SaintsViewModel
 import com.grimreich.ui.tavern.TavernScreen
@@ -37,6 +40,7 @@ sealed class GameRoute(val route: String) {
     object Hub : GameRoute("hub")
     object WorldMap : GameRoute("map")
     object City : GameRoute("city")
+    object Market : GameRoute("market")
     object Combat : GameRoute("combat")
     object Tavern : GameRoute("tavern")
     object Temple : GameRoute("temple")
@@ -44,6 +48,7 @@ sealed class GameRoute(val route: String) {
     object Quests : GameRoute("quests")
     object Recruit : GameRoute("recruit")
     object Inventory : GameRoute("inventory")
+    object CharDetail : GameRoute("char_detail")
 }
 
 @Composable
@@ -62,6 +67,7 @@ fun GameNavHost(
             GameScreenMode.HUB -> GameRoute.Hub.route
             GameScreenMode.WORLD_MAP -> GameRoute.WorldMap.route
             GameScreenMode.CITY -> GameRoute.City.route
+            GameScreenMode.MARKET -> GameRoute.Market.route
             GameScreenMode.COMBAT -> GameRoute.Combat.route
             GameScreenMode.TAVERN -> GameRoute.Tavern.route
             GameScreenMode.TEMPLE -> GameRoute.Temple.route
@@ -69,6 +75,7 @@ fun GameNavHost(
             GameScreenMode.QUESTS -> GameRoute.Quests.route
             GameScreenMode.RECRUIT -> GameRoute.Recruit.route
             GameScreenMode.INVENTORY -> GameRoute.Inventory.route
+            GameScreenMode.CHAR_DETAIL -> GameRoute.CharDetail.route
             else -> GameRoute.Hub.route
         }
         if (navController.currentBackStackEntry?.destination?.route != target) {
@@ -154,6 +161,17 @@ fun GameNavHost(
                 onCharacter = { root.inspectHero(it) }
             )
         }
+        composable(GameRoute.CharDetail.route) {
+            val hero by root.inspectedHero.collectAsState()
+            hero?.let {
+                CharDetailScreen(
+                    hero = it,
+                    onBack = { root.setMode(GameScreenMode.HUB) }
+                )
+            } ?: run {
+                root.setMode(GameScreenMode.HUB)
+            }
+        }
         composable(GameRoute.WorldMap.route) {
             WorldMapScreen(
                 viewModel = hiltViewModel(),
@@ -163,12 +181,19 @@ fun GameNavHost(
         composable(GameRoute.City.route) {
             CityScreen(
                 viewModel = hiltViewModel(),
-                onMarket = { /* TODO */ },
+                onMarket = { root.setMode(GameScreenMode.MARKET) },
                 onTavern = { root.setMode(GameScreenMode.TAVERN) },
                 onTemple = { root.setMode(GameScreenMode.TEMPLE) },
                 onRecruit = { root.setMode(GameScreenMode.RECRUIT) },
                 onDialogue = { root.setMode(GameScreenMode.DIALOGUE) },
                 onExit = { root.setMode(GameScreenMode.HUB) }
+            )
+        }
+        composable(GameRoute.Market.route) {
+            val marketVm: MarketViewModel = hiltViewModel()
+            MarketScreen(
+                viewModel = marketVm,
+                onBack = { root.setMode(GameScreenMode.CITY) }
             )
         }
         composable(GameRoute.Combat.route) {
@@ -197,7 +222,9 @@ fun GameNavHost(
             )
         }
         composable(GameRoute.Quests.route) {
+            val questVm: QuestJournalViewModel = hiltViewModel()
             QuestJournalScreen(
+                viewModel = questVm,
                 onBack = { root.setMode(GameScreenMode.HUB) }
             )
         }

@@ -8,6 +8,7 @@ import androidx.lifecycle.lifecycleScope
 import com.grimreich.core.GameRepository
 import com.grimreich.ui.main.GameNavHost
 import com.grimreich.ui.main.GameRootViewModel
+import com.grimreich.ui.shared.DevMenuOverlay
 import com.grimreich.core.GameBootstrapper
 import com.grimreich.ui.theme.GrimTheme
 import dagger.hilt.android.AndroidEntryPoint
@@ -33,7 +34,9 @@ class MainActivity : AppCompatActivity() {
         setContent {
             GrimTheme {
                 val rootViewModel: GameRootViewModel = hiltViewModel()
-                GameNavHost(root = rootViewModel)
+                DevMenuOverlay(root = rootViewModel) {
+                    GameNavHost(root = rootViewModel)
+                }
             }
         }
     }

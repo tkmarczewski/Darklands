@@ -38,11 +38,21 @@ class QuestJournalViewModel @Inject constructor(
             .replace("ś", "s").replace("ź", "z").replace("ż", "z")
             .replace(" ", "_")
 
+        val active = state.quest.activeQuests.mapNotNull { questSystem.getQuest(it) }
+        val completed = state.quest.completedQuests.mapNotNull { questSystem.getQuest(it) }
+        
+        val occupiedIds = (active.map { it.id } + completed.map { it.id }).toSet()
+        val freeSlots = (5 - active.size).coerceAtMost(5).coerceAtLeast(0)
+        
+        val available = questSystem.availableForCity(cityId, excludeIds = occupiedIds)
+            .shuffled()
+            .take(freeSlots)
+
         _uiState.update {
             it.copy(
-                activeQuests = state.quest.activeQuests.mapNotNull { id -> questSystem.getQuest(id) },
-                completedQuests = state.quest.completedQuests.mapNotNull { id -> questSystem.getQuest(id) },
-                availableQuests = questSystem.availableForCity(cityId)
+                activeQuests = active,
+                completedQuests = completed,
+                availableQuests = available
             )
         }
     }
