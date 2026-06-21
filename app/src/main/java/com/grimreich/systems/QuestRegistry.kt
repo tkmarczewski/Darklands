@@ -79,6 +79,18 @@ object QuestRegistry {
         QuestTemplate("q_jester_laugh", "Ostatni Śmiech Błazna", "Błazen zna sekrety całego dworu i chce je sprzedać.", "Drama", 120, "Zdobądź sekrety błazna.")
     )
 
+    val verdictChain = QuestChain(
+        id = "chain_verdict",
+        title = "Wyrok, którego nikt nie wydał",
+        stages = listOf(
+            QuestTemplate("q_verdict_1", "Gabinet bez śladów", "Zbadaj miejsce zbrodni wysokiego urzędnika.", "Verdict", 150, "Znajdź dowody w gabinecie urzędnika."),
+            QuestTemplate("q_verdict_2", "Mieszkanie, które nie pamięta", "Archiwistka Imperium zniknęła. Jej dom jest pusty.", "Verdict", 150, "Odszukaj ślady Liry Voss."),
+            QuestTemplate("q_verdict_3", "Fabryka, która zabiła sama siebie", "WINNI. Tak brzmi wyrok na ścianie fabryki.", "Verdict", 200, "Zbadaj ruiny fabryki zbrojeniowej."),
+            QuestTemplate("q_verdict_4", "Sala, która pamięta wyroki", "Dawna sala sądowa Imperium kryje sekret Trybunału.", "Verdict", 250, "Wejdź do sali wyroku i przetrwaj wizję."),
+            QuestTemplate("q_verdict_5", "Proces, którego nikt nie prowadzi", "Stoisz w kręgu oskarżonych. Trybunał patrzy.", "Verdict", 500, "Dokonaj ostatecznego wyboru wobec Trybunału.")
+        )
+    )
+
     val bloodChain = QuestChain(
         id = "chain_blood",
         title = "Krew, Która Nie Chce Zaschnąć",

@@ -130,8 +130,6 @@ data class CombatStateDto(
 
 @Serializable
 data class StatusEffectDto(
-    val id: String,
-    val name: String,
     val type: String,
     val duration: Int,
     val magnitude: Int

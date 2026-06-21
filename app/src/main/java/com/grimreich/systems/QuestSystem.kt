@@ -106,5 +106,20 @@ class QuestSystem @Inject constructor(
                 )
             )
         }
+
+        // Seed verdict chain
+        QuestRegistry.verdictChain.stages.forEach { template ->
+            register(
+                QuestEntry(
+                    id = template.id,
+                    title = template.title,
+                    description = template.description,
+                    objective = template.objective,
+                    cityId = "twierdza_zelazna", // Verdict chain starts in Iron Fortress (lore canonical)
+                    rewardGold = template.baseReward,
+                    originRefId = "guard"
+                )
+            )
+        }
     }
 }

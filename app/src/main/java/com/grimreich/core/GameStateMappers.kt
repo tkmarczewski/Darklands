@@ -182,7 +182,7 @@ fun WorldState.toDto(): WorldStateDto = WorldStateDto(
     weather = weather.name,
     echoIntensity = echoIntensity,
     collapseProgress = collapseProgress,
-    ontologicalLevel = ontologicalLevel,
+    ontologicalLevel = ontologicalLevel.level,
     discoveredLocations = discoveredLocations.toList(),
     cityEntryCount = cityEntryCount
 )
@@ -196,10 +196,10 @@ fun WorldStateDto.toDomain(): WorldState = WorldState().also {
     it.lastEncounter = lastEncounter
     it.season = try { Season.valueOf(season) } catch(e: Exception) { Season.AUTUMN }
     it.globalStability = globalStability
-    it.weather = try { WeatherType.valueOf(weather) } catch(e: Exception) { WeatherType.MISTY }
+    it.weather = try { WeatherType.valueOf(weather) } catch(e: Exception) { WeatherType.MIST }
     it.echoIntensity = echoIntensity
     it.collapseProgress = collapseProgress
-    it.ontologicalLevel = ontologicalLevel
+    it.ontologicalLevel = try { OntologicalLevel.values().find { lvl -> lvl.level == ontologicalLevel } ?: OntologicalLevel.MATERIAL } catch(e: Exception) { OntologicalLevel.MATERIAL }
     it.discoveredLocations.addAll(discoveredLocations)
     it.cityEntryCount = cityEntryCount
 }
@@ -233,17 +233,13 @@ fun CombatStateDto.toDomain(): CombatState = CombatState().also {
 }
 
 fun StatusEffect.toDto(): StatusEffectDto = StatusEffectDto(
-    id = id,
-    name = name,
     type = type.name,
     duration = duration,
-    magnitude = magnitude
+    magnitude = strength
 )
 
 fun StatusEffectDto.toDomain(): StatusEffect = StatusEffect(
-    id = id,
-    name = name,
-    type = try { StatusEffectType.valueOf(type) } catch(e: Exception) { StatusEffectType.BUFF },
+    type = try { StatusEffectType.valueOf(type) } catch(e: Exception) { StatusEffectType.POISON },
     duration = duration,
-    magnitude = magnitude
+    strength = magnitude
 )
