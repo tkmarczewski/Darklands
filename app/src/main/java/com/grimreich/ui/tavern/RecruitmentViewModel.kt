@@ -27,17 +27,18 @@ class RecruitmentViewModel @Inject constructor(
     val uiState: StateFlow<RecruitmentUiState> = _uiState.asStateFlow()
 
     init {
+        // Force refresh recruitment pool on city entry logic
+        val state = gameRepository.currentState()
+        // If pool was never generated for this entry, do it
+        state.hireableHeroes.clear()
+        state.hireableHeroes.addAll(HeroPool.generatePool(state.grimCurrentRegion, 3))
+        gameRepository.persistCurrentState()
+        
         refresh()
     }
 
     fun refresh() {
         val state = gameRepository.currentState()
-        
-        // Use real hireableHeroes from state
-        if (state.hireableHeroes.isEmpty()) {
-            state.hireableHeroes.addAll(HeroPool.generatePool(state.grimCurrentRegion, 3))
-        }
-
         _uiState.update { it.copy(availableHeroes = state.hireableHeroes.toList(), gold = state.gold) }
     }
 

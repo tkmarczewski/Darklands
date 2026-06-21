@@ -9,26 +9,36 @@ import javax.inject.Singleton
 class ProceduralNpcGenerator @Inject constructor(
     private val cityCatalogue: CityCatalogue
 ) {
-    private val roles = listOf("Kupiec", "Żebrak", "Strażnik", "Alchemik", "Mieszczanin", "Pielgrzym")
+    private val roles = mapOf(
+        "Kupiec" to "merchant_start",
+        "Żebrak" to "beggar_start",
+        "Strażnik" to "guard_start",
+        "Alchemik" to "alchemist_start",
+        "Mieszczanin" to "end",
+        "Pielgrzym" to "zealot_start",
+        "Mistyk" to "mystic_start"
+    )
 
     fun generateForCity(cityId: String, seed: Int): List<NPC> {
         val random = Random(seed.toLong())
-        val count = 2 + random.nextInt(4)
+        val count = 3 + random.nextInt(3)
+        
+        val roleKeys = roles.keys.toList()
         
         return List(count) {
-            val role = roles[random.nextInt(roles.size)]
+            val roleName = roleKeys[random.nextInt(roleKeys.size)]
             NPC(
                 id = "npc_${cityId}_${it}",
                 name = generateName(random),
-                role = role,
-                startNodeId = "end"
+                role = roleName,
+                startNodeId = roles[roleName] ?: "end"
             )
         }
     }
 
     private fun generateName(random: Random): String {
-        val first = listOf("Klaus", "Hans", "Helga", "Greta", "Otto", "Bruno", "Marta", "Erich")
-        val last = listOf("von Weber", "Schmidt", "Müller", "Wagner", "Becker", "Hoffmann")
+        val first = listOf("Klaus", "Hans", "Helga", "Greta", "Otto", "Bruno", "Marta", "Erich", "Ulrich", "Siegfried")
+        val last = listOf("von Weber", "Schmidt", "Müller", "Wagner", "Becker", "Hoffmann", "Schulz", "Koch", "Bauer", "Richter")
         return "${first[random.nextInt(first.size)]} ${last[random.nextInt(last.size)]}"
     }
 }

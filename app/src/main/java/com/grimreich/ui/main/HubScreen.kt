@@ -14,6 +14,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -73,13 +74,13 @@ fun HubScreen(
                     }
 
                     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        val expeditionText = if (state.activeQuestsCount > 0) "EKSPEDYCJA (${state.activeQuestsCount})" else "BRAK WYPRAW"
+                        val expeditionCount = state.expeditionQuestsCount
                         HubNavButton(
-                            text = expeditionText,
+                            text = if (expeditionCount > 0) "EKSPEDYCJA ($expeditionCount)" else "BRAK WYPRAW",
                             modifier = Modifier.weight(1.5f),
-                            color = if (state.activeQuestsCount > 0) Color(0xFF4A6000) else Color(0xFF1A1A1A),
-                            enabled = state.activeQuestsCount > 0,
-                            onClick = { /* onQuests() or onExpedition() logic */ onQuests() }
+                            color = if (expeditionCount > 0) Color(0xFFADFF2F) else Color(0xFF1A1A1A),
+                            enabled = expeditionCount > 0,
+                            onClick = { /* Navigate to Expedition/Combat/Journal */ onQuests() }
                         )
                     }
 

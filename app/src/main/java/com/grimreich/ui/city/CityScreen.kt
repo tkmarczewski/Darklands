@@ -80,19 +80,14 @@ fun CityScreen(
                     
                     val qCount = state.activeQuestsCount
                     CityNavBtn(
-                        text = if (qCount > 0) "QUEST ($qCount)" else "BRAK ZADAŃ",
-                        onClick = {
-                            viewModel.openQuestNode { name, role, node ->
-                                viewModel.startDialogue(name, role, node, onDialogue)
-                            }
-                        },
+                        text = if (qCount > 0) "QUESTY ($qCount)" else "BRAK ZADAŃ",
+                        onClick = { viewModel.toggleQuestMenu(true) },
                         color = if (qCount > 0) Color(0xFF4A6000) else Color(0xFF1A1A1A),
                         enabled = qCount > 0
                     )
                     
                     Spacer(modifier = Modifier.weight(1f))
                     
-                    // EXIT BUTTON
                     Button(
                         onClick = onExit,
                         modifier = Modifier.fillMaxWidth().height(50.dp),
@@ -140,6 +135,40 @@ fun CityScreen(
                     }
                 }
             }
+        }
+
+        // QUEST SELECTION OVERLAY
+        if (state.isQuestMenuOpen) {
+            AlertDialog(
+                onDismissRequest = { viewModel.toggleQuestMenu(false) },
+                title = { Text("WYBIERZ ZADANIE", color = Color(0xFFC0A060)) },
+                text = {
+                    LazyColumn(modifier = Modifier.heightIn(max = 300.dp)) {
+                        items(state.availableQuests) { quest ->
+                            Surface(
+                                modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp).clickable { 
+                                    viewModel.selectQuestAndOpenDialogue(quest, onDialogue)
+                                },
+                                color = Color(0xFF111111),
+                                border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFF222222))
+                            ) {
+                                Column(modifier = Modifier.padding(12.dp)) {
+                                    Text(quest.title, color = Color.White, fontWeight = FontWeight.Bold, fontSize = 14.sp)
+                                    Text(quest.originRefId.uppercase(), color = Color.Red, fontSize = 10.sp)
+                                }
+                            }
+                        }
+                    }
+                },
+                confirmButton = {},
+                dismissButton = {
+                    TextButton(onClick = { viewModel.toggleQuestMenu(false) }) {
+                        Text("ZAMKNIJ", color = Color.Gray)
+                    }
+                },
+                containerColor = Color(0xFF050505),
+                shape = MaterialTheme.shapes.extraSmall
+            )
         }
     }
 }

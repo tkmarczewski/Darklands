@@ -3,6 +3,7 @@ package com.grimreich.ui.main
 import androidx.lifecycle.ViewModel
 import com.grimreich.core.GameRepository
 import com.grimreich.core.Hero
+import com.grimreich.systems.QuestSystem
 import com.grimreich.world.CityCatalogue
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -14,15 +15,17 @@ import javax.inject.Inject
 data class HubUiState(
     val locationName: String = "",
     val day: Int = 1,
-    val timeOfDay: String = "Poranek",
-    val party: List<Hero> = emptyList(),
+    val timeOfDay: String = "",
+    val gold: Int = 0,
     val activeQuestsCount: Int = 0,
-    val gold: Int = 0
+    val expeditionQuestsCount: Int = 0,
+    val party: List<Hero> = emptyList()
 )
 
 @HiltViewModel
 class HubViewModel @Inject constructor(
     private val gameRepository: GameRepository,
+    private val questSystem: QuestSystem,
     private val cityCatalogue: CityCatalogue
 ) : ViewModel() {
 
@@ -35,24 +38,33 @@ class HubViewModel @Inject constructor(
 
     fun refresh() {
         val state = gameRepository.currentState()
-        val rawId = state.grimCurrentRegion
-        val cityId = rawId.lowercase()
+        val currentCityId = rawIdToSlug(state.grimCurrentRegion)
+        val city = cityCatalogue.get(currentCityId)
+
+        val active = state.quest.activeQuests.mapNotNull { questSystem.getQuest(it) }
+        
+        // Expedition quests = Active quests in this region but "outside" (not strictly tied to urban NPCs)
+        // Or simply all active quests for the current region
+        val expeditionCount = active.count { it.cityId == currentCityId }
+
+        _uiState.update { 
+            it.copy(
+                locationName = city?.name ?: "Pustka",
+                day = state.world.day,
+                timeOfDay = state.world.timeOfDay,
+                gold = state.gold,
+                activeQuestsCount = active.size,
+                expeditionQuestsCount = expeditionCount,
+                party = state.party.toList()
+            )
+        }
+    }
+
+    private fun rawIdToSlug(rawId: String): String {
+        return rawId.lowercase()
             .replace("ą", "a").replace("ć", "c").replace("ę", "e")
             .replace("ł", "l").replace("ń", "n").replace("ó", "o")
             .replace("ś", "s").replace("ź", "z").replace("ż", "z")
             .replace(" ", "_")
-
-        val cityData = cityCatalogue.get(cityId)
-
-        _uiState.update { 
-            it.copy(
-                locationName = (cityData?.name ?: state.world.location).uppercase(),
-                day = state.world.day,
-                timeOfDay = state.world.timeOfDay,
-                party = state.party.toList(),
-                activeQuestsCount = state.quest.activeQuests.size,
-                gold = state.gold
-            )
-        }
     }
 }
