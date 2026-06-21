@@ -68,6 +68,11 @@ class GameRepository @Inject constructor(
 
     fun restoreIfAvailable(): Boolean {
         val restored = persistence.restore() ?: return false
+        if (restored.version < 2) {
+            // Data incompatible with new engine or version
+            persistence.clear()
+            return false
+        }
         state = restored.toDomain()
         return true
     }

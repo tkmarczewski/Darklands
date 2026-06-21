@@ -4,6 +4,7 @@ import com.grimreich.grimreich.v1.*
 
 fun GameState.toDto(): SessionStateDto {
     return SessionStateDto(
+        version = 2, // Engine migration version
         playerName = playerName,
         characterNameLocked = characterNameLocked,
         metaAwarenessLevel = metaAwarenessLevel,

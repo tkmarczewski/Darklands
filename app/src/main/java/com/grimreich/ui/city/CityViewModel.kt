@@ -7,7 +7,6 @@ import com.grimreich.systems.SocialEventSystem
 import com.grimreich.world.ProceduralNpcGenerator
 import com.grimreich.grimreich.v1.NPC
 import com.grimreich.systems.QuestSystem
-import com.grimreich.systems.QuestStatus
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -54,7 +53,11 @@ class CityViewModel @Inject constructor(
         questSystem.seedIntegratedContent()
         
         val activeCount = state.quest.activeQuests.mapNotNull { questSystem.getQuest(it) }.count { it.cityId == cityId }
-        val availableCount = questSystem.availableForCity(cityId).size
+        
+        // Fix: Use occupiedIds set to correctly count available quests
+        val activeIds = state.quest.activeQuests.toSet()
+        val completedIds = state.quest.completedQuests.toSet()
+        val availableCount = questSystem.availableForCity(cityId, excludeIds = activeIds + completedIds).size
         val totalCount = activeCount + availableCount
 
         val seed = state.world.day + cityId.hashCode()
@@ -89,15 +92,18 @@ class CityViewModel @Inject constructor(
             .replace("ś", "s").replace("ź", "z").replace("ż", "z")
             .replace(" ", "_")
 
-        val quest = questSystem.availableForCity(cityId).firstOrNull()
-            ?: questSystem.all().find { it.status == QuestStatus.AKTYWNE && it.cityId == cityId }
+        val activeIds = state.quest.activeQuests.toSet()
+        val completedIds = state.quest.completedQuests.toSet()
+        val quest = questSystem.availableForCity(cityId, excludeIds = activeIds + completedIds).firstOrNull()
+            ?: state.quest.activeQuests.mapNotNull { questSystem.getQuest(it) }.find { it.cityId == cityId }
         
         if (quest != null) {
             val node = when (quest.originRefId) {
-                "aelion" -> "aelion_start"
+                "guard" -> "guard_start"
                 "merchant" -> "merchant_start"
                 "zealot" -> "zealot_start"
                 "mystic" -> "mystic_start"
+                "aelion" -> "aelion_start"
                 else -> "mystic_start"
             }
             onNpcClick(quest.originRefId, quest.originRefId, node)
