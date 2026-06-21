@@ -48,29 +48,13 @@ class GameBootstrapper @Inject constructor(
         state.world.timeOfDay = "morning"
         state.world.location = cityCatalogue.startingCityId
         state.grimCurrentRegion = cityCatalogue.startingCityId
-        state.gold = 100
+        state.gold = GameConstants.INITIAL_GOLD
 
-        // Ralwing is ALWAYS in the party from start
-        val ralwing = Hero(
-            id = "hero_ralwing",
-            name = "Ralwing",
-            age = 40,
-            strength = 18,
-            agility = 16,
-            endurance = 15,
-            perception = 12,
-            intelligence = 10,
-            charisma = 10,
-            piety = 10,
-            hp = 80,
-            maxHp = 80,
-            portraitRes = "port_knight"
-        )
-        state.party.add(ralwing)
-        state.activeHeroId = ralwing.id
+        // Ralwing is no longer added by default here. 
+        // He will be available via Dev Menu or recruitment if desired.
 
         // Initial pool of recruits
-        state.hireableHeroes.addAll(HeroPool.generatePool(state.grimCurrentRegion, 3))
+        state.hireableHeroes.addAll(HeroPool.generatePool(state.grimCurrentRegion, GameConstants.MAX_RECRUITS_POOL_SIZE))
 
         gameRepository.persistCurrentState()
     }

@@ -3,6 +3,7 @@ package com.grimreich.ui.tavern
 import androidx.lifecycle.ViewModel
 import com.grimreich.core.GameRepository
 import com.grimreich.core.Hero
+import com.grimreich.core.GameConstants
 import com.grimreich.systems.DialogueManager
 import com.grimreich.systems.HeroPool
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -31,7 +32,7 @@ class RecruitmentViewModel @Inject constructor(
         val state = gameRepository.currentState()
         // If pool was never generated for this entry, do it
         state.hireableHeroes.clear()
-        state.hireableHeroes.addAll(HeroPool.generatePool(state.grimCurrentRegion, 3))
+        state.hireableHeroes.addAll(HeroPool.generatePool(state.grimCurrentRegion, GameConstants.MAX_RECRUITS_POOL_SIZE))
         gameRepository.persistCurrentState()
         
         refresh()
@@ -44,8 +45,8 @@ class RecruitmentViewModel @Inject constructor(
 
     fun hireHero(hero: Hero) {
         val state = gameRepository.currentState()
-        if (state.gold >= 50) {
-            state.gold -= 50
+        if (state.gold >= GameConstants.HIRE_HERO_COST) {
+            state.gold -= GameConstants.HIRE_HERO_COST
             state.party.add(hero)
             state.hireableHeroes.remove(hero)
             gameRepository.persistCurrentState()
@@ -55,10 +56,10 @@ class RecruitmentViewModel @Inject constructor(
 
     fun rerollRecruits() {
         val state = gameRepository.currentState()
-        if (state.gold >= 10) {
-            state.gold -= 10
+        if (state.gold >= GameConstants.REROLL_RECRUITS_COST) {
+            state.gold -= GameConstants.REROLL_RECRUITS_COST
             state.hireableHeroes.clear()
-            state.hireableHeroes.addAll(HeroPool.generatePool(state.grimCurrentRegion, 3))
+            state.hireableHeroes.addAll(HeroPool.generatePool(state.grimCurrentRegion, GameConstants.MAX_RECRUITS_POOL_SIZE))
             gameRepository.persistCurrentState()
             refresh()
         }

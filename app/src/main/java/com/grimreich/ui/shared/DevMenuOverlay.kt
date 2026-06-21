@@ -13,9 +13,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
+import com.grimreich.core.GameConstants
+import com.grimreich.core.Hero
 import com.grimreich.ui.main.GameRootViewModel
 import com.grimreich.ui.main.GameScreenMode
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun DevMenuOverlay(
     root: GameRootViewModel,
@@ -55,7 +58,10 @@ fun DevMenuOverlay(
 
                     Spacer(modifier = Modifier.height(8.dp))
 
-                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    FlowRow(
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
                         Button(onClick = { root.setMode(GameScreenMode.HUB); visible = false }) {
                             Text("HUB")
                         }
@@ -70,10 +76,35 @@ fun DevMenuOverlay(
                         }
                         Button(onClick = {
                             val s = root.gameRepository.currentState()
-                            s.gold += 500
+                            s.gold += GameConstants.DEV_GOLD_GIFT
                             root.saveGame()
                         }) {
-                            Text("+500 GOLD")
+                            Text("+${GameConstants.DEV_GOLD_GIFT} GOLD")
+                        }
+                        Button(onClick = {
+                            val s = root.gameRepository.currentState()
+                            val ralwingExists = s.party.any { it.id == "hero_ralwing" }
+                            if (!ralwingExists) {
+                                val ralwing = Hero(
+                                    id = "hero_ralwing",
+                                    name = "Ralwing",
+                                    age = 40,
+                                    strength = 18,
+                                    agility = 16,
+                                    endurance = 15,
+                                    perception = 12,
+                                    intelligence = 10,
+                                    charisma = 10,
+                                    piety = 10,
+                                    hp = 80,
+                                    maxHp = 80,
+                                    portraitRes = "port_knight"
+                                )
+                                s.party.add(ralwing)
+                                root.saveGame()
+                            }
+                        }) {
+                            Text("DODAJ RALWINGA")
                         }
                     }
                 }

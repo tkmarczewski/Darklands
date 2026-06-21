@@ -143,18 +143,24 @@ fun CityScreen(
                 onDismissRequest = { viewModel.toggleQuestMenu(false) },
                 title = { Text("WYBIERZ ZADANIE", color = Color(0xFFC0A060)) },
                 text = {
-                    LazyColumn(modifier = Modifier.heightIn(max = 300.dp)) {
-                        items(state.availableQuests) { quest ->
-                            Surface(
-                                modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp).clickable { 
-                                    viewModel.selectQuestAndOpenDialogue(quest, onDialogue)
-                                },
-                                color = Color(0xFF111111),
-                                border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFF222222))
-                            ) {
-                                Column(modifier = Modifier.padding(12.dp)) {
-                                    Text(quest.title, color = Color.White, fontWeight = FontWeight.Bold, fontSize = 14.sp)
-                                    Text(quest.originRefId.uppercase(), color = Color.Red, fontSize = 10.sp)
+                    if (state.activeLocalQuests.isEmpty()) {
+                        Box(modifier = Modifier.fillMaxWidth().padding(24.dp), contentAlignment = Alignment.Center) {
+                            Text("Brak aktywnych zadań dla tej lokacji.", color = Color.Gray, fontSize = 14.sp)
+                        }
+                    } else {
+                        LazyColumn(modifier = Modifier.heightIn(max = 300.dp)) {
+                            items(state.activeLocalQuests) { quest ->
+                                Surface(
+                                    modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp).clickable { 
+                                        viewModel.selectQuestAndOpenDialogue(quest, onDialogue)
+                                    },
+                                    color = Color(0xFF111111),
+                                    border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFF222222))
+                                ) {
+                                    Column(modifier = Modifier.padding(12.dp)) {
+                                        Text(quest.title, color = Color.White, fontWeight = FontWeight.Bold, fontSize = 14.sp)
+                                        Text(quest.originRefId.uppercase(), color = Color.Red, fontSize = 10.sp)
+                                    }
                                 }
                             }
                         }

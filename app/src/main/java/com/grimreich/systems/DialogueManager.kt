@@ -1,6 +1,7 @@
 package com.grimreich.systems
 
 import com.grimreich.core.GameRepository
+import com.grimreich.core.GameConstants
 import com.grimreich.grimreich.v1.DialogueChoice
 import com.grimreich.grimreich.v1.DialogueNode
 import dagger.Lazy
@@ -58,9 +59,9 @@ class DialogueManager @Inject constructor(
         val state = gameRepositoryProvider.get().currentState()
         val stability = state.world.globalStability
         
-        if (stability >= 70) return node
+        if (stability >= GameConstants.STABILITY_THRESHOLD_HIGH) return node
         
-        val fracturedText = if (stability < 30) {
+        val fracturedText = if (stability < GameConstants.STABILITY_THRESHOLD_LOW) {
             glitchText(node.text) + " ...GŁOSY... ABSOLUT... [NIE SŁUCHAJ ICH] ...CISZA..."
         } else {
             node.text + " (rzeczywistość wokół ciebie zaczyna tracić nasycenie)"
@@ -101,8 +102,8 @@ class DialogueManager @Inject constructor(
             text = "Prorocy patrzą! Czy Twoja dusza jest czysta, wędrowcze?",
             choices = listOf(
                 DialogueChoice("Jestem wierny.", "end"),
-                DialogueChoice("Ofiaruj krew (HP-5)", "zealot_sacrifice", onSelect = { 
-                    it.party.forEach { h -> h.hp -= 5 }
+                DialogueChoice("Ofiaruj krew (HP-${GameConstants.ZEALOT_SACRIFICE_HP_LOSS})", "zealot_sacrifice", onSelect = { 
+                    it.party.forEach { h -> h.hp -= GameConstants.ZEALOT_SACRIFICE_HP_LOSS }
                 })
             )
         ))
