@@ -97,10 +97,18 @@ class MarketViewModel @Inject constructor(
 
     fun sell(itemId: String) {
         val state = gameRepository.currentState()
-        val item = _uiState.value.itemsToSell.find { it.id == itemId } ?: return
-        state.gold += item.sellPrice
-        state.inventory.removeAll { it.id == itemId }
-        gameRepository.persistCurrentState()
-        refresh()
+        val index = state.inventory.indexOfFirst { it.id == itemId }
+        if (index != -1) {
+            val item = state.inventory[index]
+            val cityId = toSlug(state.grimCurrentRegion)
+            val cityData = cityCatalogue.get(cityId)
+            val modifier = cityData?.priceModifier ?: 1.0f
+            val sellPrice = (item.value * 0.6f * modifier).toInt().coerceAtLeast(1)
+            
+            state.gold += sellPrice
+            state.inventory.removeAt(index)
+            gameRepository.persistCurrentState()
+            refresh()
+        }
     }
 }

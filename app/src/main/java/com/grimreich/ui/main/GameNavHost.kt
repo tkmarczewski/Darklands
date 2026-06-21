@@ -80,9 +80,11 @@ fun GameNavHost(
         }
         if (navController.currentBackStackEntry?.destination?.route != target) {
             navController.navigate(target) {
+                launchSingleTop = true
+                restoreState = true
                 // When switching between core modes (Menu vs Game), clear the backstack
                 if (mode == GameScreenMode.MAIN_MENU || mode == GameScreenMode.HUB) {
-                    popUpTo(0) { inclusive = true }
+                    popUpTo(GameRoute.MainMenu.route) { inclusive = (mode == GameScreenMode.MAIN_MENU) }
                 } else {
                     popUpTo(GameRoute.Hub.route) { inclusive = false }
                 }
@@ -123,8 +125,7 @@ fun GameNavHost(
                         root.gameBootstrapper.bootstrapFreshWorld(seed = 1)
                         // Then customize with the data from creator
                         val state = root.gameRepository.currentState()
-                        state.playerName = root.gameRepository.currentState().playerName
-                        state.party.clear()
+                        // Add player hero to the party instead of clearing it (keep dev hero)
                         val hero = Hero(
                             id = UUID.randomUUID().toString(),
                             name = name,

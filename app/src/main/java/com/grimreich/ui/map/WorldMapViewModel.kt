@@ -48,11 +48,14 @@ class WorldMapViewModel @Inject constructor(
 
     fun refresh() {
         val state = gameRepository.currentState()
+        val canonicalIds = setOf("wybrzeze_polnocne", "twierdza_zelazna", "port_mglisty", "opactwo_ciszy")
         _uiState.update { 
             it.copy(
                 discoveredLocations = state.world.discoveredLocations.toList(),
                 currentLocationId = state.grimCurrentRegion,
-                allCities = cityCatalogue.all()
+                allCities = cityCatalogue.all().filter { city ->
+                    canonicalIds.contains(city.id) || state.world.discoveredLocations.contains(city.id)
+                }
             )
         }
     }

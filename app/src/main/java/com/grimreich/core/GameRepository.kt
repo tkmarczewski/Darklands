@@ -40,7 +40,6 @@ class GameRepository @Inject constructor(
 
     fun seed() {
         state = GameState()
-        // No default party here, we'll set it in CharacterCreator logic
         state.gold = 100
 
         cityCatalogue.clear()
@@ -55,14 +54,6 @@ class GameRepository @Inject constructor(
         questSystem.seedIntegratedContent()
         dialogueManager.seedBasicDialogues()
 
-        state.hireableHeroes.addAll(
-            listOf(
-                Hero(id = "rec_borg", name = "Borg Ironfoot", age = 34, strength = 15, endurance = 14, hp = 30, maxHp = 30),
-                Hero(id = "rec_elara", name = "Elara Shadow", age = 22, agility = 16, perception = 15, hp = 20, maxHp = 20)
-            )
-        )
-
-        state.inventory.add(Item("sword_01", "Żelazny Miecz", "weapon", "weapon", 50, 2.5, effects = mapOf("attack" to 8)))
         state.logEntries.add("Początek nowej ery w Grimreich.")
         persistCurrentState()
     }
