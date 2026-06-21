@@ -30,7 +30,8 @@ fun HubScreen(
     onInventory: () -> Unit,
     onQuests: () -> Unit,
     onWorldLog: () -> Unit,
-    onCharacter: (String) -> Unit
+    onCharacter: (String) -> Unit,
+    onExpedition: () -> Unit
 ) {
     val state by viewModel.uiState.collectAsState()
 
@@ -51,7 +52,7 @@ fun HubScreen(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(text = state.locationName, color = Color(0xFFE0C080), fontWeight = FontWeight.Bold, fontSize = 12.sp)
-                Text(text = "DZIEŃ ${state.day} | ${state.timeOfDay.uppercase()}", color = Color.LightGray, fontSize = 12.sp)
+                Text(text = "DZIEŃ ${state.day} | ${state.timeOfDay.uppercase()}", color = Color(0xFFE0C080), fontSize = 12.sp)
                 Text(text = "${state.gold} G", color = Color(0xFFE0C080), fontWeight = FontWeight.Bold, fontSize = 12.sp)
             }
 
@@ -78,9 +79,9 @@ fun HubScreen(
                         HubNavButton(
                             text = if (expeditionCount > 0) "EKSPEDYCJA ($expeditionCount)" else "BRAK WYPRAW",
                             modifier = Modifier.weight(1.5f),
-                            color = if (expeditionCount > 0) Color(0xFFADFF2F) else Color(0xFF1A1A1A),
+                            color = if (expeditionCount > 0) Color(0xFF4A6000) else Color(0xFF1A1A1A),
                             enabled = expeditionCount > 0,
-                            onClick = { /* Navigate to Expedition/Combat/Journal */ onQuests() }
+                            onClick = onExpedition
                         )
                     }
 

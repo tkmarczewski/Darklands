@@ -60,12 +60,30 @@ class DialogueViewModel @Inject constructor(
     }
 
     fun choose(choice: DialogueChoice) {
-        choice.onSelect(gameRepository.currentState())
+        val state = gameRepository.currentState()
+        choice.onSelect(state)
         val nextNode = dialogueManager.getNode(choice.targetNodeId)
         _uiState.update { it.copy(currentNode = nextNode) }
         
         if (choice.targetNodeId == "end" || nextNode == null) {
-            val state = gameRepository.currentState()
+            // Handle quest activation/completion from dialogue
+            state.pendingQuestId?.let { cmd ->
+                if (cmd.startsWith("COMPLETE:")) {
+                    val qId = cmd.removePrefix("COMPLETE:")
+                    state.quest.activeQuests.remove(qId)
+                    if (!state.quest.completedQuests.contains(qId)) {
+                        state.quest.completedQuests.add(qId)
+                        gameRepository.log("Zadanie ukończone: $qId")
+                    }
+                } else {
+                    if (!state.quest.activeQuests.contains(cmd)) {
+                        state.quest.activeQuests.add(cmd)
+                        gameRepository.log("Nowe zadanie aktywowane: $cmd")
+                    }
+                }
+                state.pendingQuestId = null
+            }
+
             state.pendingDialogueNodeId = null
             state.pendingDialogueNpcName = null
             state.pendingDialogueNpcRole = null

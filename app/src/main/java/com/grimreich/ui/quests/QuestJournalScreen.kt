@@ -128,7 +128,10 @@ private fun QuestCard(
             }
             Text(text = quest.description, color = Color.White, fontSize = 12.sp)
             Spacer(modifier = Modifier.height(8.dp))
-            Text(text = "CEL: ${quest.objective}", color = Color.Red, fontSize = 10.sp)
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                Text(text = "CEL: ${quest.objective}", color = Color.Red, fontSize = 10.sp)
+                Text(text = "LOKACJA: ${quest.cityId.uppercase().replace("_", " ")}", color = Color.Gray, fontSize = 9.sp)
+            }
         }
     }
 }

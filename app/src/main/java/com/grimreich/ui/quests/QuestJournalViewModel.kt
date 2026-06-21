@@ -32,22 +32,15 @@ class QuestJournalViewModel @Inject constructor(
 
     fun refresh() {
         val state = gameRepository.currentState()
-        val rawCity = state.grimCurrentRegion
-        val cityId = rawCity.lowercase()
-            .replace("ą", "a").replace("ć", "c").replace("ę", "e")
-            .replace("ł", "l").replace("ń", "n").replace("ó", "o")
-            .replace("ś", "s").replace("ź", "z").replace("ż", "z")
-            .replace(" ", "_")
-
         val active = state.quest.activeQuests.mapNotNull { questSystem.getQuest(it) }
         val completed = state.quest.completedQuests.mapNotNull { questSystem.getQuest(it) }
         
         val occupiedIds = (active.map { it.id } + completed.map { it.id }).toSet()
         
-        // Show up to 5 available quests from the total pool in this city
-        val available = questSystem.availableForCity(cityId, excludeIds = occupiedIds)
+        // Show available quests globally for the journal
+        val available = questSystem.all().filter { it.status == com.grimreich.systems.QuestStatus.DOSTEPNE && !occupiedIds.contains(it.id) }
             .shuffled()
-            .take(5)
+            .take(10)
 
         _uiState.update {
             it.copy(

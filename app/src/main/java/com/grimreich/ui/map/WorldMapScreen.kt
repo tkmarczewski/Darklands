@@ -41,9 +41,10 @@ fun WorldMapScreen(viewModel: WorldMapViewModel, onBack: () -> Unit) {
 
             LazyColumn(modifier = Modifier.weight(1f)) {
                 items(allCities) { city ->
-                    // Removed local filtering, rely on ViewModel filtering
+                    val qCount = state.cityQuestCounts[city.id] ?: 0
+                    
                     MapLocationItem(
-                        name = city.name,
+                        name = city.name + if (qCount > 0) " ($qCount ZADANIA)" else "",
                         isCurrent = city.id == state.currentLocationId,
                         isSelected = city.id == state.selectedCityId,
                         onClick = { viewModel.selectCity(city.id) }

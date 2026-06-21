@@ -17,14 +17,16 @@ data class MapUiState(
     val selectedCityId: String? = null,
     val currentLocationId: String = "",
     val allCities: List<CityData> = emptyList(),
-    val selectedCityData: CityData? = null
+    val selectedCityData: CityData? = null,
+    val cityQuestCounts: Map<String, Int> = emptyMap() // NEW
 )
 
 @HiltViewModel
 class WorldMapViewModel @Inject constructor(
     private val gameRepository: GameRepository,
     private val travelSystem: TravelSystem,
-    private val cityCatalogue: CityCatalogue
+    private val cityCatalogue: CityCatalogue,
+    private val questSystem: com.grimreich.systems.QuestSystem
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(MapUiState())
@@ -59,6 +61,12 @@ class WorldMapViewModel @Inject constructor(
             "pogranicze_stepowe", 
             "ziemie_dzikie"
         )
+        
+        // Calculate quest counts per city
+        val questCounts = state.quest.activeQuests
+            .mapNotNull { questSystem.getQuest(it) }
+            .groupBy { it.cityId }
+            .mapValues { it.value.size }
 
         _uiState.update { 
             it.copy(
@@ -66,7 +74,8 @@ class WorldMapViewModel @Inject constructor(
                 currentLocationId = state.grimCurrentRegion,
                 allCities = cityCatalogue.all().filter { city ->
                     canonicalIds.contains(city.id) || state.world.discoveredLocations.contains(city.id)
-                }
+                },
+                cityQuestCounts = questCounts
             )
         }
     }

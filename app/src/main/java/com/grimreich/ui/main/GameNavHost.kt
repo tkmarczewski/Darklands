@@ -11,6 +11,7 @@ import com.grimreich.core.GameBootstrapper
 import com.grimreich.core.GameState
 import com.grimreich.core.Hero
 import com.grimreich.core.Career
+import com.grimreich.core.HeroSkill
 import com.grimreich.grimreich.v1.Item
 import com.grimreich.ui.city.CityScreen
 import com.grimreich.ui.city.CityViewModel
@@ -50,6 +51,7 @@ sealed class GameRoute(val route: String) {
     object Recruit : GameRoute("recruit")
     object Inventory : GameRoute("inventory")
     object CharDetail : GameRoute("char_detail")
+    object Expedition : GameRoute("expedition")
 }
 
 @Composable
@@ -77,6 +79,7 @@ fun GameNavHost(
             GameScreenMode.RECRUIT -> GameRoute.Recruit.route
             GameScreenMode.INVENTORY -> GameRoute.Inventory.route
             GameScreenMode.CHAR_DETAIL -> GameRoute.CharDetail.route
+            GameScreenMode.EVENTS -> GameRoute.Expedition.route // Expedition screen
             else -> null
         }
         
@@ -119,14 +122,17 @@ fun GameNavHost(
             CharacterCreatorScreen(
                 onStartGame = { name, career, attrs, skills ->
                     scope.launch {
-                        val state = root.gameRepository.currentState()
-                        state.heroName = name
+                        // First bootstrap to clear old state but keep names
+                        val repo = root.gameRepository
+                        repo.currentState().playerName = root.gameRepository.currentState().playerName
+                        repo.currentState().heroName = name
                         
                         root.gameBootstrapper.bootstrapFreshWorld(seed = 1)
+                        val state = repo.currentState()
                         
-                        // Add player hero to the party (Ralwing is already added in bootstrapper)
+                        // Create NEW hero based on creator results
                         val hero = Hero(
-                            id = UUID.randomUUID().toString(),
+                            id = "player_hero_${UUID.randomUUID()}",
                             name = name,
                             age = 25,
                             strength = attrs["Str"] ?: 10,
@@ -140,16 +146,12 @@ fun GameNavHost(
                             maxHp = (attrs["End"] ?: 10) * 2 + 20,
                             currentCareer = career
                         )
-                        // Add stat bonuses from career
-                        hero.strength += career.strBonus
-                        hero.agility += career.agiBonus
-                        hero.intelligence += career.intBonus
-                        hero.virtue += career.virtueBonus
-
+                        skills.forEach { hero.skills[it.displayName] = 30 }
+                        
                         state.party.add(hero)
                         state.activeHeroId = hero.id
                         
-                        root.gameRepository.persistCurrentState()
+                        repo.persistCurrentState()
                         root.setMode(GameScreenMode.HUB)
                     }
                 },
@@ -164,7 +166,15 @@ fun GameNavHost(
                 onInventory = { root.setMode(GameScreenMode.INVENTORY) },
                 onQuests = { root.setMode(GameScreenMode.QUESTS) },
                 onWorldLog = { /* root.setMode(GameScreenMode.WORLD_LOG) */ },
-                onCharacter = { root.inspectHero(it) }
+                onCharacter = { root.inspectHero(it) },
+                onExpedition = { root.setMode(GameScreenMode.EVENTS) }
+            )
+        }
+        composable(GameRoute.Expedition.route) {
+            ExpeditionScreen(
+                viewModel = hiltViewModel(),
+                onBack = { root.setMode(GameScreenMode.HUB) },
+                onCombat = { /* root.setMode(GameScreenMode.COMBAT) */ }
             )
         }
         composable(GameRoute.CharDetail.route) {
