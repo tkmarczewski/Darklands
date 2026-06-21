@@ -26,7 +26,6 @@ fun WorldMapScreen(viewModel: WorldMapViewModel, onBack: () -> Unit) {
     val allCities = state.allCities
 
     Box(modifier = Modifier.fillMaxSize().background(Color.Black)) {
-        // BACKGROUND MAP (Using a generic placeholder if drawable is missing)
         Box(modifier = Modifier.fillMaxSize().background(Color(0xFF0A0A0A)))
 
         Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
@@ -42,17 +41,13 @@ fun WorldMapScreen(viewModel: WorldMapViewModel, onBack: () -> Unit) {
 
             LazyColumn(modifier = Modifier.weight(1f)) {
                 items(allCities) { city ->
-                    val isCanonical = setOf("wybrzeze_polnocne", "twierdza_zelazna", "port_mglisty", "opactwo_ciszy")
-                    val isVisible = isCanonical.contains(city.id) || state.discoveredLocations.contains(city.id)
-                    
-                    if (isVisible) {
-                        MapLocationItem(
-                            name = city.name,
-                            isCurrent = city.id == state.currentLocationId,
-                            isSelected = city.id == state.selectedCityId,
-                            onClick = { viewModel.selectCity(city.id) }
-                        )
-                    }
+                    // Removed local filtering, rely on ViewModel filtering
+                    MapLocationItem(
+                        name = city.name,
+                        isCurrent = city.id == state.currentLocationId,
+                        isSelected = city.id == state.selectedCityId,
+                        onClick = { viewModel.selectCity(city.id) }
+                    )
                 }
             }
 

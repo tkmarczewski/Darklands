@@ -43,12 +43,11 @@ class QuestJournalViewModel @Inject constructor(
         val completed = state.quest.completedQuests.mapNotNull { questSystem.getQuest(it) }
         
         val occupiedIds = (active.map { it.id } + completed.map { it.id }).toSet()
-        val freeSlots = (5 - active.size).coerceAtMost(5).coerceAtLeast(0)
         
-        // availableForCity now takes excludeIds to handle randomization and pool size logic
+        // Show up to 5 available quests from the total pool in this city
         val available = questSystem.availableForCity(cityId, excludeIds = occupiedIds)
             .shuffled()
-            .take(freeSlots)
+            .take(5)
 
         _uiState.update {
             it.copy(
@@ -60,8 +59,12 @@ class QuestJournalViewModel @Inject constructor(
     }
 
     fun acceptQuest(questId: String) {
-        questSystem.activate(questId)
-        gameRepository.persistCurrentState()
-        refresh()
+        val state = gameRepository.currentState()
+        // Standard limit: total active quests cannot exceed 5
+        if (state.quest.activeQuests.size < 5) {
+            questSystem.activate(questId)
+            gameRepository.persistCurrentState()
+            refresh()
+        }
     }
 }

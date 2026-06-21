@@ -37,7 +37,7 @@ class CityCatalogue @Inject constructor() {
     fun seedCanonical() {
         if (cities.isNotEmpty()) return
 
-        // 1. WYBRZEŻE PÓŁNOCNE (Prorok Aelion | Pamięć i Mgła)
+        // 1. WYBRZEŻE PÓŁNOCNE
         register(CityData(
             id = "wybrzeze_polnocne",
             name = "Wybrzeże Północne",
@@ -46,13 +46,11 @@ class CityCatalogue @Inject constructor() {
             rulingFaction = "Zakon Świtu",
             priceModifier = 1.0f,
             backgroundDrawable = "bg_region_north_coast",
-            loreDescription = "Miejsce, gdzie rzeczywistość miesza się z sennym oparem. Ludzie tracą tu wspomnienia, a mróz nie jest temperaturą, lecz stanem duszy.",
-            primaryArtifact = "Kielich Zapomnienia",
-            prophet = "Aelion",
-            events = mutableListOf("port_mrozny", "zatoka_piracka", "latarnia_switu")
+            loreDescription = "Miejsce, gdzie rzeczywistość miesza się z sennym oparem.",
+            prophet = "Aelion"
         ))
 
-        // 2. RÓWNINY KORONNE (Herold Xyrel | Krew i Wojna)
+        // 2. RÓWNINY KORONNE
         register(CityData(
             id = "rowniny_koronne",
             name = "Równiny Koronne",
@@ -61,13 +59,24 @@ class CityCatalogue @Inject constructor() {
             rulingFaction = "Twierdza Zakonu",
             priceModifier = 0.9f,
             backgroundDrawable = "bg_region_crown_plains",
-            loreDescription = "Ziemia przesiąknięta szkarłatem. Tu wojna nigdy się nie kończy, a stal rdzewieje od nadmiaru życia wylewanego na polach bitew.",
-            primaryArtifact = "Sztandar Rozpaczy",
-            prophet = "Xyrel",
-            events = mutableListOf("miasto_korony", "cmentarzysko_krolow")
+            loreDescription = "Ziemia przesiąknięta szkarłatem.",
+            prophet = "Xyrel"
         ))
 
-        // 3. SERCE KRAINY (Sędzia Mira | Prawda i Odbicia)
+        // 3. TWIERDZA ZAKONU (Tribunal Canonical)
+        register(CityData(
+            id = "twierdza_zakonu",
+            name = "Twierdza Zakonu",
+            region = "East",
+            phenomenon = "Wyrok",
+            rulingFaction = "Inkwizycja",
+            priceModifier = 1.1f,
+            backgroundDrawable = "bg_location_order_fortress",
+            loreDescription = "Serce sprawiedliwości i Trybunału.",
+            prophet = "Silentius"
+        ))
+
+        // 4. SERCE KRAINY
         register(CityData(
             id = "serce_krainy",
             name = "Serce Krainy",
@@ -76,13 +85,11 @@ class CityCatalogue @Inject constructor() {
             rulingFaction = "Klasztor Milczenia",
             priceModifier = 1.2f,
             backgroundDrawable = "bg_region_heartland",
-            loreDescription = "Kraina luster i lśniących jezior. Każdy czyn znajduje tu swoje natychmiastowe odbicie, a kłamstwo jest fizycznie bolesne.",
-            primaryArtifact = "Lustro Absolutu",
-            prophet = "Mira",
-            events = mutableListOf("dwor_zloty")
+            loreDescription = "Kraina luster i lśniących jezior.",
+            prophet = "Mira"
         ))
 
-        // 4. POŁUDNIOWE RUINY (Strażnik Sereth | Pełnia i Światło)
+        // 5. POŁUDNIOWE RUINY
         register(CityData(
             id = "poludniowe_ruiny",
             name = "Południowe Ruiny",
@@ -91,13 +98,11 @@ class CityCatalogue @Inject constructor() {
             rulingFaction = "Zakon Świtu",
             priceModifier = 1.05f,
             backgroundDrawable = "bg_region_south_ruins",
-            loreDescription = "Wieczna jasność księżyca w pełni oświetla resztki dawnej chwały. Światło to jednak parzy tych, którzy skrywają mrok w sercu.",
-            primaryArtifact = "Maska Sereth",
-            prophet = "Sereth",
-            events = mutableListOf("zlote_ruiny", "spalona_wies")
+            loreDescription = "Wieczna jasność księżyca w pełni.",
+            prophet = "Sereth"
         ))
 
-        // 5. GÓRY POŁUDNIOWE (Ferrun | Głębia i Metal)
+        // 6. GÓRY POŁUDNIOWE
         register(CityData(
             id = "gory_poludniowe",
             name = "Góry Południowe",
@@ -106,13 +111,11 @@ class CityCatalogue @Inject constructor() {
             rulingFaction = "Kopalnia Żelaza",
             priceModifier = 1.3f,
             backgroundDrawable = "bg_region_south_mountains",
-            loreDescription = "Ciężkie góry, gdzie grawitacja wydaje się silniejsza. W kopalniach wydobywa się metal, który pamięta narodziny świata.",
-            primaryArtifact = "Młot Ferruna",
-            prophet = "Ferrun",
-            events = mutableListOf("czerwona_przelecz")
+            loreDescription = "Ciężkie góry, gdzie grawitacja wydaje się silniejsza.",
+            prophet = "Ferrun"
         ))
 
-        // 6. POGRANICZE STEPOWE (Noctyros | Pęknięcie i Cień)
+        // 7. POGRANICZE STEPOWE
         register(CityData(
             id = "pogranicze_stepowe",
             name = "Pogranicze Stepowe",
@@ -121,13 +124,11 @@ class CityCatalogue @Inject constructor() {
             rulingFaction = "Ruiny Czarnej Paszczy",
             priceModifier = 1.1f,
             backgroundDrawable = "bg_region_steppe",
-            loreDescription = "Przez te stepy przebiega Wielkie Pęknięcie. Cień nie pada tu od słońca, lecz wycieka z samej ziemi, pożerając kolory.",
-            primaryArtifact = "Oko Noctyrosa",
-            prophet = "Noctyros",
-            events = mutableListOf("kamienna_przystan")
+            loreDescription = "Przez te stepy przebiega Wielkie Pęknięcie.",
+            prophet = "Noctyros"
         ))
 
-        // 7. ZIEMIE DZIKIE (Naturalne)
+        // 8. ZIEMIE DZIKIE
         register(CityData(
             id = "ziemie_dzikie",
             name = "Ziemie Dzikie",
@@ -136,9 +137,7 @@ class CityCatalogue @Inject constructor() {
             rulingFaction = "Brak",
             priceModifier = 0.8f,
             backgroundDrawable = "bg_region_wild_lands",
-            loreDescription = "Miejsce, gdzie natura oszalała. Rośliny rosną w kilka sekund, a zwierzęta mówią ludzkimi głosami, których nie chcielibyście usłyszeć.",
-            primaryArtifact = "Serce Anomalii",
-            events = mutableListOf("las_cieni", "bagna_szeptow")
+            loreDescription = "Miejsce, gdzie natura oszalała."
         ))
     }
 }

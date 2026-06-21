@@ -115,7 +115,7 @@ class QuestSystem @Inject constructor(
                     title = template.title,
                     description = template.description,
                     objective = template.objective,
-                    cityId = "twierdza_zelazna", // Verdict chain starts in Iron Fortress (lore canonical)
+                    cityId = "twierdza_zakonu", // Updated to canonical ID
                     rewardGold = template.baseReward,
                     originRefId = "guard"
                 )

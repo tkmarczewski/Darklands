@@ -48,7 +48,18 @@ class WorldMapViewModel @Inject constructor(
 
     fun refresh() {
         val state = gameRepository.currentState()
-        val canonicalIds = setOf("wybrzeze_polnocne", "twierdza_zelazna", "port_mglisty", "opactwo_ciszy")
+        // Define canonical IDs to filter locations visible from start
+        val canonicalIds = setOf(
+            "wybrzeze_polnocne", 
+            "rowniny_koronne", 
+            "twierdza_zakonu", 
+            "serce_krainy", 
+            "poludniowe_ruiny", 
+            "gory_poludniowe", 
+            "pogranicze_stepowe", 
+            "ziemie_dzikie"
+        )
+
         _uiState.update { 
             it.copy(
                 discoveredLocations = state.world.discoveredLocations.toList(),
