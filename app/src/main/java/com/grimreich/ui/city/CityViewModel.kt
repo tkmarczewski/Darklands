@@ -22,7 +22,7 @@ data class CityUiState(
     val backgroundDrawable: String = "bg_region_north_coast",
     val activeQuestsCount: Int = 0,
     val npcs: List<NPC> = emptyList(),
-    val availableQuests: List<QuestEntry> = emptyList(),
+    val activeLocalQuests: List<QuestEntry> = emptyList(), // Only ACTIVE quests here
     val isQuestMenuOpen: Boolean = false
 )
 
@@ -52,16 +52,13 @@ class CityViewModel @Inject constructor(
         val cityData = cityCatalogue.get(cityId)
         questSystem.seedIntegratedContent()
         
-        val activeIds = state.quest.activeQuests.toSet()
-        val completedIds = state.quest.completedQuests.toSet()
+        // Filter ONLY active quests for the current city
+        val localActive = state.quest.activeQuests
+            .mapNotNull { questSystem.getQuest(it) }
+            .filter { it.cityId == cityId }
         
-        val localAvailable = questSystem.availableForCity(cityId, excludeIds = activeIds + completedIds)
-        val localActive = state.quest.activeQuests.mapNotNull { questSystem.getQuest(it) }.filter { it.cityId == cityId }
-        
-        val totalCount = localAvailable.size + localActive.size
+        val activeCount = localActive.size
 
-        // Refresh hireable heroes pool on city entry (if we want to force it)
-        // Here we can use a day-based seed or just entry count
         state.world.cityEntryCount++
         
         val seed = state.world.day + cityId.hashCode() + state.world.cityEntryCount
@@ -72,9 +69,9 @@ class CityViewModel @Inject constructor(
                 cityName = (cityData?.name ?: "Nieznane Miejsce").uppercase(),
                 cityStatus = socialEventSystem.cityAudience(cityId, null),
                 backgroundDrawable = cityData?.backgroundDrawable ?: "bg_region_north_coast",
-                activeQuestsCount = totalCount,
+                activeQuestsCount = activeCount,
                 npcs = generatedNpcs,
-                availableQuests = localAvailable + localActive
+                activeLocalQuests = localActive
             )
         }
     }

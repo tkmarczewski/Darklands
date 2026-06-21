@@ -6,6 +6,7 @@ data class GameState(
     @Transient val grimEngine: GrimWorldEngine = GrimWorldEngineFactory.create(),
 
     var playerName: String? = null,
+    var heroName: String? = null, // New field for the created character
     var characterNameLocked: Boolean = false,
     var metaAwarenessLevel: Int = 0,
 
@@ -32,8 +33,9 @@ data class GameState(
     var lastSaveTimestamp: Long = System.currentTimeMillis()
 ) {
     fun deepCopy(): GameState = GameState(
-        grimEngine = GrimWorldEngineFactory.create(), // Isolate engine by creating fresh for snapshot
+        grimEngine = GrimWorldEngineFactory.create(),
         playerName = playerName,
+        heroName = heroName,
         characterNameLocked = characterNameLocked,
         metaAwarenessLevel = metaAwarenessLevel,
         grimCurrentRegion = grimCurrentRegion,

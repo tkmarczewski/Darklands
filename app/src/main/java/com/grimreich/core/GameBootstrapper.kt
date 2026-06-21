@@ -20,6 +20,9 @@ class GameBootstrapper @Inject constructor(
     private val worldMap: WorldMap
 ) {
     suspend fun bootstrapFreshWorld(seed: Int = 1) = withContext(Dispatchers.IO) {
+        val existingPlayerName = gameRepository.currentState().playerName
+        val existingHeroName = gameRepository.currentState().heroName
+
         // Clear all session volatile caches
         cityCatalogue.clear()
         cityCatalogue.seedCanonical()
@@ -38,15 +41,18 @@ class GameBootstrapper @Inject constructor(
         gameRepository.replaceState(GameState())
         val state = gameRepository.currentState()
         
+        state.playerName = existingPlayerName
+        state.heroName = existingHeroName
+
         state.world.day = 1
         state.world.timeOfDay = "morning"
         state.world.location = cityCatalogue.startingCityId
         state.grimCurrentRegion = cityCatalogue.startingCityId
         state.gold = 100
 
-        // Dev Hero - Ralwing
-        val devHero = Hero(
-            id = "dev_hero_0",
+        // Ralwing is ALWAYS in the party from start
+        val ralwing = Hero(
+            id = "hero_ralwing",
             name = "Ralwing",
             age = 40,
             strength = 18,
@@ -60,8 +66,8 @@ class GameBootstrapper @Inject constructor(
             maxHp = 80,
             portraitRes = "port_knight"
         )
-        state.party.add(devHero)
-        state.activeHeroId = devHero.id
+        state.party.add(ralwing)
+        state.activeHeroId = ralwing.id
 
         // Initial pool of recruits
         state.hireableHeroes.addAll(HeroPool.generatePool(state.grimCurrentRegion, 3))

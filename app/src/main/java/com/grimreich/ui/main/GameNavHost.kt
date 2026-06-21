@@ -10,6 +10,7 @@ import androidx.navigation.compose.rememberNavController
 import com.grimreich.core.GameBootstrapper
 import com.grimreich.core.GameState
 import com.grimreich.core.Hero
+import com.grimreich.core.Career
 import com.grimreich.grimreich.v1.Item
 import com.grimreich.ui.city.CityScreen
 import com.grimreich.ui.city.CityViewModel
@@ -118,9 +119,12 @@ fun GameNavHost(
             CharacterCreatorScreen(
                 onStartGame = { name, career, attrs, skills ->
                     scope.launch {
-                        root.gameBootstrapper.bootstrapFreshWorld(seed = 1)
                         val state = root.gameRepository.currentState()
-                        // Add player hero to the party (Grimwald Dev is already there)
+                        state.heroName = name
+                        
+                        root.gameBootstrapper.bootstrapFreshWorld(seed = 1)
+                        
+                        // Add player hero to the party (Ralwing is already added in bootstrapper)
                         val hero = Hero(
                             id = UUID.randomUUID().toString(),
                             name = name,
@@ -136,9 +140,15 @@ fun GameNavHost(
                             maxHp = (attrs["End"] ?: 10) * 2 + 20,
                             currentCareer = career
                         )
-                        skills.forEach { hero.skills[it.name] = 30 }
+                        // Add stat bonuses from career
+                        hero.strength += career.strBonus
+                        hero.agility += career.agiBonus
+                        hero.intelligence += career.intBonus
+                        hero.virtue += career.virtueBonus
+
                         state.party.add(hero)
                         state.activeHeroId = hero.id
+                        
                         root.gameRepository.persistCurrentState()
                         root.setMode(GameScreenMode.HUB)
                     }
@@ -213,7 +223,8 @@ fun GameNavHost(
         composable(GameRoute.Dialogue.route) {
             DialogueScreen(
                 viewModel = hiltViewModel(),
-                onExit = { root.setMode(GameScreenMode.CITY) }
+                onExit = { root.setMode(GameScreenMode.CITY) },
+                onMarket = { root.setMode(GameScreenMode.MARKET) }
             )
         }
         composable(GameRoute.Quests.route) {
