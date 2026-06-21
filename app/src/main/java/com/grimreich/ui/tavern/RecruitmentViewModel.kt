@@ -3,24 +3,24 @@ package com.grimreich.ui.tavern
 import androidx.lifecycle.ViewModel
 import com.grimreich.core.GameRepository
 import com.grimreich.core.Hero
-import com.grimreich.systems.DialogueManager
+import com.grimreich.world.HeroPool
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import javax.inject.Inject
-import java.util.UUID
 
 data class RecruitmentUiState(
     val availableHeroes: List<Hero> = emptyList(),
-    val gold: Int = 0
+    val gold: Int = 0,
+    val hireCosts: Map<String, Int> = emptyMap()  // heroId -> koszt
 )
 
 @HiltViewModel
 class RecruitmentViewModel @Inject constructor(
     private val gameRepository: GameRepository,
-    private val dialogueManager: DialogueManager
+    private val heroPool: HeroPool
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(RecruitmentUiState())
@@ -30,23 +30,39 @@ class RecruitmentViewModel @Inject constructor(
         refresh()
     }
 
+    /**
+     * Odświeża pulę — generuje 4 nowych losowych bohaterów.
+     * Wywoływane przy każdym wejściu na ekran rekrutacji.
+     */
     fun refresh() {
         val state = gameRepository.currentState()
-        // Mock heroes for now
-        val heroes = listOf(
-            Hero(UUID.randomUUID().toString(), "Klaus", 30, 12, 10, 10, 10, 12, 8, 10, 44, 44, portraitRes = dialogueManager.getPortrait("KNIGHT")),
-            Hero(UUID.randomUUID().toString(), "Helga", 28, 10, 12, 11, 13, 10, 11, 9, 40, 40, portraitRes = dialogueManager.getPortrait("SCHOLAR"))
-        )
-        _uiState.update { it.copy(availableHeroes = heroes, gold = state.gold) }
+        val heroes = heroPool.generatePool(4)
+        val costs = heroes.associate { hero ->
+            hero.id to (hero.currentCareer?.let { heroPool.hireCostFor(it) } ?: 50)
+        }
+        _uiState.update {
+            it.copy(
+                availableHeroes = heroes,
+                gold = state.gold,
+                hireCosts = costs
+            )
+        }
     }
 
     fun hireHero(hero: Hero) {
         val state = gameRepository.currentState()
-        if (state.gold >= 50) {
-            state.gold -= 50
+        val cost = _uiState.value.hireCosts[hero.id] ?: 50
+        if (state.gold >= cost) {
+            state.gold -= cost
             state.party.add(hero)
             gameRepository.persistCurrentState()
-            refresh()
+            // Usuń zatrudnionego z listy i odśwież złoto
+            _uiState.update { current ->
+                current.copy(
+                    availableHeroes = current.availableHeroes.filter { it.id != hero.id },
+                    gold = state.gold
+                )
+            }
         }
     }
 }

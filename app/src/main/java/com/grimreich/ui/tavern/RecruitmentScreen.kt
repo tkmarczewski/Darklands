@@ -26,6 +26,11 @@ fun RecruitmentScreen(
     val state by viewModel.uiState.collectAsState()
     val context = LocalContext.current
 
+    // Odśwież pulę przy każdym wejściu na ekran
+    LaunchedEffect(Unit) {
+        viewModel.refresh()
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -36,26 +41,58 @@ fun RecruitmentScreen(
             text = "WERBUNEK",
             style = MaterialTheme.typography.headlineMedium,
             color = Color(0xFFC0A060),
-            modifier = Modifier.padding(bottom = 8.dp).align(Alignment.CenterHorizontally)
+            modifier = Modifier
+                .padding(bottom = 4.dp)
+                .align(Alignment.CenterHorizontally)
+        )
+        Text(
+            text = "Dostępni najemnicy w tej karczmie",
+            color = Color(0xFF888888),
+            fontSize = 12.sp,
+            modifier = Modifier
+                .align(Alignment.CenterHorizontally)
+                .padding(bottom = 4.dp)
         )
         Text(
             text = "Złoto: ${state.gold} zł",
             color = Color.Yellow,
             fontSize = 14.sp,
-            modifier = Modifier.align(Alignment.CenterHorizontally).padding(bottom = 16.dp)
+            modifier = Modifier
+                .align(Alignment.CenterHorizontally)
+                .padding(bottom = 16.dp)
         )
 
-        LazyColumn(modifier = Modifier.weight(1f)) {
-            items(state.availableHeroes) { hero ->
-                HireableItem(hero) {
-                    viewModel.hireHero(hero)
+        if (state.availableHeroes.isEmpty()) {
+            Box(
+                modifier = Modifier.weight(1f).fillMaxWidth(),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = "Wszyscy najemnicy zostali wynajęci.",
+                    color = Color(0xFF666666),
+                    fontSize = 14.sp
+                )
+            }
+        } else {
+            LazyColumn(modifier = Modifier.weight(1f)) {
+                items(state.availableHeroes, key = { it.id }) { hero ->
+                    val cost = state.hireCosts[hero.id] ?: 50
+                    HireableItem(
+                        hero = hero,
+                        cost = cost,
+                        canAfford = state.gold >= cost,
+                        onHire = { viewModel.hireHero(hero) }
+                    )
                 }
             }
         }
 
         Button(
             onClick = onBack,
-            modifier = Modifier.fillMaxWidth().height(50.dp).padding(top = 8.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(50.dp)
+                .padding(top = 8.dp),
             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF400000))
         ) {
             Text("POWRÓT", color = Color.White, fontWeight = FontWeight.Bold)
@@ -64,18 +101,34 @@ fun RecruitmentScreen(
 }
 
 @Composable
-private fun HireableItem(hero: Hero, onHire: () -> Unit) {
+private fun HireableItem(
+    hero: Hero,
+    cost: Int,
+    canAfford: Boolean,
+    onHire: () -> Unit
+) {
     val context = LocalContext.current
-    val portResId = context.resources.getIdentifier(hero.portraitRes ?: "port_rogue", "drawable", context.packageName)
+    val portResId = context.resources.getIdentifier(
+        hero.portraitRes.ifBlank { "port_knight" },
+        "drawable",
+        context.packageName
+    )
+    val careerName = hero.currentCareer?.displayName ?: "Najemnik"
 
     Card(
-        modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp),
         colors = CardDefaults.cardColors(containerColor = Color(0xFF0A0A0A)),
-        border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFF222222))
+        border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFF333333))
     ) {
-        Row(modifier = Modifier.padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
+        Row(
+            modifier = Modifier.padding(12.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            // Portret
             Surface(
-                modifier = Modifier.size(60.dp),
+                modifier = Modifier.size(64.dp),
                 color = Color(0xFF1A1A1A),
                 shape = MaterialTheme.shapes.extraSmall,
                 border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFFE0C080))
@@ -89,18 +142,62 @@ private fun HireableItem(hero: Hero, onHire: () -> Unit) {
                 }
             }
 
-            Spacer(modifier = Modifier.width(16.dp))
+            Spacer(modifier = Modifier.width(12.dp))
 
+            // Dane bohatera
             Column(modifier = Modifier.weight(1f)) {
-                Text(text = hero.name, color = Color.White, fontWeight = FontWeight.Bold)
-                Text(text = "HP: ${hero.maxHp} | SIŁ: ${hero.strength}", color = Color.LightGray, fontSize = 12.sp)
+                Text(
+                    text = hero.name,
+                    color = Color.White,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 14.sp
+                )
+                Text(
+                    text = "$careerName · wiek ${hero.age}",
+                    color = Color(0xFFA08040),
+                    fontSize = 11.sp
+                )
+                Text(
+                    text = "SIŁ:${hero.strength} ZRC:${hero.agility} INT:${hero.intelligence} WYT:${hero.endurance}",
+                    color = Color.LightGray,
+                    fontSize = 11.sp
+                )
+                Text(
+                    text = "HP: ${hero.maxHp} · PER:${hero.perception} CHA:${hero.charisma} PIE:${hero.piety}",
+                    color = Color(0xFF888888),
+                    fontSize = 10.sp
+                )
+                // Wyposażenie
+                val weaponId = hero.equipment["weapon"]
+                val armorId  = hero.equipment["armor"]
+                if (weaponId != null || armorId != null) {
+                    Text(
+                        text = listOfNotNull(
+                            weaponId?.let { "⚔ $it" },
+                            armorId?.let  { "🛡 $it" }
+                        ).joinToString(" · "),
+                        color = Color(0xFF556622),
+                        fontSize = 10.sp
+                    )
+                }
             }
 
+            Spacer(modifier = Modifier.width(8.dp))
+
+            // Przycisk zatrudnienia
             Button(
                 onClick = onHire,
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2A4000))
+                enabled = canAfford,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = if (canAfford) Color(0xFF2A4000) else Color(0xFF2A2A2A),
+                    disabledContainerColor = Color(0xFF2A2A2A)
+                )
             ) {
-                Text("50 zł", color = Color.White)
+                Text(
+                    text = "$cost zł",
+                    color = if (canAfford) Color.White else Color(0xFF666666),
+                    fontSize = 12.sp
+                )
             }
         }
     }
