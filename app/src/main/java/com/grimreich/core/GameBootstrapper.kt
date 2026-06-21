@@ -7,7 +7,6 @@ import com.grimreich.world.CityCatalogue
 import com.grimreich.world.ItemCatalogue
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import java.util.*
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -45,10 +44,10 @@ class GameBootstrapper @Inject constructor(
         state.grimCurrentRegion = cityCatalogue.startingCityId
         state.gold = 100
 
-        // Dev Hero
+        // Dev Hero - always added for debugging
         val devHero = Hero(
             id = "dev_hero_0",
-            name = "Ralwing",
+            name = "Grimwald Dev",
             age = 40,
             strength = 18,
             agility = 16,
@@ -58,12 +57,13 @@ class GameBootstrapper @Inject constructor(
             charisma = 10,
             piety = 10,
             hp = 80,
-            maxHp = 80
+            maxHp = 80,
+            portraitRes = "port_knight"
         )
         state.party.add(devHero)
         state.activeHeroId = devHero.id
 
-        // Seed 3 random recruits
+        // Initial pool of recruits
         state.hireableHeroes.addAll(HeroPool.generatePool(state.grimCurrentRegion, 3))
 
         gameRepository.persistCurrentState()

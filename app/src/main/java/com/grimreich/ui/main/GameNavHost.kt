@@ -76,17 +76,15 @@ fun GameNavHost(
             GameScreenMode.RECRUIT -> GameRoute.Recruit.route
             GameScreenMode.INVENTORY -> GameRoute.Inventory.route
             GameScreenMode.CHAR_DETAIL -> GameRoute.CharDetail.route
-            else -> GameRoute.Hub.route
+            else -> null
         }
-        if (navController.currentBackStackEntry?.destination?.route != target) {
+        
+        if (target != null && navController.currentBackStackEntry?.destination?.route != target) {
             navController.navigate(target) {
                 launchSingleTop = true
                 restoreState = true
-                // When switching between core modes (Menu vs Game), clear the backstack
                 if (mode == GameScreenMode.MAIN_MENU || mode == GameScreenMode.HUB) {
-                    popUpTo(GameRoute.MainMenu.route) { inclusive = (mode == GameScreenMode.MAIN_MENU) }
-                } else {
-                    popUpTo(GameRoute.Hub.route) { inclusive = false }
+                    popUpTo(navController.graph.startDestinationId) { inclusive = (mode == GameScreenMode.MAIN_MENU) }
                 }
             }
         }
@@ -101,12 +99,10 @@ fun GameNavHost(
                     root.setMode(GameScreenMode.PLAYER_IDENTITY)
                 },
                 onContinue = {
-                    if (root.gameRepository.restoreIfAvailable()) {
-                        root.setMode(GameScreenMode.HUB)
-                    }
+                    root.restoreSessionIfValid()
                 },
                 onExit = { (context as? android.app.Activity)?.finish() },
-                onDevMenu = { /* root.setMode(GameScreenMode.DEV_MENU) */ }
+                onDevMenu = { root.setMode(GameScreenMode.DEV_MENU) }
             )
         }
         composable(GameRoute.PlayerIdentity.route) {
@@ -123,9 +119,8 @@ fun GameNavHost(
                 onStartGame = { name, career, attrs, skills ->
                     scope.launch {
                         root.gameBootstrapper.bootstrapFreshWorld(seed = 1)
-                        // Then customize with the data from creator
                         val state = root.gameRepository.currentState()
-                        // Add player hero to the party instead of clearing it (keep dev hero)
+                        // Add player hero to the party (Grimwald Dev is already there)
                         val hero = Hero(
                             id = UUID.randomUUID().toString(),
                             name = name,
@@ -191,9 +186,8 @@ fun GameNavHost(
             )
         }
         composable(GameRoute.Market.route) {
-            val marketVm: MarketViewModel = hiltViewModel()
             MarketScreen(
-                viewModel = marketVm,
+                viewModel = hiltViewModel(),
                 onBack = { root.setMode(GameScreenMode.CITY) }
             )
         }

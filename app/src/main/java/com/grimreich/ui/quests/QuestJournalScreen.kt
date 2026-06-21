@@ -1,6 +1,8 @@
 package com.grimreich.ui.quests
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -20,11 +22,7 @@ fun QuestJournalScreen(
     viewModel: QuestJournalViewModel,
     onBack: () -> Unit
 ) {
-    val uiState by viewModel.uiState.collectAsState()
-
-    LaunchedEffect(Unit) {
-        viewModel.refresh()
-    }
+    val state by viewModel.uiState.collectAsState()
 
     Column(
         modifier = Modifier
@@ -34,104 +32,103 @@ fun QuestJournalScreen(
     ) {
         Text(
             text = "DZIENNIK ZADAŃ",
-            style = MaterialTheme.typography.headlineMedium,
             color = Color(0xFFC0A060),
-            modifier = Modifier.padding(bottom = 16.dp).align(Alignment.CenterHorizontally)
+            fontSize = 24.sp,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.align(Alignment.CenterHorizontally).padding(bottom = 16.dp)
         )
 
         LazyColumn(modifier = Modifier.weight(1f)) {
             item { SectionHeader("AKTYWNE") }
-            if (uiState.activeQuests.isEmpty()) {
+            if (state.activeQuests.isEmpty()) {
                 item { EmptyLabel("Brak podjętych zadań.") }
             } else {
-                items(uiState.activeQuests) { quest -> QuestCard(quest) }
-            }
-
-            item { Spacer(modifier = Modifier.height(20.dp)); SectionHeader("DOSTĘPNE W OKOLICY") }
-            if (uiState.availableQuests.isEmpty()) {
-                item { EmptyLabel("Brak nowych ogłoszeń.") }
-            } else {
-                items(uiState.availableQuests) { quest ->
-                    QuestCard(quest, canAccept = true) {
-                        viewModel.acceptQuest(quest.id)
-                    }
+                items(state.activeQuests) { quest ->
+                    QuestCard(quest, isActive = true, onAccept = {})
                 }
             }
 
-            item { Spacer(modifier = Modifier.height(20.dp)); SectionHeader("UKOŃCZONE") }
-            if (uiState.completedQuests.isEmpty()) {
-                item { EmptyLabel("Twoja legenda dopiero się zaczyna.") }
+            item { Spacer(modifier = Modifier.height(16.dp)) }
+            item { SectionHeader("DOSTĘPNE W OKOLICY") }
+            if (state.availableQuests.isEmpty()) {
+                item { EmptyLabel("Brak dostępnych zadań.") }
             } else {
-                items(uiState.completedQuests) { quest -> QuestCard(quest, isCompleted = true) }
+                items(state.availableQuests) { quest ->
+                    QuestCard(quest, isActive = false, onAccept = { viewModel.acceptQuest(quest.id) })
+                }
+            }
+            
+            item { Spacer(modifier = Modifier.height(16.dp)) }
+            item { SectionHeader("UKOŃCZONE") }
+            if (state.completedQuests.isEmpty()) {
+                item { EmptyLabel("Brak ukończonych zadań.") }
+            } else {
+                items(state.completedQuests) { quest ->
+                    QuestCard(quest, isCompleted = true, onAccept = {})
+                }
             }
         }
 
         Button(
             onClick = onBack,
-            modifier = Modifier.fillMaxWidth().height(50.dp).padding(top = 8.dp),
+            modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF400000))
         ) {
-            Text("POWRÓT", color = Color.White, fontWeight = FontWeight.Bold)
+            Text("POWRÓT")
         }
     }
 }
 
 @Composable
-private fun SectionHeader(text: String) {
+private fun SectionHeader(title: String) {
     Text(
-        text = text,
-        style = MaterialTheme.typography.titleSmall,
-        color = Color(0xFF800000),
+        text = title,
+        color = Color.Red,
+        fontSize = 14.sp,
         fontWeight = FontWeight.Bold,
-        modifier = Modifier.padding(vertical = 4.dp)
+        modifier = Modifier.padding(bottom = 8.dp)
     )
-    HorizontalDivider(color = Color(0xFF333333), thickness = 1.dp)
 }
 
 @Composable
 private fun EmptyLabel(text: String) {
     Text(
         text = text,
-        color = Color.DarkGray,
+        color = Color.Gray,
         fontSize = 12.sp,
-        modifier = Modifier.padding(vertical = 8.dp)
+        modifier = Modifier.padding(bottom = 12.dp)
     )
 }
 
 @Composable
 private fun QuestCard(
-    quest: QuestEntry, 
-    isCompleted: Boolean = false, 
-    canAccept: Boolean = false,
-    onAccept: () -> Unit = {}
+    quest: QuestEntry,
+    isActive: Boolean = false,
+    isCompleted: Boolean = false,
+    onAccept: () -> Unit
 ) {
     Card(
         modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
-        colors = CardDefaults.cardColors(containerColor = Color(0xFF0A0A0A)),
+        colors = CardDefaults.cardColors(containerColor = Color(0xFF101010)),
         border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFF222222))
     ) {
         Column(modifier = Modifier.padding(12.dp)) {
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                Text(
-                    text = quest.title,
-                    style = MaterialTheme.typography.titleMedium,
-                    color = if (isCompleted) Color.Gray else Color(0xFFC0A060),
-                    modifier = Modifier.weight(1f)
-                )
-                if (canAccept) {
+                Text(text = quest.title, color = Color(0xFFC0A060), fontWeight = FontWeight.Bold)
+                if (!isActive && !isCompleted) {
                     Button(
                         onClick = onAccept,
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2A4000)),
-                        contentPadding = PaddingValues(horizontal = 8.dp, vertical = 0.dp),
-                        modifier = Modifier.height(28.dp)
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF203010)),
+                        modifier = Modifier.height(32.dp).padding(0.dp),
+                        contentPadding = PaddingValues(horizontal = 8.dp, vertical = 0.dp)
                     ) {
-                        Text("PRZYJMIJ", fontSize = 10.sp, color = Color.White)
+                        Text("PRZYJMIJ", fontSize = 10.sp)
                     }
                 }
             }
-            Text(text = quest.description, fontSize = 12.sp, color = Color.LightGray)
-            Spacer(modifier = Modifier.height(4.dp))
-            Text(text = "CEL: ${quest.objective}", fontSize = 10.sp, color = Color(0xFF800000), fontWeight = FontWeight.Bold)
+            Text(text = quest.description, color = Color.White, fontSize = 12.sp)
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(text = "CEL: ${quest.objective}", color = Color.Red, fontSize = 10.sp)
         }
     }
 }

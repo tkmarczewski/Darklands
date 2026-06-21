@@ -1,12 +1,13 @@
 package com.grimreich.systems
 
 import com.grimreich.core.GameRepository
-import com.grimreich.systems.QuestRegistry
 import dagger.Lazy
 import javax.inject.Inject
 import javax.inject.Singleton
 
-enum class QuestStatus { DOSTEPNE, AKTYWNE, UKONCZONE }
+enum class QuestStatus {
+    DOSTEPNE, AKTYWNE, UKONCZONE
+}
 
 data class QuestEntry(
     val id: String,
@@ -16,7 +17,7 @@ data class QuestEntry(
     val cityId: String,
     val rewardGold: Int,
     var status: QuestStatus = QuestStatus.DOSTEPNE,
-    val originRefId: String = ""
+    val originRefId: String = "mystic"
 )
 
 @Singleton
@@ -34,27 +35,26 @@ class QuestSystem @Inject constructor(
 
     fun all(): List<QuestEntry> = allQuests.values.toList()
 
-    fun activate(questId: String): QuestEntry {
-        val quest = allQuests[questId] ?: error("Nie znaleziono zadania: $questId")
+    fun activate(id: String): QuestEntry {
+        val quest = allQuests[id] ?: throw IllegalArgumentException("No such quest: $id")
         quest.status = QuestStatus.AKTYWNE
         val state = gameRepository.currentState()
-        if (!state.quest.activeQuests.contains(questId)) {
-            state.quest.activeQuests.add(questId)
+        if (!state.quest.activeQuests.contains(id)) {
+            state.quest.activeQuests.add(id)
         }
-        gameRepository.persistCurrentState()
         return quest
     }
 
-    fun complete(questId: String): QuestEntry {
-        val quest = allQuests[questId] ?: error("Nie znaleziono zadania: $questId")
+    fun complete(id: String): QuestEntry {
+        val quest = allQuests[id] ?: throw IllegalArgumentException("No such quest: $id")
         quest.status = QuestStatus.UKONCZONE
         val state = gameRepository.currentState()
-        state.quest.activeQuests.remove(questId)
-        if (!state.quest.completedQuests.contains(questId)) {
-            state.quest.completedQuests.add(questId)
+        state.quest.activeQuests.remove(id)
+        if (!state.quest.completedQuests.contains(id)) {
+            state.quest.completedQuests.add(id)
         }
         state.gold += quest.rewardGold
-        gameRepository.persistCurrentState()
+        gameRepository.log("Ukończono zadanie: ${quest.title}. Nagroda: ${quest.rewardGold} zł.")
         return quest
     }
 

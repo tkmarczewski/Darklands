@@ -7,6 +7,7 @@ import com.grimreich.systems.SocialEventSystem
 import com.grimreich.world.ProceduralNpcGenerator
 import com.grimreich.grimreich.v1.NPC
 import com.grimreich.systems.QuestSystem
+import com.grimreich.systems.QuestStatus
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -54,7 +55,7 @@ class CityViewModel @Inject constructor(
         
         val activeCount = state.quest.activeQuests.mapNotNull { questSystem.getQuest(it) }.count { it.cityId == cityId }
         
-        // Fix: Use occupiedIds set to correctly count available quests
+        // Use occupiedIds set to correctly count available quests
         val activeIds = state.quest.activeQuests.toSet()
         val completedIds = state.quest.completedQuests.toSet()
         val availableCount = questSystem.availableForCity(cityId, excludeIds = activeIds + completedIds).size

@@ -32,17 +32,20 @@ data class GameState(
     var lastSaveTimestamp: Long = System.currentTimeMillis()
 ) {
     fun deepCopy(): GameState = GameState(
-        grimEngine = GrimWorldEngineFactory.create(), // Always create fresh engine for snapshot to isolate
+        grimEngine = GrimWorldEngineFactory.create(), // Isolate engine by creating fresh for snapshot
         playerName = playerName,
         characterNameLocked = characterNameLocked,
         metaAwarenessLevel = metaAwarenessLevel,
         grimCurrentRegion = grimCurrentRegion,
         grimPendingExpeditionName = grimPendingExpeditionName,
         pendingQuestId = pendingQuestId,
-        party = party.toMutableList(),
-        hireableHeroes = hireableHeroes.toMutableList(),
+        pendingDialogueNpcName = pendingDialogueNpcName,
+        pendingDialogueNpcRole = pendingDialogueNpcRole,
+        pendingDialogueNodeId = pendingDialogueNodeId,
+        party = party.map { it.copy() }.toMutableList(),
+        hireableHeroes = hireableHeroes.map { it.copy() }.toMutableList(),
         activeHeroId = activeHeroId,
-        inventory = inventory.toMutableList(),
+        inventory = inventory.map { it.copy() }.toMutableList(),
         logEntries = logEntries.toMutableList(),
         gold = gold,
         quest = quest.copy(

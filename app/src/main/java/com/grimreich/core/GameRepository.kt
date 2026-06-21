@@ -39,23 +39,8 @@ class GameRepository @Inject constructor(
     }
 
     fun seed() {
-        state = GameState()
-        state.gold = 100
-
-        cityCatalogue.clear()
-        cityCatalogue.seedCanonical()
-        
-        itemCatalogue.seed()
-
-        state.grimCurrentRegion = "wybrzeze_polnocne"
-        state.world.location = "wybrzeze_polnocne"
-
-        questSystem.clear()
-        questSystem.seedIntegratedContent()
-        dialogueManager.seedBasicDialogues()
-
-        state.logEntries.add("Początek nowej ery w Grimreich.")
-        persistCurrentState()
+        // Legacy seed disabled to avoid conflicts with GameBootstrapper
+        log("Seed requested but ignored (using Bootstrapper flow)")
     }
 
     fun log(msg: String) {
@@ -64,16 +49,22 @@ class GameRepository @Inject constructor(
         persistCurrentState()
     }
 
-    fun sync() {}
+    fun sync() {
+        // Reseed runtime content on sync/restore to ensure catalogues are populated
+        cityCatalogue.seedCanonical()
+        itemCatalogue.seed()
+        questSystem.seedIntegratedContent()
+        dialogueManager.seedBasicDialogues()
+    }
 
     fun restoreIfAvailable(): Boolean {
         val restored = persistence.restore() ?: return false
         if (restored.version < 2) {
-            // Data incompatible with new engine or version
             persistence.clear()
             return false
         }
         state = restored.toDomain()
+        sync() // Ensure catalogues are seeded
         return true
     }
 
