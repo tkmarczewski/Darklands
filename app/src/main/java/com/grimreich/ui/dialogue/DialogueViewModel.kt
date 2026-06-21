@@ -59,6 +59,14 @@ class DialogueViewModel @Inject constructor(
         choice.onSelect(gameRepository.currentState())
         val nextNode = dialogueManager.getNode(choice.targetNodeId)
         _uiState.update { it.copy(currentNode = nextNode) }
+        
+        if (choice.targetNodeId == "end") {
+            val state = gameRepository.currentState()
+            state.pendingDialogueNodeId = null
+            state.pendingDialogueNpcName = null
+            state.pendingDialogueNpcRole = null
+        }
+
         gameRepository.persistCurrentState()
     }
 }

@@ -1,6 +1,7 @@
 package com.grimreich.systems
 
 import com.grimreich.core.GameRepository
+import com.grimreich.systems.QuestRegistry
 import dagger.Lazy
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -70,76 +71,40 @@ class QuestSystem @Inject constructor(
     fun seedIntegratedContent() {
         if (allQuests.isNotEmpty()) return
         
-        register(
-            QuestEntry(
-                id = "q_start_02",
-                title = "Szept w Ciemności",
-                description = "W Twierdzy Żelaznej słyszano głosy dochodzące z zamarzniętych studni.",
-                objective = "Zbadaj studnie w Twierdzy",
-                cityId = "twierdza_zelazna",
-                rewardGold = 75,
-                originRefId = "guard",
+        // Seed all templates from QuestRegistry
+        QuestRegistry.allTemplates.forEach { template ->
+            register(
+                QuestEntry(
+                    id = template.id,
+                    title = template.title,
+                    description = template.description,
+                    objective = template.objective,
+                    cityId = template.preferredCityId ?: "wybrzeze_polnocne",
+                    rewardGold = template.baseReward,
+                    originRefId = when (template.category) {
+                        "Intrigue" -> "merchant"
+                        "Anomaly" -> "mystic"
+                        "Beast" -> "guard"
+                        "Drama" -> "zealot"
+                        else -> "mystic"
+                    }
+                )
             )
-        )
+        }
 
-        register(
-            QuestEntry(
-                id = "q_start_03",
-                title = "Ostatnia Wieczerza",
-                description = "W Porcie Mglistym brakuje zapasów. Ktoś kradnie ryby prosto z sieci.",
-                objective = "Złap złodzieja w Porcie",
-                cityId = "port_mglisty",
-                rewardGold = 40,
-                originRefId = "merchant",
+        // Seed blood chain
+        QuestRegistry.bloodChain.stages.forEach { template ->
+             register(
+                QuestEntry(
+                    id = template.id,
+                    title = template.title,
+                    description = template.description,
+                    objective = template.objective,
+                    cityId = "wybrzeze_polnocne", // Chain starts here
+                    rewardGold = template.baseReward,
+                    originRefId = "mystic"
+                )
             )
-        )
-
-        register(
-            QuestEntry(
-                id = "q_rand_01",
-                title = "Milcząca Modlitwa",
-                description = "Mnisi z Opactwa Ciszy szukają kogoś, kto odzyska skradziony dzwon.",
-                objective = "Odzyskaj dzwon Opactwa",
-                cityId = "opactwo_ciszy",
-                rewardGold = 60,
-                originRefId = "mystic",
-            )
-        )
-
-        register(
-            QuestEntry(
-                id = "q_rand_02",
-                title = "Cień Przeszłości",
-                description = "Ktoś widział statek widmo dryfujący u wybrzeży.",
-                objective = "Zbadaj wrak na Wybrzeżu",
-                cityId = "wybrzeze_polnocne",
-                rewardGold = 55,
-                originRefId = "aelion",
-            )
-        )
-
-        register(
-            QuestEntry(
-                id = "q_rand_03",
-                title = "Zatruta Mgła",
-                description = "Gęsta, nienaturalna mgła dusi mieszkańców Portu.",
-                objective = "Oczyść opary w Porcie",
-                cityId = "port_mglisty",
-                rewardGold = 90,
-                originRefId = "zealot",
-            )
-        )
-
-        register(
-            QuestEntry(
-                id = "q_rand_04",
-                title = "Zamarznięta Groza",
-                description = "Potwór z lodu terroryzuje bramy Twierdzy.",
-                objective = "Zgładź lodową bestię",
-                cityId = "twierdza_zelazna",
-                rewardGold = 45,
-                originRefId = "guard",
-            )
-        )
+        }
     }
 }

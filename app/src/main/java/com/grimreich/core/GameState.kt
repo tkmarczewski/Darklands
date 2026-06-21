@@ -32,7 +32,7 @@ data class GameState(
     var lastSaveTimestamp: Long = System.currentTimeMillis()
 ) {
     fun deepCopy(): GameState = GameState(
-        grimEngine = grimEngine,
+        grimEngine = GrimWorldEngineFactory.create(), // Always create fresh engine for snapshot to isolate
         playerName = playerName,
         characterNameLocked = characterNameLocked,
         metaAwarenessLevel = metaAwarenessLevel,
