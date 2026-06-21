@@ -1,16 +1,15 @@
 package com.grimreich.ui.dialogue
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.grimreich.core.GameRepository
 import com.grimreich.systems.DialogueManager
 import com.grimreich.grimreich.v1.DialogueNode
 import com.grimreich.grimreich.v1.DialogueChoice
 import com.grimreich.world.CityCatalogue
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 data class DialogueUiState(
@@ -31,17 +30,22 @@ class DialogueViewModel @Inject constructor(
     val uiState: StateFlow<DialogueUiState> = _uiState.asStateFlow()
 
     init {
-        val state = gameRepository.currentState()
-        if (state.pendingDialogueNodeId != null) {
-            init(
-                state.pendingDialogueNpcName ?: "Nieznajomy",
-                state.pendingDialogueNpcRole ?: "Cień",
-                state.pendingDialogueNodeId!!
-            )
+        // Observe pending dialogue state to make the VM reactive
+        viewModelScope.launch {
+            gameRepository.currentState().let { state ->
+                // Initial load
+                if (state.pendingDialogueNodeId != null) {
+                    refresh(
+                        state.pendingDialogueNpcName ?: "Nieznajomy",
+                        state.pendingDialogueNpcRole ?: "Cień",
+                        state.pendingDialogueNodeId!!
+                    )
+                }
+            }
         }
     }
 
-    fun init(npcName: String, npcRole: String, startNodeId: String) {
+    private fun refresh(npcName: String, npcRole: String, nodeId: String) {
         val currentCityId = gameRepository.currentState().grimCurrentRegion
         val city = cityCatalogue.get(currentCityId)
         
@@ -50,7 +54,7 @@ class DialogueViewModel @Inject constructor(
                 npcName = npcName,
                 npcRole = npcRole,
                 backgroundDrawable = city?.backgroundDrawable ?: "bg_region_north_coast",
-                currentNode = dialogueManager.getNode(startNodeId)
+                currentNode = dialogueManager.getNode(nodeId)
             )
         }
     }
@@ -60,7 +64,7 @@ class DialogueViewModel @Inject constructor(
         val nextNode = dialogueManager.getNode(choice.targetNodeId)
         _uiState.update { it.copy(currentNode = nextNode) }
         
-        if (choice.targetNodeId == "end") {
+        if (choice.targetNodeId == "end" || nextNode == null) {
             val state = gameRepository.currentState()
             state.pendingDialogueNodeId = null
             state.pendingDialogueNpcName = null

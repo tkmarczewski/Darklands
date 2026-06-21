@@ -44,10 +44,10 @@ class GameBootstrapper @Inject constructor(
         state.grimCurrentRegion = cityCatalogue.startingCityId
         state.gold = 100
 
-        // Dev Hero - always added for debugging
+        // Dev Hero - Ralwing
         val devHero = Hero(
             id = "dev_hero_0",
-            name = "Grimwald Dev",
+            name = "Ralwing",
             age = 40,
             strength = 18,
             agility = 16,

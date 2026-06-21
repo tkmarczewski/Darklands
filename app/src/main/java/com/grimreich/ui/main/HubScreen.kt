@@ -14,7 +14,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -78,9 +77,9 @@ fun HubScreen(
                         HubNavButton(
                             text = expeditionText,
                             modifier = Modifier.weight(1.5f),
-                            color = if (state.activeQuestsCount > 0) Color(0xFFADFF2F) else Color(0xFF1A1A1A),
+                            color = if (state.activeQuestsCount > 0) Color(0xFF4A6000) else Color(0xFF1A1A1A),
                             enabled = state.activeQuestsCount > 0,
-                            onClick = { /* Expedition logic */ }
+                            onClick = { /* onQuests() or onExpedition() logic */ onQuests() }
                         )
                     }
 

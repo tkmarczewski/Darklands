@@ -71,15 +71,26 @@ class QuestSystem @Inject constructor(
     fun seedIntegratedContent() {
         if (allQuests.isNotEmpty()) return
         
-        // Seed all templates from QuestRegistry
-        QuestRegistry.allTemplates.forEach { template ->
+        val canonicalCities = listOf(
+            "wybrzeze_polnocne", 
+            "rowniny_koronne", 
+            "twierdza_zakonu", 
+            "serce_krainy", 
+            "poludniowe_ruiny", 
+            "gory_poludniowe", 
+            "pogranicze_stepowe", 
+            "ziemie_dzikie"
+        )
+
+        // Seed all templates from QuestRegistry - distributing them across cities
+        QuestRegistry.allTemplates.forEachIndexed { index, template ->
             register(
                 QuestEntry(
                     id = template.id,
                     title = template.title,
                     description = template.description,
                     objective = template.objective,
-                    cityId = template.preferredCityId ?: "wybrzeze_polnocne",
+                    cityId = template.preferredCityId ?: canonicalCities[index % canonicalCities.size],
                     rewardGold = template.baseReward,
                     originRefId = when (template.category) {
                         "Intrigue" -> "merchant"
@@ -115,7 +126,7 @@ class QuestSystem @Inject constructor(
                     title = template.title,
                     description = template.description,
                     objective = template.objective,
-                    cityId = "twierdza_zakonu", // Updated to canonical ID
+                    cityId = "twierdza_zakonu",
                     rewardGold = template.baseReward,
                     originRefId = "guard"
                 )
