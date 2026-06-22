@@ -51,7 +51,7 @@ fun DialogueScreen(
                     color = Color(0xFF101010),
                     border = androidx.compose.foundation.BorderStroke(2.dp, Color(0xFFC0A060))
                 ) {
-                    val portResId = context.resources.getIdentifier(state.currentNode?.npcId?.lowercase() ?: "port_rogue", "drawable", context.packageName)
+                    val portResId = context.resources.getIdentifier(state.npcPortrait, "drawable", context.packageName)
                     if (portResId != 0) {
                         Image(
                             painter = painterResource(id = portResId),

@@ -15,6 +15,7 @@ data class DialogueUiState(
     val currentNode: DialogueNode? = null,
     val npcName: String = "",
     val npcRole: String = "",
+    val npcPortrait: String = "port_rogue",
     val backgroundDrawable: String = "bg_region_north_coast"
 )
 
@@ -51,6 +52,7 @@ class DialogueViewModel @Inject constructor(
             it.copy(
                 npcName = npcName,
                 npcRole = npcRole,
+                npcPortrait = dialogueManager.getPortrait(npcRole),
                 backgroundDrawable = city?.backgroundDrawable ?: "bg_region_north_coast",
                 currentNode = dialogueManager.getNode(nodeId)
             )
