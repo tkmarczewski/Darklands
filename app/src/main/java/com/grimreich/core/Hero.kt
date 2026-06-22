@@ -1,5 +1,7 @@
 package com.grimreich.core
 
+import com.grimreich.core.mutations.Mutation
+
 data class Hero(
     val id: String,
     val name: String,
@@ -36,8 +38,9 @@ data class Hero(
     var trait: Trait? = null,
     val abilities: MutableList<Ability> = mutableListOf(),
     // Umiejętności (mapa nazw HeroSkill -> wartość 0-100)
-    // Initialized by factory or system, default to baseline
     val skills: MutableMap<String, Int> = mutableMapOf(),
+    // Mutacje 2.0
+    val activeMutations: MutableList<Mutation> = mutableListOf(),
     // Ekwipunek (slot -> id przedmiotu)
     val equipment: MutableMap<String, String?> = mutableMapOf(
         "weapon" to null, "armor" to null, "helmet" to null, "shield" to null

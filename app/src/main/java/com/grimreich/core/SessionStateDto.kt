@@ -55,6 +55,7 @@ data class HeroDto(
     val portraitRes: String,
     val hp: Int,
     val maxHp: Int,
+    val activeMutations: List<com.grimreich.core.mutations.MutationDto> = emptyList(),
     val currentCareer: String? = null,
     val trait: String? = null,
     val skills: Map<String, Int> = emptyMap(),
