@@ -1,15 +1,13 @@
 package com.grimreich.ui.main
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.grimreich.core.GameRepository
 import com.grimreich.core.Hero
 import com.grimreich.systems.QuestSystem
 import com.grimreich.world.CityCatalogue
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.*
 import javax.inject.Inject
 
 data class HubUiState(
@@ -33,30 +31,26 @@ class HubViewModel @Inject constructor(
     val uiState: StateFlow<HubUiState> = _uiState.asStateFlow()
 
     init {
-        refresh()
-    }
+        gameRepository.gameState
+            .onEach { state ->
+                val currentCityId = rawIdToSlug(state.grimCurrentRegion)
+                val city = cityCatalogue.get(currentCityId)
+                val active = state.quest.activeQuests.mapNotNull { questSystem.getQuest(it) }
+                val expeditionCount = active.count { it.cityId == currentCityId && it.isOutsideCity }
 
-    fun refresh() {
-        val state = gameRepository.currentState()
-        val currentCityId = rawIdToSlug(state.grimCurrentRegion)
-        val city = cityCatalogue.get(currentCityId)
-
-        val active = state.quest.activeQuests.mapNotNull { questSystem.getQuest(it) }
-        
-        // Expedition quests = Active quests in this region but "outside"
-        val expeditionCount = active.count { it.cityId == currentCityId && it.isOutsideCity }
-
-        _uiState.update { 
-            it.copy(
-                locationName = city?.name ?: "Pustka",
-                day = state.world.day,
-                timeOfDay = state.world.timeOfDay,
-                gold = state.gold,
-                activeQuestsCount = active.size,
-                expeditionQuestsCount = expeditionCount,
-                party = state.party.toList()
-            )
-        }
+                _uiState.update { 
+                    it.copy(
+                        locationName = city?.name ?: "Pustka",
+                        day = state.world.day,
+                        timeOfDay = state.world.timeOfDay,
+                        gold = state.gold,
+                        activeQuestsCount = active.size,
+                        expeditionQuestsCount = expeditionCount,
+                        party = state.party.toList()
+                    )
+                }
+            }
+            .launchIn(viewModelScope)
     }
 
     private fun rawIdToSlug(rawId: String): String {

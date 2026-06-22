@@ -1,6 +1,7 @@
 package com.grimreich.ui.city
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.grimreich.core.GameRepository
 import com.grimreich.world.CityCatalogue
 import com.grimreich.systems.SocialEventSystem
@@ -10,10 +11,7 @@ import com.grimreich.systems.QuestSystem
 import com.grimreich.systems.QuestStatus
 import com.grimreich.systems.QuestEntry
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.*
 import javax.inject.Inject
 
 data class CityUiState(
@@ -22,7 +20,7 @@ data class CityUiState(
     val backgroundDrawable: String = "bg_region_north_coast",
     val activeQuestsCount: Int = 0,
     val npcs: List<NPC> = emptyList(),
-    val activeLocalQuests: List<QuestEntry> = emptyList(), // Only ACTIVE quests here
+    val activeLocalQuests: List<QuestEntry> = emptyList(),
     val isQuestMenuOpen: Boolean = false
 )
 
@@ -39,41 +37,31 @@ class CityViewModel @Inject constructor(
     val uiState: StateFlow<CityUiState> = _uiState.asStateFlow()
 
     init {
-        refresh()
-    }
+        gameRepository.gameState
+            .onEach { state ->
+                val rawId = state.grimCurrentRegion
+                val cityId = rawIdToSlug(rawId)
+                val cityData = cityCatalogue.get(cityId)
+                
+                val localActiveUrban = state.quest.activeQuests
+                    .mapNotNull { questSystem.getQuest(it) }
+                    .filter { it.cityId == cityId && !it.isOutsideCity }
+                
+                val seed = state.world.day + cityId.hashCode() + state.world.cityEntryCount
+                val generatedNpcs = npcGenerator.generateForCity(cityId, seed)
 
-    fun refresh() {
-        val state = gameRepository.currentState()
-        cityCatalogue.seedCanonical()
-        
-        val rawId = state.grimCurrentRegion
-        val cityId = rawIdToSlug(rawId)
-
-        val cityData = cityCatalogue.get(cityId)
-        questSystem.seedIntegratedContent()
-        
-        // Filter ONLY active quests for the current city that are NOT outside
-        val localActiveUrban = state.quest.activeQuests
-            .mapNotNull { questSystem.getQuest(it) }
-            .filter { it.cityId == cityId && !it.isOutsideCity }
-        
-        val activeCount = localActiveUrban.size
-
-        state.world.cityEntryCount++
-        
-        val seed = state.world.day + cityId.hashCode() + state.world.cityEntryCount
-        val generatedNpcs = npcGenerator.generateForCity(cityId, seed)
-
-        _uiState.update { 
-            it.copy(
-                cityName = (cityData?.name ?: "Nieznane Miejsce").uppercase(),
-                cityStatus = socialEventSystem.cityAudience(cityId, null),
-                backgroundDrawable = cityData?.backgroundDrawable ?: "bg_region_north_coast",
-                activeQuestsCount = activeCount,
-                npcs = generatedNpcs,
-                activeLocalQuests = localActiveUrban
-            )
-        }
+                _uiState.update { 
+                    it.copy(
+                        cityName = (cityData?.name ?: "Nieznane Miejsce").uppercase(),
+                        cityStatus = socialEventSystem.cityAudience(cityId, null),
+                        backgroundDrawable = cityData?.backgroundDrawable ?: "bg_region_north_coast",
+                        activeQuestsCount = localActiveUrban.size,
+                        npcs = generatedNpcs,
+                        activeLocalQuests = localActiveUrban
+                    )
+                }
+            }
+            .launchIn(viewModelScope)
     }
 
     fun toggleQuestMenu(open: Boolean) {
@@ -81,11 +69,11 @@ class CityViewModel @Inject constructor(
     }
 
     fun startDialogue(name: String, role: String, node: String, onStart: () -> Unit) {
-        val state = gameRepository.currentState()
-        state.pendingDialogueNpcName = name
-        state.pendingDialogueNpcRole = role
-        state.pendingDialogueNodeId = node
-        gameRepository.persistCurrentState()
+        gameRepository.updateState { state ->
+            state.pendingDialogueNpcName = name
+            state.pendingDialogueNpcRole = role
+            state.pendingDialogueNodeId = node
+        }
         onStart()
     }
 
