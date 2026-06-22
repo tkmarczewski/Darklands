@@ -27,30 +27,16 @@ class DialogueManager @Inject constructor(
     fun getPortrait(role: String): String {
         return when (role.lowercase()) {
             "aelion" -> "port_priest"
-            "merchant" -> "port_rogue"
-            "zealot" -> "port_priest"
-            "mystic" -> "port_mage"
-            "guard" -> "port_warrior"
+            "merchant", "kupiec" -> "port_rogue"
+            "zealot", "pielgrzym" -> "port_priest"
+            "mystic", "mistyk" -> "port_mage"
+            "guard", "straznik" -> "port_warrior"
             "xyrel" -> "port_knight"
             "mira" -> "port_mage"
             "sereth" -> "port_wraith"
             "ferrun" -> "port_barbarian"
             "noctyros" -> "port_demon"
-            "anomalia" -> "port_dragon"
-            "alchemik", "alchemist" -> "port_alchemist"
-            "barbarzynca", "barbarian" -> "port_barbarian"
-            "kaplan", "priest" -> "port_priest"
-            "lowca", "ranger" -> "port_ranger"
-            "rycerz", "knight" -> "port_knight"
-            "mag", "scholar" -> "port_mage"
-            "ork", "orc" -> "port_orc"
-            "troll" -> "port_troll"
-            "szkielet", "skeleton" -> "port_skeleton"
-            "upior", "wraith" -> "port_wraith"
-            "demon" -> "port_demon"
-            "smok", "dragon" -> "port_dragon"
-            "wilk", "wolf" -> "port_wolf"
-            "lotr", "rogue", "thief" -> "port_rogue"
+            "incident" -> "port_skeleton"
             else -> "port_rogue"
         }
     }
@@ -79,28 +65,30 @@ class DialogueManager @Inject constructor(
     fun seedBasicDialogues() {
         if (nodes.isNotEmpty()) return
 
-        // GUARD
+        // 1. GUARD
         registerNode(DialogueNode(
             id = "guard_start", npcId = "guard",
             text = "Stój! Mgła gęstnieje, a prawo musi być przestrzegane. Czego szukasz w cieniu murów?",
             choices = listOf(
-                DialogueChoice("Szukam pracy.", "end"),
+                DialogueChoice("Szukam pracy.", "guard_work"),
                 DialogueChoice("Tylko przechodzę.", "end")
             )
         ))
+        registerNode(DialogueNode(id = "guard_work", npcId = "guard", text = "Zawsze potrzebujemy rąk do pracy przy murach. Sprawdź tablicę zadań w HUBie.", choices = listOf(DialogueChoice("Dziękuję.", "end"))))
 
-        // MERCHANT
+        // 2. MERCHANT
         registerNode(DialogueNode(
-            id = "merchant_start", npcId = "procedural",
-            text = "Mam towary z Drugiej Strony. Złoto jest tu jedyną prawdą.",
+            id = "merchant_start", npcId = "merchant",
+            text = "Mam towary z Drugiej Strony. Złoto jest tu jedyną prawdą. Chcesz handlować?",
             choices = listOf(
-                DialogueChoice("Pokaż ofertę", "end") // Flow handled by transition
+                DialogueChoice("Pokaż co masz (OTWÓRZ TARG).", "end"),
+                DialogueChoice("Może innym razem.", "end")
             )
         ))
 
-        // ZEALOT / PILGRIM
+        // 3. PILGRIM / ZEALOT
         registerNode(DialogueNode(
-            id = "zealot_start", npcId = "procedural",
+            id = "zealot_start", npcId = "zealot",
             text = "Prorocy patrzą! Czy Twoja dusza jest czysta, wędrowcze? Pielgrzymujemy do Serca Krainy, by obmyć się w jeziorach prawdy.",
             choices = listOf(
                 DialogueChoice("Jestem wierny.", "end"),
@@ -110,64 +98,40 @@ class DialogueManager @Inject constructor(
                 DialogueChoice("Dokąd dokładnie zmierzacie?", "zealot_destination")
             )
         ))
-        registerNode(DialogueNode(
-            id = "zealot_destination", npcId = "procedural", 
-            text = "Do Opactwa Ciszy. Tam, gdzie słowa tracą znaczenie, a Absolut staje się słyszalny.", 
-            choices = listOf(DialogueChoice("Powodzenia.", "end"))
-        ))
-        registerNode(DialogueNode(
-            id = "zealot_sacrifice", npcId = "procedural", 
-            text = "Twoja ofiara została przyjęta. Czuć mrowienie w kościach.",
-            choices = listOf(DialogueChoice("Idź w pokoju.", "end"))
-        ))
+        registerNode(DialogueNode(id = "zealot_destination", npcId = "zealot", text = "Do Opactwa Ciszy. Tam, gdzie słowa tracą znaczenie, a Absolut staje się słyszalny.", choices = listOf(DialogueChoice("Powodzenia.", "end"))))
+        registerNode(DialogueNode(id = "zealot_sacrifice", npcId = "zealot", text = "Twoja ofiara została przyjęta. Czuć mrowienie w kościach.", choices = listOf(DialogueChoice("Idź w pokoju.", "end"))))
 
-        // MYSTIC
+        // 4. MYSTIC
         registerNode(DialogueNode(
-            id = "mystic_start", npcId = "procedural",
+            id = "mystic_start", npcId = "mystic",
             text = "Cień w Tobie rośnie. Absolut Cię woła, Kotwico. Widzę wieżę bez drzwi w Twoich snach... czy ona już tu jest?",
             choices = listOf(
-                DialogueChoice("Powiedz mi o wieży.", "mystic_tower_info"),
+                DialogueChoice("Powiedz mi o wieży (ZADANIE).", "mystic_tower_info"),
                 DialogueChoice("Kim jesteś?", "mystic_who"),
                 DialogueChoice("Nie interesują mnie sny.", "end")
             )
         ))
         registerNode(DialogueNode(
-            id = "mystic_tower_info", npcId = "procedural",
-            text = "Ona pojawia się tylko tam, gdzie śmierć jest świeża. Szukaj jej na obrzeżach miasta, pośród mgły. Ale pamiętaj - by wejść, musisz przestać istnieć na chwilę.",
+            id = "mystic_tower_info", npcId = "mystic",
+            text = "Ona pojawia się tylko tam, gdzie śmierć jest świeża. Szukaj jej na obrzeżach miasta, pośród mgły. By wejść, musisz przestać istnieć na chwilę.",
             choices = listOf(
                 DialogueChoice("Jak mogę 'przestać istnieć'?", "mystic_tower_exist"),
                 DialogueChoice("Rozumiem.", "end")
             )
         ))
         registerNode(DialogueNode(
-            id = "mystic_tower_exist", npcId = "procedural",
-            text = "To stan między uderzeniami serca. Medytuj w ciszy ruin. Jeśli uda Ci się odnaleźć wejście, zadanie 'Wieża Bez Drzwi' zostanie ukończone.",
+            id = "mystic_tower_exist", npcId = "mystic",
+            text = "To stan między uderzeniami serca. Medytuj w ciszy ruin. Jeśli uda Ci się odnaleźć wejście, zadanie zostanie ukończone.",
             choices = listOf(
-                DialogueChoice("Spróbuję tego (UKOŃCZ ZADANIE).", "end", onSelect = {
+                DialogueChoice("Spróbuję tego (UKOŃCZ ZADANIE: Wieża Bez Drzwi).", "end", onSelect = {
                     it.pendingQuestId = "COMPLETE:q_doorless_tower"
-                })
+                }),
+                DialogueChoice("To brzmi jak szaleństwo.", "end")
             )
         ))
-        registerNode(DialogueNode(
-            id = "mystic_who", npcId = "procedural",
-            text = "Jestem tym, co zostało z kogoś, kto za długo patrzył w Pęknięcie. Widzę węzły czasu, które próbujesz rozplątać.",
-            choices = listOf(DialogueChoice("To niepokojące.", "end"))
-        ))
+        registerNode(DialogueNode(id = "mystic_who", npcId = "mystic", text = "Jestem echem kogoś, kto za długo patrzył w Pęknięcie. Widzę węzły czasu, które próbujesz rozplątać.", choices = listOf(DialogueChoice("To niepokojące.", "end"))))
 
-        // AELION
-        registerNode(DialogueNode(
-            id = "aelion_start", npcId = "aelion",
-            text = "Mgła nie jest pogodą, wędrowcze. To skroplona niepamięć Absolutu.",
-            choices = listOf(
-                DialogueChoice("Pamiętam imię mojej matki.", "end"),
-                DialogueChoice("Szukam wizji.", "end")
-            )
-        ))
-
-        // OTHER PROCEDURALS
-        registerNode(DialogueNode(id = "soldier_start", npcId = "procedural", text = "Stal to jedyna modlitwa, jaką znam.", choices = listOf(DialogueChoice("Prowadź nas.", "end"))))
-        
-        // VERDICT CHAIN HOOK
+        // 5. INCIDENT HOOK (VERDICT CHAIN)
         registerNode(DialogueNode(
             id = "verdict_hook_start", npcId = "incident",
             text = "Przed Tobą leżą zwłoki strażnika. Na ścianie obok ktoś nabazgrał krwią: 'WINNI'. To już trzeci taki przypadek w tym tygodniu.",
@@ -180,13 +144,20 @@ class DialogueManager @Inject constructor(
             id = "verdict_hook_investigate", npcId = "incident",
             text = "W zaciśniętej pięści denata znajdujesz symbol wysokiego urzędnika. Musisz sprawdzić jego gabinet w Twierdzy Zakonu.",
             choices = listOf(
-                DialogueChoice("Podejmij śledztwo.", "end", onSelect = {
-                    // Logic to activate quest
+                DialogueChoice("Podejmij śledztwo (START: Wyrok).", "end", onSelect = {
                     it.pendingQuestId = "q_verdict_1"
                 })
             )
         ))
-        registerNode(DialogueNode(id = "amnesiac_start", npcId = "procedural", text = "Gdzie jest mój dom? Pamiętam tylko białą pustkę...", choices = listOf(DialogueChoice("Nie ma już domu.", "end"))))
-        registerNode(DialogueNode(id = "beggar_start", npcId = "procedural", text = "Daj miedziaka dla bytu, który znika.", choices = listOf(DialogueChoice("Proszę (Gold-${GameConstants.BEGGAR_GIFT_COST})", "end", onSelect = { it.gold -= GameConstants.BEGGAR_GIFT_COST }))))
+
+        // AELION
+        registerNode(DialogueNode(
+            id = "aelion_start", npcId = "aelion",
+            text = "Mgła nie jest pogodą, wędrowcze. To skroplona niepamięć Absolutu.",
+            choices = listOf(
+                DialogueChoice("Pamiętam imię mojej matki.", "end"),
+                DialogueChoice("Szukam wizji.", "end")
+            )
+        ))
     }
 }

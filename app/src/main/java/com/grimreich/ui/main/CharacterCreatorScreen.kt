@@ -1,6 +1,7 @@
 package com.grimreich.ui.main
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -27,61 +28,77 @@ fun CharacterCreatorScreen(
     var heroName by remember { mutableStateOf("") }
 
     Column(
-        modifier = Modifier.fillMaxSize().background(Color.Black).padding(16.dp),
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.Black)
+            .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text("KREACJA BOHATERA", color = Color(0xFFC0A060), fontSize = 24.sp, fontWeight = FontWeight.Bold)
-        
-        Spacer(modifier = Modifier.height(8.dp))
-        
-        // Progress Indicator
-        Row(modifier = Modifier.fillMaxWidth().padding(horizontal = 32.dp), horizontalArrangement = Arrangement.SpaceBetween) {
-            ProgressDot("KARIERA", state.stage == CreatorStage.CAREER)
-            ProgressDot("CECHY", state.stage == CreatorStage.ATTRIBUTES)
-            ProgressDot("SPECJALIZACJE", state.stage == CreatorStage.SKILLS)
+        Text(
+            text = "KREACJA BOHATERA",
+            color = Color(0xFFC0A060),
+            fontSize = 24.sp,
+            fontWeight = FontWeight.Bold
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Breadcrumbs / Progress
+        Row(
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
+            horizontalArrangement = Arrangement.SpaceEvenly
+        ) {
+            ProgressItem("PROFESJA", active = state.stage == CreatorStage.CAREER)
+            ProgressItem("CECHY", active = state.stage == CreatorStage.ATTRIBUTES)
+            ProgressItem("SPECJALIZACJE", active = state.stage == CreatorStage.SKILLS)
         }
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        when (state.stage) {
-            CreatorStage.CAREER -> {
-                CareerSelectionStage(
-                    heroName = heroName,
-                    onNameChange = { heroName = it },
-                    selectedCareer = state.selectedCareer,
-                    onCareerSelect = { viewModel.selectCareer(it) }
-                )
-            }
-            CreatorStage.ATTRIBUTES -> {
-                AttributeStage(
-                    attributes = state.attributes,
-                    pointsRemaining = state.pointsRemaining,
-                    onAttrChange = { k, d -> viewModel.changeAttr(k, d) }
-                )
-            }
-            CreatorStage.SKILLS -> {
-                SkillStage(
-                    skills = state.availableSkills,
-                    selected = state.specializedSkills,
-                    pointsRemaining = state.specializationPointsRemaining,
-                    onToggle = { viewModel.toggleSkill(it) }
-                )
+        Box(modifier = Modifier.weight(1f)) {
+            when (state.stage) {
+                CreatorStage.CAREER -> {
+                    ProfessionStage(
+                        heroName = heroName,
+                        onNameChange = { heroName = it },
+                        selectedCareer = state.selectedCareer,
+                        onSelect = { viewModel.selectCareer(it) }
+                    )
+                }
+                CreatorStage.ATTRIBUTES -> {
+                    AttributesStage(
+                        attributes = state.attributes,
+                        pointsRemaining = state.pointsRemaining,
+                        onUpdate = { key, delta -> viewModel.changeAttr(key, delta) }
+                    )
+                }
+                CreatorStage.SKILLS -> {
+                    SkillsStage(
+                        availableSkills = state.availableSkills,
+                        selectedSkills = state.specializedSkills,
+                        pointsRemaining = state.specializationPointsRemaining,
+                        onToggle = { viewModel.toggleSkill(it) }
+                    )
+                }
             }
         }
 
-        Spacer(modifier = Modifier.weight(1f))
+        Spacer(modifier = Modifier.height(16.dp))
 
-        // NAVIGATION BUTTONS
+        // Bottom Navigation
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             Button(
-                onClick = { if (state.stage == CreatorStage.CAREER) onBack() else viewModel.prevStage() },
+                onClick = {
+                    if (state.stage == CreatorStage.CAREER) onBack()
+                    else viewModel.prevStage()
+                },
                 modifier = Modifier.weight(1f),
                 colors = ButtonDefaults.buttonColors(containerColor = Color.DarkGray)
             ) {
                 Text("POWRÓT")
             }
             Button(
-                onClick = { 
+                onClick = {
                     if (state.stage == CreatorStage.SKILLS) {
                         onStartGame(heroName, state.selectedCareer, state.attributes, state.specializedSkills.toList())
                     } else {
@@ -90,22 +107,34 @@ fun CharacterCreatorScreen(
                 },
                 modifier = Modifier.weight(1f),
                 enabled = if (state.stage == CreatorStage.CAREER) heroName.isNotBlank() else true,
-                colors = ButtonDefaults.buttonColors(containerColor = if (state.stage == CreatorStage.SKILLS) Color(0xFF4A6000) else Color(0xFF333333))
+                colors = ButtonDefaults.buttonColors(containerColor = if (state.stage == CreatorStage.SKILLS) Color(0xFF4A6000) else Color(0xFF2A2A2A))
             ) {
-                Text(if (state.stage == CreatorStage.SKILLS) "ZAKOŃCZ" else "DALEJ")
+                Text(if (state.stage == CreatorStage.SKILLS) "ROZPOCZNIJ" else "DALEJ")
             }
         }
     }
 }
 
 @Composable
-private fun CareerSelectionStage(
+fun ProgressItem(label: String, active: Boolean) {
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        Box(
+            modifier = Modifier
+                .size(8.dp)
+                .background(if (active) Color(0xFFC0A060) else Color.DarkGray)
+        )
+        Text(label, color = if (active) Color.White else Color.Gray, fontSize = 8.sp)
+    }
+}
+
+@Composable
+fun ProfessionStage(
     heroName: String,
     onNameChange: (String) -> Unit,
     selectedCareer: Career,
-    onCareerSelect: (Career) -> Unit
+    onSelect: (Career) -> Unit
 ) {
-    val careers = Career.entries.filter { it.minAge <= 14 }
+    val startingCareers = Career.entries.filter { it.minAge <= 14 }
 
     Column {
         OutlinedTextField(
@@ -114,22 +143,36 @@ private fun CareerSelectionStage(
             label = { Text("IMIĘ BOHATERA", color = Color.Gray) },
             textStyle = androidx.compose.ui.text.TextStyle(color = Color.White),
             modifier = Modifier.fillMaxWidth(),
-            colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = Color(0xFFC0A060), unfocusedBorderColor = Color.DarkGray)
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedBorderColor = Color(0xFFC0A060),
+                unfocusedBorderColor = Color.DarkGray
+            )
         )
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        Text("PROFESJA:", color = Color.Gray, fontSize = 12.sp)
-        LazyColumn(modifier = Modifier.height(300.dp).padding(vertical = 8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            items(careers) { career ->
+        Text("WYBIERZ DROGĘ:", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 14.sp)
+        
+        LazyColumn(
+            modifier = Modifier.fillMaxSize().padding(vertical = 8.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            items(startingCareers) { career ->
                 Card(
-                    modifier = Modifier.fillMaxWidth().clickable { onCareerSelect(career) },
-                    colors = CardDefaults.cardColors(containerColor = if (selectedCareer == career) Color(0xFF302010) else Color(0xFF101010)),
-                    border = androidx.compose.foundation.BorderStroke(1.dp, if (selectedCareer == career) Color(0xFFC0A060) else Color.DarkGray)
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable { onSelect(career) },
+                    colors = CardDefaults.cardColors(
+                        containerColor = if (selectedCareer == career) Color(0xFF302010) else Color(0xFF101010)
+                    ),
+                    border = androidx.compose.foundation.BorderStroke(
+                        1.dp,
+                        if (selectedCareer == career) Color(0xFFC0A060) else Color.Transparent
+                    )
                 ) {
                     Column(modifier = Modifier.padding(12.dp)) {
                         Text(career.displayName, color = Color.White, fontWeight = FontWeight.Bold)
-                        Text(career.description, color = Color.LightGray, fontSize = 11.sp)
+                        Text(career.description, color = Color.Gray, fontSize = 12.sp)
                     }
                 }
             }
@@ -138,17 +181,39 @@ private fun CareerSelectionStage(
 }
 
 @Composable
-private fun AttributeStage(attributes: Map<String, Int>, pointsRemaining: Int, onAttrChange: (String, Int) -> Unit) {
+fun AttributesStage(
+    attributes: Map<String, Int>,
+    pointsRemaining: Int,
+    onUpdate: (String, Int) -> Unit
+) {
     Column {
-        Text("PUNKTY CECH: $pointsRemaining", color = Color.Yellow, fontWeight = FontWeight.Bold)
+        Text(
+            "DOSTĘPNE PUNKTY: $pointsRemaining",
+            color = Color.Yellow,
+            fontWeight = FontWeight.Bold,
+            fontSize = 18.sp
+        )
         Spacer(modifier = Modifier.height(16.dp))
         attributes.forEach { (key, value) ->
-            Row(modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-                Text(key.uppercase(), color = Color.White, modifier = Modifier.width(60.dp))
+            Row(
+                modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(key.uppercase(), color = Color.White, modifier = Modifier.width(80.dp))
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    IconButton(onClick = { onAttrChange(key, -1) }) { Text("-", color = Color.Red) }
-                    Text(value.toString(), color = Color.White, fontWeight = FontWeight.Bold, modifier = Modifier.padding(horizontal = 16.dp))
-                    IconButton(onClick = { onAttrChange(key, 1) }) { Text("+", color = Color.Green) }
+                    IconButton(onClick = { onUpdate(key, -1) }) {
+                        Text("-", color = Color.Red, fontSize = 24.sp)
+                    }
+                    Text(
+                        value.toString(),
+                        color = Color.White,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(horizontal = 16.dp)
+                    )
+                    IconButton(onClick = { onUpdate(key, 1) }) {
+                        Text("+", color = Color.Green, fontSize = 24.sp)
+                    }
                 }
             }
         }
@@ -156,29 +221,40 @@ private fun AttributeStage(attributes: Map<String, Int>, pointsRemaining: Int, o
 }
 
 @Composable
-private fun SkillStage(skills: List<HeroSkill>, selected: Set<HeroSkill>, pointsRemaining: Int, onToggle: (HeroSkill) -> Unit) {
+fun SkillsStage(
+    availableSkills: List<HeroSkill>,
+    selectedSkills: Set<HeroSkill>,
+    pointsRemaining: Int,
+    onToggle: (HeroSkill) -> Unit
+) {
     Column {
-        Text("SPECJALIZACJE: $pointsRemaining", color = Color.Yellow, fontWeight = FontWeight.Bold)
+        Text(
+            "PUNKTY SPECJALIZACJI: $pointsRemaining",
+            color = Color.Yellow,
+            fontWeight = FontWeight.Bold,
+            fontSize = 18.sp
+        )
         Spacer(modifier = Modifier.height(16.dp))
-        LazyColumn(modifier = Modifier.height(400.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-            items(skills) { skill ->
-                val isSelected = selected.contains(skill)
+        LazyColumn(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+            items(availableSkills) { skill ->
+                val isSelected = selectedSkills.contains(skill)
                 Surface(
-                    modifier = Modifier.fillMaxWidth().clickable { onToggle(skill) },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable { onToggle(skill) },
                     color = if (isSelected) Color(0xFF1A3010) else Color(0xFF111111),
-                    border = androidx.compose.foundation.BorderStroke(1.dp, if (isSelected) Color.Green else Color.DarkGray)
+                    border = androidx.compose.foundation.BorderStroke(
+                        1.dp,
+                        if (isSelected) Color.Green else Color.DarkGray
+                    )
                 ) {
-                    Text(skill.displayName, color = if (isSelected) Color.White else Color.Gray, modifier = Modifier.padding(12.dp))
+                    Text(
+                        skill.displayName,
+                        color = if (isSelected) Color.White else Color.Gray,
+                        modifier = Modifier.padding(12.dp)
+                    )
                 }
             }
         }
-    }
-}
-
-@Composable
-private fun ProgressDot(label: String, active: Boolean) {
-    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        Box(modifier = Modifier.size(10.dp).background(if (active) Color(0xFFC0A060) else Color.DarkGray))
-        Text(label, color = if (active) Color.White else Color.Gray, fontSize = 8.sp)
     }
 }
