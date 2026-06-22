@@ -15,7 +15,7 @@ class ProceduralNpcGenerator @Inject constructor(
         "Żebrak" to "beggar_start",
         "Strażnik" to "guard_start",
         "Alchemik" to "alchemist_start",
-        "Mieszczanin" to "end",
+        "Mieszczanin" to "citizen_start",
         "Pielgrzym" to "zealot_start",
         "Mistyk" to "mystic_start"
     )

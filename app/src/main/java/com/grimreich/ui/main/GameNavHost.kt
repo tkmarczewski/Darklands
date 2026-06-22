@@ -79,7 +79,7 @@ fun GameNavHost(
             GameScreenMode.RECRUIT -> GameRoute.Recruit.route
             GameScreenMode.INVENTORY -> GameRoute.Inventory.route
             GameScreenMode.CHAR_DETAIL -> GameRoute.CharDetail.route
-            GameScreenMode.EVENTS -> GameRoute.Expedition.route // Expedition screen
+            GameScreenMode.EVENTS -> GameRoute.Expedition.route
             else -> null
         }
         
@@ -122,15 +122,14 @@ fun GameNavHost(
             CharacterCreatorScreen(
                 onStartGame = { name, career, attrs, skills ->
                     scope.launch {
-                        // First bootstrap to clear old state but keep names
                         val repo = root.gameRepository
-                        repo.currentState().playerName = root.gameRepository.currentState().playerName
-                        repo.currentState().heroName = name
+                        val existingPlayerName = repo.currentState().playerName
                         
                         root.gameBootstrapper.bootstrapFreshWorld(seed = 1)
                         val state = repo.currentState()
+                        state.playerName = existingPlayerName
+                        state.heroName = name
                         
-                        // Create NEW hero based on creator results
                         val hero = Hero(
                             id = "player_hero_${UUID.randomUUID()}",
                             name = name,
@@ -175,8 +174,7 @@ fun GameNavHost(
                 viewModel = hiltViewModel(),
                 onBack = { root.setMode(GameScreenMode.HUB) },
                 onCombat = { quest ->
-                    root.gameRepository.log("Wyprawa rozpoczęta: ${quest.title}")
-                    // Transition to combat or event logic
+                    root.combatSystem.startEncounterForQuest(quest.id)
                     root.setMode(GameScreenMode.COMBAT)
                 }
             )

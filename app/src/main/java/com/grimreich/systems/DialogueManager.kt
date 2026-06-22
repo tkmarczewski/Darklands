@@ -83,12 +83,23 @@ class DialogueManager @Inject constructor(
             id = "merchant_start", npcId = "merchant",
             text = "Mam towary z Drugiej Strony. Złoto jest tu jedyną prawdą. Chcesz handlować?",
             choices = listOf(
-                DialogueChoice("Pokaż co masz (OTWÓRZ TARG).", "end"),
+                DialogueChoice("Pokaż ofertę (OTWÓRZ TARG).", "end"),
                 DialogueChoice("Masz jakieś plotki?", "merchant_rumors"),
                 DialogueChoice("Może innym razem.", "end")
             )
         ))
         registerNode(DialogueNode(id = "merchant_rumors", npcId = "merchant", text = "Mówią, że Prorok Aelion ukrywa coś pod kaplicą. Ale kto by słuchał kupca?", choices = listOf(DialogueChoice("Interesujące.", "end"))))
+
+        // 3. CITIZEN
+        registerNode(DialogueNode(
+            id = "citizen_start", npcId = "merchant", // Use available portrait
+            text = "Dzień dobry... chociaż czy w GrimReich dni wciąż są dobre? Każdy rano sprawdza, czy jego odbicie w lustrze wciąż mruga w tym samym czasie.",
+            choices = listOf(
+                DialogueChoice("Co słychać w mieście?", "citizen_rumors"),
+                DialogueChoice("Żegnaj.", "end")
+            )
+        ))
+        registerNode(DialogueNode(id = "citizen_rumors", npcId = "merchant", text = "Mówią, że strażnicy znajdują ciała z napisem 'WINNI'. Boję się wychodzić po zmroku.", choices = listOf(DialogueChoice("Bądź ostrożny.", "end"))))
 
         // 3. PILGRIM / ZEALOT
         registerNode(DialogueNode(

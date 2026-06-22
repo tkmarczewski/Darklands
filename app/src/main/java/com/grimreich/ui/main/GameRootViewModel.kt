@@ -18,7 +18,8 @@ enum class GameScreenMode {
 @HiltViewModel
 class GameRootViewModel @Inject constructor(
     val gameRepository: GameRepository,
-    val gameBootstrapper: GameBootstrapper
+    val gameBootstrapper: GameBootstrapper,
+    val combatSystem: com.grimreich.systems.CombatSystem
 ) : ViewModel() {
 
     private val _mode = MutableStateFlow(GameScreenMode.MAIN_MENU)

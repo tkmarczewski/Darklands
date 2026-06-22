@@ -34,16 +34,16 @@ class CombatSystem @Inject constructor(
         val state = gameRepository.currentState()
         val c = state.combat
         c.active = true
-        c.round = 0
+        c.round = 1 // Start at round 1
         c.enemyName = enemyName
         c.enemyHp = enemyHp
         c.enemyMaxHp = enemyHp
         c.enemyAttack = enemyAttack
         c.enemyDefense = enemyDefense
         c.log.clear()
-        c.log.add("Walka z $enemyName rozpoczęta!")
+        c.log.add("Pojedynek z $enemyName rozpoczęty!")
         
-        gameRepository.log("Walka z $enemyName!")
+        gameRepository.log("Rozpoczęto walkę: $enemyName")
         gameRepository.persistCurrentState()
     }
 
