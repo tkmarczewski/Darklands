@@ -121,4 +121,33 @@ class CharacterCreatorViewModel @Inject constructor() : ViewModel() {
             _uiState.update { it.copy(specializedSkills = currentSet, specializationPointsRemaining = remaining - 1) }
         }
     }
+
+    fun randomizeAll() {
+        val careers = Career.entries.filter { it.minAge <= 14 }
+        val career = careers.random()
+        selectCareer(career)
+        
+        val preferred = when (career) {
+            Career.KNIGHT -> listOf("Str", "End", "Agi")
+            Career.ALCHEMIST -> listOf("Int", "Cha", "Per")
+            Career.GUARD -> listOf("Per", "Agi", "End")
+            Career.SCHOLAR -> listOf("Int", "Pie", "Cha")
+            Career.THIEF, Career.ROGUE -> listOf("Agi", "Per", "Cha")
+            else -> _uiState.value.attributes.keys.toList()
+        }
+
+        repeat(20) {
+            val key = if (Random.nextInt(100) < 70) preferred.random() else _uiState.value.attributes.keys.random()
+            changeAttr(key, 1)
+        }
+
+        val skills = availableSkillsForCareer(career).shuffled().take(3)
+        skills.forEach { toggleSkill(it) }
+    }
+
+    fun randomName(): String {
+        val first = listOf("Klaus", "Hans", "Helga", "Greta", "Otto", "Bruno", "Marta", "Erich")
+        val last = listOf("von Weber", "Schmidt", "Müller", "Wagner", "Becker", "Hoffmann")
+        return "${first.random()} ${last.random()}"
+    }
 }

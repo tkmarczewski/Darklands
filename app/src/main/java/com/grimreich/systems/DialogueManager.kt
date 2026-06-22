@@ -70,7 +70,7 @@ class DialogueManager @Inject constructor(
             id = "guard_start", npcId = "guard",
             text = "Stój! Mgła gęstnieje, a prawo musi być przestrzegane. Czego szukasz w cieniu murów?",
             choices = listOf(
-                DialogueChoice("Szukam pracy.", "guard_work"),
+                DialogueChoice("Szukam pracy (ZADANIA).", "guard_work"),
                 DialogueChoice("Tylko przechodzę.", "end")
             )
         ))
@@ -82,9 +82,38 @@ class DialogueManager @Inject constructor(
             text = "Mam towary z Drugiej Strony. Złoto jest tu jedyną prawdą. Chcesz handlować?",
             choices = listOf(
                 DialogueChoice("Pokaż co masz (OTWÓRZ TARG).", "end"),
+                DialogueChoice("Masz jakieś plotki?", "merchant_rumors"),
                 DialogueChoice("Może innym razem.", "end")
             )
         ))
+        registerNode(DialogueNode(id = "merchant_rumors", npcId = "merchant", text = "Mówią, że Prorok Aelion ukrywa coś pod kaplicą. Ale kto by słuchał kupca?", choices = listOf(DialogueChoice("Interesujące.", "end"))))
+
+        // 6. BEGGAR
+        registerNode(DialogueNode(
+            id = "beggar_start", npcId = "beggar",
+            text = "Daj miedziaka dla bytu, który znika. Moje ciało rzednie, a głód jest jedyną rzeczą, która we mnie została.",
+            choices = listOf(
+                DialogueChoice("Proszę (Gold-${GameConstants.BEGGAR_GIFT_COST}).", "beggar_thanks", onSelect = { it.gold -= GameConstants.BEGGAR_GIFT_COST }),
+                DialogueChoice("Nic nie dostaniesz.", "beggar_sad"),
+                DialogueChoice("Dlaczego znika?", "beggar_lore")
+            )
+        ))
+        registerNode(DialogueNode(id = "beggar_thanks", npcId = "beggar", text = "Niech Twoja Kotwica trzyma się mocno. Pamiętaj - nie wszystko co widzisz, naprawdę tam jest.", choices = listOf(DialogueChoice("Idź w pokoju.", "end"))))
+        registerNode(DialogueNode(id = "beggar_sad", npcId = "beggar", text = "Wszyscy jesteśmy tylko echem... Ty też kiedyś będziesz prosił o miedziaka za wspomnienie.", choices = listOf(DialogueChoice("Żegnaj.", "end"))))
+        registerNode(DialogueNode(id = "beggar_lore", npcId = "beggar", text = "Bo patrzyłem w Absolut. Bez mrugania. To wypala esencję. Zostawia tylko pragnienie.", choices = listOf(DialogueChoice("To przerażające.", "end"))))
+
+        // 7. ALCHEMIST
+        registerNode(DialogueNode(
+            id = "alchemist_start", npcId = "alchemist",
+            text = "Ostrożnie! Te wyziewy mogą zmienić Twoje DNA w płynne złoto. Czego potrzebuje Twoja marna powłoka?",
+            choices = listOf(
+                DialogueChoice("Szukam mikstur stabilności.", "alchemist_potions"),
+                DialogueChoice("Czym się zajmujesz?", "alchemist_lore"),
+                DialogueChoice("Tylko patrzę.", "end")
+            )
+        ))
+        registerNode(DialogueNode(id = "alchemist_potions", npcId = "alchemist", text = "Nie mamy ich na składzie. Mgła je rozpuszcza. Ale mam coś na wzmocnienie mięśni... za odpowiednią cenę.", choices = listOf(DialogueChoice("Pokaż ofertę.", "end"))))
+        registerNode(DialogueNode(id = "alchemist_lore", npcId = "alchemist", text = "Próbuję skondensować wolną wolę w butelce. To jedyny sposób, by przetrwać Pęknięcie.", choices = listOf(DialogueChoice("Powodzenia.", "end"))))
 
         // 3. PILGRIM / ZEALOT
         registerNode(DialogueNode(

@@ -17,7 +17,8 @@ data class QuestEntry(
     val cityId: String,
     val rewardGold: Int,
     var status: QuestStatus = QuestStatus.DOSTEPNE,
-    val originRefId: String = "mystic"
+    val originRefId: String = "mystic",
+    val isOutsideCity: Boolean = false // NEW
 )
 
 @Singleton
@@ -98,7 +99,8 @@ class QuestSystem @Inject constructor(
                         "Beast" -> "guard"
                         "Drama" -> "zealot"
                         else -> "mystic"
-                    }
+                    },
+                    isOutsideCity = (template.category == "Anomaly" || template.category == "Beast")
                 )
             )
         }
@@ -113,7 +115,8 @@ class QuestSystem @Inject constructor(
                     objective = template.objective,
                     cityId = "wybrzeze_polnocne", // Chain starts here
                     rewardGold = template.baseReward,
-                    originRefId = "mystic"
+                    originRefId = "mystic",
+                    isOutsideCity = true
                 )
             )
         }
@@ -128,7 +131,8 @@ class QuestSystem @Inject constructor(
                     objective = template.objective,
                     cityId = "twierdza_zakonu",
                     rewardGold = template.baseReward,
-                    originRefId = "guard"
+                    originRefId = "guard",
+                    isOutsideCity = (template.id != "q_verdict_1") // First stage is usually in city
                 )
             )
         }

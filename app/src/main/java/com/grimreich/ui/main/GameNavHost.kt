@@ -174,7 +174,11 @@ fun GameNavHost(
             ExpeditionScreen(
                 viewModel = hiltViewModel(),
                 onBack = { root.setMode(GameScreenMode.HUB) },
-                onCombat = { /* root.setMode(GameScreenMode.COMBAT) */ }
+                onCombat = { quest ->
+                    root.gameRepository.log("Wyprawa rozpoczęta: ${quest.title}")
+                    // Transition to combat or event logic
+                    root.setMode(GameScreenMode.COMBAT)
+                }
             )
         }
         composable(GameRoute.CharDetail.route) {

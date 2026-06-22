@@ -37,15 +37,14 @@ class ExpeditionViewModel @Inject constructor(
         val city = cityCatalogue.get(currentCityId)
 
         // Find active quests for this region that are "outside city"
-        // For now, we'll assume all local active quests can lead to an expedition
-        val activeLocal = state.quest.activeQuests
+        val activeOutside = state.quest.activeQuests
             .mapNotNull { questSystem.getQuest(it) }
-            .filter { it.cityId == currentCityId }
+            .filter { it.cityId == currentCityId && it.isOutsideCity }
 
         _uiState.update { 
             it.copy(
                 regionName = city?.name ?: "Nieznana okolica",
-                outsideQuests = activeLocal
+                outsideQuests = activeOutside
             )
         }
     }

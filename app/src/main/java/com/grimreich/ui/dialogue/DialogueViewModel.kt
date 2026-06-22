@@ -9,7 +9,6 @@ import com.grimreich.grimreich.v1.DialogueChoice
 import com.grimreich.world.CityCatalogue
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 data class DialogueUiState(
@@ -30,10 +29,9 @@ class DialogueViewModel @Inject constructor(
     val uiState: StateFlow<DialogueUiState> = _uiState.asStateFlow()
 
     init {
-        // Observe pending dialogue state to make the VM reactive
-        viewModelScope.launch {
-            gameRepository.currentState().let { state ->
-                // Initial load
+        // Observe game state to react to NPC clicks
+        gameRepository.gameState
+            .onEach { state ->
                 if (state.pendingDialogueNodeId != null) {
                     refresh(
                         state.pendingDialogueNpcName ?: "Nieznajomy",
@@ -42,7 +40,7 @@ class DialogueViewModel @Inject constructor(
                     )
                 }
             }
-        }
+            .launchIn(viewModelScope)
     }
 
     private fun refresh(npcName: String, npcRole: String, nodeId: String) {

@@ -43,9 +43,8 @@ class HubViewModel @Inject constructor(
 
         val active = state.quest.activeQuests.mapNotNull { questSystem.getQuest(it) }
         
-        // Expedition quests = Active quests in this region but "outside" (not strictly tied to urban NPCs)
-        // Or simply all active quests for the current region
-        val expeditionCount = active.count { it.cityId == currentCityId }
+        // Expedition quests = Active quests in this region but "outside"
+        val expeditionCount = active.count { it.cityId == currentCityId && it.isOutsideCity }
 
         _uiState.update { 
             it.copy(

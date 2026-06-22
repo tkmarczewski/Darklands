@@ -10,6 +10,9 @@ import dagger.Lazy
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -25,32 +28,36 @@ class GameRepository @Inject constructor(
     private val repositoryScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
     private val questSystem get() = questSystemProvider.get()
     private val dialogueManager get() = dialogueManagerProvider.get()
-    private var state: GameState = GameState()
+    
+    private val _gameState = MutableStateFlow(GameState())
+    val gameState: StateFlow<GameState> = _gameState.asStateFlow()
 
-    fun currentState(): GameState = state
+    fun currentState(): GameState = _gameState.value
 
     fun replaceState(newState: GameState) {
-        state = newState
+        _gameState.value = newState
+        sync()
     }
 
-    fun updateState(transform: (GameState) -> GameState) {
-        state = transform(state)
+    fun updateState(transform: (GameState) -> Unit) {
+        val current = _gameState.value
+        transform(current)
+        _gameState.value = current.deepCopy() // Force flow update with a deep copy
         persistCurrentState()
     }
 
     fun seed() {
-        // Legacy seed disabled to avoid conflicts with GameBootstrapper
-        log("Seed requested but ignored (using Bootstrapper flow)")
+        log("Seed requested via Bootstrapper flow")
     }
 
     fun log(msg: String) {
-        state.logEntries.add(msg)
-        if (state.logEntries.size > 100) state.logEntries.removeAt(0)
-        persistCurrentState()
+        updateState { 
+            it.logEntries.add(msg)
+            if (it.logEntries.size > GameConstants.MAX_LOG_ENTRIES) it.logEntries.removeAt(0)
+        }
     }
 
     fun sync() {
-        // Reseed runtime content on sync/restore to ensure catalogues are populated
         cityCatalogue.seedCanonical()
         itemCatalogue.seed()
         questSystem.seedIntegratedContent()
@@ -63,13 +70,13 @@ class GameRepository @Inject constructor(
             persistence.clear()
             return false
         }
-        state = restored.toDomain()
-        sync() // Ensure catalogues are seeded
+        _gameState.value = restored.toDomain()
+        sync()
         return true
     }
 
     fun persistCurrentState() {
-        val stateSnapshot = state.deepCopy()
+        val stateSnapshot = _gameState.value.deepCopy()
         repositoryScope.launch {
             try {
                 val dto = stateSnapshot.toDto()
@@ -84,6 +91,6 @@ class GameRepository @Inject constructor(
 
     fun clearSessionAndReset() {
         persistence.clear()
-        state = GameState()
+        _gameState.value = GameState()
     }
 }

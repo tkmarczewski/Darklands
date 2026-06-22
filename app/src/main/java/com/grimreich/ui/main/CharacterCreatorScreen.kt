@@ -55,6 +55,19 @@ fun CharacterCreatorScreen(
 
         Spacer(modifier = Modifier.height(24.dp))
 
+        Row(modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp), horizontalArrangement = Arrangement.End) {
+            Button(
+                onClick = { 
+                    viewModel.randomizeAll() 
+                    heroName = viewModel.randomName()
+                },
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1A1A1A)),
+                border = androidx.compose.foundation.BorderStroke(1.dp, Color.Gray)
+            ) {
+                Text("LOSUJ WSZYSTKO", fontSize = 10.sp)
+            }
+        }
+
         Box(modifier = Modifier.weight(1f)) {
             when (state.stage) {
                 CreatorStage.CAREER -> {
@@ -106,10 +119,10 @@ fun CharacterCreatorScreen(
                     }
                 },
                 modifier = Modifier.weight(1f),
-                enabled = if (state.stage == CreatorStage.CAREER) heroName.isNotBlank() else true,
+                enabled = (state.stage != CreatorStage.CAREER || heroName.isNotBlank()),
                 colors = ButtonDefaults.buttonColors(containerColor = if (state.stage == CreatorStage.SKILLS) Color(0xFF4A6000) else Color(0xFF2A2A2A))
             ) {
-                Text(if (state.stage == CreatorStage.SKILLS) "ROZPOCZNIJ" else "DALEJ")
+                Text(if (state.stage == CreatorStage.SKILLS) "ZAKOŃCZ" else "DALEJ")
             }
         }
     }
@@ -136,7 +149,7 @@ fun ProfessionStage(
 ) {
     val startingCareers = Career.entries.filter { it.minAge <= 14 }
 
-    Column {
+    Column(modifier = Modifier.fillMaxSize()) {
         OutlinedTextField(
             value = heroName,
             onValueChange = onNameChange,
@@ -154,7 +167,7 @@ fun ProfessionStage(
         Text("WYBIERZ DROGĘ:", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 14.sp)
         
         LazyColumn(
-            modifier = Modifier.fillMaxSize().padding(vertical = 8.dp),
+            modifier = Modifier.weight(1f).padding(vertical = 8.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             items(startingCareers) { career ->
@@ -186,7 +199,7 @@ fun AttributesStage(
     pointsRemaining: Int,
     onUpdate: (String, Int) -> Unit
 ) {
-    Column {
+    Column(modifier = Modifier.fillMaxSize()) {
         Text(
             "DOSTĘPNE PUNKTY: $pointsRemaining",
             color = Color.Yellow,
@@ -194,25 +207,27 @@ fun AttributesStage(
             fontSize = 18.sp
         )
         Spacer(modifier = Modifier.height(16.dp))
-        attributes.forEach { (key, value) ->
-            Row(
-                modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Text(key.uppercase(), color = Color.White, modifier = Modifier.width(80.dp))
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    IconButton(onClick = { onUpdate(key, -1) }) {
-                        Text("-", color = Color.Red, fontSize = 24.sp)
-                    }
-                    Text(
-                        value.toString(),
-                        color = Color.White,
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier.padding(horizontal = 16.dp)
-                    )
-                    IconButton(onClick = { onUpdate(key, 1) }) {
-                        Text("+", color = Color.Green, fontSize = 24.sp)
+        LazyColumn(modifier = Modifier.weight(1f)) {
+            items(attributes.toList()) { (key, value) ->
+                Row(
+                    modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(key.uppercase(), color = Color.White, modifier = Modifier.width(80.dp))
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        IconButton(onClick = { onUpdate(key, -1) }) {
+                            Text("-", color = Color.Red, fontSize = 24.sp)
+                        }
+                        Text(
+                            value.toString(),
+                            color = Color.White,
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier.padding(horizontal = 16.dp)
+                        )
+                        IconButton(onClick = { onUpdate(key, 1) }) {
+                            Text("+", color = Color.Green, fontSize = 24.sp)
+                        }
                     }
                 }
             }
@@ -227,7 +242,7 @@ fun SkillsStage(
     pointsRemaining: Int,
     onToggle: (HeroSkill) -> Unit
 ) {
-    Column {
+    Column(modifier = Modifier.fillMaxSize()) {
         Text(
             "PUNKTY SPECJALIZACJI: $pointsRemaining",
             color = Color.Yellow,
@@ -235,7 +250,7 @@ fun SkillsStage(
             fontSize = 18.sp
         )
         Spacer(modifier = Modifier.height(16.dp))
-        LazyColumn(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+        LazyColumn(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
             items(availableSkills) { skill ->
                 val isSelected = selectedSkills.contains(skill)
                 Surface(

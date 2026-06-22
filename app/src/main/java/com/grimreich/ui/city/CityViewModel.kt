@@ -52,12 +52,12 @@ class CityViewModel @Inject constructor(
         val cityData = cityCatalogue.get(cityId)
         questSystem.seedIntegratedContent()
         
-        // Filter ONLY active quests for the current city
-        val localActive = state.quest.activeQuests
+        // Filter ONLY active quests for the current city that are NOT outside
+        val localActiveUrban = state.quest.activeQuests
             .mapNotNull { questSystem.getQuest(it) }
-            .filter { it.cityId == cityId }
+            .filter { it.cityId == cityId && !it.isOutsideCity }
         
-        val activeCount = localActive.size
+        val activeCount = localActiveUrban.size
 
         state.world.cityEntryCount++
         
@@ -71,7 +71,7 @@ class CityViewModel @Inject constructor(
                 backgroundDrawable = cityData?.backgroundDrawable ?: "bg_region_north_coast",
                 activeQuestsCount = activeCount,
                 npcs = generatedNpcs,
-                activeLocalQuests = localActive
+                activeLocalQuests = localActiveUrban
             )
         }
     }
