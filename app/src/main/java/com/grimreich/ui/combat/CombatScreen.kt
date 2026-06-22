@@ -62,13 +62,13 @@ fun CombatScreen(viewModel: CombatViewModel, onExit: () -> Unit) {
         Surface(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(120.dp)
+                .height(160.dp) // Increased height for better readability
                 .padding(vertical = 8.dp),
             color = Color(0xFF1A1A1A),
             shape = MaterialTheme.shapes.small
         ) {
             LazyColumn(modifier = Modifier.padding(8.dp)) {
-                items(state.log.takeLast(20).reversed()) { entry ->
+                items(state.log.takeLast(30).reversed()) { entry ->
                     Text(text = entry, color = Color.LightGray, fontSize = 12.sp, fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace)
                 }
             }
@@ -88,11 +88,11 @@ fun CombatScreen(viewModel: CombatViewModel, onExit: () -> Unit) {
             }
         } else {
             Button(
-                onClick = onExit,
+                onClick = { viewModel.exitCombat(onExit) }, // Use ViewModel to handle cleanup
                 modifier = Modifier.fillMaxWidth(),
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2A2A2A))
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4A6000))
             ) {
-                Text("POWRÓT", color = Color(0xFFE0C080))
+                Text("ZAKOŃCZ", color = Color.White, fontWeight = FontWeight.Bold)
             }
         }
     }

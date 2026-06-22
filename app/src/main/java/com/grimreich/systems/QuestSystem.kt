@@ -18,7 +18,8 @@ data class QuestEntry(
     val rewardGold: Int,
     var status: QuestStatus = QuestStatus.DOSTEPNE,
     val originRefId: String = "mystic",
-    val isOutsideCity: Boolean = false // NEW
+    val isOutsideCity: Boolean = false,
+    val nextQuestId: String? = null // For chains
 )
 
 @Singleton
@@ -39,9 +40,10 @@ class QuestSystem @Inject constructor(
     fun activate(id: String): QuestEntry {
         val quest = allQuests[id] ?: throw IllegalArgumentException("No such quest: $id")
         quest.status = QuestStatus.AKTYWNE
-        val state = gameRepository.currentState()
-        if (!state.quest.activeQuests.contains(id)) {
-            state.quest.activeQuests.add(id)
+        gameRepository.updateState { state ->
+            if (!state.quest.activeQuests.contains(id)) {
+                state.quest.activeQuests.add(id)
+            }
         }
         return quest
     }
@@ -49,12 +51,24 @@ class QuestSystem @Inject constructor(
     fun complete(id: String): QuestEntry {
         val quest = allQuests[id] ?: throw IllegalArgumentException("No such quest: $id")
         quest.status = QuestStatus.UKONCZONE
-        val state = gameRepository.currentState()
-        state.quest.activeQuests.remove(id)
-        if (!state.quest.completedQuests.contains(id)) {
-            state.quest.completedQuests.add(id)
+        
+        gameRepository.updateState { state ->
+            state.quest.activeQuests.remove(id)
+            if (!state.quest.completedQuests.contains(id)) {
+                state.quest.completedQuests.add(id)
+            }
+            state.gold += quest.rewardGold
+            
+            // Handle chains: activate next quest
+            quest.nextQuestId?.let { nextId ->
+                if (!state.quest.activeQuests.contains(nextId) && !state.quest.completedQuests.contains(nextId)) {
+                    state.quest.activeQuests.add(nextId)
+                    allQuests[nextId]?.status = QuestStatus.AKTYWNE
+                    gameRepository.log("Nowy etap zadania: ${allQuests[nextId]?.title}")
+                }
+            }
         }
-        state.gold += quest.rewardGold
+        
         gameRepository.log("Ukończono zadanie: ${quest.title}. Nagroda: ${quest.rewardGold} zł.")
         return quest
     }
@@ -106,23 +120,24 @@ class QuestSystem @Inject constructor(
         }
 
         // Seed blood chain
-        QuestRegistry.bloodChain.stages.forEach { template ->
+        QuestRegistry.bloodChain.stages.forEachIndexed { i, template ->
              register(
                 QuestEntry(
                     id = template.id,
                     title = template.title,
                     description = template.description,
                     objective = template.objective,
-                    cityId = "wybrzeze_polnocne", // Chain starts here
+                    cityId = "wybrzeze_polnocne",
                     rewardGold = template.baseReward,
                     originRefId = "mystic",
-                    isOutsideCity = true
+                    isOutsideCity = true,
+                    nextQuestId = if (i < QuestRegistry.bloodChain.stages.size - 1) QuestRegistry.bloodChain.stages[i+1].id else null
                 )
             )
         }
 
         // Seed verdict chain
-        QuestRegistry.verdictChain.stages.forEach { template ->
+        QuestRegistry.verdictChain.stages.forEachIndexed { i, template ->
             register(
                 QuestEntry(
                     id = template.id,
@@ -132,7 +147,8 @@ class QuestSystem @Inject constructor(
                     cityId = "twierdza_zakonu",
                     rewardGold = template.baseReward,
                     originRefId = "guard",
-                    isOutsideCity = (template.id != "q_verdict_1") // First stage is usually in city
+                    isOutsideCity = (template.id != "q_verdict_1"),
+                    nextQuestId = if (i < QuestRegistry.verdictChain.stages.size - 1) QuestRegistry.verdictChain.stages[i+1].id else null
                 )
             )
         }

@@ -93,7 +93,7 @@ class DialogueManager @Inject constructor(
             id = "merchant_start", npcId = "merchant",
             text = "Mam towary z Drugiej Strony. Złoto jest tu jedyną prawdą. Chcesz handlować?",
             choices = listOf(
-                DialogueChoice("Pokaż co masz (OTWÓRZ TARG).", "end"),
+                DialogueChoice("Pokaż ofertę (OTWÓRZ TARG).", "end"),
                 DialogueChoice("Czy słyszałeś o dziwnych relikwiach? (MISJA)", "merchant_quest_check"),
                 DialogueChoice("Masz jakieś plotki?", "merchant_rumors"),
                 DialogueChoice("Może innym razem.", "end")
@@ -114,7 +114,7 @@ class DialogueManager @Inject constructor(
 
         // 3. CITIZEN
         registerNode(DialogueNode(
-            id = "citizen_start", npcId = "merchant", // Use available portrait
+            id = "citizen_start", npcId = "merchant", 
             text = "Dzień dobry... chociaż czy w GrimReich dni wciąż są dobre? Każdy rano sprawdza, czy jego odbicie w lustrze wciąż mruga w tym samym czasie.",
             choices = listOf(
                 DialogueChoice("Co słychać w mieście?", "citizen_rumors"),
@@ -186,8 +186,20 @@ class DialogueManager @Inject constructor(
                 })
             )
         ))
+        
+        // 6. QUEST DIALOGUES (BLOOD ICON)
+        registerNode(DialogueNode(
+            id = "blood_icon_start", npcId = "zealot",
+            text = "Wioska jest przerażona. Statua płacze krwią, która nigdy nie zasycha. Czy pomożesz nam ją oczyścić?",
+            choices = listOf(
+                DialogueChoice("Pomogę Wam (WYPRAWA).", "end", onSelect = {
+                    it.pendingQuestId = "COMBAT_WIN:q_blood_icon"
+                }),
+                DialogueChoice("Moja Kotwica jest zbyt słaba.", "end")
+            )
+        ))
 
-        // 6. BEGGAR
+        // 7. BEGGAR
         registerNode(DialogueNode(
             id = "beggar_start", npcId = "beggar",
             text = "Daj miedziaka dla bytu, który znika. Moje ciało rzednie, a głód jest jedyną rzeczą, która we mnie została.",
@@ -201,7 +213,7 @@ class DialogueManager @Inject constructor(
         registerNode(DialogueNode(id = "beggar_sad", npcId = "beggar", text = "Wszyscy jesteśmy tylko echem... Ty też kiedyś będziesz prosił o miedziaka za wspomnienie.", choices = listOf(DialogueChoice("Żegnaj.", "end"))))
         registerNode(DialogueNode(id = "beggar_lore", npcId = "beggar", text = "Bo patrzyłem w Absolut. Bez mrugania. To wypala esencję. Zostawia tylko pragnienie.", choices = listOf(DialogueChoice("To przerażające.", "end"))))
 
-        // 7. ALCHEMIST
+        // 8. ALCHEMIST
         registerNode(DialogueNode(
             id = "alchemist_start", npcId = "alchemist",
             text = "Ostrożnie! Te wyziewy mogą zmienić Twoje DNA w płynne złoto. Czego potrzebuje Twoja marna powłoka?",

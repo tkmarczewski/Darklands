@@ -79,13 +79,17 @@ class CityViewModel @Inject constructor(
 
     fun selectQuestAndOpenDialogue(quest: QuestEntry, onDialogue: () -> Unit) {
         toggleQuestMenu(false)
-        val node = when (quest.originRefId) {
-            "guard" -> "guard_start"
-            "merchant" -> "merchant_start"
-            "zealot" -> "zealot_start"
-            "mystic" -> "mystic_start"
-            "aelion" -> "aelion_start"
-            else -> "mystic_start"
+        val node = when (quest.id) {
+            "q_blood_icon" -> "blood_icon_start"
+            "q_doorless_tower" -> "mystic_tower_info"
+            else -> when (quest.originRefId) {
+                "guard" -> "guard_start"
+                "merchant" -> "merchant_start"
+                "zealot" -> "zealot_start"
+                "mystic" -> "mystic_start"
+                "aelion" -> "aelion_start"
+                else -> "mystic_start"
+            }
         }
         startDialogue(quest.originRefId.uppercase(), quest.originRefId, node, onDialogue)
     }
