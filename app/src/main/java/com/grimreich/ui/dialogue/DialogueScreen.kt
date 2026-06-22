@@ -85,18 +85,24 @@ fun DialogueScreen(
                         lineHeight = 24.sp
                     )
                     
-                    Spacer(modifier = Modifier.weight(1f))
+                    Spacer(modifier = Modifier.height(16.dp))
                     
-                    // CHOICES
-                    state.currentNode?.choices?.forEach { choice ->
-                        DialogueChoiceBtn(choice.text) { 
-                            viewModel.choose(choice)
-                            if (choice.targetNodeId == "end") {
-                                // If NPC is merchant, we might want to go to market instead of city
-                                if (state.npcRole.lowercase().contains("kupiec") || state.npcRole.lowercase().contains("merchant")) {
-                                    onMarket()
-                                } else {
-                                    onExit()
+                    // CHOICES with scrolling
+                    LazyColumn(
+                        modifier = Modifier.weight(1f).fillMaxWidth(),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        state.currentNode?.choices?.let { choices ->
+                            items(choices) { choice ->
+                                DialogueChoiceBtn(choice.text) { 
+                                    viewModel.choose(choice)
+                                    if (choice.targetNodeId == "end") {
+                                        if (state.npcRole.lowercase().contains("kupiec") || state.npcRole.lowercase().contains("merchant")) {
+                                            onMarket()
+                                        } else {
+                                            onExit()
+                                        }
+                                    }
                                 }
                             }
                         }

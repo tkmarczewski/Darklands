@@ -152,7 +152,7 @@ class CombatRound @Inject constructor(
             val defendRoll = (defArmor * defMod * Random.nextFloat().let { 0.5f + it * 0.5f }).toInt()
 
             val dmg = maxOf(1, attackRoll - defendRoll)
-            defender.hp -= dmg
+            defender.hp = (defender.hp - dmg).coerceAtLeast(0)
             defender.endurance = (defender.endurance - dmg / 2).coerceAtLeast(0)
             defender.morale = moraleSystem.moraleAfterHit(defender.morale, dmg)
             log.add("${attacker.name} atakuje ${defender.name}: $dmg obrażeń.")
@@ -168,7 +168,7 @@ class CombatRound @Inject constructor(
             val attackerDef = (attacker.armor * attackerStatus.defenseModifier() *
                 Random.nextFloat().let { 0.5f + it * 0.5f }).toInt()
             dmgToAttacker = maxOf(0, counterAtk - attackerDef)
-            attacker.hp -= dmgToAttacker
+            attacker.hp = (attacker.hp - dmgToAttacker).coerceAtLeast(0)
             attacker.endurance = (attacker.endurance - dmgToAttacker / 2).coerceAtLeast(0)
             attacker.morale = moraleSystem.moraleAfterHit(attacker.morale, dmgToAttacker)
             if (dmgToAttacker > 0) log.add("${defender.name} kontratakuje: $dmgToAttacker obrażeń.")

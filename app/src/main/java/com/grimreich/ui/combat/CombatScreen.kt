@@ -28,7 +28,7 @@ fun CombatScreen(viewModel: CombatViewModel, onExit: () -> Unit) {
             .padding(16.dp)
     ) {
         Text(
-            text = if (state.active) "⚔ WALKA: ${state.enemyName}" else "⚔ KONIEC WALKI",
+            text = if (state.active) "⚔ WALKA: ${state.enemyName} (RUNDA ${state.round})" else "⚔ KONIEC WALKI",
             color = Color(0xFFE0C080),
             style = MaterialTheme.typography.headlineSmall,
             modifier = Modifier.align(Alignment.CenterHorizontally)

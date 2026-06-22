@@ -73,22 +73,44 @@ class DialogueManager @Inject constructor(
             text = "Stój! Mgła gęstnieje, a prawo musi być przestrzegane. Czego szukasz w cieniu murów?",
             choices = listOf(
                 DialogueChoice("Szukam pracy (ZADANIA).", "guard_work"),
+                DialogueChoice("Czy coś niepokojącego działo się ostatnio? (MISJA)", "guard_quest_check"),
                 DialogueChoice("Tylko przechodzę.", "end")
             )
         ))
         registerNode(DialogueNode(id = "guard_work", npcId = "guard", text = "Zawsze potrzebujemy rąk do pracy przy murach. Sprawdź tablicę zadań w HUBie.", choices = listOf(DialogueChoice("Dziękuję.", "end"))))
+        
+        registerNode(DialogueNode(
+            id = "guard_quest_check", npcId = "guard",
+            text = "Zależy kogo pytasz. Mieszczanie szepczą o 'Wyroku', ale we dnie pilnujemy tylko porządku. Chociaż... jeśli widziałeś jakieś 'Miejsce Zbrodni', to daj znać.",
+            choices = listOf(
+                DialogueChoice("Widziałem coś takiego.", "verdict_hook_start"),
+                DialogueChoice("Będę miał oczy otwarte.", "end")
+            )
+        ))
 
         // 2. MERCHANT
         registerNode(DialogueNode(
             id = "merchant_start", npcId = "merchant",
             text = "Mam towary z Drugiej Strony. Złoto jest tu jedyną prawdą. Chcesz handlować?",
             choices = listOf(
-                DialogueChoice("Pokaż ofertę (OTWÓRZ TARG).", "end"),
+                DialogueChoice("Pokaż co masz (OTWÓRZ TARG).", "end"),
+                DialogueChoice("Czy słyszałeś o dziwnych relikwiach? (MISJA)", "merchant_quest_check"),
                 DialogueChoice("Masz jakieś plotki?", "merchant_rumors"),
                 DialogueChoice("Może innym razem.", "end")
             )
         ))
         registerNode(DialogueNode(id = "merchant_rumors", npcId = "merchant", text = "Mówią, że Prorok Aelion ukrywa coś pod kaplicą. Ale kto by słuchał kupca?", choices = listOf(DialogueChoice("Interesujące.", "end"))))
+        
+        registerNode(DialogueNode(
+            id = "merchant_quest_check", npcId = "merchant",
+            text = "Relikwie? Zawsze. Ale niektóre są przeklęte. Mówią, że krwawa ikona w pobliskiej wiosce zaczęła płakać. To zły znak.",
+            choices = listOf(
+                DialogueChoice("Gdzie jest ta wioska? (ZADANIE)", "end", onSelect = {
+                    it.quest.activeQuests.add("q_blood_icon")
+                }),
+                DialogueChoice("Nie brzmi to dobrze.", "end")
+            )
+        ))
 
         // 3. CITIZEN
         registerNode(DialogueNode(

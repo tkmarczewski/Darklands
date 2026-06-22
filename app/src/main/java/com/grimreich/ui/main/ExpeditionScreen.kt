@@ -23,31 +23,65 @@ fun ExpeditionScreen(
 ) {
     val state by viewModel.uiState.collectAsState()
 
-    Column(
-        modifier = Modifier.fillMaxSize().background(Color.Black).padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text("WYPRAWA: ${state.regionName.uppercase()}", color = Color(0xFFC0A060), fontSize = 22.sp, fontWeight = FontWeight.Bold)
-        Text("CELE W POBLIŻU:", color = Color.Gray, fontSize = 12.sp, modifier = Modifier.padding(top = 8.dp, bottom = 16.dp))
+    var questToConfirm by remember { mutableStateOf<QuestEntry?>(null) }
 
-        if (state.outsideQuests.isEmpty()) {
-            Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.Center) {
-                Text("Brak aktywnych celów poza murami miasta.", color = Color.DarkGray)
-            }
-        } else {
-            LazyColumn(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                items(state.outsideQuests) { quest ->
-                    ExpeditionQuestCard(quest) { onCombat(quest) }
+    Box(modifier = Modifier.fillMaxSize().background(Color.Black)) {
+        Column(
+            modifier = Modifier.fillMaxSize().padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text("WYPRAWA: ${state.regionName.uppercase()}", color = Color(0xFFC0A060), fontSize = 22.sp, fontWeight = FontWeight.Bold)
+            Text("CELE W POBLIŻU:", color = Color.Gray, fontSize = 12.sp, modifier = Modifier.padding(top = 8.dp, bottom = 16.dp))
+
+            if (state.outsideQuests.isEmpty()) {
+                Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.Center) {
+                    Text("Brak aktywnych celów poza murami miasta.", color = Color.DarkGray)
                 }
+            } else {
+                LazyColumn(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                    items(state.outsideQuests) { quest ->
+                        ExpeditionQuestCard(quest) { questToConfirm = quest }
+                    }
+                }
+            }
+
+            Button(
+                onClick = onBack,
+                modifier = Modifier.fillMaxWidth().height(50.dp).padding(top = 16.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF400000))
+            ) {
+                Text("POWRÓT DO HUB")
             }
         }
 
-        Button(
-            onClick = onBack,
-            modifier = Modifier.fillMaxWidth().height(50.dp).padding(top = 16.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF400000))
-        ) {
-            Text("POWRÓT DO HUB")
+        // CONFIRMATION OVERLAY with Combat Warning
+        questToConfirm?.let { quest ->
+            AlertDialog(
+                onDismissRequest = { questToConfirm = null },
+                title = { Text("WYRUSZYĆ?", color = Color.Yellow) },
+                text = {
+                    Column {
+                        Text(quest.title, color = Color.White, fontWeight = FontWeight.Bold)
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text("Uwaga: Wyjście poza miasto może wiązać się z walką.", color = Color.Red, fontSize = 12.sp)
+                    }
+                },
+                confirmButton = {
+                    Button(onClick = { 
+                        onCombat(quest)
+                        questToConfirm = null
+                    }) {
+                        Text("WYRUSZ")
+                    }
+                },
+                dismissButton = {
+                    TextButton(onClick = { questToConfirm = null }) {
+                        Text("ANULUJ", color = Color.Gray)
+                    }
+                },
+                containerColor = Color(0xFF151515),
+                shape = MaterialTheme.shapes.extraSmall
+            )
         }
     }
 }

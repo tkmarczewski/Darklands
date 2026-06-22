@@ -34,18 +34,19 @@ fun CharacterCreatorScreen(
             .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        // Reduced header size
         Text(
             text = "KREACJA BOHATERA",
             color = Color(0xFFC0A060),
-            fontSize = 24.sp,
+            fontSize = 20.sp,
             fontWeight = FontWeight.Bold
         )
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(4.dp))
 
-        // Breadcrumbs / Progress
+        // Progress
         Row(
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp),
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
             ProgressItem("PROFESJA", active = state.stage == CreatorStage.CAREER)
@@ -53,18 +54,20 @@ fun CharacterCreatorScreen(
             ProgressItem("SPECJALIZACJE", active = state.stage == CreatorStage.SKILLS)
         }
 
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(12.dp))
 
-        Row(modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp), horizontalArrangement = Arrangement.End) {
+        Row(modifier = Modifier.fillMaxWidth().padding(bottom = 4.dp), horizontalArrangement = Arrangement.End) {
             Button(
                 onClick = { 
                     viewModel.randomizeAll() 
                     heroName = viewModel.randomName()
                 },
+                modifier = Modifier.height(32.dp),
+                contentPadding = PaddingValues(horizontal = 8.dp, vertical = 0.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1A1A1A)),
                 border = androidx.compose.foundation.BorderStroke(1.dp, Color.Gray)
             ) {
-                Text("LOSUJ WSZYSTKO", fontSize = 10.sp)
+                Text("LOSUJ WSZYSTKO", fontSize = 9.sp)
             }
         }
 
@@ -153,22 +156,22 @@ fun ProfessionStage(
         OutlinedTextField(
             value = heroName,
             onValueChange = onNameChange,
-            label = { Text("IMIĘ BOHATERA", color = Color.Gray) },
-            textStyle = androidx.compose.ui.text.TextStyle(color = Color.White),
-            modifier = Modifier.fillMaxWidth(),
+            label = { Text("IMIĘ BOHATERA", color = Color.Gray, fontSize = 10.sp) },
+            textStyle = androidx.compose.ui.text.TextStyle(color = Color.White, fontSize = 14.sp),
+            modifier = Modifier.fillMaxWidth().height(56.dp),
             colors = OutlinedTextFieldDefaults.colors(
                 focusedBorderColor = Color(0xFFC0A060),
                 unfocusedBorderColor = Color.DarkGray
             )
         )
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(8.dp))
 
-        Text("WYBIERZ DROGĘ:", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 14.sp)
+        Text("WYBIERZ DROGĘ:", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 12.sp)
         
         LazyColumn(
-            modifier = Modifier.weight(1f).padding(vertical = 8.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+            modifier = Modifier.weight(1f).padding(vertical = 4.dp),
+            verticalArrangement = Arrangement.spacedBy(6.dp)
         ) {
             items(startingCareers) { career ->
                 Card(
@@ -183,9 +186,9 @@ fun ProfessionStage(
                         if (selectedCareer == career) Color(0xFFC0A060) else Color.Transparent
                     )
                 ) {
-                    Column(modifier = Modifier.padding(12.dp)) {
-                        Text(career.displayName, color = Color.White, fontWeight = FontWeight.Bold)
-                        Text(career.description, color = Color.Gray, fontSize = 12.sp)
+                    Column(modifier = Modifier.padding(10.dp)) {
+                        Text(career.displayName, color = Color.White, fontWeight = FontWeight.Bold, fontSize = 13.sp)
+                        Text(career.description, color = Color.Gray, fontSize = 11.sp)
                     }
                 }
             }
