@@ -13,6 +13,7 @@ import com.grimreich.core.Hero
 import com.grimreich.core.Career
 import com.grimreich.core.HeroSkill
 import com.grimreich.grimreich.v1.Item
+import com.grimreich.systems.DialogueManager
 import com.grimreich.ui.city.CityScreen
 import com.grimreich.ui.city.CityViewModel
 import com.grimreich.ui.city.MarketScreen
@@ -52,6 +53,7 @@ sealed class GameRoute(val route: String) {
     object Inventory : GameRoute("inventory")
     object CharDetail : GameRoute("char_detail")
     object Expedition : GameRoute("expedition")
+    object DevMenu : GameRoute("dev_menu")
 }
 
 @Composable
@@ -61,7 +63,6 @@ fun GameNavHost(
 ) {
     val mode by root.mode.collectAsState()
     val scope = rememberCoroutineScope()
-
     LaunchedEffect(mode) {
         val target = when (mode) {
             GameScreenMode.MAIN_MENU -> GameRoute.MainMenu.route
@@ -80,6 +81,7 @@ fun GameNavHost(
             GameScreenMode.INVENTORY -> GameRoute.Inventory.route
             GameScreenMode.CHAR_DETAIL -> GameRoute.CharDetail.route
             GameScreenMode.EVENTS -> GameRoute.Expedition.route
+            GameScreenMode.DEV_MENU -> GameRoute.DevMenu.route
             else -> null
         }
         
@@ -93,7 +95,6 @@ fun GameNavHost(
             }
         }
     }
-
     NavHost(navController = navController, startDestination = GameRoute.MainMenu.route) {
         composable(GameRoute.MainMenu.route) {
             val context = LocalContext.current
@@ -156,8 +157,7 @@ fun GameNavHost(
                 },
                 onBack = { root.setMode(GameScreenMode.PLAYER_IDENTITY) }
             )
-        }
-        composable(GameRoute.Hub.route) {
+        }        composable(GameRoute.Hub.route) {
             HubScreen(
                 viewModel = hiltViewModel(),
                 onMap = { root.setMode(GameScreenMode.WORLD_MAP) },
@@ -254,6 +254,12 @@ fun GameNavHost(
         composable(GameRoute.Inventory.route) {
             InventoryScreen(
                 viewModel = hiltViewModel(),
+                onBack = { root.setMode(GameScreenMode.HUB) }
+            )
+        }
+        composable(GameRoute.DevMenu.route) {
+            DevMenuScreen(
+                root = root,
                 onBack = { root.setMode(GameScreenMode.HUB) }
             )
         }
