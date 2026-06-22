@@ -6,6 +6,7 @@ import com.grimreich.core.mutations.*
 fun GameState.toDto(): SessionStateDto = SessionStateDto(
     version = 2,
     playerName = playerName,
+    heroName = heroName,
     characterNameLocked = characterNameLocked,
     metaAwarenessLevel = metaAwarenessLevel,
     grimCurrentRegion = grimCurrentRegion,
@@ -30,6 +31,7 @@ fun GameState.toDto(): SessionStateDto = SessionStateDto(
 
 fun SessionStateDto.toDomain(): GameState = GameState(
     playerName = playerName,
+    heroName = heroName,
     characterNameLocked = characterNameLocked,
     metaAwarenessLevel = metaAwarenessLevel,
     grimCurrentRegion = grimCurrentRegion,
@@ -114,11 +116,11 @@ fun HeroDto.toDomain(): Hero = Hero(
 fun Item.toDto(): ItemDto = ItemDto(
     id = id,
     name = name,
-    type = type.toString(),
+    type = type.name, 
     slot = slot,
     value = value,
     weight = weight,
-    rarity = rarity.toString(),
+    rarity = rarity.name, 
     effects = effects
 )
 
@@ -178,9 +180,9 @@ fun WorldState.toDto(): WorldStateDto = WorldStateDto(
     timeOfDay = timeOfDay,
     fatigue = fatigue,
     lastEncounter = lastEncounter,
-    season = season.toString(),
+    season = season.name,
     globalStability = globalStability,
-    weather = weather.toString(),
+    weather = weather.name,
     echoIntensity = echoIntensity,
     collapseProgress = collapseProgress,
     ontologicalLevel = ontologicalLevel.level,
@@ -213,6 +215,9 @@ fun CombatState.toDto(): CombatStateDto = CombatStateDto(
     enemyMaxHp = enemyMaxHp,
     enemyAttack = enemyAttack,
     enemyDefense = enemyDefense,
+    enemyAgility = enemyAgility,
+    enemyIntelligence = enemyIntelligence,
+    enemyStrength = enemyStrength,
     enemyEffects = enemyEffects.map { it.toDto() },
     heroEffects = heroEffects.map { it.toDto() },
     log = log
@@ -226,6 +231,9 @@ fun CombatStateDto.toDomain(): CombatState = CombatState().also {
     it.enemyMaxHp = enemyMaxHp
     it.enemyAttack = enemyAttack
     it.enemyDefense = enemyDefense
+    it.enemyAgility = enemyAgility
+    it.enemyIntelligence = enemyIntelligence
+    it.enemyStrength = enemyStrength
     it.heroEffects.addAll(heroEffects.map { effect -> effect.toDomain() })
     it.enemyEffects.addAll(enemyEffects.map { effect -> effect.toDomain() })
     it.log.addAll(log)

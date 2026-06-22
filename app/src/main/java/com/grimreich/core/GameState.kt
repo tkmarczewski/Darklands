@@ -6,7 +6,7 @@ data class GameState(
     @Transient val grimEngine: GrimWorldEngine = GrimWorldEngineFactory.create(),
 
     var playerName: String? = null,
-    var heroName: String? = null, // New field for the created character
+    var heroName: String? = null, // Hero name field
     var characterNameLocked: Boolean = false,
     var metaAwarenessLevel: Int = 0,
 

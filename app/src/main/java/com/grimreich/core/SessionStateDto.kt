@@ -1,12 +1,14 @@
 package com.grimreich.core
 
 import kotlinx.serialization.Serializable
+import com.grimreich.core.mutations.MutationDto
 
 @Serializable
 data class SessionStateDto(
-    val version: Int = 2,
+    val version: Int = 1,
 
     val playerName: String? = null,
+    val heroName: String? = null, // Hero name field
     val characterNameLocked: Boolean = false,
     val metaAwarenessLevel: Int = 0,
 
@@ -22,14 +24,14 @@ data class SessionStateDto(
     val activeHeroId: String? = null,
     val inventory: List<ItemDto> = emptyList(),
     val logEntries: List<String> = emptyList(),
-    val gold: Int = 100,
+    val gold: Int = 0,
 
     val quest: QuestStateDto = QuestStateDto(),
     val reputation: ReputationStateDto = ReputationStateDto(),
     val prayer: PrayerStateDto = PrayerStateDto(),
     val world: WorldStateDto = WorldStateDto(),
     val combat: CombatStateDto = CombatStateDto(),
-    val lastSaveTimestamp: Long = 0L
+    val lastSaveTimestamp: Long = 0
 )
 
 @Serializable
@@ -55,7 +57,7 @@ data class HeroDto(
     val portraitRes: String,
     val hp: Int,
     val maxHp: Int,
-    val activeMutations: List<com.grimreich.core.mutations.MutationDto> = emptyList(),
+    val activeMutations: List<MutationDto> = emptyList(),
     val currentCareer: String? = null,
     val trait: String? = null,
     val skills: Map<String, Int> = emptyMap(),
@@ -67,11 +69,11 @@ data class ItemDto(
     val id: String,
     val name: String,
     val type: String,
-    val slot: String? = null,
-    val value: Int = 0,
-    val weight: Double = 0.0,
-    val rarity: String = "common",
-    val effects: Map<String, Int> = emptyMap()
+    val slot: String?,
+    val value: Int,
+    val weight: Double,
+    val rarity: String,
+    val effects: Map<String, Int>
 )
 
 @Serializable
@@ -98,18 +100,18 @@ data class PrayerStateDto(
 
 @Serializable
 data class WorldStateDto(
-    val region: String = "North",
-    val location: String = "wybrzeze_polnocne",
+    val region: String = "",
+    val location: String = "",
     val day: Int = 1,
-    val timeOfDay: String = "morning",
+    val timeOfDay: String = "",
     val fatigue: Int = 0,
     val lastEncounter: String = "",
-    val season: String = "AUTUMN",
+    val season: String = "",
     val globalStability: Int = 100,
-    val weather: String = "MISTY",
-    val echoIntensity: Float = 0.0f,
-    val collapseProgress: Float = 0.0f,
-    val ontologicalLevel: Int = 1,
+    val weather: String = "",
+    val echoIntensity: Float = 0f,
+    val collapseProgress: Float = 0f,
+    val ontologicalLevel: Int = 0,
     val discoveredLocations: List<String> = emptyList(),
     val cityEntryCount: Int = 0
 )
@@ -124,8 +126,10 @@ data class CombatStateDto(
     val enemyAttack: Int = 0,
     val enemyDefense: Int = 0,
     val enemyAgility: Int = 0,
-    val heroEffects: List<StatusEffectDto> = emptyList(),
+    val enemyIntelligence: Int = 0,
+    val enemyStrength: Int = 0,
     val enemyEffects: List<StatusEffectDto> = emptyList(),
+    val heroEffects: List<StatusEffectDto> = emptyList(),
     val log: List<String> = emptyList()
 )
 
