@@ -129,7 +129,7 @@ class DialogueManager @Inject constructor(
             text = "Relikwie? Zawsze. Ale niektore sa przeklete. Mowia, ze krwawa ikona w pobliskiej wiosce zaczela plakac. To zly znak.",
             choices = listOf(
                 DialogueChoice("Gdzie jest ta wioska? (ZADANIE)", "end", onSelect = {
-                    it.activeQuests.add("q_blood_icon")
+                    it.quest.activeQuests.add("q_blood_icon")
                 }),
                 DialogueChoice("Nie brzmi to dobrze.", "end")
             )
@@ -215,4 +215,6 @@ class DialogueManager @Inject constructor(
                 }),
                 DialogueChoice("Moja Kotwica jest zbyt slaba.", "end")
             )
-        )
+        ))
+    }
+}

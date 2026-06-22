@@ -33,6 +33,7 @@ import com.grimreich.ui.saints.SaintsViewModel
 import com.grimreich.ui.tavern.TavernScreen
 import com.grimreich.ui.tavern.TavernViewModel
 import com.grimreich.ui.tavern.RecruitmentScreen
+import com.grimreich.ui.DevMenuScreen
 import kotlinx.coroutines.launch
 import java.util.*
 
@@ -157,7 +158,8 @@ fun GameNavHost(
                 },
                 onBack = { root.setMode(GameScreenMode.PLAYER_IDENTITY) }
             )
-        }        composable(GameRoute.Hub.route) {
+        }
+        composable(GameRoute.Hub.route) {
             HubScreen(
                 viewModel = hiltViewModel(),
                 onMap = { root.setMode(GameScreenMode.WORLD_MAP) },

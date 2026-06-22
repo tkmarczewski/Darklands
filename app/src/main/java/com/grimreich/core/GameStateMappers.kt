@@ -116,22 +116,22 @@ fun HeroDto.toDomain(): Hero = Hero(
 fun Item.toDto(): ItemDto = ItemDto(
     id = id,
     name = name,
-    type = type.name, 
+    type = type,
     slot = slot,
     value = value,
     weight = weight,
-    rarity = rarity.name, 
+    rarity = rarity,
     effects = effects
 )
 
 fun ItemDto.toDomain(): Item = Item(
     id = id,
     name = name,
-    type = try { ItemType.valueOf(type) } catch(e: Exception) { ItemType.MISC },
+    type = type,
     slot = slot,
     value = value,
     weight = weight,
-    rarity = try { Rarity.valueOf(rarity) } catch(e: Exception) { Rarity.COMMON },
+    rarity = rarity,
     effects = effects
 )
 
@@ -202,7 +202,7 @@ fun WorldStateDto.toDomain(): WorldState = WorldState().also {
     it.weather = try { WeatherType.valueOf(weather) } catch(e: Exception) { WeatherType.CLEAR }
     it.echoIntensity = echoIntensity
     it.collapseProgress = collapseProgress
-    it.ontologicalLevel = try { OntologicalLevel.entries.find { l -> l.level == ontologicalLevel } ?: OntologicalLevel.STABLE } catch(e: Exception) { OntologicalLevel.STABLE }
+    it.ontologicalLevel = try { OntologicalLevel.entries.find { l -> l.level == ontologicalLevel } ?: OntologicalLevel.MATERIAL } catch(e: Exception) { OntologicalLevel.MATERIAL }
     it.discoveredLocations.addAll(discoveredLocations)
     it.cityEntryCount = cityEntryCount
 }

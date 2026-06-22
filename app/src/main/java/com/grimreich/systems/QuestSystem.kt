@@ -19,8 +19,8 @@ data class QuestEntry(
     var status: QuestStatus = QuestStatus.DOSTEPNE,
     val originRefId: String = "mystic",
     val isOutsideCity: Boolean = false,
-    val nextQuestId: String? = null // For chains
-            val hasCombat: Boolean = false // true if quest involves a battle
+    val nextQuestId: String? = null, // For chains
+    val hasCombat: Boolean = false // true if quest involves a battle
 )
 
 @Singleton
@@ -115,8 +115,8 @@ class QuestSystem @Inject constructor(
                         "Drama" -> "zealot"
                         else -> "mystic"
                     },
-                    isOutsideCity = (template.category == "Anomaly" || template.category == "Beast")
-                                hasCombat = template.enemyStats != null,
+                    isOutsideCity = (template.category == "Anomaly" || template.category == "Beast"),
+                    hasCombat = template.enemyStats != null
                 )
             )
         }
@@ -132,7 +132,7 @@ class QuestSystem @Inject constructor(
                     cityId = "wybrzeze_polnocne",
                     rewardGold = template.baseReward,
                     originRefId = "mystic",
-                                hasCombat = template.enemyStats != null,
+                    hasCombat = template.enemyStats != null,
                     isOutsideCity = true,
                     nextQuestId = if (i < QuestRegistry.bloodChain.stages.size - 1) QuestRegistry.bloodChain.stages[i+1].id else null
                 )
@@ -150,7 +150,7 @@ class QuestSystem @Inject constructor(
                     cityId = "twierdza_zakonu",
                     rewardGold = template.baseReward,
                     originRefId = "guard",
-                                hasCombat = template.enemyStats != null,
+                    hasCombat = template.enemyStats != null,
                     isOutsideCity = (template.id != "q_verdict_1"),
                     nextQuestId = if (i < QuestRegistry.verdictChain.stages.size - 1) QuestRegistry.verdictChain.stages[i+1].id else null
                 )
