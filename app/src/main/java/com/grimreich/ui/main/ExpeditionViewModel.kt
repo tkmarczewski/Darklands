@@ -47,4 +47,13 @@ class ExpeditionViewModel @Inject constructor(
     fun startQuestCombat(quest: QuestEntry, onStart: () -> Unit) {
         onStart()
     }
+
+
+    fun completeNonCombatQuest(quest: QuestEntry, onComplete: () -> Unit) {
+        questSystem.complete(quest.id)
+        onComplete()
+    }}
+
+    fun questHasCombat(quest: QuestEntry): Boolean = quest.hasCombat
+
 }
