@@ -8,6 +8,7 @@ object GameConstants {
     const val DEFAULT_QUEST_REWARD = 100
     const val BEGGAR_GIFT_COST = 5
     const val DEV_GOLD_GIFT = 500
+    const val CHURCH_OFFERING_COST = 50
 
     // Party & Heroes
     const val MAX_QUEST_POOL_SIZE = 5

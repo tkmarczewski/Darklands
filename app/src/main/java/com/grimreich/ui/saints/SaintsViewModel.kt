@@ -38,6 +38,12 @@ class SaintsViewModel @Inject constructor(
         refresh()
     }
 
+    fun makeOffering(amount: Int) {
+        val msg = churchSystem.makeOffering(amount)
+        updateLog(msg)
+        refresh()
+    }
+
     fun cleanse() {
         val hero = gameRepository.currentState().party.firstOrNull() ?: return
         val msg = churchSystem.cleanseRelic(hero)

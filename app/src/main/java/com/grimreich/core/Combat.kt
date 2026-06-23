@@ -124,66 +124,19 @@ class CombatRound @Inject constructor(
         val log = mutableListOf<String>()
 
         applyStatusTick(attacker, log)
-        if (isDefeated(attacker)) return RoundResult(0, 0, attacker.morale, defender.morale, WoundType.NONE, WoundType.NONE, log)
+        if (isDefeated(attacker)) {
+            return RoundResult(0, 0, attacker.morale, defender.morale, WoundType.NONE, WoundType.NONE, log)
+        }
 
-        val attackerStatus = moraleSystem.computeStatus(attacker.morale)
-        val defenderStatus = moraleSystem.computeStatus(defender.morale)
-
-        val dodgeChance = GrimConstants.Combat.BASE_DODGE_CHANCE + (defender.agility * GrimConstants.Combat.AGILITY_DODGE_MODIFIER)
-        val dodged = Random.nextFloat() < dodgeChance
-
-        val dmgToDefender = if (dodged) {
-            log.add("${defender.name} unika ataku!")
-            0
+        val dmgToDefender = resolveAttack(attacker, defender, attackerEquipped, log)
+        val dmgToAttacker = if (!isDefeated(defender)) {
+            resolveCounterAttack(attacker, defender, log)
         } else {
-            var rawAtk = attacker.attackBase + (attacker.strength / 2) + attackerEquipped.totalAttack()
-            
-            if (defender.activeEffects.any { it.type == StatusEffectType.WET } && 
-                attacker.activeEffects.any { it.type == StatusEffectType.SHOCK }) {
-                rawAtk = (rawAtk * 1.5f).toInt()
-                log.add("Przewodnictwo! Mokry wróg otrzymuje zwiększone obrażenia od porażenia.")
-            }
-
-            val atkMod = attackerStatus.attackModifier()
-            val defMod = defenderStatus.defenseModifier()
-            val defArmor = defender.armor + attackerEquipped.totalDefense()
-
-            val attackRoll = (rawAtk * atkMod * Random.nextFloat().let { 0.7f + it * 0.6f }).toInt()
-            val defendRoll = (defArmor * defMod * Random.nextFloat().let { 0.5f + it * 0.5f }).toInt()
-
-            val dmg = maxOf(1, attackRoll - defendRoll)
-            defender.hp = (defender.hp - dmg).coerceAtLeast(0)
-            defender.endurance = (defender.endurance - dmg / 2).coerceAtLeast(0)
-            defender.morale = moraleSystem.moraleAfterHit(defender.morale, dmg)
-            log.add("${attacker.name} atakuje ${defender.name}: $dmg obrażeń.")
-
-            tryApplyStatus(attacker, defender, log)
-            dmg
+            0
         }
 
-        var dmgToAttacker = 0
-        if (!isDefeated(defender)) {
-            val counterAtk = (defender.attackBase * defenderStatus.attackModifier() *
-                Random.nextFloat().let { 0.6f + it * 0.8f }).toInt()
-            val attackerDef = (attacker.armor * attackerStatus.defenseModifier() *
-                Random.nextFloat().let { 0.5f + it * 0.5f }).toInt()
-            dmgToAttacker = maxOf(0, counterAtk - attackerDef)
-            attacker.hp = (attacker.hp - dmgToAttacker).coerceAtLeast(0)
-            attacker.endurance = (attacker.endurance - dmgToAttacker / 2).coerceAtLeast(0)
-            attacker.morale = moraleSystem.moraleAfterHit(attacker.morale, dmgToAttacker)
-            if (dmgToAttacker > 0) log.add("${defender.name} kontratakuje: $dmgToAttacker obrażeń.")
-        }
-
-        val defenderWound = computeWound(defender)
-        val attackerWound = computeWound(attacker)
-        if (defenderWound != WoundType.NONE) {
-            defender.wounds.add(defenderWound)
-            log.add("${defender.name} otrzymuje ranę: $defenderWound")
-        }
-        if (attackerWound != WoundType.NONE) {
-            attacker.wounds.add(attackerWound)
-            log.add("${attacker.name} otrzymuje ranę: $attackerWound")
-        }
+        val defenderWound = applyWound(defender, log)
+        val attackerWound = applyWound(attacker, log)
 
         return RoundResult(
             attackerDamage = dmgToDefender,
@@ -194,6 +147,78 @@ class CombatRound @Inject constructor(
             defenderWound = defenderWound,
             log = log
         )
+    }
+
+    private fun resolveAttack(
+        attacker: CombatantState,
+        defender: CombatantState,
+        attackerEquipped: EquippedItems,
+        log: MutableList<String>
+    ): Int {
+        val dodgeChance = GrimConstants.Combat.BASE_DODGE_CHANCE +
+            (defender.agility * GrimConstants.Combat.AGILITY_DODGE_MODIFIER)
+        val dodged = Random.nextFloat() < dodgeChance
+
+        if (dodged) {
+            log.add("${defender.name} unika ataku!")
+            return 0
+        }
+
+        var rawAtk = attacker.attackBase + (attacker.strength / 2) + attackerEquipped.totalAttack()
+        if (defender.activeEffects.any { it.type == StatusEffectType.WET } &&
+            attacker.activeEffects.any { it.type == StatusEffectType.SHOCK }) {
+            rawAtk = (rawAtk * 1.5f).toInt()
+            log.add("Przewodnictwo! Mokry wróg otrzymuje zwiększone obrażenia od porażenia.")
+        }
+
+        val attackerStatus = moraleSystem.computeStatus(attacker.morale)
+        val defenderStatus = moraleSystem.computeStatus(defender.morale)
+        val defArmor = defender.armor + attackerEquipped.totalDefense()
+
+        val attackRoll = (rawAtk * attackerStatus.attackModifier() *
+            (0.7f + Random.nextFloat() * 0.6f)).toInt()
+        val defendRoll = (defArmor * defenderStatus.defenseModifier() *
+            (0.5f + Random.nextFloat() * 0.5f)).toInt()
+
+        val dmg = maxOf(1, attackRoll - defendRoll)
+        defender.hp = (defender.hp - dmg).coerceAtLeast(0)
+        defender.endurance = (defender.endurance - dmg / 2).coerceAtLeast(0)
+        defender.morale = moraleSystem.moraleAfterHit(defender.morale, dmg)
+        log.add("${attacker.name} atakuje ${defender.name}: $dmg obrażeń.")
+
+        tryApplyStatus(attacker, defender, log)
+        return dmg
+    }
+
+    private fun resolveCounterAttack(
+        attacker: CombatantState,
+        defender: CombatantState,
+        log: MutableList<String>
+    ): Int {
+        val attackerStatus = moraleSystem.computeStatus(attacker.morale)
+        val defenderStatus = moraleSystem.computeStatus(defender.morale)
+
+        val counterAtk = (defender.attackBase * defenderStatus.attackModifier() *
+            (0.6f + Random.nextFloat() * 0.8f)).toInt()
+        val attackerDef = (attacker.armor * attackerStatus.defenseModifier() *
+            (0.5f + Random.nextFloat() * 0.5f)).toInt()
+
+        val dmg = maxOf(0, counterAtk - attackerDef)
+        attacker.hp = (attacker.hp - dmg).coerceAtLeast(0)
+        attacker.endurance = (attacker.endurance - dmg / 2).coerceAtLeast(0)
+        attacker.morale = moraleSystem.moraleAfterHit(attacker.morale, dmg)
+
+        if (dmg > 0) log.add("${defender.name} kontratakuje: $dmg obrażeń.")
+        return dmg
+    }
+
+    private fun applyWound(combatant: CombatantState, log: MutableList<String>): WoundType {
+        val wound = computeWound(combatant)
+        if (wound != WoundType.NONE) {
+            combatant.wounds.add(wound)
+            log.add("${combatant.name} otrzymuje ranę: $wound")
+        }
+        return wound
     }
 
     private fun applyStatusTick(combatant: CombatantState, log: MutableList<String>) {
@@ -233,7 +258,8 @@ class CombatRound @Inject constructor(
     }
 
     private fun tryApplyStatus(attacker: CombatantState, defender: CombatantState, log: MutableList<String>) {
-        val statusChance = GrimConstants.Combat.STATUS_CHANCE_BASE + (attacker.intelligence * GrimConstants.Combat.STATUS_CHANCE_INT_MOD)
+        val statusChance = GrimConstants.Combat.STATUS_CHANCE_BASE +
+            (attacker.intelligence * GrimConstants.Combat.STATUS_CHANCE_INT_MOD)
         if (Random.nextFloat() < statusChance) {
             val effectType = StatusEffectType.entries.toTypedArray().random()
             val existing = defender.activeEffects.find { it.type == effectType }

@@ -16,6 +16,19 @@ class ChurchSystem @Inject constructor(
         return "${hero.name} modli się żarliwie. (+10 Divine Favor, +1 Cnota)"
     }
 
+    fun makeOffering(amount: Int): String {
+        val state = gameRepository.currentState()
+        if (state.gold < amount) return "Brak wystarczającej ilości złota na ofiarę."
+
+        state.gold -= amount
+        // Stability recovery: 1 stability for every 10 gold, max 20 per offering
+        val recovery = (amount / 10).coerceAtMost(20)
+        state.world.globalStability = (state.world.globalStability + recovery).coerceAtMost(100)
+
+        gameRepository.persistCurrentState()
+        return "Złożono ofiarę w wysokości $amount zł. Stabilność świata wzrosła o $recovery."
+    }
+
     fun cleanseRelic(hero: Hero): String {
         if (hero.corruption <= 0) return "${hero.name} nie jest skażony mrokiem."
 
