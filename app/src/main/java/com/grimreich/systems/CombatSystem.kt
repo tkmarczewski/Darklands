@@ -71,16 +71,19 @@ class CombatSystem @Inject constructor(
                 c.log.add("${hero.name} przyjmuje postawe obronna.")
             }
             "SPECIAL_MIST" -> {
-                heroState.agility += 5
-                c.log.add("${hero.name} wzywa Mgle!")
+                val bonus = 5 + (hero.piety * GrimConstants.Combat.PIETY_SKILL_SCALING).toInt()
+                heroState.agility += bonus
+                c.log.add("${hero.name} wzywa Mglę! (+${bonus} ZRC)")
             }
             "SPECIAL_BLOOD" -> {
-                heroState.strength += 5
-                c.log.add("${hero.name} wzmacnia sie Krwia!")
+                val bonus = 5 + (hero.piety * GrimConstants.Combat.PIETY_SKILL_SCALING).toInt()
+                heroState.strength += bonus
+                c.log.add("${hero.name} wzmacnia się Krwią! (+${bonus} SIŁ)")
             }
             "SPECIAL_REFLECTION" -> {
-                heroState.intelligence += 5
-                c.log.add("${hero.name} skupia Odbicie!")
+                val bonus = 5 + (hero.piety * GrimConstants.Combat.PIETY_SKILL_SCALING).toInt()
+                heroState.intelligence += bonus
+                c.log.add("${hero.name} skupia Odbicie! (+${bonus} INT)")
             }
         }
 

@@ -30,6 +30,7 @@ data class GameState(
     val prayer: PrayerState = PrayerState(),
     val world: WorldState = WorldState(),
     val combat: CombatState = CombatState(),
+    var isExpeditionActive: Boolean = false,
     var lastSaveTimestamp: Long = System.currentTimeMillis()
 ) {
     fun deepCopy(): GameState = GameState(
@@ -71,6 +72,7 @@ data class GameState(
             enemyEffects = combat.enemyEffects.toMutableList(),
             heroEffects = combat.heroEffects.toMutableList()
         ),
+        isExpeditionActive = isExpeditionActive,
         lastSaveTimestamp = lastSaveTimestamp
     )
 }

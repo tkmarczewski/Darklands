@@ -1,5 +1,7 @@
 package com.grimreich.core
 
+import androidx.compose.ui.unit.dp
+
 object GameConstants {
     // Economics
     const val INITIAL_GOLD = 100
@@ -25,4 +27,21 @@ object GameConstants {
     
     // UI Constraints
     const val MAX_LOG_ENTRIES = 100
+
+    object UI {
+        val PADDING_SMALL = 8.dp
+        val PADDING_MEDIUM = 16.dp
+        val PADDING_LARGE = 24.dp
+        val PADDING_HUGE = 32.dp
+
+        val ICON_SMALL = 24.dp
+        val ICON_MEDIUM = 48.dp
+        val ICON_LARGE = 64.dp
+
+        val BUTTON_HEIGHT_DEFAULT = 50.dp
+        val BUTTON_HEIGHT_SMALL = 32.dp
+
+        val CARD_ELEVATION = 4.dp
+        val BORDER_WIDTH = 1.dp
+    }
 }

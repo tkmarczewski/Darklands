@@ -1,40 +1,56 @@
-# Project Refactoring and Polish Plan
+# Technical Debt Cleanup, Combat 2.0, and OtherSide Integration Plan
 
-Based on the audit, I propose a plan to address technical debt and enhance core gameplay mechanics.
+This plan addresses technical debt by centralizing UI constants, enhances the combat system with hero attributes, and integrates the OtherSide expedition mechanics with world stability.
 
 ## Proposed Changes
 
-### 1. Technical Debt (Detekt & Standards)
-Clean up the codebase to comply with project standards.
+### 1. Technical Debt (UI Constants & Imports)
+Centralize magic numbers and clean up wildcard imports.
+
+#### [GameConstants.kt](file:///C:/repo2/app/src/main/java/com/grimreich/core/GameConstants.kt)
+- Add `UI` nested object with standard spacing (`PADDING_SMALL`, `PADDING_MEDIUM`, `PADDING_LARGE`), icon sizes, and button heights.
 
 #### [Multiple UI Files]
-- Replace wildcard imports with explicit ones.
-- Replace magic numbers with constants from `GameConstants.kt`.
+- Replace all inline `.dp` values with `GameConstants.UI` values.
+- Replace `import .*` with explicit imports in all screens.
+
+#### [NEW] [WorldPhaseWidget.kt](file:///C:/repo2/app/src/main/java/com/grimreich/ui/shared/WorldPhaseWidget.kt)
+- Create a dedicated UI component to display the current Era (e.g., "Era of Fracture" or "Era of Convergence") based on world stability.
+- Add thematic descriptions and visual indicators (colors/glow) that shift with stability levels.
+
+#### [HubScreen.kt](file:///C:/repo2/app/src/main/java/com/grimreich/ui/main/HubScreen.kt)
+- Integrate the `WorldPhaseWidget` into the top corner (e.g., Top-Right) of the Hub.
+- Ensure it updates in real-time as the world state changes.
+
+---
+
+### 2. Combat 2.0 (Attribute Integration)
+Make Hero attributes meaningful in battle.
 
 #### [Combat.kt](file:///C:/repo2/app/src/main/java/com/grimreich/core/Combat.kt)
-- Refactor `resolveRound` to reduce length and complexity.
+- **Perception**: Add critical hit chance logic based on `attacker.perception`.
+- **Charisma**: Add morale regeneration or passive party buffs based on `attacker.charisma`.
+- **Piety**: Scale the effectiveness of special skills (MIST, BLOOD, REFLECTION) with `attacker.piety`.
 
-### 2. Gameplay Enhancements
-Deepen existing systems.
+---
 
-#### [MutationSystem.kt](file:///C:/repo2/app/src/main/java/com/grimreich/core/mutations/MutationSystem.kt)
-- Implement mutation tier progression (evolution logic).
+### 3. OtherSide Integration
+Connect expeditions with the world's ontological state.
 
-#### [SaintCatalogue.kt](file:///C:/repo2/app/src/main/java/com/grimreich/core/SaintCatalogue.kt) & UI
-- Integrate Saint blessings with actual game state modifiers (e.g., stability recovery).
+#### [OtherSideSystem.kt](file:///C:/repo2/app/src/main/java/com/grimreich/systems/OtherSideSystem.kt)
+- Implement stability drain during active expeditions.
+- Trigger "Reality Glitches" more frequently while on the Other Side.
 
-### 3. Expanded Unit Tests
-Ensure the new logic is robust.
-
-#### [MutationSystemTest.kt](file:///C:/repo2/app/src/test/java/com/grimreich/core/mutations/MutationSystemTest.kt) [NEW]
-- Test mutation chance based on stability.
-- Test attribute modifier application.
+#### [OntologicalEngine.kt](file:///C:/repo2/app/src/main/java/com/grimreich/core/engine/OntologicalEngine.kt)
+- Add a multiplier for stability shifts when an expedition is active.
 
 ## Verification Plan
 
 ### Automated Tests
-- `./gradlew test` (Verify existing and new tests).
-- `./gradlew detekt` (Verify reduction in lint warnings).
+- `./gradlew test`
+- Update `OntologicalEngineTest.kt` to verify stability drain during expeditions.
+- Add `CombatAttributeTest.kt` to verify Perception and Charisma impact.
 
 ### Manual Verification
-- Launch the app and verify the Temple interaction updates the player's attributes or world stability.
+- Start an expedition and observe the global stability log in the Hub.
+- Check if special skills in combat show different values based on hero Piety.

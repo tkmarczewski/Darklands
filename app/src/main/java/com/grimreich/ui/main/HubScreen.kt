@@ -20,7 +20,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.grimreich.R
+import com.grimreich.core.GameConstants
 import com.grimreich.core.Hero
+import com.grimreich.ui.shared.WorldPhaseWidget
 
 @Composable
 fun HubScreen(
@@ -45,18 +47,44 @@ fun HubScreen(
             alpha = 0.4f
         )
 
-        Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
+        Column(modifier = Modifier.fillMaxSize().padding(GameConstants.UI.PADDING_MEDIUM)) {
             // HEADER: Info Bar
             Row(
-                modifier = Modifier.fillMaxWidth().background(Color(0x80000000)).padding(8.dp),
-                horizontalArrangement = Arrangement.SpaceBetween
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(Color(0x80000000))
+                    .padding(GameConstants.UI.PADDING_SMALL),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(text = state.locationName, color = Color(0xFFE0C080), fontWeight = FontWeight.Bold, fontSize = 12.sp)
-                Text(text = "DZIEŃ ${state.day} | ${state.timeOfDay.uppercase()}", color = Color(0xFFE0C080), fontSize = 12.sp)
-                Text(text = "${state.gold} G", color = Color(0xFFE0C080), fontWeight = FontWeight.Bold, fontSize = 12.sp)
+                Column {
+                    Text(
+                        text = state.locationName.uppercase(),
+                        color = Color(0xFFE0C080),
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 14.sp,
+                        letterSpacing = 1.sp
+                    )
+                    Text(
+                        text = "DZIEŃ ${state.day} | ${state.timeOfDay.uppercase()}",
+                        color = Color.Gray,
+                        fontSize = 10.sp
+                    )
+                }
+
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(
+                        text = "${state.gold} G",
+                        color = Color(0xFFFFD700),
+                        fontWeight = FontWeight.ExtraBold,
+                        fontSize = 16.sp
+                    )
+                    Spacer(modifier = Modifier.width(GameConstants.UI.PADDING_MEDIUM))
+                    WorldPhaseWidget(stability = state.worldStability)
+                }
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(GameConstants.UI.PADDING_MEDIUM))
 
             Row(modifier = Modifier.weight(1f)) {
                 // LEFT: Main Navigation Grid

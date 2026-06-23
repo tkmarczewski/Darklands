@@ -7,7 +7,12 @@ import com.grimreich.systems.QuestEntry
 import com.grimreich.systems.QuestSystem
 import com.grimreich.world.CityCatalogue
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 
 data class ExpeditionUiState(
@@ -42,12 +47,23 @@ class ExpeditionViewModel @Inject constructor(
                 }
             }
             .launchIn(viewModelScope)
+            
+        // When entering expedition screen, mark as active
+        enterExpedition()
+    }
+
+    private fun enterExpedition() {
+        gameRepository.updateState { it.isExpeditionActive = true }
+    }
+
+    fun exitExpedition(onBack: () -> Unit) {
+        gameRepository.updateState { it.isExpeditionActive = false }
+        onBack()
     }
 
     fun startQuestCombat(quest: QuestEntry, onStart: () -> Unit) {
         onStart()
     }
-
 
     fun completeNonCombatQuest(quest: QuestEntry, onComplete: () -> Unit) {
         questSystem.complete(quest.id)
@@ -55,4 +71,10 @@ class ExpeditionViewModel @Inject constructor(
     }
 
     fun questHasCombat(quest: QuestEntry): Boolean = quest.hasCombat
+
+    override fun onCleared() {
+        super.onCleared()
+        // Defensive cleanup if user leaves via other means
+        gameRepository.updateState { it.isExpeditionActive = false }
+    }
 }

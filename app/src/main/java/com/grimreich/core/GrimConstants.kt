@@ -11,6 +11,9 @@ object GrimConstants {
         const val BASE_DODGE_CHANCE = 0.05f
         const val AGILITY_DODGE_MODIFIER = 0.02f
         const val CRITICAL_HIT_MULTIPLIER = 1.5f
+        const val PERCEPTION_CRIT_MODIFIER = 0.015f
+        const val CHARISMA_MORALE_REGEN = 1
+        const val PIETY_SKILL_SCALING = 0.2f
         
         const val STATUS_CHANCE_BASE = 0.1f
         const val STATUS_CHANCE_INT_MOD = 0.03f

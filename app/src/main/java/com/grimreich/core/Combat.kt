@@ -89,6 +89,9 @@ data class CombatantState(
     var agility: Int = 5,
     var intelligence: Int = 5,
     var strength: Int = 5,
+    var perception: Int = 5,
+    var charisma: Int = 5,
+    var piety: Int = 5,
     var activeEffects: MutableList<StatusEffect> = mutableListOf(),
     var wounds: MutableList<WoundType> = mutableListOf()
 )
@@ -175,16 +178,30 @@ class CombatRound @Inject constructor(
         val defenderStatus = moraleSystem.computeStatus(defender.morale)
         val defArmor = defender.armor + attackerEquipped.totalDefense()
 
+        // Critical Hit Logic (Perception based)
+        val critChance = attacker.perception * GrimConstants.Combat.PERCEPTION_CRIT_MODIFIER
+        val isCrit = Random.nextFloat() < critChance
+        val critMod = if (isCrit) GrimConstants.Combat.CRITICAL_HIT_MULTIPLIER else 1.0f
+
         val attackRoll = (rawAtk * attackerStatus.attackModifier() *
-            (0.7f + Random.nextFloat() * 0.6f)).toInt()
+            (0.7f + Random.nextFloat() * 0.6f) * critMod).toInt()
         val defendRoll = (defArmor * defenderStatus.defenseModifier() *
             (0.5f + Random.nextFloat() * 0.5f)).toInt()
 
         val dmg = maxOf(1, attackRoll - defendRoll)
+        if (isCrit) log.add("KRYTYK! ${attacker.name} zadaje potężny cios.")
+        
         defender.hp = (defender.hp - dmg).coerceAtLeast(0)
         defender.endurance = (defender.endurance - dmg / 2).coerceAtLeast(0)
         defender.morale = moraleSystem.moraleAfterHit(defender.morale, dmg)
         log.add("${attacker.name} atakuje ${defender.name}: $dmg obrażeń.")
+
+        // Morale Regen (Charisma based)
+        if (attacker.charisma > 10) {
+            val regen = (attacker.charisma / 10) * GrimConstants.Combat.CHARISMA_MORALE_REGEN
+            attacker.morale = (attacker.morale + regen).coerceAtMost(GrimConstants.Combat.MAX_MORALE)
+            if (regen > 0) log.add("${attacker.name} zagrzewa siebie do walki. (+${regen} Morale)")
+        }
 
         tryApplyStatus(attacker, defender, log)
         return dmg

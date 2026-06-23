@@ -7,7 +7,12 @@ import com.grimreich.core.Hero
 import com.grimreich.systems.QuestSystem
 import com.grimreich.world.CityCatalogue
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 
 data class HubUiState(
@@ -17,7 +22,8 @@ data class HubUiState(
     val gold: Int = 0,
     val activeQuestsCount: Int = 0,
     val expeditionQuestsCount: Int = 0,
-    val party: List<Hero> = emptyList()
+    val party: List<Hero> = emptyList(),
+    val worldStability: Int = 100
 )
 
 @HiltViewModel
@@ -46,7 +52,8 @@ class HubViewModel @Inject constructor(
                         gold = state.gold,
                         activeQuestsCount = active.size,
                         expeditionQuestsCount = expeditionCount,
-                        party = state.party.toList()
+                        party = state.party.toList(),
+                        worldStability = state.world.globalStability
                     )
                 }
             }
