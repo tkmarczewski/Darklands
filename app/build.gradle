@@ -11,11 +11,11 @@ plugins {
 
 android {
     namespace = 'com.grimreich'
-    compileSdk = 34
+    compileSdk = 35
     defaultConfig {
         applicationId = "com.grimreich"
         minSdk = 24
-        targetSdk = 34
+        targetSdk = 35
         versionCode = 1
         versionName = "1.0.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -76,12 +76,12 @@ dependencies {
     implementation "androidx.hilt:hilt-navigation-compose:1.2.0"
 
     // DI
-    implementation "com.google.dagger:hilt-android:2.59.2"
-    ksp "com.google.dagger:hilt-android-compiler:2.59.2"
-    testImplementation "com.google.dagger:hilt-android-testing:2.59.2"
-    androidTestImplementation "com.google.dagger:hilt-android-testing:2.59.2"
-    kspTest "com.google.dagger:hilt-android-compiler:2.59.2"
-    kspAndroidTest "com.google.dagger:hilt-android-compiler:2.59.2"
+    implementation "com.google.dagger:hilt-android:2.51.1"
+    ksp "com.google.dagger:hilt-android-compiler:2.51.1"
+    testImplementation "com.google.dagger:hilt-android-testing:2.51.1"
+    androidTestImplementation "com.google.dagger:hilt-android-testing:2.51.1"
+    kspTest "com.google.dagger:hilt-android-compiler:2.51.1"
+    kspAndroidTest "com.google.dagger:hilt-android-compiler:2.51.1"
     
     // SERIALIZATION
     implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3"
