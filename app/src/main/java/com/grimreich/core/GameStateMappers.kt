@@ -26,6 +26,7 @@ fun GameState.toDto(): SessionStateDto = SessionStateDto(
     prayer = prayer.toDto(),
     world = world.toDto(),
     combat = combat.toDto(),
+    isExpeditionActive = isExpeditionActive,
     lastSaveTimestamp = lastSaveTimestamp
 )
 
@@ -51,6 +52,7 @@ fun SessionStateDto.toDomain(): GameState = GameState(
     prayer = prayer.toDomain(),
     world = world.toDomain(),
     combat = combat.toDomain(),
+    isExpeditionActive = isExpeditionActive,
     lastSaveTimestamp = lastSaveTimestamp
 )
 

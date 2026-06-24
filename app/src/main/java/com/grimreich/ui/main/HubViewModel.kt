@@ -1,10 +1,12 @@
 package com.grimreich.ui.main
 
+import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.grimreich.core.GameRepository
 import com.grimreich.core.Hero
 import com.grimreich.systems.QuestSystem
+import com.grimreich.systems.VisualContentSystem
 import com.grimreich.world.CityCatalogue
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -23,14 +25,18 @@ data class HubUiState(
     val activeQuestsCount: Int = 0,
     val expeditionQuestsCount: Int = 0,
     val party: List<Hero> = emptyList(),
-    val worldStability: Int = 100
+    val worldStability: Int = 100,
+    val hubBackground: String = "bg_party_castle",
+    val hubTintColor: Color = Color.Transparent,
+    val atmosphericMessage: String = ""
 )
 
 @HiltViewModel
 class HubViewModel @Inject constructor(
     private val gameRepository: GameRepository,
     private val questSystem: QuestSystem,
-    private val cityCatalogue: CityCatalogue
+    private val cityCatalogue: CityCatalogue,
+    private val visualContentSystem: VisualContentSystem
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(HubUiState())
@@ -43,6 +49,7 @@ class HubViewModel @Inject constructor(
                 val city = cityCatalogue.get(currentCityId)
                 val active = state.quest.activeQuests.mapNotNull { questSystem.getQuest(it) }
                 val expeditionCount = active.count { it.cityId == currentCityId && it.isOutsideCity }
+                val stability = state.world.globalStability
 
                 _uiState.update { 
                     it.copy(
@@ -53,7 +60,10 @@ class HubViewModel @Inject constructor(
                         activeQuestsCount = active.size,
                         expeditionQuestsCount = expeditionCount,
                         party = state.party.toList(),
-                        worldStability = state.world.globalStability
+                        worldStability = stability,
+                        hubBackground = visualContentSystem.getHubBackground(currentCityId, stability),
+                        hubTintColor = visualContentSystem.getHubTintColor(stability),
+                        atmosphericMessage = visualContentSystem.getAtmosphericMessage(stability)
                     )
                 }
             }

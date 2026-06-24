@@ -13,6 +13,7 @@ class ExperienceSystem @Inject constructor(
         hero.xp += amount
         val leveledUp = if (hero.xp >= hero.level * 100) {
             hero.level++
+            hero.attributePoints += 2 // Grant 2 points per level
             hero.xp = 0
             true
         } else false

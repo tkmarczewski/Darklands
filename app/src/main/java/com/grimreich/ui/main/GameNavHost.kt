@@ -186,6 +186,7 @@ fun GameNavHost(
             hero?.let {
                 CharDetailScreen(
                     hero = it,
+                    onUpgrade = { stat -> root.upgradeStat(it.id, stat) },
                     onBack = { root.setMode(GameScreenMode.HUB) }
                 )
             } ?: run {

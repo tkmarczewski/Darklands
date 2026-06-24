@@ -1,34 +1,28 @@
-# Raport z Audytu Projektu GrimReich - Czerwiec 2026
+# Kompletny Audyt EMU Projektu GrimReich - Czerwiec 2026
 
-## 1. Status Ogólny
-Projekt przeszedł znaczącą modernizację (wersja 2.0). Architektura opiera się na Jetpack Compose z Single Activity (`MainActivity`). Systemy gry są zmodularyzowane w `com.grimreich.systems`, a stan zarządzany przez `GameRepository`.
+## 1. Warstwa Inżynieryjna (Engineering - E)
+- **Zarządzanie Budowaniem**: Gradle zmodernizowany do 9.6.0, AGP 8.8.2, Kotlin 2.0.21. Usunięto nieaktualne właściwości w `gradle.properties`.
+- **Persystencja**: Naprawiono krytyczny błąd desynchronizacji stanu. Flaga `isExpeditionActive` oraz nowe pola zostały dodane do `SessionStateDto` i `GameStateMappers.kt`.
+- **Dług Techniczny**: Scentralizowano stałe UI w `GameConstants.UI`. Wyeliminowano wildcard importy w Hubie, Świątyni i Mieście.
 
-## 2. Co działa (Kluczowe funkcjonalności)
-- **CI/CD**: Potok GitHub Actions jest skonfigurowany i działa (testy, linter, build APK).
-- **Testy Jednostkowe**: Podstawowe UTS dla logiki pór roku i silnika ontologicznego.
-- **Nawigacja**: Pełny `GameNavHost` obsługujący ekrany: Menu, Kreator, Hub, Miasto, Walka, Dziennik, Ekwipunek.
-- **Systemy Core**: Silnik ontologiczny, system mutacji, zarządzanie drużyną i zasobami (złoto, HP).
-- **Zapisy**: `StatePersistenceManager` z obsługą serializacji do JSON.
+## 2. Warstwa Mechanik (Mechanics - M)
+- **System Rozwoju Postaci**: Zaimplementowano logikę awansu. XP teraz generuje `attributePoints`, które gracz może wydać w ekranie szczegółów postaci na ulepszanie statystyk (SIŁ, ZRC, itd.).
+- **Walka 2.0**: Statystyki mają realny wpływ na starcia:
+    - **Percepcja**: Szansa na trafienia krytyczne.
+    - **Charyzma**: Regeneracja morale w trakcie walki.
+    - **Pobożność**: Skalowanie siły skilli specjalnych (Mgła, Krew).
+- **Stabilność Świata**: Zintegrowano OtherSide z systemem drenażu stabilności. Dodano mechanikę ofiar w świątyni (Gold -> Stability).
+- **Ewolucja Mutacji**: Mutacje mogą ewoluować na wyższe poziomy (Dormant -> Transcendent).
 
-## 3. Zidentyfikowane Braki (Co nie działa / Czego brakuje)
+## 3. Doświadczenie Użytkownika (User Experience - U)
+- **Responsywność Świata**: Hub reaguje wizualnie na stan stabilności (dynamiczne tinty, zmiany tła przy krytycznie niskiej stabilności).
+- **Świadomość Ery**: Dodano `WorldPhaseWidget` w Hubie, informujący o aktualnej erze świata (np. Era Pęknięcia).
+- **Interfejs Awansu**: Dodano przyciski "+" w ekranie postaci, widoczne tylko gdy dostępne są punkty atrybutów.
 
-### A. Braki w Logice Gry (Gameplay Gaps)
-1. **Ewolucja Mutacji**: Mamy `MutationRegistry`, ale system nie obsługuje "Tiers" (Dormant -> Manifested). Mutacje są nadawane, ale brak mechaniki ich pogłębiania.
-2. **System Eksedycji (OtherSide)**: Ekran `ExpeditionScreen` istnieje, ale integracja z `GrimWorldEngine` i systemem warstw rzeczywistości jest szczątkowa.
-3. **Zbalansowanie Walki**: Walka jest bardzo uproszczona. Brak wpływu statystyk (np. `Perception`, `Charisma`) na przebieg starcia poza podstawowym atakiem.
-4. **Interakcje w Mieście**: Ekran świątyni (`SaintsScreen`) i rynku (`MarketScreen`) są obecne, ale brakuje w nich głębi interakcji (np. ofiary dla świętych wpływające na stabilność świata).
-
-### B. Braki Techniczne (Technical Debt)
-1. **Złożoność Metod (Detekt)**: Linter zgłasza błędy w `Combat.kt`, `GrimBuilders.kt`, `DialogueManager.kt` (zbyt długie funkcje, za dużo parametrów).
-2. **Wildcard Imports**: Wiele plików UI używa `import .*`, co jest niezgodne ze stylem projektu.
-3. **Magic Numbers**: W plikach UI i generatorach (np. `HeroPool.kt`) twardo wpisane wartości liczbowe zamiast stałych.
-4. **Brak UTS dla Systemów**: Brak testów dla `MutationSystem`, `InventorySystem` oraz `QuestSystem`.
-
-## 4. Rekomendacje (Kolejne Kroki)
-- [ ] **Refaktoryzacja `Combat.kt`**: Rozbicie `resolveRound` na mniejsze funkcje.
-- [ ] **Rozbudowa UTS**: Dodanie testów dla `MutationSystem` (weryfikacja szans na mutację).
-- [ ] **Naprawa stałych**: Przeniesienie magicznych liczb do `GameConstants.kt`.
-- [ ] **Integracja Świątyni**: Połączenie systemu `SaintCatalogue` z UI, aby modlitwy miały realny wpływ na stan gry.
+## 4. Pozostałe Gaps (Do zrobienia)
+- **System Przedmiotów w Walce**: Brak slotów na mikstury w `CombatScreen`.
+- **Zdarzenia Losowe**: `EncounterSystem` wymaga rozbudowy o zdarzenia tekstowe podczas podróży.
+- **Dźwięk**: Całkowity brak warstwy audio.
 
 ---
-*GrimReich: Fundamenty są solidne, czas na szlifowanie mechanik.*
+*GrimReich: System jest spójny, mechaniki są połączone. Świat reaguje na gracza.*

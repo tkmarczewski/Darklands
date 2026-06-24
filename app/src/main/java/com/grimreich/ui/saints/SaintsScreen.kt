@@ -35,7 +35,7 @@ fun SaintsScreen(viewModel: SaintsViewModel, onExit: () -> Unit) {
         modifier = Modifier
             .fillMaxSize()
             .background(Color(0xFF1A1A2E))
-            .padding(16.dp)
+            .padding(GameConstants.UI.PADDING_MEDIUM)
     ) {
         // HEADER
         Row(
@@ -58,18 +58,18 @@ fun SaintsScreen(viewModel: SaintsViewModel, onExit: () -> Unit) {
             }
         }
 
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(GameConstants.UI.PADDING_LARGE))
 
         Row(modifier = Modifier.fillMaxSize()) {
             // LEFT: Status and Actions
             Column(modifier = Modifier.weight(1f)) {
                 Surface(
                     color = Color(0x40000000),
-                    modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp)
+                    modifier = Modifier.fillMaxWidth().padding(bottom = GameConstants.UI.PADDING_MEDIUM)
                 ) {
-                    Column(modifier = Modifier.padding(12.dp)) {
+                    Column(modifier = Modifier.padding(GameConstants.UI.PADDING_SMALL)) {
                         Text("TWOJA DRUŻYNA", color = Color.Gray, fontSize = 10.sp, fontWeight = FontWeight.Bold)
-                        Spacer(modifier = Modifier.height(8.dp))
+                        Spacer(modifier = Modifier.height(GameConstants.UI.PADDING_SMALL))
                         Text(text = state.partyStatus, color = Color(0xFFC8A96E), fontSize = 12.sp, fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace)
                     }
                 }
@@ -83,7 +83,7 @@ fun SaintsScreen(viewModel: SaintsViewModel, onExit: () -> Unit) {
                     Text("MÓDL SIĘ", color = Color(0xFFE0C080), fontWeight = FontWeight.Bold)
                 }
 
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(GameConstants.UI.PADDING_SMALL))
 
                 Button(
                     onClick = { viewModel.makeOffering(GameConstants.CHURCH_OFFERING_COST) },
@@ -94,7 +94,7 @@ fun SaintsScreen(viewModel: SaintsViewModel, onExit: () -> Unit) {
                     Text("ZŁÓŻ OFIARĘ (${GameConstants.CHURCH_OFFERING_COST} zł)", color = Color(0xFFE0C080), fontWeight = FontWeight.Bold)
                 }
                 
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(GameConstants.UI.PADDING_SMALL))
                 
                 Button(
                     onClick = { viewModel.cleanse() },
@@ -116,7 +116,7 @@ fun SaintsScreen(viewModel: SaintsViewModel, onExit: () -> Unit) {
                 }
             }
 
-            Spacer(modifier = Modifier.width(16.dp))
+            Spacer(modifier = Modifier.width(GameConstants.UI.PADDING_MEDIUM))
 
             // RIGHT: Saints Catalog and Log
             Column(modifier = Modifier.weight(1.2f)) {
@@ -124,16 +124,16 @@ fun SaintsScreen(viewModel: SaintsViewModel, onExit: () -> Unit) {
                     color = Color(0x20FFFFFF),
                     modifier = Modifier.fillMaxWidth().weight(1f)
                 ) {
-                    LazyColumn(modifier = Modifier.padding(12.dp)) {
+                    LazyColumn(modifier = Modifier.padding(GameConstants.UI.PADDING_SMALL)) {
                         item {
                             Text("KATALOG ŚWIĘTYCH", color = Color.Gray, fontSize = 10.sp, fontWeight = FontWeight.Bold)
-                            Spacer(modifier = Modifier.height(8.dp))
+                            Spacer(modifier = Modifier.height(GameConstants.UI.PADDING_SMALL))
                             Text(text = state.saintsText, color = Color(0xFFC8A96E), fontSize = 12.sp)
                         }
                     }
                 }
                 
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(GameConstants.UI.PADDING_SMALL))
                 
                 Surface(
                     color = Color(0x60000000),

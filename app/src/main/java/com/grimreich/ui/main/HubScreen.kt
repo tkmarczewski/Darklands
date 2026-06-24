@@ -3,10 +3,26 @@ package com.grimreich.ui.main
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -19,7 +35,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.grimreich.R
 import com.grimreich.core.GameConstants
 import com.grimreich.core.Hero
 import com.grimreich.ui.shared.WorldPhaseWidget
@@ -39,13 +54,21 @@ fun HubScreen(
 
     Box(modifier = Modifier.fillMaxSize().background(Color.Black)) {
         // BACKGROUND
-        Image(
-            painter = painterResource(id = R.drawable.bg_party_castle),
-            contentDescription = null,
-            modifier = Modifier.fillMaxSize(),
-            contentScale = ContentScale.Crop,
-            alpha = 0.4f
-        )
+        val context = LocalContext.current
+        val bgResId = context.resources.getIdentifier(state.hubBackground, "drawable", context.packageName)
+        
+        if (bgResId != 0) {
+            Image(
+                painter = painterResource(id = bgResId),
+                contentDescription = null,
+                modifier = Modifier.fillMaxSize(),
+                contentScale = ContentScale.Crop,
+                alpha = 0.4f
+            )
+        }
+        
+        // Dynamic Tint based on World Stability
+        Box(modifier = Modifier.fillMaxSize().background(state.hubTintColor))
 
         Column(modifier = Modifier.fillMaxSize().padding(GameConstants.UI.PADDING_MEDIUM)) {
             // HEADER: Info Bar
@@ -88,13 +111,22 @@ fun HubScreen(
 
             Row(modifier = Modifier.weight(1f)) {
                 // LEFT: Main Navigation Grid
-                Column(modifier = Modifier.weight(1.5f), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                Column(
+                    modifier = Modifier.weight(1.5f), 
+                    verticalArrangement = Arrangement.spacedBy(GameConstants.UI.PADDING_SMALL)
+                ) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(), 
+                        horizontalArrangement = Arrangement.spacedBy(GameConstants.UI.PADDING_SMALL)
+                    ) {
                         HubNavButton("MIASTO", modifier = Modifier.weight(1f), onClick = onCity)
                         HubNavButton("MAPA", modifier = Modifier.weight(1f), onClick = onMap)
                         HubNavButton("PLECAK", modifier = Modifier.weight(1f), onClick = onInventory)
                     }
-                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(), 
+                        horizontalArrangement = Arrangement.spacedBy(GameConstants.UI.PADDING_SMALL)
+                    ) {
                         HubNavButton("ZADANIA", modifier = Modifier.weight(1f), onClick = onQuests)
                         HubNavButton("DRUŻYNA", modifier = Modifier.weight(1f), color = Color(0xFF4A0000), onClick = { 
                             state.party.firstOrNull()?.id?.let { onCharacter(it) }
@@ -102,7 +134,10 @@ fun HubScreen(
                         HubNavButton("KRONIKA", modifier = Modifier.weight(1f), onClick = onWorldLog)
                     }
 
-                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(), 
+                        horizontalArrangement = Arrangement.spacedBy(GameConstants.UI.PADDING_SMALL)
+                    ) {
                         val expeditionCount = state.expeditionQuestsCount
                         HubNavButton(
                             text = if (expeditionCount > 0) "EKSPEDYCJA ($expeditionCount)" else "BRAK WYPRAW",
@@ -113,7 +148,7 @@ fun HubScreen(
                         )
                     }
 
-                    Spacer(modifier = Modifier.height(16.dp))
+                    Spacer(modifier = Modifier.height(GameConstants.UI.PADDING_MEDIUM))
 
                     // WORLD STATUS LOG MINI
                     Surface(
@@ -121,37 +156,41 @@ fun HubScreen(
                         shape = MaterialTheme.shapes.extraSmall,
                         modifier = Modifier.fillMaxWidth().weight(1f)
                     ) {
-                        Column(modifier = Modifier.padding(12.dp)) {
+                        Column(modifier = Modifier.padding(GameConstants.UI.PADDING_SMALL)) {
                             Text("STATUS ŚWIATA", color = Color.Gray, fontSize = 10.sp, fontWeight = FontWeight.Bold)
-                            Spacer(modifier = Modifier.height(8.dp))
-                            Text("Rzeczywistość w ${state.locationName} pozostaje stabilna.", color = Color.DarkGray, fontSize = 12.sp)
+                            Spacer(modifier = Modifier.height(GameConstants.UI.PADDING_SMALL))
+                            Text(
+                                text = state.atmosphericMessage,
+                                color = if (state.worldStability < 40) Color(0xFFB22222) else Color.LightGray,
+                                fontSize = 12.sp
+                            )
                         }
                     }
                 }
 
-                Spacer(modifier = Modifier.width(16.dp))
+                Spacer(modifier = Modifier.width(GameConstants.UI.PADDING_MEDIUM))
 
                 // RIGHT: World Log Summary
                 Surface(
                     color = Color(0x10FFFFFF),
                     modifier = Modifier.weight(1f).fillMaxHeight()
                 ) {
-                    Column(modifier = Modifier.padding(12.dp)) {
+                    Column(modifier = Modifier.padding(GameConstants.UI.PADDING_SMALL)) {
                         Text("OSTATNIE WIEŚCI:", color = Color.Gray, fontSize = 10.sp)
-                        Spacer(modifier = Modifier.height(8.dp))
+                        Spacer(modifier = Modifier.height(GameConstants.UI.PADDING_SMALL))
                         Text("Mieszkańcy szepczą o powrocie Proroka Aeliona...", color = Color.LightGray, fontSize = 11.sp)
                     }
                 }
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(GameConstants.UI.PADDING_MEDIUM))
 
             // BOTTOM: Party Strip
-            Text("TWOJA DRUŻYNA (kliknij by podejrzeć)", color = Color.Gray, fontSize = 10.sp, fontWeight = FontWeight.Bold)
+            Text("TWOJA DRUŻYNA", color = Color.Gray, fontSize = 10.sp, fontWeight = FontWeight.Bold)
             Spacer(modifier = Modifier.height(4.dp))
             LazyRow(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                horizontalArrangement = Arrangement.spacedBy(GameConstants.UI.PADDING_SMALL)
             ) {
                 items(state.party) { hero ->
                     PartyMemberCard(hero) { onCharacter(hero.id) }
@@ -166,10 +205,10 @@ fun HubNavButton(text: String, modifier: Modifier = Modifier, color: Color = Col
     Button(
         onClick = onClick,
         enabled = enabled,
-        modifier = modifier.height(60.dp),
+        modifier = modifier.height(GameConstants.UI.BUTTON_HEIGHT_DEFAULT + 10.dp),
         colors = ButtonDefaults.buttonColors(containerColor = color, disabledContainerColor = Color(0xFF0F0F0F)),
         shape = MaterialTheme.shapes.extraSmall,
-        border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFF333333))
+        border = androidx.compose.foundation.BorderStroke(GameConstants.UI.BORDER_WIDTH, Color(0xFF333333))
     ) {
         Text(text = text, color = if (enabled) Color(0xFFE0C080) else Color.DarkGray, fontSize = 12.sp, fontWeight = FontWeight.Bold)
     }
@@ -181,9 +220,9 @@ fun PartyMemberCard(hero: Hero, onClick: () -> Unit) {
         modifier = Modifier.width(140.dp).clickable { onClick() },
         color = Color(0xFF151515),
         shape = MaterialTheme.shapes.extraSmall,
-        border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFF444444))
+        border = androidx.compose.foundation.BorderStroke(GameConstants.UI.BORDER_WIDTH, Color(0xFF444444))
     ) {
-        Column(modifier = Modifier.padding(10.dp)) {
+        Column(modifier = Modifier.padding(GameConstants.UI.PADDING_SMALL)) {
             Text(text = hero.name, color = Color(0xFFE0C080), fontWeight = FontWeight.Bold, fontSize = 13.sp)
             LinearProgressIndicator(
             progress = { if (hero.maxHp > 0) hero.hp.toFloat() / hero.maxHp else 0f },

@@ -31,6 +31,7 @@ data class SessionStateDto(
     val prayer: PrayerStateDto = PrayerStateDto(),
     val world: WorldStateDto = WorldStateDto(),
     val combat: CombatStateDto = CombatStateDto(),
+    val isExpeditionActive: Boolean = false,
     val lastSaveTimestamp: Long = 0
 )
 

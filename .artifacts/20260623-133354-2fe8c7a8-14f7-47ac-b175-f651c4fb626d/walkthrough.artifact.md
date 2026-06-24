@@ -1,29 +1,30 @@
-# Project Refactoring and Gameplay Polish Walkthrough
+# Modernization and EMU Audit Fixes Walkthrough
 
-Zakończyłem audyt oraz wdrożyłem poprawki długu technicznego i nowe mechaniki gameplayu zgodnie z planem.
+Zakończyłem proces modernizacji Gradle oraz wdrożyłem poprawki wynikające z audytu EMU (Engineering, Mechanics, UX).
 
 ## Co zostało zrobione
 
-### 1. Refaktoryzacja Systemu Walki
-- **[Combat.kt](file:///C:/repo2/app/src/main/java/com/grimreich/core/Combat.kt)**: Rozbiłem gigantyczną funkcję `resolveRound` na mniejsze, czytelne metody: `resolveAttack`, `resolveCounterAttack`, `applyWound`, `applyStatusTick`. Zmniejszyło to złożoność cyklomatyczną raportowaną przez linter.
+### 1. Modernizacja Gradle (Engineering)
+- Zaktualizowano Gradle do wersji **9.6.0** i AGP do **8.8.2**.
+- Skonfigurowano Kotlin **2.0.21** z wtyczką `compose-compiler`.
+- Wyczyściłem `gradle.properties` z przestarzałych ustawień, eliminując warningi builda.
 
-### 2. Rozbudowa Systemu Mutacji
-- **[MutationSystem.kt](file:///C:/repo2/app/src/main/java/com/grimreich/core/mutations/MutationSystem.kt)**: Dodałem mechanikę **ewolucji mutacji**. Mutacje mogą teraz przechodzić między poziomami (Dormant -> Manifested -> Dominant -> Transcendent), dając dodatkowe bonusy do atrybutów.
-- **[MutationSystemTest.kt](file:///C:/repo2/app/src/test/java/com/grimreich/core/mutations/MutationSystemTest.kt)**: Dodałem testy jednostkowe weryfikujące szanse na mutację przy niskiej stabilności świata oraz poprawność nakładania modyfikatorów.
+### 2. Pełny System Rozwoju (Mechanics)
+- **Logika Awansu**: `ExperienceSystem` teraz poprawnie przyznaje punkty atrybutów po zdobyciu XP.
+- **Interfejs Level-up**: W ekranie szczegółów postaci (`CharDetailScreen`) dodałem możliwość wydawania punktów na ulepszanie statystyk (Siła, Zręczność, itd.).
 
-### 3. Integracja Świątyni (Saint Blessings)
-- **[ChurchSystem.kt](file:///C:/repo2/app/src/main/java/com/grimreich/systems/ChurchSystem.kt)**: Dodałem funkcję `makeOffering`, która pozwala graczowi składać ofiary ze złota w zamian za **odzyskanie stabilności świata**.
-- **[SaintsScreen.kt](file:///C:/repo2/app/src/main/java/com/grimreich/ui/saints/SaintsScreen.kt)**: Dodałem przycisk "ZŁÓŻ OFIARĘ" w UI świątyni, połączony z nową logiką.
+### 3. Dynamiczna Atmosfera i Reaktywność (UX)
+- **Responsywny Hub**: Tło i kolorystyka Hub'a zmieniają się teraz dynamicznie w zależności od stabilności świata. Przy niskiej stabilności świat "krwawi" (czerwony tint) i zmienia tło na mroczniejsze.
+- **Wiadomości Atmosferyczne**: Dodano system opisowy informujący o stanie granic rzeczywistości.
 
-### 4. Czyszczenie Kodu (Technical Debt)
-- **UI Cleanup**: W plikach `RecruitmentScreen.kt`, `CityScreen.kt`, `SaintsScreen.kt` i `CombatScreen.kt` usunąłem wildcard importy (`.*`) oraz zastąpiłem magiczne liczby stałymi z `GameConstants.kt`.
-- **Zależności**: Zaktualizowałem `build.gradle`, aby poprawnie obsługiwał Mockito w testach.
+### 4. Naprawa Persystencji (Engineering)
+- Zsynchronizowano `SessionStateDto` i `GameStateMappers`. Od teraz stan ekspedycji i nowe parametry świata są poprawnie zapisywane i wczytywane.
 
-## Podsumowanie Weryfikacji
+## Podsumowanie Audytu EMU
 
-Wszystkie zmiany zostały zweryfikowane lokalnie:
-- `./gradlew test`: **Pass** (Wszystkie 7 testów, w tym nowe testy mutacji, zakończone sukcesem).
-- `./gradlew assembleDebug`: **Pass** (Aplikacja buduje się poprawnie).
-- `./gradlew detekt`: **Pass** (Liczba ostrzeżeń w zmodyfikowanych plikach spadła znacząco).
+Projekt osiągnął wysoką spójność między warstwami:
+- **E**: Czysty build, stabilna persystencja.
+- **M**: Statystyki wpływają na walkę, XP przekłada się na realne wzmocnienie.
+- **U**: Świat reaguje na działania gracza (ekspedycje -> drenaż stabilności -> zmiana wizualna).
 
-Projekt jest teraz czystszy technicznie i bogatszy o kluczowe mechaniki progresji.
+Zmiany są gotowe do dalszego testowania w locie.
