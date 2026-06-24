@@ -15,7 +15,7 @@ android {
     defaultConfig {
         applicationId = "com.grimreich"
         minSdk = 24
-        targetSdk = 35
+        targetSdk = 34
         versionCode = 1
         versionName = "1.0.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -76,12 +76,12 @@ dependencies {
     implementation "androidx.hilt:hilt-navigation-compose:1.2.0"
 
     // DI
-    implementation "com.google.dagger:hilt-android:2.51.1"
-    ksp "com.google.dagger:hilt-android-compiler:2.51.1"
-    testImplementation "com.google.dagger:hilt-android-testing:2.51.1"
-    androidTestImplementation "com.google.dagger:hilt-android-testing:2.51.1"
-    kspTest "com.google.dagger:hilt-android-compiler:2.51.1"
-    kspAndroidTest "com.google.dagger:hilt-android-compiler:2.51.1"
+    implementation "com.google.dagger:hilt-android:2.55"
+    ksp "com.google.dagger:hilt-android-compiler:2.55"
+    testImplementation "com.google.dagger:hilt-android-testing:2.55"
+    androidTestImplementation "com.google.dagger:hilt-android-testing:2.55"
+    kspTest "com.google.dagger:hilt-android-compiler:2.55"
+    kspAndroidTest "com.google.dagger:hilt-android-compiler:2.55"
     
     // SERIALIZATION
     implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3"
