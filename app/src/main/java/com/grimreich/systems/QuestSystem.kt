@@ -21,7 +21,11 @@ data class QuestEntry(
     val isOutsideCity: Boolean = false,
     val nextQuestId: String? = null, // For chains
     val hasCombat: Boolean = false, // true if quest involves a battle
-    val category: String = "Normal"
+    val category: String = "Normal",
+    val nextLocationHint: String? = null,
+    val nextNpcHint: String? = null,
+    val factionRewardId: String? = null,
+    val factionRewardAmount: Int = 0
 )
 
 @Singleton
@@ -71,12 +75,26 @@ class QuestSystem @Inject constructor(
             }
             state.gold += quest.rewardGold
             
+            // Faction Rewards
+            quest.factionRewardId?.let { factionId ->
+                val current = state.reputation.globalFactions[factionId] ?: 0
+                state.reputation.globalFactions[factionId] = current + quest.factionRewardAmount
+                gameRepository.log("Zyskałeś reputację u: $factionId (+${quest.factionRewardAmount})")
+                
+                // Handle Rivalries (Simple logic: if helping Dawn, Inquisition dislikes it slightly)
+                handleRivalries(state, factionId, quest.factionRewardAmount)
+            }
+
             // Handle chains: activate next quest
             quest.nextQuestId?.let { nextId ->
                 if (!state.quest.activeQuests.contains(nextId) && !state.quest.completedQuests.contains(nextId)) {
                     state.quest.activeQuests.add(nextId)
                     allQuests[nextId]?.status = QuestStatus.AKTYWNE
-                    gameRepository.log("Nowy etap zadania: ${allQuests[nextId]?.title}")
+                    val nextQuest = allQuests[nextId]
+                    val hint = if (nextQuest?.nextLocationHint != null) {
+                        " Udaj się do: ${nextQuest.nextLocationHint} (NPC: ${nextQuest.nextNpcHint})"
+                    } else ""
+                    gameRepository.log("Nowy etap zadania: ${nextQuest?.title}.$hint")
                 }
             }
         }
@@ -93,6 +111,23 @@ class QuestSystem @Inject constructor(
 
     fun clear() {
         allQuests.clear()
+    }
+
+    private fun handleRivalries(state: com.grimreich.core.GameState, factionId: String, amount: Int) {
+        val rivals = when (factionId.lowercase()) {
+            "zakon", "dawn" -> listOf("inkwizycja")
+            "inkwizycja", "inquisition" -> listOf("zakon")
+            "pustka", "void" -> listOf("zakon", "inkwizycja")
+            else -> emptyList()
+        }
+        
+        rivals.forEach { rivalId ->
+            val current = state.reputation.globalFactions[rivalId] ?: 0
+            state.reputation.globalFactions[rivalId] = current - (amount / 2)
+            if (amount >= 10) {
+                 gameRepository.log("Twoje działania nie spodobały się frakcji: $rivalId")
+            }
+        }
     }
 
     fun seedIntegratedContent() {
@@ -126,6 +161,14 @@ class QuestSystem @Inject constructor(
                         "Drama" -> "zealot"
                         else -> "mystic"
                     },
+                    factionRewardId = when (template.category) {
+                        "Intrigue" -> "pustka"
+                        "Anomaly" -> "milczenie"
+                        "Beast" -> "inkwizycja"
+                        "Drama" -> "zakon"
+                        else -> null
+                    },
+                    factionRewardAmount = 15,
                     isOutsideCity = (template.category == "Anomaly" || template.category == "Beast"),
                     hasCombat = template.enemyStats != null,
                     category = template.category
@@ -148,7 +191,11 @@ class QuestSystem @Inject constructor(
                     hasCombat = template.enemyStats != null,
                     isOutsideCity = true,
                     category = "Chain",
-                    nextQuestId = if (i < QuestRegistry.bloodChain.stages.size - 1) QuestRegistry.bloodChain.stages[i+1].id else null
+                    factionRewardId = "zakon",
+                    factionRewardAmount = 10,
+                    nextQuestId = if (i < QuestRegistry.bloodChain.stages.size - 1) QuestRegistry.bloodChain.stages[i+1].id else null,
+                    nextLocationHint = if (i < QuestRegistry.bloodChain.stages.size - 1) "Wybrzeże Północne" else null,
+                    nextNpcHint = if (i < QuestRegistry.bloodChain.stages.size - 1) "Mistyk" else null
                 )
             )
         }
@@ -167,7 +214,11 @@ class QuestSystem @Inject constructor(
                     hasCombat = template.enemyStats != null,
                     isOutsideCity = (template.id != "q_verdict_1"),
                     category = "Verdict",
-                    nextQuestId = if (i < QuestRegistry.verdictChain.stages.size - 1) QuestRegistry.verdictChain.stages[i+1].id else null
+                    factionRewardId = "inkwizycja",
+                    factionRewardAmount = 12,
+                    nextQuestId = if (i < QuestRegistry.verdictChain.stages.size - 1) QuestRegistry.verdictChain.stages[i+1].id else null,
+                    nextLocationHint = if (i < QuestRegistry.verdictChain.stages.size - 1) "Twierdza Zakonu" else null,
+                    nextNpcHint = if (i < QuestRegistry.verdictChain.stages.size - 1) "Strażnik" else null
                 )
             )
         }

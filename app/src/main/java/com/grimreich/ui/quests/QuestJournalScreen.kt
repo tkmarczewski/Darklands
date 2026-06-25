@@ -165,7 +165,12 @@ private fun QuestCard(
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                     val objectiveText = if (isAchieved) "ZADANIE WYKONANE. WRÓĆ DO ZLECENIODAWCY." else "CEL: ${quest.objective}"
                     Text(text = objectiveText, color = if (isAchieved) Color.Green else if (isCompleted) Color.Gray else Color(0xFFADFF2F), fontSize = 10.sp)
-                    Text(text = "LOKACJA: ${quest.cityId.uppercase().replace("_", " ")}", color = Color.Gray, fontSize = 9.sp)
+                    
+                    if (quest.factionRewardId != null) {
+                        Text(text = "+${quest.factionRewardAmount} REP: ${quest.factionRewardId.uppercase()}", color = Color(0xFFC0A060), fontSize = 9.sp)
+                    } else {
+                        Text(text = "LOKACJA: ${quest.cityId.uppercase().replace("_", " ")}", color = Color.Gray, fontSize = 9.sp)
+                    }
                 }
             }
         }

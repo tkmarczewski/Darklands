@@ -4,6 +4,7 @@ import com.grimreich.core.GameRepository
 import com.grimreich.core.GameConstants
 import com.grimreich.grimreich.v1.DialogueChoice
 import com.grimreich.grimreich.v1.DialogueNode
+import com.grimreich.grimreich.v1.ReputationLevel
 import dagger.Lazy
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -29,7 +30,33 @@ class DialogueManager @Inject constructor(
     }
 
     fun getNode(id: String): DialogueNode? {
-        val baseNode = nodes[id] ?: return null
+        val gameState = gameRepositoryProvider.get().currentState()
+        
+        // Handle Faction-Specific Start Nodes
+        var targetId = id
+        if (id.endsWith("_start")) {
+            val baseRole = id.removeSuffix("_start")
+            val factionId = when (baseRole) {
+                "guard" -> "inkwizycja"
+                "merchant" -> "pustka"
+                "zealot" -> "zakon"
+                "mystic" -> "milczenie"
+                else -> null
+            }
+            
+            if (factionId != null) {
+                val score = gameState.reputation.globalFactions[factionId] ?: 0
+                val level = ReputationLevel.fromScore(score)
+                when (level) {
+                    ReputationLevel.HATED -> targetId = "${baseRole}_hated"
+                    ReputationLevel.HOSTILE -> targetId = "${baseRole}_hostile"
+                    ReputationLevel.EXALTED -> targetId = "${baseRole}_exalted"
+                    else -> {} // Use normal start
+                }
+            }
+        }
+
+        val baseNode = nodes[targetId] ?: nodes[id] ?: return null
         activeDialogueId = id
         return applyWorldEffects(baseNode)
     }
@@ -108,45 +135,57 @@ class DialogueManager @Inject constructor(
         // 1. GUARD
         registerNode(DialogueNode(
             id = "guard_start", npcId = "guard",
-            text = "Stoj! Mgla gescieje, a prawo musi byc przestrzegane. Czego szukasz w cieniu murow?",
+            text = "Stój! Mgła gęstnieje, a prawo musi być przestrzegane. Czego szukasz w cieniu murów?",
             choices = listOf(
-                DialogueChoice("Szukam pracy (ZADANIA).", "guard_work"),
-                DialogueChoice("Czy cos niepokojocego dzialo sie ostatnio? (MISJA)", "guard_quest_check"),
-                DialogueChoice("[Charisma 12] Przekonaj go, ze jestes wyslannikiem Zakonu.", "guard_convince", requiredAttributes = mapOf("charisma" to 12)),
-                DialogueChoice("[Strength 15] Zaimponuj mu swoja postura.", "guard_impress", requiredAttributes = mapOf("strength" to 15)),
-                DialogueChoice("Tylko przechodze.", "end")
+                DialogueChoice("Czy coś niepokojącego działo się ostatnio?", "guard_quest_check"),
+                DialogueChoice("Tylko przechodzę.", "end")
             )
         ))
-        registerNode(DialogueNode(id = "guard_impress", npcId = "guard", text = "Widze, ze Kotwica nie oszczedzila Twoich miesni. Tacy jak Ty sa potrzebni w Straznicy. Mowia, ze w ruinach na poludniu widzieli cos... nieludzkiego.", choices = listOf(DialogueChoice("Dziekuje.", "end"))))
-        registerNode(DialogueNode(id = "guard_convince", npcId = "guard", text = "Wyslannikiem? Wybacz, nie poznalem Twoich szat. Przejdz w pokoju, Kotwico. Mowia, ze w ruinach na poludniu widzieli cos... nieludzkiego.", choices = listOf(DialogueChoice("Dziekuje.", "end"))))
-        registerNode(DialogueNode(id = "guard_work", npcId = "guard", text = "Zawsze potrzebujemy rak do pracy przy murach. Sprawdz tablice zadan w HUBie.", choices = listOf(DialogueChoice("Dziekuję.", "end"))))
+
+        // GUARD FACTION NODES
+        registerNode(DialogueNode(id = "guard_hostile", npcId = "guard", text = "Wracaj skąd przyszedłeś, Kotwico. Twój zapach kojarzy mi się ze zdradą. Inkwizycja Cię obserwuje.", choices = listOf(DialogueChoice("Już idę.", "end"))))
+        registerNode(DialogueNode(id = "guard_hated", npcId = "guard", text = "Zabiję Cię, jeśli zrobisz jeszcze jeden krok. Dla Twojego rodzaju nie ma miejsca w Twierdzy.", choices = listOf(DialogueChoice("Spróbuj tylko. (WALKA)", "end"))))
+        registerNode(DialogueNode(id = "guard_exalted", npcId = "guard", text = "Chwała Twoim czynom! Inkwizycja jest dumna z tak wiernej Kotwicy. Przejdź swobodnie.", choices = listOf(DialogueChoice("Dziękuję.", "end"))))
 
         registerNode(DialogueNode(
             id = "guard_quest_check", npcId = "guard",
-            text = "Zalyz kogo pytasz. Mieszczanie szepcza o 'Wyroku', ale we dnie pilnujemy tylko porzadku. Chociaz... jesli widzia脸色 jakieś 'Miejsce Zbrodni', to daj znać.",
+            text = "Mieszczanie szepczą o 'Wyroku'. Jeśli zobaczysz coś podejrzanego, daj znać. Szczególnie jeśli natrafisz na ślady morderstw.",
             choices = listOf(
-                DialogueChoice("Widziałem cos takiego.", "verdict_hook_start"),
-                DialogueChoice("Bede mial oczy otwarte.", "end")
+                DialogueChoice("[Pokaż dowody] Mam trzy ślady 'Wyroku'.", "verdict_start_final", 
+                    requiredAttributes = mapOf("perception" to 10)), // Requirement to check if they have it
+                DialogueChoice("Będę pamiętał.", "end")
             )
         ))
+
+        registerNode(DialogueNode(
+            id = "verdict_start_final", npcId = "guard",
+            text = "To już recydywa. Musisz natychmiast udać się do Twierdzy Zakonu i przeszukać gabinet urzędnika. To śledztwo jest teraz Twoim priorytetem.",
+            choices = listOf(
+                DialogueChoice("Podejmę się tego (START: Wyrok).", "end", onSelect = {
+                    it.quest.activeQuests.add("q_verdict_1")
+                    it.logEntries.add("Rozpoczęto śledztwo: Wyrok, którego nikt nie wydał.")
+                })
+            )
+        ))
+
         // 2. MERCHANT
         registerNode(DialogueNode(
             id = "merchant_start", npcId = "merchant",
-            text = "Mam towary z Drugiej Strony. Zloto jest tu jedyna prawda. Chcesz handlowac?",
+            text = "Mam towary z Drugiej Strony. Złoto jest tu jedyną prawdą. Chcesz handlować?",
             choices = listOf(
-                DialogueChoice("Pokaz oferte (OTWORZ TARG).", "end"),
-                DialogueChoice("Czy slyszales o dziwnych relikwiach? (MISJA)", "merchant_quest_check"),
-                DialogueChoice("[Intelligence 14] Rozpoznaj rzadki artefakt in jego torbie.", "merchant_artifact", requiredAttributes = mapOf("intelligence" to 14)),
-                DialogueChoice("Masz jakies plotki?", "merchant_rumors"),
-                DialogueChoice("Moze innym razem.", "end")
+                DialogueChoice("Pokaż ofertę (OTWÓRZ TARG).", "end"),
+                DialogueChoice("Czy słyszałeś o dziwnych relikwiach?", "merchant_quest_check"),
+                DialogueChoice("Może innym razem.", "end")
             )
         ))
-        registerNode(DialogueNode(id = "merchant_artifact", npcId = "merchant", text = "Spostrzegawczy jestes. To Fragment Pustki. Nie na sprzedaz dla zwyklego smiertelnika, ale skoro go widzisz... moze kiedys pohandlujemy czyms wiecej.", choices = listOf(DialogueChoice("Bede pamietal.", "end"))))
-        registerNode(DialogueNode(id = "merchant_rumors", npcId = "merchant", text = "Mowia, ze Prorok Aelion ukrywa cos pod kaplica. Ale kto by sluchal kupca?", choices = listOf(DialogueChoice("Interesujace.", "end"))))
+
+        // MERCHANT FACTION NODES
+        registerNode(DialogueNode(id = "merchant_hostile", npcId = "merchant", text = "Zajęty jestem. Nie handluję z tymi, którzy psują mi rynek. Znikaj.", choices = listOf(DialogueChoice("Jasne.", "end"))))
+        registerNode(DialogueNode(id = "merchant_exalted", npcId = "merchant", text = "Och! Moja ulubiona Kotwica! Dla Ciebie mam specjalne ceny i towary spod lady.", choices = listOf(DialogueChoice("Pokaż co masz.", "end"))))
 
         registerNode(DialogueNode(
             id = "merchant_quest_check", npcId = "merchant",
-            text = "Relikwie? Zawsze. Ale niektore sa przeklete. Mowia, ze krwawa ikona w pobliskiej wiosce zaczela plakac. To zly znak.",
+            text = "Mówią, że krwawa ikona w pobliskiej wiosce zaczęła płakać. To zły znak. Chcesz to sprawdzić?",
             choices = listOf(
                 DialogueChoice("Gdzie jest ta wioska? (ZADANIE)", "end", onSelect = {
                     it.quest.activeQuests.add("q_blood_icon")
@@ -154,200 +193,72 @@ class DialogueManager @Inject constructor(
                 DialogueChoice("Nie brzmi to dobrze.", "end")
             )
         ))
+
         // 3. CITIZEN
         registerNode(DialogueNode(
             id = "citizen_start", npcId = "citizen",
-            text = "Dzien dobry... chociaz czy w GrimReich dni wciaz sa dobre? Kazdy rano sprawdza, czy jego odbicie w lustrze wciaz mroga w tym samym czasie.",
+            text = "Dzień dobry... chociaż czy w GrimReich dni wciąż są dobre?",
             choices = listOf(
-                DialogueChoice("Co slychac w miescie?", "citizen_rumors"),
-                DialogueChoice("[Perception 11] Zauwaz, ze jego cien porusza sie niezaleznie.", "citizen_shadow", requiredAttributes = mapOf("perception" to 11)),
-                DialogueChoice("Zegnaj.", "end")
-            )
-        ))
-        registerNode(DialogueNode(id = "citizen_shadow", npcId = "citizen", text = "Ciii! On slucha. Cien to jedyne, co nam zostanie, gdy swiatlo Absolutu zgasnie. Uwazaj na wlasne odbicie.", choices = listOf(DialogueChoice("Rozumiem.", "end"))))
-        registerNode(DialogueNode(id = "citizen_rumors", npcId = "citizen", text = "Mowia, ze straznicy znajduja ciala z napisem 'WINNI'. Boje sie wychodzic po zmroku.", choices = listOf(DialogueChoice("Badz ostrozny.", "end"))))
-        // 3. PILGRIM / ZEALOT
-        registerNode(DialogueNode(
-            id = "zealot_start", npcId = "zealot",
-            text = "Prorocy patrza! Czy Twoja dusza jest czysta, wedrowcze? Pielgrzymujemy do Serca Krainy, by obmyc sie w jeziorach prawdy.",
-            choices = listOf(
-                DialogueChoice("Jestem wierny.", "end"),
-                DialogueChoice("[Piety 13] Odmow wspolna modlitwe.", "zealot_prayer", requiredAttributes = mapOf("piety" to 13)),
-                DialogueChoice("Ofiaruj krew (HP-${GameConstants.ZEALOT_SACRIFICE_HP_LOSS})", "zealot_sacrifice", onSelect = {
-                    it.party.forEach { h -> h.hp -= GameConstants.ZEALOT_SACRIFICE_HP_LOSS }
-                }),
-                DialogueChoice("Dokad dokladnie zmierzacie?", "zealot_destination")
-            )
-        ))
-        registerNode(DialogueNode(id = "zealot_prayer", npcId = "zealot", text = "Twoje slowa niosą moc, ktorej dawno nie slyszalem. Niech Absolut oswieca Twoja droge. Wez ten amulet.", choices = listOf(DialogueChoice("Dziekuje (OTRZYMANO RELIKWIE).", "end", onSelect = {
-             it.logEntries.add("Otrzymano Amulet Pielgrzyma.")
-        }))))
-        registerNode(DialogueNode(id = "zealot_destination", npcId = "zealot", text = "Do Opactwa Ciszy. Tam, gdzie slowa traca znaczenie, a Absolut staje sie slyszalny.", choices = listOf(DialogueChoice("Powodzenia.", "end"))))
-        registerNode(DialogueNode(id = "zealot_sacrifice", npcId = "zealot", text = "Twoja ofiara zostala przyjeta. Czuc mrowienie w kosciach.", choices = listOf(DialogueChoice("Idz w pokoju.", "end"))))
-        //  4. MYSTIC
-        registerNode(DialogueNode(
-            id = "mystic_start", npcId = "mystic",
-            text = "Cien w Tobie rosnie. Absolut Cie wola, Kotwico. Widze wize bez drzwi w Twoich snach... czy ona juz tu jest?",
-            choices = listOf(
-                DialogueChoice("Powiedz mi o wiezy (ZADANIE).", "mystic_tower_info"),
-                DialogueChoice("[Intelligence 15] Zapytaj o Nature Pekniecia.", "mystic_fracture", requiredAttributes = mapOf("intelligence" to 15)),
-                DialogueChoice("Kim jestes?", "mystic_who"),
-                DialogueChoice("Nie interesuja mnie sny.", "end")
-            )
-        ))
-        registerNode(DialogueNode(id = "mystic_fracture", npcId = "mystic", text = "Pekniecie to nie dziura, to szew. Swiat sie rozpada, bo ktos probuje go uszyc na nowo wedlug innego wzoru. My jestesmy tylko nicmi.", choices = listOf(DialogueChoice("To mroczna wizja.", "end"))))
-        registerNode(DialogueNode(
-            id = "mystic_tower_info", npcId = "mystic",
-            text = "Ona pojawia sie only tam, gdzie smierc jest swieza. Szukaj jej na obrzezach miasta, posrod mgly. By wejsc, musisz przestac istniec na chwile.",
-            choices = listOf(
-                DialogueChoice("Jak moge 'przestac istniec'?", "mystic_tower_exist"),
-                DialogueChoice("Rozumiem.", "end")
-            )
-        ))
-        registerNode(DialogueNode(
-            id = "mystic_tower_exist", npcId = "mystic",
-            text = "To stan miedzy uderzeniami serca. Medytuj w ciszy ruin. Sproboj tego (UKONCZ ZADANIE: Wieza Bez Drzwi).",
-            choices = listOf(
-                DialogueChoice("Sproboje.", "end", onSelect = {
-                    it.pendingQuestId = "COMPLETE:q_doorless_tower"
-                }),
-                DialogueChoice("To brzmi like szalenstwo.", "end")
-            )
-        ))
-        registerNode(DialogueNode(id = "mystic_who", npcId = "mystic", text = "Jestem echem kogos, kto za dlugo patrzyl w Pekniecie. Widze wezly czasu, ktore probujesz rozplatac.", choices = listOf(DialogueChoice("To niepokojace.", "end"))))
-
-        // 7. ALCHEMIST
-        registerNode(DialogueNode(
-            id = "alchemist_start", npcId = "alchemist",
-            text = "Uważaj na to, co pijesz. Woda w tych stronach ma pamięć... i czasami nie chce zapomnieć o tych, którzy w niej utonęli.",
-            choices = listOf(
-                DialogueChoice("Masz jakieś mikstury?", "end"),
-                DialogueChoice("[Intelligence 12] Czy to prawda, że rtęć może stabilizować Kotwicę?", "alchemist_mercury", requiredAttributes = mapOf("intelligence" to 12)),
+                DialogueChoice("Co słychać w mieście?", "citizen_rumors"),
                 DialogueChoice("Żegnaj.", "end")
             )
         ))
-        registerNode(DialogueNode(id = "alchemist_mercury", npcId = "alchemist", text = "Rtęć? Tylko ta destylowana w świetle pełnej Anomalii. Niebezpieczna wiedza. Weź to, przyda ci się przy kolejnym skoku stabilności.", choices = listOf(DialogueChoice("Dziękuję.", "end"))))
+        registerNode(DialogueNode(id = "citizen_rumors", npcId = "citizen", text = "Mówią, że strażnicy znajdują ciała z napisem 'WINNI'. Boję się wychodzić po zmroku.", choices = listOf(DialogueChoice("Bądź ostrożny.", "end"))))
 
-        // 8. BEGGAR
-        registerNode(DialogueNode(
-            id = "beggar_start", npcId = "beggar",
-            text = "Daj miedziaka dla kogoś, kto widział Drugą Stronę i wrócił bez oczu...",
-            choices = listOf(
-                DialogueChoice("Daj 5 złota.", "beggar_give", onSelect = { it.gold -= 5 }),
-                DialogueChoice("[Perception 13] Zauważ, że pod łachmanami chowa złoty sztylet.", "beggar_dagger", requiredAttributes = mapOf("perception" to 13)),
-                DialogueChoice("Nie mam nic dla ciebie.", "end")
-            )
-        ))
-        registerNode(DialogueNode(id = "beggar_give", npcId = "beggar", text = "Niech Absolut ci wynagrodzi. Uważaj na karczmę, ściany tam mają uszy, które krwawią.", choices = listOf(DialogueChoice("Dziwna rada...", "end"))))
-        registerNode(DialogueNode(id = "beggar_dagger", npcId = "beggar", text = "Spostrzegawczyś... To pamiątka z lepszych czasów. Albor klątwa. Idź swoją drogą, zanim on też ciebie zauważy.", choices = listOf(DialogueChoice("Odchodzę.", "end"))))
-
-        //  5. INCIDENT HOOK (VERDICT CHAIN)
+        // 5. INCIDENT HOOK (VERDICT CHAIN)
         registerNode(DialogueNode(
             id = "verdict_hook_start", npcId = "incident",
-            text = "Przed Toba leza zwloki straznika. Na scianie obok ktos nabazgral krwia: 'WINNI'. To juz trzeci taki przypadek w tym tygodniu.",
+            text = "Przed Tobą leżą zwłoki strażnika. Na ścianie obok ktoś nabazgrał krwią: 'WINNI'.",
             choices = listOf(
-                DialogueChoice("Zbadaj cialo (ZADANIE).", "verdict_hook_investigate"),
-                DialogueChoice("Zawiadom straze.", "end")
+                DialogueChoice("Zbadaj ciało.", "verdict_hook_investigate"),
+                DialogueChoice("Zawiadom straże.", "end")
             )
         ))
         registerNode(DialogueNode(
             id = "verdict_hook_investigate", npcId = "incident",
-            text = "W zacisnietej piesci denata znajdujesz symbol wysokiego urzednika. Musisz sprawdzic jego gabinet w Twierdzy Zakonu.",
+            text = "W zaciśniętej pięści denata znajdujesz symbol wysokiego urzędnika.",
             choices = listOf(
-                DialogueChoice("Podejmij sledztwo (START: Wyrok).", "end", onSelect = {
-                    it.pendingQuestId = "q_verdict_1"
+                DialogueChoice("Zbierz dowody.", "end", onSelect = {
+                    it.world.verdictIncidentsSeen += 1
+                    it.logEntries.add("Zebrano dowód z miejsca zbrodni (${it.world.verdictIncidentsSeen}/3).")
+                    if (it.world.verdictIncidentsSeen >= 3) {
+                         it.logEntries.add("Masz wystarczająco dowodów. Porozmawiaj ze Strażnikiem o 'Wyroku'.")
+                    }
                 })
             )
         ))
 
-        // 6. BLOOD ICON QUEST
-        registerNode(DialogueNode(
-            id = "blood_icon_start", npcId = "zealot",
-            text = "Wioska jest przestraszona. Statua placze krwia, ktora nigdy nie zasycha. Czy pomozez nam ja oczyscic?",
-            choices = listOf(
-                DialogueChoice("Pomoge Wam (WYPRAWA).", "end", onSelect = {
-                    it.pendingQuestId = "COMBAT_WIN:q_blood_icon"
-                }),
-                DialogueChoice("Moja Kotwica jest zbyt slaba.", "end")
-            )
-        ))
-
-        // INFESTED NPC
-        registerNode(DialogueNode(
-            id = "infested_start", npcId = "infested",
-            text = "Twoja... Kotwica... lśni... Pozwól mi... Dotknąć... Prawdy...",
-            choices = listOf(
-                DialogueChoice("Odejdź ode mnie!", "end"),
-                DialogueChoice("[Intelligence 13] Spróbuj nawiązać kontakt z umysłem.", "infested_contact", requiredAttributes = mapOf("intelligence" to 13))
-            )
-        ))
-        registerNode(DialogueNode(id = "infested_contact", npcId = "infested", text = "Widzę... to, co ty... Świat to tylko... Skóra... pod którą... Pulsuje... Nic...", choices = listOf(DialogueChoice("To przerażające.", "end"))))
-
         // REGIONAL HERO: AELION
         registerNode(DialogueNode(
             id = "aelion_start", npcId = "aelion",
-            text = "Witaj, Kotwico. Mgła rzednie w Twojej obecności, ale mrok pod nią staje się gęstszy. Czego szukasz u Proroka?",
+            text = "Mgła rzednie w Twojej obecności, Kotwico. Czego szukasz u Proroka?",
             choices = listOf(
                 DialogueChoice("Jak mogę ustabilizować ten świat?", "aelion_stability"),
-                DialogueChoice("Kim są 'Wybrańcy'?", "aelion_chosen"),
                 DialogueChoice("Żegnaj.", "end")
             )
         ))
-        registerNode(DialogueNode(id = "aelion_stability", npcId = "aelion", text = "Stabilność to iluzja. Szukaj Serca Krainy. Tam Mirror (Mira) pokaże Ci, co jest odbiciem, a co źródłem.", choices = listOf(DialogueChoice("Dziękuję.", "end"))))
-        registerNode(DialogueNode(id = "aelion_chosen", npcId = "aelion", text = "Ci, którzy przetrwali Pęknięcie bez utraty siebie. Jest nas niewielu. Xyrel na wschodzie pilnuje murów, ale on widzi tylko Wyrok.", choices = listOf(DialogueChoice("Interesujące.", "end"))))
+        registerNode(DialogueNode(id = "aelion_stability", npcId = "aelion", text = "Stabilność to iluzja. Szukaj Serca Krainy. Tam Mira pokaże Ci prawdę.", choices = listOf(DialogueChoice("Dziękuję.", "end"))))
 
-        // REGIONAL HERO: XYREL
-        registerNode(DialogueNode(
-            id = "xyrel_start", npcId = "xyrel",
-            text = "Kotwica. Kolejna, która myśli, że może powstrzymać to, co nieuniknione. Równiny spływają krwią, a my tylko liczymy winnych.",
-            choices = listOf(
-                DialogueChoice("Szukam Aeliona.", "xyrel_aelion"),
-                DialogueChoice("Dlaczego Inkwizycja jest taka surowa?", "xyrel_strict"),
-                DialogueChoice("Nie przeszkadzam.", "end")
-            )
-        ))
-        registerNode(DialogueNode(id = "xyrel_aelion", npcId = "xyrel", text = "Starzec siedzi w swojej mgle. Myśli, że modlitwa naprawi Pęknięcie. Tutaj potrzebujemy stali, nie kadzidła.", choices = listOf(DialogueChoice("Rozumiem.", "end"))))
-        registerNode(DialogueNode(id = "xyrel_strict", npcId = "xyrel", text = "Bo słabość to zaproszenie dla Drugiej Strony. Każda wątpliwość to kolejna szczelina w rzeczywistości.", choices = listOf(DialogueChoice("Mocne słowa.", "end"))))
-
-        // QUEST RESOLUTION NODES (Generic hooks for reporting back)
+        // QUEST RESOLUTION NODES
         registerNode(DialogueNode(
             id = "quest_report_back_generic", npcId = "generic",
             text = "Widzę, że zadanie zostało wykonane. Dobra robota, Kotwico. Oto Twoja zapłata.",
-            choices = listOf(
-                DialogueChoice("Dziękuję. (ODBIERZ NAGRODĘ)", "end")
-            )
+            choices = listOf( DialogueChoice("Dziękuję. (ODBIERZ NAGRODĘ)", "end") )
         ))
-
         registerNode(DialogueNode(
             id = "guard_report_back", npcId = "guard",
-            text = "Stal i dyscyplina! Meldujesz wykonanie zadania? Doskonale. Twoja służba nie zostanie zapomniana.",
-            choices = listOf(
-                DialogueChoice("Ku chwale Zakonu. (ODBIERZ NAGRODĘ)", "end")
-            )
+            text = "Stal i dyscyplina! Meldujesz wykonanie zadania? Doskonale. Przyjmij zapłatę.",
+            choices = listOf( DialogueChoice("Ku chwale Zakonu. (ODBIERZ NAGRODĘ)", "end") )
         ))
-
         registerNode(DialogueNode(
             id = "merchant_report_back", npcId = "merchant",
-            text = "Aha! Przynosisz dobre wieści? Interesy z Tobą to czysta przyjemność. Złoto już czeka.",
-            choices = listOf(
-                DialogueChoice("Wymieńmy to na kruszec. (ODBIERZ NAGRODĘ)", "end")
-            )
+            text = "Aha! Przynosisz dobre wieści? Złoto już czeka.",
+            choices = listOf( DialogueChoice("Wymieńmy to na kruszec. (ODBIERZ NAGRODĘ)", "end") )
         ))
-
         registerNode(DialogueNode(
             id = "mystic_report_back", npcId = "mystic",
-            text = "Echa ucichły... przynajmniej na chwilę. Zrobiłeś to, co było konieczne. Poczuj wdzięczność rzeczywistości.",
-            choices = listOf(
-                DialogueChoice("Zrozumiałem. (ODBIERZ NAGRODĘ)", "end")
-            )
-        ))
-
-        registerNode(DialogueNode(
-            id = "zealot_report_back", npcId = "zealot",
-            text = "Prorocy uśmiechają się do Ciebie! Twoja wiara została wystawiona na próbę i przetrwała. Przyjmij to jako dar od Serca.",
-            choices = listOf(
-                DialogueChoice("Niech Absolut prowadzi. (ODBIERZ NAGRODĘ)", "end")
-            )
+            text = "Echa ucichły... zrobiłeś to, co było konieczne. Przyjmij wdzięczność rzeczywistości.",
+            choices = listOf( DialogueChoice("Zrozumiałem. (ODBIERZ NAGRODĘ)", "end") )
         ))
     }
 }

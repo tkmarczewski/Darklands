@@ -105,4 +105,10 @@ object QuestRegistry {
             QuestTemplate("q_blood_8", "Ołtarz, Który Pamięta", "Finał w podziemiach. Ołtarz czeka na uczestnika.", "Chain", 300, "Dokonaj ostatecznego wyboru.", enemyStats = EnemyStats("Klątwa Krwi", 120, 25, 20))
         )
     )
+
+    val incidents = listOf(
+        QuestTemplate("q_incident_1", "Znalezisko w rynsztoku", "Zauważasz błysk srebra w brudnej wodzie. To medalion strażnika.", "Incident", 20, "Zbadaj rynsztok."),
+        QuestTemplate("q_incident_2", "Krzyk za murem", "Słyszysz stłumiony krzyk, a potem nagłą ciszę.", "Incident", 20, "Sprawdź źródło hałasu."),
+        QuestTemplate("q_incident_3", "Puste mieszkanie", "Drzwi są wyważone. W środku panuje nienaturalny porządek.", "Incident", 20, "Przeszukaj mieszkanie.")
+    )
 }

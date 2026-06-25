@@ -23,7 +23,8 @@ data class CityUiState(
     val npcs: List<NPC> = emptyList(),
     val activeLocalQuests: List<QuestEntry> = emptyList(),
     val isQuestMenuOpen: Boolean = false,
-    val isGlitchActive: Boolean = false
+    val isGlitchActive: Boolean = false,
+    val priceModifier: Float = 1.0f
 )
 
 @HiltViewModel
@@ -50,8 +51,7 @@ class CityViewModel @Inject constructor(
                     .mapNotNull { questSystem.getQuest(it) }
                     .filter { it.cityId == cityId && !it.isOutsideCity }
                 
-                val seed = state.world.day + cityId.hashCode() + state.world.cityEntryCount
-                val generatedNpcs = npcGenerator.generateForCity(cityId, seed)
+                val generatedNpcs = npcGenerator.generateForCity(cityId, state)
 
                 val stability = state.world.globalStability
                 val isCorrupted = stability < GameConstants.STABILITY_THRESHOLD_LOW
@@ -59,6 +59,26 @@ class CityViewModel @Inject constructor(
                     cityData.corruptedBackgroundDrawable
                 } else {
                     cityData?.backgroundDrawable ?: "bg_region_north_coast"
+                }
+
+                // Reputation-based pricing
+                val factionId = when (cityData?.rulingFaction?.lowercase()) {
+                    "zakon switu" -> "zakon"
+                    "inkwizycja" -> "inkwizycja"
+                    "klasztor milczenia" -> "milczenie"
+                    else -> null
+                }
+                var baseModifier = cityData?.priceModifier ?: 1.0f
+                factionId?.let { fid ->
+                    val score = state.reputation.globalFactions[fid] ?: 0
+                    val level = com.grimreich.grimreich.v1.ReputationLevel.fromScore(score)
+                    baseModifier *= when (level) {
+                        com.grimreich.grimreich.v1.ReputationLevel.EXALTED -> 0.8f // 20% discount
+                        com.grimreich.grimreich.v1.ReputationLevel.FRIENDLY -> 0.9f // 10% discount
+                        com.grimreich.grimreich.v1.ReputationLevel.HOSTILE -> 1.2f // 20% markup
+                        com.grimreich.grimreich.v1.ReputationLevel.HATED -> 1.5f // 50% markup
+                        else -> 1.0f
+                    }
                 }
 
                 _uiState.update { 
@@ -69,7 +89,8 @@ class CityViewModel @Inject constructor(
                         activeQuestsCount = localActiveUrban.size,
                         npcs = generatedNpcs,
                         activeLocalQuests = localActiveUrban,
-                        isGlitchActive = ontologicalEngine.isGlitchActive()
+                        isGlitchActive = ontologicalEngine.isGlitchActive(),
+                        priceModifier = baseModifier
                     )
                 }
             }

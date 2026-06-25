@@ -62,11 +62,11 @@ fun CityScreen(
                     .fillMaxSize()
                     .glitchEffect(state.isGlitchActive, 1.5f),
                 contentScale = ContentScale.Crop,
-                alpha = 0.5f
+                alpha = 0.8f
             )
         }
         
-        Box(modifier = Modifier.fillMaxSize().background(Color(0x90000000)))
+        Box(modifier = Modifier.fillMaxSize().background(Color(0x60000000)))
 
         Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
             // HEADER

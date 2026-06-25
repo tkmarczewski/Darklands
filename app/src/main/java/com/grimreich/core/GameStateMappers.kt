@@ -157,11 +157,13 @@ fun QuestStateDto.toDomain(): QuestState = QuestState().also {
 }
 
 fun ReputationState.toDto(): ReputationStateDto = ReputationStateDto(
-    cityFactions = cityFactions.mapValues { it.value.toMap() }
+    cityFactions = cityFactions.mapValues { it.value.toMap() },
+    globalFactions = globalFactions.toMap()
 )
 
 fun ReputationStateDto.toDomain(): ReputationState = ReputationState().also {
     it.cityFactions.putAll(cityFactions.mapValues { entry -> entry.value.toMutableMap() })
+    it.globalFactions.putAll(globalFactions.toMutableMap())
 }
 
 fun PrayerState.toDto(): PrayerStateDto = PrayerStateDto(
@@ -192,7 +194,8 @@ fun WorldState.toDto(): WorldStateDto = WorldStateDto(
     collapseProgress = collapseProgress,
     ontologicalLevel = ontologicalLevel.level,
     discoveredLocations = discoveredLocations,
-    cityEntryCount = cityEntryCount
+    cityEntryCount = cityEntryCount,
+    verdictIncidentsSeen = verdictIncidentsSeen
 )
 
 fun WorldStateDto.toDomain(): WorldState = WorldState().also {
@@ -210,6 +213,7 @@ fun WorldStateDto.toDomain(): WorldState = WorldState().also {
     it.ontologicalLevel = try { OntologicalLevel.entries.find { l -> l.level == ontologicalLevel } ?: OntologicalLevel.MATERIAL } catch(e: Exception) { OntologicalLevel.MATERIAL }
     it.discoveredLocations.addAll(discoveredLocations)
     it.cityEntryCount = cityEntryCount
+    it.verdictIncidentsSeen = verdictIncidentsSeen
 }
 
 fun CombatState.toDto(): CombatStateDto = CombatStateDto(

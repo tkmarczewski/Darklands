@@ -22,6 +22,20 @@ enum class OntologicalLevel(val level: Int, val displayName: String) {
     ABSOLUTE_SCRIBES(14, "Skrybowie Absolutni")
 }
 
+enum class ReputationLevel(val minScore: Int, val displayName: String) {
+    HATED(-100, "Znienawidzony"),
+    HOSTILE(-50, "Wrogi"),
+    NEUTRAL(0, "Neutralny"),
+    FRIENDLY(50, "Przyjazny"),
+    EXALTED(100, "Wywyższony");
+
+    companion object {
+        fun fromScore(score: Int): ReputationLevel {
+            return entries.sortedByDescending { it.minScore }.firstOrNull { score >= it.minScore } ?: HATED
+        }
+    }
+}
+
 data class NPC(
     val id: String,
     val name: String,

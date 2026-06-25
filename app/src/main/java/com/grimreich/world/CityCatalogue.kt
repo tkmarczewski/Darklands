@@ -58,7 +58,7 @@ class CityCatalogue @Inject constructor() {
             name = "Równiny Koronne",
             region = "East",
             phenomenon = "Krew",
-            rulingFaction = "Twierdza Zakonu",
+            rulingFaction = "Zakon Świtu",
             priceModifier = 0.9f,
             backgroundDrawable = "bg_region_crown_plains",
             corruptedBackgroundDrawable = "bg_corrupted_village",

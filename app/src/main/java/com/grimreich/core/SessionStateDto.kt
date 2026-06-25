@@ -89,7 +89,8 @@ data class QuestStateDto(
 
 @Serializable
 data class ReputationStateDto(
-    val cityFactions: Map<String, Map<String, Int>> = emptyMap()
+    val cityFactions: Map<String, Map<String, Int>> = emptyMap(),
+    val globalFactions: Map<String, Int> = emptyMap()
 )
 
 @Serializable
@@ -115,7 +116,8 @@ data class WorldStateDto(
     val collapseProgress: Float = 0f,
     val ontologicalLevel: Int = 0,
     val discoveredLocations: List<String> = emptyList(),
-    val cityEntryCount: Int = 0
+    val cityEntryCount: Int = 0,
+    val verdictIncidentsSeen: Int = 0
 )
 
 @Serializable

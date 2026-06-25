@@ -134,12 +134,6 @@ class DialogueViewModel @Inject constructor(
                     cmd.startsWith("FINALIZE:") -> {
                         val qId = cmd.removePrefix("FINALIZE:")
                         // Call the explicit system complete to handle gold reward
-                        gameRepository.persistCurrentState() // Save current state first
-                        val quest = (gameRepository as? com.grimreich.core.GameRepository)?.let {
-                            // Actually it's easier to just call QuestSystem.complete directly
-                            // But I don't have easy access to it here except via the Provider or Dagger
-                        }
-                        // Use QuestSystem injected via constructor
                         questSystem.complete(qId)
                     }
                     else -> {

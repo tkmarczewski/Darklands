@@ -1,89 +1,70 @@
 package com.grimreich.world
 
-import com.grimreich.core.GameRepository
+import com.grimreich.core.GameState
 import com.grimreich.grimreich.v1.NPC
-import java.util.Random
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlin.random.Random
 
 @Singleton
-class ProceduralNpcGenerator @Inject constructor(
-    private val gameRepository: GameRepository
-) {
-    private val roles = mapOf(
-        "Kupiec" to "merchant_start",
-        "Żebrak" to "beggar_start",
-        "Strażnik" to "guard_start",
-        "Alchemik" to "alchemist_start",
-        "Mieszczanin" to "citizen_start",
-        "Pielgrzym" to "zealot_start",
-        "Mistyk" to "mystic_start"
-    )
+class ProceduralNpcGenerator @Inject constructor() {
 
-    fun generateForCity(cityId: String, seed: Int): List<NPC> {
-        val state = gameRepository.currentState()
-        
-        // Return known NPCs if already generated for this city
-        state.knownNpcs[cityId]?.let { return it }
-
-        val random = Random(seed.toLong())
+    fun generateForCity(cityId: String, state: GameState): List<NPC> {
+        val random = Random(cityId.hashCode() + state.world.day)
         val npcList = mutableListOf<NPC>()
 
         // 1. REGIONAL HEROES
-        when (cityId) {
-            "wybrzeze_polnocne" -> npcList.add(NPC(
-                id = "hero_aelion",
+        if (cityId == "wybrzeze_polnocne") {
+            npcList.add(NPC(
+                id = "aelion",
                 name = "Prorok Aelion",
-                role = "MYSTIC",
-                startNodeId = "aelion_start",
-                isRegionalHero = true
+                role = "AELION",
+                isRegionalHero = true,
+                startNodeId = "aelion_start"
             ))
-            "rowniny_koronne" -> npcList.add(NPC(
-                id = "hero_xyrel",
+        }
+        if (cityId == "rowniny_koronne") {
+             npcList.add(NPC(
+                id = "xyrel",
                 name = "Inkwizytor Xyrel",
-                role = "GUARD",
-                startNodeId = "xyrel_start",
-                isRegionalHero = true
+                role = "XYREL",
+                isRegionalHero = true,
+                startNodeId = "xyrel_start"
             ))
         }
 
-        // 2. INCIDENTS
+        // 2. CANONICAL ROLES
+        val roles = listOf("Merchant", "Guard", "Zealot", "Mystic", "Beggar")
+        roles.forEach { role ->
+            if (random.nextBoolean()) {
+                val isInfested = state.world.globalStability < 40 && random.nextInt(100) < 20
+                npcList.add(NPC(
+                    id = "npc_${role.lowercase()}_$cityId",
+                    name = generateName(role, random),
+                    role = role,
+                    isInfested = isInfested,
+                    startNodeId = if (isInfested) "infested_start" else "${role.lowercase()}_start"
+                ))
+            }
+        }
+
+        // 3. INCIDENTS (VERDICT HOOKS)
         val hasVerdict1 = state.quest.activeQuests.contains("q_verdict_1") || state.quest.completedQuests.contains("q_verdict_1")
-        if (!hasVerdict1 && random.nextInt(100) < 30) {
+        if (!hasVerdict1 && state.world.verdictIncidentsSeen < 3 && random.nextInt(100) < 50) {
              npcList.add(NPC(
-                id = "npc_verdict_hook",
+                id = "npc_verdict_hook_${state.world.verdictIncidentsSeen}",
                 name = "Miejsce Zbrodni",
                 role = "INCIDENT",
                 startNodeId = "verdict_hook_start"
             ))
         }
 
-        // 3. GENERATED NPCS
-        val count = 2 + random.nextInt(3)
-        val roleKeys = roles.keys.toList()
-        repeat(count) {
-            val roleName = roleKeys[random.nextInt(roleKeys.size)]
-            val isInfested = state.world.globalStability < 40 && random.nextInt(100) < (50 - state.world.globalStability)
-            
-            npcList.add(NPC(
-                id = "npc_${cityId}_${it}_${random.nextInt(1000)}",
-                name = generateName(random),
-                role = roleName,
-                startNodeId = if (isInfested) "infested_start" else roles[roleName] ?: "end",
-                isInfested = isInfested
-            ))
-        }
-        
-        // Persist the generated NPCs
-        state.knownNpcs[cityId] = npcList
-        gameRepository.persistCurrentState()
-        
         return npcList
     }
 
-    private fun generateName(random: Random): String {
-        val first = listOf("Klaus", "Hans", "Helga", "Greta", "Otto", "Bruno", "Marta", "Erich", "Ulrich", "Siegfried")
-        val last = listOf("von Weber", "Schmidt", "Müller", "Wagner", "Becker", "Hoffmann", "Schulz", "Koch", "Bauer", "Richter")
-        return "${first[random.nextInt(first.size)]} ${last[random.nextInt(last.size)]}"
+    private fun generateName(role: String, random: Random): String {
+        val first = listOf("Siegfried", "Marta", "Erich", "Helga", "Kurt", "Klara")
+        val last = listOf("Richter", "Maier", "Weber", "Wagner", "Schulz", "Hoffmann")
+        return "${first.random(random)} ${last.random(random)}"
     }
 }

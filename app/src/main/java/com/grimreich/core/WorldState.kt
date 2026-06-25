@@ -16,5 +16,6 @@ data class WorldState(
     var collapseProgress: Float = 0.0f, // 0.0 - 1.0 (Transition to 2.0)
     var ontologicalLevel: OntologicalLevel = OntologicalLevel.MATERIAL,
     val discoveredLocations: MutableList<String> = mutableListOf(),
-    var cityEntryCount: Int = 0 // TRACKS VISITS FOR VERDICT CAMPAIGN
+    var cityEntryCount: Int = 0, // TRACKS VISITS FOR VERDICT CAMPAIGN
+    var verdictIncidentsSeen: Int = 0
 )

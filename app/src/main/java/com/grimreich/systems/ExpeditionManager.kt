@@ -109,6 +109,7 @@ class ExpeditionManager @Inject constructor(
             QuestStepType.INVESTIGATION -> ExpeditionResult.StartInvestigation(step.targetId)
             QuestStepType.TRAVEL -> ExpeditionResult.Travel(step.targetId)
             QuestStepType.CHOICE -> ExpeditionResult.OpenChoice(step.targetId, step.description)
+            QuestStepType.REPORT_BACK -> ExpeditionResult.QuestCompleted(questId, 0) // Should not be directly reachable via resolveStep
         }
     }
 
