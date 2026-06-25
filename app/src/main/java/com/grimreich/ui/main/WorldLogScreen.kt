@@ -12,11 +12,16 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.grimreich.systems.ChronicleEntry
+
+data class SimpleLogEntry(
+    val day: Int,
+    val text: String,
+    val importance: Int = 1
+)
 
 @Composable
 fun WorldLogScreen(
-    logEntries: List<ChronicleEntry>,
+    logEntries: List<SimpleLogEntry>,
     onBack: () -> Unit
 ) {
     Column(
@@ -26,7 +31,7 @@ fun WorldLogScreen(
             .padding(16.dp)
     ) {
         Text(
-            text = "KRONIKA ŚWIATA",
+            text = "REJESTR WYDARZEŃ",
             style = MaterialTheme.typography.headlineMedium,
             color = Color(0xFFC0A060),
             modifier = Modifier.padding(bottom = 16.dp).align(Alignment.CenterHorizontally)
@@ -39,7 +44,7 @@ fun WorldLogScreen(
             if (logEntries.isEmpty()) {
                 item {
                     Text(
-                        "Kroniki milczą. Twoje czyny jeszcze nie zostały zapisane.",
+                        "Rejestr milczy. Twoje czyny jeszcze nie zostały zapisane.",
                         color = Color.DarkGray,
                         fontSize = 14.sp,
                         modifier = Modifier.padding(16.dp)
@@ -63,7 +68,7 @@ fun WorldLogScreen(
 }
 
 @Composable
-private fun LogEntryCard(entry: ChronicleEntry) {
+private fun LogEntryCard(entry: SimpleLogEntry) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(containerColor = Color(0xFF0A0A0A)),

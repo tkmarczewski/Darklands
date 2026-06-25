@@ -38,6 +38,8 @@ class EndingSystem @Inject constructor(
         }
     }
 
+    fun getAllHeroes(): List<Hero> = gameRepository.currentState().party.toList()
+
     fun getHeroEpilogue(hero: Hero): String {
         return when {
             hero.corruption >= 80 -> "${hero.name} stał się naczyniem dla mroku, błąkając się wiecznie po Drugiej Stronie."

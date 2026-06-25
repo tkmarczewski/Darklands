@@ -21,15 +21,16 @@ class CombatSystem @Inject constructor(
 
     private fun heroToCombatant(): CombatantState? {
         val hero = partyRepository.activeHero() ?: return null
-        val armorValue = if (hero.equipment["armor"] != null) 3 else 0
+        val state = gameRepository.currentState()
+        
         return CombatantState(
             name = hero.name,
             hp = hero.hp,
             maxHp = hero.maxHp,
             endurance = hero.endurance,
             morale = 70,
-            armor = armorValue,
-            attackBase = 5,
+            armor = hero.effectiveArmor(state.inventory),
+            attackBase = hero.effectiveAttack(state.inventory),
             strength = hero.strength,
             agility = hero.agility,
             intelligence = hero.intelligence

@@ -6,12 +6,36 @@ object GrimBuilders {
     fun randomId(prefix: String): String = "$prefix-${UUID.randomUUID()}"
     fun grimWorld(id: String = randomId("world"), name: String = "Grimreich", regions: List<Region> = listOf(region()), factions: List<Faction> = listOf(faction()), notes: String? = null) = GrimWorld(id, name, regions.toList(), factions.toList(), notes)
     fun region(id: String = randomId("region"), name: String = "Misty Vale", description: String = "A foggy, half-ruined city where shadows move.", encounters: List<Encounter> = listOf(encounter()), seed: Long? = null) = Region(id, name, description, encounters.toList(), seed)
-    fun npc(id: String = randomId("npc"), name: String = "Unnamed", role: String = "villager", factionId: String? = null, stats: Map<String, Int> = defaultStats(), inventory: List<Item> = emptyList(), dialogue: Map<String, Any>? = null) = NPC(id, name, role, factionId, stats.toMap(), inventory.toList(), dialogue)
+    
+    fun npc(
+        id: String = randomId("npc"), 
+        name: String = "Unnamed", 
+        role: String = "villager", 
+        factionId: String? = null, 
+        personality: String = "Normal",
+        stats: Map<String, Int> = defaultStats(), 
+        inventory: List<Item> = emptyList(), 
+        dialogue: Map<String, Any>? = null
+    ) = NPC(id, name, role, factionId, personality, stats.toMap(), inventory.toList(), dialogue)
+
     fun basicNPCLifePath(name: String) = NPCLifePath(name, "mist", "blood", "reflection", 1, 1, listOf("birth"), "npc", "ending")
     fun emptyWorldChronicle(name: String) = WorldChronicle(name, "mist", "blood", "reflection", "fullness", "chaos", "region", "npc", "ending")
     fun defaultNonlinearTime(regionName: String) = NonlinearTime(regionName, 1, 1, 1, 1, 1, emptyList(), "region", "npc", "monster", "ending")
     fun boss(id: String = randomId("boss"), name: String = "Ancient Horror", level: Int = 10, lootTable: RewardTable = rewardTable()) = Boss(id, name, level, lootTable)
-    fun item(id: String = randomId("item"), name: String = "Rusty Blade", type: String = "weapon", rarity: String = "common", properties: Map<String, Any> = emptyMap()) = Item(id = id, name = name, type = type, rarity = rarity, properties = properties.toMap())
+    
+    fun item(
+        id: String = randomId("item"), 
+        name: String = "Rusty Blade", 
+        type: String = "weapon", 
+        slot: String? = null,
+        value: Int = 10,
+        weight: Double = 1.0,
+        rarity: String = "common", 
+        lore: String = "",
+        properties: Map<String, Any> = emptyMap(),
+        effects: Map<String, Int> = emptyMap()
+    ) = Item(id = id, name = name, type = type, slot = slot, value = value, weight = weight, rarity = rarity, lore = lore, properties = properties.toMap(), effects = effects)
+
     fun lootEntry(itemId: String, weight: Int = 10, minQty: Int = 1, maxQty: Int = 1) = LootEntry(itemId, weight, minQty, maxQty)
     fun rewardTable(id: String = randomId("reward"), entries: List<LootEntry> = listOf(lootEntry(item().id, 100))) = RewardTable(id, entries.toList())
     fun encounter(id: String = randomId("enc"), name: String = "Wandering Bandits", difficulty: Int = 1, possibleNpcs: List<String> = emptyList()) = Encounter(id, name, difficulty, possibleNpcs.toList())

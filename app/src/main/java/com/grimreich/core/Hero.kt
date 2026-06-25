@@ -44,6 +44,16 @@ data class Hero(
     val activeMutations: MutableList<Mutation> = mutableListOf(),
     // Ekwipunek (slot -> id przedmiotu)
     val equipment: MutableMap<String, String?> = mutableMapOf(
-        "weapon" to null, "armor" to null, "helmet" to null, "shield" to null
+        "weapon" to null, "armor" to null, "helmet" to null, "shield" to null, "accessory" to null
     )
-)
+) {
+    fun getEquipmentBonus(stat: String, items: List<com.grimreich.grimreich.v1.Item>): Int {
+        val equippedIds = equipment.values.filterNotNull()
+        return items.filter { it.id in equippedIds }
+            .sumOf { it.effects[stat] ?: 0 }
+    }
+
+    fun effectiveAttack(items: List<com.grimreich.grimreich.v1.Item>): Int = 5 + (strength / 2) + getEquipmentBonus("attack", items)
+    fun effectiveDefense(items: List<com.grimreich.grimreich.v1.Item>): Int = (agility / 3) + getEquipmentBonus("defense", items)
+    fun effectiveArmor(items: List<com.grimreich.grimreich.v1.Item>): Int = getEquipmentBonus("armor", items)
+}

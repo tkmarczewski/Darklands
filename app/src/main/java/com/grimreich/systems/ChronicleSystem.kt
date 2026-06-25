@@ -75,10 +75,16 @@ class ChronicleSystem @Inject constructor(
         }
     }
 
+    fun record(text: String, importance: Int = 1) {
+        gameRepository.log(text)
+    }
+
     fun getUnlockedEntries(): List<ChronicleEntry> {
         val unlockedIds = gameRepository.currentState().unlockedLoreIds
         return allEntries.values.filter { unlockedIds.contains(it.id) }
     }
 
     fun isUnlocked(id: String): Boolean = gameRepository.currentState().unlockedLoreIds.contains(id)
+
+    fun getAll(): List<ChronicleEntry> = allEntries.values.toList()
 }
