@@ -27,6 +27,7 @@ fun GameState.toDto(): SessionStateDto = SessionStateDto(
     world = world.toDto(),
     combat = combat.toDto(),
     knownNpcs = knownNpcs.mapValues { entry -> entry.value.map { (it as com.grimreich.grimreich.v1.NPC).toDto() } },
+    unlockedLoreIds = unlockedLoreIds.toList(),
     isExpeditionActive = isExpeditionActive,
     lastSaveTimestamp = lastSaveTimestamp
 )
@@ -55,6 +56,7 @@ fun SessionStateDto.toDomain(): GameState = GameState(
     combat = combat.toDomain(),
 ).also {
     it.knownNpcs.putAll(knownNpcs.mapValues { entry -> entry.value.map { it.toDomain() as com.grimreich.grimreich.v1.NPC } })
+    it.unlockedLoreIds.addAll(unlockedLoreIds)
     it.isExpeditionActive = isExpeditionActive
     it.lastSaveTimestamp = lastSaveTimestamp
 }
@@ -255,6 +257,7 @@ fun NpcDto.toDomain(): com.grimreich.grimreich.v1.NPC = com.grimreich.grimreich.
     name = name,
     role = role,
     factionId = factionId,
+    personality = personality,
     startNodeId = startNodeId,
     stability = stability
 )
@@ -264,6 +267,7 @@ fun com.grimreich.grimreich.v1.NPC.toDto(): NpcDto = NpcDto(
     name = name,
     role = role,
     factionId = factionId,
+    personality = personality,
     startNodeId = startNodeId,
     stability = stability
 )

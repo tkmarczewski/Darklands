@@ -35,6 +35,7 @@ import com.grimreich.ui.tavern.TavernViewModel
 import com.grimreich.ui.tavern.RecruitmentScreen
 import com.grimreich.ui.DevMenuScreen
 import com.grimreich.ui.ritual.RitualScreen
+import com.grimreich.ui.main.ChronicleScreen
 import com.grimreich.systems.RitualSystem
 import kotlinx.coroutines.launch
 import java.util.*
@@ -55,6 +56,7 @@ sealed class GameRoute(val route: String) {
     object Recruit : GameRoute("recruit")
     object Inventory : GameRoute("inventory")
     object CharDetail : GameRoute("char_detail")
+    object Chronicle : GameRoute("chronicle")
     object Expedition : GameRoute("expedition")
     object DevMenu : GameRoute("dev_menu")
     object Ritual : GameRoute("ritual")
@@ -95,6 +97,7 @@ fun GameNavHost(
             GameScreenMode.RECRUIT -> GameRoute.Recruit.route
             GameScreenMode.INVENTORY -> GameRoute.Inventory.route
             GameScreenMode.CHAR_DETAIL -> GameRoute.CharDetail.route
+            GameScreenMode.WORLD_LOG -> GameRoute.Chronicle.route
             GameScreenMode.EVENTS -> GameRoute.Expedition.route
             GameScreenMode.DEV_MENU -> GameRoute.DevMenu.route
             GameScreenMode.RITUAL -> GameRoute.Ritual.route
@@ -272,6 +275,11 @@ fun GameNavHost(
         composable(GameRoute.Inventory.route) {
             InventoryScreen(
                 viewModel = hiltViewModel(),
+                onBack = { root.setMode(GameScreenMode.HUB) }
+            )
+        }
+        composable(GameRoute.Chronicle.route) {
+            ChronicleScreen(
                 onBack = { root.setMode(GameScreenMode.HUB) }
             )
         }

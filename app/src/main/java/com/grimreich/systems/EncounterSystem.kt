@@ -27,9 +27,10 @@ data class Encounter(
 
 @Singleton
 class EncounterSystem @Inject constructor(
-    private val lootSystem: LootSystem
+    private val lootSystem: LootSystem,
+    private val chronicleSystem: dagger.Lazy<ChronicleSystem>
 ) {
-    private val encounters = listOf(
+    private val encounters = mutableListOf(
         Encounter(
             "enc_01", "Cienie w zaułku", "Widzisz migoczące światło w głębi uliczki.",
             EncounterType.INTERACTIVE,
@@ -60,6 +61,38 @@ class EncounterSystem @Inject constructor(
                     "Stabilność świata wzrosła!"
                 },
                 EncounterChoice("Omiń", "Wygląda niebezpiecznie.") { "Przyspieszyłeś kroku." }
+            )
+        ),
+        // --- NARRATIVE ECHO EVENTS ---
+        Encounter(
+            "echo_frozen_archivist", "Zamarznięty Archiwista", "Na środku traktu stoi postać pokryta szronem, mimo upału. Trzyma w rękach księgę, której strony przewracają się same. 'Wszystko musi zostać skatalogowane, zanim zniknie', szepcze Archiwista.",
+            EncounterType.INTERACTIVE,
+            listOf(
+                EncounterChoice("[Intelligence 14] Pomóż mu skatalogować otoczenie", "Pamięć jest kotwicą.", "intelligence", 14) { s ->
+                    chronicleSystem.get().unlock("lore_fracture_origin")
+                    s.world.globalStability += 5
+                    "Twoja pomoc uspokaja Archiwistę. Wręcza Ci zapisany zwój."
+                },
+                EncounterChoice("Zabierz księgę siłą [Strength 15]", "Księga rozpada się w proch.", "strength", 15) { s ->
+                    s.gold += 100
+                    s.world.globalStability -= 5
+                    "Znalazłeś 100 złota w pyłach księgi."
+                }
+            )
+        ),
+        Encounter(
+            "echo_glitched_child", "Błąd w Obrazie", "Mała dziewczynka siedzi pod drzewem. Gdy mruga, jej postać przesuwa się o kilka centymetrów w bok, zostawiając za sobą powidok. 'Widzisz to?' pyta, wskazując na niebo. 'Piksele spadają jak śnieg.'",
+            EncounterType.INTERACTIVE,
+            listOf(
+                EncounterChoice("[Charisma 13] Uspokój dziecko", "Rzeczywistość odzyskuje ostrość.", "charisma", 13) { s ->
+                    s.party.forEach { h -> h.sanity += 10 }
+                    "Dziewczynka uśmiecha się. Odzyskaliście spokój ducha."
+                },
+                EncounterChoice("[Perception 15] Zbadaj niebo", "Widzisz błękitny kod.", "perception", 15) { s ->
+                    chronicleSystem.get().unlock("lore_scribes")
+                    s.world.echoIntensity += 0.1f
+                    "Widzisz surowy kod rzeczywistości. Twoja Kotwica drży."
+                }
             )
         )
     )

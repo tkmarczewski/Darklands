@@ -32,6 +32,7 @@ data class SessionStateDto(
     val world: WorldStateDto = WorldStateDto(),
     val combat: CombatStateDto = CombatStateDto(),
     val knownNpcs: Map<String, List<NpcDto>> = emptyMap(),
+    val unlockedLoreIds: List<String> = emptyList(),
     val isExpeditionActive: Boolean = false,
     val lastSaveTimestamp: Long = 0
 )
@@ -144,6 +145,7 @@ data class NpcDto(
     val name: String,
     val role: String,
     val factionId: String? = null,
+    val personality: String = "Normal",
     val startNodeId: String? = null,
     val stability: Float = 1.0f
 )

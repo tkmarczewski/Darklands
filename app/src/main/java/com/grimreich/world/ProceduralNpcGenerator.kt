@@ -65,12 +65,15 @@ class ProceduralNpcGenerator @Inject constructor() {
         roles.forEach { role ->
             if (random.nextBoolean()) {
                 val isInfested = state.world.globalStability < 40 && random.nextInt(100) < 20
+                val personality = listOf("Normal", "Fanatic", "Weary", "Greedy").random(random)
+                
                 npcList.add(NPC(
                     id = "npc_${role.lowercase()}_$cityId",
                     name = generateName(role, random),
                     role = role,
+                    personality = personality,
                     isInfested = isInfested,
-                    startNodeId = if (isInfested) "infested_start" else "${role.lowercase()}_start"
+                    startNodeId = if (isInfested) "infested_start" else "${role.lowercase()}_${personality.lowercase()}_start"
                 ))
             }
         }

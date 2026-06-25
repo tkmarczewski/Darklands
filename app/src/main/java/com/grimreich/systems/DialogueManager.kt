@@ -12,7 +12,8 @@ import kotlin.random.Random
 
 @Singleton
 class DialogueManager @Inject constructor(
-    private val gameRepositoryProvider: Lazy<GameRepository>
+    private val gameRepositoryProvider: Lazy<GameRepository>,
+    private val chronicleSystem: Lazy<ChronicleSystem>
 ) {
     private val nodes = mutableMapOf<String, DialogueNode>()
     private var activeDialogueId: String? = null
@@ -236,12 +237,25 @@ class DialogueManager @Inject constructor(
                 DialogueChoice("Jak mogę ustabilizować ten świat?", "aelion_stability"),
                 DialogueChoice("Słyszałem o dzwonach bijących pod wodą...", "aelion_bells"),
                 DialogueChoice("Kim naprawdę jest Absolut?", "aelion_absolute"),
+                DialogueChoice("[PRZEKLETA WIEDZA] Chcę poznać Twoją prawdziwą naturę.", "aelion_secret_reveal", requiredAttributes = mapOf("intelligence" to 16)),
                 DialogueChoice("Żegnaj.", "end")
             )
         ))
         registerNode(DialogueNode(id = "aelion_stability", npcId = "aelion", text = "Stabilność to iluzja. Szukaj Serca Krainy. Tam Mira pokaże Ci prawdę.", choices = listOf(DialogueChoice("Dziękuję.", "end"))))
         registerNode(DialogueNode(id = "aelion_bells", npcId = "aelion", text = "Zatopione katedry nie milczą, one krzyczą w języku, którego zapomnieliśmy. Kiedyś byliśmy całością. Teraz jesteśmy tylko odłamkami rozbitego witraża. Jeśli usłyszysz dzwony, nie idź w stronę wody. To one przyciągnęły Pęknięcie.", choices = listOf(DialogueChoice("Będę pamiętał.", "aelion_start"))))
         registerNode(DialogueNode(id = "aelion_absolute", npcId = "aelion", text = "Absolut to nie bóg. To Architekt, który porzucił plac budowy, zostawiając nas w niedokończonym świecie. My jesteśmy tylko błędami w jego wielkim planie, próbującymi nadać sens własnemu nieistnieniu.", choices = listOf(DialogueChoice("To mroczna wizja.", "aelion_start"))))
+
+        registerNode(DialogueNode(
+            id = "aelion_secret_reveal", npcId = "aelion",
+            text = "A więc widzisz znaki pod moją skórą... Rzeczywistość nie wytrzyma tej prawdy! [EKRAN MIGOCZE]",
+            choices = listOf(
+                DialogueChoice("Powiedz mi wszystko.", "end", onSelect = {
+                    chronicleSystem.get().unlock("lore_aelion_secret")
+                    it.world.echoIntensity += 0.2f
+                    // Trigger visual glitch effect through some state change if possible
+                })
+            )
+        ))
 
         // REGIONAL HERO: MIRA (NEW)
         registerNode(DialogueNode(
@@ -285,12 +299,14 @@ class DialogueManager @Inject constructor(
         registerNode(DialogueNode(id = "noctyros_fracture", npcId = "noctyros", text = "To błąd logiczny. Dwa wymiary nałożyły się na siebie, bo ktoś zapomniał o warunkach brzegowych. Druga Strona to po prostu to, co nie powinno istnieć, a jednak zajmuje miejsce w pamięci świata.", choices = listOf(DialogueChoice("Mówisz zagadkami.", "noctyros_start"))))
         registerNode(DialogueNode(id = "noctyros_save", npcId = "noctyros", text = "Nie możesz uratować czegoś, co jest zaprojektowane, by upaść. Możesz tylko przetrwać wystarczająco długo, by zobaczyć Epilog. Ale czy wybierzesz zakończenie Materialne, czy Meta-Narracyjne... to zależy od Twoich 'wyborów'.", choices = listOf(DialogueChoice("Zrobię co w mojej mocy.", "noctyros_start"))))
 
-        // QUEST RESOLUTION NODES
-        registerNode(DialogueNode(
-            id = "quest_report_back_generic", npcId = "generic",
-            text = "Widzę, że zadanie zostało wykonane. Dobra robota, Kotwico. Oto Twoja zapłata.",
-            choices = listOf( DialogueChoice("Dziękuję. (ODBIERZ NAGRODĘ)", "end") )
-        ))
+        // GUARD PERSONALITY VARIATIONS
+        registerNode(DialogueNode(id = "guard_normal_start", npcId = "guard", text = "Stój! Prawo musi być przestrzegane. Czego szukasz?", choices = listOf(DialogueChoice("Tylko przechodzę.", "end"))))
+        registerNode(DialogueNode(id = "guard_fanatic_start", npcId = "guard", text = "W Imię Absolutu! Czy Twoja dusza jest czysta od błędów Pęknięcia? Każdy obcy to potencjalna anomalia!", choices = listOf(DialogueChoice("Jestem wierny.", "end"))))
+        registerNode(DialogueNode(id = "guard_weary_start", npcId = "guard", text = "Kolejna Kotwica... Czy to się kiedyś skończy? Przejdź szybko, zanim mgła znów namiesza mi w głowie.", choices = listOf(DialogueChoice("Dziękuję za zrozumienie.", "end"))))
+
+        // MERCHANT PERSONALITY VARIATIONS
+        registerNode(DialogueNode(id = "merchant_normal_start", npcId = "merchant", text = "Złoto to jedyna prawda. Chcesz handlować?", choices = listOf(DialogueChoice("Pokaż ofertę.", "end"))))
+        registerNode(DialogueNode(id = "merchant_greedy_start", npcId = "merchant", text = "Widzę, że masz pełny trzos... Ceny poszły w górę przez to całe Pęknięcie. Płać albo znikaj.", choices = listOf(DialogueChoice("Zobaczymy...", "end"))))
         registerNode(DialogueNode(
             id = "guard_report_back", npcId = "guard",
             text = "Stal i dyscyplina! Meldujesz wykonanie zadania? Doskonale. Przyjmij zapłatę.",

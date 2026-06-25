@@ -31,6 +31,7 @@ data class GameState(
     val world: WorldState = WorldState(),
     val combat: CombatState = CombatState(),
     val knownNpcs: MutableMap<String, List<com.grimreich.grimreich.v1.NPC>> = mutableMapOf(),
+    val unlockedLoreIds: MutableSet<String> = mutableSetOf(),
     var isExpeditionActive: Boolean = false,
     var lastSaveTimestamp: Long = System.currentTimeMillis()
 ) {
@@ -74,6 +75,7 @@ data class GameState(
             heroEffects = combat.heroEffects.toMutableList()
         ),
         knownNpcs = knownNpcs.mapValues { it.value.map { n -> n.copy() } }.toMutableMap(),
+        unlockedLoreIds = unlockedLoreIds.toMutableSet(),
         isExpeditionActive = isExpeditionActive,
         lastSaveTimestamp = lastSaveTimestamp
     )

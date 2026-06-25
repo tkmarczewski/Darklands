@@ -41,6 +41,7 @@ data class NPC(
     val name: String,
     val role: String,
     val factionId: String? = null,
+    val personality: String = "Normal",
     val stats: Map<String, Int> = emptyMap(),
     val inventory: List<Item> = emptyList(),
     val dialogue: Map<String, Any>? = null,
@@ -49,6 +50,14 @@ data class NPC(
     val isInfested: Boolean = false,
     val isRegionalHero: Boolean = false,
     val interactionHistory: MutableMap<String, Int> = mutableMapOf()
+)
+
+data class ChronicleEntry(
+    val id: String,
+    val title: String,
+    val fullText: String,
+    val category: String, // e.g. "Era of Fracture", "Saints", "Factions"
+    val unlocked: Boolean = false
 )
 
 data class Boss(val id: String, val name: String, val level: Int, val lootTable: RewardTable)
