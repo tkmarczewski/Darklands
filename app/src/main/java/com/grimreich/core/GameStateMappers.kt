@@ -126,6 +126,7 @@ fun Item.toDto(): ItemDto = ItemDto(
     value = value,
     weight = weight,
     rarity = rarity,
+    lore = lore,
     effects = effects
 )
 
@@ -137,6 +138,7 @@ fun ItemDto.toDomain(): Item = Item(
     value = value,
     weight = weight,
     rarity = rarity,
+    lore = lore ?: "",
     effects = effects
 )
 

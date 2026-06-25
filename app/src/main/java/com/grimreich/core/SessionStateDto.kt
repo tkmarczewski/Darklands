@@ -75,6 +75,7 @@ data class ItemDto(
     val value: Int,
     val weight: Double,
     val rarity: String,
+    val lore: String? = null,
     val effects: Map<String, Int>
 )
 

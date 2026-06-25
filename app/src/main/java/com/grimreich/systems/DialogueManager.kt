@@ -234,10 +234,56 @@ class DialogueManager @Inject constructor(
             text = "Mgła rzednie w Twojej obecności, Kotwico. Czego szukasz u Proroka?",
             choices = listOf(
                 DialogueChoice("Jak mogę ustabilizować ten świat?", "aelion_stability"),
+                DialogueChoice("Słyszałem o dzwonach bijących pod wodą...", "aelion_bells"),
+                DialogueChoice("Kim naprawdę jest Absolut?", "aelion_absolute"),
                 DialogueChoice("Żegnaj.", "end")
             )
         ))
         registerNode(DialogueNode(id = "aelion_stability", npcId = "aelion", text = "Stabilność to iluzja. Szukaj Serca Krainy. Tam Mira pokaże Ci prawdę.", choices = listOf(DialogueChoice("Dziękuję.", "end"))))
+        registerNode(DialogueNode(id = "aelion_bells", npcId = "aelion", text = "Zatopione katedry nie milczą, one krzyczą w języku, którego zapomnieliśmy. Kiedyś byliśmy całością. Teraz jesteśmy tylko odłamkami rozbitego witraża. Jeśli usłyszysz dzwony, nie idź w stronę wody. To one przyciągnęły Pęknięcie.", choices = listOf(DialogueChoice("Będę pamiętał.", "aelion_start"))))
+        registerNode(DialogueNode(id = "aelion_absolute", npcId = "aelion", text = "Absolut to nie bóg. To Architekt, który porzucił plac budowy, zostawiając nas w niedokończonym świecie. My jesteśmy tylko błędami w jego wielkim planie, próbującymi nadać sens własnemu nieistnieniu.", choices = listOf(DialogueChoice("To mroczna wizja.", "aelion_start"))))
+
+        // REGIONAL HERO: MIRA (NEW)
+        registerNode(DialogueNode(
+            id = "mira_start", npcId = "mira",
+            text = "Spójrz w taflę jeziora. Widzisz to? Twoje odbicie mrugnęło sekundę za późno. Witaj w Sercu Krainy, gdzie prawda jest tylko jednym z wariantów.",
+            choices = listOf(
+                DialogueChoice("Czym jest Wielkie Zwierciadło?", "mira_mirror"),
+                DialogueChoice("Czy moje odbicie może mi zaszkodzić?", "mira_danger"),
+                DialogueChoice("Odejdź.", "end")
+            )
+        ))
+        registerNode(DialogueNode(id = "mira_mirror", npcId = "mira", text = "To soczewka Absolutu. Przez nią widzą nas Skrybowie. Myślą, że jesteśmy tylko atramentem na papierze, ale my czujemy ból. My krwawimy echem.", choices = listOf(DialogueChoice("Kim są Skrybowie?", "mira_scribes"))))
+        registerNode(DialogueNode(id = "mira_scribes", npcId = "mira", text = "Bytami z wyższego wymiaru paradygmatu. Piszą naszą historię w czasie rzeczywistym. Czasami popełniają błędy... i tak powstają anomalie.", choices = listOf(DialogueChoice("Przerażające.", "mira_start"))))
+        registerNode(DialogueNode(id = "mira_danger", npcId = "mira", text = "Twoje odbicie to Twoja potencjalność. Jeśli ono wyjdzie z lustra, Ty będziesz musiał wejść do środka. W Sercu Krainy nie ma miejsca dla dwóch wersji tej samej duszy.", choices = listOf(DialogueChoice("Będę uważać.", "mira_start"))))
+
+        // REGIONAL HERO: FERRUN (NEW)
+        registerNode(DialogueNode(
+            id = "ferrun_start", npcId = "ferrun",
+            text = "Ciężar... czujesz go? Grawitacja w tych górach to nie fizyka, to poczucie winy tego świata. Co sprowadza Cię do Głębi?",
+            choices = listOf(
+                DialogueChoice("Szukam broni przeciw Drugiej Stronie.", "ferrun_weapon"),
+                DialogueChoice("Dlaczego kopalnie są tak głębokie?", "ferrun_mines"),
+                DialogueChoice("Żegnaj.", "end")
+            )
+        ))
+        registerNode(DialogueNode(id = "ferrun_weapon", npcId = "ferrun", text = "Wykuwamy stal z Ciemności. Ale pamiętaj – broń, która może ranić echa, powoli zmienia swojego właściciela w jedno z nich. Każdy cios to pęknięcie w Twoim człowieczeństwie.", choices = listOf(DialogueChoice("Jestem gotów na to ryzyko.", "ferrun_start"))))
+        registerNode(DialogueNode(id = "ferrun_mines", npcId = "ferrun", text = "Kopiemy, by znaleźć dno rzeczywistości. Chcemy sprawdzić, na czym to wszystko stoi. Obawiam się jednak, że pod spodem jest tylko nieskończona, głodna nicość.", choices = listOf(DialogueChoice("Obyście się mylili.", "ferrun_start"))))
+
+        // REGIONAL HERO: NOCTYROS (NEW - META AWARE)
+        registerNode(DialogueNode(
+            id = "noctyros_start", npcId = "noctyros",
+            text = "Ach, główny bohater. Widzę, że Twoja Kotwica jest silna... tym razem. Stepy Pogranicza to margines tego świata. Tutaj widać szwy rzeczywistości.",
+            choices = listOf(
+                DialogueChoice("Co masz na myśli mówiąc 'główny bohater'?", "noctyros_meta"),
+                DialogueChoice("Czym jest Pęknięcie?", "noctyros_fracture"),
+                DialogueChoice("Jak mogę uratować GrimReich?", "noctyros_save"),
+                DialogueChoice("Jesteś szalony. Żegnaj.", "end")
+            )
+        ))
+        registerNode(DialogueNode(id = "noctyros_meta", npcId = "noctyros", text = "Jesteś procesem, który próbuje naprawić uszkodzone dane. Ten świat to tylko SessionState, a Ty jesteś jego jedyną szansą na odświeżenie. Ale uważaj... Skryba może w każdej chwili zamknąć aplikację rzeczywistości.", choices = listOf(DialogueChoice("Nic nie rozumiem.", "noctyros_start"))))
+        registerNode(DialogueNode(id = "noctyros_fracture", npcId = "noctyros", text = "To błąd logiczny. Dwa wymiary nałożyły się na siebie, bo ktoś zapomniał o warunkach brzegowych. Druga Strona to po prostu to, co nie powinno istnieć, a jednak zajmuje miejsce w pamięci świata.", choices = listOf(DialogueChoice("Mówisz zagadkami.", "noctyros_start"))))
+        registerNode(DialogueNode(id = "noctyros_save", npcId = "noctyros", text = "Nie możesz uratować czegoś, co jest zaprojektowane, by upaść. Możesz tylko przetrwać wystarczająco długo, by zobaczyć Epilog. Ale czy wybierzesz zakończenie Materialne, czy Meta-Narracyjne... to zależy od Twoich 'wyborów'.", choices = listOf(DialogueChoice("Zrobię co w mojej mocy.", "noctyros_start"))))
 
         // QUEST RESOLUTION NODES
         registerNode(DialogueNode(

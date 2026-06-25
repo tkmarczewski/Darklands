@@ -84,7 +84,7 @@ class CityViewModel @Inject constructor(
                 _uiState.update { 
                     it.copy(
                         cityName = (cityData?.name ?: "Nieznane Miejsce").uppercase(),
-                        cityStatus = socialEventSystem.cityAudience(cityId, null),
+                        cityStatus = (cityData?.loreDescription ?: socialEventSystem.cityAudience(cityId, null)),
                         backgroundDrawable = bg,
                         activeQuestsCount = localActiveUrban.size,
                         npcs = generatedNpcs,

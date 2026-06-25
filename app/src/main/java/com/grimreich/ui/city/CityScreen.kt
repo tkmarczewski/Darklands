@@ -126,15 +126,21 @@ fun CityScreen(
                 Column(modifier = Modifier.weight(1f).fillMaxHeight()) {
                     Surface(
                         color = Color(0x60000000),
-                        modifier = Modifier.fillMaxWidth().padding(bottom = 12.dp),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .weight(0.4f)
+                            .padding(bottom = 12.dp),
                         shape = MaterialTheme.shapes.extraSmall
                     ) {
-                        Text(
-                            text = state.cityStatus,
-                            color = Color.LightGray,
-                            fontSize = 12.sp,
-                            modifier = Modifier.padding(10.dp)
-                        )
+                        LazyColumn(modifier = Modifier.padding(10.dp)) {
+                            item {
+                                Text(
+                                    text = state.cityStatus,
+                                    color = Color.LightGray,
+                                    fontSize = 12.sp
+                                )
+                            }
+                        }
                     }
                     
                     Text("MIESZKAŃCY:", color = Color(0xFFC0A060), fontSize = 10.sp, fontWeight = FontWeight.Bold)
@@ -144,7 +150,7 @@ fun CityScreen(
                         Text("Ulice są puste...", color = Color.DarkGray, fontSize = 14.sp)
                     } else {
                         LazyColumn(
-                            modifier = Modifier.fillMaxSize(),
+                            modifier = Modifier.weight(0.6f),
                             verticalArrangement = Arrangement.spacedBy(6.dp)
                         ) {
                             items(state.npcs) { npc ->

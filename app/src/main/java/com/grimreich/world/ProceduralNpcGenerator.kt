@@ -32,6 +32,33 @@ class ProceduralNpcGenerator @Inject constructor() {
                 startNodeId = "xyrel_start"
             ))
         }
+        if (cityId == "serce_krainy") {
+            npcList.add(NPC(
+                id = "mira",
+                name = "Mira Wieloznaczna",
+                role = "MIRA",
+                isRegionalHero = true,
+                startNodeId = "mira_start"
+            ))
+        }
+        if (cityId == "gory_poludniowe") {
+            npcList.add(NPC(
+                id = "ferrun",
+                name = "Ferrun Żelazny",
+                role = "FERRUN",
+                isRegionalHero = true,
+                startNodeId = "ferrun_start"
+            ))
+        }
+        if (cityId == "pogranicze_stepowe") {
+            npcList.add(NPC(
+                id = "noctyros",
+                name = "Noctyros",
+                role = "NOCTYROS",
+                isRegionalHero = true,
+                startNodeId = "noctyros_start"
+            ))
+        }
 
         // 2. CANONICAL ROLES
         val roles = listOf("Merchant", "Guard", "Zealot", "Mystic", "Beggar")

@@ -61,6 +61,7 @@ data class Item(
     val value: Int = 0,
     val weight: Double = 0.0,
     val rarity: String = "common",
+    val lore: String = "",
     val properties: Map<String, Any> = emptyMap(),
     val effects: Map<String, Int> = emptyMap()
 )
