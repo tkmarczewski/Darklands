@@ -122,11 +122,13 @@ class CharacterCreatorViewModel @Inject constructor() : ViewModel() {
         }
     }
 
-    fun randomizeAll() {
-        val careers = Career.entries.filter { it.minAge <= 14 }
-        val career = careers.random()
-        selectCareer(career)
+    fun randomizeAttributes() {
+        val career = _uiState.value.selectedCareer
+        val newAttrs = _uiState.value.attributes.toMutableMap()
+        newAttrs.keys.forEach { newAttrs[it] = GameConstants.DEFAULT_ATTRIBUTE_VALUE }
         
+        _uiState.update { it.copy(attributes = newAttrs, pointsRemaining = 20) }
+
         val preferred = when (career) {
             Career.KNIGHT -> listOf("Str", "End", "Agi")
             Career.ALCHEMIST -> listOf("Int", "Cha", "Per")
@@ -140,9 +142,21 @@ class CharacterCreatorViewModel @Inject constructor() : ViewModel() {
             val key = if (Random.nextInt(100) < 70) preferred.random() else _uiState.value.attributes.keys.random()
             changeAttr(key, 1)
         }
+    }
 
+    fun randomizeSkills() {
+        val career = _uiState.value.selectedCareer
+        _uiState.update { it.copy(specializedSkills = emptySet(), specializationPointsRemaining = 3) }
         val skills = availableSkillsForCareer(career).shuffled().take(3)
         skills.forEach { toggleSkill(it) }
+    }
+
+    fun randomizeAll() {
+        val careers = Career.entries.filter { it.minAge <= 14 }
+        val career = careers.random()
+        selectCareer(career)
+        randomizeAttributes()
+        randomizeSkills()
     }
 
     fun randomName(): String {

@@ -64,10 +64,10 @@ fun CharacterCreatorScreen(
                 },
                 modifier = Modifier.height(32.dp),
                 contentPadding = PaddingValues(horizontal = 8.dp, vertical = 0.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1A1A1A)),
-                border = androidx.compose.foundation.BorderStroke(1.dp, Color.Gray)
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFC0A060)),
+                border = androidx.compose.foundation.BorderStroke(1.dp, Color.Black)
             ) {
-                Text("LOSUJ WSZYSTKO", fontSize = 9.sp)
+                Text("LOSUJ WSZYSTKO", fontSize = 9.sp, color = Color.Black, fontWeight = FontWeight.Bold)
             }
         }
 
@@ -78,14 +78,16 @@ fun CharacterCreatorScreen(
                         heroName = heroName,
                         onNameChange = { heroName = it },
                         selectedCareer = state.selectedCareer,
-                        onSelect = { viewModel.selectCareer(it) }
+                        onSelect = { viewModel.selectCareer(it) },
+                        onRandomizeName = { heroName = viewModel.randomName() }
                     )
                 }
                 CreatorStage.ATTRIBUTES -> {
                     AttributesStage(
                         attributes = state.attributes,
                         pointsRemaining = state.pointsRemaining,
-                        onUpdate = { key, delta -> viewModel.changeAttr(key, delta) }
+                        onUpdate = { key, delta -> viewModel.changeAttr(key, delta) },
+                        onRandomize = { viewModel.randomizeAttributes() }
                     )
                 }
                 CreatorStage.SKILLS -> {
@@ -93,7 +95,8 @@ fun CharacterCreatorScreen(
                         availableSkills = state.availableSkills,
                         selectedSkills = state.specializedSkills,
                         pointsRemaining = state.specializationPointsRemaining,
-                        onToggle = { viewModel.toggleSkill(it) }
+                        onToggle = { viewModel.toggleSkill(it) },
+                        onRandomize = { viewModel.randomizeSkills() }
                     )
                 }
             }
@@ -109,9 +112,10 @@ fun CharacterCreatorScreen(
                     else viewModel.prevStage()
                 },
                 modifier = Modifier.weight(1f),
-                colors = ButtonDefaults.buttonColors(containerColor = Color.DarkGray)
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFC0A060)),
+                shape = MaterialTheme.shapes.extraSmall
             ) {
-                Text("POWRÓT")
+                Text("POWRÓT", color = Color.Black, fontWeight = FontWeight.Bold)
             }
             Button(
                 onClick = {
@@ -123,9 +127,17 @@ fun CharacterCreatorScreen(
                 },
                 modifier = Modifier.weight(1f),
                 enabled = (state.stage != CreatorStage.CAREER || heroName.isNotBlank()),
-                colors = ButtonDefaults.buttonColors(containerColor = if (state.stage == CreatorStage.SKILLS) Color(0xFF4A6000) else Color(0xFF2A2A2A))
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = if (state.stage == CreatorStage.SKILLS) Color(0xFF4A6000) else Color(0xFFC0A060),
+                    disabledContainerColor = Color.DarkGray
+                ),
+                shape = MaterialTheme.shapes.extraSmall
             ) {
-                Text(if (state.stage == CreatorStage.SKILLS) "ZAKOŃCZ" else "DALEJ")
+                Text(
+                    text = if (state.stage == CreatorStage.SKILLS) "ZAKOŃCZ" else "DALEJ",
+                    color = if (state.stage == CreatorStage.SKILLS) Color.White else Color.Black,
+                    fontWeight = FontWeight.Bold
+                )
             }
         }
     }
@@ -148,22 +160,34 @@ fun ProfessionStage(
     heroName: String,
     onNameChange: (String) -> Unit,
     selectedCareer: Career,
-    onSelect: (Career) -> Unit
+    onSelect: (Career) -> Unit,
+    onRandomizeName: () -> Unit
 ) {
     val startingCareers = Career.entries.filter { it.minAge <= 14 }
 
     Column(modifier = Modifier.fillMaxSize()) {
-        OutlinedTextField(
-            value = heroName,
-            onValueChange = onNameChange,
-            label = { Text("IMIĘ BOHATERA", color = Color.Gray, fontSize = 10.sp) },
-            textStyle = androidx.compose.ui.text.TextStyle(color = Color.White, fontSize = 14.sp),
-            modifier = Modifier.fillMaxWidth().height(56.dp),
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = Color(0xFFC0A060),
-                unfocusedBorderColor = Color.DarkGray
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            OutlinedTextField(
+                value = heroName,
+                onValueChange = onNameChange,
+                label = { Text("IMIĘ BOHATERA", color = Color.Gray, fontSize = 10.sp) },
+                textStyle = androidx.compose.ui.text.TextStyle(color = Color.White, fontSize = 14.sp),
+                modifier = Modifier.weight(1f).height(56.dp),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = Color(0xFFC0A060),
+                    unfocusedBorderColor = Color.DarkGray
+                )
             )
-        )
+            Spacer(modifier = Modifier.width(8.dp))
+            Button(
+                onClick = onRandomizeName,
+                modifier = Modifier.height(56.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFC0A060)),
+                shape = MaterialTheme.shapes.extraSmall
+            ) {
+                Text("LOSUJ", color = Color.Black, fontSize = 10.sp, fontWeight = FontWeight.Bold)
+            }
+        }
 
         Spacer(modifier = Modifier.height(8.dp))
 
@@ -200,15 +224,27 @@ fun ProfessionStage(
 fun AttributesStage(
     attributes: Map<String, Int>,
     pointsRemaining: Int,
-    onUpdate: (String, Int) -> Unit
+    onUpdate: (String, Int) -> Unit,
+    onRandomize: () -> Unit
 ) {
     Column(modifier = Modifier.fillMaxSize()) {
-        Text(
-            "DOSTĘPNE PUNKTY: $pointsRemaining",
-            color = Color.Yellow,
-            fontWeight = FontWeight.Bold,
-            fontSize = 18.sp
-        )
+        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+            Text(
+                "DOSTĘPNE PUNKTY: $pointsRemaining",
+                color = Color.Yellow,
+                fontWeight = FontWeight.Bold,
+                fontSize = 18.sp
+            )
+            Button(
+                onClick = onRandomize,
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFC0A060)),
+                shape = MaterialTheme.shapes.extraSmall,
+                modifier = Modifier.height(36.dp),
+                contentPadding = PaddingValues(horizontal = 8.dp)
+            ) {
+                Text("LOSUJ", color = Color.Black, fontSize = 10.sp, fontWeight = FontWeight.Bold)
+            }
+        }
         Spacer(modifier = Modifier.height(16.dp))
         LazyColumn(modifier = Modifier.weight(1f)) {
             items(attributes.toList()) { (key, value) ->
@@ -243,15 +279,27 @@ fun SkillsStage(
     availableSkills: List<HeroSkill>,
     selectedSkills: Set<HeroSkill>,
     pointsRemaining: Int,
-    onToggle: (HeroSkill) -> Unit
+    onToggle: (HeroSkill) -> Unit,
+    onRandomize: () -> Unit
 ) {
     Column(modifier = Modifier.fillMaxSize()) {
-        Text(
-            "PUNKTY SPECJALIZACJI: $pointsRemaining",
-            color = Color.Yellow,
-            fontWeight = FontWeight.Bold,
-            fontSize = 18.sp
-        )
+        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+            Text(
+                "PUNKTY SPECJALIZACJI: $pointsRemaining",
+                color = Color.Yellow,
+                fontWeight = FontWeight.Bold,
+                fontSize = 18.sp
+            )
+            Button(
+                onClick = onRandomize,
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFC0A060)),
+                shape = MaterialTheme.shapes.extraSmall,
+                modifier = Modifier.height(36.dp),
+                contentPadding = PaddingValues(horizontal = 8.dp)
+            ) {
+                Text("LOSUJ", color = Color.Black, fontSize = 10.sp, fontWeight = FontWeight.Bold)
+            }
+        }
         Spacer(modifier = Modifier.height(16.dp))
         LazyColumn(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
             items(availableSkills) { skill ->

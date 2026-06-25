@@ -108,23 +108,46 @@ class ExpeditionViewModel @Inject constructor(
 
     fun startQuestCombat(quest: QuestEntry, onStart: () -> Unit) {
         val result = expeditionManager.startQuest(quest.id)
-        if (result is com.grimreich.systems.ExpeditionResult.StartCombat) {
-            gameRepository.updateState { 
-                it.pendingQuestId = "COMBAT_WIN:${quest.id}"
-            }
-            onStart()
+        processExpeditionResult(result, onStart)
+    }
+
+    fun completeNonCombatQuest(quest: QuestEntry, onNext: () -> Unit) {
+        val startResult = expeditionManager.startQuest(quest.id)
+        if (startResult is com.grimreich.systems.ExpeditionResult.StartInvestigation || 
+            startResult is com.grimreich.systems.ExpeditionResult.StartDialogue ||
+            startResult is com.grimreich.systems.ExpeditionResult.Travel) {
+            
+            // For now, auto-resolve non-combat steps with success
+            val finishResult = expeditionManager.onStepFinished(quest.id, success = true)
+            processExpeditionResult(finishResult, onNext)
+        } else {
+             processExpeditionResult(startResult, onNext)
         }
     }
 
-    fun completeNonCombatQuest(quest: QuestEntry, onComplete: () -> Unit) {
-        expeditionManager.startQuest(quest.id)
-        val result = expeditionManager.onStepFinished(quest.id, success = true)
-        if (result is com.grimreich.systems.ExpeditionResult.QuestCompleted) {
-            gameRepository.log("Ukończono zadanie na wyprawie: ${quest.title}")
+    private fun processExpeditionResult(result: com.grimreich.systems.ExpeditionResult, onUIAction: () -> Unit) {
+        when (result) {
+            is com.grimreich.systems.ExpeditionResult.StartCombat -> {
+                gameRepository.updateState { it.pendingQuestId = "COMBAT_WIN:${result.enemyId}" }
+                onUIAction()
+            }
+            is com.grimreich.systems.ExpeditionResult.QuestCompleted -> {
+                gameRepository.log("Zadanie wykonane: ${result.questId}")
+                gameRepository.persistCurrentState()
+                onUIAction()
+            }
+            is com.grimreich.systems.ExpeditionResult.Error -> {
+                gameRepository.log("Błąd ekspedycji: ${result.message}")
+            }
+            else -> {
+                // If it's another step (dialogue/travel), we might need to handle it.
+                // For "Wyrok", investigations are currently logic-only.
+                val finishResult = expeditionManager.onStepFinished(gameRepository.currentState().pendingQuestId ?: "", success = true)
+                if (finishResult is com.grimreich.systems.ExpeditionResult.QuestCompleted) {
+                     gameRepository.log("Cel wyprawy osiągnięty.")
+                }
+            }
         }
-        // Force refresh by notifying repository if needed, though updateState should do it
-        gameRepository.persistCurrentState()
-        onComplete()
     }
 
     fun questHasCombat(quest: QuestEntry): Boolean = quest.hasCombat

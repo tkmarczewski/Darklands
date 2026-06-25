@@ -31,6 +31,7 @@ data class Hero(
     // Punkty życia
     var hp: Int           = 30,
     var maxHp: Int        = 30,
+    var isDead: Boolean   = false,
     // Kariera
     var currentCareer: Career? = null,
     var careerHistory: List<CareerEntry> = emptyList(),

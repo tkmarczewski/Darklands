@@ -158,8 +158,11 @@ class CombatSystem @Inject constructor(
 
         if (combatRound.isDefeated(heroState)) {
             c.active = false
+            hero.isDead = true
+            hero.hp = 0
+            gameRepository.log("${hero.name} został zgładzony... Jego dusza dryfuje w Pęknięciu.")
+            gameRepository.persistCurrentState()
             onCombatEnd?.invoke()
-            c.log.add("${hero.name} pokonany...")
         }
 
         gameRepository.persistCurrentState()

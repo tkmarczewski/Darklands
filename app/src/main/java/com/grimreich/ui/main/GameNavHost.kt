@@ -34,6 +34,8 @@ import com.grimreich.ui.tavern.TavernScreen
 import com.grimreich.ui.tavern.TavernViewModel
 import com.grimreich.ui.tavern.RecruitmentScreen
 import com.grimreich.ui.DevMenuScreen
+import com.grimreich.ui.ritual.RitualScreen
+import com.grimreich.systems.RitualSystem
 import kotlinx.coroutines.launch
 import java.util.*
 
@@ -55,6 +57,7 @@ sealed class GameRoute(val route: String) {
     object CharDetail : GameRoute("char_detail")
     object Expedition : GameRoute("expedition")
     object DevMenu : GameRoute("dev_menu")
+    object Ritual : GameRoute("ritual")
 }
 
 @Composable
@@ -64,6 +67,17 @@ fun GameNavHost(
 ) {
     val mode by root.mode.collectAsState()
     val scope = rememberCoroutineScope()
+
+    // Global listener for death to redirect to Ritual
+    LaunchedEffect(Unit) {
+        root.gameRepository.gameState.collect { state ->
+            val activeHero = state.party.find { it.id == state.activeHeroId }
+            if (activeHero?.isDead == true && root.mode.value != GameScreenMode.RITUAL) {
+                root.setMode(GameScreenMode.RITUAL)
+            }
+        }
+    }
+
     LaunchedEffect(mode) {
         val target = when (mode) {
             GameScreenMode.MAIN_MENU -> GameRoute.MainMenu.route
@@ -83,6 +97,7 @@ fun GameNavHost(
             GameScreenMode.CHAR_DETAIL -> GameRoute.CharDetail.route
             GameScreenMode.EVENTS -> GameRoute.Expedition.route
             GameScreenMode.DEV_MENU -> GameRoute.DevMenu.route
+            GameScreenMode.RITUAL -> GameRoute.Ritual.route
             else -> null
         }
         
@@ -264,6 +279,21 @@ fun GameNavHost(
             DevMenuScreen(
                 onBack = { root.setMode(GameScreenMode.HUB) }
             )
+        }
+        composable(GameRoute.Ritual.route) {
+            val ritualVm: com.grimreich.ui.ritual.RitualViewModel = hiltViewModel()
+            val hero by ritualVm.deadHero.collectAsState()
+            
+            hero?.let {
+                RitualScreen(
+                    hero = it,
+                    ritualSystem = ritualVm.ritualSystem,
+                    onRevived = { root.setMode(GameScreenMode.HUB) },
+                    onSacrificed = { root.setMode(GameScreenMode.HUB) }
+                )
+            } ?: run {
+                root.setMode(GameScreenMode.HUB)
+            }
         }
 
     }
