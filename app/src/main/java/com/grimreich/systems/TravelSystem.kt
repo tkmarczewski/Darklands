@@ -30,9 +30,10 @@ class TravelSystem @Inject constructor(
             totalHoursTraveled = partyState.totalHoursTraveled + hoursSpent
         )
         
+        val state = gameRepository.currentState()
         val encounterTriggered = random.nextFloat() < terrain.encounterChance
         val encounterId = if (encounterTriggered) {
-            encounterSystem.rollEncounter(random)?.id
+            encounterSystem.rollEncounter(random, state)?.id
         } else null
         
         val result = TravelResult(
@@ -100,7 +101,7 @@ class TravelSystem @Inject constructor(
         w.timeOfDay = if (newParty.totalHoursTraveled % 24 > 12) "evening" else "afternoon"
         
         if (travelResult.encounterTriggered) {
-            val encounter = encounterSystem.rollEncounter(kotlin.random.Random.Default)
+            val encounter = encounterSystem.rollEncounter(kotlin.random.Random.Default, g)
             if (encounter != null) {
                 encounterSystem.activeEncounter = encounter
                 g.pendingQuestId = "encounter:${encounter.id}"

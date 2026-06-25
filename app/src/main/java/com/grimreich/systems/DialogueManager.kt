@@ -245,6 +245,22 @@ class DialogueManager @Inject constructor(
         registerNode(DialogueNode(id = "aelion_bells", npcId = "aelion", text = "Zatopione katedry nie milczą, one krzyczą w języku, którego zapomnieliśmy. Kiedyś byliśmy całością. Teraz jesteśmy tylko odłamkami rozbitego witraża. Jeśli usłyszysz dzwony, nie idź w stronę wody. To one przyciągnęły Pęknięcie.", choices = listOf(DialogueChoice("Będę pamiętał.", "aelion_start"))))
         registerNode(DialogueNode(id = "aelion_absolute", npcId = "aelion", text = "Absolut to nie bóg. To Architekt, który porzucił plac budowy, zostawiając nas w niedokończonym świecie. My jesteśmy tylko błędami w jego wielkim planie, próbującymi nadać sens własnemu nieistnieniu.", choices = listOf(DialogueChoice("To mroczna wizja.", "aelion_start"))))
 
+        // AELION ENDING NODES
+        registerNode(DialogueNode(
+            id = "aelion_final", npcId = "aelion",
+            text = "Dzwony Wybrzeża biją po raz ostatni. Pęknięcie mnie wzywa. Mogę stać się częścią Twojej drużyny i opóźnić Epilog... albo zniknąć w Nadziei.",
+            choices = listOf(
+                DialogueChoice("[REKRUTACJA] Twoja wiedza jest nam potrzebna.", "end", factionId = "zakon", requiredReputation = 100, onSelect = { s ->
+                    s.pendingQuestId = "RECRUIT:aelion"
+                }),
+                DialogueChoice("[ASCENDENCJA] Twoja Nadzieja musi trwać wiecznie.", "aelion_ascend", onSelect = { s ->
+                    s.world.globalStability = (s.world.globalStability + 30).coerceAtMost(100)
+                }),
+                DialogueChoice("Niech morze Cię zabierze.", "end")
+            )
+        ))
+        registerNode(DialogueNode(id = "aelion_ascend", npcId = "aelion", text = "Będę wieczną latarnią dla tych, którzy się zagubili. [AELION ZNIKA, STABILNOŚĆ +30]", choices = listOf(DialogueChoice("Do widzenia, Proroku.", "end"))))
+
         registerNode(DialogueNode(
             id = "aelion_secret_reveal", npcId = "aelion",
             text = "A więc widzisz znaki pod moją skórą... Rzeczywistość nie wytrzyma tej prawdy! [EKRAN MIGOCZE]",
@@ -270,6 +286,54 @@ class DialogueManager @Inject constructor(
         registerNode(DialogueNode(id = "mira_mirror", npcId = "mira", text = "To soczewka Absolutu. Przez nią widzą nas Skrybowie. Myślą, że jesteśmy tylko atramentem na papierze, ale my czujemy ból. My krwawimy echem.", choices = listOf(DialogueChoice("Kim są Skrybowie?", "mira_scribes"))))
         registerNode(DialogueNode(id = "mira_scribes", npcId = "mira", text = "Bytami z wyższego wymiaru paradygmatu. Piszą naszą historię w czasie rzeczywistym. Czasami popełniają błędy... i tak powstają anomalie.", choices = listOf(DialogueChoice("Przerażające.", "mira_start"))))
         registerNode(DialogueNode(id = "mira_danger", npcId = "mira", text = "Twoje odbicie to Twoja potencjalność. Jeśli ono wyjdzie z lustra, Ty będziesz musiał wejść do środka. W Sercu Krainy nie ma miejsca dla dwóch wersji tej samej duszy.", choices = listOf(DialogueChoice("Będę uważać.", "mira_start"))))
+
+        // MIRA ENDING NODES
+        registerNode(DialogueNode(
+            id = "mira_final", npcId = "mira",
+            text = "Lustra pękają. Skryba traci cierpliwość do mojego Serca. Muszę wybrać: zostać tu i wyparować, lub dołączyć do Twojej Kotwicy.",
+            choices = listOf(
+                DialogueChoice("[REKRUTACJA] Chodź ze mną. Razem naprawimy świat.", "end", factionId = "milczenie", requiredReputation = 100, onSelect = { s ->
+                    s.pendingQuestId = "RECRUIT:mira"
+                }),
+                DialogueChoice("[ASCENDENCJA] Poświęć się dla stabilności krainy.", "mira_ascend", onSelect = { s ->
+                    s.world.globalStability = (s.world.globalStability + 30).coerceAtMost(100)
+                }),
+                DialogueChoice("Nie potrzebuję kolejnego cienia.", "end")
+            )
+        ))
+        registerNode(DialogueNode(id = "mira_ascend", npcId = "mira", text = "Zrozumiałam. Stanę się światłem wewnątrz zwierciadła. [MIRA ZNIKA, STABILNOŚĆ +30]", choices = listOf(DialogueChoice("Żegnaj, Miro.", "end"))))
+
+        // FERRUN ENDING NODES
+        registerNode(DialogueNode(
+            id = "ferrun_final", npcId = "ferrun",
+            text = "Kopalnie są puste. Wykopaliśmy wszystko, co materialne. Został tylko ciężar. Pozwolisz mi nieść go razem z Tobą?",
+            choices = listOf(
+                DialogueChoice("[REKRUTACJA] Twoja stal nam się przyda.", "end", factionId = "inkwizycja", requiredReputation = 100, onSelect = { s ->
+                    s.pendingQuestId = "RECRUIT:ferrun"
+                }),
+                DialogueChoice("[ASCENDENCJA] Zablokuj Głębię swoim życiem.", "ferrun_ascend", onSelect = { s ->
+                    s.world.globalStability = (s.world.globalStability + 30).coerceAtMost(100)
+                }),
+                DialogueChoice("Góry to Twoje miejsce.", "end")
+            )
+        ))
+        registerNode(DialogueNode(id = "ferrun_ascend", npcId = "ferrun", text = "Zostaję na dnie. Moje ciało zamieni się w żelazo, by nicość nie przeszła dalej. [FERRUN ZNIKA, STABILNOŚĆ +30]", choices = listOf(DialogueChoice("Twoja ofiara nie zostanie zapomniana.", "end"))))
+
+        // NOCTYROS ENDING NODES
+        registerNode(DialogueNode(
+            id = "noctyros_final", npcId = "noctyros",
+            text = "Pęknięcie jest zbyt szerokie. Sesja dobiega końca. Widzę Epilog na horyzoncie. Mogę wejść do Twojej drużyny jako błąd systemowy... albo wrócić do kodu.",
+            choices = listOf(
+                DialogueChoice("[REKRUTACJA] Potrzebujemy kogoś, kto widzi kod.", "end", factionId = "pustka", requiredReputation = 100, onSelect = { s ->
+                    s.pendingQuestId = "RECRUIT:noctyros"
+                }),
+                DialogueChoice("[ASCENDENCJA] Napraw Pęknięcie swoją esencją.", "noctyros_ascend", onSelect = { s ->
+                    s.world.globalStability = (s.world.globalStability + 30).coerceAtMost(100)
+                }),
+                DialogueChoice("Znikaj w swojej nicości.", "end")
+            )
+        ))
+        registerNode(DialogueNode(id = "noctyros_ascend", npcId = "noctyros", text = "Nadpisuję dane... Rzeczywistość... odświeżona. [NOCTYROS ZNIKA, STABILNOŚĆ +30]", choices = listOf(DialogueChoice("Dziękuję.", "end"))))
 
         // REGIONAL HERO: FERRUN (NEW)
         registerNode(DialogueNode(

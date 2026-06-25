@@ -27,6 +27,13 @@ fun ExpeditionScreen(
     val state by viewModel.uiState.collectAsState()
     var questToConfirm by remember { mutableStateOf<QuestEntry?>(null) }
 
+    // React to Raids
+    LaunchedEffect(state.raidCombatData) {
+        state.raidCombatData?.let { (id, stats) ->
+            onCombat(QuestEntry(id, stats.first, "", "", "", 0, hasCombat = true))
+        }
+    }
+
     Box(modifier = Modifier.fillMaxSize().background(Color.Black)) {
         Column(
             modifier = Modifier.fillMaxSize().padding(GameConstants.UI.PADDING_MEDIUM),

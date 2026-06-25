@@ -22,7 +22,8 @@ data class ExpeditionUiState(
     val regionName: String = "",
     val outsideQuests: List<QuestEntry> = emptyList(),
     val activeEncounter: Encounter? = null,
-    val encounterLog: String? = null
+    val encounterLog: String? = null,
+    val raidCombatData: Pair<String, Triple<String, Int, Int>>? = null
 )
 
 @HiltViewModel
@@ -64,8 +65,9 @@ class ExpeditionViewModel @Inject constructor(
         gameRepository.updateState { it.isExpeditionActive = true }
         // Roll for random encounter on enter
         val random = kotlin.random.Random.Default
+        val state = gameRepository.currentState()
         if (random.nextFloat() < 0.4f) {
-            val encounter = encounterSystem.rollEncounter(random)
+            val encounter = encounterSystem.rollEncounter(random, state)
             encounterSystem.activeEncounter = encounter
         }
     }
@@ -80,6 +82,7 @@ class ExpeditionViewModel @Inject constructor(
                 "perception" -> hero.perception
                 "intelligence" -> hero.intelligence
                 "strength" -> hero.strength
+                "charisma" -> hero.charisma
                 else -> 0
             }
             if (value < choice.requiredValue) {
@@ -89,11 +92,28 @@ class ExpeditionViewModel @Inject constructor(
         }
 
         val msg = choice.effect(state)
-        gameRepository.log("Wydarzenie: ${choice.description} -> $msg")
-        encounterSystem.activeEncounter = null
-        gameRepository.persistCurrentState()
         
-        _uiState.update { it.copy(activeEncounter = null, encounterLog = msg) }
+        // Special case for raids
+        if (msg.startsWith("POJEDYNEK:")) {
+            val parts = msg.split(":")
+            val name = parts[1]
+            val hp = parts[2].toInt()
+            val atk = parts[3].toInt()
+            
+            encounterSystem.activeEncounter = null
+            gameRepository.updateState { it.pendingQuestId = "RAID:$name:$hp:$atk" }
+            _uiState.update { 
+                it.copy(
+                    activeEncounter = null,
+                    raidCombatData = "RAID" to Triple(name, hp, atk)
+                ) 
+            }
+        } else {
+            gameRepository.log("Wydarzenie: ${choice.description} -> $msg")
+            encounterSystem.activeEncounter = null
+            gameRepository.persistCurrentState()
+            _uiState.update { it.copy(activeEncounter = null, encounterLog = msg) }
+        }
     }
 
     fun dismissEncounter() {

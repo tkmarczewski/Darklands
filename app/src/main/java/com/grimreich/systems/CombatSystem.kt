@@ -198,6 +198,18 @@ class CombatSystem @Inject constructor(
     }
 
     fun startEncounterForQuest(questId: String) {
+        if (questId == "RAID") {
+            // Stats should have been set in state or passed differently.
+            // Let's use a simpler approach: get from GameState.pendingQuestId if it starts with RAID
+            val state = gameRepository.currentState()
+            val pending = state.pendingQuestId
+            if (pending?.startsWith("RAID:") == true) {
+                val parts = pending.split(":")
+                startCombat(parts[1], parts[2].toInt(), parts[3].toInt(), parts[3].toInt() / 2)
+                return
+            }
+        }
+
         val template = QuestRegistry.allTemplates.find { it.id == questId }
             ?: QuestRegistry.bloodChain.stages.find { it.id == questId }
             ?: QuestRegistry.verdictChain.stages.find { it.id == questId }

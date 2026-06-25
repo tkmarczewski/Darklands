@@ -150,5 +150,32 @@ class ItemCatalogue @Inject constructor() {
             effects = mapOf("corruption" to 5),
             properties = mapOf("icon" to "ic_artifact_core")
         ))
+
+        // FACTION EXCLUSIVE ITEMS (NEW)
+        register(Item(
+            id = "inquisitor_seal",
+            name = "Pieczęć Inkwizytora",
+            type = "relic",
+            slot = "accessory",
+            value = 300,
+            weight = 0.2,
+            rarity = "rare",
+            lore = "Złoty sygnet z wyrytym okiem Trybunału. Daje prawo do zadawania pytań, na które nikt nie chce odpowiadać.",
+            effects = mapOf("perception" to 5, "piety" to 3, "armor" to 2),
+            properties = mapOf("icon" to "ic_artifact_eye", "faction" to "inkwizycja")
+        ))
+
+        register(Item(
+            id = "dawns_ember",
+            name = "Żar Świtu",
+            type = "relic",
+            slot = "accessory",
+            value = 300,
+            weight = 0.1,
+            rarity = "rare",
+            lore = "Wiecznie ciepły odłamek pierwszej latarni Zakonu. Rozprasza mrok w duszy i chroni przed szaleństwem.",
+            effects = mapOf("sanity" to 10, "piety" to 5, "defense" to 3),
+            properties = mapOf("icon" to "ic_artifact_stone", "faction" to "zakon")
+        ))
     }
 }

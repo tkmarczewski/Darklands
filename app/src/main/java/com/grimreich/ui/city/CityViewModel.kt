@@ -25,7 +25,9 @@ data class CityUiState(
     val isQuestMenuOpen: Boolean = false,
     val isGlitchActive: Boolean = false,
     val priceModifier: Float = 1.0f,
-    val glitchIntensity: Float = 1.0f
+    val glitchIntensity: Float = 1.0f,
+    val factionStanding: com.grimreich.grimreich.v1.ReputationLevel = com.grimreich.grimreich.v1.ReputationLevel.NEUTRAL,
+    val rulingFactionName: String = "Neutralna"
 )
 
 @HiltViewModel
@@ -89,9 +91,11 @@ class CityViewModel @Inject constructor(
                     else -> null
                 }
                 var baseModifier = cityData?.priceModifier ?: 1.0f
+                var currentStanding = com.grimreich.grimreich.v1.ReputationLevel.NEUTRAL
                 factionId?.let { fid ->
                     val score = state.reputation.globalFactions[fid] ?: 0
                     val level = com.grimreich.grimreich.v1.ReputationLevel.fromScore(score)
+                    currentStanding = level
                     baseModifier *= when (level) {
                         com.grimreich.grimreich.v1.ReputationLevel.EXALTED -> 0.8f // 20% discount
                         com.grimreich.grimreich.v1.ReputationLevel.FRIENDLY -> 0.9f // 10% discount
@@ -111,7 +115,9 @@ class CityViewModel @Inject constructor(
                         activeLocalQuests = localActiveUrban,
                         isGlitchActive = finalGlitchIntensity > 0.5f,
                         priceModifier = baseModifier,
-                        glitchIntensity = finalGlitchIntensity
+                        glitchIntensity = finalGlitchIntensity,
+                        factionStanding = currentStanding,
+                        rulingFactionName = cityData?.rulingFaction ?: "Neutralna"
                     )
                 }
             }
@@ -138,6 +144,15 @@ class CityViewModel @Inject constructor(
                 "mystic", "mistyk" -> "mystic_report_back"
                 "zealot", "pielgrzym" -> "zealot_report_back"
                 else -> "quest_report_back_generic"
+            }
+        } else if (state.world.globalStability < 25 || (state.reputation.globalFactions[role.lowercase()] ?: 0) >= 100) {
+            // Hero Arc Resolution
+            when (role.lowercase()) {
+                "mira" -> "mira_final"
+                "ferrun" -> "ferrun_final"
+                "noctyros" -> "noctyros_final"
+                "aelion" -> "aelion_final" // I'll add this too
+                else -> node
             }
         } else node
 

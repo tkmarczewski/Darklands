@@ -268,6 +268,52 @@ class ChronicleSystem @Inject constructor(
             fullText = "Każda anomalia, którą pokonasz, zostawia bliznę w kodzie świata. Te blizny są jedynym dowodem na to, że kiedykolwiek tu byliśmy."
         ))
 
+        // --- THE GREAT UNBINDING (ENDINGS LORE) ---
+
+        register(ChronicleEntry(
+            id = "lore_aelion_ascension",
+            title = "Ostatnia Nadzieja Wybrzeża",
+            category = "Endings",
+            fullText = """
+                Prorok Aelion oddał swoją esencję mgle. Jego światło nie pochodzi już z ognia, lecz z czystej stabilności. 
+                Mówi się, że tak długo, jak dzwony katedr milczą, Wybrzeże Północne pozostanie nienaruszone przez Epilog. 
+                Prorok przestał istnieć jako instancja, stając się stałą w równaniu świata.
+            """.trimIndent()
+        ))
+
+        register(ChronicleEntry(
+            id = "lore_mira_ascension",
+            title = "Prawda w Odbiciu",
+            category = "Endings",
+            fullText = """
+                Mira weszła w Wielkie Zwierciadło i rozbiła je od środka. 
+                Tysiące odłamków szkła spadło na Serce Krainy, a każdy z nich zawierał idealną kopię kawałka rzeczywistości. 
+                Dzięki jej ofierze, Skryba nie może już wymazać krainy bez zniszczenia samej soczewki, przez którą patrzy.
+            """.trimIndent()
+        ))
+
+        register(ChronicleEntry(
+            id = "lore_ferrun_iron_wall",
+            title = "Żelazna Blokada",
+            category = "Endings",
+            fullText = """
+                Góry Południowe zadrżały, gdy Ferrun zasiadł na tronie w najgłębszej kopalni. 
+                Jego ciało połączyło się z żyłami Gęstej Ciemności, tworząc nieprzenikalną barierę dla Pustki. 
+                Nicość nie może przejść przez dno, które ma wolę twardszą od bazaltu.
+            """.trimIndent()
+        ))
+
+        register(ChronicleEntry(
+            id = "lore_noctyros_update",
+            title = "Systemowa Aktualizacja",
+            category = "Endings",
+            fullText = """
+                Noctyros nadpisał Pęknięcie własnym kodem. 
+                Zamiast destrukcji, kraina Pogranicza otrzymała nowy paradygmat egzystencji. 
+                Błąd logiczny został zamieniony w nową funkcję, a rzeczywistość stepów stała się odporna na procesy czyszczące Skrybów.
+            """.trimIndent()
+        ))
+
         register(ChronicleEntry(
             id = "lore_scribe_tools",
             title = "Narzędzia Skrybów",

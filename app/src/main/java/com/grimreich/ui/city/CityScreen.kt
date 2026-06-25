@@ -76,13 +76,38 @@ fun CityScreen(
                 shape = MaterialTheme.shapes.extraSmall,
                 border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFFC0A060))
             ) {
-                Box(contentAlignment = Alignment.Center) {
+                Row(
+                    modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
                     Text(
                         text = state.cityName,
                         color = Color(0xFFE0C080),
                         fontWeight = FontWeight.Bold,
                         fontSize = 24.sp
                     )
+                    
+                    // FACTION INDICATOR
+                    Surface(
+                        color = when(state.factionStanding) {
+                            com.grimreich.grimreich.v1.ReputationLevel.EXALTED -> Color(0xFFC0A060)
+                            com.grimreich.grimreich.v1.ReputationLevel.FRIENDLY -> Color(0xFF4A6000)
+                            com.grimreich.grimreich.v1.ReputationLevel.HOSTILE -> Color(0xFF800000)
+                            com.grimreich.grimreich.v1.ReputationLevel.HATED -> Color.Black
+                            else -> Color(0xFF333333)
+                        },
+                        border = androidx.compose.foundation.BorderStroke(1.dp, Color.Gray),
+                        shape = MaterialTheme.shapes.extraSmall
+                    ) {
+                        Text(
+                            text = "${state.rulingFactionName.uppercase()}: ${state.factionStanding.displayName.uppercase()}",
+                            color = if (state.factionStanding == com.grimreich.grimreich.v1.ReputationLevel.HATED) Color.Red else Color.White,
+                            fontSize = 8.sp,
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
+                        )
+                    }
                 }
             }
 

@@ -99,7 +99,30 @@ class EncounterSystem @Inject constructor(
 
     var activeEncounter: Encounter? = null
 
-    fun rollEncounter(random: Random): Encounter? {
+    fun rollEncounter(random: Random, state: GameState): Encounter? {
+        // --- FACTION RAIDS ---
+        val hostileFactions = state.reputation.globalFactions.filter { it.value <= -50 }.keys
+        if (hostileFactions.isNotEmpty() && random.nextFloat() < 0.2f) {
+            val factionId = hostileFactions.toList().random(random)
+            return Encounter(
+                id = "raid_${factionId}",
+                title = "Zasadzka: ${factionId.uppercase()}",
+                description = "Twoje działania przeciwko frakcji ${factionId.uppercase()} nie pozostały niezauważone. Grupa zabójców zastępuje Ci drogę!",
+                type = EncounterType.COMBAT,
+                choices = listOf(
+                    EncounterChoice("Walcz o życie!", "Rozpoczyna się brutalne starcie.") { s ->
+                        val (name, hp, atk) = when(factionId) {
+                            "inkwizycja" -> Triple("Egzekutor Inkwizycji", 70, 15)
+                            "zakon" -> Triple("Mściciel Zakonu", 65, 14)
+                            else -> Triple("Zabójca Frakcyjny", 60, 12)
+                        }
+                        // This return is just a log, the actual combat start is handled in ViewModel
+                        "POJEDYNEK:$name:$hp:$atk" 
+                    }
+                )
+            )
+        }
+
         if (random.nextFloat() > 0.3f) return null
         return encounters.random()
     }

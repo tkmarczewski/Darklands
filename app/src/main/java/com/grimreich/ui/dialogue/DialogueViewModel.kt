@@ -136,6 +136,12 @@ class DialogueViewModel @Inject constructor(
                         // Call the explicit system complete to handle gold reward
                         questSystem.complete(qId)
                     }
+                    cmd.startsWith("RECRUIT:") -> {
+                        val heroType = cmd.removePrefix("RECRUIT:")
+                        val hero = createRecruitedHero(heroType)
+                        state.party.add(hero)
+                        gameRepository.log("Bohater zrekrutowany: ${hero.name}")
+                    }
                     else -> {
                         if (!state.quest.activeQuests.contains(cmd)) {
                             state.quest.activeQuests.add(cmd)
@@ -152,5 +158,33 @@ class DialogueViewModel @Inject constructor(
         }
 
         gameRepository.persistCurrentState()
+    }
+
+    private fun createRecruitedHero(type: String): com.grimreich.core.Hero {
+        return when (type.lowercase()) {
+            "mira" -> com.grimreich.core.Hero(
+                id = "hero_mira", name = "Mira Wieloznaczna", age = 120, strength = 10, agility = 14, 
+                perception = 18, intelligence = 20, endurance = 12, charisma = 15, piety = 10,
+                hp = 60, maxHp = 60, portraitRes = "port_alchemist"
+            )
+            "ferrun" -> com.grimreich.core.Hero(
+                id = "hero_ferrun", name = "Ferrun Żelazny", age = 85, strength = 22, agility = 8, 
+                perception = 10, intelligence = 12, endurance = 25, charisma = 8, piety = 15,
+                hp = 120, maxHp = 120, portraitRes = "port_barbarian"
+            )
+            "noctyros" -> com.grimreich.core.Hero(
+                id = "hero_noctyros", name = "Noctyros", age = 0, strength = 15, agility = 18, 
+                perception = 20, intelligence = 25, endurance = 15, charisma = 10, piety = 5,
+                hp = 80, maxHp = 80, portraitRes = "port_demon"
+            )
+            "aelion" -> com.grimreich.core.Hero(
+                id = "hero_aelion", name = "Prorok Aelion", age = 300, strength = 8, agility = 10, 
+                perception = 15, intelligence = 18, endurance = 12, charisma = 20, piety = 25,
+                hp = 70, maxHp = 70, portraitRes = "port_priest"
+            )
+            else -> com.grimreich.core.Hero(
+                id = "hero_gen_${java.util.UUID.randomUUID()}", name = "Wysłannik", age = 30, hp = 40, maxHp = 40
+            )
+        }
     }
 }
