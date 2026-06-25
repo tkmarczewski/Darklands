@@ -1,5 +1,6 @@
 package com.grimreich.ui.quests
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -11,6 +12,8 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -107,30 +110,52 @@ private fun QuestCard(
     isCompleted: Boolean = false,
     onAccept: () -> Unit
 ) {
+    val context = LocalContext.current
+    val iconName = when(quest.category) {
+        "Intrigue" -> "ic_artifact_eye"
+        "Anomaly" -> "ic_scroll_blood"
+        "Beast" -> "ic_item_sword_1h"
+        "Drama" -> "ic_artifact_heart"
+        "Verdict" -> "ic_artifact_mask"
+        "Chain" -> "ic_artifact_blood"
+        else -> "ic_scroll_ice"
+    }
+    val iconResId = context.resources.getIdentifier(iconName, "drawable", context.packageName)
+
     Card(
         modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
         colors = CardDefaults.cardColors(containerColor = Color(0xFF101010)),
         border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFF222222))
     ) {
-        Column(modifier = Modifier.padding(12.dp)) {
-            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                Text(text = quest.title, color = Color(0xFFC0A060), fontWeight = FontWeight.Bold)
-                if (!isActive && !isCompleted) {
-                    Button(
-                        onClick = onAccept,
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF203010)),
-                        modifier = Modifier.height(32.dp).padding(0.dp),
-                        contentPadding = PaddingValues(horizontal = 8.dp, vertical = 0.dp)
-                    ) {
-                        Text("PRZYJMIJ", fontSize = 10.sp)
+        Row(modifier = Modifier.padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
+            if (iconResId != 0) {
+                Image(
+                    painter = painterResource(id = iconResId),
+                    contentDescription = null,
+                    modifier = Modifier.size(32.dp).padding(end = 12.dp)
+                )
+            }
+            
+            Column(modifier = Modifier.weight(1f)) {
+                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                    Text(text = quest.title, color = Color(0xFFE0C080), fontWeight = FontWeight.Bold)
+                    if (!isActive && !isCompleted) {
+                        Button(
+                            onClick = onAccept,
+                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF203010)),
+                            modifier = Modifier.height(32.dp).padding(0.dp),
+                            contentPadding = PaddingValues(horizontal = 8.dp, vertical = 0.dp)
+                        ) {
+                            Text("PRZYJMIJ", fontSize = 10.sp)
+                        }
                     }
                 }
-            }
-            Text(text = quest.description, color = Color.White, fontSize = 12.sp)
-            Spacer(modifier = Modifier.height(8.dp))
-            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                Text(text = "CEL: ${quest.objective}", color = Color.Red, fontSize = 10.sp)
-                Text(text = "LOKACJA: ${quest.cityId.uppercase().replace("_", " ")}", color = Color.Gray, fontSize = 9.sp)
+                Text(text = quest.description, color = Color.White, fontSize = 12.sp)
+                Spacer(modifier = Modifier.height(8.dp))
+                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                    Text(text = "CEL: ${quest.objective}", color = if (isCompleted) Color.Gray else Color(0xFFADFF2F), fontSize = 10.sp)
+                    Text(text = "LOKACJA: ${quest.cityId.uppercase().replace("_", " ")}", color = Color.Gray, fontSize = 9.sp)
+                }
             }
         }
     }

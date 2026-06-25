@@ -20,7 +20,8 @@ data class QuestEntry(
     val originRefId: String = "mystic",
     val isOutsideCity: Boolean = false,
     val nextQuestId: String? = null, // For chains
-    val hasCombat: Boolean = false // true if quest involves a battle
+    val hasCombat: Boolean = false, // true if quest involves a battle
+    val category: String = "Normal"
 )
 
 @Singleton
@@ -116,7 +117,8 @@ class QuestSystem @Inject constructor(
                         else -> "mystic"
                     },
                     isOutsideCity = (template.category == "Anomaly" || template.category == "Beast"),
-                    hasCombat = template.enemyStats != null
+                    hasCombat = template.enemyStats != null,
+                    category = template.category
                 )
             )
         }
@@ -135,6 +137,7 @@ class QuestSystem @Inject constructor(
                     originRefId = "mystic",
                     hasCombat = template.enemyStats != null,
                     isOutsideCity = true,
+                    category = "Chain",
                     nextQuestId = if (i < QuestRegistry.bloodChain.stages.size - 1) QuestRegistry.bloodChain.stages[i+1].id else null
                 )
             )
@@ -153,6 +156,7 @@ class QuestSystem @Inject constructor(
                     originRefId = "guard",
                     hasCombat = template.enemyStats != null,
                     isOutsideCity = (template.id != "q_verdict_1"),
+                    category = "Verdict",
                     nextQuestId = if (i < QuestRegistry.verdictChain.stages.size - 1) QuestRegistry.verdictChain.stages[i+1].id else null
                 )
             )
