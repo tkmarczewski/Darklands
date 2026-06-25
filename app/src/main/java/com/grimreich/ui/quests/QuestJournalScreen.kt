@@ -61,6 +61,15 @@ fun QuestJournalScreen(
                 }
             }
             
+            val achievable = state.activeQuests.filter { it.status == com.grimreich.systems.QuestStatus.CEL_OSIAGNIETY }
+            if (achievable.isNotEmpty()) {
+                item { Spacer(modifier = Modifier.height(16.dp)) }
+                item { SectionHeader("GOTOWE DO ODDANIA") }
+                items(achievable) { quest ->
+                    QuestCard(quest, isAchieved = true, onAccept = {})
+                }
+            }
+
             item { Spacer(modifier = Modifier.height(16.dp)) }
             item { SectionHeader("UKOŃCZONE") }
             if (state.completedQuests.isEmpty()) {
@@ -108,6 +117,7 @@ private fun QuestCard(
     quest: QuestEntry,
     isActive: Boolean = false,
     isCompleted: Boolean = false,
+    isAchieved: Boolean = false,
     onAccept: () -> Unit
 ) {
     val context = LocalContext.current
@@ -138,8 +148,8 @@ private fun QuestCard(
             
             Column(modifier = Modifier.weight(1f)) {
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                    Text(text = quest.title, color = Color(0xFFE0C080), fontWeight = FontWeight.Bold)
-                    if (!isActive && !isCompleted) {
+                    Text(text = quest.title, color = if (isAchieved) Color.Green else Color(0xFFE0C080), fontWeight = FontWeight.Bold)
+                    if (!isActive && !isCompleted && !isAchieved) {
                         Button(
                             onClick = onAccept,
                             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF203010)),
@@ -153,7 +163,8 @@ private fun QuestCard(
                 Text(text = quest.description, color = Color.White, fontSize = 12.sp)
                 Spacer(modifier = Modifier.height(8.dp))
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                    Text(text = "CEL: ${quest.objective}", color = if (isCompleted) Color.Gray else Color(0xFFADFF2F), fontSize = 10.sp)
+                    val objectiveText = if (isAchieved) "ZADANIE WYKONANE. WRÓĆ DO ZLECENIODAWCY." else "CEL: ${quest.objective}"
+                    Text(text = objectiveText, color = if (isAchieved) Color.Green else if (isCompleted) Color.Gray else Color(0xFFADFF2F), fontSize = 10.sp)
                     Text(text = "LOKACJA: ${quest.cityId.uppercase().replace("_", " ")}", color = Color.Gray, fontSize = 9.sp)
                 }
             }

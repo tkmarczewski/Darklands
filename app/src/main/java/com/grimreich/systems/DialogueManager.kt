@@ -308,5 +308,46 @@ class DialogueManager @Inject constructor(
         ))
         registerNode(DialogueNode(id = "xyrel_aelion", npcId = "xyrel", text = "Starzec siedzi w swojej mgle. Myśli, że modlitwa naprawi Pęknięcie. Tutaj potrzebujemy stali, nie kadzidła.", choices = listOf(DialogueChoice("Rozumiem.", "end"))))
         registerNode(DialogueNode(id = "xyrel_strict", npcId = "xyrel", text = "Bo słabość to zaproszenie dla Drugiej Strony. Każda wątpliwość to kolejna szczelina w rzeczywistości.", choices = listOf(DialogueChoice("Mocne słowa.", "end"))))
+
+        // QUEST RESOLUTION NODES (Generic hooks for reporting back)
+        registerNode(DialogueNode(
+            id = "quest_report_back_generic", npcId = "generic",
+            text = "Widzę, że zadanie zostało wykonane. Dobra robota, Kotwico. Oto Twoja zapłata.",
+            choices = listOf(
+                DialogueChoice("Dziękuję. (ODBIERZ NAGRODĘ)", "end")
+            )
+        ))
+
+        registerNode(DialogueNode(
+            id = "guard_report_back", npcId = "guard",
+            text = "Stal i dyscyplina! Meldujesz wykonanie zadania? Doskonale. Twoja służba nie zostanie zapomniana.",
+            choices = listOf(
+                DialogueChoice("Ku chwale Zakonu. (ODBIERZ NAGRODĘ)", "end")
+            )
+        ))
+
+        registerNode(DialogueNode(
+            id = "merchant_report_back", npcId = "merchant",
+            text = "Aha! Przynosisz dobre wieści? Interesy z Tobą to czysta przyjemność. Złoto już czeka.",
+            choices = listOf(
+                DialogueChoice("Wymieńmy to na kruszec. (ODBIERZ NAGRODĘ)", "end")
+            )
+        ))
+
+        registerNode(DialogueNode(
+            id = "mystic_report_back", npcId = "mystic",
+            text = "Echa ucichły... przynajmniej na chwilę. Zrobiłeś to, co było konieczne. Poczuj wdzięczność rzeczywistości.",
+            choices = listOf(
+                DialogueChoice("Zrozumiałem. (ODBIERZ NAGRODĘ)", "end")
+            )
+        ))
+
+        registerNode(DialogueNode(
+            id = "zealot_report_back", npcId = "zealot",
+            text = "Prorocy uśmiechają się do Ciebie! Twoja wiara została wystawiona na próbę i przetrwała. Przyjmij to jako dar od Serca.",
+            choices = listOf(
+                DialogueChoice("Niech Absolut prowadzi. (ODBIERZ NAGRODĘ)", "end")
+            )
+        ))
     }
 }

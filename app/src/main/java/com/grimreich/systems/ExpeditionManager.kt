@@ -78,7 +78,7 @@ class ExpeditionManager @Inject constructor(
 
         return if (nextIndex >= definition.steps.size) {
             stepIndices.remove(questId)
-            questSystem.complete(questId)
+            questSystem.markObjectiveComplete(questId)
             ExpeditionResult.QuestCompleted(questId, definition.baseReward)
         } else {
             stepIndices[questId] = nextIndex

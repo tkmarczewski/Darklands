@@ -5,7 +5,8 @@ enum class QuestStepType {
     DIALOGUE,
     INVESTIGATION,
     TRAVEL,
-    CHOICE
+    CHOICE,
+    REPORT_BACK
 }
 
 data class QuestStep(

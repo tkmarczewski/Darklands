@@ -79,7 +79,7 @@ class CombatViewModel @Inject constructor(
         if (!state.combat.active) {
             state.pendingQuestId?.let { qId ->
                 if (qId.startsWith("COMBAT_WIN:")) {
-                    questSystem.complete(qId.removePrefix("COMBAT_WIN:"))
+                    questSystem.markObjectiveComplete(qId.removePrefix("COMBAT_WIN:"))
                 }
             }
             gameRepository.updateState { 

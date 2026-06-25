@@ -6,7 +6,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 enum class QuestStatus {
-    DOSTEPNE, AKTYWNE, UKONCZONE
+    DOSTEPNE, AKTYWNE, CEL_OSIAGNIETY, UKONCZONE
 }
 
 data class QuestEntry(
@@ -50,8 +50,18 @@ class QuestSystem @Inject constructor(
         return quest
     }
 
+    fun markObjectiveComplete(id: String) {
+        val quest = allQuests[id] ?: return
+        if (quest.status == QuestStatus.AKTYWNE) {
+            quest.status = QuestStatus.CEL_OSIAGNIETY
+            gameRepository.log("Cel osiągnięty: ${quest.title}. Wróć do zleceniodawcy po nagrodę.")
+            gameRepository.persistCurrentState()
+        }
+    }
+
     fun complete(id: String): QuestEntry {
         val quest = allQuests[id] ?: throw IllegalArgumentException("No such quest: $id")
+        // No longer restricted to only CEL_OSIAGNIETY for safety/legacy reasons, but primarily called from dialogue now
         quest.status = QuestStatus.UKONCZONE
         
         gameRepository.updateState { state ->

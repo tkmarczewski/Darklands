@@ -81,10 +81,31 @@ class CityViewModel @Inject constructor(
     }
 
     fun startDialogue(name: String, role: String, node: String, onStart: () -> Unit) {
-        gameRepository.updateState { state ->
-            state.pendingDialogueNpcName = name
-            state.pendingDialogueNpcRole = role
-            state.pendingDialogueNodeId = node
+        val state = gameRepository.currentState()
+        val cityId = rawIdToSlug(state.grimCurrentRegion)
+        
+        // Redirect to report back if any quest for this NPC/role is ready for reward
+        val questToReport = state.quest.activeQuests
+            .mapNotNull { questSystem.getQuest(it) }
+            .find { it.cityId == cityId && it.originRefId.lowercase() == role.lowercase() && it.status == QuestStatus.CEL_OSIAGNIETY }
+
+        val targetNode = if (questToReport != null) {
+            when (role.lowercase()) {
+                "guard", "straznik" -> "guard_report_back"
+                "merchant", "kupiec" -> "merchant_report_back"
+                "mystic", "mistyk" -> "mystic_report_back"
+                "zealot", "pielgrzym" -> "zealot_report_back"
+                else -> "quest_report_back_generic"
+            }
+        } else node
+
+        gameRepository.updateState { s ->
+            s.pendingDialogueNpcName = name
+            s.pendingDialogueNpcRole = role
+            s.pendingDialogueNodeId = targetNode
+            if (questToReport != null) {
+                s.pendingQuestId = "FINALIZE:${questToReport.id}"
+            }
         }
         onStart()
     }

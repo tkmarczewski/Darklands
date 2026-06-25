@@ -5,6 +5,8 @@ import androidx.lifecycle.viewModelScope
 import com.grimreich.core.GameRepository
 import com.grimreich.core.GameState
 import com.grimreich.systems.DialogueManager
+import com.grimreich.systems.QuestSystem
+import com.grimreich.systems.QuestStatus
 import com.grimreich.grimreich.v1.DialogueNode
 import com.grimreich.grimreich.v1.DialogueChoice
 import com.grimreich.world.CityCatalogue
@@ -25,6 +27,7 @@ data class DialogueUiState(
 class DialogueViewModel @Inject constructor(
     private val gameRepository: GameRepository,
     private val dialogueManager: DialogueManager,
+    private val questSystem: QuestSystem,
     private val cityCatalogue: CityCatalogue
 ) : ViewModel() {
 
@@ -119,17 +122,31 @@ class DialogueViewModel @Inject constructor(
         if (choice.targetNodeId == "end" || nextNode == null) {
             // Handle quest activation/completion from dialogue
             state.pendingQuestId?.let { cmd ->
-                if (cmd.startsWith("COMPLETE:")) {
-                    val qId = cmd.removePrefix("COMPLETE:")
-                    state.quest.activeQuests.remove(qId)
-                    if (!state.quest.completedQuests.contains(qId)) {
-                        state.quest.completedQuests.add(qId)
-                        gameRepository.log("Zadanie ukończone: $qId")
+                when {
+                    cmd.startsWith("COMPLETE:") -> {
+                        val qId = cmd.removePrefix("COMPLETE:")
+                        state.quest.activeQuests.remove(qId)
+                        if (!state.quest.completedQuests.contains(qId)) {
+                            state.quest.completedQuests.add(qId)
+                            gameRepository.log("Zadanie ukończone: $qId")
+                        }
                     }
-                } else {
-                    if (!state.quest.activeQuests.contains(cmd)) {
-                        state.quest.activeQuests.add(cmd)
-                        gameRepository.log("Nowe zadanie aktywowane: $cmd")
+                    cmd.startsWith("FINALIZE:") -> {
+                        val qId = cmd.removePrefix("FINALIZE:")
+                        // Call the explicit system complete to handle gold reward
+                        gameRepository.persistCurrentState() // Save current state first
+                        val quest = (gameRepository as? com.grimreich.core.GameRepository)?.let {
+                            // Actually it's easier to just call QuestSystem.complete directly
+                            // But I don't have easy access to it here except via the Provider or Dagger
+                        }
+                        // Use QuestSystem injected via constructor
+                        questSystem.complete(qId)
+                    }
+                    else -> {
+                        if (!state.quest.activeQuests.contains(cmd)) {
+                            state.quest.activeQuests.add(cmd)
+                            gameRepository.log("Nowe zadanie aktywowane: $cmd")
+                        }
                     }
                 }
                 state.pendingQuestId = null
