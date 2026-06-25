@@ -11,6 +11,7 @@ data class CityData(
     val rulingFaction: String = "Neutralna",
     val priceModifier: Float = 1.0f,
     val backgroundDrawable: String = "bg_region_north_coast",
+    val corruptedBackgroundDrawable: String? = null,
     val loreDescription: String = "",
     val primaryArtifact: String = "",
     val events: MutableList<String> = mutableListOf(),
@@ -46,6 +47,7 @@ class CityCatalogue @Inject constructor() {
             rulingFaction = "Zakon Świtu",
             priceModifier = 1.0f,
             backgroundDrawable = "bg_region_north_coast",
+            corruptedBackgroundDrawable = "bg_corrupted_coast",
             loreDescription = "Miejsce, gdzie rzeczywistość miesza się z sennym oparem.",
             prophet = "Aelion"
         ))
@@ -59,6 +61,7 @@ class CityCatalogue @Inject constructor() {
             rulingFaction = "Twierdza Zakonu",
             priceModifier = 0.9f,
             backgroundDrawable = "bg_region_crown_plains",
+            corruptedBackgroundDrawable = "bg_corrupted_village",
             loreDescription = "Ziemia przesiąknięta szkarłatem.",
             prophet = "Xyrel"
         ))
@@ -72,6 +75,7 @@ class CityCatalogue @Inject constructor() {
             rulingFaction = "Inkwizycja",
             priceModifier = 1.1f,
             backgroundDrawable = "bg_location_order_fortress",
+            corruptedBackgroundDrawable = "bg_corrupted_graveyard",
             loreDescription = "Serce sprawiedliwości i Trybunału.",
             prophet = "Silentius"
         ))
@@ -85,6 +89,7 @@ class CityCatalogue @Inject constructor() {
             rulingFaction = "Klasztor Milczenia",
             priceModifier = 1.2f,
             backgroundDrawable = "bg_region_heartland",
+            corruptedBackgroundDrawable = "bg_corrupted_swamp",
             loreDescription = "Kraina luster i lśniących jezior.",
             prophet = "Mira"
         ))

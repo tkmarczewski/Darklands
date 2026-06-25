@@ -21,13 +21,33 @@ class ProceduralNpcGenerator @Inject constructor(
     )
 
     fun generateForCity(cityId: String, seed: Int): List<NPC> {
-        val random = Random(seed.toLong())
-        val count = 3 + random.nextInt(3)
         val state = gameRepository.currentState()
         
+        // Return known NPCs if already generated for this city
+        state.knownNpcs[cityId]?.let { return it }
+
+        val random = Random(seed.toLong())
         val npcList = mutableListOf<NPC>()
-        
-        // Chance to spawn a "Crime Scene" for Verdict Chain if not started
+
+        // 1. REGIONAL HEROES
+        when (cityId) {
+            "wybrzeze_polnocne" -> npcList.add(NPC(
+                id = "hero_aelion",
+                name = "Prorok Aelion",
+                role = "MYSTIC",
+                startNodeId = "aelion_start",
+                isRegionalHero = true
+            ))
+            "rowniny_koronne" -> npcList.add(NPC(
+                id = "hero_xyrel",
+                name = "Inkwizytor Xyrel",
+                role = "GUARD",
+                startNodeId = "xyrel_start",
+                isRegionalHero = true
+            ))
+        }
+
+        // 2. INCIDENTS
         val hasVerdict1 = state.quest.activeQuests.contains("q_verdict_1") || state.quest.completedQuests.contains("q_verdict_1")
         if (!hasVerdict1 && random.nextInt(100) < 30) {
              npcList.add(NPC(
@@ -38,16 +58,25 @@ class ProceduralNpcGenerator @Inject constructor(
             ))
         }
 
+        // 3. GENERATED NPCS
+        val count = 2 + random.nextInt(3)
         val roleKeys = roles.keys.toList()
         repeat(count) {
             val roleName = roleKeys[random.nextInt(roleKeys.size)]
+            val isInfested = state.world.globalStability < 40 && random.nextInt(100) < (50 - state.world.globalStability)
+            
             npcList.add(NPC(
-                id = "npc_${cityId}_${it}",
+                id = "npc_${cityId}_${it}_${random.nextInt(1000)}",
                 name = generateName(random),
                 role = roleName,
-                startNodeId = roles[roleName] ?: "end"
+                startNodeId = if (isInfested) "infested_start" else roles[roleName] ?: "end",
+                isInfested = isInfested
             ))
         }
+        
+        // Persist the generated NPCs
+        state.knownNpcs[cityId] = npcList
+        gameRepository.persistCurrentState()
         
         return npcList
     }

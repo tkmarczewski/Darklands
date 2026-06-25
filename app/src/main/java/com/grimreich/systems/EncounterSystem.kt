@@ -12,6 +12,8 @@ enum class EncounterType {
 data class EncounterChoice(
     val label: String,
     val description: String,
+    val requiredAttribute: String? = null,
+    val requiredValue: Int = 0,
     val effect: (GameState) -> String
 )
 
@@ -36,6 +38,28 @@ class EncounterSystem @Inject constructor(
                     lootSystem.awardLoot(1.0f)
                 },
                 EncounterChoice("Ignoruj", "Przeszedłeś obok.") { "Bezpieczeństwo przede wszystkim." }
+            )
+        ),
+        Encounter(
+            "enc_per_01", "Ukryta Skrytka", "Twoje zmysły podpowiadają, że pod luźnym kamieniem coś się znajduje.",
+            EncounterType.RESOURCE,
+            listOf(
+                EncounterChoice("[Perception 12] Przeszukaj skrytkę", "Znalazłeś stare monety!", "perception", 12) { state ->
+                    state.gold += 50
+                    "Znalazłeś 50 złota!"
+                },
+                EncounterChoice("Zostaw to", "Może to pułapka.") { "Lepiej nie ryzykować." }
+            )
+        ),
+        Encounter(
+            "enc_int_01", "Dziwny Mechanizm", "Na środku drogi stoi dziwna, pulsująca maszyna echa.",
+            EncounterType.INTERACTIVE,
+            listOf(
+                EncounterChoice("[Intelligence 14] Rozszyfruj działanie", "Ustabilizowałeś fragment rzeczywistości!", "intelligence", 14) { state ->
+                    state.world.globalStability += 10
+                    "Stabilność świata wzrosła!"
+                },
+                EncounterChoice("Omiń", "Wygląda niebezpiecznie.") { "Przyspieszyłeś kroku." }
             )
         )
     )

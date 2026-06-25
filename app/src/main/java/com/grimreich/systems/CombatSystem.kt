@@ -57,6 +57,30 @@ class CombatSystem @Inject constructor(
     fun playerAttack(): String = resolvePlayerAction("ATTACK")
     fun playerDefend(): String = resolvePlayerAction("DEFEND")
     fun playerUseSpecial(type: String): String = resolvePlayerAction("SPECIAL_$type")
+    
+    fun usePotion(itemId: String): String {
+        val state = gameRepository.currentState()
+        val c = state.combat
+        val hero = state.party.find { it.id == state.activeHeroId } ?: return "Brak bohatera"
+        
+        val potion = state.inventory.find { it.id == itemId } ?: return "Brak mikstury"
+        val heal = potion.effects["heal"] ?: 0
+        val mana = potion.effects["mana"] ?: 0
+        
+        if (heal > 0) {
+            hero.hp = (hero.hp + heal).coerceAtMost(hero.maxHp)
+            c.log.add("${hero.name} wypija ${potion.name} (+${heal} HP)")
+        }
+        if (mana > 0) {
+            // Restore endurance/mana equivalent
+            hero.endurance = (hero.endurance + mana).coerceAtMost(hero.maxHp)
+            c.log.add("${hero.name} wypija ${potion.name} (+${mana} Wytrz.)")
+        }
+        
+        state.inventory.remove(potion)
+        gameRepository.persistCurrentState()
+        return "Użyto ${potion.name}"
+    }
 
     private fun resolvePlayerAction(actionType: String): String {
         val state = gameRepository.currentState()

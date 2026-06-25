@@ -10,6 +10,7 @@ import com.grimreich.grimreich.v1.NPC
 import com.grimreich.systems.QuestSystem
 import com.grimreich.systems.QuestStatus
 import com.grimreich.systems.QuestEntry
+import com.grimreich.core.GameConstants
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import javax.inject.Inject
@@ -21,7 +22,8 @@ data class CityUiState(
     val activeQuestsCount: Int = 0,
     val npcs: List<NPC> = emptyList(),
     val activeLocalQuests: List<QuestEntry> = emptyList(),
-    val isQuestMenuOpen: Boolean = false
+    val isQuestMenuOpen: Boolean = false,
+    val isGlitchActive: Boolean = false
 )
 
 @HiltViewModel
@@ -30,7 +32,8 @@ class CityViewModel @Inject constructor(
     private val questSystem: QuestSystem,
     private val cityCatalogue: CityCatalogue,
     private val npcGenerator: ProceduralNpcGenerator,
-    private val socialEventSystem: SocialEventSystem
+    private val socialEventSystem: SocialEventSystem,
+    private val ontologicalEngine: com.grimreich.core.engine.OntologicalEngine
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(CityUiState())
@@ -50,14 +53,23 @@ class CityViewModel @Inject constructor(
                 val seed = state.world.day + cityId.hashCode() + state.world.cityEntryCount
                 val generatedNpcs = npcGenerator.generateForCity(cityId, seed)
 
+                val stability = state.world.globalStability
+                val isCorrupted = stability < GameConstants.STABILITY_THRESHOLD_LOW
+                val bg = if (isCorrupted && cityData?.corruptedBackgroundDrawable != null) {
+                    cityData.corruptedBackgroundDrawable
+                } else {
+                    cityData?.backgroundDrawable ?: "bg_region_north_coast"
+                }
+
                 _uiState.update { 
                     it.copy(
                         cityName = (cityData?.name ?: "Nieznane Miejsce").uppercase(),
                         cityStatus = socialEventSystem.cityAudience(cityId, null),
-                        backgroundDrawable = cityData?.backgroundDrawable ?: "bg_region_north_coast",
+                        backgroundDrawable = bg,
                         activeQuestsCount = localActiveUrban.size,
                         npcs = generatedNpcs,
-                        activeLocalQuests = localActiveUrban
+                        activeLocalQuests = localActiveUrban,
+                        isGlitchActive = ontologicalEngine.isGlitchActive()
                     )
                 }
             }

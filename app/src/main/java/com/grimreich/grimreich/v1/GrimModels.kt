@@ -31,7 +31,10 @@ data class NPC(
     val inventory: List<Item> = emptyList(),
     val dialogue: Map<String, Any>? = null,
     val startNodeId: String? = null,
-    val stability: Float = 1.0f
+    val stability: Float = 1.0f,
+    val isInfested: Boolean = false,
+    val isRegionalHero: Boolean = false,
+    val interactionHistory: MutableMap<String, Int> = mutableMapOf()
 )
 
 data class Boss(val id: String, val name: String, val level: Int, val lootTable: RewardTable)
@@ -62,6 +65,8 @@ data class DialogueChoice(
     val targetNodeId: String,
     val requiredReputation: Int = 0,
     val factionId: String? = null,
+    val requiredAttributes: Map<String, Int> = emptyMap(),
+    val requiredSkills: Map<String, Int> = emptyMap(),
     val onSelect: (GameState) -> Unit = {}
 )
 

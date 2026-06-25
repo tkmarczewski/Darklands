@@ -36,6 +36,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.grimreich.ui.effects.glitchEffect
 
 @Composable
 fun CityScreen(
@@ -57,7 +58,9 @@ fun CityScreen(
             Image(
                 painter = painterResource(id = bgResId),
                 contentDescription = null,
-                modifier = Modifier.fillMaxSize(),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .glitchEffect(state.isGlitchActive, 1.5f),
                 contentScale = ContentScale.Crop,
                 alpha = 0.5f
             )

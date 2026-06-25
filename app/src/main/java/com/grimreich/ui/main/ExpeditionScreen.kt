@@ -2,31 +2,11 @@ package com.grimreich.ui.main
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -35,6 +15,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.grimreich.core.GameConstants
 import com.grimreich.systems.QuestEntry
+import com.grimreich.systems.Encounter
+import com.grimreich.systems.EncounterChoice
 
 @Composable
 fun ExpeditionScreen(
@@ -51,6 +33,17 @@ fun ExpeditionScreen(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text("WYPRAWA: ${state.regionName.uppercase()}", color = Color(0xFFC0A060), fontSize = 22.sp, fontWeight = FontWeight.Bold)
+            
+            state.encounterLog?.let { log ->
+                Surface(
+                    color = Color(0xFF111111),
+                    modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
+                    border = androidx.compose.foundation.BorderStroke(1.dp, Color.Gray)
+                ) {
+                    Text(log, color = Color.White, modifier = Modifier.padding(8.dp), fontSize = 12.sp)
+                }
+            }
+
             Text("CELE W POBLIŻU:", color = Color.Gray, fontSize = 12.sp, modifier = Modifier.padding(top = 8.dp, bottom = 16.dp))
 
             if (state.outsideQuests.isEmpty()) {
@@ -77,6 +70,36 @@ fun ExpeditionScreen(
             }
         }
 
+        // RANDOM ENCOUNTER OVERLAY
+        state.activeEncounter?.let { encounter ->
+            AlertDialog(
+                onDismissRequest = { viewModel.dismissEncounter() },
+                title = { Text(encounter.title, color = Color(0xFFE0C080)) },
+                text = { Text(encounter.description, color = Color.White) },
+                confirmButton = {
+                    Column {
+                        encounter.choices.forEach { choice ->
+                            Button(
+                                onClick = { viewModel.handleEncounterChoice(choice) },
+                                modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+                                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1A1A1A)),
+                                border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFF333333))
+                            ) {
+                                Text(choice.label, color = Color(0xFFE0C080), fontSize = 12.sp)
+                            }
+                        }
+                    }
+                },
+                dismissButton = {
+                    TextButton(onClick = { viewModel.dismissEncounter() }) {
+                        Text("ZAMKNIJ", color = Color.Gray)
+                    }
+                },
+                containerColor = Color(0xFF050505),
+                shape = MaterialTheme.shapes.extraSmall
+            )
+        }
+
         // CONFIRMATION OVERLAY with Combat Warning
         questToConfirm?.let { quest ->
             AlertDialog(
@@ -96,11 +119,14 @@ fun ExpeditionScreen(
                 confirmButton = {
                     Button(onClick = {
                         if (quest.hasCombat) {
-                            onCombat(quest)
-                            questToConfirm = null
+                            viewModel.startQuestCombat(quest) {
+                                onCombat(quest)
+                                questToConfirm = null
+                            }
                         } else {
-                            // viewModel.completeNonCombatQuest(quest) { questToConfirm = null }
-                            questToConfirm = null
+                            viewModel.completeNonCombatQuest(quest) {
+                                questToConfirm = null
+                            }
                         }
                     }) {
                         Text("WYRUSZ")

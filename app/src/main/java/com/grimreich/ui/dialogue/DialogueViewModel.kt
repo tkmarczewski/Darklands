@@ -3,6 +3,7 @@ package com.grimreich.ui.dialogue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.grimreich.core.GameRepository
+import com.grimreich.core.GameState
 import com.grimreich.systems.DialogueManager
 import com.grimreich.grimreich.v1.DialogueNode
 import com.grimreich.grimreich.v1.DialogueChoice
@@ -16,7 +17,8 @@ data class DialogueUiState(
     val npcName: String = "",
     val npcRole: String = "",
     val npcPortrait: String = "port_rogue",
-    val backgroundDrawable: String = "bg_region_north_coast"
+    val backgroundDrawable: String = "bg_region_north_coast",
+    val availableChoices: List<Pair<DialogueChoice, Boolean>> = emptyList()
 )
 
 @HiltViewModel
@@ -45,8 +47,10 @@ class DialogueViewModel @Inject constructor(
     }
 
     private fun refresh(npcName: String, npcRole: String, nodeId: String) {
-        val currentCityId = gameRepository.currentState().grimCurrentRegion
+        val gameState = gameRepository.currentState()
+        val currentCityId = gameState.grimCurrentRegion
         val city = cityCatalogue.get(currentCityId)
+        val node = dialogueManager.getNode(nodeId)
         
         _uiState.update { 
             it.copy(
@@ -54,16 +58,63 @@ class DialogueViewModel @Inject constructor(
                 npcRole = npcRole,
                 npcPortrait = dialogueManager.getPortrait(npcRole),
                 backgroundDrawable = city?.backgroundDrawable ?: "bg_region_north_coast",
-                currentNode = dialogueManager.getNode(nodeId)
+                currentNode = node,
+                availableChoices = node?.choices?.map { choice ->
+                    choice to checkRequirements(choice, gameState)
+                } ?: emptyList()
             )
         }
     }
 
+    private fun checkRequirements(choice: DialogueChoice, state: GameState): Boolean {
+        if (choice.requiredAttributes.isEmpty() && choice.requiredSkills.isEmpty() && choice.factionId == null) return true
+        
+        val hero = state.party.find { it.id == state.activeHeroId } ?: state.party.firstOrNull() ?: return false
+        
+        // Check attributes
+        choice.requiredAttributes.forEach { (attr, value) ->
+            val heroValue = when (attr.lowercase()) {
+                "strength", "siła" -> hero.strength
+                "agility", "zwinność" -> hero.agility
+                "perception", "percepcja", "postrzeganie" -> hero.perception
+                "intelligence", "inteligencja" -> hero.intelligence
+                "endurance", "wytrzymałość" -> hero.endurance
+                "charisma", "charyzma" -> hero.charisma
+                "piety", "pobożność" -> hero.piety
+                else -> 0
+            }
+            if (heroValue < value) return false
+        }
+        
+        // Check skills
+        choice.requiredSkills.forEach { (skill, value) ->
+            if ((hero.skills[skill] ?: 0) < value) return false
+        }
+
+        // Check reputation
+        if (choice.factionId != null) {
+            val rep = state.reputation.cityFactions[state.grimCurrentRegion]?.get(choice.factionId) ?: 0
+            if (rep < choice.requiredReputation) return false
+        }
+
+        return true
+    }
+
     fun choose(choice: DialogueChoice) {
         val state = gameRepository.currentState()
+        if (!checkRequirements(choice, state)) return
+
         choice.onSelect(state)
         val nextNode = dialogueManager.getNode(choice.targetNodeId)
-        _uiState.update { it.copy(currentNode = nextNode) }
+        
+        _uiState.update { 
+            it.copy(
+                currentNode = nextNode,
+                availableChoices = nextNode?.choices?.map { c ->
+                    c to checkRequirements(c, state)
+                } ?: emptyList()
+            )
+        }
         
         if (choice.targetNodeId == "end" || nextNode == null) {
             // Handle quest activation/completion from dialogue

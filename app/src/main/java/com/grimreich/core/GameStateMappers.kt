@@ -26,6 +26,7 @@ fun GameState.toDto(): SessionStateDto = SessionStateDto(
     prayer = prayer.toDto(),
     world = world.toDto(),
     combat = combat.toDto(),
+    knownNpcs = knownNpcs.mapValues { entry -> entry.value.map { (it as com.grimreich.grimreich.v1.NPC).toDto() } },
     isExpeditionActive = isExpeditionActive,
     lastSaveTimestamp = lastSaveTimestamp
 )
@@ -52,9 +53,11 @@ fun SessionStateDto.toDomain(): GameState = GameState(
     prayer = prayer.toDomain(),
     world = world.toDomain(),
     combat = combat.toDomain(),
-    isExpeditionActive = isExpeditionActive,
-    lastSaveTimestamp = lastSaveTimestamp
-)
+).also {
+    it.knownNpcs.putAll(knownNpcs.mapValues { entry -> entry.value.map { it.toDomain() as com.grimreich.grimreich.v1.NPC } })
+    it.isExpeditionActive = isExpeditionActive
+    it.lastSaveTimestamp = lastSaveTimestamp
+}
 
 fun Hero.toDto(): HeroDto = HeroDto(
     id = id,
@@ -240,6 +243,24 @@ fun CombatStateDto.toDomain(): CombatState = CombatState().also {
     it.enemyEffects.addAll(enemyEffects.map { effect -> effect.toDomain() })
     it.log.addAll(log)
 }
+
+fun NpcDto.toDomain(): com.grimreich.grimreich.v1.NPC = com.grimreich.grimreich.v1.NPC(
+    id = id,
+    name = name,
+    role = role,
+    factionId = factionId,
+    startNodeId = startNodeId,
+    stability = stability
+)
+
+fun com.grimreich.grimreich.v1.NPC.toDto(): NpcDto = NpcDto(
+    id = id,
+    name = name,
+    role = role,
+    factionId = factionId,
+    startNodeId = startNodeId,
+    stability = stability
+)
 
 fun StatusEffect.toDto(): StatusEffectDto = StatusEffectDto(
     type = type.name,

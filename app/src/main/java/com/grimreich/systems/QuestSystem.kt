@@ -131,6 +131,7 @@ class QuestSystem @Inject constructor(
                     objective = template.objective,
                     cityId = "wybrzeze_polnocne",
                     rewardGold = template.baseReward,
+                    status = if (i == 0) QuestStatus.DOSTEPNE else QuestStatus.AKTYWNE, // Only first is available initially
                     originRefId = "mystic",
                     hasCombat = template.enemyStats != null,
                     isOutsideCity = true,

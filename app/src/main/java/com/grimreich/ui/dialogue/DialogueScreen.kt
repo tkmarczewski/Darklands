@@ -92,9 +92,9 @@ fun DialogueScreen(
                         modifier = Modifier.weight(1f).fillMaxWidth(),
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        state.currentNode?.choices?.let { choices ->
-                            items(choices) { choice ->
-                                DialogueChoiceBtn(choice.text) { 
+                        items(state.availableChoices) { (choice, isEnabled) ->
+                            DialogueChoiceBtn(choice.text, isEnabled) { 
+                                if (isEnabled) {
                                     viewModel.choose(choice)
                                     if (choice.targetNodeId == "end") {
                                         if (state.npcRole.lowercase().contains("kupiec") || state.npcRole.lowercase().contains("merchant")) {
@@ -114,18 +114,18 @@ fun DialogueScreen(
 }
 
 @Composable
-private fun DialogueChoiceBtn(text: String, onClick: () -> Unit) {
+private fun DialogueChoiceBtn(text: String, isEnabled: Boolean = true, onClick: () -> Unit) {
     Surface(
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 4.dp)
-            .clickable { onClick() },
-        color = Color(0xFF151515),
-        border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFF333333))
+            .clickable(enabled = isEnabled) { onClick() },
+        color = if (isEnabled) Color(0xFF151515) else Color(0xFF0A0A0A),
+        border = androidx.compose.foundation.BorderStroke(1.dp, if (isEnabled) Color(0xFF333333) else Color(0xFF111111))
     ) {
         Text(
-            text = "> $text",
-            color = Color(0xFFE0C080),
+            text = if (isEnabled) "> $text" else "[ZABLOKOWANE] $text",
+            color = if (isEnabled) Color(0xFFE0C080) else Color.DarkGray,
             modifier = Modifier.padding(12.dp),
             fontSize = 14.sp
         )

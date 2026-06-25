@@ -1,23 +1,12 @@
 package com.grimreich.ui.combat
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.LinearProgressIndicator
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -99,6 +88,20 @@ fun CombatScreen(viewModel: CombatViewModel, onExit: () -> Unit) {
                 CombatButton("ODBICIE", onClick = { viewModel.useSpecial("REFLECTION") })
                 CombatButton("UCIECZKA", color = Color(0xFF5A1A1A), onClick = { viewModel.flee() })
             }
+
+            if (uiState.potions.isNotEmpty()) {
+                Spacer(modifier = Modifier.height(12.dp))
+                Text("TWOJE MIKSTURY:", color = Color(0xFFADFF2F), fontSize = 10.sp, fontWeight = FontWeight.Bold)
+                Spacer(modifier = Modifier.height(4.dp))
+                LazyRow(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    items(uiState.potions) { potion ->
+                        PotionBtn(potion.name) { viewModel.usePotion(potion.id) }
+                    }
+                }
+            }
         } else {
             Button(
                 onClick = { viewModel.exitCombat(onExit) },
@@ -139,5 +142,23 @@ fun CombatButton(text: String, color: Color = Color(0xFF2A2A2A), onClick: () -> 
         shape = MaterialTheme.shapes.extraSmall
     ) {
         Text(text = text, color = Color(0xFFE0C080), fontSize = 10.sp, fontWeight = FontWeight.Bold)
+    }
+}
+
+@Composable
+fun PotionBtn(name: String, onClick: () -> Unit) {
+    Surface(
+        onClick = onClick,
+        color = Color(0xFF2A4000),
+        shape = androidx.compose.foundation.shape.RoundedCornerShape(4.dp),
+        border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFFADFF2F))
+    ) {
+        Text(
+            text = name.uppercase(),
+            color = Color.White,
+            fontSize = 9.sp,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.padding(horizontal = 8.dp, vertical = 6.dp)
+        )
     }
 }

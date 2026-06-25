@@ -33,11 +33,31 @@ class ExpeditionManager @Inject constructor(
     private val stepIndices = mutableMapOf<String, Int>()
 
     fun startQuest(questId: String): ExpeditionResult {
-        val definition = QuestDefinitionRegistry.getById(questId)
+        val definition = QuestDefinitionRegistry.getById(questId) 
+            ?: createDefaultDefinition(questId)
             ?: return ExpeditionResult.Error("Brak definicji questa: $questId")
 
         stepIndices[questId] = 0
         return resolveStep(questId, definition)
+    }
+
+    private fun createDefaultDefinition(questId: String): QuestDefinition? {
+        val entry = questSystem.getQuest(questId) ?: return null
+        return QuestDefinition(
+            id = entry.id,
+            title = entry.title,
+            description = entry.description,
+            category = "Standard",
+            baseReward = entry.rewardGold,
+            steps = listOf(
+                QuestStep(
+                    id = "${entry.id}_step",
+                    type = if (entry.hasCombat) QuestStepType.COMBAT else QuestStepType.INVESTIGATION,
+                    targetId = entry.id,
+                    description = entry.objective
+                )
+            )
+        )
     }
 
     fun currentStep(questId: String): QuestStep? {
@@ -50,6 +70,7 @@ class ExpeditionManager @Inject constructor(
         if (!success) return ExpeditionResult.Error("Krok nieudany")
 
         val definition = QuestDefinitionRegistry.getById(questId)
+            ?: createDefaultDefinition(questId)
             ?: return ExpeditionResult.Error("Brak definicji questa: $questId")
 
         val currentIndex = stepIndices[questId] ?: 0
@@ -57,6 +78,7 @@ class ExpeditionManager @Inject constructor(
 
         return if (nextIndex >= definition.steps.size) {
             stepIndices.remove(questId)
+            questSystem.complete(questId)
             ExpeditionResult.QuestCompleted(questId, definition.baseReward)
         } else {
             stepIndices[questId] = nextIndex
@@ -70,7 +92,19 @@ class ExpeditionManager @Inject constructor(
             ?: return ExpeditionResult.Error("Brak kroku")
 
         return when (step.type) {
-            QuestStepType.COMBAT -> ExpeditionResult.StartCombat(step.targetId, "Enemy", 50, 10, 5)
+            QuestStepType.COMBAT -> {
+                val stats = QuestRegistry.allTemplates.find { it.id == questId }?.enemyStats
+                    ?: QuestRegistry.bloodChain.stages.find { it.id == questId }?.enemyStats
+                    ?: QuestRegistry.verdictChain.stages.find { it.id == questId }?.enemyStats
+                
+                ExpeditionResult.StartCombat(
+                    enemyId = step.targetId,
+                    enemyName = stats?.name ?: "Potworna Istota",
+                    enemyHp = stats?.hp ?: 50,
+                    enemyAtk = stats?.atk ?: 10,
+                    enemyDef = stats?.def ?: 5
+                )
+            }
             QuestStepType.DIALOGUE -> ExpeditionResult.StartDialogue(step.targetId)
             QuestStepType.INVESTIGATION -> ExpeditionResult.StartInvestigation(step.targetId)
             QuestStepType.TRAVEL -> ExpeditionResult.Travel(step.targetId)
@@ -79,7 +113,7 @@ class ExpeditionManager @Inject constructor(
     }
 
     fun getStepInfo(questId: String): String {
-        val definition = QuestDefinitionRegistry.getById(questId) ?: return "Brak"
+        val definition = QuestDefinitionRegistry.getById(questId) ?: createDefaultDefinition(questId) ?: return "Brak"
         val index = stepIndices[questId] ?: 0
         return "[${index + 1}/${definition.steps.size}]"
     }

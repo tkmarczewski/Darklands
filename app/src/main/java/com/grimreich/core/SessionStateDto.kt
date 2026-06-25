@@ -31,6 +31,7 @@ data class SessionStateDto(
     val prayer: PrayerStateDto = PrayerStateDto(),
     val world: WorldStateDto = WorldStateDto(),
     val combat: CombatStateDto = CombatStateDto(),
+    val knownNpcs: Map<String, List<NpcDto>> = emptyMap(),
     val isExpeditionActive: Boolean = false,
     val lastSaveTimestamp: Long = 0
 )
@@ -132,6 +133,16 @@ data class CombatStateDto(
     val enemyEffects: List<StatusEffectDto> = emptyList(),
     val heroEffects: List<StatusEffectDto> = emptyList(),
     val log: List<String> = emptyList()
+)
+
+@Serializable
+data class NpcDto(
+    val id: String,
+    val name: String,
+    val role: String,
+    val factionId: String? = null,
+    val startNodeId: String? = null,
+    val stability: Float = 1.0f
 )
 
 @Serializable

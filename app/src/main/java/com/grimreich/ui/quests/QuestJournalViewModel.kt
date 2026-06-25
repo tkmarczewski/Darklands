@@ -32,15 +32,19 @@ class QuestJournalViewModel @Inject constructor(
 
     fun refresh() {
         val state = gameRepository.currentState()
+        val currentCityId = state.grimCurrentRegion
+        
         val active = state.quest.activeQuests.mapNotNull { questSystem.getQuest(it) }
         val completed = state.quest.completedQuests.mapNotNull { questSystem.getQuest(it) }
         
         val occupiedIds = (active.map { it.id } + completed.map { it.id }).toSet()
         
-        // Show available quests globally for the journal
-        val available = questSystem.all().filter { it.status == com.grimreich.systems.QuestStatus.DOSTEPNE && !occupiedIds.contains(it.id) }
+        // Show available quests for the current city
+        val available = questSystem.all()
+            .filter { it.status == com.grimreich.systems.QuestStatus.DOSTEPNE && !occupiedIds.contains(it.id) }
+            .filter { it.cityId == currentCityId }
             .shuffled()
-            .take(10)
+            .take(5)
 
         _uiState.update {
             it.copy(

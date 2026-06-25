@@ -7,13 +7,15 @@ import com.grimreich.core.GameRepository
 import com.grimreich.core.Hero
 import com.grimreich.systems.CombatSystem
 import com.grimreich.systems.QuestSystem
+import com.grimreich.grimreich.v1.Item
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import javax.inject.Inject
 
 data class CombatUiState(
     val combat: CombatState = CombatState(),
-    val party: List<Hero> = emptyList()
+    val party: List<Hero> = emptyList(),
+    val potions: List<Item> = emptyList()
 )
 
 @HiltViewModel
@@ -32,7 +34,8 @@ class CombatViewModel @Inject constructor(
                 _uiState.update { 
                     it.copy(
                         combat = state.combat.copy(),
-                        party = state.party.toList()
+                        party = state.party.toList(),
+                        potions = state.inventory.filter { item -> item.type == "potion" }
                     )
                 }
             }
@@ -54,6 +57,12 @@ class CombatViewModel @Inject constructor(
     fun useSpecial(type: String) {
         if (combatSystem.isCombatActive()) {
             combatSystem.playerUseSpecial(type)
+        }
+    }
+
+    fun usePotion(itemId: String) {
+        if (combatSystem.isCombatActive()) {
+            combatSystem.usePotion(itemId)
         }
     }
 

@@ -83,6 +83,42 @@ fun DevMenuOverlay(
                         }
                         Button(onClick = {
                             val s = root.gameRepository.currentState()
+                            s.grimCurrentRegion = "twierdza_zakonu"
+                            root.setMode(GameScreenMode.CITY)
+                            visible = false
+                        }) {
+                            Text("TP: TWIERDZA")
+                        }
+                        Button(onClick = {
+                            val s = root.gameRepository.currentState()
+                            s.grimCurrentRegion = "serce_krainy"
+                            root.setMode(GameScreenMode.CITY)
+                            visible = false
+                        }) {
+                            Text("TP: SERCE")
+                        }
+                        Button(onClick = {
+                            root.gameRepository.updateState { it.world.globalStability = 10 }
+                            visible = false
+                        }) {
+                            Text("GLITCH ON")
+                        }
+                        Button(onClick = {
+                            val s = root.gameRepository.currentState()
+                            root.gameRepository.updateState { state ->
+                                val item = com.grimreich.grimreich.v1.Item(
+                                    id = "potion_hp_" + System.currentTimeMillis(),
+                                    name = "Mikstura Zdrowia",
+                                    type = "potion",
+                                    effects = mapOf("heal" to 20)
+                                )
+                                state.inventory.add(item)
+                            }
+                        }) {
+                            Text("+POTION")
+                        }
+                        Button(onClick = {
+                            val s = root.gameRepository.currentState()
                             val ralwingExists = s.party.any { it.id == "hero_ralwing" }
                             if (!ralwingExists) {
                                 val ralwing = Hero(
