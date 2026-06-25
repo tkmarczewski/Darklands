@@ -322,5 +322,18 @@ class DialogueManager @Inject constructor(
             text = "Echa ucichły... zrobiłeś to, co było konieczne. Przyjmij wdzięczność rzeczywistości.",
             choices = listOf( DialogueChoice("Zrozumiałem. (ODBIERZ NAGRODĘ)", "end") )
         ))
+
+        // --- DATA GHOST DIALOGUES ---
+        registerNode(DialogueNode(
+            id = "data_ghost_start", npcId = "ghost",
+            text = "Czekaj... Czy Ty też to widzisz? To nie jest prawdziwe słońce. To tylko tekstura. Twoja Kotwica... widzę jej ID.",
+            choices = listOf(
+                DialogueChoice("O czym Ty mówisz?", "ghost_meta_info"),
+                DialogueChoice("Czy jesteś błędem?", "ghost_error"),
+                DialogueChoice("Żegnaj.", "end")
+            )
+        ))
+        registerNode(DialogueNode(id = "ghost_meta_info", npcId = "ghost", text = "Twoje wybory... myślisz, że są Twoje? Skryba już dawno je przewidział. Widziałem Twój SaveState. Próbujesz naprawić coś, co zostało uszkodzone u podstaw.", choices = listOf(DialogueChoice("Dziwne...", "data_ghost_start"))))
+        registerNode(DialogueNode(id = "ghost_error", npcId = "ghost", text = "Jestem śmieciem, który nie został wyczyszczony. Fragmentem poprzedniej sesji. Jeśli dotkniesz mojego echa, sam możesz stać się tylko linią w WorldLogu.", choices = listOf(DialogueChoice("Niebezpieczne.", "data_ghost_start"))))
     }
 }

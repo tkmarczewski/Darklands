@@ -24,7 +24,8 @@ data class CityUiState(
     val activeLocalQuests: List<QuestEntry> = emptyList(),
     val isQuestMenuOpen: Boolean = false,
     val isGlitchActive: Boolean = false,
-    val priceModifier: Float = 1.0f
+    val priceModifier: Float = 1.0f,
+    val glitchIntensity: Float = 1.0f
 )
 
 @HiltViewModel
@@ -55,10 +56,29 @@ class CityViewModel @Inject constructor(
 
                 val stability = state.world.globalStability
                 val isCorrupted = stability < GameConstants.STABILITY_THRESHOLD_LOW
+                val isGrim20 = stability < 35
+
+                // Calculate Glitch Intensity based on echo and stability
+                val baseGlitch = if (ontologicalEngine.isGlitchActive()) 1.2f else 0f
+                val stabilityFactor = (100 - stability) / 100f // 0.0 to 1.0
+                val finalGlitchIntensity = (baseGlitch + state.world.echoIntensity + stabilityFactor * 2f).coerceAtMost(5f)
+
                 val bg = if (isCorrupted && cityData?.corruptedBackgroundDrawable != null) {
                     cityData.corruptedBackgroundDrawable
                 } else {
                     cityData?.backgroundDrawable ?: "bg_region_north_coast"
+                }
+
+                val transformedCityName = if (isGrim20) {
+                    "KRYPTA_PROCESU_${cityId.uppercase().take(3)}_${cityId.hashCode().toString().takeLast(4)}"
+                } else {
+                    (cityData?.name ?: "Nieznane Miejsce").uppercase()
+                }
+
+                val transformedCityStatus = if (isGrim20) {
+                    "OSTRZEŻENIE: Spójność danych krytycznie niska. Próba odzyskania narracji... NIEPOWODZENIE. Lokacja oznaczona przez Skrybę jako 'DO WYMAZANIA'."
+                } else {
+                    (cityData?.loreDescription ?: socialEventSystem.cityAudience(cityId, null))
                 }
 
                 // Reputation-based pricing
@@ -83,14 +103,15 @@ class CityViewModel @Inject constructor(
 
                 _uiState.update { 
                     it.copy(
-                        cityName = (cityData?.name ?: "Nieznane Miejsce").uppercase(),
-                        cityStatus = (cityData?.loreDescription ?: socialEventSystem.cityAudience(cityId, null)),
+                        cityName = transformedCityName,
+                        cityStatus = transformedCityStatus,
                         backgroundDrawable = bg,
                         activeQuestsCount = localActiveUrban.size,
                         npcs = generatedNpcs,
                         activeLocalQuests = localActiveUrban,
-                        isGlitchActive = ontologicalEngine.isGlitchActive(),
-                        priceModifier = baseModifier
+                        isGlitchActive = finalGlitchIntensity > 0.5f,
+                        priceModifier = baseModifier,
+                        glitchIntensity = finalGlitchIntensity
                     )
                 }
             }

@@ -60,7 +60,7 @@ fun CityScreen(
                 contentDescription = null,
                 modifier = Modifier
                     .fillMaxSize()
-                    .glitchEffect(state.isGlitchActive, 1.5f),
+                    .glitchEffect(state.isGlitchActive, state.glitchIntensity),
                 contentScale = ContentScale.Crop,
                 alpha = 0.8f
             )

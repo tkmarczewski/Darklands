@@ -65,11 +65,18 @@ class ProceduralNpcGenerator @Inject constructor() {
         roles.forEach { role ->
             if (random.nextBoolean()) {
                 val isInfested = state.world.globalStability < 40 && random.nextInt(100) < 20
+                val isGrim20 = state.world.globalStability < 35
                 val personality = listOf("Normal", "Fanatic", "Weary", "Greedy").random(random)
                 
+                val npcName = if (isGrim20) {
+                    "INSTANCJA_${role.uppercase().take(3)}_${(100..999).random(random)}"
+                } else {
+                    generateName(role, random)
+                }
+
                 npcList.add(NPC(
                     id = "npc_${role.lowercase()}_$cityId",
-                    name = generateName(role, random),
+                    name = npcName,
                     role = role,
                     personality = personality,
                     isInfested = isInfested,
@@ -86,6 +93,16 @@ class ProceduralNpcGenerator @Inject constructor() {
                 name = "Miejsce Zbrodni",
                 role = "INCIDENT",
                 startNodeId = "verdict_hook_start"
+            ))
+        }
+
+        // 4. DATA GHOSTS
+        if (state.world.globalStability < 30 && random.nextInt(100) < 30) {
+            npcList.add(NPC(
+                id = "npc_ghost_$cityId",
+                name = "Duch Danych",
+                role = "INCIDENT",
+                startNodeId = "data_ghost_start"
             ))
         }
 
