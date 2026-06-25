@@ -66,6 +66,12 @@ class CombatViewModel @Inject constructor(
         }
     }
 
+    fun useEchoSkill(type: String) {
+        if (combatSystem.isCombatActive()) {
+            combatSystem.useEchoSkill(type)
+        }
+    }
+
     fun flee() {
         gameRepository.updateState { 
             it.combat.active = false

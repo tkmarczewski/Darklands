@@ -60,6 +60,7 @@ sealed class GameRoute(val route: String) {
     object Expedition : GameRoute("expedition")
     object DevMenu : GameRoute("dev_menu")
     object Ritual : GameRoute("ritual")
+    object Ending : GameRoute("ending")
 }
 
 @Composable
@@ -101,6 +102,7 @@ fun GameNavHost(
             GameScreenMode.EVENTS -> GameRoute.Expedition.route
             GameScreenMode.DEV_MENU -> GameRoute.DevMenu.route
             GameScreenMode.RITUAL -> GameRoute.Ritual.route
+            GameScreenMode.ENDING -> GameRoute.Ending.route
             else -> null
         }
         
@@ -184,9 +186,10 @@ fun GameNavHost(
                 onCity = { root.setMode(GameScreenMode.CITY) },
                 onInventory = { root.setMode(GameScreenMode.INVENTORY) },
                 onQuests = { root.setMode(GameScreenMode.QUESTS) },
-                onWorldLog = { /* root.setMode(GameScreenMode.WORLD_LOG) */ },
+                onWorldLog = { root.setMode(GameScreenMode.WORLD_LOG) },
                 onCharacter = { root.inspectHero(it) },
-                onExpedition = { root.setMode(GameScreenMode.EVENTS) }
+                onExpedition = { root.setMode(GameScreenMode.EVENTS) },
+                onEnding = { root.setMode(GameScreenMode.ENDING) }
             )
         }
         composable(GameRoute.Expedition.route) {
@@ -286,6 +289,12 @@ fun GameNavHost(
         composable(GameRoute.DevMenu.route) {
             DevMenuScreen(
                 onBack = { root.setMode(GameScreenMode.HUB) }
+            )
+        }
+        composable(GameRoute.Ending.route) {
+            EndingScreen(
+                viewModel = hiltViewModel(),
+                onFinish = { root.setMode(GameScreenMode.MAIN_MENU) }
             )
         }
         composable(GameRoute.Ritual.route) {

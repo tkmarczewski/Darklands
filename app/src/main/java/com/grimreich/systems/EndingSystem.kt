@@ -19,6 +19,15 @@ class EndingSystem @Inject constructor(
     private val gameRepository: GameRepository,
     private val chronicleSystem: ChronicleSystem
 ) {
+    fun shouldTriggerMetaEnding(): Boolean {
+        val s = gameRepository.currentState()
+        // Trigger if stability is critical or enough regional heroes are settled (using chronicle entries as proxy)
+        val heroEndings = listOf("lore_aelion_ascension", "lore_mira_ascension", "lore_ferrun_iron_wall", "lore_noctyros_update")
+        val resolvedCount = heroEndings.count { chronicleSystem.isUnlocked(it) }
+        
+        return s.world.globalStability < 10 || resolvedCount >= 4
+    }
+
     fun resolveEnding(gameState: GameState): Ending {
         val faith = gameState.prayer.faith
         val virtue = gameState.prayer.virtue

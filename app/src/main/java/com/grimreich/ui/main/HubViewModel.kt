@@ -36,11 +36,18 @@ class HubViewModel @Inject constructor(
     private val gameRepository: GameRepository,
     private val questSystem: QuestSystem,
     private val cityCatalogue: CityCatalogue,
-    private val visualContentSystem: VisualContentSystem
+    private val visualContentSystem: VisualContentSystem,
+    private val endingSystem: com.grimreich.systems.EndingSystem
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(HubUiState())
     val uiState: StateFlow<HubUiState> = _uiState.asStateFlow()
+
+    fun checkForEnding(onTrigger: () -> Unit) {
+        if (endingSystem.shouldTriggerMetaEnding()) {
+            onTrigger()
+        }
+    }
 
     init {
         gameRepository.gameState

@@ -102,6 +102,15 @@ fun CombatScreen(viewModel: CombatViewModel, onExit: () -> Unit) {
                     }
                 }
             }
+
+            Spacer(modifier = Modifier.height(12.dp))
+            Text("ZDOLNOŚCI ECHO (KOSZT ŚWIATA):", color = Color.Red, fontSize = 10.sp, fontWeight = FontWeight.Bold)
+            Spacer(modifier = Modifier.height(4.dp))
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
+                CombatButton("REWIZJA", color = Color(0xFF400040), onClick = { viewModel.useEchoSkill("REVISION") })
+                CombatButton("WYMAZANIE", color = Color(0xFF000040), onClick = { viewModel.useEchoSkill("ERASURE") })
+                CombatButton("NADPISANIE", color = Color(0xFF404000), onClick = { viewModel.useEchoSkill("OVERWRITE") })
+            }
         } else {
             Button(
                 onClick = { viewModel.exitCombat(onExit) },

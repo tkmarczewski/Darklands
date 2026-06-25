@@ -58,7 +58,49 @@ class CombatSystem @Inject constructor(
     fun playerAttack(): String = resolvePlayerAction("ATTACK")
     fun playerDefend(): String = resolvePlayerAction("DEFEND")
     fun playerUseSpecial(type: String): String = resolvePlayerAction("SPECIAL_$type")
-    
+
+    fun useEchoSkill(skillType: String): String {
+        val state = gameRepository.currentState()
+        val hero = state.party.find { it.id == state.activeHeroId } ?: return "Brak bohatera"
+        val c = state.combat
+        if (!c.active) return "Brak walki"
+
+        return when (skillType) {
+            "REVISION" -> {
+                if (hero.sanity < 5) return "Zbyt mało Poczytalności!"
+                hero.sanity -= 5
+                hero.hp = (hero.hp + 15).coerceAtMost(hero.maxHp) // Simplified revision: restore some HP
+                c.log.add("[REWIZJA] ${hero.name} nagina czas. (+15 HP, -5 Sanity)")
+                state.metaAwarenessLevel += 1
+                gameRepository.persistCurrentState()
+                "REWIZJA"
+            }
+            "ERASURE" -> {
+                if (state.world.globalStability < 10) return "Świat jest zbyt niestabilny!"
+                state.world.globalStability -= 10
+                state.world.echoIntensity += 0.05f
+                val dmg = c.enemyHp / 2
+                c.enemyHp -= dmg
+                c.log.add("[WYMAZANIE] ${hero.name} usuwa dane wroga. (-$dmg HP, -10 Stabilność)")
+                if (c.enemyHp <= 0) {
+                    c.active = false
+                    onCombatEnd?.invoke()
+                    c.log.add("${c.enemyName} wymazany!")
+                }
+                gameRepository.persistCurrentState()
+                "WYMAZANIE"
+            }
+            "OVERWRITE" -> {
+                hero.corruption += 15
+                c.enemyAttack = (c.enemyAttack / 2).coerceAtLeast(1)
+                c.log.add("[NADPISANIE] ${hero.name} zmienia parametry wroga. (-Atak wroga, +15 Korupcja)")
+                gameRepository.persistCurrentState()
+                "NADPISANIE"
+            }
+            else -> "Nieznana umiejętność"
+        }
+    }
+
     fun usePotion(itemId: String): String {
         val state = gameRepository.currentState()
         val c = state.combat

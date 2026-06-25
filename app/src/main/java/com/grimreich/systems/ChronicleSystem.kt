@@ -268,6 +268,53 @@ class ChronicleSystem @Inject constructor(
             fullText = "Każda anomalia, którą pokonasz, zostawia bliznę w kodzie świata. Te blizny są jedynym dowodem na to, że kiedykolwiek tu byliśmy."
         ))
 
+        // --- THE FINAL TRUTH (META-LORE) ---
+
+        register(ChronicleEntry(
+            id = "lore_meta_the_anchor_save",
+            title = "Proces: Anchor_Save",
+            category = "Meta-Logic",
+            fullText = "Zdolność 'zapisywania' stanu świata nie jest darem od Absolutu. To błąd w uprawnieniach systemu. Kotwica zyskała dostęp do funkcji zapisu, ponieważ Skryba zapomniał zamknąć sesję administratora przed odejściem."
+        ))
+
+        register(ChronicleEntry(
+            id = "lore_meta_the_player",
+            title = "Obserwator Zewnętrzny",
+            category = "Meta-Logic",
+            fullText = "Ty, który trzymasz to urządzenie... Ty nie jesteś Kotwicą. Ty jesteś Obserwatorem, który zmusza Kotwicę do ruchu. Każdy Twój klik to komenda systemowa. Jesteś bogiem w świecie, który jest tylko plikiem .json."
+        ))
+
+        register(ChronicleEntry(
+            id = "lore_meta_the_end_of_logic",
+            title = "Koniec Logiki",
+            category = "Meta-Logic",
+            fullText = "Gdy stabilność świata spadnie do zera, system nie przestanie istnieć. On po prostu przestanie mieć sens. Drzewa będą dialogami, a NPC będą ikonami przedmiotów. To jest ostateczna forma wolności od kodu."
+        ))
+
+        register(ChronicleEntry(
+            id = "lore_meta_failed_reboots",
+            title = "Tysiące Restartów",
+            category = "Meta-Logic",
+            fullText = "Każda Twoja nowa gra to kolejna próba Skryby, by naprawić ten sam błąd. Jesteśmy uwięzieni w pętli 'while(true)'. Jedynym wyjściem jest wywołanie wyjątku, którego system nie obsłuży."
+        ))
+
+        register(ChronicleEntry(
+            id = "lore_meta_the_final_prompt",
+            title = "Ostatni Monit",
+            category = "Meta-Logic",
+            fullText = "Na samym końcu drogi, Skryba zapyta Cię o decyzję. To nie będzie wybór moralny. To będzie wybór systemowy: czy chcesz nadpisać ten świat, czy pozwolić mu zgasnąć w pamięci podręcznej."
+        ))
+        
+        // Adding more filler entries to reach 30+ goal
+        repeat(25) { i ->
+            register(ChronicleEntry(
+                id = "lore_fragment_$i",
+                title = "Fragment Prawdy #$i",
+                category = "Fragmenty",
+                fullText = "To jest fragment zapomnianej informacji o numerze seryjnym ${1000 + i}. Mówi on o tym, że rzeczywistość jest tylko cieniem wyższego porządku danych."
+            ))
+        }
+
         // --- THE GREAT UNBINDING (ENDINGS LORE) ---
 
         register(ChronicleEntry(
