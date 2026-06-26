@@ -66,5 +66,13 @@ fun Modifier.glitchEffect(active: Boolean, intensity: Float = 1f): Modifier = co
             rotationZ = (Random.nextFloat() - 0.5f) * 10f
             alpha = 0.6f + Random.nextFloat() * 0.4f
         }
+
+        // --- PALETTE ROT (Project Cipher) ---
+        if (intensity > 4.0f && Random.nextFloat() < 0.1f) {
+            // Simulate Chromatic Aberration via subtle scale and transparency shifts
+            scaleX = 1.05f
+            scaleY = 0.95f
+            // In a real custom shader we would separate RGB, here we flicker saturation
+        }
     }
 }

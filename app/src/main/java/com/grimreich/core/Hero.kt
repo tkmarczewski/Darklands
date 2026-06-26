@@ -34,7 +34,7 @@ data class Hero(
     var isDead: Boolean   = false,
     // Kariera
     var currentCareer: Career? = null,
-    var careerHistory: List<CareerEntry> = emptyList(),
+    var careerHistory: MutableList<CareerEntry> = mutableListOf(),
     // Cechy i zdolności
     var trait: Trait? = null,
     val abilities: MutableList<Ability> = mutableListOf(),

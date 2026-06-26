@@ -25,8 +25,18 @@ class AudioEngine @Inject constructor(
 
         stopMusic()
         try {
+            val state = gameRepository.get().currentState()
+            val stability = state.world.globalStability
+            
             musicPlayer = MediaPlayer.create(context, resId).apply {
                 isLooping = loop
+                
+                // --- PITCH WOBBLE (Project Cipher) ---
+                if (stability < 10) {
+                    // Simulating a "dying record player" effect
+                    setPlaybackParams(playbackParams.setPitch(0.8f + (android.os.SystemClock.elapsedRealtime() % 400) / 1000f))
+                }
+
                 start()
             }
             // Bug fix: only update currentTrackResId on success, not before catch
