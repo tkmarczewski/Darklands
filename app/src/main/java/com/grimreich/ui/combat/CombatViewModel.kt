@@ -31,7 +31,7 @@ class CombatViewModel @Inject constructor(
     init {
         gameRepository.gameState
             .onEach { state ->
-                _uiState.update { 
+                _uiState.update {
                     it.copy(
                         combat = state.combat.copy(),
                         party = state.party.toList(),
@@ -73,7 +73,7 @@ class CombatViewModel @Inject constructor(
     }
 
     fun flee() {
-        gameRepository.updateState { 
+        gameRepository.updateState {
             it.combat.active = false
             it.combat.log.add("Uciekłeś z walki!")
         }
@@ -88,11 +88,12 @@ class CombatViewModel @Inject constructor(
                     questSystem.markObjectiveComplete(qId.removePrefix("COMBAT_WIN:"))
                 }
             }
-            gameRepository.updateState { 
+            gameRepository.updateState {
                 it.pendingQuestId = null
                 it.combat.log.clear()
             }
+            onExit()
         }
-        onExit()
+        // If combat is still active, do not navigate away
     }
 }
