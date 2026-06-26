@@ -17,7 +17,7 @@ class AgingSystem @Inject constructor(
 ) {
     fun applyAging(hero: Hero) {
         if (hero.age > 60) {
-            hero.strength -= 1
+                        hero.strength = (hero.strength - 1).coerceAtLeast(1)
             gameRepository.log("${hero.name} odczuwa upływ czasu.")
         }
         gameRepository.persistCurrentState()
