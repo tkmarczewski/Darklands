@@ -54,10 +54,10 @@ class CareerChain @Inject constructor() {
 
     fun applyCareer(career: Career, hero: Hero): Hero {
         hero.currentCareer = career
-        hero.strength += career.strBonus
-        hero.agility += career.agiBonus
-        hero.intelligence += career.intBonus
-        hero.virtue += career.virtueBonus
+                hero.strength = (hero.strength + career.strBonus).coerceAtMost(25)
+                hero.agility = (hero.agility + career.agiBonus).coerceAtMost(25)
+                hero.intelligence = (hero.intelligence + career.intBonus).coerceAtMost(25)
+                hero.virtue = (hero.virtue + career.virtueBonus).coerceAtMost(100)
         // Add to history if not exists
         return hero
     }
