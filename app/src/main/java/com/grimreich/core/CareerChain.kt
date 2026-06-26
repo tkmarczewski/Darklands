@@ -17,13 +17,13 @@ enum class Career(
     val virtueBonus: Int = 0,
     val description: String = ""
 ) {
-    PAGE("Paź", 7, 14, strBonus = 1, agiBonus = 1, description = "Młody sługa uczący się podstaw rycerskiego rzemiosła."),
+    PAGE("Paż", 7, 14, strBonus = 1, agiBonus = 1, description = "Młody sługa uczący się podstaw rycerskiego rzemiosła."),
     SQUIRE("Giermek", 14, 21, requiredStrength = 10, strBonus = 2, agiBonus = 1, description = "Pomocnik rycerza, szkolący się w walce i etykiecie."),
     KNIGHT("Rycerz", 21, 60, requiredVirtue = 30, requiredStrength = 12, strBonus = 3, virtueBonus = 5, description = "Zakonny wojownik, obrońca wiary i tradycji."),
     MERCENARY("Najemnik", 16, 60, requiredStrength = 11, strBonus = 2, agiBonus = 2, description = "Wojownik do wynajęcia, znający realia wojny."),
     SCHOLAR("Uczony", 14, 80, requiredIntelligence = 12, intBonus = 4, description = "Poszukiwacz wiedzy, badający starożytne pisma."),
     MONK("Mnich", 14, 80, requiredVirtue = 20, virtueBonus = 5, intBonus = 1, description = "Sługa kościoła, oddany modlitwie i kontemplacji."),
-    THIEF("Złodziej", 12, 50, requiredAgility = 12, agiBonus = 3, description = "Cień miejskich zaułków, mistrz manipulacji."),
+    THIEF("Żodziej", 12, 50, requiredAgility = 12, agiBonus = 3, description = "Cień miejskich zaułków, mistrz manipulacji."),
     ALCHEMIST("Alchemik", 18, 70, requiredIntelligence = 14, intBonus = 3, description = "Mistrz eliksirów i przemian materii."),
     CRAFTSMAN("Rzemieślnik", 14, 70, requiredStrength = 10, strBonus = 2, description = "Twórca przedmiotów, znający się na metalurgii."),
     MERCHANT("Kupiec", 16, 75, requiredIntelligence = 10, description = "Handlarz, znający wartość towarów i ludzi."),
@@ -42,6 +42,13 @@ data class CareerEntry(
 
 @Singleton
 class CareerChain @Inject constructor() {
+
+    companion object {
+        // BUG-R3-05: Aligned stat caps with MutationSystem.STAT_CAP for consistency
+        private const val STAT_CAP = 99
+        private const val VIRTUE_CAP = 100
+    }
+
     fun isEligible(career: Career, hero: Hero): Boolean {
         return hero.age in career.minAge..career.maxAge &&
                 hero.virtue >= career.requiredVirtue &&
@@ -54,11 +61,19 @@ class CareerChain @Inject constructor() {
 
     fun applyCareer(career: Career, hero: Hero): Hero {
         hero.currentCareer = career
-                hero.strength = (hero.strength + career.strBonus).coerceAtMost(25)
-                hero.agility = (hero.agility + career.agiBonus).coerceAtMost(25)
-                hero.intelligence = (hero.intelligence + career.intBonus).coerceAtMost(25)
-                hero.virtue = (hero.virtue + career.virtueBonus).coerceAtMost(100)
-        // Add to history if not exists
+
+        // BUG-R3-05: Use coerceIn(0, cap) instead of coerceAtMost to prevent negative stats
+        hero.strength = (hero.strength + career.strBonus).coerceIn(0, STAT_CAP)
+        hero.agility = (hero.agility + career.agiBonus).coerceIn(0, STAT_CAP)
+        hero.intelligence = (hero.intelligence + career.intBonus).coerceIn(0, STAT_CAP)
+        hero.virtue = (hero.virtue + career.virtueBonus).coerceIn(0, VIRTUE_CAP)
+
+        // BUG-R3-06: Actually record career history (was left as stub comment)
+        val entry = CareerEntry(career = career, yearsServed = 0)
+        if (hero.careerHistory.none { it.career == career }) {
+            hero.careerHistory.add(entry)
+        }
+
         return hero
     }
 }
