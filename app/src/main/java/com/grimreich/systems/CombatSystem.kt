@@ -116,7 +116,7 @@ class CombatSystem @Inject constructor(
         }
         if (mana > 0) {
             // Restore endurance/mana equivalent
-            hero.endurance = (hero.endurance + mana).coerceAtMost(hero.maxHp)
+                        hero.endurance = (hero.endurance + mana).coerceIn(0, 20)
             c.log.add("${hero.name} wypija ${potion.name} (+${mana} Wytrz.)")
         }
         
@@ -257,7 +257,7 @@ class CombatSystem @Inject constructor(
             val pending = state.pendingQuestId
             if (pending?.startsWith("RAID:") == true) {
                 val parts = pending.split(":")
-                startCombat(parts[1], parts[2].toInt(), parts[3].toInt(), parts[3].toInt() / 2)
+                            if (parts.size >= 4) startCombat(parts[1], parts[2].toIntOrNull() ?: 40, parts[3].toIntOrNull() ?: 10, (parts[3].toIntOrNull() ?: 10) / 2)
                 return
             }
         }
