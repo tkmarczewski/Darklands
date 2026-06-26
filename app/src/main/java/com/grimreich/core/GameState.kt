@@ -52,7 +52,7 @@ data class GameState(
         hireableHeroes = hireableHeroes.map { it.copy() }.toMutableList(),
         activeHeroId = activeHeroId,
         inventory = inventory.map { it.copy() }.toMutableList(),
-        logEntries = logEntries.toMutableList(),
+                    logEntries = logEntries.takeLast(200).toMutableList(),
         gold = gold,
         quest = quest.copy(
             activeQuests = quest.activeQuests.toMutableList(),
@@ -84,4 +84,10 @@ data class GameState(
         isExpeditionActive = isExpeditionActive,
         lastSaveTimestamp = lastSaveTimestamp
     )
+
+        /** Adds a log entry, keeping only the last 200 to prevent save-state bloat. */
+    fun addLog(entry: String) {
+        logEntries.add(entry)
+        if (logEntries.size > 200) logEntries.removeAt(0)
+    }
 }
