@@ -23,7 +23,7 @@ class BossBattleSystem @Inject constructor(
         val playerAtk = 10 + heroAttackBonus(gameState)
         val dmg = maxOf(1, playerAtk - boss.armor / 2)
         boss.hp -= dmg
-        boss.morale -= 5
+                boss.morale = (boss.morale - 5).coerceAtLeast(0)
 
         if (boss.hp <= 72 && boss.phase == 1) {
             boss.phase = 2

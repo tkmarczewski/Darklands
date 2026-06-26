@@ -2,6 +2,7 @@ package com.grimreich.systems
 
 import android.content.Context
 import android.media.MediaPlayer
+import android.util.Log
 import com.grimreich.R
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
@@ -12,6 +13,10 @@ class AudioEngine @Inject constructor(
     @ApplicationContext private val context: Context,
     private val gameRepository: dagger.Lazy<com.grimreich.core.GameRepository>
 ) {
+    companion object {
+        private const val TAG = "AudioEngine"
+    }
+
     private var musicPlayer: MediaPlayer? = null
     private var currentTrackResId: Int = 0
 
@@ -24,17 +29,28 @@ class AudioEngine @Inject constructor(
                 isLooping = loop
                 start()
             }
+            // Bug fix: only update currentTrackResId on success, not before catch
             currentTrackResId = resId
         } catch (e: Exception) {
-            // Log error if needed
+            Log.e(TAG, "Blad odtwarzania utworu resId=$resId", e)
+            // Ensure player state is clean after failure
+            musicPlayer = null
+            currentTrackResId = 0
         }
     }
 
     fun stopMusic() {
-        musicPlayer?.stop()
-        musicPlayer?.release()
-        musicPlayer = null
-        currentTrackResId = 0
+        try {
+            musicPlayer?.let {
+                if (it.isPlaying) it.stop()
+                it.release()
+            }
+        } catch (e: Exception) {
+            // Guard against OBS-05: IllegalStateException during rapid release or double release
+        } finally {
+            musicPlayer = null
+            currentTrackResId = 0
+        }
     }
 
     fun playForRoute(route: String) {

@@ -16,12 +16,13 @@ class CollapseEngine @Inject constructor(
 
     fun tick() {
         val g = gameRepository.currentState()
-        g.world.collapseProgress += 0.01f
-        
+        // Fix: clamp collapseProgress to [0.0, 1.0] to prevent overflow
+        g.world.collapseProgress = (g.world.collapseProgress + 0.01f).coerceAtMost(1.0f)
+
         if (g.world.collapseProgress > 0.5f && activeScenario == null) {
             activeScenario = decideScenario()
         }
-        
+
         applyScenarioEffects()
         gameRepository.persistCurrentState()
     }
@@ -39,8 +40,16 @@ class CollapseEngine @Inject constructor(
     private fun applyScenarioEffects() {
         activeScenario?.let {
             when (it) {
-                CollapseScenario.MIST_OBLIVION -> gameRepository.currentState().world.echoIntensity += 0.02f
-                CollapseScenario.BLOOD_RUIN -> gameRepository.currentState().party.forEach { h -> h.hp -= 1 }
+                CollapseScenario.MIST_OBLIVION -> {
+                    val state = gameRepository.currentState()
+                    // Fix: clamp echoIntensity to [0.0, 1.0] to prevent unbounded growth
+                    state.world.echoIntensity = (state.world.echoIntensity + 0.02f).coerceAtMost(1.0f)
+                }
+                CollapseScenario.BLOOD_RUIN -> {
+                    val state = gameRepository.currentState()
+                    // Fix: clamp hero HP to >= 0 on each tick
+                    state.party.forEach { h -> h.hp = (h.hp - 1).coerceAtLeast(0) }
+                }
                 else -> {}
             }
         }

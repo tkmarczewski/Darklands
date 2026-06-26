@@ -11,14 +11,24 @@ class ExperienceSystem @Inject constructor(
 ) {
     fun addXp(hero: Hero, amount: Int): String {
         hero.xp += amount
-        val leveledUp = if (hero.xp >= hero.level * 100) {
+        var leveledUp = false
+        var levelsGained = 0
+
+        // Fix: use while-loop to handle cascading level-ups
+        // (e.g. gaining 500 XP at level 1 threshold 100 should give multiple levels)
+        while (hero.xp >= hero.level * 100) {
+            hero.xp -= hero.level * 100
             hero.level++
             hero.attributePoints += 2 // Grant 2 points per level
-            hero.xp = 0
-            true
-        } else false
+            leveledUp = true
+            levelsGained++
+        }
 
         gameRepository.persistCurrentState()
-        return if (leveledUp) "Awans! ${hero.name} osiągnął poziom ${hero.level}." else "Zdobyto $amount XP."
+        return when {
+            levelsGained > 1 -> "Awans x$levelsGained! ${hero.name} osiagnął poziom ${hero.level}."
+            leveledUp -> "Awans! ${hero.name} osiagnął poziom ${hero.level}."
+            else -> "Zdobyto $amount XP."
+        }
     }
 }

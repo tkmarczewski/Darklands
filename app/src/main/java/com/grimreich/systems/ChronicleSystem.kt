@@ -416,6 +416,7 @@ class ChronicleSystem @Inject constructor(
 
     fun getUnlockedEntries(): List<ChronicleEntry> {
         val unlockedIds = gameRepository.currentState().unlockedLoreIds
+        // Filter directly from values - more efficient than toList().filter()
         return allEntries.values.filter { unlockedIds.contains(it.id) }
     }
 

@@ -100,7 +100,7 @@ fun RecruitmentScreen(
                     HireableItem(
                         hero = hero,
                         cost = cost,
-                        canAfford = state.gold >= cost,
+                        canAfford = state.gold >= cost && !state.isPartyFull,
                         onHire = { viewModel.hireHero(hero) }
                     )
                 }
@@ -214,7 +214,7 @@ private fun HireableItem(
                 )
             ) {
                 Text(
-                    text = "$cost zł",
+                    text = if (canAfford) "$cost zł" else "ZABLOKOWANE",
                     color = if (canAfford) Color.White else Color(0xFF666666),
                     fontSize = 12.sp
                 )

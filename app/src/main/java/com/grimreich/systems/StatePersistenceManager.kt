@@ -1,6 +1,7 @@
 package com.grimreich.systems
 
 import android.content.Context
+import android.util.Log
 import com.grimreich.core.SessionStateDto
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.serialization.json.Json
@@ -12,6 +13,10 @@ import javax.inject.Singleton
 class StatePersistenceManager @Inject constructor(
     @ApplicationContext private val context: Context
 ) {
+    companion object {
+        private const val TAG = "StatePersistenceManager"
+    }
+
     private val json = Json {
         ignoreUnknownKeys = true
         encodeDefaults = true
@@ -25,7 +30,7 @@ class StatePersistenceManager @Inject constructor(
         try {
             sessionFile.writeText(json.encodeToString(SessionStateDto.serializer(), session))
         } catch (e: Exception) {
-            e.printStackTrace()
+            Log.e(TAG, "Blad zapisu sesji do pliku: $sessionFileName", e)
         }
     }
 
@@ -34,7 +39,7 @@ class StatePersistenceManager @Inject constructor(
         return try {
             json.decodeFromString(SessionStateDto.serializer(), sessionFile.readText())
         } catch (e: Exception) {
-            e.printStackTrace()
+            Log.e(TAG, "Blad wczytywania sesji z pliku: $sessionFileName. Gra zostanie zresetowana.", e)
             null
         }
     }

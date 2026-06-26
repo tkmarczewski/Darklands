@@ -14,6 +14,7 @@ import com.grimreich.core.GameConstants
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import javax.inject.Inject
+import java.text.Normalizer
 
 data class CityUiState(
     val cityName: String = "Ładowanie...",
@@ -185,10 +186,11 @@ class CityViewModel @Inject constructor(
     }
 
     private fun rawIdToSlug(rawId: String): String {
-        return rawId.lowercase()
-            .replace("ą", "a").replace("ć", "c").replace("ę", "e")
-            .replace("ł", "l").replace("ń", "n").replace("ó", "o")
-            .replace("ś", "s").replace("ź", "z").replace("ż", "z")
+        // Fix(OBS-02): use Normalizer instead of brittle manual character mapping
+        val normalized = Normalizer.normalize(rawId, Normalizer.Form.NFD)
+        return normalized
+            .replace(Regex("\\p{InCombiningDiacriticalMarks}+"), "")
+            .lowercase()
             .replace(" ", "_")
     }
 }

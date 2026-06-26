@@ -12,7 +12,7 @@ class NpcAI @Inject constructor(
     fun tickNpc(hero: Hero) {
         val intensity = gameRepository.currentState().world.echoIntensity
         if (intensity > 0.8f) {
-            hero.sanity -= 1
+            hero.sanity = (hero.sanity - 1).coerceAtLeast(0)
         }
         gameRepository.persistCurrentState()
     }

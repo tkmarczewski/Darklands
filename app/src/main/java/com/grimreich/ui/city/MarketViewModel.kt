@@ -42,11 +42,13 @@ class MarketViewModel @Inject constructor(
         refresh()
     }
 
-    private fun toSlug(raw: String) = raw.lowercase()
-        .replace("ą","a").replace("ć","c").replace("ę","e")
-        .replace("ł","l").replace("ń","n").replace("ó","o")
-        .replace("ś","s").replace("ź","z").replace("ż","z")
-        .replace(" ","_")
+    private fun toSlug(raw: String): String {
+        val normalized = java.text.Normalizer.normalize(raw, java.text.Normalizer.Form.NFD)
+        return normalized
+            .replace(Regex("\\p{InCombiningDiacriticalMarks}+"), "")
+            .lowercase()
+            .replace(" ", "_")
+    }
 
     fun refresh() {
         val state = gameRepository.currentState()
