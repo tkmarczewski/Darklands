@@ -2,6 +2,7 @@ package com.grimreich.ui
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.grimreich.ui.main.GameNavHost
@@ -17,6 +18,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             GrimTheme {
+                BackHandler { /* Disable system back button to enforce ontological stability */ }
                 val rootViewModel: GameRootViewModel = hiltViewModel()
                 DevMenuOverlay(root = rootViewModel) {
                     GameNavHost(root = rootViewModel)

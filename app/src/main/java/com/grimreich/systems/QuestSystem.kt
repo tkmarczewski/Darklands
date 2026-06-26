@@ -59,21 +59,26 @@ class QuestSystem @Inject constructor(
         if (quest.status == QuestStatus.AKTYWNE) {
             quest.status = QuestStatus.CEL_OSIAGNIETY
             gameRepository.log("""
-                Cel osiągnięty: ${quest.title}. Twoja dłoń drży, gdy odkładasz broń lub zamykasz księgę. 
-                Duszny zapach spalonego Echa unosi się w powietrzu, a Ty czujesz na plecach spojrzenie Skrybów. 
-                To jeszcze nie koniec. Wróć do zleceniodawcy, by odebrać to, co Ci obiecano.
+                [SYSTEM]: Cel zadania '${quest.title}' został osiągnięty. Dane sesji zaktualizowane. 
+                Twoja obecność tutaj zostawiła trwały ślad. Wróć do zleceniodawcy, by zamknąć ten wątek.
             """.trimIndent())
+            
+            // Force save to prevent desync
             gameRepository.persistCurrentState()
         }
     }
 
     fun complete(id: String): QuestEntry {
         val quest = allQuests[id] ?: throw IllegalArgumentException("No such quest: $id")
-        // No longer restricted to only CEL_OSIAGNIETY for safety/legacy reasons, but primarily called from dialogue now
+        // No longer restricted to only CEL_OSIAGNIETY for safety/legacy reasons
         quest.status = QuestStatus.UKONCZONE
         
         gameRepository.updateState { state ->
-            state.quest.activeQuests.remove(id)
+            // Use iterator-safe removal or reassignment
+            val newList = state.quest.activeQuests.filter { it != id }.toMutableSet()
+            state.quest.activeQuests.clear()
+            state.quest.activeQuests.addAll(newList)
+
             if (!state.quest.completedQuests.contains(id)) {
                 state.quest.completedQuests.add(id)
             }

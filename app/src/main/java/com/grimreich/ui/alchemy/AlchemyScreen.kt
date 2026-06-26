@@ -32,10 +32,14 @@ fun AlchemyScreen(
             .padding(16.dp)
     ) {
         // HEADER
-        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
             Text("KOCIOŁ ALCHEMICZNY", color = Color(0xFFADFF2F), fontSize = 24.sp, fontWeight = FontWeight.Bold)
-            Button(onClick = onBack, colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF400000))) {
-                Text("POWRÓT")
+            Button(
+                onClick = onBack, 
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF400000)),
+                shape = MaterialTheme.shapes.extraSmall
+            ) {
+                Text("POWRÓT", color = Color.White, fontWeight = FontWeight.Bold)
             }
         }
 

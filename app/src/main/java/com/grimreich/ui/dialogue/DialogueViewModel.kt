@@ -161,6 +161,15 @@ class DialogueViewModel @Inject constructor(
 
         gameRepository.persistCurrentState()
     }
+    
+    override fun onCleared() {
+        super.onCleared()
+        gameRepository.updateState { 
+            it.pendingDialogueNodeId = null
+            it.pendingDialogueNpcName = null
+            it.pendingDialogueNpcRole = null
+        }
+    }
 
     private fun createRecruitedHero(type: String): com.grimreich.core.Hero {
         return when (type.lowercase()) {

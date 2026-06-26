@@ -136,15 +136,7 @@ fun CityScreen(
                     
                     Spacer(modifier = Modifier.weight(1f))
                     
-                    Button(
-                        onClick = onExit,
-                        modifier = Modifier.fillMaxWidth().height(50.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF800000)),
-                        shape = MaterialTheme.shapes.extraSmall,
-                        border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFFFF0000))
-                    ) {
-                        Text("WYJDŹ", color = Color.White, fontWeight = FontWeight.Bold)
-                    }
+                    CityNavBtn("WYJDŹ", onExit, color = Color(0xFF800000))
                 }
 
                 Spacer(modifier = Modifier.width(16.dp))

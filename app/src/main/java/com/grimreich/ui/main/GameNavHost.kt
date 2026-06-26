@@ -37,6 +37,7 @@ import com.grimreich.ui.DevMenuScreen
 import com.grimreich.ui.ritual.RitualScreen
 import com.grimreich.ui.main.ChronicleScreen
 import com.grimreich.ui.alchemy.AlchemyScreen
+import com.grimreich.ui.alchemy.AlchemyViewModel
 import com.grimreich.systems.RitualSystem
 import kotlinx.coroutines.launch
 import java.util.*
@@ -242,7 +243,7 @@ fun GameNavHost(
         }
         composable(GameRoute.Alchemy.route) {
             AlchemyScreen(
-                viewModel = hiltViewModel(),
+                viewModel = hiltViewModel<AlchemyViewModel>(),
                 onBack = { root.setMode(GameScreenMode.CITY) }
             )
         }

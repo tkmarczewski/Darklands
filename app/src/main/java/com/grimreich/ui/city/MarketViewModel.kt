@@ -90,9 +90,12 @@ class MarketViewModel @Inject constructor(
             _uiState.update { it.copy(errorMessage = "Za mało złota.") }
             return
         }
-        state.gold -= item.price
-        itemCatalogue.get(itemId)?.let { state.inventory.add(it) }
-        gameRepository.persistCurrentState()
+        
+        gameRepository.updateState { s ->
+            s.gold -= item.price
+            itemCatalogue.get(itemId)?.let { s.inventory.add(it.copy()) }
+            s.logEntries.add("Zakupiono: ${item.name} za ${item.price} szt. złota.")
+        }
         refresh()
     }
 
@@ -104,11 +107,15 @@ class MarketViewModel @Inject constructor(
             val cityId = toSlug(state.grimCurrentRegion)
             val cityData = cityCatalogue.get(cityId)
             val modifier = cityData?.priceModifier ?: 1.0f
-            val sellPrice = (item.value * 0.6f * modifier).toInt().coerceAtLeast(1)
             
-            state.gold += sellPrice
-            state.inventory.removeAt(index)
-            gameRepository.persistCurrentState()
+            val sellModifier = if (modifier > 1.0f) 0.5f else 0.6f
+            val sellPrice = (item.value * sellModifier * modifier).toInt().coerceAtLeast(1)
+            
+            gameRepository.updateState { s ->
+                s.gold += sellPrice
+                s.inventory.removeAt(index)
+                s.logEntries.add("Sprzedano: ${item.name} za $sellPrice szt. złota.")
+            }
             refresh()
         }
     }

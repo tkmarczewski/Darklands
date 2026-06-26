@@ -62,10 +62,10 @@ class ExpeditionViewModel @Inject constructor(
     }
 
     private fun enterExpedition() {
-        val state = gameRepository.currentState()
+        val currentS = gameRepository.currentState()
         // Ensure activeHeroId is set
-        if (state.activeHeroId == null) {
-            val firstAlive = state.party.firstOrNull { !it.isDead }
+        if (currentS.activeHeroId == null) {
+            val firstAlive = currentS.party.firstOrNull { !it.isDead }
             if (firstAlive != null) {
                 gameRepository.updateState { it.activeHeroId = firstAlive.id }
             }
@@ -74,9 +74,9 @@ class ExpeditionViewModel @Inject constructor(
         gameRepository.updateState { it.isExpeditionActive = true }
         // Roll for random encounter on enter
         val random = kotlin.random.Random.Default
-        val state = gameRepository.currentState()
+        val stateForRoll = gameRepository.currentState()
         if (random.nextFloat() < 0.4f) {
-            val encounter = encounterSystem.rollEncounter(random, state)
+            val encounter = encounterSystem.rollEncounter(random, stateForRoll)
             encounterSystem.activeEncounter = encounter
         }
     }
