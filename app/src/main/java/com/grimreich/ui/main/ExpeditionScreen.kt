@@ -41,6 +41,10 @@ fun ExpeditionScreen(
         ) {
             Text("WYPRAWA: ${state.regionName.uppercase()}", color = Color(0xFFC0A060), fontSize = 22.sp, fontWeight = FontWeight.Bold)
             
+            state.activeStepInfo?.let { info ->
+                Text("POSTĘP: $info", color = Color.Yellow, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+            }
+
             state.encounterLog?.let { log ->
                 Surface(
                     color = Color(0xFF111111),

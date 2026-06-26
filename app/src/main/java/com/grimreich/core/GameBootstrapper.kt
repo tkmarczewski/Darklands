@@ -35,7 +35,7 @@ class GameBootstrapper @Inject constructor(
         itemCatalogue.seed()
         
         questSystem.clear()
-        questSystem.seedIntegratedContent()
+        questSystem.seedIntegratedContent(seed = (System.currentTimeMillis() % 1000).toInt())
         
         dialogueManager.seedBasicDialogues()
         

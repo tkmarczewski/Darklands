@@ -61,7 +61,7 @@ class ExpeditionManager @Inject constructor(
     }
 
     fun currentStep(questId: String): QuestStep? {
-        val definition = QuestDefinitionRegistry.getById(questId) ?: return null
+        val definition = QuestDefinitionRegistry.getById(questId) ?: createDefaultDefinition(questId) ?: return null
         val index = stepIndices[questId] ?: 0
         return definition.steps.getOrNull(index)
     }
@@ -75,6 +75,8 @@ class ExpeditionManager @Inject constructor(
 
         val currentIndex = stepIndices[questId] ?: 0
         val nextIndex = currentIndex + 1
+        
+        gameRepository.log("[SYSTEM]: Krok questa zakończony powodzeniem. Przetwarzanie postępu...")
 
         return if (nextIndex >= definition.steps.size) {
             stepIndices.remove(questId)

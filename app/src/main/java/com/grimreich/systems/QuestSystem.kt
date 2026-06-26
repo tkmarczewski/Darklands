@@ -151,9 +151,10 @@ class QuestSystem @Inject constructor(
         }
     }
 
-    fun seedIntegratedContent() {
+    fun seedIntegratedContent(seed: Int = 1) {
         if (allQuests.isNotEmpty()) return
         
+        val random = kotlin.random.Random(seed)
         val canonicalCities = listOf(
             "wybrzeze_polnocne", 
             "rowniny_koronne", 
@@ -163,10 +164,11 @@ class QuestSystem @Inject constructor(
             "gory_poludniowe", 
             "pogranicze_stepowe", 
             "ziemie_dzikie"
-        )
+        ).shuffled(random)
 
         // Seed all templates from QuestRegistry - distributing them across cities
-        QuestRegistry.allTemplates.forEachIndexed { index, template ->
+        val shuffledTemplates = QuestRegistry.allTemplates.shuffled(random)
+        shuffledTemplates.forEachIndexed { index, template ->
             register(
                 QuestEntry(
                     id = template.id,

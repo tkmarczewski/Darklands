@@ -23,7 +23,8 @@ data class ExpeditionUiState(
     val outsideQuests: List<QuestEntry> = emptyList(),
     val activeEncounter: Encounter? = null,
     val encounterLog: String? = null,
-    val raidCombatData: Pair<String, Triple<String, Int, Int>>? = null
+    val raidCombatData: Pair<String, Triple<String, Int, Int>>? = null,
+    val activeStepInfo: String? = null
 )
 
 @HiltViewModel
@@ -51,7 +52,13 @@ class ExpeditionViewModel @Inject constructor(
                     it.copy(
                         regionName = city?.name ?: "Nieznana okolica",
                         outsideQuests = activeOutside,
-                        activeEncounter = encounterSystem.activeEncounter
+                        activeEncounter = encounterSystem.activeEncounter,
+                        activeStepInfo = state.pendingQuestId?.let { qId ->
+                            if (qId.startsWith("COMBAT_WIN:")) {
+                                val actualQId = qId.removePrefix("COMBAT_WIN:")
+                                expeditionManager.getStepInfo(actualQId)
+                            } else null
+                        }
                     )
                 }
             }
