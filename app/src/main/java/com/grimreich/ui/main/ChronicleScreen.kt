@@ -83,7 +83,10 @@ fun ChronicleScreen(
         }
 
         Button(
-            onClick = onBack,
+            onClick = {
+                selectedEntry = null // Clear state before back
+                onBack()
+            },
             modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2A2A2A))
         ) {

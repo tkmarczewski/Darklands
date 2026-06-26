@@ -79,13 +79,23 @@ fun DialogueScreen(
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
                     Text(
-                        text = state.currentNode?.text ?: "...",
+                        text = state.currentNode?.text ?: "Cisza... (Sesja utraciła spójność)",
                         color = Color.White,
                         fontSize = 16.sp,
                         lineHeight = 24.sp
                     )
                     
                     Spacer(modifier = Modifier.height(16.dp))
+
+                    if (state.availableChoices.isEmpty()) {
+                        Button(
+                            onClick = onExit,
+                            modifier = Modifier.fillMaxWidth(),
+                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF400000))
+                        ) {
+                            Text("WYJDŹ (BŁĄD PARADYGMATU)")
+                        }
+                    }
                     
                     // CHOICES with scrolling
                     LazyColumn(
