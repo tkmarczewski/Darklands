@@ -29,6 +29,11 @@ class GameRootViewModel @Inject constructor(
     private val _inspectedHero = MutableStateFlow<Hero?>(null)
     val inspectedHero: StateFlow<Hero?> = _inspectedHero.asStateFlow()
 
+    init {
+        // Start title music on launch
+        audioEngine.playForRoute(GameScreenMode.MAIN_MENU.name.lowercase())
+    }
+
     fun setMode(newMode: GameScreenMode) {
         _mode.value = newMode
         audioEngine.playForRoute(newMode.name.lowercase())
