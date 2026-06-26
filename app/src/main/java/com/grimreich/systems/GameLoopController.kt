@@ -33,7 +33,7 @@ class GameLoopController @Inject constructor(
     }
 
     fun acceptQuest(playerState: PlayerState, questId: String): PlayerState {
-        questSystem.activate(questId)
+                if (questSystem.getQuest(questId) != null) questSystem.activate(questId)
         return playerState.copy(activeQuestId = questId)
     }
 
