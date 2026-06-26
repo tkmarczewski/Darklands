@@ -15,6 +15,7 @@ object GameConstants {
     // Party & Heroes
     const val MAX_QUEST_POOL_SIZE = 5
     const val MAX_RECRUITS_POOL_SIZE = 3
+        const val MAX_PARTY_SIZE = 6
     const val STARTING_HERO_AGE = 25
     const val DEFAULT_ATTRIBUTE_VALUE = 10
     const val HP_PER_ENDURANCE = 2
