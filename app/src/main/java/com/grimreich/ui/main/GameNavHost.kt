@@ -36,6 +36,7 @@ import com.grimreich.ui.tavern.RecruitmentScreen
 import com.grimreich.ui.DevMenuScreen
 import com.grimreich.ui.ritual.RitualScreen
 import com.grimreich.ui.main.ChronicleScreen
+import com.grimreich.ui.alchemy.AlchemyScreen
 import com.grimreich.systems.RitualSystem
 import kotlinx.coroutines.launch
 import java.util.*
@@ -48,6 +49,7 @@ sealed class GameRoute(val route: String) {
     object WorldMap : GameRoute("map")
     object City : GameRoute("city")
     object Market : GameRoute("market")
+    object Alchemy : GameRoute("alchemy")
     object Combat : GameRoute("combat")
     object Tavern : GameRoute("tavern")
     object Temple : GameRoute("temple")
@@ -224,6 +226,7 @@ fun GameNavHost(
             CityScreen(
                 viewModel = hiltViewModel(),
                 onMarket = { root.setMode(GameScreenMode.MARKET) },
+                onAlchemy = { root.setMode(GameScreenMode.ALCHEMY) },
                 onTavern = { root.setMode(GameScreenMode.TAVERN) },
                 onTemple = { root.setMode(GameScreenMode.TEMPLE) },
                 onRecruit = { root.setMode(GameScreenMode.RECRUIT) },
@@ -233,6 +236,12 @@ fun GameNavHost(
         }
         composable(GameRoute.Market.route) {
             MarketScreen(
+                viewModel = hiltViewModel(),
+                onBack = { root.setMode(GameScreenMode.CITY) }
+            )
+        }
+        composable(GameRoute.Alchemy.route) {
+            AlchemyScreen(
                 viewModel = hiltViewModel(),
                 onBack = { root.setMode(GameScreenMode.CITY) }
             )

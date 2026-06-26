@@ -42,6 +42,7 @@ import com.grimreich.ui.effects.glitchEffect
 fun CityScreen(
     viewModel: CityViewModel,
     onMarket: () -> Unit,
+    onAlchemy: () -> Unit,
     onTavern: () -> Unit,
     onTemple: () -> Unit,
     onRecruit: () -> Unit,
@@ -120,6 +121,7 @@ fun CityScreen(
                     verticalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
                     CityNavBtn("TARG", onMarket)
+                    CityNavBtn("ALCHEMIA", onAlchemy)
                     CityNavBtn("KARCZMA", onTavern)
                     CityNavBtn("KAPLICA", onTemple)
                     CityNavBtn("WERBUNEK", onRecruit)

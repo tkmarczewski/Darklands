@@ -54,7 +54,7 @@ class MarketViewModel @Inject constructor(
         val cityData = cityCatalogue.get(cityId)
         val modifier = cityData?.priceModifier ?: 1.0f
 
-        val forSale = itemCatalogue.all().map { item ->
+        val forSale = itemCatalogue.all().shuffled(kotlin.random.Random(state.world.day + cityId.hashCode())).take(10).map { item ->
             MarketItem(
                 id = item.id,
                 name = item.name,

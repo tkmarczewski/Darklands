@@ -49,56 +49,6 @@ class ItemCatalogue @Inject constructor() {
             properties = mapOf("weaponType" to "sword", "icon" to "ic_item_sword_1h")
         ))
 
-        register(Item(
-            id = "axe_1h",
-            name = "Topór bojowy",
-            type = "weapon",
-            slot = "weapon",
-            value = 25,
-            weight = 3.0,
-            lore = "Ostra krawędź wykuta w głębiach Gór Południowych. Idealna do rozłupywania tarcz i czaszek.",
-            effects = mapOf("attack" to 12, "minStrength" to 9),
-            properties = mapOf("weaponType" to "axe", "icon" to "ic_item_axe_1h")
-        ))
-
-        // ARMOR
-        register(Item(
-            id = "armor_leather",
-            name = "Skórzana zbroja",
-            type = "armor",
-            slot = "armor",
-            value = 20,
-            weight = 5.0,
-            lore = "Wzmocniona skóra dzikiego zwierza z Ziem Dzikich. Zapewnia podstawową ochronę bez krępowania ruchów.",
-            effects = mapOf("armor" to 2, "defense" to 1),
-            properties = mapOf("icon" to "ic_item_armor_leather")
-        ))
-
-        register(Item(
-            id = "armor_plate",
-            name = "Pancerz płytowy",
-            type = "armor",
-            slot = "armor",
-            value = 80,
-            weight = 15.0,
-            lore = "Majstersztyk kowalski z czasów przed Era of Fracture. Ciężka stal, która może zatrzymać nawet ciosy demonów.",
-            effects = mapOf("armor" to 8, "defense" to -2, "minStrength" to 12),
-            properties = mapOf("icon" to "ic_item_armor_plate")
-        ))
-
-        // SHIELDS
-        register(Item(
-            id = "shield_round",
-            name = "Okrągła tarcza",
-            type = "shield",
-            slot = "shield",
-            value = 15,
-            weight = 4.0,
-            lore = "Drewniana tarcza okuta żelazem. Prosta, ale skuteczna w rękach wprawnego wojownika.",
-            effects = mapOf("defense" to 4, "armor" to 1),
-            properties = mapOf("icon" to "ic_item_shield_round")
-        ))
-
         // POTIONS
         register(Item(
             id = "potion_hp", 
@@ -108,7 +58,7 @@ class ItemCatalogue @Inject constructor() {
             value = 25, 
             weight = 0.5, 
             lore = "Gęsty, szkarłatny płyn, który smakuje metalem i ziemią. Legenda mówi, że pierwsze mikstury warzono z krwi tych, którzy widzieli Absolut.",
-            effects = mapOf("heal" to 15), 
+            effects = mapOf("heal" to 20), 
             properties = mapOf("icon" to "ic_item_potion_hp")
         ))
 
@@ -124,7 +74,49 @@ class ItemCatalogue @Inject constructor() {
             properties = mapOf("icon" to "ic_item_potion_mana")
         ))
 
-        // ACCESSORIES
+        register(Item(
+            id = "potion_sanity",
+            name = "Kojący Wywar",
+            type = "potion",
+            value = 40,
+            weight = 0.3,
+            lore = "Napój o smaku lawendy i zapomnienia. Pozwala na chwilę uciszyć głosy Skrybów.",
+            effects = mapOf("sanity" to 15),
+            properties = mapOf("icon" to "ic_scroll_ice")
+        ))
+
+        // ALCHEMY INGREDIENTS
+        register(Item(
+            id = "ing_echo_dust",
+            name = "Pył Echa",
+            type = "ingredient",
+            value = 10,
+            weight = 0.1,
+            lore = "Drobinki rzeczywistości, które osiadają na przedmiotach dotkniętych Pęknięciem.",
+            properties = mapOf("icon" to "ic_artifact_stone")
+        ))
+
+        register(Item(
+            id = "ing_blood_root",
+            name = "Krwawy Korzeń",
+            type = "ingredient",
+            value = 15,
+            weight = 0.2,
+            lore = "Roślina, która rośnie tylko tam, gdzie ziemia piła krew królów.",
+            properties = mapOf("icon" to "ic_artifact_blood")
+        ))
+
+        register(Item(
+            id = "ing_mist_essence",
+            name = "Esencja Mgły",
+            type = "ingredient",
+            value = 20,
+            weight = 0.05,
+            lore = "Uwięziony w butelce opar z Wybrzeża Północnego. Ulotny i niebezpieczny.",
+            properties = mapOf("icon" to "ic_artifact_core")
+        ))
+
+        // UNIQUE
         register(Item(
             id = "amulet_pilgrim",
             name = "Amulet Pielgrzyma",
@@ -146,36 +138,9 @@ class ItemCatalogue @Inject constructor() {
             value = 500,
             weight = 1.0,
             rarity = "unique",
-            lore = "Kawałek rzeczywistości, która przestała istnieć. Jest tak czarny, że wzrok ześlizguje się z jego krawędzi. Prawdziwy skarb dla kolekcjonerów anomalii.",
+            lore = "Kawałek rzeczywistości, która przestała istnieć. Jest tak czarny, że wzrok ześlizguje się z jego krawędzi.",
             effects = mapOf("corruption" to 5),
             properties = mapOf("icon" to "ic_artifact_core")
-        ))
-
-        // FACTION EXCLUSIVE ITEMS (NEW)
-        register(Item(
-            id = "inquisitor_seal",
-            name = "Pieczęć Inkwizytora",
-            type = "relic",
-            slot = "accessory",
-            value = 300,
-            weight = 0.2,
-            rarity = "rare",
-            lore = "Złoty sygnet z wyrytym okiem Trybunału. Daje prawo do zadawania pytań, na które nikt nie chce odpowiadać.",
-            effects = mapOf("perception" to 5, "piety" to 3, "armor" to 2),
-            properties = mapOf("icon" to "ic_artifact_eye", "faction" to "inkwizycja")
-        ))
-
-        register(Item(
-            id = "dawns_ember",
-            name = "Żar Świtu",
-            type = "relic",
-            slot = "accessory",
-            value = 300,
-            weight = 0.1,
-            rarity = "rare",
-            lore = "Wiecznie ciepły odłamek pierwszej latarni Zakonu. Rozprasza mrok w duszy i chroni przed szaleństwem.",
-            effects = mapOf("sanity" to 10, "piety" to 5, "defense" to 3),
-            properties = mapOf("icon" to "ic_artifact_stone", "faction" to "zakon")
         ))
     }
 }
