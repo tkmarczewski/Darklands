@@ -15,7 +15,8 @@ import javax.inject.Inject
 data class RecruitmentUiState(
     val availableHeroes: List<Hero> = emptyList(),
     val gold: Int = 0,
-    val hireCosts: Map<String, Int> = emptyMap()
+    val hireCosts: Map<String, Int> = emptyMap(),
+    val isPartyFull: Boolean = false
 )
 
 @HiltViewModel
@@ -51,7 +52,8 @@ class RecruitmentViewModel @Inject constructor(
             it.copy(
                 availableHeroes = state.hireableHeroes.toList(),
                 gold = state.gold,
-                hireCosts = costs
+                hireCosts = costs,
+                isPartyFull = state.party.size >= GameConstants.MAX_PARTY_SIZE
             )
         }
     }
