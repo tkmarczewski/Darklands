@@ -53,7 +53,10 @@ class AlchemySystem @Inject constructor(
             }
         }
 
-        // Remove ingredients
+        // Add result
+        val resultItem = itemCatalogue.get(recipe.resultItemId) ?: return "Błąd: Nie znaleziono receptury wyjściowej."
+
+        // Remove ingredients ONLY after all validations (Round 4 Fix)
         recipe.ingredients.forEach { (ingId, qty) ->
             repeat(qty) {
                 val item = state.inventory.find { it.id == ingId }
@@ -61,15 +64,9 @@ class AlchemySystem @Inject constructor(
             }
         }
 
-        // Add result
-        val resultItem = itemCatalogue.get(recipe.resultItemId)
-        if (resultItem != null) {
-            state.inventory.add(resultItem.copy())
-            gameRepository.log("${hero.name} uwarzył: ${resultItem.name}.")
-            gameRepository.persistCurrentState()
-            return "Sukces! Uwarzono ${resultItem.name}."
-        }
-
-        return "Błąd tworzenia przedmiotu."
+        state.inventory.add(resultItem.copy())
+        gameRepository.log("${hero.name} uwarzył: ${resultItem.name}.")
+        gameRepository.persistCurrentState()
+        return "Sukces! Uwarzono ${resultItem.name}."
     }
 }

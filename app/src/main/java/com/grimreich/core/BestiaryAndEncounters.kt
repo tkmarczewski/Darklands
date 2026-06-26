@@ -206,7 +206,14 @@ object Bestiary {
         )
     )
 
-    fun get(type: EnemyType): Enemy = enemies[type] ?: error("Unknown enemy: $type")
+    fun get(type: EnemyType): Enemy = enemies[type] ?: Enemy(
+        type = EnemyType.BANDIT,
+        name = "Błąd Rzeczywistości (Bandyta)",
+        stats = EnemyStats(maxHp = 25, attack = 15, defense = 10, speed = 12, morale = 8),
+        ai = EnemyAI.AGGRESSIVE,
+        lootTable = LootTable(goldMin = 5, goldMax = 20),
+        xpReward = 10
+    )
 }
 
 // ────────── ENCOUNTER DEFINITIONS ─────────────────────────────────────────
@@ -297,6 +304,11 @@ object EncounterCatalog {
         )
     )
 
-    fun get(id: String): BattleEncounter = encounters[id] ?: error("Unknown encounter: $id")
+    fun get(id: String): BattleEncounter = encounters[id] ?: BattleEncounter(
+        id = "error_fallback",
+        name = "Błąd Paradygmatu",
+        enemies = listOf(EnemyType.BANDIT),
+        difficulty = 1
+    )
     fun all(): List<BattleEncounter> = encounters.values.toList()
 }

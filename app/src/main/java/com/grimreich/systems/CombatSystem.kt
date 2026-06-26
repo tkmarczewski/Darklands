@@ -198,6 +198,11 @@ class CombatSystem @Inject constructor(
         val woundMsg = if (result.defenderWound != WoundType.NONE) " [Rana ${c.enemyName}: ${result.defenderWound}]" else ""
         val heroWoundMsg = if (result.attackerWound != WoundType.NONE) " [Rana ${hero.name}: ${result.attackerWound}]" else ""
 
+        // --- PROJECT CIPHER: SCRIBE BOSS LOGIC ---
+        if (c.enemyName.lowercase().contains("skryba") || c.enemyName.lowercase().contains("scribe")) {
+            handleScribeBossSpecial(c, result, hero)
+        }
+
         if (combatRound.isDefeated(enemyState)) {
             c.active = false
             onCombatEnd?.invoke()
@@ -220,6 +225,34 @@ class CombatSystem @Inject constructor(
 
         gameRepository.persistCurrentState()
         return "Runda ${c.round}: ${result.log.joinToString(" | ")} | Morale: $heroMoraleLabel vs $enemyMoraleLabel$woundMsg$heroWoundMsg"
+    }
+
+    private fun handleScribeBossSpecial(c: CombatState, result: RoundResult, hero: Hero) {
+        val state = gameRepository.currentState()
+        // The Scribe is invulnerable to normal damage unless corrupted
+        if (!c.log.any { it.contains("[NADPISANIE]") || it.contains("[REWIZJA]") }) {
+            c.enemyHp = c.enemyMaxHp 
+            c.log.add("[LOG_ADMIN]: Wykryto nieautoryzowaną próbę zmiany wartości HP. Przywracanie stanu fabrycznego.")
+        }
+
+        // Scribe attacks with system commands
+        if (c.round % 3 == 0) {
+            val command = listOf("DELETE_STAMINA", "REALLOCATE_SANITY", "FORCE_CORRUPTION").random()
+            when (command) {
+                "DELETE_STAMINA" -> {
+                    hero.endurance = (hero.endurance - 5).coerceAtLeast(0)
+                    c.log.add("[SYSTEM]: Komenda: DELETE_STAMINA. ${hero.name} traci siły.")
+                }
+                "REALLOCATE_SANITY" -> {
+                    hero.sanity = (hero.sanity - 8).coerceAtLeast(0)
+                    c.log.add("[SYSTEM]: Komenda: REALLOCATE_SANITY. Twoje myśli zostają przeniesione do sektora tymczasowego.")
+                }
+                "FORCE_CORRUPTION" -> {
+                    hero.corruption = (hero.corruption + 10).coerceAtMost(100)
+                    c.log.add("[SYSTEM]: Komenda: FORCE_CORRUPTION. Błąd spójności danych bohatera.")
+                }
+            }
+        }
     }
 
     fun isCombatActive() = gameRepository.currentState().combat.active

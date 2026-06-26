@@ -14,7 +14,8 @@ class InjurySystem @Inject constructor(
 
     fun applyInjury(hero: Hero, damage: Int) {
         // BUG-R4-02: Guard against maxHp <= 0 (avoid division by zero and always-true condition)
-        if (hero.maxHp <= 0) return
+        if (hero.maxHp <= 0) return 
+
         if (damage > hero.maxHp / 2) {
             // BUG-R3-05: Sanity clamp — previously: hero.sanity -= 5 (no clamp!)
             hero.sanity = (hero.sanity - 5).coerceIn(0, SANITY_CAP)

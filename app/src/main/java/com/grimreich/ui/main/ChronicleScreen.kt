@@ -35,8 +35,21 @@ fun ChronicleScreen(
             color = Color(0xFFC0A060),
             fontSize = 24.sp,
             fontWeight = FontWeight.Bold,
-            modifier = Modifier.align(Alignment.CenterHorizontally).padding(bottom = 16.dp)
+            modifier = Modifier.align(Alignment.CenterHorizontally).padding(bottom = 8.dp)
         )
+
+        // --- REALITY DECRYPTION PROGRESS (Project Cipher) ---
+        // Using entries.size vs hardcoded target for now
+        val progress = if (entries.isNotEmpty()) (entries.size.toFloat() / 50f).coerceAtMost(1f) else 0f
+        Column(modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp)) {
+            Text("DEKODOWANIE RZECZYWISTOŚCI: ${(progress * 100).toInt()}%", color = Color.Gray, fontSize = 10.sp)
+            LinearProgressIndicator(
+                progress = progress,
+                modifier = Modifier.fillMaxWidth().height(4.dp),
+                color = if (progress >= 1.0f) Color.Yellow else Color(0xFFC0A060),
+                trackColor = Color(0xFF111111)
+            )
+        }
 
         Row(modifier = Modifier.weight(1f)) {
             // Left: Entry List

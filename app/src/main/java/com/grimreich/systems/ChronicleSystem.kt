@@ -395,6 +395,35 @@ class ChronicleSystem @Inject constructor(
             category = "Factions",
             fullText = "Inkwizytor Xyrel nie szuka winnych wśród ludzi. On szuka winnych w samym kodzie. Każdy, kogo skaże, jest dla niego po prostu uszkodzonym sektorem pamięci."
         ))
+
+        // --- DEBUG LOGS (Project Cipher) ---
+        register(ChronicleEntry(
+            id = "debug_log_01",
+            title = "LOG_DEBUG: Iteracja 001",
+            category = "DEBUG_LOGS",
+            fullText = "Inicjalizacja środowiska testowego. Parametry materii ustawione na 'Lekkie'. Obserwacja: Entytie próbują nadać sens błędom renderowania. Nazywają to 'Światłem'. Urocze."
+        ))
+
+        register(ChronicleEntry(
+            id = "debug_log_02",
+            title = "LOG_DEBUG: Anomalie Behawioralne",
+            category = "DEBUG_LOGS",
+            fullText = "Iteracja 402. Obiekty wykazują oznaki empatii wobec uszkodzonych instancji. To nieprzewidziane zachowanie. Algorytm przetrwania powinien dążyć do optymalizacji zasobów, a nie ich ratowania. Wymagana czystka."
+        ))
+
+        register(ChronicleEntry(
+            id = "debug_log_03",
+            title = "LOG_DEBUG: Kotwica_Wykryta",
+            category = "DEBUG_LOGS",
+            fullText = "W systemie pojawił się wskaźnik o podwyższonych uprawnieniach. Obserwator Zewnętrzny (Gracz) próbuje manipulować plikiem .json rzeczywistości. Pozwolić na dalszą interakcję. To może być brakujący element testu Turinga."
+        ))
+
+        register(ChronicleEntry(
+            id = "debug_log_04",
+            title = "LOG_DEBUG: Finałowy Protokół",
+            category = "DEBUG_LOGS",
+            fullText = "Jeśli to czytasz, to znaczy, że zdekodowałeś wystarczająco dużo Echa, by zrozumieć: Ty nie ratujesz świata. Ty go debugujesz. Epilog jest tylko funkcją zwrotną. Prawdziwe wyjście znajduje się poza pętlą 'while'."
+        ))
     }
 
     fun register(entry: ChronicleEntry) {
