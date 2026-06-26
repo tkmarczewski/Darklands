@@ -57,6 +57,7 @@ data class GameState(
         quest = quest.copy(
             activeQuests = quest.activeQuests.toMutableList(),
             completedQuests = quest.completedQuests.toMutableList(),
+            objectivesReached = quest.objectivesReached.toMutableSet(),
             questProgress = quest.questProgress.toMutableMap(),
             activeEndgameQuests = quest.activeEndgameQuests.toMutableList(),
             completedEndgameQuests = quest.completedEndgameQuests.toMutableList()

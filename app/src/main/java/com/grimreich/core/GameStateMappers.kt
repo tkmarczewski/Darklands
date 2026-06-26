@@ -153,6 +153,7 @@ fun ItemDto.toDomain(): Item = Item(
 fun QuestState.toDto(): QuestStateDto = QuestStateDto(
     activeQuests = activeQuests,
     completedQuests = completedQuests,
+    objectivesReached = objectivesReached.toList(),
     questProgress = questProgress,
     activeEndgameQuests = activeEndgameQuests,
     completedEndgameQuests = completedEndgameQuests
@@ -161,6 +162,7 @@ fun QuestState.toDto(): QuestStateDto = QuestStateDto(
 fun QuestStateDto.toDomain(): QuestState = QuestState().also {
     it.activeQuests.addAll(activeQuests)
     it.completedQuests.addAll(completedQuests)
+    it.objectivesReached.addAll(objectivesReached)
     it.questProgress.putAll(questProgress)
     it.activeEndgameQuests.addAll(activeEndgameQuests)
     it.completedEndgameQuests.addAll(completedEndgameQuests)

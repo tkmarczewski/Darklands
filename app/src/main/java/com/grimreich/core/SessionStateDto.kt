@@ -92,6 +92,7 @@ data class ItemDto(
 data class QuestStateDto(
     val activeQuests: List<String> = emptyList(),
     val completedQuests: List<String> = emptyList(),
+    val objectivesReached: List<String> = emptyList(),
     val questProgress: Map<String, Int> = emptyMap(),
     val activeEndgameQuests: List<String> = emptyList(),
     val completedEndgameQuests: List<String> = emptyList()

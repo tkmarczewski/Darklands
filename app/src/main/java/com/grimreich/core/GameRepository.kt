@@ -60,9 +60,10 @@ class GameRepository @Inject constructor(
     }
 
     fun sync() {
+        val state = _gameState.value
         cityCatalogue.seedCanonical()
         itemCatalogue.seed()
-        questSystem.seedIntegratedContent()
+        questSystem.syncWithState(state)
         dialogueManager.seedBasicDialogues()
     }
 

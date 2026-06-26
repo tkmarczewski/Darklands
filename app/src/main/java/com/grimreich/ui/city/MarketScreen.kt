@@ -40,7 +40,7 @@ fun MarketScreen(
         Row(modifier = Modifier.weight(1f)) {
             Column(modifier = Modifier.weight(1f).padding(end = 8.dp)) {
                 Text("DO KUPIENIA", color = Color(0xFF888844), fontSize = 10.sp, fontWeight = FontWeight.Bold)
-                LazyColumn {
+                LazyColumn(modifier = Modifier.weight(1f)) {
                     items(state.itemsForSale) { item ->
                         MarketItemRow(
                             name = item.name,
@@ -50,6 +50,17 @@ fun MarketScreen(
                             onClick = { viewModel.buy(item.id) }
                         )
                     }
+                }
+                
+                Spacer(modifier = Modifier.height(16.dp))
+                
+                Button(
+                    onClick = onBack,
+                    modifier = Modifier.fillMaxWidth().height(44.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF400000)),
+                    shape = MaterialTheme.shapes.extraSmall
+                ) {
+                    Text("POWRÓT", color = Color.White, fontWeight = FontWeight.Bold)
                 }
             }
 
@@ -67,14 +78,6 @@ fun MarketScreen(
                     }
                 }
             }
-        }
-
-        Button(
-            onClick = onBack,
-            modifier = Modifier.fillMaxWidth().height(50.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF400000))
-        ) {
-            Text("POWRÓT DO MIASTA", color = Color.White, fontWeight = FontWeight.Bold)
         }
     }
 }

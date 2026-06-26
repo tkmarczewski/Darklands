@@ -34,28 +34,32 @@ fun AlchemyScreen(
         // HEADER
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
             Text("KOCIOŁ ALCHEMICZNY", color = Color(0xFFADFF2F), fontSize = 24.sp, fontWeight = FontWeight.Bold)
-            Button(
-                onClick = onBack, 
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF400000)),
-                shape = MaterialTheme.shapes.extraSmall
-            ) {
-                Text("POWRÓT", color = Color.White, fontWeight = FontWeight.Bold)
-            }
         }
 
         Spacer(modifier = Modifier.height(16.dp))
 
         Row(modifier = Modifier.weight(1f)) {
-            // LEFT: Recipe List
+            // LEFT: Recipe List & EXIT
             Column(modifier = Modifier.weight(1f)) {
                 Text("RECEPTURY", color = Color.Gray, fontSize = 10.sp, fontWeight = FontWeight.Bold)
                 Spacer(modifier = Modifier.height(8.dp))
-                LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                LazyColumn(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     items(state.recipes) { recipe ->
                         RecipeItem(recipe, isSelected = state.selectedRecipe?.id == recipe.id) {
                             viewModel.selectRecipe(recipe)
                         }
                     }
+                }
+                
+                Spacer(modifier = Modifier.height(16.dp))
+                
+                Button(
+                    onClick = onBack, 
+                    modifier = Modifier.fillMaxWidth().height(44.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF400000)),
+                    shape = androidx.compose.material3.MaterialTheme.shapes.extraSmall
+                ) {
+                    Text("POWRÓT", color = Color.White, fontWeight = FontWeight.Bold)
                 }
             }
 

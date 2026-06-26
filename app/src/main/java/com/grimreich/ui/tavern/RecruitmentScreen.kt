@@ -107,13 +107,13 @@ fun RecruitmentScreen(
             }
         }
 
+        Spacer(modifier = Modifier.height(16.dp))
+        
         Button(
             onClick = onBack,
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(50.dp)
-                .padding(top = 8.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF400000))
+            modifier = Modifier.width(180.dp).height(44.dp),
+            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF400000)),
+            shape = MaterialTheme.shapes.extraSmall
         ) {
             Text("POWRÓT", color = Color.White, fontWeight = FontWeight.Bold)
         }

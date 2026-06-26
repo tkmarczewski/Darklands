@@ -54,17 +54,29 @@ class QuestSystem @Inject constructor(
         return quest
     }
 
+    fun syncWithState(state: com.grimreich.core.GameState) {
+        seedIntegratedContent()
+        allQuests.values.forEach { quest ->
+            when {
+                state.quest.completedQuests.contains(quest.id) -> quest.status = QuestStatus.UKONCZONE
+                state.quest.objectivesReached.contains(quest.id) -> quest.status = QuestStatus.CEL_OSIAGNIETY
+                state.quest.activeQuests.contains(quest.id) -> quest.status = QuestStatus.AKTYWNE
+                else -> quest.status = QuestStatus.DOSTEPNE
+            }
+        }
+    }
+
     fun markObjectiveComplete(id: String) {
         val quest = allQuests[id] ?: return
-        if (quest.status == QuestStatus.AKTYWNE) {
-            quest.status = QuestStatus.CEL_OSIAGNIETY
-            gameRepository.log("""
-                [SYSTEM]: Cel zadania '${quest.title}' został osiągnięty. Dane sesji zaktualizowane. 
-                Twoja obecność tutaj zostawiła trwały ślad. Wróć do zleceniodawcy, by zamknąć ten wątek.
-            """.trimIndent())
-            
-            // Force save to prevent desync
-            gameRepository.persistCurrentState()
+        gameRepository.updateState { state ->
+            if (quest.status == QuestStatus.AKTYWNE) {
+                quest.status = QuestStatus.CEL_OSIAGNIETY
+                state.quest.objectivesReached.add(id)
+                gameRepository.log("""
+                    [SYSTEM]: Cel zadania '${quest.title}' został osiągnięty. Dane sesji zaktualizowane. 
+                    Twoja obecność tutaj zostawiła trwały ślad. Wróć do zleceniodawcy, by zamknąć ten wątek.
+                """.trimIndent())
+            }
         }
     }
 
