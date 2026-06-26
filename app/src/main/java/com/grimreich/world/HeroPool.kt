@@ -180,7 +180,7 @@ class HeroPool @Inject constructor() {
         val armor  = armorByCareer[career]?.random(rng)
 
         val skills = skillsByCareer[career]
-            ?.mapValues { (_, base) -> base + rng.nextInt(11) - 5 }
+                        ?.mapValues { (_, base) -> (base + rng.nextInt(11) - 5).coerceAtLeast(1) }
             ?.toMutableMap()
             ?: mutableMapOf()
 
