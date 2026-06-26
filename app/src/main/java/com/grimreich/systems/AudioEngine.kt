@@ -1,0 +1,67 @@
+package com.grimreich.systems
+
+import android.content.Context
+import android.media.MediaPlayer
+import com.grimreich.R
+import dagger.hilt.android.qualifiers.ApplicationContext
+import javax.inject.Inject
+import javax.inject.Singleton
+
+@Singleton
+class AudioEngine @Inject constructor(
+    @ApplicationContext private val context: Context,
+    private val gameRepository: dagger.Lazy<com.grimreich.core.GameRepository>
+) {
+    private var musicPlayer: MediaPlayer? = null
+    private var currentTrackResId: Int = 0
+
+    fun playMusic(resId: Int, loop: Boolean = true) {
+        if (currentTrackResId == resId) return
+
+        stopMusic()
+        try {
+            musicPlayer = MediaPlayer.create(context, resId).apply {
+                isLooping = loop
+                start()
+            }
+            currentTrackResId = resId
+        } catch (e: Exception) {
+            // Log error if needed
+        }
+    }
+
+    fun stopMusic() {
+        musicPlayer?.stop()
+        musicPlayer?.release()
+        musicPlayer = null
+        currentTrackResId = 0
+    }
+
+    fun playForRoute(route: String) {
+        val state = gameRepository.get().currentState()
+        val stability = state.world.globalStability
+
+        val track = when {
+            stability < 20 -> R.raw.ost_glitch_ambient
+            route.contains("main_menu") -> R.raw.ost_main_menu
+            route.contains("city") -> {
+                val currentCity = state.grimCurrentRegion.lowercase()
+                when {
+                    currentCity.contains("zakon") || currentCity.contains("fortress") -> R.raw.ost_faction_order
+                    currentCity.contains("serce") || currentCity.contains("heart") -> R.raw.ost_magic_location
+                    else -> R.raw.ost_city
+                }
+            }
+            route.contains("combat") -> {
+                if (state.combat.enemyMaxHp > 100) R.raw.ost_combat_boss else R.raw.ost_combat_normal
+            }
+            route.contains("expedition") || route.contains("events") -> R.raw.ost_exploration
+            route.contains("tavern") -> R.raw.ost_tavern
+            route.contains("market") -> R.raw.ost_market
+            route.contains("ending") -> R.raw.ost_epilogue
+            route.contains("death") || route.contains("ritual") -> R.raw.ost_death
+            else -> R.raw.ost_main_theme
+        }
+        playMusic(track)
+    }
+}

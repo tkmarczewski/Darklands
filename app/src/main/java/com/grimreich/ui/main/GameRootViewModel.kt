@@ -19,7 +19,8 @@ enum class GameScreenMode {
 class GameRootViewModel @Inject constructor(
     val gameRepository: GameRepository,
     val gameBootstrapper: GameBootstrapper,
-    val combatSystem: CombatSystem
+    val combatSystem: com.grimreich.systems.CombatSystem,
+    private val audioEngine: com.grimreich.systems.AudioEngine
 ) : ViewModel() {
 
     private val _mode = MutableStateFlow(GameScreenMode.MAIN_MENU)
@@ -30,6 +31,7 @@ class GameRootViewModel @Inject constructor(
 
     fun setMode(newMode: GameScreenMode) {
         _mode.value = newMode
+        audioEngine.playForRoute(newMode.name.lowercase())
     }
 
     fun restoreSessionIfValid(): Boolean {
