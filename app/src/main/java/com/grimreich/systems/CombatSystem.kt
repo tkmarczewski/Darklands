@@ -185,6 +185,16 @@ class CombatSystem @Inject constructor(
 
         val heroMoraleLabel = moraleSystem.computeStatus(result.attackerMorale)
         val enemyMoraleLabel = moraleSystem.computeStatus(result.defenderMorale)
+        
+        // Enrich combat log with descriptive impact messages
+        val sensoryLogs = when {
+            result.attackerDamage > 20 -> listOf("${hero.name} wyprowadza morderczy cios! Ostrze zgrzyta o kość, a krew (lub to, co ją zastępuje) tryska na Twoją twarz.")
+            result.attackerDamage > 10 -> listOf("${hero.name} trafia czysto. Czujesz opór rozrywanego mięsa i satysfakcjonujące chrupnięcie pancerza.")
+            result.attackerDamage > 0 -> listOf("Cios ześlizguje się po powierzchni, zostawiając jedynie powierzchowną rysę na istnieniu wroga.")
+            else -> listOf("Powietrze przecina tylko świst Twojej broni. Wróg jest szybki... albo Ty stajesz się wolniejszy.")
+        }
+        c.log.addAll(sensoryLogs)
+
         val woundMsg = if (result.defenderWound != WoundType.NONE) " [Rana ${c.enemyName}: ${result.defenderWound}]" else ""
         val heroWoundMsg = if (result.attackerWound != WoundType.NONE) " [Rana ${hero.name}: ${result.attackerWound}]" else ""
 

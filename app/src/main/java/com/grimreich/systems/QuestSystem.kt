@@ -58,7 +58,11 @@ class QuestSystem @Inject constructor(
         val quest = allQuests[id] ?: return
         if (quest.status == QuestStatus.AKTYWNE) {
             quest.status = QuestStatus.CEL_OSIAGNIETY
-            gameRepository.log("Cel osiągnięty: ${quest.title}. Wróć do zleceniodawcy po nagrodę.")
+            gameRepository.log("""
+                Cel osiągnięty: ${quest.title}. Twoja dłoń drży, gdy odkładasz broń lub zamykasz księgę. 
+                Duszny zapach spalonego Echa unosi się w powietrzu, a Ty czujesz na plecach spojrzenie Skrybów. 
+                To jeszcze nie koniec. Wróć do zleceniodawcy, by odebrać to, co Ci obiecano.
+            """.trimIndent())
             gameRepository.persistCurrentState()
         }
     }
@@ -79,7 +83,7 @@ class QuestSystem @Inject constructor(
             quest.factionRewardId?.let { factionId ->
                 val current = state.reputation.globalFactions[factionId] ?: 0
                 state.reputation.globalFactions[factionId] = current + quest.factionRewardAmount
-                gameRepository.log("Zyskałeś reputację u: $factionId (+${quest.factionRewardAmount})")
+                gameRepository.log("Więzi z frakcją: $factionId zacieśniły się (+${quest.factionRewardAmount}). Widzą w Tobie kogoś więcej niż tylko najemnika.")
                 
                 // Handle Rivalries (Simple logic: if helping Dawn, Inquisition dislikes it slightly)
                 handleRivalries(state, factionId, quest.factionRewardAmount)
@@ -88,18 +92,18 @@ class QuestSystem @Inject constructor(
             // Handle chains: activate next quest
             quest.nextQuestId?.let { nextId ->
                 if (!state.quest.activeQuests.contains(nextId) && !state.quest.completedQuests.contains(nextId)) {
-                    state.quest.activeQuests.add(nextId)
                     allQuests[nextId]?.status = QuestStatus.AKTYWNE
                     val nextQuest = allQuests[nextId]
                     val hint = if (nextQuest?.nextLocationHint != null) {
-                        " Udaj się do: ${nextQuest.nextLocationHint} (NPC: ${nextQuest.nextNpcHint})"
+                        " Twoja droga prowadzi teraz do: ${nextQuest.nextLocationHint} (Szukaj: ${nextQuest.nextNpcHint})"
                     } else ""
-                    gameRepository.log("Nowy etap zadania: ${nextQuest?.title}.$hint")
+                    gameRepository.log("Cień Twoich czynów rzuca nowe wyzwanie: ${nextQuest?.title}.$hint")
+                    state.quest.activeQuests.add(nextId)
                 }
             }
         }
         
-        gameRepository.log("Ukończono zadanie: ${quest.title}. Nagroda: ${quest.rewardGold} zł.")
+        gameRepository.log("Zadanie '${quest.title}' dobiegło końca. Brzęk złota w mieszku miesza się z poczuciem spełnionego (lub zignorowanego) obowiązku.")
         return quest
     }
 
