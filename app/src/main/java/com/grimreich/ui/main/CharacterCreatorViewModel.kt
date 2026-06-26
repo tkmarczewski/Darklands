@@ -31,10 +31,22 @@ data class CharacterCreatorUiState(
 )
 
 @HiltViewModel
-class CharacterCreatorViewModel @Inject constructor() : ViewModel() {
+class CharacterCreatorViewModel @Inject constructor(
+    private val gameRepository: com.grimreich.core.GameRepository
+) : ViewModel() {
 
     private val _uiState = MutableStateFlow(CharacterCreatorUiState())
     val uiState: StateFlow<CharacterCreatorUiState> = _uiState.asStateFlow()
+
+    init {
+        // Check for Legacy Buffs
+        val meta = gameRepository.currentState().persistentMeta
+        if (meta.unlockedLegacyBuffs.contains("SCRIBES_EYE")) {
+            val baseAttrs = _uiState.value.attributes.toMutableMap()
+            baseAttrs["Int"] = (baseAttrs["Int"] ?: 10) + 5
+            _uiState.update { it.copy(attributes = baseAttrs) }
+        }
+    }
 
     fun selectCareer(career: Career) {
         val newAttrs = _uiState.value.attributes.toMutableMap()

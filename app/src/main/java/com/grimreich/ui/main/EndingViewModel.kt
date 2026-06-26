@@ -2,6 +2,7 @@ package com.grimreich.ui.main
 
 import androidx.lifecycle.ViewModel
 import com.grimreich.core.GameRepository
+import com.grimreich.core.GameState
 import com.grimreich.systems.EndingSystem
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -34,17 +35,32 @@ class EndingViewModel @Inject constructor(
     }
 
     fun ascend() {
-        gameRepository.log("WYBRANO: ASCENDENCJA. Zostałeś Skrybą.")
-        // Final logic would go here
+        val s = gameRepository.currentState()
+        s.persistentMeta.apply {
+            totalSessionsFinished += 1
+            unlockedLegacyBuffs.add("SCRIBES_EYE")
+            maxMetaAwarenessReached = maxOf(maxMetaAwarenessReached, s.metaAwarenessLevel)
+        }
+        gameRepository.log("WYBRANO: ASCENDENCJA. Zostałeś Skrybą. Odblokowano: OKO SKRYBY.")
+        gameRepository.persistCurrentState()
     }
 
     fun reboot() {
-        gameRepository.log("WYBRANO: REBOOT. Sesja odświeżona.")
-        // New Game Plus logic
+        val s = gameRepository.currentState()
+        s.persistentMeta.apply {
+            totalSessionsFinished += 1
+            unlockedLegacyBuffs.add("REINFORCED_ANCHOR")
+            maxMetaAwarenessReached = maxOf(maxMetaAwarenessReached, s.metaAwarenessLevel)
+        }
+        gameRepository.log("WYBRANO: REBOOT. Sesja odświeżona. Odblokowano: WZMOCNIONA KOTWICA.")
+        gameRepository.persistCurrentState()
     }
 
     fun delete() {
-        gameRepository.log("WYBRANO: DESTRUKCJA. Świat wymazany.")
-        // Cleanup logic
+        // True deletion - clear even persistent meta? 
+        // Plan says "Wipes the meta-data as well".
+        gameRepository.replaceState(GameState())
+        gameRepository.log("WYBRANO: DESTRUKCJA. Świat i dziedzictwo wymazane.")
+        gameRepository.persistCurrentState()
     }
 }

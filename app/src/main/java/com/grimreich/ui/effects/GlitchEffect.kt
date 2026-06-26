@@ -60,5 +60,11 @@ fun Modifier.glitchEffect(active: Boolean, intensity: Float = 1f): Modifier = co
                 ).asComposeRenderEffect()
             }
         }
+
+        // --- UI DECAY (Phase 6) ---
+        if (intensity > 3.0f && Random.nextFloat() < 0.05f) {
+            rotationZ = (Random.nextFloat() - 0.5f) * 10f
+            alpha = 0.6f + Random.nextFloat() * 0.4f
+        }
     }
 }

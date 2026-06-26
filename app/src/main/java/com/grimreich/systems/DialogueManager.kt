@@ -33,6 +33,15 @@ class DialogueManager @Inject constructor(
     fun getNode(id: String): DialogueNode? {
         val gameState = gameRepositoryProvider.get().currentState()
         
+        // Handle Déjà Vu (Meta-Awareness of previous sessions)
+        if (id.endsWith("_start") && gameState.persistentMeta.totalSessionsFinished > 0) {
+            val dejavuNode = "${id}_dejavu"
+            if (nodes.containsKey(dejavuNode)) {
+                activeDialogueId = dejavuNode
+                return applyWorldEffects(nodes[dejavuNode]!!)
+            }
+        }
+
         // Handle Faction-Specific Start Nodes
         var targetId = id
         if (id.endsWith("_start")) {
@@ -242,6 +251,16 @@ class DialogueManager @Inject constructor(
             )
         ))
         registerNode(DialogueNode(id = "aelion_stability", npcId = "aelion", text = "Stabilność to iluzja. Szukaj Serca Krainy. Tam Mira pokaże Ci prawdę.", choices = listOf(DialogueChoice("Dziękuję.", "end"))))
+
+        // AELION DEJA VU
+        registerNode(DialogueNode(
+            id = "aelion_start_dejavu", npcId = "aelion",
+            text = "Znowu? Kotwico, ile jeszcze razy musimy świadczyć tej samej pętli? Twoja obecność tutaj jest już niemal... wyryta w kodzie regionu.",
+            choices = listOf(
+                DialogueChoice("Tym razem będzie inaczej.", "aelion_start"),
+                DialogueChoice("Nie rozumiem.", "aelion_start")
+            )
+        ))
         registerNode(DialogueNode(id = "aelion_bells", npcId = "aelion", text = "Zatopione katedry nie milczą, one krzyczą w języku, którego zapomnieliśmy. Kiedyś byliśmy całością. Teraz jesteśmy tylko odłamkami rozbitego witraża. Jeśli usłyszysz dzwony, nie idź w stronę wody. To one przyciągnęły Pęknięcie.", choices = listOf(DialogueChoice("Będę pamiętał.", "aelion_start"))))
         registerNode(DialogueNode(id = "aelion_absolute", npcId = "aelion", text = "Absolut to nie bóg. To Architekt, który porzucił plac budowy, zostawiając nas w niedokończonym świecie. My jesteśmy tylko błędami w jego wielkim planie, próbującymi nadać sens własnemu nieistnieniu.", choices = listOf(DialogueChoice("To mroczna wizja.", "aelion_start"))))
 
@@ -360,6 +379,16 @@ class DialogueManager @Inject constructor(
             )
         ))
         registerNode(DialogueNode(id = "noctyros_meta", npcId = "noctyros", text = "Jesteś procesem, który próbuje naprawić uszkodzone dane. Ten świat to tylko SessionState, a Ty jesteś jego jedyną szansą na odświeżenie. Ale uważaj... Skryba może w każdej chwili zamknąć aplikację rzeczywistości.", choices = listOf(DialogueChoice("Nic nie rozumiem.", "noctyros_start"))))
+
+        // NOCTYROS DEJA VU
+        registerNode(DialogueNode(
+            id = "noctyros_start_dejavu", npcId = "noctyros",
+            text = "Ach, wskaźnik do poprzedniej sesji powraca. Widzę, że 'Anchor_Save' zadziałał bez zarzutu. Czego szukasz w tym starym marginesie?",
+            choices = listOf(
+                DialogueChoice("Szukam ostatecznego Epilogu.", "noctyros_start"),
+                DialogueChoice("Nie nazywaj mnie wskaźnikiem.", "noctyros_start")
+            )
+        ))
         registerNode(DialogueNode(id = "noctyros_fracture", npcId = "noctyros", text = "To błąd logiczny. Dwa wymiary nałożyły się na siebie, bo ktoś zapomniał o warunkach brzegowych. Druga Strona to po prostu to, co nie powinno istnieć, a jednak zajmuje miejsce w pamięci świata.", choices = listOf(DialogueChoice("Mówisz zagadkami.", "noctyros_start"))))
         registerNode(DialogueNode(id = "noctyros_save", npcId = "noctyros", text = "Nie możesz uratować czegoś, co jest zaprojektowane, by upaść. Możesz tylko przetrwać wystarczająco długo, by zobaczyć Epilog. Ale czy wybierzesz zakończenie Materialne, czy Meta-Narracyjne... to zależy od Twoich 'wyborów'.", choices = listOf(DialogueChoice("Zrobię co w mojej mocy.", "noctyros_start"))))
 

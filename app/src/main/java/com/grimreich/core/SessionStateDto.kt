@@ -4,6 +4,13 @@ import kotlinx.serialization.Serializable
 import com.grimreich.core.mutations.MutationDto
 
 @Serializable
+data class PersistentMetaDto(
+    val totalSessionsFinished: Int = 0,
+    val unlockedLegacyBuffs: List<String> = emptyList(),
+    val maxMetaAwarenessReached: Int = 0
+)
+
+@Serializable
 data class SessionStateDto(
     val version: Int = 1,
 
@@ -33,6 +40,7 @@ data class SessionStateDto(
     val combat: CombatStateDto = CombatStateDto(),
     val knownNpcs: Map<String, List<NpcDto>> = emptyMap(),
     val unlockedLoreIds: List<String> = emptyList(),
+    val persistentMeta: PersistentMetaDto = PersistentMetaDto(),
     val isExpeditionActive: Boolean = false,
     val lastSaveTimestamp: Long = 0
 )

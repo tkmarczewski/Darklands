@@ -28,6 +28,7 @@ fun GameState.toDto(): SessionStateDto = SessionStateDto(
     combat = combat.toDto(),
     knownNpcs = knownNpcs.mapValues { entry -> entry.value.map { (it as com.grimreich.grimreich.v1.NPC).toDto() } },
     unlockedLoreIds = unlockedLoreIds.toList(),
+    persistentMeta = persistentMeta.toDto(),
     isExpeditionActive = isExpeditionActive,
     lastSaveTimestamp = lastSaveTimestamp
 )
@@ -57,6 +58,11 @@ fun SessionStateDto.toDomain(): GameState = GameState(
 ).also {
     it.knownNpcs.putAll(knownNpcs.mapValues { entry -> entry.value.map { it.toDomain() as com.grimreich.grimreich.v1.NPC } })
     it.unlockedLoreIds.addAll(unlockedLoreIds)
+    it.persistentMeta.apply {
+        totalSessionsFinished = persistentMeta.totalSessionsFinished
+        unlockedLegacyBuffs.addAll(persistentMeta.unlockedLegacyBuffs)
+        maxMetaAwarenessReached = persistentMeta.maxMetaAwarenessReached
+    }
     it.isExpeditionActive = isExpeditionActive
     it.lastSaveTimestamp = lastSaveTimestamp
 }
@@ -282,4 +288,10 @@ fun StatusEffectDto.toDomain(): StatusEffect = StatusEffect(
     type = try { StatusEffectType.valueOf(type) } catch(e: Exception) { StatusEffectType.POISON },
     duration = duration,
     strength = magnitude
+)
+
+fun PersistentMeta.toDto(): PersistentMetaDto = PersistentMetaDto(
+    totalSessionsFinished = totalSessionsFinished,
+    unlockedLegacyBuffs = unlockedLegacyBuffs.toList(),
+    maxMetaAwarenessReached = maxMetaAwarenessReached
 )

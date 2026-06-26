@@ -20,8 +20,13 @@ class GameBootstrapper @Inject constructor(
     private val worldMap: WorldMap
 ) {
     suspend fun bootstrapFreshWorld(seed: Int = 1) = withContext(Dispatchers.IO) {
-        val existingPlayerName = gameRepository.currentState().playerName
-        val existingHeroName = gameRepository.currentState().heroName
+        val oldState = gameRepository.currentState()
+        val existingPlayerName = oldState.playerName
+        val existingHeroName = oldState.heroName
+        val existingLore = oldState.unlockedLoreIds.toSet()
+        val existingMeta = oldState.persistentMeta.copy(
+            unlockedLegacyBuffs = oldState.persistentMeta.unlockedLegacyBuffs.toMutableSet()
+        )
 
         // Clear all session volatile caches
         cityCatalogue.clear()
@@ -43,6 +48,19 @@ class GameBootstrapper @Inject constructor(
         
         state.playerName = existingPlayerName
         state.heroName = existingHeroName
+        state.unlockedLoreIds.addAll(existingLore)
+        
+        state.persistentMeta.apply {
+            totalSessionsFinished = existingMeta.totalSessionsFinished
+            unlockedLegacyBuffs.addAll(existingMeta.unlockedLegacyBuffs)
+            maxMetaAwarenessReached = existingMeta.maxMetaAwarenessReached
+        }
+
+        // Apply Legacy Buffs
+        if (state.persistentMeta.unlockedLegacyBuffs.contains("REINFORCED_ANCHOR")) {
+            state.world.globalStability = 100
+            gameRepository.log("[DZIEDZICTWO] Wzmocniona Kotwica: Twoja sesja startuje z pełną stabilnością.")
+        }
 
         state.world.day = 1
         state.world.timeOfDay = "morning"

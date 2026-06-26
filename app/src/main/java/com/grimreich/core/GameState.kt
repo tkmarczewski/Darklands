@@ -32,6 +32,7 @@ data class GameState(
     val combat: CombatState = CombatState(),
     val knownNpcs: MutableMap<String, List<com.grimreich.grimreich.v1.NPC>> = mutableMapOf(),
     val unlockedLoreIds: MutableSet<String> = mutableSetOf(),
+    val persistentMeta: PersistentMeta = PersistentMeta(),
     var isExpeditionActive: Boolean = false,
     var lastSaveTimestamp: Long = System.currentTimeMillis()
 ) {
@@ -76,6 +77,9 @@ data class GameState(
         ),
         knownNpcs = knownNpcs.mapValues { it.value.map { n -> n.copy() } }.toMutableMap(),
         unlockedLoreIds = unlockedLoreIds.toMutableSet(),
+        persistentMeta = persistentMeta.copy(
+            unlockedLegacyBuffs = persistentMeta.unlockedLegacyBuffs.toMutableSet()
+        ),
         isExpeditionActive = isExpeditionActive,
         lastSaveTimestamp = lastSaveTimestamp
     )
