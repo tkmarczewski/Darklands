@@ -40,10 +40,12 @@ class GameRepository @Inject constructor(
     }
 
     fun updateState(transform: (GameState) -> Unit) {
-        val current = _gameState.value
-        transform(current)
-        _gameState.value = current.deepCopy() // Force flow update with a deep copy
-        persistCurrentState()
+        synchronized(this) {
+            val current = _gameState.value
+            transform(current)
+            _gameState.value = current.deepCopy() // Force flow update with a deep copy
+            persistCurrentState()
+        }
     }
 
     fun seed() {

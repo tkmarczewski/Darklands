@@ -121,35 +121,37 @@ class DialogueViewModel @Inject constructor(
         
         if (choice.targetNodeId == "end" || nextNode == null) {
             // Handle quest activation/completion from dialogue
-            state.pendingQuestId?.let { cmd ->
+            val cmd = state.pendingQuestId
+            state.pendingQuestId = null // CLEAR FIRST (Anti-reentry)
+            
+            cmd?.let { c ->
                 when {
-                    cmd.startsWith("COMPLETE:") -> {
-                        val qId = cmd.removePrefix("COMPLETE:")
+                    c.startsWith("COMPLETE:") -> {
+                        val qId = c.removePrefix("COMPLETE:")
                         state.quest.activeQuests.remove(qId)
                         if (!state.quest.completedQuests.contains(qId)) {
                             state.quest.completedQuests.add(qId)
                             gameRepository.log("Zadanie ukończone: $qId")
                         }
                     }
-                    cmd.startsWith("FINALIZE:") -> {
-                        val qId = cmd.removePrefix("FINALIZE:")
+                    c.startsWith("FINALIZE:") -> {
+                        val qId = c.removePrefix("FINALIZE:")
                         // Call the explicit system complete to handle gold reward
                         questSystem.complete(qId)
                     }
-                    cmd.startsWith("RECRUIT:") -> {
-                        val heroType = cmd.removePrefix("RECRUIT:")
+                    c.startsWith("RECRUIT:") -> {
+                        val heroType = c.removePrefix("RECRUIT:")
                         val hero = createRecruitedHero(heroType)
                         state.party.add(hero)
                         gameRepository.log("Bohater zrekrutowany: ${hero.name}")
                     }
                     else -> {
-                        if (!state.quest.activeQuests.contains(cmd)) {
-                            state.quest.activeQuests.add(cmd)
-                            gameRepository.log("Nowe zadanie aktywowane: $cmd")
+                        if (!state.quest.activeQuests.contains(c)) {
+                            state.quest.activeQuests.add(c)
+                            gameRepository.log("Nowe zadanie aktywowane: $c")
                         }
                     }
                 }
-                state.pendingQuestId = null
             }
 
             state.pendingDialogueNodeId = null

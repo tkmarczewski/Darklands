@@ -63,11 +63,12 @@ class MarketViewModel @Inject constructor(
         }
 
         val toSell = state.inventory.map { item ->
+            val sellModifier = if (modifier > 1.0f) 0.5f else 0.6f // Anti-exploit: higher prices = worse sell ratio
             MarketItem(
                 id = item.id,
                 name = item.name,
                 price = item.value,
-                sellPrice = (item.value * 0.6f * modifier).toInt().coerceAtLeast(1)
+                sellPrice = (item.value * sellModifier * modifier).toInt().coerceAtLeast(1)
             )
         }
 

@@ -14,10 +14,12 @@ class InventorySystem @Inject constructor(
     fun equip(heroId: String, itemId: String): String {
         val state = gameRepository.currentState()
         val hero   = state.party.firstOrNull { it.id == heroId } ?: return "Brak bohatera: $heroId"
-        val item   = state.inventory.firstOrNull { it.id == itemId }
-            ?: return "Nie znaleziono: $itemId"
+        
+        // CRITICAL FIX: Verify item exists in inventory before equipping
+        val item = state.inventory.firstOrNull { it.id == itemId }
+            ?: return "Nie znaleziono przedmiotu $itemId w plecaku"
 
-        val slot = item.slot ?: return "${item.name} nie ma slotu"
+        val slot = item.slot ?: return "${item.name} nie ma przypisanego slotu"
         
         val minStr = item.effects["minStrength"] ?: 0
         if (minStr > 0 && hero.strength < minStr) {

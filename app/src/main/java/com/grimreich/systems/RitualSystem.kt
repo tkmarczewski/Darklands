@@ -26,12 +26,12 @@ class RitualSystem @Inject constructor(
 
         gameRepository.updateState { s ->
             val h = s.party.find { it.id == heroId } ?: return@updateState
-            s.world.globalStability -= REVIVAL_STABILITY_DRAIN
+            s.world.globalStability = (s.world.globalStability - REVIVAL_STABILITY_DRAIN).coerceAtLeast(0)
             
             h.isDead = false
             h.hp = h.maxHp / 2
-            h.corruption += REVIVAL_CORRUPTION_GAIN
-            h.sanity -= REVIVAL_SANITY_LOSS
+            h.corruption = (h.corruption + REVIVAL_CORRUPTION_GAIN).coerceAtMost(100)
+            h.sanity = (h.sanity - REVIVAL_SANITY_LOSS).coerceAtLeast(0)
             
             s.logEntries.add("Rytuał Echa powiódł się. ${h.name} powraca z Otchłani, lecz fundamenty świata drżą.")
         }
