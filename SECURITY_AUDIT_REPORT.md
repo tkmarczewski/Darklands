@@ -156,4 +156,51 @@ NPC AI uzywa `kotlin.random.Random` bez seeda — kazde uruchomienie aplikacji d
 
 ---
 
+## Runda 3 Audytu — Pliki pozostałe (world/, viewmodels/, grimreich/v1/, systems/CombatSystem)
+
+### BUG-10: `HeroPool.generateHero()` — skill values mogą być ujemne
+**Plik:** `world/HeroPool.kt` | **Commit:** fix(BUG-10)
+`skills?.mapValues { (_, base) -> base + rng.nextInt(11) - 5 }` — wartość bazowa np. 20 minus 5 = OK, ale baza 0 minus 5 = -5. Ujemna umiejętność nie ma sensu.
+**Naprawka:** Zmieniono na `(base + rng.nextInt(11) - 5).coerceAtLeast(1)` — minimum 1.
+
+---
+
+### BUG-11: `DevMenuViewModel` — nieograniczony wzrost listy logów (wyciek pamięci)
+**Plik:** `viewmodels/DevMenuViewModel.kt` | **Commit:** fix(BUG-11)
+`_logEntries.value = _logEntries.value + entry` — lista rośnie bez limitu w długich sesjach deweloperskich.
+**Naprawka:** Dodano `private fun addLog(entry)` z `.takeLast(100)` — lista nigdy nie przekroczy 100 wpisów.
+
+---
+
+### BUG-12: `LootRoller.roll()` — brak górnego limitu liczby losowań (ryzyko OOM)
+**Plik:** `grimreich/v1/GrimGenerators.kt` | **Commit:** fix(BUG-12)
+`List(rolls.coerceAtLeast(1)) { ... }` — brak górnego limitu; przekazanie bardzo dużej wartości `rolls` powoduje OOM.
+**Naprawka:** Zmieniono na `.coerceIn(1, 20)` — max 20 losowań na raz.
+
+---
+
+### BUG-13: `CombatSystem.usePotion()` — endurance cap względem `hero.maxHp` zamiast własnego maksimum
+**Plik:** `systems/CombatSystem.kt` | **Commit:** fix(BUG-13,BUG-14)
+`hero.endurance = (hero.endurance + mana).coerceAtMost(hero.maxHp)` — `endurance` to atrybut 0-20, a `maxHp` może wynosić 40+. Oznaczało to, że eliksir mógł podbić endurance powyżej 20.
+**Naprawka:** Zmieniono na `.coerceIn(0, 20)` — prawidłowy zakres endurance.
+
+---
+
+### BUG-14: `CombatSystem.startEncounterForQuest()` — niebezpieczny dostęp do elementów tablicy `parts[]`
+**Plik:** `systems/CombatSystem.kt` | **Commit:** fix(BUG-13,BUG-14)
+`parts[2].toInt()`, `parts[3].toInt()` — jeśli `pendingQuestId` ma format `"RAID:boss"` (tylko 2 segmenty), wywołanie crashuje `IndexOutOfBoundsException`.
+**Naprawka:** Dodano guard `if (parts.size >= 4)` + użyto `toIntOrNull() ?: default`.
+
+---
+
+## 8. Zaktualizowane Wnioski (po 3 rundach)
+
+- Łącznie **13 błędów krytycznych** wykrytych i naprawionych w 3 rundach audytu.
+- Kluczowe kategorie błędów: złe zakresy wartości, nieograniczony wzrost kolekcji, niebezpieczne parsowanie stringów, błędne cappowanie statów.
+- Nowo przejrzane moduły: `world/`, `viewmodels/`, `grimreich/v1/`, `systems/AlchemySystem`, `systems/InventorySystem`, `systems/QuestSystem`, `systems/CombatSystem`.
+- Pliki kontraktów i modeli domenowych (`contracts/`, `domain/`) nie zawierają logiki — **czyste**.
+- `content/Models.kt` — wzorcowe użycie `init {}` do walidacji — **czyste**.
+
+---
+
 *Wygenerowano automatycznie podczas 2 sesji audytu kodu (26 czerwca 2026).*
