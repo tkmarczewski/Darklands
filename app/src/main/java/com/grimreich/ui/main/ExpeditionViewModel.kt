@@ -144,6 +144,21 @@ class ExpeditionViewModel @Inject constructor(
 
     fun startQuestCombat(quest: QuestEntry, onStart: () -> Unit) {
         val result = expeditionManager.startQuest(quest.id)
+        
+        // CRITICAL FIX: Update state to trigger Combat before calling onStart
+        if (result is com.grimreich.systems.ExpeditionResult.StartCombat) {
+            gameRepository.updateState { 
+                it.pendingQuestId = "COMBAT_WIN:${quest.id}"
+                // Ensure combat state is initialized in repo
+                it.combat.active = true
+                it.combat.enemyName = result.enemyName
+                it.combat.enemyHp = result.enemyHp
+                it.combat.enemyMaxHp = result.enemyHp
+                it.combat.enemyAttack = result.enemyAtk
+                it.combat.enemyDefense = result.enemyDef
+            }
+        }
+
         processExpeditionResult(result, onStart)
     }
 

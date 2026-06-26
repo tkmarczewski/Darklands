@@ -81,13 +81,16 @@ fun RitualScreen(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        TextButton(
+        Button(
             onClick = {
                 ritualSystem.sacrificeHero(hero.id)
                 onSacrificed()
-            }
+            },
+            modifier = Modifier.fillMaxWidth().height(56.dp),
+            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1A1A1A)),
+            border = androidx.compose.foundation.BorderStroke(1.dp, Color.Gray)
         ) {
-            Text("LET THEM REST (PERMANENT DEATH)", color = Color.Gray)
+            Text("POZWÓL MU ODEJŚĆ (PERMANENTNA ŚMIERĆ)", color = Color.White)
         }
         
         if (!canRevive) {

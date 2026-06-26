@@ -120,6 +120,10 @@ fun CityScreen(
                     modifier = Modifier.width(180.dp).fillMaxHeight(),
                     verticalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
+                    CityNavBtn("POWRÓT DO HUB", onExit, color = Color(0xFF400000))
+                    
+                    Spacer(modifier = Modifier.height(10.dp))
+
                     CityNavBtn("TARG", onMarket)
                     CityNavBtn("ALCHEMIA", onAlchemy)
                     CityNavBtn("KARCZMA", onTavern)
@@ -135,8 +139,6 @@ fun CityScreen(
                     )
                     
                     Spacer(modifier = Modifier.weight(1f))
-                    
-                    CityNavBtn("WYJDŹ", onExit, color = Color(0xFF800000))
                 }
 
                 Spacer(modifier = Modifier.width(16.dp))

@@ -179,7 +179,13 @@ class CombatSystem @Inject constructor(
         c.enemyHp = enemyState.hp
         hero.hp = heroState.hp
         hero.endurance = heroState.endurance
+        
+        // CRITICAL FIX: Forces Compose to see a new list reference for the log
         c.log.addAll(result.log)
+        val newLog = c.log.toList() 
+        c.log.clear()
+        c.log.addAll(newLog)
+
         c.heroEffects = heroState.activeEffects
         c.enemyEffects = enemyState.activeEffects
 

@@ -122,7 +122,14 @@ class DialogueViewModel @Inject constructor(
         if (choice.targetNodeId == "end" || nextNode == null) {
             // Handle quest activation/completion from dialogue
             val cmd = state.pendingQuestId
-            state.pendingQuestId = null // CLEAR FIRST (Anti-reentry)
+            
+            // CRITICAL FIX: Clear dialogue pointers FIRST to prevent re-triggering logic
+            gameRepository.updateState { 
+                it.pendingDialogueNodeId = null
+                it.pendingDialogueNpcName = null
+                it.pendingDialogueNpcRole = null
+                it.pendingQuestId = null 
+            }
             
             cmd?.let { c ->
                 when {
