@@ -18,27 +18,32 @@ class DevMenuViewModel @Inject constructor(
     private val _currentQuestInfo = MutableStateFlow("—")
     val currentQuestInfo: StateFlow<String> = _currentQuestInfo
 
+        private fun addLog(entry: String) {
+        val updated = (_logEntries.value + entry).takeLast(100)
+        _logEntries.value = updated
+    }
+
     fun startQuest(questId: String) {
         val result = expeditionManager.startQuest(questId)
-        _logEntries.value = _logEntries.value + "START $questId → $result"
+                    addLog("START $questId → $result")
         refreshInfo(questId)
     }
 
     fun stepSuccess(questId: String) {
         val result = expeditionManager.onStepFinished(questId, success = true)
-        _logEntries.value = _logEntries.value + "STEP ✓ $questId → $result"
+                    addLog("STEP ✓ $questId → $result")
         refreshInfo(questId)
     }
 
     fun stepFail(questId: String) {
         val result = expeditionManager.onStepFinished(questId, success = false)
-        _logEntries.value = _logEntries.value + "STEP ✗ $questId → $result"
+                    addLog("STEP ✗ $questId → $result")
         refreshInfo(questId)
     }
 
     fun resetQuest(questId: String) {
         expeditionManager.resetProgress(questId)
-        _logEntries.value = _logEntries.value + "RESET $questId"
+                    addLog("RESET $questId")
         _currentQuestInfo.value = "—"
     }
 
