@@ -158,8 +158,10 @@ class CombatRound @Inject constructor(
         attackerEquipped: EquippedItems,
         log: MutableList<String>
     ): Int {
-        val dodgeChance = GrimConstants.Combat.BASE_DODGE_CHANCE +
-            (defender.agility * GrimConstants.Combat.AGILITY_DODGE_MODIFIER)
+        if (attacker.maxHp <= 0 || defender.maxHp <= 0) return 0 // Guard maxHp==0
+
+        val dodgeChance = (GrimConstants.Combat.BASE_DODGE_CHANCE +
+            (defender.agility * GrimConstants.Combat.AGILITY_DODGE_MODIFIER)).coerceAtMost(0.8f) // Dodge cap
         val dodged = Random.nextFloat() < dodgeChance
 
         if (dodged) {
@@ -179,7 +181,7 @@ class CombatRound @Inject constructor(
         val defArmor = defender.armor + attackerEquipped.totalDefense()
 
         // Critical Hit Logic (Perception based)
-        val critChance = attacker.perception * GrimConstants.Combat.PERCEPTION_CRIT_MODIFIER
+        val critChance = (attacker.perception * GrimConstants.Combat.PERCEPTION_CRIT_MODIFIER).coerceAtMost(0.8f) // Crit cap
         val isCrit = Random.nextFloat() < critChance
         val critMod = if (isCrit) GrimConstants.Combat.CRITICAL_HIT_MULTIPLIER else 1.0f
 

@@ -13,6 +13,10 @@ class EchoSystem @Inject constructor(
     @ApplicationContext private val context: Context,
     private val gameRepository: GameRepository
 ) {
+    companion object {
+        private const val MAX_ETERNAL_HEROES = 15
+    }
+
     private val ECHO_FILE = "eternal_echoes.json"
     private val gson = Gson()
     private val eternalHeroes = mutableListOf<Hero>()
@@ -42,13 +46,22 @@ class EchoSystem @Inject constructor(
     fun recordHero(hero: Hero, context: Context) {
         if (eternalHeroes.none { it.id == hero.id }) {
             eternalHeroes.add(hero)
+            // Limit the list size to prevent memory bloat (BUG-R4-11)
+            if (eternalHeroes.size > MAX_ETERNAL_HEROES) {
+                eternalHeroes.removeAt(0)
+            }
             save(context)
         }
     }
 
     private fun save(context: Context) {
-        val file = File(context.filesDir, ECHO_FILE)
-        file.writeText(gson.toJson(eternalHeroes))
+        try {
+            val file = File(context.filesDir, ECHO_FILE)
+            file.writeText(gson.toJson(eternalHeroes))
+        } catch (e: Exception) {
+            // Guard against IO errors (Round 4 Audit)
+            e.printStackTrace()
+        }
     }
 
     fun getRandomEcho(): Hero? {

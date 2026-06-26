@@ -14,12 +14,20 @@ class GameLoopController @Inject constructor(
     private val travelSystem: TravelSystem,
     private val cityCatalogue: CityCatalogue
 ) {
-    suspend fun bootstrap(seed: Int = 1): PlayerState {
-        gameRepository.clearSessionAndReset()
-        gameBootstrapper.bootstrapFreshWorld(seed)
+    private var isBootstrapping = false
 
-        val startingCityId = cityCatalogue.startingCityId
-        return PlayerState(currentCityId = startingCityId)
+    suspend fun bootstrap(seed: Int = 1): PlayerState {
+        if (isBootstrapping) return PlayerState() // Guard OBS-06
+        isBootstrapping = true
+        try {
+            gameRepository.clearSessionAndReset()
+            gameBootstrapper.bootstrapFreshWorld(seed)
+
+            val startingCityId = cityCatalogue.startingCityId
+            return PlayerState(currentCityId = startingCityId)
+        } finally {
+            isBootstrapping = false
+        }
     }
 
     fun cityScreen(playerState: PlayerState): CityScreenState {
