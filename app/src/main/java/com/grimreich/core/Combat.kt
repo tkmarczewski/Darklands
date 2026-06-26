@@ -244,28 +244,28 @@ class CombatRound @Inject constructor(
             val effect = it.next()
             when (effect.type) {
                 StatusEffectType.POISON -> {
-                    combatant.hp -= effect.strength
+                                    combatant.hp = (combatant.hp - effect.strength).coerceAtLeast(0)
                     log.add("${combatant.name} cierpi od trucizny: -${effect.strength} HP.")
                 }
                 StatusEffectType.BLEED -> {
-                    combatant.hp -= effect.strength
+                                    combatant.hp = (combatant.hp - effect.strength).coerceAtLeast(0)
                     combatant.endurance = (combatant.endurance - 1).coerceAtLeast(0)
                     log.add("${combatant.name} krwawi: -${effect.strength} HP.")
                 }
                 StatusEffectType.FIRE -> {
-                    combatant.hp -= effect.strength
-                    combatant.morale -= 2
+                                    combatant.hp = (combatant.hp - effect.strength).coerceAtLeast(0)
+                                    combatant.morale = (combatant.morale - 2).coerceAtLeast(0)
                     log.add("${combatant.name} płonie: -${effect.strength} HP.")
                 }
                 StatusEffectType.FREEZE -> {
-                    combatant.morale -= 1
+                                    combatant.morale = (combatant.morale - 1).coerceAtLeast(0)
                     log.add("${combatant.name} jest przemarznięty.")
                 }
                 StatusEffectType.WET -> {
                     log.add("${combatant.name} jest przemoczony.")
                 }
                 StatusEffectType.SHOCK -> {
-                    combatant.endurance -= 2
+                                    combatant.endurance = (combatant.endurance - 2).coerceAtLeast(0)
                     log.add("${combatant.name} drży od wyładowań.")
                 }
             }
