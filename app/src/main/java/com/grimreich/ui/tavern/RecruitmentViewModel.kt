@@ -32,7 +32,7 @@ class RecruitmentViewModel @Inject constructor(
     }
 
     /**
-     * Odświeża pulę — generuje 4 nowych losowych bohaterów.
+     * Odswieża pule - generuje 4 nowych losowych bohaterów.
      * Wywoływane przy każdym wejściu na ekran rekrutacji.
      */
     fun refresh() {
@@ -42,7 +42,7 @@ class RecruitmentViewModel @Inject constructor(
             state.hireableHeroes.addAll(heroPool.generatePool(GameConstants.MAX_RECRUITS_POOL_SIZE))
             gameRepository.persistCurrentState()
         }
-        
+
         val costs = state.hireableHeroes.associate { hero ->
             hero.id to (hero.currentCareer?.let { heroPool.hireCostFor(it) } ?: GameConstants.HIRE_HERO_COST)
         }
@@ -59,21 +59,11 @@ class RecruitmentViewModel @Inject constructor(
     fun hireHero(hero: Hero) {
         val state = gameRepository.currentState()
         val cost = _uiState.value.hireCosts[hero.id] ?: GameConstants.HIRE_HERO_COST
-        if (state.gold >= cost) {
+        // Bug fix: guard against unbounded party growth
+        if (state.gold >= cost && state.party.size < GameConstants.MAX_PARTY_SIZE) {
             state.gold -= cost
             state.party.add(hero)
             state.hireableHeroes.removeIf { it.id == hero.id }
-            gameRepository.persistCurrentState()
-            refresh()
-        }
-    }
-
-    fun rerollRecruits() {
-        val state = gameRepository.currentState()
-        if (state.gold >= GameConstants.REROLL_RECRUITS_COST) {
-            state.gold -= GameConstants.REROLL_RECRUITS_COST
-            state.hireableHeroes.clear()
-            state.hireableHeroes.addAll(heroPool.generatePool(GameConstants.MAX_RECRUITS_POOL_SIZE))
             gameRepository.persistCurrentState()
             refresh()
         }
