@@ -10,7 +10,7 @@ import kotlin.random.Random
 class ProceduralNpcGenerator @Inject constructor() {
 
     fun generateForCity(cityId: String, state: GameState): List<NPC> {
-        val random = Random(cityId.hashCode() + state.world.day)
+                val random = Random(cityId.hashCode().toLong() + state.world.day.toLong())
         val npcList = mutableListOf<NPC>()
 
         // 1. REGIONAL HEROES
