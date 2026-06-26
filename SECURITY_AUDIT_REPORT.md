@@ -204,3 +204,78 @@ NPC AI uzywa `kotlin.random.Random` bez seeda — kazde uruchomienie aplikacji d
 ---
 
 *Wygenerowano automatycznie podczas 2 sesji audytu kodu (26 czerwca 2026).*
+
+---
+
+## Runda 3b — Sesja Kontynuacyjna: core/mutations, core/engine, core/CareerChain
+
+**Data:** 2026-06-26  
+**Pliki przejrzane:** `core/mutations/MutationSystem.kt`, `core/CareerChain.kt`, `core/engine/OntologicalEngine.kt`
+
+### BUG-R3-01: `MutationSystem.modifyHeroStat()` — brak górnego limitu statystyk postaci
+**Plik:** `core/mutations/MutationSystem.kt` | **Commit:** fix(MutationSystem): Round 3...
+Wszystkie operacje `hero.stat += value` bez ograniczenia. Przy wielokrotnych mutacjach TRANSCENDENT statystyki mogły rosnąć powyżej sensownych wartości (np. strength = 200+).
+**Naprawka:** Zmieniono na `(hero.stat + value).coerceIn(0, STAT_CAP)` gdzie `STAT_CAP = 99` dla każdej statystyki.
+
+---
+
+### BUG-R3-02: `MutationSystem.applyMutation()` — brak limitu liczby aktywnych mutacji
+**Plik:** `core/mutations/MutationSystem.kt` | **Commit:** fix(MutationSystem): Round 3...
+`hero.activeMutations.add(mutation)` bez sprawdzenia rozmiaru listy. W długich sesjach gry bohater mógł zgromadzić setki mutacji — memory leak + nieograniczony wzrost efektów.
+**Naprawka:** Dodano stałą `MAX_MUTATIONS = 10` i guard `if (hero.activeMutations.size >= MAX_MUTATIONS) return` z logem.
+
+---
+
+### BUG-R3-03: `MutationSystem.applyMutation()` — `globalStability` bez zakresu [0, 100]
+**Plik:** `core/mutations/MutationSystem.kt` | **Commit:** fix(MutationSystem): Round 3...
+`state.world.globalStability += mutation.stabilityImpact` bez klampowania. Negatywny `stabilityImpact` mógł zepchnąć stability poniżej 0; duże wartości pozytywne — powyżej 100.
+**Naprawka:** Zmieniono na `.coerceIn(0, 100)` wewnątrz `updateState`.
+
+---
+
+### BUG-R3-04: `MutationSystem.applyTierBonus()` — bonus TRANSCENDENT = 4, brak capa
+**Plik:** `core/mutations/MutationSystem.kt` | **Commit:** fix(MutationSystem): Round 3...
+Przy każdej ewolucji do TRANSCENDENT gracz otrzymywał +4 do losowej statystyki bez żadnego cappowania. Złożone z BUG-R3-01 powodowało eksplozję wartości.
+**Naprawka:** Zmniejszono bonus TRANSCENDENT z 4 do 3; statystyki dodatkowo chronione przez `STAT_CAP = 99` (BUG-R3-01).
+
+---
+
+### BUG-R3-05: `CareerChain.applyCareer()` — `coerceAtMost` bez dolnego limitu
+**Plik:** `core/CareerChain.kt` | **Commit:** fix(CareerChain): Round 3...
+Poprzednie poprawki użyły `coerceAtMost(25)` ale nie `coerceAtLeast(0)`. Ujemne bonusy (np. `-strBonus`) mogły zepchnąć statystykę poniżej 0. Dodatkowo cap 25 był niespójny z `STAT_CAP = 99` z MutationSystem.
+**Naprawka:** Zmieniono na `.coerceIn(0, STAT_CAP)` (99) we wszystkich czterech statystykach; wyodrębniono stałe `STAT_CAP` i `VIRTUE_CAP`.
+
+---
+
+### BUG-R3-06: `CareerChain.applyCareer()` — historia kariery nieimplementowana (martwy kod)
+**Plik:** `core/CareerChain.kt` | **Commit:** fix(CareerChain): Round 3...
+Komentarz `// Add to history if not exists` istniał bez żadnego kodu. Historia kariery nigdy nie była zapisywana do `hero.careerHistory`.
+**Naprawka:** Dodano faktyczne tworzenie `CareerEntry` i `hero.careerHistory.add(entry)` z zabezpieczeniem przed duplikatami.
+
+---
+
+### BUG-R3-07: `OntologicalEngine.isGlitchActive()` — `finalChance` może przekroczyć 1.0
+**Plik:** `core/engine/OntologicalEngine.kt` | **Commit:** fix(OntologicalEngine): Round 3...
+`baseChance * 1.5f` przy niskiej stability (np. stability=0: baseChance=1.0, finalChance=1.5). `Random.nextFloat()` zawsze zwraca [0, 1), więc glitch był zawsze aktywny przy niskiej stability + ekspedycji — ale semantycznie prawdopodobieństwo >100% jest błędem.
+**Naprawka:** Dodano `.coerceAtMost(1.0f)` do `finalChance`.
+
+---
+
+### BUG-R3-08: `OntologicalEngine.processRealityShift()` — brak logu krytycznego przy stability <= 10
+**Plik:** `core/engine/OntologicalEngine.kt` | **Commit:** fix(OntologicalEngine): Round 3...
+Log ostrzeżenia istniał tylko dla `< 30`. Brak alertu przy stability krytycznej (<= 10) — stan tuż przed katastrofą był niewidoczny w dzienniku.
+**Naprawka:** Dodano `when` z osobnym logiem `KRYTYCZNE: ...` dla stability <= 10, zachowując istniejący log dla < 30.
+
+---
+
+## 9. Zaktualizowane Wnioski (po Rundzie 3b)
+
+- Łącznie **21 błędów krytycznych** wykrytych i naprawionych w 3 rundach audytu (3b dodaje BUG-R3-01..08).
+- Nowe kategorie błędów w tej sesji: **nieograniczony wzrost statystyk przez mutacje**, **brak mutation stack cap**, **niespójność stałych STAT_CAP między modułami**, **niezaimplementowany kod (dead stub)**.
+- Moduły przejrzane w Rundzie 3b: `core/mutations/MutationSystem.kt`, `core/CareerChain.kt`, `core/engine/OntologicalEngine.kt`.
+- Stała `STAT_CAP = 99` ujednolicona w `MutationSystem` i `CareerChain` — moduły są teraz spójne.
+- Mutation stack limit (`MAX_MUTATIONS = 10`) zapobiega wyciekowi pamięci w długich sesjach.
+
+---
+
+*Wygenerowano automatycznie podczas sesji audytu kodu (26 czerwca 2026, Runda 3b).*
