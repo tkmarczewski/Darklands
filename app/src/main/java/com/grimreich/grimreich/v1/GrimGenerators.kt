@@ -25,7 +25,7 @@ class ExpeditionGenerator(private val random: Random = Random.Default) {
     fun generateExpedition(name: String, phenomenon: String? = null, chaos: Int? = null, difficulty: Int? = null, layers: List<String>? = null, enemies: List<String>? = null, rewards: List<String>? = null) = generate(name, phenomenon ?: "Phenom", chaos ?: 1, difficulty ?: 1)
 }
 class LootRoller(private val random: Random = Random.Default) { 
-    fun roll(baseRewards:List<String>, summary:OtherSideReward, rolls:Int): GeneratedLoot = GeneratedLoot(List(rolls.coerceAtLeast(1)) { LootEntry(baseRewards.ifEmpty { listOf("scrap") }.random(random)) }) 
+        fun roll(baseRewards:List<String>, summary:OtherSideReward, rolls:Int): GeneratedLoot = GeneratedLoot(List(rolls.coerceIn(1, 20)) { LootEntry(baseRewards.ifEmpty { listOf("scrap") }.random(random)) })
     fun roll(baseRewards:List<String>, summary:OtherSideReward, rolls:Int, tier: Int, chaos: Int): GeneratedLoot = roll(baseRewards, summary, rolls)
     fun roll(baseRewards:List<String>, summary:OtherSideReward, rolls:Int, tier: Int, chaos: Int, vararg other: Any): GeneratedLoot = roll(baseRewards, summary, rolls)
     fun roll(baseRewards:List<String>, summary:OtherSideReward, rolls:Int, tier: Int, chaos: Int, rare: Int, curse: Int, extra: String): GeneratedLoot = roll(baseRewards, summary, rolls)
