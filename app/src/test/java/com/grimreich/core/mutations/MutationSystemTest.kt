@@ -27,36 +27,58 @@ class MutationSystemTest {
 
     @Test
     fun `checkForNewMutation applies mutation when stability is low`() {
-        val hero = Hero(id = "test_hero", name = "Test Hero", age = 25, strength = 10)
-        val stability = 10
+        val heroId = "test_hero"
+        val hero = Hero(id = heroId, name = "Test Hero", age = 25, strength = 10)
+        // Set low stability to maximize chance
+        val stability = 0
+        val state = GameState(world = WorldState(globalStability = stability)).apply { party.add(hero) }
         
-        // We call it multiple times to ensure Random eventually triggers (since it's 15%)
-        repeat(100) {
-            mutationSystem.checkForNewMutation(hero, "region_1", stability)
-        }
-        
-        assertTrue(hero.activeMutations.isNotEmpty())
-    }
-
-    @Test
-    fun `applyMutation updates hero stats and world stability`() {
-        val hero = Hero(id = "test_hero", name = "Test Hero", age = 25, strength = 10)
-        val state = GameState(world = WorldState(globalStability = 100))
-        
+        `when`(gameRepository.currentState()).thenReturn(state)
         `when`(gameRepository.updateState(any())).thenAnswer { invocation ->
             @Suppress("UNCHECKED_CAST")
             val transform = invocation.arguments[0] as (GameState) -> Unit
             transform(state)
         }
 
-        // Simulating the trigger (we might need many attempts due to Random)
+        // We try different days to ensure we hit a winning seed quickly
         var triggered = false
-        repeat(1000) {
-            if (!triggered && hero.activeMutations.isNotEmpty()) triggered = true
-            mutationSystem.checkForNewMutation(hero, "region", 0)
+        for (day in 1..200) {
+            state.world.day = day
+            mutationSystem.checkForNewMutation(heroId, "region_1", 0)
+            if (hero.activeMutations.isNotEmpty()) {
+                triggered = true
+                break
+            }
         }
         
-        assertTrue("Hero should have at least one mutation", hero.activeMutations.isNotEmpty())
+        assertTrue("Mutation should eventually trigger with low stability across multiple seeds", triggered)
+    }
+
+    @Test
+    fun `applyMutation updates hero stats and world stability`() {
+        val heroId = "test_hero"
+        val hero = Hero(id = heroId, name = "Test Hero", age = 25, strength = 10)
+        val state = GameState(world = WorldState(globalStability = 100)).apply { party.add(hero) }
+        
+        `when`(gameRepository.currentState()).thenReturn(state)
+        `when`(gameRepository.updateState(any())).thenAnswer { invocation ->
+            @Suppress("UNCHECKED_CAST")
+            val transform = invocation.arguments[0] as (GameState) -> Unit
+            transform(state)
+        }
+
+        // Simulating the trigger by trying different seeds
+        var triggered = false
+        for (day in 1..500) {
+            state.world.day = day
+            mutationSystem.checkForNewMutation(heroId, "region", 0)
+            if (hero.activeMutations.isNotEmpty()) {
+                triggered = true
+                break
+            }
+        }
+        
+        assertTrue("Hero should have at least one mutation", triggered)
         assertTrue("World stability should have decreased", state.world.globalStability < 100)
     }
 }
