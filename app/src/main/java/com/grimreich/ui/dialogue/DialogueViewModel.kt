@@ -70,12 +70,20 @@ class DialogueViewModel @Inject constructor(
     }
 
     private fun checkRequirements(choice: DialogueChoice, state: GameState): Boolean {
-        if (choice.requiredAttributes.isEmpty() && choice.requiredSkills.isEmpty() && choice.factionId == null) return true
+        // Special check for Gold (used in Beggar dialogue)
+        choice.requiredAttributes["gold"]?.let { requiredGold ->
+            if (state.gold < requiredGold) return false
+        }
+
+        if (choice.requiredAttributes.filterKeys { it != "gold" }.isEmpty() && 
+            choice.requiredSkills.isEmpty() && 
+            choice.factionId == null) return true
         
         val hero = state.party.find { it.id == state.activeHeroId } ?: state.party.firstOrNull() ?: return false
         
         // Check attributes
         choice.requiredAttributes.forEach { (attr, value) ->
+            if (attr.lowercase() == "gold") return@forEach
             val heroValue = when (attr.lowercase()) {
                 "strength", "siła" -> hero.strength
                 "agility", "zwinność" -> hero.agility

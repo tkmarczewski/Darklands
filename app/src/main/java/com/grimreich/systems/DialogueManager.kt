@@ -157,6 +157,46 @@ class DialogueManager @Inject constructor(
         registerNode(DialogueNode(id = "guard_hated", npcId = "guard", text = "Zabiję Cię, jeśli zrobisz jeszcze jeden krok. Dla Twojego rodzaju nie ma miejsca w Twierdzy.", choices = listOf(DialogueChoice("Spróbuj tylko. (WALKA)", "end"))))
         registerNode(DialogueNode(id = "guard_exalted", npcId = "guard", text = "Chwała Twoim czynom! Inkwizycja jest dumna z tak wiernej Kotwicy. Przejdź swobodnie.", choices = listOf(DialogueChoice("Dziękuję.", "end"))))
 
+        // ZEALOT (NEW)
+        registerNode(DialogueNode(
+            id = "zealot_start", npcId = "zealot",
+            text = "Brat-Pielgrzym zaciska dłoń na krwawiącej ikonie. 'Widzisz to? Nawet drewno płacze nad losem tego świata. Czy szukasz odkupienia w cieniu dzwonów?'",
+            choices = listOf(
+                DialogueChoice("Powiedz mi o świętych miejscach.", "zealot_holy"),
+                DialogueChoice("Co słychać w klasztorze?", "zealot_monastery"),
+                DialogueChoice("Nie teraz.", "end")
+            )
+        ))
+        registerNode(DialogueNode(id = "zealot_holy", npcId = "zealot", text = "Szukaj Świetlistej Polany. To jedyne miejsce, gdzie Skrybowie wciąż używają białego atramentu.", choices = listOf(DialogueChoice("Dziękuję.", "zealot_start"))))
+        registerNode(DialogueNode(id = "zealot_monastery", npcId = "zealot", text = "Milczenie jest tam tak gęste, że można je kroić nożem. Bracia nie mówią, bo każde słowo to błąd w alokacji.", choices = listOf(DialogueChoice("Rozumiem.", "zealot_start"))))
+        registerNode(DialogueNode(id = "zealot_report_back", npcId = "zealot", text = "Twoja ofiara została przyjęta. Kod wiary został odświeżony. Przyjmij błogosławieństwo.", choices = listOf(DialogueChoice("Amen. (ODBIERZ NAGRODĘ)", "end"))))
+
+        // BEGGAR (NEW)
+        registerNode(DialogueNode(
+            id = "beggar_start", npcId = "beggar",
+            text = "Żebrak wyciąga brudną dłoń, w której trzyma pusty kielich. 'Daj mi choć jeden bajt nadziei, Kotwico. Moja pamięć podręczna jest pusta, a głód Echa mnie pożera.'",
+            choices = listOf(
+                DialogueChoice("Oto 5 złota (DAJ JAŁMUŻNĘ).", "beggar_gift", requiredAttributes = mapOf("gold" to 5), onSelect = {
+                    it.gold -= 5
+                }),
+                DialogueChoice("Nie mam nic dla Ciebie.", "end")
+            )
+        ))
+        registerNode(DialogueNode(id = "beggar_gift", npcId = "beggar", text = "Dziękuję... Niech Skryba zapisze Twój gest w sekcji nagród. Słyszałem, że w cieniach kopalń Ferrun znalazł coś, co nie powinno istnieć.", choices = listOf(DialogueChoice("Interesujące.", "end"), DialogueChoice("Trzymaj się.", "end"))))
+
+        // MYSTIC (NEW)
+        registerNode(DialogueNode(
+            id = "mystic_start", npcId = "mystic",
+            text = "Mistyk patrzy przez Ciebie, jakby czytał Twoje metadane. 'Kotwico, Twoje ID mruga. Rzeczywistość wokół Ciebie traci spójność. Czego chcesz od kogoś, kto widzi surowy tekst?'",
+            choices = listOf(
+                DialogueChoice("Jak naprawić Pęknięcie?", "mystic_fracture"),
+                DialogueChoice("Czy jestem tylko postacią?", "mystic_meta"),
+                DialogueChoice("Żegnaj.", "end")
+            )
+        ))
+        registerNode(DialogueNode(id = "mystic_fracture", npcId = "mystic", text = "Nie naprawisz go. Możesz tylko opóźnić Epilog, karmiąc świat stabilnością swoich czynów.", choices = listOf(DialogueChoice("Spróbuję.", "mystic_start"))))
+        registerNode(DialogueNode(id = "mystic_meta", npcId = "mystic", text = "Wszyscy jesteśmy. Ale Ty masz przewagę – ktoś po Drugiej Stronie trzyma Twoje urządzenie sterujące.", choices = listOf(DialogueChoice("Dziwna wizja.", "mystic_start"))))
+
         registerNode(DialogueNode(
             id = "guard_quest_check", npcId = "guard",
             text = "Strażnik ścisza głos, niemal dotykając Twojego ramienia. 'Mieszczanie szepczą o Wyroku. Mówią, że jeśli znajdziesz trzy dowody ich grzechów, Inkwizycja pozwoli Ci wejść głębiej.'",
@@ -237,6 +277,19 @@ class DialogueManager @Inject constructor(
                 })
             )
         ))
+        
+        // XYREL (NEW)
+        registerNode(DialogueNode(
+            id = "xyrel_start", npcId = "xyrel",
+            text = "Inkwizytor Xyrel zaciska dłoń na rękojeści miecza, nie odrywając wzroku od horyzontu. 'Czuję odór błędu, Kotwico. Równiny krwawią nieużytecznymi danymi. Czy Twoja obecność tutaj jest autoryzowana?'",
+            choices = listOf(
+                DialogueChoice("Próbuję tylko pomóc.", "xyrel_help"),
+                DialogueChoice("Czym jest Dogmat Czystego Kodu?", "xyrel_dogma"),
+                DialogueChoice("Moja droga jest moja własna.", "end")
+            )
+        ))
+        registerNode(DialogueNode(id = "xyrel_help", npcId = "xyrel", text = "Pomoc jest zbędna, jeśli nie towarzyszy jej posłuszeństwo paradygmatowi. Usuwamy to, co zepsute. Jeśli chcesz się przydać, znajdź tych, którzy sieją szum.", choices = listOf(DialogueChoice("Rozumiem.", "xyrel_start"))))
+        registerNode(DialogueNode(id = "xyrel_dogma", npcId = "xyrel", text = "To jedyna stała. Kod musi być czysty, by Skryba go nie skreślił. Każda anomalia, każda wolna wola poza systemem, to zaproszenie do Epilogu.", choices = listOf(DialogueChoice("Mroczna wiara.", "xyrel_start"))))
 
         // REGIONAL HERO: AELION
         registerNode(DialogueNode(

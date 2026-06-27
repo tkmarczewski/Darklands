@@ -109,8 +109,8 @@ class QuestSystem @Inject constructor(
             // Handle chains: activate next quest
             quest.nextQuestId?.let { nextId ->
                 if (!state.quest.activeQuests.contains(nextId) && !state.quest.completedQuests.contains(nextId)) {
-                    allQuests[nextId]?.status = QuestStatus.AKTYWNE
                     val nextQuest = allQuests[nextId]
+                    nextQuest?.status = QuestStatus.AKTYWNE
                     val hint = if (nextQuest?.nextLocationHint != null) {
                         " Twoja droga prowadzi teraz do: ${nextQuest.nextLocationHint} (Szukaj: ${nextQuest.nextNpcHint})"
                     } else ""
