@@ -9,53 +9,56 @@ class ChurchSystem @Inject constructor(
     private val gameRepository: GameRepository
 ) {
     fun pray(heroId: String): String {
-        var msg = ""
+        var result = ""
         gameRepository.updateState { state ->
             val hero = state.party.find { it.id == heroId } ?: return@updateState
-            hero.divineFavor = (hero.divineFavor + 10).coerceAtMost(150)
-            hero.virtue += 1
-            msg = "${hero.name} modli się żarliwie. (+10 Divine Favor, +1 Cnota)"
+            
+            // Stability affects faith efficacy
+            val stability = state.world.globalStability
+            val gain = if (stability > 50) 10 else 5
+            
+            hero.piety = (hero.piety + 1).coerceAtMost(99)
+            state.prayer.faith = (state.prayer.faith + gain).coerceAtMost(100)
+            
+            result = "Modlitwa zakończona. Wiara wzmocniona (+${gain})."
+            state.logEntries.add("${hero.name} modli się przed ołtarzem.")
+            
+            if (stability < 20) {
+                state.logEntries.add("Słyszysz jedynie statyczny szum w odpowiedzi na modlitwę.")
+            }
         }
-        return msg.ifEmpty { "Brak bohatera." }
+        return result
     }
 
     fun makeOffering(amount: Int): String {
-        var msg = ""
+        var result = ""
         gameRepository.updateState { state ->
-            if (state.gold < amount) {
-                msg = "Brak wystarczającej ilości złota na ofiarę."
-                return@updateState
+            if (state.gold >= amount) {
+                state.gold -= amount
+                state.prayer.virtue += amount / 10
+                result = "Złożono ofiarę w wysokości $amount G."
+                state.logEntries.add(result)
+            } else {
+                result = "Niewystarczająca ilość złota."
             }
-
-            state.gold -= amount
-            val recovery = (amount / 10).coerceAtMost(20)
-            state.world.globalStability = (state.world.globalStability + recovery).coerceAtMost(100)
-            msg = "Złożono ofiarę w wysokości $amount zł. Stabilność świata wzrosła o $recovery."
         }
-        return msg
+        return result
     }
 
-    fun cleanseRelic(heroId: String): String {
-        var msg = ""
+    fun cleanseRelic(itemId: String): String {
+        var result = ""
         gameRepository.updateState { state ->
-            val hero = state.party.find { it.id == heroId } ?: return@updateState
-            if (hero.corruption <= 0) {
-                msg = "${hero.name} nie jest skażony mrokiem."
-                return@updateState
+            val item = state.inventory.find { it.id == itemId } ?: return@updateState
+            if (state.prayer.faith >= 30) {
+                state.prayer.faith -= 30
+                // For now, cleansing just logs success
+                result = "Relikwia ${item.name} została oczyszczona z wpływów echa."
+                state.logEntries.add(result)
+                state.world.globalStability = (state.world.globalStability + 5).coerceAtMost(100)
+            } else {
+                result = "Zbyt słaba wiara, by przeprowadzić rytuał oczyszczenia."
             }
-
-            val cost = hero.corruption * 5
-            if (state.gold < cost) {
-                msg = "Brak złota na ceremonię oczyszczenia (potrzeba $cost)."
-                return@updateState
-            }
-
-            state.gold -= cost
-            val reduction = hero.corruption / 2 + 5
-            hero.corruption = (hero.corruption - reduction).coerceAtLeast(0)
-            hero.sanity = (hero.sanity + 10).coerceAtMost(100)
-            msg = "${hero.name} przeszedł rytuał oczyszczenia. Korupcja spadła o $reduction. Poczytalność wzrosła."
         }
-        return msg.ifEmpty { "Brak bohatera." }
+        return result
     }
 }

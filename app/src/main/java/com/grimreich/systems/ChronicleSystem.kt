@@ -9,16 +9,16 @@ import javax.inject.Singleton
 class ChronicleSystem @Inject constructor(
     private val gameRepository: GameRepository
 ) {
-    val allEntries = mutableMapOf<String, ChronicleEntry>()
+    private val allEntries = mutableMapOf<String, ChronicleEntry>()
 
     init {
         seed()
     }
 
     fun seed() {
-        register(ChronicleEntry("lore_aelion_secret", "Tajemnica Aeliona", "Prorok widzi świat jako ciąg instrukcji.", "NPC", false))
-        register(ChronicleEntry("lore_first_fracture", "Pierwsze Pęknięcie", "Dzień, w którym horyzont przestał być linią.", "HISTORIA", false))
-        // ... and more entries as needed
+        register(ChronicleEntry("lore_fracture_origin", "Początek Pęknięcia", "W roku 1242 Mgła po raz pierwszy przestała być tylko zjawiskiem pogodowym.", "HISTORIA", false))
+        register(ChronicleEntry("lore_scribes", "Archiwiści Absolutu", "Mówią, że świat jest zapisywany w czasie rzeczywistym przez istoty spoza paradygmatu.", "ONTOLOGIA", false))
+        register(ChronicleEntry("lore_black_anchor", "Czarna Kotwica", "Ostatnie zabezpieczenie przed całkowitym wymazaniem GrimReich.", "TAJEMNICA", false))
     }
 
     fun register(entry: ChronicleEntry) {
@@ -26,26 +26,26 @@ class ChronicleSystem @Inject constructor(
     }
 
     fun unlock(id: String) {
-        gameRepository.updateState { state ->
-            if (!state.unlockedLoreIds.contains(id)) {
+        val entry = allEntries[id] ?: return
+        if (!entry.unlocked) {
+            allEntries[id] = entry.copy(unlocked = true)
+            gameRepository.updateState { state ->
                 state.unlockedLoreIds.add(id)
-                state.logEntries.add("Odblokowano nowy wpis w Kronice: ${allEntries[id]?.title ?: id}")
+                state.logEntries.add("Nowy wpis w Kronice: ${entry.title}")
             }
         }
     }
 
-    fun record(msg: String, stabilityImpact: Int = 0) {
-        gameRepository.updateState { state ->
-            state.logEntries.add(msg)
-            if (stabilityImpact != 0) {
-                state.world.globalStability = (state.world.globalStability + stabilityImpact).coerceIn(0, 100)
-            }
+    fun record(msg: String, stabilityThreshold: Int = 100) {
+        val currentStability = gameRepository.currentState().world.globalStability
+        if (currentStability <= stabilityThreshold) {
+            gameRepository.log("[KRONIKA] $msg")
         }
     }
 
     fun getUnlockedEntries(): List<ChronicleEntry> {
         val unlockedIds = gameRepository.currentState().unlockedLoreIds
-        return allEntries.values.filter { it.id in unlockedIds }
+        return allEntries.values.filter { it.id in unlockedIds || it.unlocked }
     }
 
     fun isUnlocked(id: String): Boolean = gameRepository.currentState().unlockedLoreIds.contains(id)

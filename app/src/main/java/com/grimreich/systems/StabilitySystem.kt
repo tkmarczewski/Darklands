@@ -2,8 +2,11 @@ package com.grimreich.systems
 
 import com.grimreich.core.GameRepository
 import com.grimreich.core.GameState
+import com.grimreich.core.Season
+import com.grimreich.core.WeatherType
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlin.random.Random
 
 @Singleton
 class StabilitySystem @Inject constructor(
@@ -17,9 +20,40 @@ class StabilitySystem @Inject constructor(
             
             if (delta < 0) state.logEntries.add("Stabilność rzeczywistości słabnie...")
             
+            // Apply Seasonal Modifiers to heroes based on stability
+            applyAtmosphericEffects(state)
+            
             // CULMINATION: Zero Stability Logic
             if (next == 0 && current > 0) {
                 triggerCollapse(state)
+            }
+        }
+    }
+
+    private fun applyAtmosphericEffects(state: GameState) {
+        val world = state.world
+        val stability = world.globalStability
+
+        // Project Cipher: Weather Glitches
+        if (stability < 25 && Random.nextFloat() < 0.2f) {
+            world.weather = WeatherType.entries.random() // Erratic weather
+            state.logEntries.add("!!! BŁĄD ATMOSFERY: Pogoda traci spójność !!!")
+        }
+
+        // Seasonal Modifiers
+        state.party.forEach { hero ->
+            when (world.season) {
+                Season.WINTER -> {
+                    // Winter is harsh on stamina
+                    hero.endurance = (hero.endurance - 1).coerceAtLeast(5)
+                }
+                Season.SUMMER -> {
+                    // Summer improves morale but increases fatigue if stability is low
+                    if (stability < 50) {
+                        world.fatigue = (world.fatigue + 1).coerceAtMost(100)
+                    }
+                }
+                else -> {}
             }
         }
     }
@@ -29,18 +63,15 @@ class StabilitySystem @Inject constructor(
         state.world.echoIntensity = 1.0f
         state.world.collapseProgress = 1.0f
         
-        // At 0 stability, heroes take sanity damage every tick
+        // At 0 stability, the world is a graveyard of instances
         state.party.forEach { hero ->
-            hero.sanity = (hero.sanity - 20).coerceAtLeast(0)
+            hero.sanity = (hero.sanity - 30).coerceAtLeast(0)
             if (hero.sanity == 0) {
-                hero.hp = (hero.hp - 5).coerceAtLeast(0)
+                hero.hp = (hero.hp - 10).coerceAtLeast(0)
             }
         }
-        
-        // Instanced NPC name changes (already partially in generator, but here we can force it)
-        state.knownNpcs.forEach { (_, list) ->
-            // In a real system we might mutate existing NPCs here
-        }
+
+        state.world.weather = WeatherType.STORM // Permanent storm in collapse
     }
 
     fun getStabilityModifier(): Float {
