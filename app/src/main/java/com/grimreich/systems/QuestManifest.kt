@@ -41,6 +41,9 @@ class QuestManifest @Inject constructor(
         registerQuest("q_undying_mother", "Matka, Która Nie Umiera", "Kobieta żyje 200 lat i błaga o śmierć.", "wybrzeze_polnocne", "zealot", 100, StepType.DIALOGUE, "citizen")
         registerQuest("q_lost_squad", "Zaginiony Oddział", "Żołnierze wrócili, ale się nie postarzali.", "rowniny_koronne", "guard", 150, StepType.INVESTIGATION, "squad_secret")
         registerQuest("q_demon_merchant", "Kupiec Widzący Demony", "Kupiec twierdzi, że klienci mają demonicze cienie.", "twierdza_zakonu", "merchant", 130, StepType.DIALOGUE, "merchant")
+        
+        // --- VI. CIPHER FINALE ---
+        registerQuest("q_scribe_encounter", "Konfrontacja ze Skrybą", "Fundamenty świata drżą. Skryba czeka w Sercu Krainy.", "serce_krainy", "mira", 500, StepType.COMBAT, "scribe_boss")
     }
 
     private fun registerQuest(id: String, title: String, desc: String, city: String, npc: String, gold: Int, type: StepType, target: String) {

@@ -25,7 +25,7 @@ import com.grimreich.grimreich.v1.DialogueChoice
 fun DialogueScreen(
     viewModel: DialogueViewModel,
     onExit: () -> Unit,
-    onMarket: () -> Unit // Transition to Market if requested
+    onMarket: () -> Unit
 ) {
     val state by viewModel.uiState.collectAsState()
     val context = LocalContext.current
@@ -107,7 +107,8 @@ fun DialogueScreen(
                                 if (isEnabled) {
                                     viewModel.choose(choice)
                                     if (choice.targetNodeId == "end") {
-                                        if (state.npcRole.lowercase().contains("kupiec") || state.npcRole.lowercase().contains("merchant")) {
+                                        // Logic fix: Only open market if it was an explicit trade choice
+                                        if (choice.text.uppercase().contains("HANDLUJ") || choice.text.uppercase().contains("RYNEK")) {
                                             onMarket()
                                         } else {
                                             onExit()

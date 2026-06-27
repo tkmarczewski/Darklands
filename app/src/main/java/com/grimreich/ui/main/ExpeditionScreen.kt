@@ -15,6 +15,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.grimreich.core.GameConstants
 import com.grimreich.systems.QuestDefinition
+import com.grimreich.systems.Encounter
+import com.grimreich.systems.EncounterChoice
 
 @Composable
 fun ExpeditionScreen(
@@ -33,19 +35,28 @@ fun ExpeditionScreen(
             
             Spacer(modifier = Modifier.height(24.dp))
 
-            if (state.activeQuests.isEmpty()) {
-                Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.Center) {
-                    Text("Brak aktywnych celów w tym regionie.", color = Color.DarkGray)
-                }
+            // Logic fix: Show encounter if active, otherwise show quests
+            if (state.activeEncounter != null) {
+                EncounterView(state.activeEncounter!!, onChoice = { viewModel.handleEncounterChoice(it) })
+            } else if (state.encounterLog != null) {
+                EncounterLogView(state.encounterLog!!, onDismiss = { viewModel.dismissEncounter() })
             } else {
-                LazyColumn(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                    items(state.activeQuests) { quest ->
-                        QuestActionCard(quest) {
-                            viewModel.startQuest(quest.id, onCombat)
+                if (state.activeQuests.isEmpty()) {
+                    Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.Center) {
+                        Text("Brak aktywnych celów w tym regionie.", color = Color.DarkGray)
+                    }
+                } else {
+                    LazyColumn(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                        items(state.activeQuests) { quest ->
+                            QuestActionCard(quest) {
+                                viewModel.startQuest(quest.id, onCombat)
+                            }
                         }
                     }
                 }
             }
+
+            Spacer(modifier = Modifier.height(16.dp))
 
             Button(
                 onClick = onBack,
@@ -53,6 +64,49 @@ fun ExpeditionScreen(
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF400000))
             ) {
                 Text("POWRÓT")
+            }
+        }
+    }
+}
+
+@Composable
+fun EncounterView(encounter: Encounter, onChoice: (EncounterChoice) -> Unit) {
+    Surface(
+        modifier = Modifier.fillMaxWidth().padding(8.dp),
+        color = Color(0xFF151515),
+        border = androidx.compose.foundation.BorderStroke(1.dp, Color.Yellow)
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Text(encounter.title.uppercase(), color = Color.Yellow, fontWeight = FontWeight.Bold, fontSize = 18.sp)
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(encounter.description, color = Color.White, fontSize = 14.sp)
+            Spacer(modifier = Modifier.height(16.dp))
+            
+            encounter.choices.forEach { choice ->
+                Button(
+                    onClick = { onChoice(choice) },
+                    modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF222222))
+                ) {
+                    Text(choice.label, color = Color.White)
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun EncounterLogView(log: String, onDismiss: () -> Unit) {
+    Surface(
+        modifier = Modifier.fillMaxWidth().padding(8.dp),
+        color = Color(0xFF0A0A0A),
+        border = androidx.compose.foundation.BorderStroke(1.dp, Color.Gray)
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Text(log, color = Color.LightGray, fontSize = 15.sp)
+            Spacer(modifier = Modifier.height(16.dp))
+            Button(onClick = onDismiss, modifier = Modifier.align(Alignment.End)) {
+                Text("ZROZUMIAŁEM")
             }
         }
     }

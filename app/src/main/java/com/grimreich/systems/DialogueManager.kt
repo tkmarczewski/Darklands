@@ -56,13 +56,13 @@ class DialogueManager @Inject constructor(
 
     fun getPortrait(role: String): String {
         return when (role.lowercase()) {
-            "aelion" -> "kaplan"
-            "merchant", "kupiec" -> "zloto"
-            "guard", "straznik" -> "rycerz"
-            "mira" -> "mag"
-            "ferrun" -> "barbarzynca"
-            "noctyros" -> "demon"
-            else -> "lowca"
+            "aelion" -> "port_knight" // Mapping to standard port_ names
+            "merchant", "kupiec" -> "port_mercenary"
+            "guard", "straznik" -> "port_guard"
+            "mira" -> "port_physician"
+            "ferrun" -> "port_craftsman"
+            "noctyros" -> "port_monk"
+            else -> "port_scholar"
         }
     }
 
@@ -149,7 +149,7 @@ class DialogueManager @Inject constructor(
             )
         ))
         
-        // 3. GENERIC REPORT BACK (BUG #4 / #21)
+        // 3. GENERIC REPORT BACK
         registerNode(DialogueNode(
             id = "quest_report_back_generic", npcId = "generic",
             text = "Dobra robota. To zadanie wymagało poświęcenia. Oto Twoja nagroda.",
@@ -162,6 +162,24 @@ class DialogueManager @Inject constructor(
             )
         ))
         
+        // 4. MERCHANT SPECIAL
+        registerNode(DialogueNode(
+            id = "merchant_start", npcId = "merchant",
+            text = "Złoto to jedyna rzecz, która nie glitchuje w tym świecie. Chcesz pohandlować?",
+            choices = listOf(
+                DialogueChoice("Pokaż mi swoje towary. (HANDLUJ)", "market_open"),
+                DialogueChoice("Żegnaj.", "end")
+            )
+        ))
+
+        registerNode(DialogueNode(
+            id = "market_open", npcId = "merchant",
+            text = "Najlepsze ceny od tej strony Pęknięcia.",
+            choices = listOf(
+                DialogueChoice("[OTWÓRZ RYNEK]", "end") // This will trigger onMarket() in DialogueScreen
+            )
+        ))
+
         // AELION
         registerNode(DialogueNode(
             id = "aelion_start", npcId = "aelion",

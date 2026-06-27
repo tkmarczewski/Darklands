@@ -12,35 +12,36 @@ class InventorySystem @Inject constructor(
 ) {
 
     fun equip(heroId: String, itemId: String): String {
-        val state = gameRepository.currentState()
-        val hero   = state.party.firstOrNull { it.id == heroId } ?: return "Brak bohatera: $heroId"
-        
-        // CRITICAL FIX: Verify item exists in inventory before equipping
-        val item = state.inventory.firstOrNull { it.id == itemId }
-            ?: return "Nie znaleziono przedmiotu $itemId w plecaku"
+        var result = ""
+        gameRepository.updateState { state ->
+            val hero = state.party.find { it.id == heroId } ?: run { result = "Brak bohatera"; return@updateState }
+            val item = state.inventory.find { it.id == itemId } ?: run { result = "Brak przedmiotu"; return@updateState }
+            val slot = item.slot ?: run { result = "Brak slotu"; return@updateState }
+            
+            val minStr = item.effects["minStrength"] ?: 0
+            if (minStr > 0 && hero.strength < minStr) {
+                result = "Za słaby (wym. $minStr SIŁ)"
+                return@updateState
+            }
 
-        val slot = item.slot ?: return "${item.name} nie ma przypisanego slotu"
-        
-        val minStr = item.effects["minStrength"] ?: 0
-        if (minStr > 0 && hero.strength < minStr) {
-            return "${hero.name} za słaby (siła ${hero.strength}, wymaga $minStr)"
+            hero.equipment[slot] = itemId
+            state.logEntries.add("${hero.name} zakłada ${item.name}.")
+            result = "Założono"
         }
-
-        hero.equipment[slot] = itemId
-        gameRepository.log("${hero.name} założył ${item.name} [$slot]")
-        gameRepository.persistCurrentState()
-        return "${hero.name} założył ${item.name} (slot: $slot)"
+        return result
     }
 
     fun unequip(heroId: String, slot: String): String {
-        val state = gameRepository.currentState()
-        val hero = state.party.firstOrNull { it.id == heroId } ?: return "Brak bohatera: $heroId"
-        val itemId = hero.equipment[slot] ?: return "Slot $slot jest pusty"
-        val item = state.inventory.firstOrNull { it.id == itemId }
-        hero.equipment[slot] = null
-
-        gameRepository.persistCurrentState()
-        return "${hero.name} zdjął ${item?.name ?: itemId}"
+        var result = ""
+        gameRepository.updateState { state ->
+            val hero = state.party.find { it.id == heroId } ?: return@updateState
+            val itemId = hero.equipment[slot] ?: return@updateState
+            val item = state.inventory.find { it.id == itemId }
+            hero.equipment[slot] = null
+            result = "Zdjęto ${item?.name ?: "przedmiot"}"
+            state.logEntries.add("${hero.name} zdejmuje przedmiot.")
+        }
+        return result
     }
 
     fun listInventory(): String {
@@ -50,7 +51,7 @@ class InventorySystem @Inject constructor(
             val rarityLabel = if (item.rarity != "normal") " [${item.rarity.uppercase()}]" else ""
             val extra = when (item.type) {
                 "weapon" -> " (ATK:${item.effects["attack"] ?: 0})"
-                "armor" -> " (DEF:${item.effects["defense"] ?: 0})"
+                "armor" -> " (DEF:${item.effects["armor"] ?: 0})" // Corrected from defense
                 "potion" -> " (HEAL:${item.effects["heal"] ?: 0})"
                 else -> " (${item.type})"
             }
@@ -69,21 +70,15 @@ class InventorySystem @Inject constructor(
     }
 
     fun transferItem(fromHeroId: String, toHeroId: String, itemId: String): String {
-        val state = gameRepository.currentState()
-        val party = state.party
-        val from = party.firstOrNull { it.id == fromHeroId } ?: return "Brak bohatera: $fromHeroId"
-        val to   = party.firstOrNull { it.id == toHeroId } ?: return "Brak bohatera: $toHeroId"
-        val item = state.inventory.firstOrNull { it.id == itemId }
-            ?: return "Nie znaleziono: $itemId"
-
-        val equippedSlot = from.equipment.entries.firstOrNull { it.value == itemId }?.key
-        if (equippedSlot != null) {
-            from.equipment[equippedSlot] = null
+        gameRepository.updateState { state ->
+            val from = state.party.find { it.id == fromHeroId } ?: return@updateState
+            val equippedSlot = from.equipment.entries.firstOrNull { it.value == itemId }?.key
+            if (equippedSlot != null) {
+                from.equipment[equippedSlot] = null
+            }
+            state.logEntries.add("Przekazano przedmiot.")
         }
-
-        gameRepository.log("Transfer ${item.name}: ${from.name} -> ${to.name}")
-        gameRepository.persistCurrentState()
-        return "Transfer ${item.name}: ${from.name} -> ${to.name}"
+        return "Przekazano"
     }
 
     fun itemDetail(itemId: String): String {
@@ -99,29 +94,32 @@ class InventorySystem @Inject constructor(
     }
 
     fun useItem(itemId: String): String {
-        val state = gameRepository.currentState()
-        val item = state.inventory.firstOrNull { it.id == itemId } ?: return "Nie znaleziono: $itemId"
-        val hero = partyRepository.activeHero() ?: return "Brak aktywnego bohatera."
-        
-        val targetHero = state.party.firstOrNull { it.id == hero.id } ?: return "Brak bohatera w stanie sesji."
+        var result = ""
+        gameRepository.updateState { state ->
+            val item = state.inventory.find { it.id == itemId } ?: run { result = "Brak"; return@updateState }
+            val activeHeroId = state.activeHeroId ?: return@updateState
+            val targetHero = state.party.find { it.id == activeHeroId } ?: return@updateState
 
-        val heal = item.effects["heal"] ?: 0
-        if (heal > 0) {
-            targetHero.hp = (targetHero.hp + heal).coerceAtMost(targetHero.maxHp)
+            val heal = item.effects["heal"] ?: 0
+            val sanity = item.effects["sanity"] ?: 0
+            
+            if (heal > 0) targetHero.hp = (targetHero.hp + heal).coerceAtMost(targetHero.maxHp)
+            if (sanity > 0) targetHero.sanity = (targetHero.sanity + sanity).coerceAtMost(100)
+
+            state.inventory.remove(item)
+            result = "Użyto ${item.name}"
+            state.logEntries.add("${targetHero.name} używa ${item.name}.")
         }
-
-        state.inventory.remove(item)
-        gameRepository.persistCurrentState()
-        return "${targetHero.name} użył ${item.name}. +$heal HP"
+        return result
     }
 
     fun getEquippedItems(hero: Hero): EquippedItems {
         val state = gameRepository.currentState()
         val gear = EquippedItems()
-        hero.equipment["weapon"]?.let { id -> gear.weapon = state.inventory.firstOrNull { it.id == id } }
-        hero.equipment["armor"]?.let { id -> gear.bodyArmor = state.inventory.firstOrNull { it.id == id } }
-        hero.equipment["helmet"]?.let { id -> gear.helmet = state.inventory.firstOrNull { it.id == id } }
-        hero.equipment["shield"]?.let { id -> gear.shield = state.inventory.firstOrNull { it.id == id } }
+        hero.equipment["weapon"]?.let { id -> gear.weapon = state.inventory.find { it.id == id } }
+        hero.equipment["armor"]?.let { id -> gear.bodyArmor = state.inventory.find { it.id == id } }
+        hero.equipment["helmet"]?.let { id -> gear.helmet = state.inventory.find { it.id == id } }
+        hero.equipment["shield"]?.let { id -> gear.shield = state.inventory.find { it.id == id } }
         return gear
     }
 }

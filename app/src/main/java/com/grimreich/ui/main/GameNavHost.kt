@@ -90,7 +90,7 @@ fun GameNavHost(
     NavHost(navController = navController, startDestination = GameRoute.MainMenu.route) {
         composable(GameRoute.MainMenu.route) {
             MainMenuScreen(
-                onNewGame = { root.startNewGame() },
+                onNewGame = { root.startNewGame() }, 
                 onContinue = { root.restoreSessionIfValid() },
                 onExit = { /* exit app */ },
                 onDevMenu = { root.setMode(GameScreenMode.DEV_MENU) }
@@ -99,7 +99,7 @@ fun GameNavHost(
 
         composable(GameRoute.PlayerIdentity.route) {
             PlayerIdentityScreen(
-                onContinue = { name -> root.setMode(GameScreenMode.CHARACTER_CREATOR) },
+                onContinue = { name -> root.setPlayerIdentity(name) },
                 onBack = { root.setMode(GameScreenMode.MAIN_MENU) },
                 viewModel = hiltViewModel()
             )
@@ -107,7 +107,7 @@ fun GameNavHost(
 
         composable(GameRoute.CharacterCreator.route) {
             CharacterCreatorScreen(
-                onStartGame = { name, career, attrs, skills -> root.setMode(GameScreenMode.HUB) },
+                onStartGame = { name, career, attrs, skills -> root.finalizeCharacterCreation(name, career, attrs, skills) },
                 onBack = { root.setMode(GameScreenMode.PLAYER_IDENTITY) },
                 viewModel = hiltViewModel()
             )

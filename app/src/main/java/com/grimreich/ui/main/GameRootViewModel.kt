@@ -2,9 +2,7 @@ package com.grimreich.ui.main
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.grimreich.core.GameBootstrapper
-import com.grimreich.core.GameRepository
-import com.grimreich.core.Hero
+import com.grimreich.core.*
 import com.grimreich.systems.AudioEngine
 import com.grimreich.systems.CombatSystem
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -32,17 +30,56 @@ class GameRootViewModel @Inject constructor(
         id?.let { state.party.find { h -> h.id == it } }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), null)
 
-    init {
-        // Audio handled externally
-    }
+    // Temporary storage for character creation
+    private var pendingPlayerName: String? = null
 
     fun setMode(mode: GameScreenMode) {
         _mode.value = mode
     }
 
     fun startNewGame() {
+        setMode(GameScreenMode.PLAYER_IDENTITY)
+    }
+
+    fun setPlayerIdentity(name: String) {
+        pendingPlayerName = name
+        setMode(GameScreenMode.CHARACTER_CREATOR)
+    }
+
+    fun finalizeCharacterCreation(name: String, career: Career, attrs: Map<String, Int>, skills: List<HeroSkill>) {
         viewModelScope.launch {
             gameBootstrapper.bootstrapFreshWorld()
+            
+            gameRepository.updateState { state ->
+                state.playerName = pendingPlayerName ?: "Wędrowiec"
+                state.heroName = name
+                
+                // Create the hero object from creation data
+                val hero = Hero(
+                    id = "hero_main",
+                    name = name,
+                    age = 20, // default
+                    currentCareer = career,
+                    strength = attrs["Str"] ?: 10,
+                    agility = attrs["Agi"] ?: 10,
+                    perception = attrs["Per"] ?: 10,
+                    intelligence = attrs["Int"] ?: 10,
+                    endurance = attrs["End"] ?: 10,
+                    charisma = attrs["Cha"] ?: 10,
+                    piety = attrs["Pie"] ?: 10,
+                    hp = 40,
+                    maxHp = 40
+                )
+                
+                // Apply skills
+                skills.forEach { hero.skills[it.displayName] = 40 }
+                
+                state.party.add(hero)
+                state.activeHeroId = hero.id
+                state.logEntries.add("Bohater $name wyrusza w drogę.")
+            }
+            
+            gameRepository.persistCurrentState()
             setMode(GameScreenMode.HUB)
         }
     }

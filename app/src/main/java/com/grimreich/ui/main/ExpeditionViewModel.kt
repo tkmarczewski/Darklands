@@ -13,6 +13,7 @@ import com.grimreich.systems.EncounterChoice
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import javax.inject.Inject
+import kotlin.random.Random
 
 data class ExpeditionUiState(
     val regionName: String = "",
@@ -46,6 +47,15 @@ class ExpeditionViewModel @Inject constructor(
                         activeEncounter = encounterSystem.activeEncounter
                     )
                 }
+                
+                // Logic fix: Roll for random encounters when entering or updating
+                if (encounterSystem.activeEncounter == null && _uiState.value.encounterLog == null) {
+                    val rolled = encounterSystem.rollEncounter(Random(System.currentTimeMillis()), state)
+                    if (rolled != null) {
+                        encounterSystem.selectEncounter(rolled)
+                        _uiState.update { it.copy(activeEncounter = rolled) }
+                    }
+                }
             }
             .launchIn(viewModelScope)
             
@@ -64,7 +74,7 @@ class ExpeditionViewModel @Inject constructor(
                 StepType.COMBAT -> {
                     state.pendingQuestId = "COMBAT_WIN:$questId"
                     state.combat.active = true
-                    state.combat.enemyName = "Abominacja questa"
+                    state.combat.enemyName = step.targetId // Logic fix: Use step target
                     state.combat.enemyHp = 60
                     state.combat.enemyMaxHp = 60
                     shouldCombat = true
@@ -81,7 +91,7 @@ class ExpeditionViewModel @Inject constructor(
 
     fun dismissEncounter() {
         encounterSystem.activeEncounter = null
-        _uiState.update { it.copy(activeEncounter = null) }
+        _uiState.update { it.copy(activeEncounter = null, encounterLog = null) }
     }
 
     fun handleEncounterChoice(choice: EncounterChoice) {
@@ -89,8 +99,26 @@ class ExpeditionViewModel @Inject constructor(
         gameRepository.updateState { state ->
             msg = choice.effect(state)
         }
-        encounterSystem.activeEncounter = null
-        _uiState.update { it.copy(encounterLog = msg, activeEncounter = null) }
+        
+        // Logic fix: Parse POJEDYNEK string to trigger combat
+        if (msg.startsWith("POJEDYNEK:")) {
+            val parts = msg.split(":")
+            if (parts.size >= 4) {
+                gameRepository.updateState { state ->
+                    state.combat.active = true
+                    state.combat.enemyName = parts[1]
+                    state.combat.enemyHp = parts[2].toIntOrNull() ?: 50
+                    state.combat.enemyMaxHp = state.combat.enemyHp
+                    state.combat.enemyAttack = parts[3].toIntOrNull() ?: 10
+                }
+                // Transition to combat will be handled by UI observer or explicit call
+                // For now we set encounter log to notify the user
+                _uiState.update { it.copy(encounterLog = "Rozpoczyna się starcie: ${parts[1]}!", activeEncounter = null) }
+            }
+        } else {
+            encounterSystem.activeEncounter = null
+            _uiState.update { it.copy(encounterLog = msg, activeEncounter = null) }
+        }
     }
 
     override fun onCleared() {

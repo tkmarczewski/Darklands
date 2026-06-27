@@ -25,12 +25,15 @@ class CombatSystem @Inject constructor(
             hp = hero.hp,
             maxHp = hero.maxHp,
             endurance = hero.endurance,
-            morale = 70,
+            morale = hero.morale,
             armor = hero.effectiveArmor(state.inventory),
             attackBase = hero.effectiveAttack(state.inventory),
             strength = hero.strength,
             agility = hero.agility,
-            intelligence = hero.intelligence
+            intelligence = hero.intelligence,
+            perception = hero.perception,
+            charisma = hero.charisma,
+            piety = hero.piety
         )
     }
 
@@ -45,6 +48,12 @@ class CombatSystem @Inject constructor(
             c.enemyMaxHp = enemyHp
             c.enemyAttack = enemyAttack
             c.enemyDefense = enemyDefense
+            
+            // Map default bestiary secondary stats for now
+            c.enemyAgility = 10
+            c.enemyIntelligence = 10
+            c.enemyStrength = 10
+            
             c.log.clear()
             c.log.add("Pojedynek z $enemyName rozpoczęty!")
         }
@@ -58,7 +67,13 @@ class CombatSystem @Inject constructor(
         gameRepository.updateState { state ->
             val hero = state.party.find { it.id == state.activeHeroId } ?: run { result = "Brak"; return@updateState }
             val potion = state.inventory.find { it.id == itemId } ?: run { result = "Brak"; return@updateState }
-            hero.hp = (hero.hp + 20).coerceAtMost(hero.maxHp)
+            
+            val heal = potion.effects["heal"] ?: 0
+            val sanity = potion.effects["sanity"] ?: 0
+            
+            if (heal > 0) hero.hp = (hero.hp + heal).coerceAtMost(hero.maxHp)
+            if (sanity > 0) hero.sanity = (hero.sanity + sanity).coerceAtMost(100)
+            
             state.inventory.remove(potion)
             state.combat.log.add("${hero.name} wypija ${potion.name}.")
             result = "Użyto"
@@ -92,21 +107,27 @@ class CombatSystem @Inject constructor(
                 endurance = c.enemyHp / 2,
                 morale = 60,
                 armor = c.enemyDefense,
-                attackBase = c.enemyAttack
+                attackBase = c.enemyAttack,
+                agility = c.enemyAgility,
+                intelligence = c.enemyIntelligence,
+                strength = c.enemyStrength
             )
 
             val result = combatRound.resolveRound(
                 attacker = heroState,
-                defender = enemyState,
-                attackerEquipped = inventorySystem.getEquippedItems(hero)
+                defender = enemyState
             )
 
             c.round++
             c.enemyHp = enemyState.hp
             hero.hp = heroState.hp
             hero.endurance = heroState.endurance
+            hero.morale = heroState.morale
             
             c.log.addAll(result.log)
+            if (c.log.size > 50) {
+                repeat(c.log.size - 50) { c.log.removeAt(0) }
+            }
             
             if (combatRound.isDefeated(enemyState)) {
                 c.active = false
