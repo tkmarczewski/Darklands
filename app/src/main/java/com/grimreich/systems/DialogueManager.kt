@@ -17,8 +17,8 @@ class DialogueManager @Inject constructor(
     private val nodes = mutableMapOf<String, DialogueNode>()
     private var activeDialogueId: String? = null
 
-    fun isDialogueActive() = activeDialogueId != null
-    fun getActiveDialogueId() = activeDialogueId
+    fun isDialogueActive(): Boolean = activeDialogueId != null
+    fun currentDialogueId(): String? = activeDialogueId
     fun endDialogue() { activeDialogueId = null }
 
     fun registerNode(node: DialogueNode) {
@@ -26,58 +26,49 @@ class DialogueManager @Inject constructor(
     }
 
     fun getNode(id: String): DialogueNode? {
-        val gameState = gameRepositoryProvider.get().currentState()
-        
-        if (id.endsWith("_start") && gameState.persistentMeta.totalSessionsFinished > 0) {
-            val dejavuNode = "${id}_dejavu"
-            if (nodes.containsKey(dejavuNode)) {
-                activeDialogueId = dejavuNode
-                return applyWorldEffects(nodes[dejavuNode]!!)
-            }
-        }
-
         val baseNode = nodes[id] ?: return null
-        activeDialogueId = id
-        return applyWorldEffects(baseNode)
+        val stability = gameRepositoryProvider.get().currentState().world.globalStability
+        
+        // Project Cipher: Apply glitches based on stability
+        return if (stability < 40) {
+            applyWorldEffects(baseNode, stability)
+        } else {
+            baseNode
+        }
     }
 
     fun makeChoice(choice: DialogueChoice): DialogueNode? {
-        gameRepositoryProvider.get().updateState { state ->
-            choice.onSelect(state)
-        }
-
-        return if (choice.targetNodeId == "end") {
-            endDialogue()
-            null
-        } else {
-            getNode(choice.targetNodeId)
-        }
-    }
-
-    fun getPortrait(role: String): String {
-        return when (role.lowercase()) {
-            "aelion" -> "port_knight" // Mapping to standard port_ names
-            "merchant", "kupiec" -> "port_mercenary"
-            "guard", "straznik" -> "port_guard"
-            "mira" -> "port_physician"
-            "ferrun" -> "port_craftsman"
-            "noctyros" -> "port_monk"
-            else -> "port_scholar"
-        }
-    }
-
-    private fun applyWorldEffects(node: DialogueNode): DialogueNode {
         val state = gameRepositoryProvider.get().currentState()
-        val stability = state.world.globalStability
-        if (stability >= 70) return node
-        return node.copy(text = glitchText(node.text))
+        
+        // Execute side effects
+        choice.onSelect(state)
+        
+        activeDialogueId = choice.targetNodeId
+        return if (choice.targetNodeId == "end") null else getNode(choice.targetNodeId)
+    }
+
+    fun getPortrait(npcId: String): String {
+        return when (npcId) {
+            "guard" -> "port_guard"
+            "merchant" -> "port_merchant"
+            "aelion" -> "port_prophet"
+            "mira" -> "port_mira"
+            else -> "port_knight"
+        }
+    }
+
+    private fun applyWorldEffects(node: DialogueNode, stability: Int): DialogueNode {
+        val glitchedText = if (stability < 20) glitchText(node.text) else node.text
+        return node.copy(text = glitchedText)
     }
 
     private fun glitchText(text: String): String {
-        val metaGlitches = listOf("[BŁĄD]", "[ZABIJ_PROCES]", "[CISZA]")
-        return text.split(" ").map { word ->
-            if (Random.nextFloat() < 0.05f) metaGlitches.random() else word
-        }.joinToString(" ")
+        val chars = text.toCharArray()
+        repeat(maxOf(1, text.length / 20)) {
+            val idx = Random.nextInt(chars.size)
+            chars[idx] = if (Random.nextBoolean()) '?' else '#'
+        }
+        return String(chars)
     }
 
     fun seedBasicDialogues() {
@@ -97,8 +88,9 @@ class DialogueManager @Inject constructor(
             id = "guard_quest_check", npcId = "guard",
             text = "Mamy problem z 'Wyrokiem'. Jeśli chcesz pomóc, weź to zlecenie.",
             choices = listOf(
-                DialogueChoice("Przyjmuję (ZADANIE: Wyrok).", "end", onSelect = {
+                DialogueChoice("Przyjmuję (ZADANIE: Wyrok).", "end", onSelect = { state ->
                     questEngine.get().activateQuest("q_verdict_1")
+                    state.pendingQuestId = null
                 }),
                 DialogueChoice("Może później.", "end")
             )
@@ -108,95 +100,75 @@ class DialogueManager @Inject constructor(
             id = "guard_report_back", npcId = "guard",
             text = "Dobra robota, Kotwico. Inkwizycja dziękuje za Twoją służbę. Oto zapłata.",
             choices = listOf(
-                DialogueChoice("Dziękuję. (ZAMKNIJ ZADANIE)", "end", onSelect = { state ->
-                    val qId = state.pendingQuestId?.removePrefix("FINALIZE:") ?: "q_verdict_1"
-                    questEngine.get().completeQuest(qId)
-                    state.pendingQuestId = null
+                DialogueChoice("Ku chwale Zakonu.", "end", onSelect = { s ->
+                    s.gold += 100
+                    s.reputation.globalFactions["KNIGHTS"] = (s.reputation.globalFactions["KNIGHTS"] ?: 0) + 10
                 })
             )
         ))
 
-        // 2. MYSTIC
-        registerNode(DialogueNode(
-            id = "mystic_start", npcId = "mystic",
-            text = "Czuję w Tobie bicie Serca... lub jego brak. Czego pragnie dusza w świecie binarnym?",
-            choices = listOf(
-                DialogueChoice("Słyszałem o Krwawej Ikonie.", "mystic_quest_check"),
-                DialogueChoice("Żegnaj.", "end")
-            )
-        ))
-
-        registerNode(DialogueNode(
-            id = "mystic_quest_check", npcId = "mystic",
-            text = "Ikona płacze szumem. Musisz ją uciszyć, zanim Skryba ją wymaże.",
-            choices = listOf(
-                DialogueChoice("Zrobię to. (ZADANIE: Ikona)", "end", onSelect = {
-                    questEngine.get().activateQuest("q_blood_icon")
-                }),
-                DialogueChoice("Nie tym razem.", "end")
-            )
-        ))
-
-        registerNode(DialogueNode(
-            id = "mystic_report_back", npcId = "mystic",
-            text = "Echa ucichły. Przyjmij tę ofiarę za swój trud.",
-            choices = listOf(
-                DialogueChoice("Zrozumiałem. (ZAMKNIJ ZADANIE)", "end", onSelect = { state ->
-                    val qId = state.pendingQuestId?.removePrefix("FINALIZE:") ?: "q_blood_icon"
-                    questEngine.get().completeQuest(qId)
-                    state.pendingQuestId = null
-                })
-            )
-        ))
-        
-        // 3. GENERIC REPORT BACK
-        registerNode(DialogueNode(
-            id = "quest_report_back_generic", npcId = "generic",
-            text = "Dobra robota. To zadanie wymagało poświęcenia. Oto Twoja nagroda.",
-            choices = listOf(
-                DialogueChoice("Przyjmuję zapłatę. (ZAMKNIJ ZADANIE)", "end", onSelect = { state ->
-                    val qId = state.pendingQuestId?.removePrefix("FINALIZE:") ?: return@DialogueChoice
-                    questEngine.get().completeQuest(qId)
-                    state.pendingQuestId = null
-                })
-            )
-        ))
-        
-        // 4. MERCHANT SPECIAL
+        // 2. MERCHANT
         registerNode(DialogueNode(
             id = "merchant_start", npcId = "merchant",
-            text = "Złoto to jedyna rzecz, która nie glitchuje w tym świecie. Chcesz pohandlować?",
+            text = "Witaj, podróżniku. Mam towary, których nie znajdziesz nigdzie indziej... za odpowiednią cenę.",
             choices = listOf(
-                DialogueChoice("Pokaż mi swoje towary. (HANDLUJ)", "market_open"),
-                DialogueChoice("Żegnaj.", "end")
+                DialogueChoice("Pokaż mi swoje towary (RYNEK).", "end"),
+                DialogueChoice("Co wiesz o tym regionie?", "merchant_info"),
+                DialogueChoice("Do widzenia.", "end")
             )
         ))
 
         registerNode(DialogueNode(
-            id = "market_open", npcId = "merchant",
-            text = "Najlepsze ceny od tej strony Pęknięcia.",
+            id = "merchant_info", npcId = "merchant",
+            text = "Ceny rosną, a stabilność spada. Mówią, że Archiwiści znowu zaczęli śnić.",
             choices = listOf(
-                DialogueChoice("[OTWÓRZ RYNEK]", "end") // This will trigger onMarket() in DialogueScreen
+                DialogueChoice("Interesujące.", "merchant_start")
             )
         ))
 
-        // AELION
+        // 3. AELION (Regional Hero)
         registerNode(DialogueNode(
             id = "aelion_start", npcId = "aelion",
-            text = "Prorok unosi głowę. 'Mgła rzednie w Twojej obecności. Czego szukasz?'",
+            text = "Kotwico... Twoja obecność tutaj jest jak pęknięcie na tafli jeziora. Czy wiesz, że ten świat jest tylko snem Sędziów?",
             choices = listOf(
-                DialogueChoice("Chcę poznać Twoją naturę.", "aelion_secret"),
-                DialogueChoice("Żegnaj.", "end")
+                DialogueChoice("Nie rozumiem.", "aelion_meta"),
+                DialogueChoice("Szukam sposobu na stabilizację Mgły.", "aelion_quest"),
+                DialogueChoice("Muszę iść.", "end")
+            )
+        ))
+
+        registerNode(DialogueNode(
+            id = "aelion_meta", npcId = "aelion",
+            text = "Gdy stabilność spadnie do zera, szyfr zostanie ujawniony. Wtedy zobaczymy surowy kod naszego przeznaczenia.",
+            choices = listOf(
+                DialogueChoice("Jak to możliwe?", "aelion_start")
+            )
+        ))
+
+        registerNode(DialogueNode(
+            id = "aelion_quest", npcId = "aelion",
+            text = "Aby ocalić GrimReich, musisz odnaleźć pozostałe relikwie. Zacznij od Wybrzeża Północnego.",
+            choices = listOf(
+                DialogueChoice("Zrobię to.", "end")
+            )
+        ))
+        
+        // 4. MIRA (Regional Hero)
+        registerNode(DialogueNode(
+            id = "mira_start", npcId = "mira",
+            text = "Lustra nie kłamią, podróżniku. Widzę w Twoim odbiciu wiele wersji GrimReich. Która z nich jest prawdziwa?",
+            choices = listOf(
+                DialogueChoice("Wszystkie są prawdziwe.", "mira_wisdom"),
+                DialogueChoice("Żadna nie jest prawdziwa.", "mira_wisdom"),
+                DialogueChoice("To nie ma znaczenia.", "end")
             )
         ))
         
         registerNode(DialogueNode(
-            id = "aelion_secret", npcId = "aelion",
-            text = "A więc widzisz znaki pod moją skórą... Rzeczywistość nie wytrzyma tej prawdy!",
+            id = "mira_wisdom", npcId = "mira",
+            text = "Słusznie. Prawda jest jedynie sumą wszystkich echa. Jeśli chcesz wiedzieć więcej, przynieś mi Esencję Odbicia.",
             choices = listOf(
-                DialogueChoice("Powiedz mi wszystko.", "end", onSelect = {
-                    chronicleSystem.get().unlock("lore_aelion_secret")
-                })
+                DialogueChoice("Będę pamiętał.", "end")
             )
         ))
     }

@@ -3,10 +3,10 @@ package com.grimreich.ui.map
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.grimreich.core.GameRepository
+import com.grimreich.systems.QuestEngine
 import com.grimreich.systems.TravelSystem
 import com.grimreich.world.CityCatalogue
 import com.grimreich.world.CityData
-import com.grimreich.systems.QuestEngine
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import javax.inject.Inject
@@ -17,7 +17,8 @@ data class MapUiState(
     val currentLocationId: String = "",
     val allCities: List<CityData> = emptyList(),
     val selectedCityData: CityData? = null,
-    val cityQuestCounts: Map<String, Int> = emptyMap()
+    val cityQuestCounts: Map<String, Int> = emptyMap(),
+    val worldStability: Int = 100
 )
 
 @HiltViewModel
@@ -32,35 +33,38 @@ class WorldMapViewModel @Inject constructor(
     val uiState: StateFlow<MapUiState> = _uiState.asStateFlow()
 
     init {
-        gameRepository.gameState
-            .onEach { refresh() }
-            .launchIn(viewModelScope)
+        refresh()
     }
 
     fun selectCity(cityId: String?) {
         _uiState.update { it.copy(selectedCityId = cityId, selectedCityData = cityCatalogue.get(cityId)) }
     }
 
-    fun travelToSelected(onArrived: () -> Unit) {
-        val dest = _uiState.value.selectedCityId ?: return
-        travelSystem.travelTo(dest)
-        onArrived()
+    fun travelToSelected(onDone: () -> Unit) {
+        val cityId = _uiState.value.selectedCityId ?: return
+        travelSystem.travelTo(cityId)
+        onDone()
     }
 
-    fun refresh() {
-        val state = gameRepository.currentState()
-        
-        val counts = cityCatalogue.all().associate { city ->
-            city.id to questEngine.getActiveQuestsForCity(city.id).size
-        }
+    private fun refresh() {
+        gameRepository.gameState
+            .onEach { state ->
+                val allCities = cityCatalogue.all()
+                val counts = allCities.associate { city ->
+                    city.id to questEngine.getActiveQuestsForCity(city.id).size
+                }
 
-        _uiState.update {
-            it.copy(
-                discoveredLocations = state.world.discoveredLocations,
-                currentLocationId = state.grimCurrentRegion,
-                allCities = cityCatalogue.all(),
-                cityQuestCounts = counts
-            )
-        }
+                _uiState.update { 
+                    it.copy(
+                        discoveredLocations = state.world.discoveredLocations,
+                        currentLocationId = state.grimCurrentRegion,
+                        allCities = allCities,
+                        selectedCityData = cityCatalogue.get(it.selectedCityId),
+                        cityQuestCounts = counts,
+                        worldStability = state.world.globalStability
+                    )
+                }
+            }
+            .launchIn(viewModelScope)
     }
 }
