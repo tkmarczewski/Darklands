@@ -4,10 +4,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.grimreich.core.GameRepository
 import com.grimreich.core.GameState
+import com.grimreich.grimreich.v1.DialogueChoice
+import com.grimreich.grimreich.v1.DialogueNode
 import com.grimreich.systems.DialogueManager
 import com.grimreich.systems.QuestEngine
-import com.grimreich.grimreich.v1.DialogueNode
-import com.grimreich.grimreich.v1.DialogueChoice
 import com.grimreich.world.CityCatalogue
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
@@ -17,9 +17,10 @@ data class DialogueUiState(
     val currentNode: DialogueNode? = null,
     val npcName: String = "",
     val npcRole: String = "",
-    val npcPortrait: String = "port_rogue",
-    val backgroundDrawable: String = "bg_region_north_coast",
-    val availableChoices: List<Pair<DialogueChoice, Boolean>> = emptyList()
+    val npcPortrait: String = "",
+    val backgroundDrawable: String = "",
+    val availableChoices: List<Pair<DialogueChoice, Boolean>> = emptyList(),
+    val worldStability: Int = 100
 )
 
 @HiltViewModel
@@ -36,56 +37,52 @@ class DialogueViewModel @Inject constructor(
     init {
         gameRepository.gameState
             .onEach { state ->
-                if (state.pendingDialogueNodeId != null) {
-                    refresh(
-                        state.pendingDialogueNpcName ?: "Nieznajomy",
-                        state.pendingDialogueNpcRole ?: "Cień",
-                        state.pendingDialogueNodeId!!
+                val npcName = state.pendingDialogueNpcName ?: ""
+                val npcRole = state.pendingDialogueNpcRole ?: ""
+                val nodeId = state.pendingDialogueNodeId ?: "start"
+                
+                val cityId = state.grimCurrentRegion
+                val city = cityCatalogue.get(cityId)
+                
+                val node = dialogueManager.getNode(nodeId)
+                val choices = node?.choices?.map { choice ->
+                    choice to checkRequirements(choice, state)
+                } ?: emptyList()
+
+                _uiState.update { 
+                    it.copy(
+                        currentNode = node,
+                        npcName = npcName,
+                        npcRole = npcRole,
+                        npcPortrait = "port_knight", // Default for now
+                        backgroundDrawable = city?.backgroundDrawable ?: "bg_generic_city",
+                        availableChoices = choices,
+                        worldStability = state.world.globalStability
                     )
                 }
             }
             .launchIn(viewModelScope)
     }
 
-    private fun refresh(npcName: String, npcRole: String, nodeId: String) {
-        val gameState = gameRepository.currentState()
-        val city = cityCatalogue.get(gameState.grimCurrentRegion)
-        val node = dialogueManager.getNode(nodeId)
-        
-        _uiState.update { 
-            it.copy(
-                npcName = npcName,
-                npcRole = npcRole,
-                npcPortrait = dialogueManager.getPortrait(npcRole),
-                backgroundDrawable = city?.backgroundDrawable ?: "bg_region_north_coast",
-                currentNode = node,
-                availableChoices = node?.choices?.map { choice ->
-                    choice to checkRequirements(choice, gameState)
-                } ?: emptyList()
-            )
-        }
-    }
-
     private fun checkRequirements(choice: DialogueChoice, state: GameState): Boolean {
-        choice.requiredAttributes["gold"]?.let { if (state.gold < it) return false }
+        // Logic check: e.g. gold, items, quest status
+        if (choice.requiredReputation > 0) {
+            // Check global or city rep?
+        }
         return true
     }
 
     fun choose(choice: DialogueChoice) {
         gameRepository.updateState { state ->
+            state.pendingDialogueNodeId = choice.targetNodeId
+            
+            // Execute logic-level effects defined in the choice
             choice.onSelect(state)
-        }
-        
-        val nextNode = dialogueManager.getNode(choice.targetNodeId)
-        if (nextNode != null) {
-            _uiState.update { it.copy(currentNode = nextNode) }
-        } else {
-            // Dialogue End - Clear pointers
-            gameRepository.updateState { 
-                it.pendingDialogueNodeId = null
-                it.pendingDialogueNpcName = null
-                it.pendingDialogueNpcRole = null
-                it.pendingQuestId = null
+            
+            if (choice.targetNodeId == "end") {
+                state.pendingDialogueNpcName = null
+                state.pendingDialogueNpcRole = null
+                state.pendingDialogueNodeId = null
             }
         }
     }

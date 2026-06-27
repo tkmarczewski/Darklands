@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.grimreich.core.GameRepository
 import com.grimreich.core.Hero
+import com.grimreich.systems.EndingSystem
 import com.grimreich.systems.QuestEngine
 import com.grimreich.systems.VisualContentSystem
 import com.grimreich.world.CityCatalogue
@@ -21,7 +22,7 @@ data class HubUiState(
     val expeditionQuestsCount: Int = 0,
     val party: List<Hero> = emptyList(),
     val worldStability: Int = 100,
-    val hubBackground: String = "bg_party_castle",
+    val hubBackground: String = "",
     val hubTintColor: Color = Color.Transparent,
     val atmosphericMessage: String = ""
 )
@@ -32,7 +33,7 @@ class HubViewModel @Inject constructor(
     private val questEngine: QuestEngine,
     private val cityCatalogue: CityCatalogue,
     private val visualContentSystem: VisualContentSystem,
-    private val endingSystem: com.grimreich.systems.EndingSystem
+    private val endingSystem: EndingSystem
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(HubUiState())
@@ -49,23 +50,35 @@ class HubViewModel @Inject constructor(
             .onEach { state ->
                 val currentCityId = state.grimCurrentRegion
                 val city = cityCatalogue.get(currentCityId)
-                val activeCount = state.quest.activeQuestIds.size
-                val expeditionCount = questEngine.getActiveQuestsForCity(currentCityId).size
+                
                 val stability = state.world.globalStability
+                val tint = when {
+                    stability < 15 -> Color(0x66FF0000) // Dark Red Glitch
+                    stability < 35 -> Color(0x33AA0000) // Faint Red
+                    stability < 60 -> Color(0x22000000) // Dimming
+                    else -> Color.Transparent
+                }
+
+                val message = when {
+                    stability < 20 -> "Rzeczywistość rozpada się na Twoich oczach. Słyszysz statyczny szum kodu."
+                    stability < 40 -> "Powidoki i echa stają się codziennością. Ludzie boją się patrzeć w lustra."
+                    stability < 70 -> "Dni wydają się krótsze, a cienie dłuższe niż być powinny."
+                    else -> "W GrimReich panuje względny spokój, choć Mgła nigdy nie śpi."
+                }
 
                 _uiState.update { 
                     it.copy(
-                        locationName = city?.name ?: "Pustka",
+                        locationName = city?.name ?: "Nieznane Miejsce",
                         day = state.world.day,
                         timeOfDay = state.world.timeOfDay,
                         gold = state.gold,
-                        activeQuestsCount = activeCount,
-                        expeditionQuestsCount = expeditionCount,
-                        party = state.party.toList(),
+                        activeQuestsCount = state.quest.activeQuestIds.size,
+                        expeditionQuestsCount = questEngine.getActiveQuestsForCity(currentCityId).size,
+                        party = state.party,
                         worldStability = stability,
-                        hubBackground = visualContentSystem.getHubBackground(currentCityId, stability),
-                        hubTintColor = visualContentSystem.getHubTintColor(stability),
-                        atmosphericMessage = visualContentSystem.getAtmosphericMessage(stability)
+                        hubBackground = city?.backgroundDrawable ?: "bg_generic_city",
+                        hubTintColor = tint,
+                        atmosphericMessage = message
                     )
                 }
             }

@@ -1,5 +1,7 @@
 package com.grimreich.ui.dialogue
 
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.*
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -20,6 +22,7 @@ import androidx.compose.ui.unit.sp
 import com.grimreich.R
 import com.grimreich.grimreich.v1.DialogueNode
 import com.grimreich.grimreich.v1.DialogueChoice
+import kotlin.random.Random
 
 @Composable
 fun DialogueScreen(
@@ -29,6 +32,18 @@ fun DialogueScreen(
 ) {
     val state by viewModel.uiState.collectAsState()
     val context = LocalContext.current
+    
+    // GLITCH ANIMATION
+    val infiniteTransition = rememberInfiniteTransition(label = "glitch")
+    val jitterX by infiniteTransition.animateFloat(
+        initialValue = -2f,
+        targetValue = 2f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(50, easing = LinearEasing),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "jitter"
+    )
 
     Box(modifier = Modifier.fillMaxSize().background(Color.Black)) {
         // BACKGROUND
@@ -39,7 +54,7 @@ fun DialogueScreen(
                 contentDescription = null,
                 modifier = Modifier.fillMaxSize(),
                 contentScale = ContentScale.Crop,
-                alpha = 0.3f
+                alpha = if (state.worldStability < 30) 0.15f else 0.3f
             )
         }
 
@@ -49,14 +64,15 @@ fun DialogueScreen(
                 Surface(
                     modifier = Modifier.size(120.dp),
                     color = Color(0xFF101010),
-                    border = androidx.compose.foundation.BorderStroke(2.dp, Color(0xFFC0A060))
+                    border = androidx.compose.foundation.BorderStroke(2.dp, if (state.worldStability < 20) Color.Red else Color(0xFFC0A060))
                 ) {
                     val portResId = context.resources.getIdentifier(state.npcPortrait, "drawable", context.packageName)
                     if (portResId != 0) {
                         Image(
                             painter = painterResource(id = portResId),
                             contentDescription = null,
-                            modifier = Modifier.fillMaxSize()
+                            modifier = Modifier.fillMaxSize(),
+                            alpha = if (state.worldStability < 50 && Random.nextFloat() < 0.1f) 0.5f else 1.0f
                         )
                     }
                 }
@@ -64,7 +80,13 @@ fun DialogueScreen(
                 Spacer(modifier = Modifier.width(16.dp))
                 
                 Column {
-                    Text(text = state.npcName.uppercase(), color = Color(0xFFC0A060), fontWeight = FontWeight.Bold, fontSize = 20.sp)
+                    Text(
+                        text = if (state.worldStability < 35 && Random.nextFloat() < 0.2f) "NULL_PTR_EXCEPTION" else state.npcName.uppercase(),
+                        color = if (state.worldStability < 20) Color.Red else Color(0xFFC0A060),
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 20.sp,
+                        modifier = if (state.worldStability < 15) Modifier.offset(x = jitterX.dp) else Modifier
+                    )
                     Text(text = state.npcRole.uppercase(), color = Color.Gray, fontSize = 12.sp)
                 }
             }
@@ -78,9 +100,14 @@ fun DialogueScreen(
                 border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFF222222))
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
+                    val rawText = state.currentNode?.text ?: "Cisza... (Sesja utraciła spójność)"
+                    val displayedText = if (state.worldStability < 25) {
+                        rawText.map { if (Random.nextFloat() < 0.05f) '?' else it }.joinToString("")
+                    } else rawText
+
                     Text(
-                        text = state.currentNode?.text ?: "Cisza... (Sesja utraciła spójność)",
-                        color = Color.White,
+                        text = displayedText,
+                        color = if (state.worldStability < 10) Color.Red else Color.White,
                         fontSize = 16.sp,
                         lineHeight = 24.sp
                     )
@@ -103,7 +130,7 @@ fun DialogueScreen(
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         items(state.availableChoices) { (choice, isEnabled) ->
-                            DialogueChoiceBtn(choice.text, isEnabled) { 
+                            DialogueChoiceBtn(choice.text, isEnabled, state.worldStability) { 
                                 if (isEnabled) {
                                     viewModel.choose(choice)
                                     if (choice.targetNodeId == "end") {
@@ -125,7 +152,7 @@ fun DialogueScreen(
 }
 
 @Composable
-private fun DialogueChoiceBtn(text: String, isEnabled: Boolean = true, onClick: () -> Unit) {
+private fun DialogueChoiceBtn(text: String, isEnabled: Boolean = true, stability: Int = 100, onClick: () -> Unit) {
     Surface(
         modifier = Modifier
             .fillMaxWidth()
@@ -134,8 +161,10 @@ private fun DialogueChoiceBtn(text: String, isEnabled: Boolean = true, onClick: 
         color = if (isEnabled) Color(0xFF151515) else Color(0xFF0A0A0A),
         border = androidx.compose.foundation.BorderStroke(1.dp, if (isEnabled) Color(0xFF333333) else Color(0xFF111111))
     ) {
+        val label = if (stability < 40 && !isEnabled) "[USZKODZONE]" else if (isEnabled) "> $text" else "[ZABLOKOWANE] $text"
+        
         Text(
-            text = if (isEnabled) "> $text" else "[ZABLOKOWANE] $text",
+            text = label,
             color = if (isEnabled) Color(0xFFE0C080) else Color.DarkGray,
             modifier = Modifier.padding(12.dp),
             fontSize = 14.sp

@@ -19,44 +19,56 @@ class AudioEngine @Inject constructor(
 
     private var musicPlayer: MediaPlayer? = null
     private var currentTrackResId: Int = 0
+    private val lock = Any()
 
     fun playMusic(resId: Int, loop: Boolean = true) {
-        if (currentTrackResId == resId) return
+        synchronized(lock) {
+            if (currentTrackResId == resId) return
 
-        stopMusic()
-        try {
-            val state = gameRepository.get().currentState()
-            val stability = state.world.globalStability
-            
-            musicPlayer = MediaPlayer.create(context, resId).apply {
-                isLooping = loop
+            stopMusicInternal()
+            try {
+                val state = gameRepository.get().currentState()
+                val stability = state.world.globalStability
                 
-                // --- PITCH WOBBLE (Project Cipher) ---
-                if (stability < 10) {
-                    // Simulating a "dying record player" effect
-                    setPlaybackParams(playbackParams.setPitch(0.8f + (android.os.SystemClock.elapsedRealtime() % 400) / 1000f))
-                }
+                musicPlayer = MediaPlayer.create(context, resId)?.apply {
+                    isLooping = loop
+                    
+                    // --- PITCH WOBBLE (Project Cipher) ---
+                    if (stability < 15) {
+                        try {
+                            // Simulating a "dying record player" effect
+                            val pitch = 0.85f + (android.os.SystemClock.elapsedRealtime() % 300) / 1000f
+                            setPlaybackParams(playbackParams.setPitch(pitch))
+                        } catch (e: Exception) {
+                            // Some devices might not support pitch shifting
+                        }
+                    }
 
-                start()
+                    start()
+                }
+                currentTrackResId = resId
+            } catch (e: Exception) {
+                Log.e(TAG, "Blad odtwarzania utworu resId=$resId", e)
+                musicPlayer = null
+                currentTrackResId = 0
             }
-            // Bug fix: only update currentTrackResId on success, not before catch
-            currentTrackResId = resId
-        } catch (e: Exception) {
-            Log.e(TAG, "Blad odtwarzania utworu resId=$resId", e)
-            // Ensure player state is clean after failure
-            musicPlayer = null
-            currentTrackResId = 0
         }
     }
 
     fun stopMusic() {
+        synchronized(lock) {
+            stopMusicInternal()
+        }
+    }
+
+    private fun stopMusicInternal() {
         try {
             musicPlayer?.let {
                 if (it.isPlaying) it.stop()
                 it.release()
             }
         } catch (e: Exception) {
-            // Guard against OBS-05: IllegalStateException during rapid release or double release
+            Log.w(TAG, "Blad podczas zwalniania MediaPlayer", e)
         } finally {
             musicPlayer = null
             currentTrackResId = 0

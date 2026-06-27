@@ -33,6 +33,8 @@ class ExpeditionViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(ExpeditionUiState())
     val uiState: StateFlow<ExpeditionUiState> = _uiState.asStateFlow()
 
+    private var hasRolledForCurrentVisit = false
+
     init {
         gameRepository.gameState
             .onEach { state ->
@@ -48,8 +50,9 @@ class ExpeditionViewModel @Inject constructor(
                     )
                 }
                 
-                // Logic fix: Roll for random encounters when entering or updating
-                if (encounterSystem.activeEncounter == null && _uiState.value.encounterLog == null) {
+                // Deterministic and controlled encounter roll
+                if (!hasRolledForCurrentVisit && encounterSystem.activeEncounter == null && _uiState.value.encounterLog == null) {
+                    hasRolledForCurrentVisit = true
                     val rolled = encounterSystem.rollEncounter(Random(System.currentTimeMillis()), state)
                     if (rolled != null) {
                         encounterSystem.selectEncounter(rolled)
@@ -74,7 +77,7 @@ class ExpeditionViewModel @Inject constructor(
                 StepType.COMBAT -> {
                     state.pendingQuestId = "COMBAT_WIN:$questId"
                     state.combat.active = true
-                    state.combat.enemyName = step.targetId // Logic fix: Use step target
+                    state.combat.enemyName = step.targetId
                     state.combat.enemyHp = 60
                     state.combat.enemyMaxHp = 60
                     shouldCombat = true
@@ -100,7 +103,6 @@ class ExpeditionViewModel @Inject constructor(
             msg = choice.effect(state)
         }
         
-        // Logic fix: Parse POJEDYNEK string to trigger combat
         if (msg.startsWith("POJEDYNEK:")) {
             val parts = msg.split(":")
             if (parts.size >= 4) {
@@ -111,8 +113,6 @@ class ExpeditionViewModel @Inject constructor(
                     state.combat.enemyMaxHp = state.combat.enemyHp
                     state.combat.enemyAttack = parts[3].toIntOrNull() ?: 10
                 }
-                // Transition to combat will be handled by UI observer or explicit call
-                // For now we set encounter log to notify the user
                 _uiState.update { it.copy(encounterLog = "Rozpoczyna się starcie: ${parts[1]}!", activeEncounter = null) }
             }
         } else {

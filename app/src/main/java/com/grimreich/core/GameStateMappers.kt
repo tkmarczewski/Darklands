@@ -131,12 +131,13 @@ fun HeroDto.toDomain(): Hero = Hero(
 }
 
 fun CareerEntryDto.toDomain(): CareerEntry = CareerEntry(
-    career = Career.valueOf(careerName),
-    yearsServed = 0 // Info lost in DTO but better than nothing
+    career = try { Career.valueOf(careerName) } catch (e: Exception) { Career.MERCENARY },
+    yearsServed = yearsServed
 )
 
 fun CareerEntry.toDto(): CareerEntryDto = CareerEntryDto(
     careerName = career.name,
+    yearsServed = yearsServed,
     levelReached = 0,
     dateReached = 0
 )

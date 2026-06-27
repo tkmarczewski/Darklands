@@ -13,24 +13,29 @@ class ProceduralNpcGenerator @Inject constructor() {
     fun generateForCity(cityId: String, state: GameState): List<NPC> {
         val random = Random(cityId.hashCode().toLong() + state.world.day.toLong())
         val npcList = mutableListOf<NPC>()
+        
+        val worldStability = state.world.globalStability
+        val isGrim20 = worldStability < 35
 
         // 1. REGIONAL HEROES
         if (cityId == "wybrzeze_polnocne") {
             npcList.add(NPC(
                 id = "aelion",
-                name = "Prorok Aelion",
+                name = if (isGrim20) "PROCES_AEL_ALPHA" else "Prorok Aelion",
                 role = "AELION",
                 isRegionalHero = true,
-                startNodeId = "aelion_start"
+                startNodeId = "aelion_start",
+                stability = (worldStability / 100f).coerceIn(0.1f, 1.0f)
             ))
         }
         if (cityId == "serce_krainy") {
             npcList.add(NPC(
                 id = "mira",
-                name = "Mira Wieloznaczna",
+                name = if (isGrim20) "SĘDZIA_MIRA_v2" else "Mira Wieloznaczna",
                 role = "MIRA",
                 isRegionalHero = true,
-                startNodeId = "mira_start"
+                startNodeId = "mira_start",
+                stability = (worldStability / 100f).coerceIn(0.1f, 1.0f)
             ))
         }
 
@@ -38,19 +43,23 @@ class ProceduralNpcGenerator @Inject constructor() {
         val roles = listOf("Merchant", "Guard", "Mystic", "Beggar")
         roles.forEach { role ->
             if (random.nextBoolean()) {
-                val isGrim20 = state.world.globalStability < 35
-                
                 val npcName = if (isGrim20) {
                     "INSTANCJA_${role.uppercase().take(3)}_${(100..999).random(random)}"
                 } else {
                     generateName(role, random)
                 }
 
+                // OBS-10: NPC infestation chance based on world stability
+                val infestationChance = if (worldStability < 20) 0.4f else if (worldStability < 50) 0.1f else 0.01f
+                val isInfested = random.nextFloat() < infestationChance
+
                 npcList.add(NPC(
                     id = "npc_${role.lowercase()}_$cityId",
                     name = npcName,
                     role = role,
-                    startNodeId = "${role.lowercase()}_start"
+                    startNodeId = "${role.lowercase()}_start",
+                    stability = (worldStability / 100f).coerceIn(0.05f, 1.0f),
+                    isInfested = isInfested
                 ))
             }
         }
@@ -59,7 +68,7 @@ class ProceduralNpcGenerator @Inject constructor() {
     }
 
     private fun generateName(role: String, random: Random): String {
-        val names = listOf("Aldous", "Vane", "Kael", "Mina", "Garrick", "Liora")
+        val names = listOf("Aldous", "Vane", "Kael", "Mina", "Garrick", "Liora", "Thane", "Elowen")
         return names.random(random) + " ($role)"
     }
 }
