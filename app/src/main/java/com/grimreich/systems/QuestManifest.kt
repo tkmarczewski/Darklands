@@ -1,6 +1,5 @@
 package com.grimreich.systems
 
-import com.grimreich.grimreich.v1.*
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -33,6 +32,43 @@ class QuestManifest @Inject constructor(
             target = "Gęsta Mgła"
         )
         
+        // --- QUEST CHAIN: Shadows of the Scribes ---
+        
+        registerQuest(
+            id = "q_scribes_1",
+            title = "Cienie Archiwistów I",
+            desc = "Mira twierdzi, że ktoś podmienia wpisy w Kronice Świata.",
+            cityId = "serce_krainy",
+            npcId = "mira",
+            gold = 150,
+            stepType = StepType.INVESTIGATION,
+            target = "Pęknięta Kronika"
+        )
+
+        registerQuest(
+            id = "q_scribes_2",
+            title = "Cienie Archiwistów II",
+            desc = "Ślady prowadzą do zapomnianego skryptorium. Musisz wyeliminować Echa Archiwistów.",
+            cityId = "serce_krainy",
+            npcId = "mira",
+            gold = 250,
+            stepType = StepType.COMBAT,
+            target = "Echo Archiwisty",
+            prerequisiteId = "q_scribes_1"
+        )
+
+        registerQuest(
+            id = "q_scribes_3",
+            title = "Cienie Archiwistów III",
+            desc = "Finałowa konfrontacja z Cieniem Pierwszego Sędziego.",
+            cityId = "serce_krainy",
+            npcId = "mira",
+            gold = 500,
+            stepType = StepType.COMBAT,
+            target = "Pierwszy Sędzia (Cień)",
+            prerequisiteId = "q_scribes_2"
+        )
+        
         // Late-game Quest (Climax)
         registerQuest(
             id = "q_collapse_core",
@@ -42,14 +78,16 @@ class QuestManifest @Inject constructor(
             npcId = "mira",
             gold = 500,
             stepType = StepType.COMBAT,
-            target = "Boss: Echo Absolutu"
+            target = "Boss: Echo Absolutu",
+            prerequisiteId = "q_scribes_3"
         )
     }
 
     private fun registerQuest(
         id: String, title: String, desc: String, 
         cityId: String, npcId: String, gold: Int, 
-        stepType: StepType, target: String
+        stepType: StepType, target: String,
+        prerequisiteId: String? = null
     ) {
         engine.register(QuestDefinition(
             id = id,
@@ -59,8 +97,9 @@ class QuestManifest @Inject constructor(
             cityId = cityId,
             originNpcId = npcId,
             steps = listOf(
-                QuestStep("Zbadaj: $target", stepType, target)
-            )
+                QuestStep("Cel: $target", stepType, target)
+            ),
+            prerequisiteQuestId = prerequisiteId
         ))
     }
 }

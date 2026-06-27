@@ -21,7 +21,8 @@ data class QuestDefinition(
     val rewardGold: Int,
     val steps: List<QuestStep>,
     val cityId: String,
-    val originNpcId: String
+    val originNpcId: String,
+    val prerequisiteQuestId: String? = null // New: Supporting chains
 )
 
 @Singleton
@@ -37,23 +38,39 @@ class QuestEngine @Inject constructor(
     fun getDefinition(id: String) = registry[id]
 
     fun getStatus(questId: String): QuestStatus {
-        return gameRepository.currentState().quest.progress[questId]?.status ?: QuestStatus.LOCKED
+        val state = gameRepository.currentState()
+        
+        // 1. Check if completed
+        if (state.quest.completedQuestIds.contains(questId)) return QuestStatus.COMPLETED
+        
+        // 2. Check if active
+        val progress = state.quest.progress[questId]
+        if (progress != null) return progress.status
+        
+        // 3. Chain logic: Check prerequisites
+        val def = registry[questId]
+        if (def?.prerequisiteQuestId != null) {
+            val prereqStatus = getStatus(def.prerequisiteQuestId)
+            return if (prereqStatus == QuestStatus.COMPLETED) QuestStatus.AVAILABLE else QuestStatus.LOCKED
+        }
+
+        return QuestStatus.AVAILABLE
     }
 
     fun activateQuest(questId: String) {
+        if (getStatus(questId) != QuestStatus.AVAILABLE) return
+
         gameRepository.updateState { state ->
             val currentProgress = state.quest.progress[questId] ?: QuestProgress(questId)
-            if (currentProgress.status == QuestStatus.AVAILABLE || currentProgress.status == QuestStatus.LOCKED) {
-                state.quest.progress[questId] = currentProgress.copy(status = QuestStatus.ACTIVE)
-                state.quest.activeQuestIds.add(questId)
-            }
+            state.quest.progress[questId] = currentProgress.copy(status = QuestStatus.ACTIVE)
+            state.quest.activeQuestIds.add(questId)
         }
     }
 
     fun advanceStep(questId: String) {
         gameRepository.updateState { state ->
             val p = state.quest.progress[questId] ?: return@updateState
-            if (p.status != QuestStatus.ACTIVE) return@updateState // Guard: only advance active quests
+            if (p.status != QuestStatus.ACTIVE) return@updateState // Guard
 
             val def = registry[questId] ?: return@updateState
             
@@ -80,6 +97,10 @@ class QuestEngine @Inject constructor(
         }
     }
     
+    fun getAvailableQuestsForCity(cityId: String): List<QuestDefinition> {
+        return registry.values.filter { it.cityId == cityId && getStatus(it.id) == QuestStatus.AVAILABLE }
+    }
+
     fun getActiveQuestsForCity(cityId: String): List<QuestDefinition> {
         val activeIds = gameRepository.currentState().quest.activeQuestIds
         return registry.values.filter { it.id in activeIds && it.cityId == cityId }
