@@ -1,5 +1,6 @@
 package com.grimreich.ui.combat
 
+import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -14,6 +15,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.grimreich.core.GameConstants
+import kotlin.random.Random
 
 @Composable
 fun CombatScreen(
@@ -22,29 +24,45 @@ fun CombatScreen(
 ) {
     val state by viewModel.uiState.collectAsState()
 
+    // GLITCH ANIMATION
+    val infiniteTransition = rememberInfiniteTransition(label = "glitch")
+    val jitterX by infiniteTransition.animateFloat(
+        initialValue = -1f,
+        targetValue = 1f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(40, easing = LinearEasing),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "jitter"
+    )
+
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.Black)
+            .background(if (state.worldStability < 10 && Random.nextFloat() < 0.05f) Color(0xFF200000) else Color.Black)
             .padding(16.dp)
     ) {
         // ENEMY
-        CombatantRow(state.combat.enemyName, state.combat.enemyHp, state.combat.enemyMaxHp, isEnemy = true)
+        val enemyName = if (state.worldStability < 30 && Random.nextFloat() < 0.1f) "UNKNOWN_ENTITY" else state.combat.enemyName
+        CombatantRow(enemyName, state.combat.enemyHp, state.combat.enemyMaxHp, isEnemy = true, stability = state.worldStability, jitter = jitterX)
         
         Spacer(modifier = Modifier.height(16.dp))
 
-        // LOG (SCROLLABLE)
+        // LOG
         Surface(
             color = Color(0xFF111111),
             modifier = Modifier.weight(1f).fillMaxWidth(),
-            border = androidx.compose.foundation.BorderStroke(1.dp, Color.DarkGray)
+            border = androidx.compose.foundation.BorderStroke(1.dp, if (state.worldStability < 20) Color.Red else Color.DarkGray)
         ) {
             LazyColumn(
                 modifier = Modifier.padding(12.dp),
                 reverseLayout = true
             ) {
                 items(state.combat.log.asReversed()) { msg ->
-                    Text(msg, color = Color.LightGray, fontSize = 11.sp, lineHeight = 14.sp)
+                    val displayedMsg = if (state.worldStability < 15) {
+                        msg.map { if (Random.nextFloat() < 0.03f) '#' else it }.joinToString("")
+                    } else msg
+                    Text(displayedMsg, color = if (state.worldStability < 10) Color.Red else Color.LightGray, fontSize = 11.sp, lineHeight = 14.sp)
                 }
             }
         }
@@ -53,7 +71,7 @@ fun CombatScreen(
 
         // HEROES
         state.party.forEach { hero ->
-            CombatantRow(hero.name, hero.hp, hero.maxHp, isEnemy = false)
+            CombatantRow(hero.name, hero.hp, hero.maxHp, isEnemy = false, stability = state.worldStability, jitter = jitterX)
             Spacer(modifier = Modifier.height(4.dp))
         }
 
@@ -85,27 +103,29 @@ fun CombatScreen(
             }
             Spacer(modifier = Modifier.height(8.dp))
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                CombatButton("REWIZJA", Color(0xFF004488), modifier = Modifier.weight(1f)) { viewModel.useEchoSkill("REVISION") }
+                val revLabel = if (state.worldStability < 40) "REWIZJA_v2" else "REWIZJA"
+                CombatButton(revLabel, Color(0xFF004488), modifier = Modifier.weight(1f)) { viewModel.useEchoSkill("REVISION") }
                 CombatButton("NADPISANIE", Color(0xFF440088), modifier = Modifier.weight(1f)) { viewModel.useEchoSkill("OVERWRITE") }
             }
         } else {
             Button(
                 onClick = { viewModel.exitCombat(onExit) },
                 modifier = Modifier.fillMaxWidth().height(50.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2A2A2A))
+                colors = ButtonDefaults.buttonColors(containerColor = if (state.worldStability < 10) Color.Red else Color(0xFF2A2A2A))
             ) {
-                Text("ZAKOŃCZ WALKĘ", color = Color.White, fontWeight = FontWeight.Bold)
+                Text(if (state.worldStability < 5) "WYJDŹ_Z_PĘTLI" else "ZAKOŃCZ WALKĘ", color = Color.White, fontWeight = FontWeight.Bold)
             }
         }
     }
 }
 
 @Composable
-fun CombatantRow(name: String, hp: Int, maxHp: Int, isEnemy: Boolean) {
-    Column {
+fun CombatantRow(name: String, hp: Int, maxHp: Int, isEnemy: Boolean, stability: Int = 100, jitter: Float = 0f) {
+    val offset = if (stability < 15) jitter.dp else 0.dp
+    Column(modifier = Modifier.offset(x = offset)) {
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
             Text(name.uppercase(), color = if (isEnemy) Color.Red else Color(0xFFE0C080), fontWeight = FontWeight.Bold, fontSize = 13.sp)
-            Text("$hp / $maxHp HP", color = Color.White, fontSize = 11.sp)
+            Text("$hp / $maxHp HP", color = if (stability < 10 && hp < 10) Color.Red else Color.White, fontSize = 11.sp)
         }
         LinearProgressIndicator(
             progress = { if (maxHp > 0) hp.toFloat() / maxHp else 0f },

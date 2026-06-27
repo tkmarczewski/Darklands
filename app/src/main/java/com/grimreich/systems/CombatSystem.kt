@@ -49,7 +49,6 @@ class CombatSystem @Inject constructor(
             c.enemyAttack = enemyAttack
             c.enemyDefense = enemyDefense
             
-            // Map default bestiary secondary stats for now
             c.enemyAgility = 10
             c.enemyIntelligence = 10
             c.enemyStrength = 10
@@ -62,7 +61,6 @@ class CombatSystem @Inject constructor(
     fun playerAttack(): String = resolvePlayerAction("ATTACK")
     fun playerDefend(): String = resolvePlayerAction("DEFEND")
     
-    // New: Use specific skill
     fun useSkill(skillId: String): String = resolvePlayerAction(skillId)
 
     fun usePotion(itemId: String): String {
@@ -97,6 +95,7 @@ class CombatSystem @Inject constructor(
 
     private fun resolvePlayerAction(actionType: String): String {
         var status = ""
+        // OPTIMIZATION: Only update repository once per round
         gameRepository.updateState { state ->
             val c = state.combat
             val hero = state.party.find { it.id == state.activeHeroId } ?: run { status = "Brak bohatera"; return@updateState }
@@ -116,7 +115,6 @@ class CombatSystem @Inject constructor(
                 strength = c.enemyStrength
             )
 
-            // Logic fix: pass skillId if it's not "ATTACK" or "DEFEND"
             val skillId = if (actionType != "ATTACK" && actionType != "DEFEND") actionType else null
             
             val result = combatRound.resolveRound(

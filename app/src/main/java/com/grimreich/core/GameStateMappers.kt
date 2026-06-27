@@ -138,11 +138,11 @@ fun CareerEntryDto.toDomain(): CareerEntry = CareerEntry(
 fun CareerEntry.toDto(): CareerEntryDto = CareerEntryDto(
     careerName = career.name,
     yearsServed = yearsServed,
-    levelReached = 0,
+    levelReached = 0, // Legacy support
     dateReached = 0
 )
 
-fun AbilityDto.toDomain(): Ability = Ability(
+fun AbilityDto.toDomain(): Ability = AbilityRegistry.all().find { it.id == id } ?: Ability(
     id = id,
     name = name,
     description = "",

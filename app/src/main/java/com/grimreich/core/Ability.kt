@@ -44,9 +44,11 @@ object AbilityRegistry {
 
     val MIND_READ = Ability(
         id = "mind_read",
-        name = "Czytanie Myśli",
-        description = "Pozwala przejrzeć intencje rozmówcy.",
+        name = "Czytanie w Myślach",
+        description = "Pozwala zajrzeć w echa cudzej świadomości.",
         costType = CostType.SANITY,
         costValue = 5
     )
+
+    fun all() = listOf(SOLARIAN_STRIKE, SHADOW_VEIL, IRON_SKIN, HOLY_RAGE, MIND_READ)
 }

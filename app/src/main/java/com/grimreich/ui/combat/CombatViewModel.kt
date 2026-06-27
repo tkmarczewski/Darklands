@@ -16,7 +16,8 @@ data class CombatUiState(
     val combat: CombatState = CombatState(),
     val party: List<Hero> = emptyList(),
     val potions: List<Item> = emptyList(),
-    val availableSkills: List<com.grimreich.core.CombatSkill> = emptyList()
+    val availableSkills: List<com.grimreich.core.CombatSkill> = emptyList(),
+    val worldStability: Int = 100
 )
 
 @HiltViewModel
@@ -32,17 +33,13 @@ class CombatViewModel @Inject constructor(
     init {
         gameRepository.gameState
             .onEach { state ->
-                val hero = state.party.find { it.id == state.activeHeroId }
                 _uiState.update { 
                     it.copy(
                         combat = state.combat,
                         party = state.party,
                         potions = state.inventory.filter { it.type == "potion" },
-                        availableSkills = com.grimreich.systems.SkillCatalogue.allSkills.filter { skill ->
-                            // Basic filter: only show melee for knights/mercs, etc.
-                            // In a real system we would check hero.abilities
-                            true 
-                        }
+                        availableSkills = com.grimreich.systems.SkillCatalogue.allSkills,
+                        worldStability = state.world.globalStability
                     )
                 }
             }
