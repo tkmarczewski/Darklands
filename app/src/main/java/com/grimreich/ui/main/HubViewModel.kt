@@ -5,16 +5,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.grimreich.core.GameRepository
 import com.grimreich.core.Hero
-import com.grimreich.systems.QuestSystem
+import com.grimreich.systems.QuestEngine
 import com.grimreich.systems.VisualContentSystem
 import com.grimreich.world.CityCatalogue
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.*
 import javax.inject.Inject
 
 data class HubUiState(
@@ -34,7 +29,7 @@ data class HubUiState(
 @HiltViewModel
 class HubViewModel @Inject constructor(
     private val gameRepository: GameRepository,
-    private val questSystem: QuestSystem,
+    private val questEngine: QuestEngine,
     private val cityCatalogue: CityCatalogue,
     private val visualContentSystem: VisualContentSystem,
     private val endingSystem: com.grimreich.systems.EndingSystem
@@ -52,10 +47,10 @@ class HubViewModel @Inject constructor(
     init {
         gameRepository.gameState
             .onEach { state ->
-                val currentCityId = rawIdToSlug(state.grimCurrentRegion)
+                val currentCityId = state.grimCurrentRegion
                 val city = cityCatalogue.get(currentCityId)
-                val active = state.quest.activeQuests.mapNotNull { questSystem.getQuest(it) }
-                val expeditionCount = active.count { it.cityId == currentCityId && it.isOutsideCity }
+                val activeCount = state.quest.activeQuestIds.size
+                val expeditionCount = questEngine.getActiveQuestsForCity(currentCityId).size
                 val stability = state.world.globalStability
 
                 _uiState.update { 
@@ -64,7 +59,7 @@ class HubViewModel @Inject constructor(
                         day = state.world.day,
                         timeOfDay = state.world.timeOfDay,
                         gold = state.gold,
-                        activeQuestsCount = active.size,
+                        activeQuestsCount = activeCount,
                         expeditionQuestsCount = expeditionCount,
                         party = state.party.toList(),
                         worldStability = stability,
@@ -75,13 +70,5 @@ class HubViewModel @Inject constructor(
                 }
             }
             .launchIn(viewModelScope)
-    }
-
-    private fun rawIdToSlug(rawId: String): String {
-        return rawId.lowercase()
-            .replace("ą", "a").replace("ć", "c").replace("ę", "e")
-            .replace("ł", "l").replace("ń", "n").replace("ó", "o")
-            .replace("ś", "s").replace("ź", "z").replace("ż", "z")
-            .replace(" ", "_")
     }
 }

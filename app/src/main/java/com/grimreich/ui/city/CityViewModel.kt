@@ -7,9 +7,9 @@ import com.grimreich.world.CityCatalogue
 import com.grimreich.systems.SocialEventSystem
 import com.grimreich.world.ProceduralNpcGenerator
 import com.grimreich.grimreich.v1.NPC
-import com.grimreich.systems.QuestSystem
-import com.grimreich.systems.QuestStatus
-import com.grimreich.systems.QuestEntry
+import com.grimreich.systems.QuestEngine
+import com.grimreich.systems.QuestDefinition
+import com.grimreich.core.QuestStatus
 import com.grimreich.core.GameConstants
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
@@ -22,7 +22,7 @@ data class CityUiState(
     val backgroundDrawable: String = "bg_region_north_coast",
     val activeQuestsCount: Int = 0,
     val npcs: List<NPC> = emptyList(),
-    val activeLocalQuests: List<QuestEntry> = emptyList(),
+    val activeLocalQuests: List<QuestDefinition> = emptyList(),
     val isQuestMenuOpen: Boolean = false,
     val isGlitchActive: Boolean = false,
     val priceModifier: Float = 1.0f,
@@ -34,7 +34,7 @@ data class CityUiState(
 @HiltViewModel
 class CityViewModel @Inject constructor(
     private val gameRepository: GameRepository,
-    private val questSystem: QuestSystem,
+    private val questEngine: QuestEngine,
     private val cityCatalogue: CityCatalogue,
     private val npcGenerator: ProceduralNpcGenerator,
     private val socialEventSystem: SocialEventSystem,
@@ -47,77 +47,27 @@ class CityViewModel @Inject constructor(
     init {
         gameRepository.gameState
             .onEach { state ->
-                val rawId = state.grimCurrentRegion
-                val cityId = rawIdToSlug(rawId)
+                val cityId = state.grimCurrentRegion
                 val cityData = cityCatalogue.get(cityId)
                 
-                val localActiveUrban = state.quest.activeQuests
-                    .mapNotNull { questSystem.getQuest(it) }
-                    .filter { it.cityId == cityId && !it.isOutsideCity }
-                
+                val localQuests = questEngine.getActiveQuestsForCity(cityId)
                 val generatedNpcs = npcGenerator.generateForCity(cityId, state)
 
                 val stability = state.world.globalStability
-                val isCorrupted = stability < GameConstants.STABILITY_THRESHOLD_LOW
                 val isGrim20 = stability < 35
 
-                // Calculate Glitch Intensity based on echo and stability
-                val baseGlitch = if (ontologicalEngine.isGlitchActive()) 1.2f else 0f
-                val stabilityFactor = (100 - stability) / 100f // 0.0 to 1.0
-                val finalGlitchIntensity = (baseGlitch + state.world.echoIntensity + stabilityFactor * 2f).coerceAtMost(5f)
-
-                val bg = if (isCorrupted && cityData?.corruptedBackgroundDrawable != null) {
-                    cityData.corruptedBackgroundDrawable
-                } else {
-                    cityData?.backgroundDrawable ?: "bg_region_north_coast"
-                }
-
-                val transformedCityName = if (isGrim20) {
-                    "KRYPTA_PROCESU_${cityId.uppercase().take(3)}_${cityId.hashCode().toString().takeLast(4)}"
-                } else {
-                    (cityData?.name ?: "Nieznane Miejsce").uppercase()
-                }
-
-                val transformedCityStatus = if (isGrim20) {
-                    "OSTRZEŻENIE: Spójność danych krytycznie niska. Próba odzyskania narracji... NIEPOWODZENIE. Lokacja oznaczona przez Skrybę jako 'DO WYMAZANIA'."
-                } else {
-                    (cityData?.loreDescription ?: socialEventSystem.cityAudience(cityId, null))
-                }
-
-                // Reputation-based pricing
-                val factionId = when (cityData?.rulingFaction?.lowercase()) {
-                    "zakon switu" -> "zakon"
-                    "inkwizycja" -> "inkwizycja"
-                    "klasztor milczenia" -> "milczenie"
-                    else -> null
-                }
-                var baseModifier = cityData?.priceModifier ?: 1.0f
-                var currentStanding = com.grimreich.grimreich.v1.ReputationLevel.NEUTRAL
-                factionId?.let { fid ->
-                    val score = state.reputation.globalFactions[fid] ?: 0
-                    val level = com.grimreich.grimreich.v1.ReputationLevel.fromScore(score)
-                    currentStanding = level
-                    baseModifier *= when (level) {
-                        com.grimreich.grimreich.v1.ReputationLevel.EXALTED -> 0.8f // 20% discount
-                        com.grimreich.grimreich.v1.ReputationLevel.FRIENDLY -> 0.9f // 10% discount
-                        com.grimreich.grimreich.v1.ReputationLevel.HOSTILE -> 1.2f // 20% markup
-                        com.grimreich.grimreich.v1.ReputationLevel.HATED -> 1.5f // 50% markup
-                        else -> 1.0f
-                    }
-                }
+                val finalGlitchIntensity = (state.world.echoIntensity + (100 - stability) / 50f).coerceAtMost(5f)
 
                 _uiState.update { 
                     it.copy(
-                        cityName = transformedCityName,
-                        cityStatus = transformedCityStatus,
-                        backgroundDrawable = bg,
-                        activeQuestsCount = localActiveUrban.size,
+                        cityName = if (isGrim20) "KRYPTA_PROCESU" else cityData?.name ?: "Nieznane",
+                        cityStatus = cityData?.loreDescription ?: socialEventSystem.cityAudience(cityId, stability),
+                        backgroundDrawable = cityData?.backgroundDrawable ?: "bg_region_north_coast",
+                        activeQuestsCount = localQuests.size,
                         npcs = generatedNpcs,
-                        activeLocalQuests = localActiveUrban,
+                        activeLocalQuests = localQuests,
                         isGlitchActive = finalGlitchIntensity > 0.5f,
-                        priceModifier = baseModifier,
                         glitchIntensity = finalGlitchIntensity,
-                        factionStanding = currentStanding,
                         rulingFactionName = cityData?.rulingFaction ?: "Neutralna"
                     )
                 }
@@ -131,29 +81,20 @@ class CityViewModel @Inject constructor(
 
     fun startDialogue(name: String, role: String, node: String, onStart: () -> Unit) {
         val state = gameRepository.currentState()
-        val cityId = rawIdToSlug(state.grimCurrentRegion)
+        val cityId = state.grimCurrentRegion
         
-        // Redirect to report back if any quest for this NPC/role is ready for reward
-        val questToReport = state.quest.activeQuests
-            .mapNotNull { questSystem.getQuest(it) }
-            .find { it.cityId == cityId && it.originRefId.lowercase() == role.lowercase() && it.status == QuestStatus.CEL_OSIAGNIETY }
+        // CHECK FOR QUEST COMPLETION (OBJECTIVE_MET)
+        val questToComplete = state.quest.progress.values.find {
+            val def = questEngine.getDefinition(it.questId)
+            it.status == QuestStatus.OBJECTIVE_MET && def?.cityId == cityId && def.originNpcId.lowercase() == role.lowercase()
+        }
 
-        val targetNode = if (questToReport != null) {
+        val targetNode = if (questToComplete != null) {
             when (role.lowercase()) {
-                "guard", "straznik" -> "guard_report_back"
-                "merchant", "kupiec" -> "merchant_report_back"
-                "mystic", "mistyk" -> "mystic_report_back"
-                "zealot", "pielgrzym" -> "zealot_report_back"
+                "guard" -> "guard_report_back"
+                "merchant" -> "merchant_report_back"
+                "mystic" -> "mystic_report_back"
                 else -> "quest_report_back_generic"
-            }
-        } else if (state.world.globalStability < 25 || (state.reputation.globalFactions[role.lowercase()] ?: 0) >= 100) {
-            // Hero Arc Resolution
-            when (role.lowercase()) {
-                "mira" -> "mira_final"
-                "ferrun" -> "ferrun_final"
-                "noctyros" -> "noctyros_final"
-                "aelion" -> "aelion_final" // I'll add this too
-                else -> node
             }
         } else node
 
@@ -161,36 +102,15 @@ class CityViewModel @Inject constructor(
             s.pendingDialogueNpcName = name
             s.pendingDialogueNpcRole = role
             s.pendingDialogueNodeId = targetNode
-            if (questToReport != null) {
-                s.pendingQuestId = "FINALIZE:${questToReport.id}"
+            if (questToComplete != null) {
+                s.pendingQuestId = "FINALIZE:${questToComplete.questId}"
             }
         }
         onStart()
     }
 
-    fun selectQuestAndOpenDialogue(quest: QuestEntry, onDialogue: () -> Unit) {
+    fun selectQuestAndOpenDialogue(quest: QuestDefinition, onDialogue: () -> Unit) {
         toggleQuestMenu(false)
-        val node = when (quest.id) {
-            "q_blood_icon" -> "blood_icon_start"
-            "q_doorless_tower" -> "mystic_tower_info"
-            else -> when (quest.originRefId) {
-                "guard" -> "guard_start"
-                "merchant" -> "merchant_start"
-                "zealot" -> "zealot_start"
-                "mystic" -> "mystic_start"
-                "aelion" -> "aelion_start"
-                else -> "mystic_start"
-            }
-        }
-        startDialogue(quest.originRefId.uppercase(), quest.originRefId, node, onDialogue)
-    }
-
-    private fun rawIdToSlug(rawId: String): String {
-        // Fix(OBS-02): use Normalizer instead of brittle manual character mapping
-        val normalized = Normalizer.normalize(rawId, Normalizer.Form.NFD)
-        return normalized
-            .replace(Regex("\\p{InCombiningDiacriticalMarks}+"), "")
-            .lowercase()
-            .replace(" ", "_")
+        startDialogue(quest.originNpcId.uppercase(), quest.originNpcId, "${quest.originNpcId}_start", onDialogue)
     }
 }

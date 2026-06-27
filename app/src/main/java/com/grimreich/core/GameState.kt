@@ -25,7 +25,7 @@ data class GameState(
     val logEntries: MutableList<String> = mutableListOf(),
     var gold: Int = 100,
 
-    val quest: QuestState = QuestState(),
+    var quest: QuestState = QuestState(),
     val reputation: ReputationState = ReputationState(),
     val prayer: PrayerState = PrayerState(),
     val world: WorldState = WorldState(),

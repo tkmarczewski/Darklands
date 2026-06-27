@@ -11,28 +11,38 @@ data class PersistentMetaDto(
 )
 
 @Serializable
-data class SessionStateDto(
-    val version: Int = 1,
+data class QuestProgressDto(
+    val questId: String,
+    val status: String,
+    val currentStepIndex: Int,
+    val variables: Map<String, Int>
+)
 
+@Serializable
+data class QuestStateDto(
+    val activeQuestIds: List<String> = emptyList(),
+    val completedQuestIds: List<String> = emptyList(),
+    val progress: Map<String, QuestProgressDto> = emptyMap()
+)
+
+@Serializable
+data class SessionStateDto(
+    val version: Int = 2,
     val playerName: String? = null,
-    val heroName: String? = null, // Hero name field
+    val heroName: String? = null,
     val characterNameLocked: Boolean = false,
     val metaAwarenessLevel: Int = 0,
-
     val grimCurrentRegion: String = "wybrzeze_polnocne",
-    val grimPendingExpeditionName: String? = null,
     val pendingQuestId: String? = null,
     val pendingDialogueNpcName: String? = null,
     val pendingDialogueNpcRole: String? = null,
     val pendingDialogueNodeId: String? = null,
-
     val party: List<HeroDto> = emptyList(),
     val hireableHeroes: List<HeroDto> = emptyList(),
     val activeHeroId: String? = null,
     val inventory: List<ItemDto> = emptyList(),
     val logEntries: List<String> = emptyList(),
     val gold: Int = 0,
-
     val quest: QuestStateDto = QuestStateDto(),
     val reputation: ReputationStateDto = ReputationStateDto(),
     val prayer: PrayerStateDto = PrayerStateDto(),
@@ -86,16 +96,6 @@ data class ItemDto(
     val rarity: String,
     val lore: String? = null,
     val effects: Map<String, Int>
-)
-
-@Serializable
-data class QuestStateDto(
-    val activeQuests: List<String> = emptyList(),
-    val completedQuests: List<String> = emptyList(),
-    val objectivesReached: List<String> = emptyList(),
-    val questProgress: Map<String, Int> = emptyMap(),
-    val activeEndgameQuests: List<String> = emptyList(),
-    val completedEndgameQuests: List<String> = emptyList()
 )
 
 @Serializable

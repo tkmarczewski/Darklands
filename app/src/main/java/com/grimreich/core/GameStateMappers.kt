@@ -10,7 +10,6 @@ fun GameState.toDto(): SessionStateDto = SessionStateDto(
     characterNameLocked = characterNameLocked,
     metaAwarenessLevel = metaAwarenessLevel,
     grimCurrentRegion = grimCurrentRegion,
-    grimPendingExpeditionName = grimPendingExpeditionName,
     pendingQuestId = pendingQuestId,
     pendingDialogueNpcName = pendingDialogueNpcName,
     pendingDialogueNpcRole = pendingDialogueNpcRole,
@@ -39,7 +38,6 @@ fun SessionStateDto.toDomain(): GameState = GameState(
     characterNameLocked = characterNameLocked,
     metaAwarenessLevel = metaAwarenessLevel,
     grimCurrentRegion = grimCurrentRegion,
-    grimPendingExpeditionName = grimPendingExpeditionName,
     pendingQuestId = pendingQuestId,
     pendingDialogueNpcName = pendingDialogueNpcName,
     pendingDialogueNpcRole = pendingDialogueNpcRole,
@@ -151,21 +149,30 @@ fun ItemDto.toDomain(): Item = Item(
 )
 
 fun QuestState.toDto(): QuestStateDto = QuestStateDto(
-    activeQuests = activeQuests,
-    completedQuests = completedQuests,
-    objectivesReached = objectivesReached.toList(),
-    questProgress = questProgress,
-    activeEndgameQuests = activeEndgameQuests,
-    completedEndgameQuests = completedEndgameQuests
+    activeQuestIds = activeQuestIds.toList(),
+    completedQuestIds = completedQuestIds.toList(),
+    progress = progress.mapValues { it.value.toDto() }
 )
 
 fun QuestStateDto.toDomain(): QuestState = QuestState().also {
-    it.activeQuests.addAll(activeQuests)
-    it.completedQuests.addAll(completedQuests)
-    it.objectivesReached.addAll(objectivesReached)
-    it.questProgress.putAll(questProgress)
-    it.activeEndgameQuests.addAll(activeEndgameQuests)
-    it.completedEndgameQuests.addAll(completedEndgameQuests)
+    it.activeQuestIds.addAll(activeQuestIds)
+    it.completedQuestIds.addAll(completedQuestIds)
+    it.progress.putAll(progress.mapValues { entry -> entry.value.toDomain() })
+}
+
+fun QuestProgress.toDto(): QuestProgressDto = QuestProgressDto(
+    questId = questId,
+    status = status.name,
+    currentStepIndex = currentStepIndex,
+    variables = variables
+)
+
+fun QuestProgressDto.toDomain(): QuestProgress = QuestProgress(
+    questId = questId,
+    status = QuestStatus.valueOf(status),
+    currentStepIndex = currentStepIndex
+).also {
+    it.variables.putAll(variables)
 }
 
 fun ReputationState.toDto(): ReputationStateDto = ReputationStateDto(

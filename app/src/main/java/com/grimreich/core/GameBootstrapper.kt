@@ -2,7 +2,8 @@ package com.grimreich.core
 
 import com.grimreich.systems.DialogueManager
 import com.grimreich.systems.HeroPool
-import com.grimreich.systems.QuestSystem
+import com.grimreich.systems.QuestEngine
+import com.grimreich.systems.QuestManifest
 import com.grimreich.world.CityCatalogue
 import com.grimreich.world.ItemCatalogue
 import kotlinx.coroutines.Dispatchers
@@ -13,7 +14,8 @@ import javax.inject.Singleton
 @Singleton
 class GameBootstrapper @Inject constructor(
     private val gameRepository: GameRepository,
-    private val questSystem: QuestSystem,
+    private val questEngine: QuestEngine,
+    private val questManifest: QuestManifest,
     private val dialogueManager: DialogueManager,
     private val cityCatalogue: CityCatalogue,
     private val itemCatalogue: ItemCatalogue,
@@ -34,8 +36,7 @@ class GameBootstrapper @Inject constructor(
         
         itemCatalogue.seed()
         
-        questSystem.clear()
-        questSystem.seedIntegratedContent(seed = (System.currentTimeMillis() % 1000).toInt())
+        questManifest.seed() // Seed definitions into engine
         
         dialogueManager.seedBasicDialogues()
         
@@ -67,9 +68,6 @@ class GameBootstrapper @Inject constructor(
         state.world.location = cityCatalogue.startingCityId
         state.grimCurrentRegion = cityCatalogue.startingCityId
         state.gold = GameConstants.INITIAL_GOLD
-
-        // Ralwing is no longer added by default here. 
-        // He will be available via Dev Menu or recruitment if desired.
 
         // Initial pool of recruits
         state.hireableHeroes.addAll(HeroPool.generatePool(state.grimCurrentRegion, GameConstants.MAX_RECRUITS_POOL_SIZE))
