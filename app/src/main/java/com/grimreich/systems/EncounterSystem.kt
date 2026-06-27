@@ -85,7 +85,7 @@ class EncounterSystem @Inject constructor(
             EncounterType.INTERACTIVE,
             listOf(
                 EncounterChoice("[Charisma 13] Uspokój dziecko", "Rzeczywistość odzyskuje ostrość.", "charisma", 13) { s ->
-                    s.party.forEach { h -> h.sanity += 10 }
+                    s.party.forEach { h -> h.hp = (h.hp + 10).coerceAtMost(h.maxHp) }
                     "Dziewczynka uśmiecha się. Odzyskaliście spokój ducha."
                 },
                 EncounterChoice("[Perception 15] Zbadaj niebo", "Widzisz błękitny kod.", "perception", 15) { s ->
@@ -101,6 +101,7 @@ class EncounterSystem @Inject constructor(
 
     fun rollEncounter(random: Random, state: GameState): Encounter? {
         // --- FACTION RAIDS ---
+        // Logic fix: Factions are indexed by their names in ReputationSystem
         val hostileFactions = state.reputation.globalFactions.filter { it.value <= -50 }.keys
         if (hostileFactions.isNotEmpty() && random.nextFloat() < 0.2f) {
             val factionId = hostileFactions.toList().random(random)
@@ -111,12 +112,11 @@ class EncounterSystem @Inject constructor(
                 type = EncounterType.COMBAT,
                 choices = listOf(
                     EncounterChoice("Walcz o życie!", "Rozpoczyna się brutalne starcie.") { s ->
-                        val (name, hp, atk) = when(factionId) {
-                            "inkwizycja" -> Triple("Egzekutor Inkwizycji", 70, 15)
-                            "zakon" -> Triple("Mściciel Zakonu", 65, 14)
+                        val (name, hp, atk) = when(factionId.uppercase()) {
+                            "CHURCH", "INKWIZYCJA" -> Triple("Egzekutor Inkwizycji", 70, 15)
+                            "KNIGHTS", "ZAKON" -> Triple("Mściciel Zakonu", 65, 14)
                             else -> Triple("Zabójca Frakcyjny", 60, 12)
                         }
-                        // This return is just a log, the actual combat start is handled in ViewModel
                         "POJEDYNEK:$name:$hp:$atk" 
                     }
                 )
@@ -124,7 +124,7 @@ class EncounterSystem @Inject constructor(
         }
 
         if (random.nextFloat() > 0.3f) return null
-        return encounters.random()
+        return encounters.random(random)
     }
 
     fun selectEncounter(encounter: Encounter) {

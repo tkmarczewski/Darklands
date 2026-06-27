@@ -214,6 +214,19 @@ object Bestiary {
         lootTable = LootTable(goldMin = 5, goldMax = 20),
         xpReward = 10
     )
+    
+    // New: Scale enemy to specific level or world ontological intensity
+    fun scaleToLevel(enemy: Enemy, level: Int, echoIntensity: Float = 0f): Enemy {
+        val multiplier = 1.0f + (level - 1) * 0.1f + (echoIntensity * 0.5f)
+        return enemy.copy(
+            stats = enemy.stats.copy(
+                maxHp = (enemy.stats.maxHp * multiplier).toInt(),
+                attack = (enemy.stats.attack * multiplier).toInt(),
+                defense = (enemy.stats.defense * multiplier).toInt()
+            ),
+            xpReward = (enemy.xpReward * multiplier).toInt()
+        )
+    }
 }
 
 // ────────── ENCOUNTER DEFINITIONS ─────────────────────────────────────────

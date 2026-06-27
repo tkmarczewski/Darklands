@@ -53,6 +53,8 @@ class QuestEngine @Inject constructor(
     fun advanceStep(questId: String) {
         gameRepository.updateState { state ->
             val p = state.quest.progress[questId] ?: return@updateState
+            if (p.status != QuestStatus.ACTIVE) return@updateState // Guard: only advance active quests
+
             val def = registry[questId] ?: return@updateState
             
             if (p.currentStepIndex < def.steps.size - 1) {

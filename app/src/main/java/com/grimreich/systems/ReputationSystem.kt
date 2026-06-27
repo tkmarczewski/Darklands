@@ -27,6 +27,11 @@ class ReputationSystem @Inject constructor(
             val current = factions[faction.name] ?: 0
             val next = (current + delta).coerceIn(-100, 100)
             factions[faction.name] = next
+            
+            // Logic fix: Update global factions as well
+            val globalCurrent = s.reputation.globalFactions[faction.name] ?: 0
+            s.reputation.globalFactions[faction.name] = (globalCurrent + delta / 2).coerceIn(-100, 100)
+
             result = next
         }
         return result

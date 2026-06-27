@@ -1,5 +1,6 @@
 package com.grimreich.core
 
+import com.grimreich.systems.SkillCatalogue
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.random.Random
@@ -121,7 +122,8 @@ class CombatRound @Inject constructor(
 
     fun resolveRound(
         attacker: CombatantState,
-        defender: CombatantState
+        defender: CombatantState,
+        skillId: String? = null
     ): RoundResult {
         val log = mutableListOf<String>()
 
@@ -130,7 +132,26 @@ class CombatRound @Inject constructor(
             return RoundResult(0, 0, attacker.morale, defender.morale, WoundType.NONE, WoundType.NONE, log)
         }
 
-        val dmgToDefender = resolveAttack(attacker, defender, log)
+        // Logic fix: Integration of specific skill effects
+        val skill = SkillCatalogue.allSkills.find { it.id == skillId }
+        val dmgToDefender = if (skill != null) {
+            // Check costs
+            if (attacker.endurance >= skill.staminaCost) {
+                attacker.endurance -= skill.staminaCost
+                log.add("${attacker.name} używa ${skill.name}!")
+                val msg = skill.effect(attacker, defender)
+                log.add(msg)
+                // We estimate damage for RoundResult based on HP change or internal logic
+                // Simple implementation: assume skill effect might modify defender HP directly
+                0 // Damage reporting in RoundResult might be redundant if skill.effect logs it
+            } else {
+                log.add("${attacker.name} jest zbyt zmęczony na ${skill.name}!")
+                resolveAttack(attacker, defender, log)
+            }
+        } else {
+            resolveAttack(attacker, defender, log)
+        }
+
         val dmgToAttacker = if (!isDefeated(defender)) {
             resolveCounterAttack(attacker, defender, log)
         } else {
@@ -159,7 +180,7 @@ class CombatRound @Inject constructor(
         if (attacker.maxHp <= 0 || defender.maxHp <= 0) return 0
 
         val dodgeChance = (GrimConstants.Combat.BASE_DODGE_CHANCE +
-            (defender.agility * GrimConstants.Combat.AGILITY_DODGE_MODIFIER)).coerceAtMost(0.8f)
+            ((defender.agility - 10) * GrimConstants.Combat.AGILITY_DODGE_MODIFIER)).coerceIn(0.05f, 0.8f)
         val dodged = Random.nextFloat() < dodgeChance
 
         if (dodged) {
@@ -167,7 +188,6 @@ class CombatRound @Inject constructor(
             return 0
         }
 
-        // Logic fix: baseAttack already includes equipment bonuses from heroToCombatant mapping
         var rawAtk = attacker.attackBase + (attacker.strength / 2)
         if (defender.activeEffects.any { it.type == StatusEffectType.WET } &&
             attacker.activeEffects.any { it.type == StatusEffectType.SHOCK }) {
@@ -178,7 +198,6 @@ class CombatRound @Inject constructor(
         val attackerStatus = moraleSystem.computeStatus(attacker.morale)
         val defenderStatus = moraleSystem.computeStatus(defender.morale)
         
-        // Logic fix: Hero shield should NOT help the enemy defense roll
         val defArmor = defender.armor 
 
         val critChance = (attacker.perception * GrimConstants.Combat.PERCEPTION_CRIT_MODIFIER).coerceAtMost(0.8f)
@@ -277,7 +296,7 @@ class CombatRound @Inject constructor(
 
     private fun tryApplyStatus(attacker: CombatantState, defender: CombatantState, log: MutableList<String>) {
         val statusChance = GrimConstants.Combat.STATUS_CHANCE_BASE +
-            (attacker.intelligence * GrimConstants.Combat.STATUS_CHANCE_INT_MOD)
+            ((attacker.intelligence - 10) * GrimConstants.Combat.STATUS_CHANCE_INT_MOD)
         if (Random.nextFloat() < statusChance) {
             val effectType = StatusEffectType.entries.toTypedArray().random()
             val existing = defender.activeEffects.find { it.type == effectType }

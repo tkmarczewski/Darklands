@@ -12,38 +12,41 @@ class MutationSystem @Inject constructor(
 ) {
 
     companion object {
-        // BUG-R3-02: Hard cap on active mutations per hero to prevent unbounded stack growth
         private const val MAX_MUTATIONS = 10
-        // BUG-R3-01: Maximum value any single hero stat can reach via mutation
         private const val STAT_CAP = 99
     }
 
     fun checkForNewMutation(heroId: String, regionId: String, currentStability: Int) {
+        val state = gameRepository.currentState()
+        // Determinism fix: Seed based on hero and region for "cipher" consistency
+        val seed = heroId.hashCode().toLong() + regionId.hashCode().toLong() + state.world.day.toLong()
+        val rng = Random(seed)
+
         val mutationChance = if (currentStability < 50) 0.15f else 0.02f
         val evolutionChance = if (currentStability < 30) 0.10f else 0.03f
 
-        gameRepository.updateState { state ->
-            val hero = state.party.find { it.id == heroId } ?: return@updateState
+        gameRepository.updateState { s ->
+            val hero = s.party.find { it.id == heroId } ?: return@updateState
 
-            if (Random.nextFloat() < mutationChance) {
+            if (rng.nextFloat() < mutationChance) {
                 val available = MutationRegistry.allMutations.filter { m ->
                     hero.activeMutations.none { it.id == m.id }
                 }
 
                 if (available.isNotEmpty() && hero.activeMutations.size < MAX_MUTATIONS) {
-                    val newMutation = available.random().copy(tier = MutationTier.MANIFESTED)
+                    val newMutation = available.random(rng).copy(tier = MutationTier.MANIFESTED)
                     hero.activeMutations.add(newMutation)
                     newMutation.attributeModifiers.forEach { (attr, mod) ->
                         modifyHeroStat(hero, attr, mod)
                     }
-                    state.world.globalStability = (state.world.globalStability + newMutation.stabilityImpact)
+                    s.world.globalStability = (s.world.globalStability + newMutation.stabilityImpact)
                         .coerceIn(0, 100)
-                    state.logEntries.add("${hero.name} manifestuje nową mutację: ${newMutation.name}!")
+                    s.logEntries.add("${hero.name} manifestuje nową mutację: ${newMutation.name}!")
                 }
-            } else if (hero.activeMutations.isNotEmpty() && Random.nextFloat() < evolutionChance) {
+            } else if (hero.activeMutations.isNotEmpty() && rng.nextFloat() < evolutionChance) {
                 val evolvable = hero.activeMutations.filter { it.tier != MutationTier.TRANSCENDENT }
                 if (evolvable.isNotEmpty()) {
-                    val target = evolvable.random()
+                    val target = evolvable.random(rng)
                     val nextTier = when (target.tier) {
                         MutationTier.DORMANT -> MutationTier.MANIFESTED
                         MutationTier.MANIFESTED -> MutationTier.DOMINANT
@@ -56,7 +59,7 @@ class MutationSystem @Inject constructor(
                     if (index != -1) {
                         hero.activeMutations[index] = updated
                         applyTierBonus(hero, updated)
-                        state.logEntries.add("Mutacja ${updated.name} u ${hero.name} ewoluowała do poziomu ${updated.tier}!")
+                        s.logEntries.add("Mutacja ${updated.name} u ${hero.name} ewoluowała do poziomu ${updated.tier}!")
                     }
                 }
             }

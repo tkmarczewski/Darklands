@@ -12,9 +12,11 @@ class ExperienceSystem @Inject constructor(
         var levelsGained = 0
         var finalName = ""
         var finalLevel = 1
+        var heroFound = false
         
         gameRepository.updateState { state ->
             val hero = state.party.find { it.id == heroId } ?: return@updateState
+            heroFound = true
             finalName = hero.name
             hero.xp += amount
             
@@ -27,10 +29,12 @@ class ExperienceSystem @Inject constructor(
             finalLevel = hero.level
         }
         
+        if (!heroFound) return "Nie znaleziono bohatera."
+
         return when {
             levelsGained > 1 -> "Awans x$levelsGained! $finalName osiągnął poziom $finalLevel."
             levelsGained == 1 -> "Awans! $finalName osiągnął poziom $finalLevel."
-            else -> "Zdobyto $amount XP."
+            else -> "Zdobyto $amount XP dla $finalName."
         }
     }
 }

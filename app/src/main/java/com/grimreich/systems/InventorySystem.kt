@@ -7,8 +7,7 @@ import javax.inject.Singleton
 
 @Singleton
 class InventorySystem @Inject constructor(
-    private val gameRepository: GameRepository,
-    private val partyRepository: PartyRepository
+    private val gameRepository: GameRepository
 ) {
 
     fun equip(heroId: String, itemId: String): String {
@@ -51,7 +50,7 @@ class InventorySystem @Inject constructor(
             val rarityLabel = if (item.rarity != "normal") " [${item.rarity.uppercase()}]" else ""
             val extra = when (item.type) {
                 "weapon" -> " (ATK:${item.effects["attack"] ?: 0})"
-                "armor" -> " (DEF:${item.effects["armor"] ?: 0})" // Corrected from defense
+                "armor" -> " (DEF:${item.effects["armor"] ?: 0})"
                 "potion" -> " (HEAL:${item.effects["heal"] ?: 0})"
                 else -> " (${item.type})"
             }
@@ -70,15 +69,20 @@ class InventorySystem @Inject constructor(
     }
 
     fun transferItem(fromHeroId: String, toHeroId: String, itemId: String): String {
+        var result = ""
         gameRepository.updateState { state ->
-            val from = state.party.find { it.id == fromHeroId } ?: return@updateState
+            val from = state.party.find { it.id == fromHeroId } ?: run { result = "Brak nadawcy"; return@updateState }
+            val to = state.party.find { it.id == toHeroId } ?: run { result = "Brak odbiorcy"; return@updateState }
+            
             val equippedSlot = from.equipment.entries.firstOrNull { it.value == itemId }?.key
             if (equippedSlot != null) {
                 from.equipment[equippedSlot] = null
             }
-            state.logEntries.add("Przekazano przedmiot.")
+            
+            state.logEntries.add("Przekazano przedmiot od ${from.name} do ${to.name}.")
+            result = "Przekazano"
         }
-        return "Przekazano"
+        return result
     }
 
     fun itemDetail(itemId: String): String {

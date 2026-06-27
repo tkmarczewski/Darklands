@@ -61,6 +61,9 @@ class CombatSystem @Inject constructor(
 
     fun playerAttack(): String = resolvePlayerAction("ATTACK")
     fun playerDefend(): String = resolvePlayerAction("DEFEND")
+    
+    // New: Use specific skill
+    fun useSkill(skillId: String): String = resolvePlayerAction(skillId)
 
     fun usePotion(itemId: String): String {
         var result = ""
@@ -113,9 +116,13 @@ class CombatSystem @Inject constructor(
                 strength = c.enemyStrength
             )
 
+            // Logic fix: pass skillId if it's not "ATTACK" or "DEFEND"
+            val skillId = if (actionType != "ATTACK" && actionType != "DEFEND") actionType else null
+            
             val result = combatRound.resolveRound(
                 attacker = heroState,
-                defender = enemyState
+                defender = enemyState,
+                skillId = skillId
             )
 
             c.round++
