@@ -48,23 +48,21 @@ class GameLoopController @Inject constructor(
 
         val destinationCity = quest.cityId
 
-        val traveledState = if (playerState.currentCityId != destinationCity) {
-            travelSystem.travel(playerState.currentCityId, destinationCity, playerState.travelState).first
-        } else {
-            playerState.travelState
+        if (playerState.currentCityId != destinationCity) {
+            travelSystem.travelTo(destinationCity)
         }
 
         val updatedPlayer = playerState.copy(
-            currentCityId = destinationCity,
-            travelState = traveledState
+            currentCityId = destinationCity
         )
 
+        val worldState = gameRepository.currentState().world
         val travelScreen = TravelScreenState(
             fromCityId = playerState.currentCityId,
             toCityId = destinationCity,
-            totalHoursTraveled = traveledState.totalHoursTraveled,
-            fatigue = traveledState.fatigue,
-            lastEncounterId = traveledState.lastEncounterId
+            totalHoursTraveled = 0,
+            fatigue = worldState.fatigue,
+            lastEncounterId = null
         )
 
         return updatedPlayer to travelScreen
@@ -74,6 +72,7 @@ class GameLoopController @Inject constructor(
         playerState: PlayerState
     ): PlayerState {
         val questId = playerState.activeQuestId ?: return playerState
+        if (questEngine.getStatus(questId) != QuestStatus.OBJECTIVE_MET) return playerState
         questEngine.completeQuest(questId)
         return playerState.copy(activeQuestId = null)
     }

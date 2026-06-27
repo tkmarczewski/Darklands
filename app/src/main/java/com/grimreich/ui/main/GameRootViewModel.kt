@@ -1,14 +1,15 @@
 package com.grimreich.ui.main
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.grimreich.core.GameBootstrapper
 import com.grimreich.core.GameRepository
 import com.grimreich.core.Hero
+import com.grimreich.systems.AudioEngine
 import com.grimreich.systems.CombatSystem
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 enum class GameScreenMode {
@@ -18,24 +19,32 @@ enum class GameScreenMode {
 @HiltViewModel
 class GameRootViewModel @Inject constructor(
     val gameRepository: GameRepository,
-    val gameBootstrapper: GameBootstrapper,
-    val combatSystem: com.grimreich.systems.CombatSystem,
-    private val audioEngine: com.grimreich.systems.AudioEngine
+    private val gameBootstrapper: GameBootstrapper,
+    private val combatSystem: CombatSystem,
+    private val audioEngine: AudioEngine
 ) : ViewModel() {
 
     private val _mode = MutableStateFlow(GameScreenMode.MAIN_MENU)
     val mode: StateFlow<GameScreenMode> = _mode.asStateFlow()
 
-    private val _inspectedHero = MutableStateFlow<Hero?>(null)
-    val inspectedHero: StateFlow<Hero?> = _inspectedHero.asStateFlow()
+    private val _inspectedHeroId = MutableStateFlow<String?>(null)
+    val inspectedHero: StateFlow<Hero?> = combine(gameRepository.gameState, _inspectedHeroId) { state, id ->
+        id?.let { state.party.find { h -> h.id == it } }
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), null)
 
     init {
-        audioEngine.playForRoute(GameScreenMode.MAIN_MENU.name.lowercase())
+        // Audio handled externally
     }
 
-    fun setMode(newMode: GameScreenMode) {
-        _mode.value = newMode
-        audioEngine.playForRoute(newMode.name.lowercase())
+    fun setMode(mode: GameScreenMode) {
+        _mode.value = mode
+    }
+
+    fun startNewGame() {
+        viewModelScope.launch {
+            gameBootstrapper.bootstrapFreshWorld()
+            setMode(GameScreenMode.HUB)
+        }
     }
 
     fun restoreSessionIfValid(): Boolean {
@@ -47,32 +56,25 @@ class GameRootViewModel @Inject constructor(
     }
 
     fun inspectHero(heroId: String) {
-        val hero = gameRepository.currentState().party.find { it.id == heroId }
-        _inspectedHero.value = hero
+        _inspectedHeroId.value = heroId
         setMode(GameScreenMode.CHAR_DETAIL)
     }
 
     fun upgradeStat(heroId: String, stat: String) {
         gameRepository.updateState { state ->
-            val hero = state.party.find { it.id == heroId }
-            if (hero != null && hero.attributePoints > 0) {
-                when (stat) {
-                    "STR" -> hero.strength++
-                    "AGI" -> hero.agility++
-                    "PER" -> hero.perception++
-                    "INT" -> hero.intelligence++
-                    "END" -> {
-                        hero.endurance++
-                        hero.maxHp += 2 
-                        hero.hp += 2
-                    }
-                    "CHA" -> hero.charisma++
-                    "PIE" -> hero.piety++
-                }
+            val hero = state.party.find { it.id == heroId } ?: return@updateState
+            if (hero.attributePoints > 0) {
                 hero.attributePoints--
-                if (_inspectedHero.value?.id == heroId) {
-                    _inspectedHero.value = hero.copy()
+                when (stat.lowercase()) {
+                    "strength", "siła" -> hero.strength++
+                    "agility", "zręczność" -> hero.agility++
+                    "intelligence", "inteligencja" -> hero.intelligence++
+                    "endurance", "wytrzymałość" -> hero.endurance++
+                    "perception", "percepcja" -> hero.perception++
+                    "charisma", "charyzma" -> hero.charisma++
+                    "piety", "pobożność" -> hero.piety++
                 }
+                state.logEntries.add("${hero.name} rozwija swoją naturę: $stat +1.")
             }
         }
     }

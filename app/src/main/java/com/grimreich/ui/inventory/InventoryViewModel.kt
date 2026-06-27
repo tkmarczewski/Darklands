@@ -1,15 +1,13 @@
 package com.grimreich.ui.inventory
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.grimreich.core.GameRepository
 import com.grimreich.core.Hero
 import com.grimreich.grimreich.v1.Item
 import com.grimreich.systems.InventorySystem
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.*
 import javax.inject.Inject
 
 data class InventoryUiState(
@@ -27,13 +25,17 @@ class InventoryViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(InventoryUiState())
     val uiState: StateFlow<InventoryUiState> = _uiState.asStateFlow()
 
+    private var selectedHeroId: String? = null
+
     init {
-        refresh()
+        gameRepository.gameState
+            .onEach { refresh() }
+            .launchIn(viewModelScope)
     }
 
     fun selectHero(heroId: String) {
-        val hero = gameRepository.currentState().party.find { it.id == heroId }
-        _uiState.update { it.copy(activeHero = hero) }
+        selectedHeroId = heroId
+        refresh()
     }
 
     fun selectItem(item: Item?) {
@@ -41,24 +43,25 @@ class InventoryViewModel @Inject constructor(
     }
 
     fun equipItem() {
-        val hero = _uiState.value.activeHero ?: return
+        val heroId = selectedHeroId ?: gameRepository.currentState().activeHeroId ?: return
         val item = _uiState.value.selectedItem ?: return
-        inventorySystem.equip(hero.id, item.id)
-        refresh()
+        inventorySystem.equip(heroId, item.id)
     }
 
     fun unequipItem(slot: String) {
-        val hero = _uiState.value.activeHero ?: return
-        inventorySystem.unequip(hero.id, slot)
-        refresh()
+        val heroId = selectedHeroId ?: gameRepository.currentState().activeHeroId ?: return
+        inventorySystem.unequip(heroId, slot)
     }
 
     fun refresh() {
         val state = gameRepository.currentState()
+        val heroId = selectedHeroId ?: state.activeHeroId
+        val hero = state.party.find { it.id == heroId }
+        
         _uiState.update { 
             it.copy(
-                inventory = state.inventory.toList(),
-                activeHero = if (it.activeHero != null) state.party.find { h -> h.id == it.activeHero.id } else null
+                activeHero = hero,
+                inventory = state.inventory
             )
         }
     }

@@ -15,43 +15,32 @@ class CollapseEngine @Inject constructor(
     var activeScenario: CollapseScenario? = null
 
     fun tick() {
-        val g = gameRepository.currentState()
-        // Fix: clamp collapseProgress to [0.0, 1.0] to prevent overflow
-        g.world.collapseProgress = (g.world.collapseProgress + 0.01f).coerceAtMost(1.0f)
+        gameRepository.updateState { state ->
+            state.world.collapseProgress = (state.world.collapseProgress + 0.01f).coerceAtMost(1.0f)
 
-        if (g.world.collapseProgress > 0.5f && activeScenario == null) {
-            activeScenario = decideScenario()
+            if (state.world.collapseProgress > 0.5f && activeScenario == null) {
+                activeScenario = decideScenario(state.prayer.faith, state.world.globalStability)
+            }
+
+            activeScenario?.let { scenario ->
+                when (scenario) {
+                    CollapseScenario.MIST_OBLIVION -> {
+                        state.world.echoIntensity = (state.world.echoIntensity + 0.02f).coerceAtMost(1.0f)
+                    }
+                    CollapseScenario.BLOOD_RUIN -> {
+                        state.party.forEach { h -> h.hp = (h.hp - 1).coerceAtLeast(0) }
+                    }
+                    else -> {}
+                }
+            }
         }
-
-        applyScenarioEffects()
-        gameRepository.persistCurrentState()
     }
 
-    private fun decideScenario(): CollapseScenario {
-        val s = gameRepository.currentState()
-        val faith = s.prayer.faith
+    private fun decideScenario(faith: Int, stability: Int): CollapseScenario {
         return when {
             faith > 70 -> CollapseScenario.FULLNESS_ASCENSION
-            s.world.globalStability < 30 -> CollapseScenario.CHAOS_DOMINION
-            else -> CollapseScenario.values().random()
-        }
-    }
-
-    private fun applyScenarioEffects() {
-        activeScenario?.let {
-            when (it) {
-                CollapseScenario.MIST_OBLIVION -> {
-                    val state = gameRepository.currentState()
-                    // Fix: clamp echoIntensity to [0.0, 1.0] to prevent unbounded growth
-                    state.world.echoIntensity = (state.world.echoIntensity + 0.02f).coerceAtMost(1.0f)
-                }
-                CollapseScenario.BLOOD_RUIN -> {
-                    val state = gameRepository.currentState()
-                    // Fix: clamp hero HP to >= 0 on each tick
-                    state.party.forEach { h -> h.hp = (h.hp - 1).coerceAtLeast(0) }
-                }
-                else -> {}
-            }
+            stability < 30 -> CollapseScenario.CHAOS_DOMINION
+            else -> CollapseScenario.entries.toTypedArray().random()
         }
     }
 }

@@ -9,8 +9,9 @@ class OtherSideSystem @Inject constructor(
     private val gameRepository: GameRepository
 ) {
     fun enterOtherSide() {
-        val g = gameRepository.currentState()
-        g.world.echoIntensity += 0.1f
-        gameRepository.persistCurrentState()
+        gameRepository.updateState { s ->
+            s.world.echoIntensity = (s.world.echoIntensity + 0.1f).coerceAtMost(1.0f)
+            s.logEntries.add("Brama do Drugiej Strony uchylona. Echo gęstnieje.")
+        }
     }
 }

@@ -90,7 +90,7 @@ fun GameNavHost(
     NavHost(navController = navController, startDestination = GameRoute.MainMenu.route) {
         composable(GameRoute.MainMenu.route) {
             MainMenuScreen(
-                onNewGame = { root.setMode(GameScreenMode.PLAYER_IDENTITY) }, 
+                onNewGame = { root.startNewGame() },
                 onContinue = { root.restoreSessionIfValid() },
                 onExit = { /* exit app */ },
                 onDevMenu = { root.setMode(GameScreenMode.DEV_MENU) }

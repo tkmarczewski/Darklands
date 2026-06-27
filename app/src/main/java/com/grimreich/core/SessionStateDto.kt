@@ -1,7 +1,6 @@
 package com.grimreich.core
 
 import kotlinx.serialization.Serializable
-import com.grimreich.core.mutations.MutationDto
 
 @Serializable
 data class PersistentMetaDto(
@@ -14,8 +13,8 @@ data class PersistentMetaDto(
 data class QuestProgressDto(
     val questId: String,
     val status: String,
-    val currentStepIndex: Int,
-    val variables: Map<String, Int>
+    val currentStepIndex: Int = 0,
+    val variables: Map<String, Int> = emptyMap()
 )
 
 @Serializable
@@ -27,7 +26,7 @@ data class QuestStateDto(
 
 @Serializable
 data class SessionStateDto(
-    val version: Int = 2,
+    val version: Int = 3,
     val playerName: String? = null,
     val heroName: String? = null,
     val characterNameLocked: Boolean = false,
@@ -42,7 +41,7 @@ data class SessionStateDto(
     val activeHeroId: String? = null,
     val inventory: List<ItemDto> = emptyList(),
     val logEntries: List<String> = emptyList(),
-    val gold: Int = 0,
+    val gold: Int = 100,
     val quest: QuestStateDto = QuestStateDto(),
     val reputation: ReputationStateDto = ReputationStateDto(),
     val prayer: PrayerStateDto = PrayerStateDto(),
@@ -78,11 +77,37 @@ data class HeroDto(
     val portraitRes: String,
     val hp: Int,
     val maxHp: Int,
+    val isDead: Boolean = false,
     val activeMutations: List<MutationDto> = emptyList(),
     val currentCareer: String? = null,
     val trait: String? = null,
     val skills: Map<String, Int> = emptyMap(),
-    val equipment: Map<String, String?> = emptyMap()
+    val equipment: Map<String, String?> = emptyMap(),
+    val careerHistory: List<CareerEntryDto> = emptyList(),
+    val abilities: List<AbilityDto> = emptyList()
+)
+
+@Serializable
+data class CareerEntryDto(
+    val careerName: String,
+    val levelReached: Int,
+    val dateReached: Long
+)
+
+@Serializable
+data class AbilityDto(
+    val id: String,
+    val name: String,
+    val type: String
+)
+
+@Serializable
+data class MutationDto(
+    val id: String,
+    val name: String,
+    val tier: String,
+    val attributeModifiers: Map<String, Int>,
+    val stabilityImpact: Int
 )
 
 @Serializable
@@ -90,12 +115,12 @@ data class ItemDto(
     val id: String,
     val name: String,
     val type: String,
-    val slot: String?,
-    val value: Int,
-    val weight: Double,
-    val rarity: String,
+    val slot: String? = null,
+    val value: Int = 0,
+    val weight: Double = 0.0,
+    val rarity: String = "COMMON",
     val lore: String? = null,
-    val effects: Map<String, Int>
+    val effects: Map<String, Int> = emptyMap()
 )
 
 @Serializable
@@ -114,15 +139,15 @@ data class PrayerStateDto(
 
 @Serializable
 data class WorldStateDto(
-    val region: String = "",
-    val location: String = "",
+    val region: String = "Pogranicze",
+    val location: String = "wybrzeze_polnocne",
     val day: Int = 1,
-    val timeOfDay: String = "",
+    val timeOfDay: String = "morning",
     val fatigue: Int = 0,
     val lastEncounter: String = "",
-    val season: String = "",
+    val season: String = "AUTUMN",
     val globalStability: Int = 100,
-    val weather: String = "",
+    val weather: String = "CLEAR",
     val echoIntensity: Float = 0f,
     val collapseProgress: Float = 0f,
     val ontologicalLevel: Int = 0,
@@ -134,18 +159,25 @@ data class WorldStateDto(
 @Serializable
 data class CombatStateDto(
     val active: Boolean = false,
-    val round: Int = 0,
+    val round: Int = 1,
     val enemyName: String = "",
     val enemyHp: Int = 0,
     val enemyMaxHp: Int = 0,
     val enemyAttack: Int = 0,
     val enemyDefense: Int = 0,
-    val enemyAgility: Int = 0,
-    val enemyIntelligence: Int = 0,
-    val enemyStrength: Int = 0,
+    val enemyAgility: Int = 10,
+    val enemyIntelligence: Int = 10,
+    val enemyStrength: Int = 10,
     val enemyEffects: List<StatusEffectDto> = emptyList(),
     val heroEffects: List<StatusEffectDto> = emptyList(),
     val log: List<String> = emptyList()
+)
+
+@Serializable
+data class StatusEffectDto(
+    val type: String,
+    val duration: Int,
+    val magnitude: Int
 )
 
 @Serializable
@@ -157,11 +189,4 @@ data class NpcDto(
     val personality: String = "Normal",
     val startNodeId: String? = null,
     val stability: Float = 1.0f
-)
-
-@Serializable
-data class StatusEffectDto(
-    val type: String,
-    val duration: Int,
-    val magnitude: Int
 )

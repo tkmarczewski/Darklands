@@ -15,7 +15,8 @@ data class CityData(
     val loreDescription: String = "",
     val primaryArtifact: String = "",
     val events: MutableList<String> = mutableListOf(),
-    val prophet: String? = null
+    val prophet: String? = null,
+    val marketStock: List<String> = emptyList()
 )
 
 @Singleton
@@ -54,7 +55,8 @@ class CityCatalogue @Inject constructor() {
                 Mówi się, że pod wodami zatoki wciąż biją dzwony zatopionych katedr, a ich dźwięk słychać tylko w snach. 
                 Zakon Świtu pilnuje tutaj latarni, które nie świecą światłem, lecz Nadzieją.
             """.trimIndent(),
-            prophet = "Aelion"
+            prophet = "Aelion",
+            marketStock = listOf("ing_herb", "pot_heal", "pot_sanity")
         ))
 
         // 2. RÓWNINY KORONNE
@@ -73,7 +75,8 @@ class CityCatalogue @Inject constructor() {
                 Opowieści głoszą, że każde ziarno zboża, które tu wyrośnie, kosztowało kroplę krwi dawnego króla. 
                 Wiatr niesie tu szepty poległych armii, a Inkwizycja patroluje trakty, szukając tych, których krew 'pamięta za dużo'.
             """.trimIndent(),
-            prophet = "Xyrel"
+            prophet = "Xyrel",
+            marketStock = listOf("ing_bone", "ing_red_dust", "pot_str")
         ))
 
         // 3. TWIERDZA ZAKONU
@@ -92,7 +95,8 @@ class CityCatalogue @Inject constructor() {
                 W murach Twierdzy cisza jest głośniejsza od krzyku. 
                 Każdy kamień został tu pobłogosławiony przez Pierwszego Sędziego, by opierał się naporowi Drugiej Strony.
             """.trimIndent(),
-            prophet = "Silentius"
+            prophet = "Silentius",
+            marketStock = listOf("pot_heal", "pot_mana")
         ))
 
         // 4. SERCE KRAINY
@@ -110,7 +114,8 @@ class CityCatalogue @Inject constructor() {
                 W Sercu Krainy rzeczywistość jest elastyczna – odbicia w lustrach mogą wyjść na zewnątrz, jeśli nikt ich nie pilnuje. 
                 Klasztor Milczenia strzeże Wielkiego Zwierciadła, w którym podobno widać projektantów tego świata, piszących nasze losy piórami z echa.
             """.trimIndent(),
-            prophet = "Mira"
+            prophet = "Mira",
+            marketStock = listOf("ing_blue_dust", "pot_sanity")
         ))
 
         // 5. POŁUDNIOWE RUINY
@@ -128,7 +133,8 @@ class CityCatalogue @Inject constructor() {
                 Tutaj czas stanął w miejscu w momencie największej katastrofy. 
                 Wędrowcy twierdzą, że cienie w Ruinach mają własne plany i potrafią kraść wspomnienia tym, którzy zbyt długo patrzą w blask Luny.
             """.trimIndent(),
-            prophet = "Sereth"
+            prophet = "Sereth",
+            marketStock = listOf("ing_bone", "pot_heal")
         ))
 
         // 6. GÓRY POŁUDNIOWE
@@ -145,7 +151,8 @@ class CityCatalogue @Inject constructor() {
                 W Górach grawitacja wydaje się mieć inne zasady – krew płynie wolniej, a grzechy ważą więcej. 
                 Górnicy wydobywają tu nie tylko kruszec, lecz 'Gęstą Ciemność', z której wykuwa się broń zdolną ranić byty z Drugiej Strony.
             """.trimIndent(),
-            prophet = "Ferrun"
+            prophet = "Ferrun",
+            marketStock = listOf("ing_red_dust", "ing_yellow_dust")
         ))
 
         // 7. POGRANICZE STEPOWE
@@ -163,7 +170,8 @@ class CityCatalogue @Inject constructor() {
                 Wioski są tu rzadkością, a ludzie, którzy tu zostali, często mówią w językach, których nikt nie rozumie – językach kodu i echa. 
                 Noctyros, strażnik Pęknięcia, twierdzi, że stepy to tylko margines w wielkiej księdze.
             """.trimIndent(),
-            prophet = "Noctyros"
+            prophet = "Noctyros",
+            marketStock = listOf("ing_feather", "ing_blue_dust")
         ))
 
         // 8. ZIEMIE DZIKIE
@@ -181,7 +189,8 @@ class CityCatalogue @Inject constructor() {
                 To strefa zero każdej nowej anomalii. 
                 Prawo tu nie sięga, a jedyną walutą jest przetrwanie. 
                 Mówi się, że w samym sercu Dzikich Ziem rośnie Drzewo Echa, które karmi się historiami tych, którzy nigdy z nich nie wrócili.
-            """.trimIndent()
+            """.trimIndent(),
+            marketStock = listOf("ing_herb", "ing_feather", "ing_bone")
         ))
     }
 }

@@ -1,8 +1,8 @@
 package com.grimreich.systems
 
 import android.content.Context
+import android.widget.Toast
 import com.grimreich.core.GameRepository
-import com.grimreich.ui.UiUtils
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.random.Random
@@ -11,48 +11,45 @@ import kotlin.random.Random
 class RandomEventManager @Inject constructor(
     private val gameRepository: GameRepository
 ) {
-
     fun triggerCityEvent(context: Context) {
-        if (Random.nextInt(100) > 40) return
-
-        val event = cityEvents.random()
-        applyEventEffects(event)
-
-        (context as? android.app.Activity)?.runOnUiThread {
-            UiUtils.showNarrativePopup(context, "MIEJSKIE WIEŚCI", event.description)
+        if (Random.nextFloat() < 0.15f) {
+            val event = cityEvents.random()
+            applyEventEffects(event)
+            Toast.makeText(context, "WYDARZENIE: ${event.description}", Toast.LENGTH_LONG).show()
         }
     }
 
     fun triggerTravelEvent(context: Context) {
-        val event = travelEvents.random()
-        applyEventEffects(event)
-
-        (context as? android.app.Activity)?.runOnUiThread {
-            UiUtils.showNarrativePopup(context, "WYDARZENIE W PODRÓŻY", event.description)
+        if (Random.nextFloat() < 0.25f) {
+            val event = travelEvents.random()
+            applyEventEffects(event)
+            Toast.makeText(context, "PODRÓŻ: ${event.description}", Toast.LENGTH_LONG).show()
         }
     }
 
     fun triggerHubEvent(context: Context) {
-        if (Random.nextInt(100) > 30) return
-
-        val event = cityEvents.random()
-        applyEventEffects(event)
-
-        (context as? android.app.Activity)?.runOnUiThread {
-            UiUtils.showNarrativePopup(context, "ECHA HUB'U", event.description)
+        // High stability reduces hub event chance
+        val stability = gameRepository.currentState().world.globalStability
+        val chance = if (stability < 40) 0.2f else 0.05f
+        
+        if (Random.nextFloat() < chance) {
+            val event = travelEvents.random()
+            applyEventEffects(event)
+            Toast.makeText(context, "MIEJSCE POSTOJU: ${event.description}", Toast.LENGTH_LONG).show()
         }
     }
 
     private fun applyEventEffects(event: GameEvent) {
-        val state = gameRepository.currentState()
-        state.world.globalStability += event.stabilityDelta
-        state.gold += event.goldDelta
-        state.party.forEach {
-            it.hp = (it.hp + event.hpDelta).coerceIn(0, it.maxHp)
-            it.sanity = (it.sanity + event.sanityDelta).coerceIn(0, 100)
-            it.morale = (it.morale + event.moraleDelta).coerceIn(0, 100)
+        gameRepository.updateState { s ->
+            s.world.globalStability = (s.world.globalStability + event.stabilityDelta).coerceIn(0, 100)
+            s.gold = (s.gold + event.goldDelta).coerceAtLeast(0)
+            s.party.forEach { hero ->
+                hero.hp = (hero.hp + event.hpDelta).coerceIn(0, hero.maxHp)
+                hero.sanity = (hero.sanity + event.sanityDelta).coerceIn(0, 100)
+                hero.morale = (hero.morale + event.moraleDelta).coerceIn(0, 100)
+            }
+            s.logEntries.add("Zdarzenie: ${event.description}")
         }
-        gameRepository.persistCurrentState()
     }
 
     data class GameEvent(
@@ -65,22 +62,18 @@ class RandomEventManager @Inject constructor(
     )
 
     private val cityEvents = listOf(
-        GameEvent("Uliczny kaznodzieja krzyczy o nadchodzącym wymazaniu. Jego słowa budzą niepokój.", sanityDelta = -5),
-        GameEvent("Znalazłeś porzuconą sakiewkę w cieniu pękniętego muru.", goldDelta = 25),
-        GameEvent("Lokalna straż wymusza 'podatek za istnienie'.", goldDelta = -15),
-        GameEvent("Poczułeś nagły przypływ wiary patrząc na symbol Proroka.", sanityDelta = 10, moraleDelta = 5),
-        GameEvent("Widziałeś jak szczur zmienił się w pył na Twoich oczach. Rzeczywistość pęka.", stabilityDelta = -2, sanityDelta = -3),
-        GameEvent("Ktoś zostawił ciepły posiłek na progu karczmy. Zjedliście go w milczeniu.", hpDelta = 5),
-        GameEvent("Słyszysz śpiew dochodzący z wnętrza studni. Jest piękny i przerażający.", sanityDelta = -10, stabilityDelta = -1),
-        GameEvent("Kupiec pomylił się przy wydawaniu reszty na Twoją korzyść.", goldDelta = 10),
-        GameEvent("Mgła wdarła się do miasta wcześniej niż zwykle.", moraleDelta = -10)
+        GameEvent("Uliczny kaznodzieja głosi koniec świata.", sanityDelta = -5, stabilityDelta = -2),
+        GameEvent("Znaleziono porzuconą sakiewkę.", goldDelta = 25),
+        GameEvent("Mieszkańcy świętują festiwal światła.", stabilityDelta = 5, moraleDelta = 10),
+        GameEvent("Podejrzany kupiec oferuje dziwne mikstury.", sanityDelta = -2),
+        GameEvent("Warta miejska żąda opłaty za przejście.", goldDelta = -10)
     )
 
     private val travelEvents = listOf(
-        GameEvent("Znaleźliście opuszczony obóz. W popiele wciąż tli się żar.", sanityDelta = -2, goldDelta = 5),
-        GameEvent("Napadła was wataha wychudzonych wilków.", hpDelta = -6, moraleDelta = -5),
-        GameEvent("Spotkaliście pielgrzyma, który pobłogosławił waszą drogę.", sanityDelta = 5, moraleDelta = 5),
-        GameEvent("Most był częściowo zawalony. Straciliście czas i siły.", hpDelta = -3, stabilityDelta = -1),
-        GameEvent("W ruinach kapliczki odnaleźliście drobne kosztowności.", goldDelta = 20)
+        GameEvent("Odpoczynek przy czystym źródle.", hpDelta = 10, moraleDelta = 5),
+        GameEvent("Napad zbójców na szlaku!", hpDelta = -5, goldDelta = -20),
+        GameEvent("Mgła gęstnieje, tracicie orientację.", sanityDelta = -10, stabilityDelta = -5),
+        GameEvent("Spotkanie z wędrownym bardem.", moraleDelta = 15),
+        GameEvent("Odnaleziono ruiny dawnej kapliczki.", stabilityDelta = 3, goldDelta = 5)
     )
 }

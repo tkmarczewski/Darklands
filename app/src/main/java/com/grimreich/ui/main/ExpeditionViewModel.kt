@@ -54,27 +54,29 @@ class ExpeditionViewModel @Inject constructor(
 
     fun startQuest(questId: String, onCombat: () -> Unit) {
         val def = questEngine.getDefinition(questId) ?: return
-        val state = gameRepository.currentState()
-        val progress = state.quest.progress[questId] ?: return
         
-        val step = def.steps.getOrNull(progress.currentStepIndex) ?: return
-        
-        when (step.type) {
-            StepType.COMBAT -> {
-                gameRepository.updateState { s ->
-                    s.pendingQuestId = "COMBAT_WIN:$questId"
-                    s.combat.active = true
-                    s.combat.enemyName = "Abominacja questa"
-                    s.combat.enemyHp = 60
-                    s.combat.enemyMaxHp = 60
+        var shouldCombat = false
+        gameRepository.updateState { state ->
+            val progress = state.quest.progress[questId] ?: return@updateState
+            val step = def.steps.getOrNull(progress.currentStepIndex) ?: return@updateState
+            
+            when (step.type) {
+                StepType.COMBAT -> {
+                    state.pendingQuestId = "COMBAT_WIN:$questId"
+                    state.combat.active = true
+                    state.combat.enemyName = "Abominacja questa"
+                    state.combat.enemyHp = 60
+                    state.combat.enemyMaxHp = 60
+                    shouldCombat = true
                 }
-                onCombat()
-            }
-            else -> {
-                questEngine.advanceStep(questId)
-                gameRepository.log("Postęp w zadaniu: ${def.title}")
+                else -> {
+                    questEngine.advanceStep(questId)
+                    state.logEntries.add("Postęp w zadaniu: ${def.title}")
+                }
             }
         }
+        
+        if (shouldCombat) onCombat()
     }
 
     fun dismissEncounter() {
@@ -83,10 +85,12 @@ class ExpeditionViewModel @Inject constructor(
     }
 
     fun handleEncounterChoice(choice: EncounterChoice) {
-        val state = gameRepository.currentState()
-        val msg = choice.effect(state)
+        var msg = ""
+        gameRepository.updateState { state ->
+            msg = choice.effect(state)
+        }
         encounterSystem.activeEncounter = null
-        _uiState.update { it.copy(encounterLog = msg) }
+        _uiState.update { it.copy(encounterLog = msg, activeEncounter = null) }
     }
 
     override fun onCleared() {

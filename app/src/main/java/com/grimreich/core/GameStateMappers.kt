@@ -4,7 +4,7 @@ import com.grimreich.grimreich.v1.*
 import com.grimreich.core.mutations.*
 
 fun GameState.toDto(): SessionStateDto = SessionStateDto(
-    version = 2,
+    version = 3,
     playerName = playerName,
     heroName = heroName,
     characterNameLocked = characterNameLocked,
@@ -87,11 +87,14 @@ fun Hero.toDto(): HeroDto = HeroDto(
     portraitRes = portraitRes,
     hp = hp,
     maxHp = maxHp,
+    isDead = isDead,
     activeMutations = activeMutations.map { it.toDto() },
     currentCareer = currentCareer?.name,
     trait = trait?.name,
     skills = skills,
-    equipment = equipment
+    equipment = equipment,
+    careerHistory = careerHistory.map { it.toDto() },
+    abilities = abilities.map { it.toDto() }
 )
 
 fun HeroDto.toDomain(): Hero = Hero(
@@ -116,13 +119,59 @@ fun HeroDto.toDomain(): Hero = Hero(
     portraitRes = portraitRes,
     hp = hp,
     maxHp = maxHp,
+    isDead = isDead,
     currentCareer = currentCareer?.let { try { Career.valueOf(it) } catch(e: Exception) { null } },
     trait = trait?.let { try { Trait.valueOf(it) } catch(e: Exception) { null } }
 ).also {
     it.activeMutations.addAll(activeMutations.map { m -> m.toDomain() })
     it.skills.putAll(skills)
     it.equipment.putAll(equipment)
+    it.careerHistory.addAll(careerHistory.map { ce -> ce.toDomain() })
+    it.abilities.addAll(abilities.map { a -> a.toDomain() })
 }
+
+fun CareerEntryDto.toDomain(): CareerEntry = CareerEntry(
+    career = Career.valueOf(careerName),
+    yearsServed = 0 // Info lost in DTO but better than nothing
+)
+
+fun CareerEntry.toDto(): CareerEntryDto = CareerEntryDto(
+    careerName = career.name,
+    levelReached = 0,
+    dateReached = 0
+)
+
+fun AbilityDto.toDomain(): Ability = Ability(
+    id = id,
+    name = name,
+    description = "",
+    costType = try { CostType.valueOf(type) } catch(e: Exception) { CostType.NONE },
+    costValue = 0
+)
+
+fun Ability.toDto(): AbilityDto = AbilityDto(
+    id = id,
+    name = name,
+    type = costType.name
+)
+
+fun Mutation.toDto(): MutationDto = MutationDto(
+    id = id,
+    name = name,
+    tier = tier.name,
+    attributeModifiers = attributeModifiers,
+    stabilityImpact = stabilityImpact
+)
+
+fun MutationDto.toDomain(): Mutation = Mutation(
+    id = id,
+    name = name,
+    description = "",
+    category = MutationCategory.PHYSICAL,
+    tier = try { MutationTier.valueOf(tier) } catch(e: Exception) { MutationTier.MANIFESTED },
+    attributeModifiers = attributeModifiers,
+    stabilityImpact = stabilityImpact
+)
 
 fun Item.toDto(): ItemDto = ItemDto(
     id = id,

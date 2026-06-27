@@ -1,11 +1,12 @@
 package com.grimreich.ui.map
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.grimreich.core.GameRepository
 import com.grimreich.systems.TravelSystem
-import com.grimreich.systems.QuestEngine
 import com.grimreich.world.CityCatalogue
 import com.grimreich.world.CityData
+import com.grimreich.systems.QuestEngine
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import javax.inject.Inject
@@ -31,7 +32,9 @@ class WorldMapViewModel @Inject constructor(
     val uiState: StateFlow<MapUiState> = _uiState.asStateFlow()
 
     init {
-        refresh()
+        gameRepository.gameState
+            .onEach { refresh() }
+            .launchIn(viewModelScope)
     }
 
     fun selectCity(cityId: String?) {
@@ -47,7 +50,6 @@ class WorldMapViewModel @Inject constructor(
     fun refresh() {
         val state = gameRepository.currentState()
         
-        // Use QuestEngine to get counts per city
         val counts = cityCatalogue.all().associate { city ->
             city.id to questEngine.getActiveQuestsForCity(city.id).size
         }

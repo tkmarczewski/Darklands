@@ -1,21 +1,20 @@
 package com.grimreich.ui.city
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.grimreich.core.GameRepository
 import com.grimreich.world.CityCatalogue
 import com.grimreich.world.ItemCatalogue
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.*
 import javax.inject.Inject
+import java.text.Normalizer
 
 data class MarketItem(
     val id: String,
     val name: String,
     val price: Int,
-    val sellPrice: Int = (price * 0.6f).toInt()
+    val sellPrice: Int
 )
 
 data class MarketUiState(
@@ -37,88 +36,64 @@ class MarketViewModel @Inject constructor(
     val uiState: StateFlow<MarketUiState> = _uiState.asStateFlow()
 
     init {
-        cityCatalogue.seedCanonical()
-        itemCatalogue.seed()
-        refresh()
-    }
-
-    private fun toSlug(raw: String): String {
-        val normalized = java.text.Normalizer.normalize(raw, java.text.Normalizer.Form.NFD)
-        return normalized
-            .replace(Regex("\\p{InCombiningDiacriticalMarks}+"), "")
-            .lowercase()
-            .replace(" ", "_")
+        gameRepository.gameState
+            .onEach { refresh() }
+            .launchIn(viewModelScope)
     }
 
     fun refresh() {
         val state = gameRepository.currentState()
-        val cityId = toSlug(state.grimCurrentRegion)
-        val cityData = cityCatalogue.get(cityId)
-        val modifier = cityData?.priceModifier ?: 1.0f
-
-        val forSale = itemCatalogue.all().shuffled(kotlin.random.Random(state.world.day + cityId.hashCode())).take(10).map { item ->
-            MarketItem(
-                id = item.id,
-                name = item.name,
-                price = (item.value * modifier).toInt().coerceAtLeast(1)
-            )
+        val cityId = state.grimCurrentRegion
+        val city = cityCatalogue.get(cityId)
+        
+        val stock = city?.marketStock ?: emptyList()
+        val forSale = stock.mapNotNull { itemId ->
+            itemCatalogue.get(itemId)?.let { item ->
+                MarketItem(item.id, item.name, item.value, (item.value * 0.5).toInt())
+            }
         }
 
         val toSell = state.inventory.map { item ->
-            val sellModifier = if (modifier > 1.0f) 0.5f else 0.6f // Anti-exploit: higher prices = worse sell ratio
-            MarketItem(
-                id = item.id,
-                name = item.name,
-                price = item.value,
-                sellPrice = (item.value * sellModifier * modifier).toInt().coerceAtLeast(1)
-            )
+            MarketItem(item.id, item.name, item.value, (item.value * 0.5).toInt())
         }
 
-        _uiState.update {
+        _uiState.update { 
             it.copy(
-                cityName = cityData?.name ?: "Nieznane Miasto",
+                cityName = city?.name ?: "Nieznane Miasto",
                 playerGold = state.gold,
                 itemsForSale = forSale,
-                itemsToSell = toSell,
-                errorMessage = null
+                itemsToSell = toSell
             )
         }
     }
 
     fun buy(itemId: String) {
         val state = gameRepository.currentState()
-        val item = _uiState.value.itemsForSale.find { it.id == itemId } ?: return
-        if (state.gold < item.price) {
-            _uiState.update { it.copy(errorMessage = "Za mało złota.") }
+        val item = itemCatalogue.get(itemId) ?: return
+        if (state.gold < item.value) {
+            _uiState.update { it.copy(errorMessage = "Brak złota!") }
             return
         }
-        
+
         gameRepository.updateState { s ->
-            s.gold -= item.price
-            itemCatalogue.get(itemId)?.let { s.inventory.add(it.copy()) }
-            s.logEntries.add("Zakupiono: ${item.name} za ${item.price} szt. złota.")
+            s.gold -= item.value
+            s.inventory.add(item.copy())
+            s.logEntries.add("Kupiono: ${item.name} za ${item.value} G.")
         }
-        refresh()
     }
 
     fun sell(itemId: String) {
         val state = gameRepository.currentState()
-        val index = state.inventory.indexOfFirst { it.id == itemId }
-        if (index != -1) {
-            val item = state.inventory[index]
-            val cityId = toSlug(state.grimCurrentRegion)
-            val cityData = cityCatalogue.get(cityId)
-            val modifier = cityData?.priceModifier ?: 1.0f
-            
-            val sellModifier = if (modifier > 1.0f) 0.5f else 0.6f
-            val sellPrice = (item.value * sellModifier * modifier).toInt().coerceAtLeast(1)
-            
-            gameRepository.updateState { s ->
-                s.gold += sellPrice
-                s.inventory.removeAt(index)
-                s.logEntries.add("Sprzedano: ${item.name} za $sellPrice szt. złota.")
+        val item = state.inventory.find { it.id == itemId } ?: return
+        val price = (item.value * 0.5).toInt()
+
+        gameRepository.updateState { s ->
+            val toRemove = s.inventory.find { it.id == itemId }
+            if (toRemove != null) {
+                s.inventory.remove(toRemove)
+                s.gold += price
+                s.logEntries.add("Sprzedano: ${item.name} za $price G.")
             }
-            refresh()
         }
     }
 }

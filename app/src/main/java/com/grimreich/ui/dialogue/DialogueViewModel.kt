@@ -4,7 +4,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.grimreich.core.GameRepository
 import com.grimreich.core.GameState
-import com.grimreich.core.QuestStatus
 import com.grimreich.systems.DialogueManager
 import com.grimreich.systems.QuestEngine
 import com.grimreich.grimreich.v1.DialogueNode
@@ -73,8 +72,9 @@ class DialogueViewModel @Inject constructor(
     }
 
     fun choose(choice: DialogueChoice) {
-        val state = gameRepository.currentState()
-        choice.onSelect(state)
+        gameRepository.updateState { state ->
+            choice.onSelect(state)
+        }
         
         val nextNode = dialogueManager.getNode(choice.targetNodeId)
         if (nextNode != null) {
@@ -85,8 +85,8 @@ class DialogueViewModel @Inject constructor(
                 it.pendingDialogueNodeId = null
                 it.pendingDialogueNpcName = null
                 it.pendingDialogueNpcRole = null
+                it.pendingQuestId = null
             }
         }
-        gameRepository.persistCurrentState()
     }
 }

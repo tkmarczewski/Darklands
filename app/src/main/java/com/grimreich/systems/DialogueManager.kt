@@ -1,7 +1,6 @@
 package com.grimreich.systems
 
 import com.grimreich.core.GameRepository
-import com.grimreich.core.QuestStatus
 import com.grimreich.grimreich.v1.DialogueChoice
 import com.grimreich.grimreich.v1.DialogueNode
 import dagger.Lazy
@@ -29,7 +28,6 @@ class DialogueManager @Inject constructor(
     fun getNode(id: String): DialogueNode? {
         val gameState = gameRepositoryProvider.get().currentState()
         
-        // 1. NG+ DEJA VU
         if (id.endsWith("_start") && gameState.persistentMeta.totalSessionsFinished > 0) {
             val dejavuNode = "${id}_dejavu"
             if (nodes.containsKey(dejavuNode)) {
@@ -44,9 +42,9 @@ class DialogueManager @Inject constructor(
     }
 
     fun makeChoice(choice: DialogueChoice): DialogueNode? {
-        val state = gameRepositoryProvider.get().currentState()
-        choice.onSelect(state)
-        gameRepositoryProvider.get().persistCurrentState()
+        gameRepositoryProvider.get().updateState { state ->
+            choice.onSelect(state)
+        }
 
         return if (choice.targetNodeId == "end") {
             endDialogue()
@@ -110,8 +108,10 @@ class DialogueManager @Inject constructor(
             id = "guard_report_back", npcId = "guard",
             text = "Dobra robota, Kotwico. Inkwizycja dziękuje za Twoją służbę. Oto zapłata.",
             choices = listOf(
-                DialogueChoice("Dziękuję. (ZAMKNIJ ZADANIE)", "end", onSelect = {
-                    questEngine.get().completeQuest("q_verdict_1")
+                DialogueChoice("Dziękuję. (ZAMKNIJ ZADANIE)", "end", onSelect = { state ->
+                    val qId = state.pendingQuestId?.removePrefix("FINALIZE:") ?: "q_verdict_1"
+                    questEngine.get().completeQuest(qId)
+                    state.pendingQuestId = null
                 })
             )
         ))
@@ -141,8 +141,23 @@ class DialogueManager @Inject constructor(
             id = "mystic_report_back", npcId = "mystic",
             text = "Echa ucichły. Przyjmij tę ofiarę za swój trud.",
             choices = listOf(
-                DialogueChoice("Zrozumiałem. (ZAMKNIJ ZADANIE)", "end", onSelect = {
-                    questEngine.get().completeQuest("q_blood_icon")
+                DialogueChoice("Zrozumiałem. (ZAMKNIJ ZADANIE)", "end", onSelect = { state ->
+                    val qId = state.pendingQuestId?.removePrefix("FINALIZE:") ?: "q_blood_icon"
+                    questEngine.get().completeQuest(qId)
+                    state.pendingQuestId = null
+                })
+            )
+        ))
+        
+        // 3. GENERIC REPORT BACK (BUG #4 / #21)
+        registerNode(DialogueNode(
+            id = "quest_report_back_generic", npcId = "generic",
+            text = "Dobra robota. To zadanie wymagało poświęcenia. Oto Twoja nagroda.",
+            choices = listOf(
+                DialogueChoice("Przyjmuję zapłatę. (ZAMKNIJ ZADANIE)", "end", onSelect = { state ->
+                    val qId = state.pendingQuestId?.removePrefix("FINALIZE:") ?: return@DialogueChoice
+                    questEngine.get().completeQuest(qId)
+                    state.pendingQuestId = null
                 })
             )
         ))

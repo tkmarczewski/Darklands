@@ -14,6 +14,5 @@ class WorldAIDirector @Inject constructor(
         if (state.gold > 1000) {
             stabilitySystem.updateStability(-1)
         }
-        gameRepository.persistCurrentState()
     }
 }

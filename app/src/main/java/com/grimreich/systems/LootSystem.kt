@@ -14,13 +14,15 @@ class LootSystem @Inject constructor(
 ) {
     fun rollLoot(chance: Float): Item? {
         if (Random.nextFloat() > chance) return null
-        return itemCatalogue.getRandomItem()
+        return itemCatalogue.all().randomOrNull()
     }
 
     fun awardLoot(chance: Float): String {
         val item = rollLoot(chance) ?: return ""
-        gameRepository.currentState().inventory.add(item)
-        gameRepository.persistCurrentState()
+        gameRepository.updateState { s ->
+            s.inventory.add(item.copy())
+            s.logEntries.add("Zdobyto przedmiot: ${item.name}")
+        }
         return "Zdobyto przedmiot: ${item.name}"
     }
 }

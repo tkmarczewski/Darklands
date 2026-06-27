@@ -46,11 +46,6 @@ fun RecruitmentScreen(
 ) {
     val state by viewModel.uiState.collectAsState()
 
-    // Odśwież pulę przy każdym wejściu na ekran
-    LaunchedEffect(Unit) {
-        viewModel.refresh()
-    }
-
     Column(
         modifier = Modifier
             .fillMaxSize()

@@ -9,8 +9,9 @@ class WorldSimulation2_0 @Inject constructor(
     private val gameRepository: GameRepository
 ) {
     fun simulate() {
-        val s = gameRepository.currentState()
-        s.world.day += 1
-        gameRepository.persistCurrentState()
+        gameRepository.updateState { s -> 
+            s.world.day += 1 
+            s.logEntries.add("Dzień ${s.world.day}: Symulacja świata postępuje.")
+        }
     }
 }

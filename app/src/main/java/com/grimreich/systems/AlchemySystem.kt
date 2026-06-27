@@ -1,7 +1,6 @@
 package com.grimreich.systems
 
 import com.grimreich.core.GameRepository
-import com.grimreich.grimreich.v1.Item
 import com.grimreich.world.ItemCatalogue
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -9,8 +8,8 @@ import javax.inject.Singleton
 data class Recipe(
     val id: String,
     val resultItemId: String,
-    val ingredients: Map<String, Int>, // ItemId -> Quantity
-    val minIntelligence: Int = 10
+    val ingredients: Map<String, Int>,
+    val minIntelligence: Int
 )
 
 @Singleton
@@ -19,54 +18,44 @@ class AlchemySystem @Inject constructor(
     private val itemCatalogue: ItemCatalogue
 ) {
     val recipes = listOf(
-        Recipe(
-            id = "rec_potion_hp",
-            resultItemId = "potion_hp",
-            ingredients = mapOf("ing_echo_dust" to 2, "ing_blood_root" to 1)
-        ),
-        Recipe(
-            id = "rec_potion_mana",
-            resultItemId = "potion_mana",
-            ingredients = mapOf("ing_echo_dust" to 2, "ing_mist_essence" to 1)
-        ),
-        Recipe(
-            id = "rec_potion_sanity",
-            resultItemId = "potion_sanity",
-            ingredients = mapOf("ing_mist_essence" to 2, "ing_blood_root" to 1),
-            minIntelligence = 14
-        )
+        Recipe("rec_healing", "pot_heal", mapOf("ing_herb" to 2), 10),
+        Recipe("rec_sanity", "pot_sanity", mapOf("ing_herb" to 1, "ing_blue_dust" to 1), 14),
+        Recipe("rec_strength", "pot_str", mapOf("ing_bone" to 2, "ing_red_dust" to 1), 12),
+        Recipe("rec_agility", "pot_agi", mapOf("ing_feather" to 2, "ing_yellow_dust" to 1), 12),
+        Recipe("rec_mana", "pot_mana", mapOf("ing_blue_dust" to 2), 15)
     )
 
     fun craft(recipe: Recipe, heroId: String): String {
-        val state = gameRepository.currentState()
-        val hero = state.party.find { it.id == heroId } ?: return "Brak bohatera."
+        val resultItem = itemCatalogue.get(recipe.resultItemId) ?: return "Błąd: Nie znaleziono receptury."
+        var result = ""
         
-        if (hero.intelligence < recipe.minIntelligence) {
-            return "${hero.name} nie rozumie tej formuły (wymagane INT ${recipe.minIntelligence})."
-        }
+        gameRepository.updateState { state ->
+            val hero = state.party.find { it.id == heroId }
+                ?: run { result = "Brak bohatera."; return@updateState }
 
-        // Check ingredients
-        for ((ingId, qty) in recipe.ingredients) {
-            val count = state.inventory.count { it.id == ingId }
-            if (count < qty) {
-                return "Brak składnika: ${itemCatalogue.get(ingId)?.name ?: ingId} ($count/$qty)."
+            if (hero.intelligence < recipe.minIntelligence) {
+                result = "${hero.name} nie rozumie tej formuły (wymagane INT ${recipe.minIntelligence})."
+                return@updateState
             }
-        }
-
-        // Add result
-        val resultItem = itemCatalogue.get(recipe.resultItemId) ?: return "Błąd: Nie znaleziono receptury wyjściowej."
-
-        // Remove ingredients ONLY after all validations (Round 4 Fix)
-        recipe.ingredients.forEach { (ingId, qty) ->
-            repeat(qty) {
-                val item = state.inventory.find { it.id == ingId }
-                if (item != null) state.inventory.remove(item)
+            
+            for ((ingId, qty) in recipe.ingredients) {
+                val count = state.inventory.count { it.id == ingId }
+                if (count < qty) {
+                    result = "Brak składnika: $ingId ($count/$qty)."
+                    return@updateState
+                }
             }
-        }
 
-        state.inventory.add(resultItem.copy())
-        gameRepository.log("${hero.name} uwarzył: ${resultItem.name}.")
-        gameRepository.persistCurrentState()
-        return "Sukces! Uwarzono ${resultItem.name}."
+            recipe.ingredients.forEach { (ingId, qty) ->
+                repeat(qty) {
+                    state.inventory.find { it.id == ingId }?.let { state.inventory.remove(it) }
+                }
+            }
+            state.inventory.add(resultItem.copy())
+            result = "Sukces! Uwarzono ${resultItem.name}."
+            state.logEntries.add("Alchemia: $result")
+        }
+        
+        return result
     }
 }

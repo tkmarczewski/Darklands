@@ -3,6 +3,7 @@ package com.grimreich.core
 import com.grimreich.grimreich.v1.*
 import com.grimreich.systems.DialogueManager
 import com.grimreich.systems.QuestEngine
+import com.grimreich.systems.QuestManifest
 import com.grimreich.systems.StatePersistenceManager
 import com.grimreich.world.CityCatalogue
 import com.grimreich.world.ItemCatalogue
@@ -21,6 +22,7 @@ import javax.inject.Singleton
 class GameRepository @Inject constructor(
     private val questEngineProvider: Lazy<QuestEngine>,
     private val dialogueManagerProvider: Lazy<DialogueManager>,
+    private val questManifestProvider: Lazy<QuestManifest>,
     private val persistence: StatePersistenceManager,
     private val cityCatalogue: CityCatalogue,
     private val itemCatalogue: ItemCatalogue,
@@ -28,6 +30,7 @@ class GameRepository @Inject constructor(
     private val repositoryScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
     private val questEngine get() = questEngineProvider.get()
     private val dialogueManager get() = dialogueManagerProvider.get()
+    private val questManifest get() = questManifestProvider.get()
     
     private val _gameState = MutableStateFlow(GameState())
     val gameState: StateFlow<GameState> = _gameState.asStateFlow()
@@ -59,11 +62,12 @@ class GameRepository @Inject constructor(
         cityCatalogue.seedCanonical()
         itemCatalogue.seed()
         dialogueManager.seedBasicDialogues()
+        questManifest.seed()
     }
 
     fun restoreIfAvailable(): Boolean {
         val restored = persistence.restore() ?: return false
-        if (restored.version < 2) {
+        if (restored.version < 3) {
             persistence.clear()
             return false
         }

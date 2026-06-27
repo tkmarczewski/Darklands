@@ -1,14 +1,12 @@
 package com.grimreich.ui.saints
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.grimreich.core.GameRepository
 import com.grimreich.systems.ChurchSystem
 import com.grimreich.systems.ReligionSystem
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.*
 import javax.inject.Inject
 
 data class SaintsUiState(
@@ -28,27 +26,26 @@ class SaintsViewModel @Inject constructor(
     val uiState: StateFlow<SaintsUiState> = _uiState.asStateFlow()
 
     init {
-        refresh()
+        gameRepository.gameState
+            .onEach { refresh() }
+            .launchIn(viewModelScope)
     }
 
     fun pray() {
         val hero = gameRepository.currentState().party.firstOrNull() ?: return
-        val msg = churchSystem.pray(hero)
+        val msg = churchSystem.pray(hero.id)
         updateLog(msg)
-        refresh()
     }
 
     fun makeOffering(amount: Int) {
         val msg = churchSystem.makeOffering(amount)
         updateLog(msg)
-        refresh()
     }
 
     fun cleanse() {
         val hero = gameRepository.currentState().party.firstOrNull() ?: return
-        val msg = churchSystem.cleanseRelic(hero)
+        val msg = churchSystem.cleanseRelic(hero.id)
         updateLog(msg)
-        refresh()
     }
 
     fun updateLog(msg: String) {

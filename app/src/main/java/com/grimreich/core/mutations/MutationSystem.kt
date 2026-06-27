@@ -18,85 +18,62 @@ class MutationSystem @Inject constructor(
         private const val STAT_CAP = 99
     }
 
-    fun checkForNewMutation(hero: Hero, regionId: String, currentStability: Int) {
-        // Base logic for mutation gain
-        // Stability below 50 increases chance significantly
+    fun checkForNewMutation(heroId: String, regionId: String, currentStability: Int) {
         val mutationChance = if (currentStability < 50) 0.15f else 0.02f
         val evolutionChance = if (currentStability < 30) 0.10f else 0.03f
 
-        if (Random.nextFloat() < mutationChance) {
-            val available = MutationRegistry.allMutations.filter { m ->
-                hero.activeMutations.none { it.id == m.id }
-            }
+        gameRepository.updateState { state ->
+            val hero = state.party.find { it.id == heroId } ?: return@updateState
 
-            if (available.isNotEmpty()) {
-                val newMutation = available.random().copy(tier = MutationTier.MANIFESTED)
-                applyMutation(hero, newMutation)
-                gameRepository.log("${hero.name} manifestuje nową mutację: ${newMutation.name}!")
-            }
-        } else if (hero.activeMutations.isNotEmpty() && Random.nextFloat() < evolutionChance) {
-            evolveExistingMutation(hero)
-        }
-    }
+            if (Random.nextFloat() < mutationChance) {
+                val available = MutationRegistry.allMutations.filter { m ->
+                    hero.activeMutations.none { it.id == m.id }
+                }
 
-    private fun evolveExistingMutation(hero: Hero) {
-        val evolvable = hero.activeMutations.filter { it.tier != MutationTier.TRANSCENDENT }
-        if (evolvable.isNotEmpty()) {
-            val target = evolvable.random()
-            val nextTier = when (target.tier) {
-                MutationTier.DORMANT -> MutationTier.MANIFESTED
-                MutationTier.MANIFESTED -> MutationTier.DOMINANT
-                MutationTier.DOMINANT -> MutationTier.TRANSCENDENT
-                MutationTier.TRANSCENDENT -> MutationTier.TRANSCENDENT
-            }
+                if (available.isNotEmpty() && hero.activeMutations.size < MAX_MUTATIONS) {
+                    val newMutation = available.random().copy(tier = MutationTier.MANIFESTED)
+                    hero.activeMutations.add(newMutation)
+                    newMutation.attributeModifiers.forEach { (attr, mod) ->
+                        modifyHeroStat(hero, attr, mod)
+                    }
+                    state.world.globalStability = (state.world.globalStability + newMutation.stabilityImpact)
+                        .coerceIn(0, 100)
+                    state.logEntries.add("${hero.name} manifestuje nową mutację: ${newMutation.name}!")
+                }
+            } else if (hero.activeMutations.isNotEmpty() && Random.nextFloat() < evolutionChance) {
+                val evolvable = hero.activeMutations.filter { it.tier != MutationTier.TRANSCENDENT }
+                if (evolvable.isNotEmpty()) {
+                    val target = evolvable.random()
+                    val nextTier = when (target.tier) {
+                        MutationTier.DORMANT -> MutationTier.MANIFESTED
+                        MutationTier.MANIFESTED -> MutationTier.DOMINANT
+                        MutationTier.DOMINANT -> MutationTier.TRANSCENDENT
+                        MutationTier.TRANSCENDENT -> MutationTier.TRANSCENDENT
+                    }
 
-            val updated = target.copy(tier = nextTier)
-            // Replace mutation in hero list
-            val index = hero.activeMutations.indexOfFirst { it.id == target.id }
-            if (index != -1) {
-                hero.activeMutations[index] = updated
-                // Re-apply modifiers (simplified: apply bonus for reaching next tier)
-                applyTierBonus(hero, updated)
-                gameRepository.log("Mutacja ${updated.name} u ${hero.name} ewoluowała do poziomu ${updated.tier}!")
+                    val updated = target.copy(tier = nextTier)
+                    val index = hero.activeMutations.indexOfFirst { it.id == target.id }
+                    if (index != -1) {
+                        hero.activeMutations[index] = updated
+                        applyTierBonus(hero, updated)
+                        state.logEntries.add("Mutacja ${updated.name} u ${hero.name} ewoluowała do poziomu ${updated.tier}!")
+                    }
+                }
             }
         }
     }
 
     private fun applyTierBonus(hero: Hero, mutation: Mutation) {
-        // BUG-R3-04: Cap tier bonus values to prevent runaway stat inflation
         val bonusAttr = mutation.attributeModifiers.keys.randomOrNull() ?: "strength"
         val bonusValue = when (mutation.tier) {
             MutationTier.DOMINANT -> 2
-            MutationTier.TRANSCENDENT -> 3  // Reduced from 4 to limit inflation
+            MutationTier.TRANSCENDENT -> 3
             else -> 1
         }
-
         modifyHeroStat(hero, bonusAttr, bonusValue)
     }
 
-    private fun applyMutation(hero: Hero, mutation: Mutation) {
-        // BUG-R3-02: Enforce mutation stack cap to prevent unbounded growth
-        if (hero.activeMutations.size >= MAX_MUTATIONS) {
-            gameRepository.log("${hero.name} osiągnął limit mutacji ($MAX_MUTATIONS). Nowa mutacja odrzucona.")
-            return
-        }
-
-        hero.activeMutations.add(mutation)
-
-        // Apply immediate stat changes
-        mutation.attributeModifiers.forEach { (attr, mod) ->
-            modifyHeroStat(hero, attr, mod)
-        }
-
-        // BUG-R3-03: Clamp globalStability to valid range [0, 100] after mutation impact
-        gameRepository.updateState { state ->
-            state.world.globalStability = (state.world.globalStability + mutation.stabilityImpact)
-                .coerceIn(0, 100)
-        }
-    }
-
     private fun modifyHeroStat(hero: Hero, attr: String, value: Int) {
-        // BUG-R3-01: Clamp all stats to [0, STAT_CAP] to prevent unbounded growth
         when (attr.lowercase()) {
             "strength" -> hero.strength = (hero.strength + value).coerceIn(0, STAT_CAP)
             "agility" -> hero.agility = (hero.agility + value).coerceIn(0, STAT_CAP)

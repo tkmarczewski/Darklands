@@ -47,8 +47,24 @@ data class GameState(
         pendingDialogueNpcName = pendingDialogueNpcName,
         pendingDialogueNpcRole = pendingDialogueNpcRole,
         pendingDialogueNodeId = pendingDialogueNodeId,
-        party = party.map { it.copy() }.toMutableList(),
-        hireableHeroes = hireableHeroes.map { it.copy() }.toMutableList(),
+        party = party.map { hero ->
+            hero.copy(
+                careerHistory = hero.careerHistory.toMutableList(),
+                abilities = hero.abilities.map { it.copy() }.toMutableList(),
+                skills = hero.skills.toMutableMap(),
+                activeMutations = hero.activeMutations.map { it.copy() }.toMutableList(),
+                equipment = hero.equipment.toMutableMap()
+            )
+        }.toMutableList(),
+        hireableHeroes = hireableHeroes.map { hero ->
+            hero.copy(
+                careerHistory = hero.careerHistory.toMutableList(),
+                abilities = hero.abilities.map { it.copy() }.toMutableList(),
+                skills = hero.skills.toMutableMap(),
+                activeMutations = hero.activeMutations.map { it.copy() }.toMutableList(),
+                equipment = hero.equipment.toMutableMap()
+            )
+        }.toMutableList(),
         activeHeroId = activeHeroId,
         inventory = inventory.map { it.copy() }.toMutableList(),
         logEntries = logEntries.toMutableList(),
