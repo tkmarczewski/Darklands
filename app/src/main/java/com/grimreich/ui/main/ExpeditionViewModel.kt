@@ -179,6 +179,7 @@ class ExpeditionViewModel @Inject constructor(
     private fun processExpeditionResult(result: com.grimreich.systems.ExpeditionResult, onUIAction: () -> Unit) {
         when (result) {
             is com.grimreich.systems.ExpeditionResult.StartCombat -> {
+                // Bridge back the quest ID for completion after victory
                 gameRepository.updateState { it.pendingQuestId = "COMBAT_WIN:${result.enemyId}" }
                 onUIAction()
             }

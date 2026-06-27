@@ -147,11 +147,12 @@ fun HubScreen(
                     ) {
                         val expeditionCount = state.expeditionQuestsCount
                         HubNavButton(
-                            text = if (expeditionCount > 0) "EKSPEDYCJA ($expeditionCount)" else "BRAK WYPRAW",
+                            text = if (expeditionCount > 0) "WYRUSZ NA WYPRAWĘ ($expeditionCount)" else "BRAK CELÓW",
                             modifier = Modifier.weight(1.5f),
-                            color = if (expeditionCount > 0) Color(0xFF4A6000) else Color(0xFF1A1A1A),
+                            color = if (expeditionCount > 0) Color(0xFFADFF2F) else Color(0xFF1A1A1A), // Bright lime color
                             enabled = expeditionCount > 0,
-                            onClick = onExpedition
+                            onClick = onExpedition,
+                            textColor = if (expeditionCount > 0) Color.Black else Color.DarkGray
                         )
                     }
 
@@ -208,7 +209,14 @@ fun HubScreen(
 }
 
 @Composable
-fun HubNavButton(text: String, modifier: Modifier = Modifier, color: Color = Color(0xFF1A1A1A), enabled: Boolean = true, onClick: () -> Unit) {
+fun HubNavButton(
+    text: String, 
+    modifier: Modifier = Modifier, 
+    color: Color = Color(0xFF1A1A1A), 
+    enabled: Boolean = true, 
+    textColor: Color = Color(0xFFE0C080),
+    onClick: () -> Unit
+) {
     Button(
         onClick = onClick,
         enabled = enabled,
@@ -217,7 +225,8 @@ fun HubNavButton(text: String, modifier: Modifier = Modifier, color: Color = Col
         shape = MaterialTheme.shapes.extraSmall,
         border = androidx.compose.foundation.BorderStroke(GameConstants.UI.BORDER_WIDTH, Color(0xFF333333))
     ) {
-        Text(text = text, color = if (enabled) Color(0xFFE0C080) else Color.DarkGray, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+        val finalTextColor = if (enabled) textColor else Color.DarkGray
+        Text(text = text, color = finalTextColor, fontSize = 12.sp, fontWeight = FontWeight.Bold)
     }
 }
 

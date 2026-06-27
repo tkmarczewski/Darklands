@@ -3,6 +3,8 @@ package com.grimreich.ui.city
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -116,8 +118,9 @@ fun CityScreen(
 
             Row(modifier = Modifier.weight(1f).fillMaxWidth()) {
                 // LEFT: Nav Actions
+                val scrollState = rememberScrollState()
                 Column(
-                    modifier = Modifier.width(180.dp).fillMaxHeight(),
+                    modifier = Modifier.width(180.dp).fillMaxHeight().verticalScroll(scrollState),
                     verticalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
                     CityNavBtn("POWRÓT DO HUB", onExit, color = Color(0xFF400000))

@@ -33,6 +33,14 @@ fun MainMenuScreen(
                 color = Color.Red,
                 fontSize = 48.sp,
                 fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(bottom = 8.dp)
+            )
+            
+            Text(
+                text = "Do Not Attempt to Adjust The Picture. We Are Controlling Transmission.",
+                color = Color.Gray.copy(alpha = 0.6f),
+                fontSize = 10.sp,
+                fontWeight = FontWeight.Light,
                 modifier = Modifier.padding(bottom = 32.dp)
             )
 

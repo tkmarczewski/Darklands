@@ -1,6 +1,7 @@
 package com.grimreich.systems
 
 import com.grimreich.core.*
+import dagger.Lazy
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -10,7 +11,8 @@ class CombatSystem @Inject constructor(
     private val partyRepository: PartyRepository,
     private val inventorySystem: InventorySystem,
     private val moraleSystem: MoraleSystem,
-    private val combatRound: CombatRound
+    private val combatRound: CombatRound,
+    private val questSystemProvider: Lazy<QuestSystem>
 ) {
 
     private var onCombatEnd: (() -> Unit)? = null
@@ -213,6 +215,15 @@ class CombatSystem @Inject constructor(
             c.active = false
             onCombatEnd?.invoke()
             c.log.add("${c.enemyName} pokonany!")
+            
+            // CRITICAL FIX: Signal Quest Success if this was a quest combat
+            state.pendingQuestId?.let { pending ->
+                if (pending.startsWith("COMBAT_WIN:")) {
+                    val qId = pending.removePrefix("COMBAT_WIN:")
+                    questSystemProvider.get().markObjectiveComplete(qId)
+                }
+            }
+
             // awardLoot handled by LootSystem
             val recovery = combatRound.postCombatRecovery(heroState)
             hero.hp = heroState.hp
