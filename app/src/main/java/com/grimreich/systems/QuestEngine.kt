@@ -3,7 +3,6 @@ package com.grimreich.systems
 import com.grimreich.core.GameRepository
 import com.grimreich.core.QuestStatus
 import com.grimreich.core.QuestProgress
-import com.grimreich.core.QuestState
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -43,9 +42,9 @@ class QuestEngine @Inject constructor(
 
     fun activateQuest(questId: String) {
         gameRepository.updateState { state ->
-            val p = state.quest.progress.getOrPut(questId) { QuestProgress(questId) }
-            if (p.status == QuestStatus.AVAILABLE || p.status == QuestStatus.LOCKED) {
-                p.status = QuestStatus.ACTIVE
+            val currentProgress = state.quest.progress[questId] ?: QuestProgress(questId)
+            if (currentProgress.status == QuestStatus.AVAILABLE || currentProgress.status == QuestStatus.LOCKED) {
+                state.quest.progress[questId] = currentProgress.copy(status = QuestStatus.ACTIVE)
                 state.quest.activeQuestIds.add(questId)
             }
         }
@@ -57,9 +56,9 @@ class QuestEngine @Inject constructor(
             val def = registry[questId] ?: return@updateState
             
             if (p.currentStepIndex < def.steps.size - 1) {
-                p.currentStepIndex++
+                state.quest.progress[questId] = p.copy(currentStepIndex = p.currentStepIndex + 1)
             } else {
-                p.status = QuestStatus.OBJECTIVE_MET
+                state.quest.progress[questId] = p.copy(status = QuestStatus.OBJECTIVE_MET)
             }
         }
     }
@@ -70,7 +69,7 @@ class QuestEngine @Inject constructor(
             val def = registry[questId] ?: return@updateState
             
             if (p.status == QuestStatus.OBJECTIVE_MET) {
-                p.status = QuestStatus.COMPLETED
+                state.quest.progress[questId] = p.copy(status = QuestStatus.COMPLETED)
                 state.quest.activeQuestIds.remove(questId)
                 state.quest.completedQuestIds.add(questId)
                 state.gold += def.rewardGold

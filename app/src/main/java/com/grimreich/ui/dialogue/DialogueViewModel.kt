@@ -80,7 +80,7 @@ class DialogueViewModel @Inject constructor(
         if (nextNode != null) {
             _uiState.update { it.copy(currentNode = nextNode) }
         } else {
-            // Dialogue End
+            // Dialogue End - Clear pointers
             gameRepository.updateState { 
                 it.pendingDialogueNodeId = null
                 it.pendingDialogueNpcName = null

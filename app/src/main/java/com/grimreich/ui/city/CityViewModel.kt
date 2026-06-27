@@ -3,29 +3,16 @@ package com.grimreich.ui.city
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.grimreich.core.GameRepository
+import com.grimreich.core.QuestStatus
 import com.grimreich.world.CityCatalogue
 import com.grimreich.systems.SocialEventSystem
 import com.grimreich.world.ProceduralNpcGenerator
 import com.grimreich.grimreich.v1.NPC
 import com.grimreich.systems.QuestEngine
 import com.grimreich.systems.QuestDefinition
-import com.grimreich.core.QuestStatus
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import javax.inject.Inject
-
-data class CityUiState(
-    val cityName: String = "Ładowanie...",
-    val cityStatus: String = "Skanowanie rzeczywistości...",
-    val backgroundDrawable: String = "bg_region_north_coast",
-    val activeQuestsCount: Int = 0,
-    val npcs: List<NPC> = emptyList(),
-    val activeLocalQuests: List<QuestDefinition> = emptyList(),
-    val isQuestMenuOpen: Boolean = false,
-    val isGlitchActive: Boolean = false,
-    val glitchIntensity: Float = 1.0f,
-    val rulingFactionName: String = "Neutralna"
-)
 
 @HiltViewModel
 class CityViewModel @Inject constructor(
@@ -106,3 +93,16 @@ class CityViewModel @Inject constructor(
         startDialogue(quest.originNpcId.uppercase(), quest.originNpcId, "${quest.originNpcId}_start", onDialogue)
     }
 }
+
+data class CityUiState(
+    val cityName: String = "Ładowanie...",
+    val cityStatus: String = "Skanowanie rzeczywistości...",
+    val backgroundDrawable: String = "bg_region_north_coast",
+    val activeQuestsCount: Int = 0,
+    val npcs: List<NPC> = emptyList(),
+    val activeLocalQuests: List<QuestDefinition> = emptyList(),
+    val isQuestMenuOpen: Boolean = false,
+    val isGlitchActive: Boolean = false,
+    val glitchIntensity: Float = 1.0f,
+    val rulingFactionName: String = "Neutralna"
+)

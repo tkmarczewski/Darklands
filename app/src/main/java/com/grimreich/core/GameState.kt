@@ -29,7 +29,7 @@ data class GameState(
     val prayer: PrayerState = PrayerState(),
     val world: WorldState = WorldState(),
     val combat: CombatState = CombatState(),
-    val knownNpcs: MutableMap<String, List<com.grimreich.grimreich.v1.NPC>> = mutableMapOf(),
+    val knownNpcs: MutableMap<String, List<NPC>> = mutableMapOf(),
     val unlockedLoreIds: MutableSet<String> = mutableSetOf(),
     val persistentMeta: PersistentMeta = PersistentMeta(),
     var isExpeditionActive: Boolean = false,

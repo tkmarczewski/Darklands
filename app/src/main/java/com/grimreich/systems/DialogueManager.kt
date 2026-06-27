@@ -1,11 +1,9 @@
 package com.grimreich.systems
 
 import com.grimreich.core.GameRepository
-import com.grimreich.core.GameConstants
 import com.grimreich.core.QuestStatus
 import com.grimreich.grimreich.v1.DialogueChoice
 import com.grimreich.grimreich.v1.DialogueNode
-import com.grimreich.grimreich.v1.ReputationLevel
 import dagger.Lazy
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -149,6 +147,24 @@ class DialogueManager @Inject constructor(
             )
         ))
         
-        // MIRA, AELION, FERRUN ETC... (SEED AS NEEDED)
+        // AELION
+        registerNode(DialogueNode(
+            id = "aelion_start", npcId = "aelion",
+            text = "Prorok unosi głowę. 'Mgła rzednie w Twojej obecności. Czego szukasz?'",
+            choices = listOf(
+                DialogueChoice("Chcę poznać Twoją naturę.", "aelion_secret"),
+                DialogueChoice("Żegnaj.", "end")
+            )
+        ))
+        
+        registerNode(DialogueNode(
+            id = "aelion_secret", npcId = "aelion",
+            text = "A więc widzisz znaki pod moją skórą... Rzeczywistość nie wytrzyma tej prawdy!",
+            choices = listOf(
+                DialogueChoice("Powiedz mi wszystko.", "end", onSelect = {
+                    chronicleSystem.get().unlock("lore_aelion_secret")
+                })
+            )
+        ))
     }
 }

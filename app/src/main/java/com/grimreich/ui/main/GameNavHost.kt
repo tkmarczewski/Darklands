@@ -26,9 +26,14 @@ import com.grimreich.ui.DevMenuScreen
 import com.grimreich.ui.map.WorldMapScreen
 import com.grimreich.ui.dialogue.DialogueScreen
 import com.grimreich.ui.dialogue.DialogueViewModel
+import com.grimreich.ui.main.PlayerIdentityScreen
+import com.grimreich.ui.main.CharacterCreatorScreen
+import com.grimreich.ui.alchemy.AlchemyViewModel
 
 sealed class GameRoute(val route: String) {
     object MainMenu : GameRoute("main_menu")
+    object PlayerIdentity : GameRoute("player_identity")
+    object CharacterCreator : GameRoute("character_creator")
     object Hub : GameRoute("hub")
     object WorldMap : GameRoute("world_map")
     object City : GameRoute("city")
@@ -57,6 +62,8 @@ fun GameNavHost(
     LaunchedEffect(mode) {
         val route = when (mode) {
             GameScreenMode.MAIN_MENU -> GameRoute.MainMenu.route
+            GameScreenMode.PLAYER_IDENTITY -> GameRoute.PlayerIdentity.route
+            GameScreenMode.CHARACTER_CREATOR -> GameRoute.CharacterCreator.route
             GameScreenMode.HUB -> GameRoute.Hub.route
             GameScreenMode.WORLD_MAP -> GameRoute.WorldMap.route
             GameScreenMode.CITY -> GameRoute.City.route
@@ -83,10 +90,26 @@ fun GameNavHost(
     NavHost(navController = navController, startDestination = GameRoute.MainMenu.route) {
         composable(GameRoute.MainMenu.route) {
             MainMenuScreen(
-                onNewGame = { root.setMode(GameScreenMode.HUB) }, 
+                onNewGame = { root.setMode(GameScreenMode.PLAYER_IDENTITY) }, 
                 onContinue = { root.restoreSessionIfValid() },
                 onExit = { /* exit app */ },
                 onDevMenu = { root.setMode(GameScreenMode.DEV_MENU) }
+            )
+        }
+
+        composable(GameRoute.PlayerIdentity.route) {
+            PlayerIdentityScreen(
+                onContinue = { name -> root.setMode(GameScreenMode.CHARACTER_CREATOR) },
+                onBack = { root.setMode(GameScreenMode.MAIN_MENU) },
+                viewModel = hiltViewModel()
+            )
+        }
+
+        composable(GameRoute.CharacterCreator.route) {
+            CharacterCreatorScreen(
+                onStartGame = { name, career, attrs, skills -> root.setMode(GameScreenMode.HUB) },
+                onBack = { root.setMode(GameScreenMode.PLAYER_IDENTITY) },
+                viewModel = hiltViewModel()
             )
         }
         
@@ -190,6 +213,13 @@ fun GameNavHost(
             EndingScreen(
                 viewModel = hiltViewModel(),
                 onFinish = { root.setMode(GameScreenMode.MAIN_MENU) }
+            )
+        }
+
+        composable(GameRoute.Alchemy.route) {
+            AlchemyScreen(
+                viewModel = hiltViewModel<AlchemyViewModel>(),
+                onBack = { root.setMode(GameScreenMode.CITY) }
             )
         }
     }

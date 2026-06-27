@@ -113,6 +113,7 @@ class CombatSystem @Inject constructor(
             onCombatEnd?.invoke()
             c.log.add("${c.enemyName} pokonany!")
             
+            // --- QUEST ENGINE TRIGGER ---
             state.pendingQuestId?.let { pending ->
                 if (pending.startsWith("COMBAT_WIN:")) {
                     val qId = pending.removePrefix("COMBAT_WIN:")
