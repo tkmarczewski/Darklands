@@ -10,11 +10,9 @@ import com.grimreich.grimreich.v1.NPC
 import com.grimreich.systems.QuestEngine
 import com.grimreich.systems.QuestDefinition
 import com.grimreich.core.QuestStatus
-import com.grimreich.core.GameConstants
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import javax.inject.Inject
-import java.text.Normalizer
 
 data class CityUiState(
     val cityName: String = "Ładowanie...",
@@ -25,9 +23,7 @@ data class CityUiState(
     val activeLocalQuests: List<QuestDefinition> = emptyList(),
     val isQuestMenuOpen: Boolean = false,
     val isGlitchActive: Boolean = false,
-    val priceModifier: Float = 1.0f,
     val glitchIntensity: Float = 1.0f,
-    val factionStanding: com.grimreich.grimreich.v1.ReputationLevel = com.grimreich.grimreich.v1.ReputationLevel.NEUTRAL,
     val rulingFactionName: String = "Neutralna"
 )
 
@@ -37,8 +33,7 @@ class CityViewModel @Inject constructor(
     private val questEngine: QuestEngine,
     private val cityCatalogue: CityCatalogue,
     private val npcGenerator: ProceduralNpcGenerator,
-    private val socialEventSystem: SocialEventSystem,
-    private val ontologicalEngine: com.grimreich.core.engine.OntologicalEngine
+    private val socialEventSystem: SocialEventSystem
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(CityUiState())
@@ -49,13 +44,11 @@ class CityViewModel @Inject constructor(
             .onEach { state ->
                 val cityId = state.grimCurrentRegion
                 val cityData = cityCatalogue.get(cityId)
-                
-                val localQuests = questEngine.getActiveQuestsForCity(cityId)
+                val quests = questEngine.getActiveQuestsForCity(cityId)
                 val generatedNpcs = npcGenerator.generateForCity(cityId, state)
 
                 val stability = state.world.globalStability
                 val isGrim20 = stability < 35
-
                 val finalGlitchIntensity = (state.world.echoIntensity + (100 - stability) / 50f).coerceAtMost(5f)
 
                 _uiState.update { 
@@ -63,9 +56,9 @@ class CityViewModel @Inject constructor(
                         cityName = if (isGrim20) "KRYPTA_PROCESU" else cityData?.name ?: "Nieznane",
                         cityStatus = cityData?.loreDescription ?: socialEventSystem.cityAudience(cityId, stability),
                         backgroundDrawable = cityData?.backgroundDrawable ?: "bg_region_north_coast",
-                        activeQuestsCount = localQuests.size,
+                        activeQuestsCount = quests.size,
                         npcs = generatedNpcs,
-                        activeLocalQuests = localQuests,
+                        activeLocalQuests = quests,
                         isGlitchActive = finalGlitchIntensity > 0.5f,
                         glitchIntensity = finalGlitchIntensity,
                         rulingFactionName = cityData?.rulingFaction ?: "Neutralna"
@@ -91,9 +84,8 @@ class CityViewModel @Inject constructor(
 
         val targetNode = if (questToComplete != null) {
             when (role.lowercase()) {
-                "guard" -> "guard_report_back"
-                "merchant" -> "merchant_report_back"
-                "mystic" -> "mystic_report_back"
+                "guard", "straznik" -> "guard_report_back"
+                "mystic", "mistyk" -> "mystic_report_back"
                 else -> "quest_report_back_generic"
             }
         } else node

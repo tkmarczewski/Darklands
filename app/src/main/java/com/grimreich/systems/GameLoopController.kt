@@ -9,15 +9,14 @@ import javax.inject.Singleton
 class GameLoopController @Inject constructor(
     private val gameRepository: GameRepository,
     private val gameBootstrapper: GameBootstrapper,
-    private val questSystem: QuestSystem,
-    private val questResolutionSystem: QuestResolutionSystem,
+    private val questEngine: QuestEngine,
     private val travelSystem: TravelSystem,
     private val cityCatalogue: CityCatalogue
 ) {
     private var isBootstrapping = false
 
     suspend fun bootstrap(seed: Int = 1): PlayerState {
-        if (isBootstrapping) return PlayerState() // Guard OBS-06
+        if (isBootstrapping) return PlayerState() 
         isBootstrapping = true
         try {
             gameRepository.clearSessionAndReset()
@@ -31,23 +30,21 @@ class GameLoopController @Inject constructor(
     }
 
     fun cityScreen(playerState: PlayerState): CityScreenState {
-        val quests = questSystem.availableForCity(playerState.currentCityId)
         return CityScreenState(
             cityId = playerState.currentCityId,
-            availableQuests = quests,
             gold = playerState.gold,
             activeQuestId = playerState.activeQuestId
         )
     }
 
     fun acceptQuest(playerState: PlayerState, questId: String): PlayerState {
-                if (questSystem.getQuest(questId) != null) questSystem.activate(questId)
+        questEngine.activateQuest(questId)
         return playerState.copy(activeQuestId = questId)
     }
 
     fun travelToQuest(playerState: PlayerState): Pair<PlayerState, TravelScreenState> {
         val questId = playerState.activeQuestId ?: error("Brak aktywnego zadania")
-        val quest = questSystem.all().find { it.id == questId } ?: error("Nieznane zadanie: $questId")
+        val quest = questEngine.getDefinition(questId) ?: error("Nieznane zadanie: $questId")
 
         val destinationCity = quest.cityId
 
@@ -74,41 +71,10 @@ class GameLoopController @Inject constructor(
     }
 
     fun resolveActiveQuest(
-        playerState: PlayerState,
-        faction: CityFaction = CityFaction.COMMONERS
-    ): Pair<PlayerState, ResolutionScreenState>? {
-        val questId = playerState.activeQuestId ?: return null
-        val goldBefore = playerState.gold
-
-        val reward = questResolutionSystem.completeQuestWithRewards(
-            questId = questId,
-            partyState = playerState.travelState,
-            faction = faction,
-            reputationDelta = 5
-        )
-
-        val updatedPlayer = playerState.copy(
-            gold = playerState.gold + reward.goldAwarded,
-            activeQuestId = null,
-            completedQuestIds = playerState.completedQuestIds + questId,
-            travelState = reward.updatedPartyState
-        )
-
-        val itemMsg = if (reward.itemsAwarded.isNotEmpty()) {
-            "\nZnalezione artefakty: " + reward.itemsAwarded.joinToString { it.name }
-        } else {
-            ""
-        }
-
-        val resolutionState = ResolutionScreenState(
-            questId = reward.questId,
-            cityId = reward.cityId,
-            goldBefore = goldBefore,
-            goldAfter = updatedPlayer.gold,
-            reputationAfter = reward.updatedReputation,
-            summary = "Misja zakończona w ${reward.cityId}: +${reward.goldAwarded} złota, reputacja ${reward.updatedReputation}.$itemMsg"
-        )
-
-        return updatedPlayer to resolutionState
+        playerState: PlayerState
+    ): PlayerState {
+        val questId = playerState.activeQuestId ?: return playerState
+        questEngine.completeQuest(questId)
+        return playerState.copy(activeQuestId = null)
     }
 }

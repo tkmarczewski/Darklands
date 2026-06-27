@@ -5,9 +5,9 @@ import androidx.lifecycle.viewModelScope
 import com.grimreich.core.CombatState
 import com.grimreich.core.GameRepository
 import com.grimreich.core.Hero
-import com.grimreich.systems.CombatSystem
-import com.grimreich.systems.QuestSystem
 import com.grimreich.grimreich.v1.Item
+import com.grimreich.systems.CombatSystem
+import com.grimreich.systems.QuestEngine
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import javax.inject.Inject
@@ -22,7 +22,7 @@ data class CombatUiState(
 class CombatViewModel @Inject constructor(
     private val gameRepository: GameRepository,
     private val combatSystem: CombatSystem,
-    private val questSystem: QuestSystem
+    private val questEngine: QuestEngine
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(CombatUiState())
@@ -31,11 +31,11 @@ class CombatViewModel @Inject constructor(
     init {
         gameRepository.gameState
             .onEach { state ->
-                _uiState.update {
+                _uiState.update { 
                     it.copy(
-                        combat = state.combat.copy(),
+                        combat = state.combat,
                         party = state.party.toList(),
-                        potions = state.inventory.filter { item -> item.type == "potion" }
+                        potions = state.inventory.filter { i -> i.type == "potion" }
                     )
                 }
             }
@@ -43,57 +43,25 @@ class CombatViewModel @Inject constructor(
     }
 
     fun attack() {
-        if (combatSystem.isCombatActive()) {
-            combatSystem.playerAttack()
-        }
+        combatSystem.playerAttack()
     }
 
     fun defend() {
-        if (combatSystem.isCombatActive()) {
-            combatSystem.playerDefend()
-        }
-    }
-
-    fun useSpecial(type: String) {
-        if (combatSystem.isCombatActive()) {
-            combatSystem.playerUseSpecial(type)
-        }
+        combatSystem.playerDefend()
     }
 
     fun usePotion(itemId: String) {
-        if (combatSystem.isCombatActive()) {
-            combatSystem.usePotion(itemId)
-        }
+        combatSystem.usePotion(itemId)
     }
 
-    fun useEchoSkill(type: String) {
-        if (combatSystem.isCombatActive()) {
-            combatSystem.useEchoSkill(type)
-        }
-    }
-
-    fun flee() {
-        gameRepository.updateState {
-            it.combat.active = false
-            it.combat.log.add("Uciekłeś z walki!")
-        }
+    fun useEchoSkill(skillType: String) {
+        combatSystem.useEchoSkill(skillType)
     }
 
     fun exitCombat(onExit: () -> Unit) {
         val state = gameRepository.currentState()
-        // If combat is finished (not active), handle quest completion if tied to combat
         if (!state.combat.active) {
-            state.pendingQuestId?.let { qId ->
-                if (qId.startsWith("COMBAT_WIN:")) {
-                    questSystem.markObjectiveComplete(qId.removePrefix("COMBAT_WIN:"))
-                }
-            }
-            gameRepository.updateState {
-                it.pendingQuestId = null
-                it.combat.log.clear()
-            }
             onExit()
         }
-        // If combat is still active, do not navigate away
     }
 }

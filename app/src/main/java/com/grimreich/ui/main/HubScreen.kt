@@ -3,20 +3,11 @@ package com.grimreich.ui.main
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.LinearProgressIndicator
@@ -117,9 +108,10 @@ fun HubScreen(
             Spacer(modifier = Modifier.height(GameConstants.UI.PADDING_MEDIUM))
 
             Row(modifier = Modifier.weight(1f)) {
-                // LEFT: Main Navigation Grid
+                // LEFT: Main Navigation Grid (SCROLLABLE)
+                val navScrollState = rememberScrollState()
                 Column(
-                    modifier = Modifier.weight(1.5f), 
+                    modifier = Modifier.weight(1.5f).verticalScroll(navScrollState), 
                     verticalArrangement = Arrangement.spacedBy(GameConstants.UI.PADDING_SMALL)
                 ) {
                     Row(
@@ -149,7 +141,7 @@ fun HubScreen(
                         HubNavButton(
                             text = if (expeditionCount > 0) "WYRUSZ NA WYPRAWĘ ($expeditionCount)" else "BRAK CELÓW",
                             modifier = Modifier.weight(1.5f),
-                            color = if (expeditionCount > 0) Color(0xFFADFF2F) else Color(0xFF1A1A1A), // Bright lime color
+                            color = if (expeditionCount > 0) Color(0xFFADFF2F) else Color(0xFF1A1A1A), 
                             enabled = expeditionCount > 0,
                             onClick = onExpedition,
                             textColor = if (expeditionCount > 0) Color.Black else Color.DarkGray
@@ -162,7 +154,7 @@ fun HubScreen(
                     Surface(
                         color = Color(0x40000000),
                         shape = MaterialTheme.shapes.extraSmall,
-                        modifier = Modifier.fillMaxWidth().weight(1f)
+                        modifier = Modifier.fillMaxWidth().height(100.dp)
                     ) {
                         Column(modifier = Modifier.padding(GameConstants.UI.PADDING_SMALL)) {
                             Text("STATUS ŚWIATA", color = Color.Gray, fontSize = 10.sp, fontWeight = FontWeight.Bold)
@@ -241,11 +233,11 @@ fun PartyMemberCard(hero: Hero, onClick: () -> Unit) {
         Column(modifier = Modifier.padding(GameConstants.UI.PADDING_SMALL)) {
             Text(text = hero.name, color = Color(0xFFE0C080), fontWeight = FontWeight.Bold, fontSize = 13.sp)
             LinearProgressIndicator(
-            progress = { if (hero.maxHp > 0) hero.hp.toFloat() / hero.maxHp else 0f },
-            modifier = Modifier.fillMaxWidth().height(4.dp).padding(vertical = 6.dp),
-            color = Color(0xFFB22222),
-            trackColor = Color(0xFF222222)
-        )
+                progress = { if (hero.maxHp > 0) hero.hp.toFloat() / hero.maxHp else 0f },
+                modifier = Modifier.fillMaxWidth().height(4.dp).padding(vertical = 6.dp),
+                color = Color(0xFFB22222),
+                trackColor = Color(0xFF222222)
+            )
             Text(text = "${hero.hp}/${hero.maxHp} HP", color = Color.Gray, fontSize = 10.sp)
         }
     }

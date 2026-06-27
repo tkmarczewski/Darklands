@@ -1,64 +1,45 @@
 package com.grimreich.ui.main
 
-import androidx.compose.runtime.*
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.grimreich.core.GameBootstrapper
-import com.grimreich.core.GameState
-import com.grimreich.core.Hero
-import com.grimreich.core.Career
-import com.grimreich.core.HeroSkill
-import com.grimreich.grimreich.v1.Item
-import com.grimreich.systems.DialogueManager
+import com.grimreich.ui.main.HubScreen
+import com.grimreich.ui.main.MainMenuScreen
+import com.grimreich.ui.main.ExpeditionScreen
 import com.grimreich.ui.city.CityScreen
-import com.grimreich.ui.city.CityViewModel
 import com.grimreich.ui.city.MarketScreen
-import com.grimreich.ui.city.MarketViewModel
 import com.grimreich.ui.combat.CombatScreen
-import com.grimreich.ui.combat.CombatViewModel
+import com.grimreich.ui.tavern.TavernScreen
+import com.grimreich.ui.tavern.RecruitmentScreen
+import com.grimreich.ui.alchemy.AlchemyScreen
+import com.grimreich.ui.quests.QuestJournalScreen
+import com.grimreich.ui.inventory.InventoryScreen
+import com.grimreich.ui.ritual.RitualScreen
+import com.grimreich.ui.main.EndingScreen
+import com.grimreich.ui.DevMenuScreen
+import com.grimreich.ui.map.WorldMapScreen
 import com.grimreich.ui.dialogue.DialogueScreen
 import com.grimreich.ui.dialogue.DialogueViewModel
-import com.grimreich.ui.inventory.InventoryScreen
-import com.grimreich.ui.inventory.InventoryViewModel
-import com.grimreich.ui.map.WorldMapScreen
-import com.grimreich.ui.map.WorldMapViewModel
-import com.grimreich.ui.quests.QuestJournalScreen
-import com.grimreich.ui.quests.QuestJournalViewModel
-import com.grimreich.ui.saints.SaintsScreen
-import com.grimreich.ui.saints.SaintsViewModel
-import com.grimreich.ui.tavern.TavernScreen
-import com.grimreich.ui.tavern.TavernViewModel
-import com.grimreich.ui.tavern.RecruitmentScreen
-import com.grimreich.ui.DevMenuScreen
-import com.grimreich.ui.ritual.RitualScreen
-import com.grimreich.ui.main.ChronicleScreen
-import com.grimreich.ui.alchemy.AlchemyScreen
-import com.grimreich.ui.alchemy.AlchemyViewModel
-import com.grimreich.systems.RitualSystem
-import kotlinx.coroutines.launch
-import java.util.*
 
 sealed class GameRoute(val route: String) {
     object MainMenu : GameRoute("main_menu")
-    object PlayerIdentity : GameRoute("player_identity")
-    object CharacterCreator : GameRoute("character_creator")
     object Hub : GameRoute("hub")
-    object WorldMap : GameRoute("map")
+    object WorldMap : GameRoute("world_map")
     object City : GameRoute("city")
     object Market : GameRoute("market")
     object Alchemy : GameRoute("alchemy")
     object Combat : GameRoute("combat")
     object Tavern : GameRoute("tavern")
-    object Temple : GameRoute("temple")
     object Dialogue : GameRoute("dialogue")
     object Quests : GameRoute("quests")
     object Recruit : GameRoute("recruit")
     object Inventory : GameRoute("inventory")
-    object CharDetail : GameRoute("char_detail")
     object Chronicle : GameRoute("chronicle")
     object Expedition : GameRoute("expedition")
     object DevMenu : GameRoute("dev_menu")
@@ -72,245 +53,129 @@ fun GameNavHost(
     navController: NavHostController = rememberNavController()
 ) {
     val mode by root.mode.collectAsState()
-    val scope = rememberCoroutineScope()
-
-    // Global listener for death to redirect to Ritual
-    LaunchedEffect(Unit) {
-        root.gameRepository.gameState.collect { state ->
-            val activeHero = state.party.find { it.id == state.activeHeroId }
-            if (activeHero?.isDead == true && root.mode.value != GameScreenMode.RITUAL) {
-                root.setMode(GameScreenMode.RITUAL)
-            }
-        }
-    }
 
     LaunchedEffect(mode) {
-        val target = when (mode) {
+        val route = when (mode) {
             GameScreenMode.MAIN_MENU -> GameRoute.MainMenu.route
-            GameScreenMode.PLAYER_IDENTITY -> GameRoute.PlayerIdentity.route
-            GameScreenMode.CHARACTER_CREATOR -> GameRoute.CharacterCreator.route
             GameScreenMode.HUB -> GameRoute.Hub.route
             GameScreenMode.WORLD_MAP -> GameRoute.WorldMap.route
             GameScreenMode.CITY -> GameRoute.City.route
             GameScreenMode.MARKET -> GameRoute.Market.route
+            GameScreenMode.ALCHEMY -> GameRoute.Alchemy.route
             GameScreenMode.COMBAT -> GameRoute.Combat.route
             GameScreenMode.TAVERN -> GameRoute.Tavern.route
-            GameScreenMode.TEMPLE -> GameRoute.Temple.route
             GameScreenMode.DIALOGUE -> GameRoute.Dialogue.route
             GameScreenMode.QUESTS -> GameRoute.Quests.route
             GameScreenMode.RECRUIT -> GameRoute.Recruit.route
             GameScreenMode.INVENTORY -> GameRoute.Inventory.route
-            GameScreenMode.CHAR_DETAIL -> GameRoute.CharDetail.route
-            GameScreenMode.WORLD_LOG -> GameRoute.Chronicle.route
-            GameScreenMode.EVENTS -> GameRoute.Expedition.route
+            GameScreenMode.CHRONICLE -> GameRoute.Chronicle.route
+            GameScreenMode.EXPEDITION -> GameRoute.Expedition.route
             GameScreenMode.DEV_MENU -> GameRoute.DevMenu.route
             GameScreenMode.RITUAL -> GameRoute.Ritual.route
             GameScreenMode.ENDING -> GameRoute.Ending.route
-            else -> null
+            else -> GameRoute.MainMenu.route
         }
-        
-        if (target != null && navController.currentBackStackEntry?.destination?.route != target) {
-            navController.navigate(target) {
-                launchSingleTop = true
-                restoreState = true
-                if (mode == GameScreenMode.MAIN_MENU || mode == GameScreenMode.HUB) {
-                    popUpTo(navController.graph.startDestinationId) { inclusive = (mode == GameScreenMode.MAIN_MENU) }
-                }
-            }
+        navController.navigate(route) {
+            popUpTo(0)
         }
     }
+
     NavHost(navController = navController, startDestination = GameRoute.MainMenu.route) {
         composable(GameRoute.MainMenu.route) {
-            val context = LocalContext.current
             MainMenuScreen(
-                onNewGame = {
-                    root.gameRepository.clearSessionAndReset()
-                    root.setMode(GameScreenMode.PLAYER_IDENTITY)
-                },
-                onContinue = {
-                    root.restoreSessionIfValid()
-                },
-                onExit = { (context as? android.app.Activity)?.finish() },
+                onNewGame = { root.setMode(GameScreenMode.HUB) }, 
+                onContinue = { root.restoreSessionIfValid() },
+                onExit = { /* exit app */ },
                 onDevMenu = { root.setMode(GameScreenMode.DEV_MENU) }
             )
         }
-        composable(GameRoute.PlayerIdentity.route) {
-            PlayerIdentityScreen(
-                onContinue = { name ->
-                    root.gameRepository.currentState().playerName = name
-                    root.setMode(GameScreenMode.CHARACTER_CREATOR)
-                },
-                onBack = { root.setMode(GameScreenMode.MAIN_MENU) }
-            )
-        }
-        composable(GameRoute.CharacterCreator.route) {
-            CharacterCreatorScreen(
-                onStartGame = { name, career, attrs, skills ->
-                    scope.launch {
-                        val repo = root.gameRepository
-                        val existingPlayerName = repo.currentState().playerName
-                        
-                        root.gameBootstrapper.bootstrapFreshWorld(seed = 1)
-                        val state = repo.currentState()
-                        state.playerName = existingPlayerName
-                        state.heroName = name
-                        
-                        val hero = Hero(
-                            id = "player_hero_${UUID.randomUUID()}",
-                            name = name,
-                            age = 25,
-                            strength = attrs["Str"] ?: 10,
-                            agility = attrs["Agi"] ?: 10,
-                            perception = attrs["Per"] ?: 10,
-                            intelligence = attrs["Int"] ?: 10,
-                            endurance = attrs["End"] ?: 10,
-                            charisma = attrs["Cha"] ?: 10,
-                            piety = attrs["Pie"] ?: 10,
-                            hp = (attrs["End"] ?: 10) * 2 + 20,
-                            maxHp = (attrs["End"] ?: 10) * 2 + 20,
-                            currentCareer = career
-                        )
-                        skills.forEach { hero.skills[it.displayName] = 30 }
-                        
-                        state.party.add(hero)
-                        state.activeHeroId = hero.id
-                        
-                        repo.persistCurrentState()
-                        root.setMode(GameScreenMode.HUB)
-                    }
-                },
-                onBack = { root.setMode(GameScreenMode.PLAYER_IDENTITY) }
-            )
-        }
+        
         composable(GameRoute.Hub.route) {
             HubScreen(
                 viewModel = hiltViewModel(),
-                onMap = { root.setMode(GameScreenMode.WORLD_MAP) },
                 onCity = { root.setMode(GameScreenMode.CITY) },
+                onMap = { root.setMode(GameScreenMode.WORLD_MAP) },
                 onInventory = { root.setMode(GameScreenMode.INVENTORY) },
                 onQuests = { root.setMode(GameScreenMode.QUESTS) },
-                onWorldLog = { root.setMode(GameScreenMode.WORLD_LOG) },
+                onWorldLog = { root.setMode(GameScreenMode.CHRONICLE) },
                 onCharacter = { root.inspectHero(it) },
-                onExpedition = { root.setMode(GameScreenMode.EVENTS) },
+                onExpedition = { root.setMode(GameScreenMode.EXPEDITION) },
                 onEnding = { root.setMode(GameScreenMode.ENDING) }
             )
         }
-        composable(GameRoute.Expedition.route) {
-            ExpeditionScreen(
-                viewModel = hiltViewModel(),
-                onBack = { root.setMode(GameScreenMode.HUB) },
-                onCombat = { quest ->
-                    root.combatSystem.startEncounterForQuest(quest.id)
-                    root.setMode(GameScreenMode.COMBAT)
-                }
-            )
-        }
-        composable(GameRoute.CharDetail.route) {
-            val hero by root.inspectedHero.collectAsState()
-            hero?.let {
-                CharDetailScreen(
-                    hero = it,
-                    onUpgrade = { stat -> root.upgradeStat(it.id, stat) },
-                    onBack = { root.setMode(GameScreenMode.HUB) }
-                )
-            } ?: run {
-                root.setMode(GameScreenMode.HUB)
-            }
-        }
-        composable(GameRoute.WorldMap.route) {
-            WorldMapScreen(
-                viewModel = hiltViewModel(),
-                onBack = { root.setMode(GameScreenMode.HUB) }
-            )
-        }
+
         composable(GameRoute.City.route) {
             CityScreen(
                 viewModel = hiltViewModel(),
                 onMarket = { root.setMode(GameScreenMode.MARKET) },
                 onAlchemy = { root.setMode(GameScreenMode.ALCHEMY) },
                 onTavern = { root.setMode(GameScreenMode.TAVERN) },
-                onTemple = { root.setMode(GameScreenMode.TEMPLE) },
+                onTemple = { /* open temple */ },
                 onRecruit = { root.setMode(GameScreenMode.RECRUIT) },
                 onDialogue = { root.setMode(GameScreenMode.DIALOGUE) },
                 onExit = { root.setMode(GameScreenMode.HUB) }
             )
         }
-        composable(GameRoute.Market.route) {
-            MarketScreen(
+
+        composable(GameRoute.Expedition.route) {
+            ExpeditionScreen(
                 viewModel = hiltViewModel(),
-                onBack = { root.setMode(GameScreenMode.CITY) }
+                onBack = { root.setMode(GameScreenMode.HUB) },
+                onCombat = { root.setMode(GameScreenMode.COMBAT) }
             )
         }
-        composable(GameRoute.Alchemy.route) {
-            AlchemyScreen(
-                viewModel = hiltViewModel<AlchemyViewModel>(),
-                onBack = { root.setMode(GameScreenMode.CITY) }
-            )
-        }
+
         composable(GameRoute.Combat.route) {
             CombatScreen(
                 viewModel = hiltViewModel(),
                 onExit = { root.setMode(GameScreenMode.HUB) }
             )
         }
-        composable(GameRoute.Tavern.route) {
-            TavernScreen(
-                viewModel = hiltViewModel(),
-                onHire = { root.setMode(GameScreenMode.RECRUIT) },
-                onExit = { root.setMode(GameScreenMode.CITY) }
-            )
-        }
-        composable(GameRoute.Temple.route) {
-            SaintsScreen(
-                viewModel = hiltViewModel(),
-                onExit = { root.setMode(GameScreenMode.CITY) }
-            )
-        }
+        
         composable(GameRoute.Dialogue.route) {
             DialogueScreen(
-                viewModel = hiltViewModel(),
+                viewModel = hiltViewModel<DialogueViewModel>(),
                 onExit = { root.setMode(GameScreenMode.CITY) },
                 onMarket = { root.setMode(GameScreenMode.MARKET) }
             )
         }
+
         composable(GameRoute.Quests.route) {
-            val questVm: QuestJournalViewModel = hiltViewModel()
             QuestJournalScreen(
-                viewModel = questVm,
+                viewModel = hiltViewModel(),
                 onBack = { root.setMode(GameScreenMode.HUB) }
             )
         }
-        composable(GameRoute.Recruit.route) {
-            RecruitmentScreen(
-                onBack = { root.setMode(GameScreenMode.CITY) }
-            )
-        }
+
         composable(GameRoute.Inventory.route) {
             InventoryScreen(
                 viewModel = hiltViewModel(),
                 onBack = { root.setMode(GameScreenMode.HUB) }
             )
         }
+        
         composable(GameRoute.Chronicle.route) {
             ChronicleScreen(
                 onBack = { root.setMode(GameScreenMode.HUB) }
             )
         }
+
+        composable(GameRoute.WorldMap.route) {
+            WorldMapScreen(
+                viewModel = hiltViewModel(),
+                onBack = { root.setMode(GameScreenMode.HUB) }
+            )
+        }
+
         composable(GameRoute.DevMenu.route) {
             DevMenuScreen(
                 onBack = { root.setMode(GameScreenMode.HUB) }
             )
         }
-        composable(GameRoute.Ending.route) {
-            EndingScreen(
-                viewModel = hiltViewModel(),
-                onFinish = { root.setMode(GameScreenMode.MAIN_MENU) }
-            )
-        }
+
         composable(GameRoute.Ritual.route) {
             val ritualVm: com.grimreich.ui.ritual.RitualViewModel = hiltViewModel()
             val hero by ritualVm.deadHero.collectAsState()
-            
             hero?.let {
                 RitualScreen(
                     hero = it,
@@ -318,10 +183,14 @@ fun GameNavHost(
                     onRevived = { root.setMode(GameScreenMode.HUB) },
                     onSacrificed = { root.setMode(GameScreenMode.HUB) }
                 )
-            } ?: run {
-                root.setMode(GameScreenMode.HUB)
             }
         }
-
+        
+        composable(GameRoute.Ending.route) {
+            EndingScreen(
+                viewModel = hiltViewModel(),
+                onFinish = { root.setMode(GameScreenMode.MAIN_MENU) }
+            )
+        }
     }
 }

@@ -3,6 +3,7 @@ package com.grimreich.systems
 import com.grimreich.core.GameRepository
 import com.grimreich.core.QuestStatus
 import com.grimreich.core.QuestProgress
+import com.grimreich.core.QuestState
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -11,7 +12,7 @@ enum class StepType { COMBAT, DIALOGUE, INVESTIGATION }
 data class QuestStep(
     val description: String,
     val type: StepType,
-    val targetId: String // e.g. NPC ID or Enemy ID
+    val targetId: String
 )
 
 data class QuestDefinition(

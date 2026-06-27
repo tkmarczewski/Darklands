@@ -2,7 +2,7 @@ package com.grimreich.core
 
 import com.grimreich.grimreich.v1.*
 import com.grimreich.systems.DialogueManager
-import com.grimreich.systems.QuestSystem
+import com.grimreich.systems.QuestEngine
 import com.grimreich.systems.StatePersistenceManager
 import com.grimreich.world.CityCatalogue
 import com.grimreich.world.ItemCatalogue
@@ -19,14 +19,14 @@ import javax.inject.Singleton
 
 @Singleton
 class GameRepository @Inject constructor(
-    private val questSystemProvider: Lazy<QuestSystem>,
+    private val questEngineProvider: Lazy<QuestEngine>,
     private val dialogueManagerProvider: Lazy<DialogueManager>,
     private val persistence: StatePersistenceManager,
     private val cityCatalogue: CityCatalogue,
     private val itemCatalogue: ItemCatalogue,
 ) {
     private val repositoryScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
-    private val questSystem get() = questSystemProvider.get()
+    private val questEngine get() = questEngineProvider.get()
     private val dialogueManager get() = dialogueManagerProvider.get()
     
     private val _gameState = MutableStateFlow(GameState())
@@ -43,13 +43,9 @@ class GameRepository @Inject constructor(
         synchronized(this) {
             val current = _gameState.value
             transform(current)
-            _gameState.value = current.deepCopy() // Force flow update with a deep copy
+            _gameState.value = current.deepCopy() 
             persistCurrentState()
         }
-    }
-
-    fun seed() {
-        log("Seed requested via Bootstrapper flow")
     }
 
     fun log(msg: String) {
@@ -60,10 +56,8 @@ class GameRepository @Inject constructor(
     }
 
     fun sync() {
-        val state = _gameState.value
         cityCatalogue.seedCanonical()
         itemCatalogue.seed()
-        questSystem.syncWithState(state)
         dialogueManager.seedBasicDialogues()
     }
 

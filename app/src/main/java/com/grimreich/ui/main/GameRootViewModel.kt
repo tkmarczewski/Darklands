@@ -12,7 +12,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import javax.inject.Inject
 
 enum class GameScreenMode {
-    MAIN_MENU, PLAYER_IDENTITY, CHARACTER_CREATOR, WORLD_MAP, CITY, COMBAT, TAVERN, TEMPLE, ALCHEMY, EVENTS, HUB, DIALOGUE, INVENTORY, QUESTS, WORLD_LOG, RECRUIT, CHAR_DETAIL, MARKET, DEV_MENU, RITUAL, ENDING
+    MAIN_MENU, PLAYER_IDENTITY, CHARACTER_CREATOR, WORLD_MAP, CITY, COMBAT, TAVERN, TEMPLE, ALCHEMY, EVENTS, HUB, DIALOGUE, INVENTORY, QUESTS, CHRONICLE, RECRUIT, CHAR_DETAIL, MARKET, DEV_MENU, RITUAL, ENDING, EXPEDITION
 }
 
 @HiltViewModel
@@ -30,7 +30,6 @@ class GameRootViewModel @Inject constructor(
     val inspectedHero: StateFlow<Hero?> = _inspectedHero.asStateFlow()
 
     init {
-        // Start title music on launch
         audioEngine.playForRoute(GameScreenMode.MAIN_MENU.name.lowercase())
     }
 
@@ -64,14 +63,13 @@ class GameRootViewModel @Inject constructor(
                     "INT" -> hero.intelligence++
                     "END" -> {
                         hero.endurance++
-                        hero.maxHp += 2 // Immediate HP bonus
+                        hero.maxHp += 2 
                         hero.hp += 2
                     }
                     "CHA" -> hero.charisma++
                     "PIE" -> hero.piety++
                 }
                 hero.attributePoints--
-                // Update inspected hero state flow if it's the same one
                 if (_inspectedHero.value?.id == heroId) {
                     _inspectedHero.value = hero.copy()
                 }

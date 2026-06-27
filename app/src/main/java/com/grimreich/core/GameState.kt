@@ -6,7 +6,7 @@ data class GameState(
     @Transient val grimEngine: GrimWorldEngine = GrimWorldEngineFactory.create(),
 
     var playerName: String? = null,
-    var heroName: String? = null, // Hero name field
+    var heroName: String? = null,
     var characterNameLocked: Boolean = false,
     var metaAwarenessLevel: Int = 0,
 
@@ -17,7 +17,6 @@ data class GameState(
     var pendingDialogueNpcRole: String? = null,
     var pendingDialogueNodeId: String? = null,
 
-    // Core game state
     val party: MutableList<Hero> = mutableListOf(),
     val hireableHeroes: MutableList<Hero> = mutableListOf(),
     var activeHeroId: String? = null,
@@ -52,15 +51,12 @@ data class GameState(
         hireableHeroes = hireableHeroes.map { it.copy() }.toMutableList(),
         activeHeroId = activeHeroId,
         inventory = inventory.map { it.copy() }.toMutableList(),
-                    logEntries = logEntries.takeLast(200).toMutableList(),
+        logEntries = logEntries.toMutableList(),
         gold = gold,
-        quest = quest.copy(
-            activeQuests = quest.activeQuests.toMutableList(),
-            completedQuests = quest.completedQuests.toMutableList(),
-            objectivesReached = quest.objectivesReached.toMutableSet(),
-            questProgress = quest.questProgress.toMutableMap(),
-            activeEndgameQuests = quest.activeEndgameQuests.toMutableList(),
-            completedEndgameQuests = quest.completedEndgameQuests.toMutableList()
+        quest = QuestState(
+            activeQuestIds = quest.activeQuestIds.toMutableSet(),
+            completedQuestIds = quest.completedQuestIds.toMutableSet(),
+            progress = quest.progress.mapValues { it.value.copy(variables = it.value.variables.toMap()) }.toMutableMap()
         ),
         reputation = reputation.copy(
             cityFactions = reputation.cityFactions.mapValues { it.value.toMutableMap() }.toMutableMap()
@@ -84,10 +80,4 @@ data class GameState(
         isExpeditionActive = isExpeditionActive,
         lastSaveTimestamp = lastSaveTimestamp
     )
-
-        /** Adds a log entry, keeping only the last 200 to prevent save-state bloat. */
-    fun addLog(entry: String) {
-        logEntries.add(entry)
-        if (logEntries.size > 200) logEntries.removeAt(0)
-    }
 }

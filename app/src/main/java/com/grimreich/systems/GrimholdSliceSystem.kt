@@ -12,15 +12,13 @@ data class GrimholdSliceViewData(
 
 @Singleton
 class GrimholdSliceSystem @Inject constructor(
-    private val questSystem: QuestSystem
+    private val questEngine: QuestEngine
 ) {
     fun view(playerState: PlayerState): GrimholdSliceViewData {
-        val quests = questSystem.availableForCity("grimhold")
-        
         return GrimholdSliceViewData(
-            title = "Grimhold - Sektor 4",
-            description = "Dzielnica spowita gęstą mgłą.",
-            availableQuests = quests.map { it.title }
+            title = "Grimhold",
+            description = "Status systemu: Stabilny.",
+            availableQuests = questEngine.getActiveQuestsForCity("grimhold").map { it.title }
         )
     }
 }

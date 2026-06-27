@@ -3,7 +3,6 @@ package com.grimreich.ui.main
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.grimreich.core.GameRepository
-import com.grimreich.core.QuestStatus
 import com.grimreich.systems.QuestEngine
 import com.grimreich.systems.QuestDefinition
 import com.grimreich.systems.StepType
@@ -61,7 +60,7 @@ class ExpeditionViewModel @Inject constructor(
         val step = def.steps.getOrNull(progress.currentStepIndex) ?: return
         
         when (step.type) {
-            com.grimreich.systems.StepType.COMBAT -> {
+            StepType.COMBAT -> {
                 gameRepository.updateState { s ->
                     s.pendingQuestId = "COMBAT_WIN:$questId"
                     s.combat.active = true

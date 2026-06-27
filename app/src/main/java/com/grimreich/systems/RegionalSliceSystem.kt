@@ -6,15 +6,13 @@ import javax.inject.Singleton
 
 @Singleton
 class RegionalSliceSystem @Inject constructor(
-    private val questSystem: QuestSystem
+    private val questEngine: QuestEngine
 ) {
     fun buildViewData(playerState: PlayerState): GrimholdSliceViewData {
-        val quests = questSystem.availableForCity(playerState.currentCityId)
-        
         return GrimholdSliceViewData(
             title = "Region: ${playerState.currentCityId}",
-            description = "Tereny poza murami Grimhold.",
-            availableQuests = quests.map { it.title }
+            description = "Eksploracja regionu w toku.",
+            availableQuests = questEngine.getActiveQuestsForCity(playerState.currentCityId).map { it.title }
         )
     }
 }

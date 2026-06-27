@@ -1,53 +1,49 @@
 package com.grimreich.viewmodels
 
 import androidx.lifecycle.ViewModel
-import com.grimreich.systems.ExpeditionManager
+import com.grimreich.systems.QuestEngine
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import javax.inject.Inject
 
 @HiltViewModel
 class DevMenuViewModel @Inject constructor(
-    private val expeditionManager: ExpeditionManager
+    private val questEngine: QuestEngine
 ) : ViewModel() {
 
     private val _logEntries = MutableStateFlow<List<String>>(emptyList())
-    val logEntries: StateFlow<List<String>> = _logEntries
+    val logEntries: StateFlow<List<String>> = _logEntries.asStateFlow()
 
-    private val _currentQuestInfo = MutableStateFlow("—")
-    val currentQuestInfo: StateFlow<String> = _currentQuestInfo
+    private val _currentQuestInfo = MutableStateFlow("")
+    val currentQuestInfo: StateFlow<String> = _currentQuestInfo.asStateFlow()
 
-        private fun addLog(entry: String) {
-        val updated = (_logEntries.value + entry).takeLast(100)
-        _logEntries.value = updated
+    fun addLog(msg: String) {
+        _logEntries.value = _logEntries.value + msg
     }
 
-    fun startQuest(questId: String) {
-        val result = expeditionManager.startQuest(questId)
-                    addLog("START $questId → $result")
-        refreshInfo(questId)
+    fun startQuest(id: String) {
+        questEngine.activateQuest(id)
+        refreshInfo(id)
     }
 
-    fun stepSuccess(questId: String) {
-        val result = expeditionManager.onStepFinished(questId, success = true)
-                    addLog("STEP ✓ $questId → $result")
-        refreshInfo(questId)
+    fun stepSuccess(id: String) {
+        questEngine.advanceStep(id)
+        refreshInfo(id)
     }
 
-    fun stepFail(questId: String) {
-        val result = expeditionManager.onStepFinished(questId, success = false)
-                    addLog("STEP ✗ $questId → $result")
-        refreshInfo(questId)
+    fun stepFail(id: String) {
+        addLog("Manual step fail triggered for $id")
     }
 
-    fun resetQuest(questId: String) {
-        expeditionManager.resetProgress(questId)
-                    addLog("RESET $questId")
-        _currentQuestInfo.value = "—"
+    fun resetQuest(id: String) {
+        addLog("Reset requested for $id - Engine 2.0 does not support raw reset yet.")
     }
 
-    private fun refreshInfo(questId: String) {
-        _currentQuestInfo.value = expeditionManager.getStepInfo(questId)
+    private fun refreshInfo(id: String) {
+        val def = questEngine.getDefinition(id)
+        val status = questEngine.getStatus(id)
+        _currentQuestInfo.value = "ID: $id | Title: ${def?.title} | Status: $status"
     }
 }

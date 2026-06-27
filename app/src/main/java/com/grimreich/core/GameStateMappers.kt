@@ -154,11 +154,11 @@ fun QuestState.toDto(): QuestStateDto = QuestStateDto(
     progress = progress.mapValues { it.value.toDto() }
 )
 
-fun QuestStateDto.toDomain(): QuestState = QuestState().also {
-    it.activeQuestIds.addAll(activeQuestIds)
-    it.completedQuestIds.addAll(completedQuestIds)
-    it.progress.putAll(progress.mapValues { entry -> entry.value.toDomain() })
-}
+fun QuestStateDto.toDomain(): QuestState = QuestState(
+    activeQuestIds = activeQuestIds.toMutableSet(),
+    completedQuestIds = completedQuestIds.toMutableSet(),
+    progress = progress.mapValues { it.value.toDomain() }.toMutableMap()
+)
 
 fun QuestProgress.toDto(): QuestProgressDto = QuestProgressDto(
     questId = questId,
@@ -170,10 +170,9 @@ fun QuestProgress.toDto(): QuestProgressDto = QuestProgressDto(
 fun QuestProgressDto.toDomain(): QuestProgress = QuestProgress(
     questId = questId,
     status = QuestStatus.valueOf(status),
-    currentStepIndex = currentStepIndex
-).also {
-    it.variables.putAll(variables)
-}
+    currentStepIndex = currentStepIndex,
+    variables = variables
+)
 
 fun ReputationState.toDto(): ReputationStateDto = ReputationStateDto(
     cityFactions = cityFactions.mapValues { it.value.toMap() },

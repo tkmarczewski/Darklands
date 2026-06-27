@@ -1,7 +1,7 @@
 package com.grimreich.core
 
 data class SaveState(
-    val playerState: PlayerState,
+    val playerState: PlayerState = PlayerState(),
     val lastResolutionSummary: String? = null,
     val version: Int = 1
 )
@@ -9,6 +9,5 @@ data class SaveState(
 data class QuestJournalState(
     val activeQuestId: String?,
     val completedQuestIds: List<String>,
-    val currentCityId: String,
-    val entries: List<QuestLogEntry>
+    val currentCityId: String
 )
