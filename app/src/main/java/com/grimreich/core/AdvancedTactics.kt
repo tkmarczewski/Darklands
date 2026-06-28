@@ -8,7 +8,7 @@ class AdvancedTactics @Inject constructor(
     private val gameRepository: GameRepository
 ) {
     fun applySynergies(hero: Hero) {
-        if (hero.skills.getOrDefault("ALCH", 0) > 20 && hero.intelligence > 12) {
+        if (hero.skills.getOrDefault("ALCH", 0) >= 15 && hero.intelligence > 12) {
             gameRepository.log("${hero.name} odkrył synergię alchemiczną!")
         }
     }

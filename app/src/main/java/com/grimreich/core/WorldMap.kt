@@ -1,15 +1,15 @@
 package com.grimreich.core
 
-import com.grimreich.world.CityCatalogue
 import javax.inject.Inject
 import javax.inject.Singleton
 
 enum class TerrainType(val encounterChance: Float, val travelHoursRange: IntRange) {
     ROAD(0.1f, 4..8),
-    FOREST(0.25f, 6..12),
-    MOUNTAIN(0.4f, 12..24),
-    RIVER(0.15f, 2..4),
-    SWAMP(0.5f, 10..20)
+    FOREST(0.3f, 8..14),
+    MOUNTAIN(0.5f, 16..24),
+    RIVER(0.2f, 6..12),
+    SWAMP(0.4f, 12..20),
+    TRAIL(0.25f, 10..18)
 }
 
 data class TravelConnection(
@@ -28,14 +28,13 @@ data class CityNode(
 
 @Singleton
 class WorldMap @Inject constructor() {
-    private val connections = mutableListOf<TravelConnection>()
+    val connections = mutableListOf<TravelConnection>()
 
-    fun seedStage1() {
+    fun seedStage1(seed: Int = 1) {
         if (connections.isNotEmpty()) return
         link("wybrzeze_polnocne", "twierdza_zelazna", TerrainType.ROAD)
-        link("twierdza_zelazna", "port_mglisty", TerrainType.FOREST)
-        link("port_mglisty", "opactwo_ciszy", TerrainType.MOUNTAIN)
-        link("opactwo_ciszy", "wybrzeze_polnocne", TerrainType.ROAD)
+        link("twierdza_zelazna", "port_mglisty", TerrainType.ROAD)
+        link("port_mglisty", "opactwo_ciszy", TerrainType.TRAIL)
     }
 
     fun clear() {
@@ -47,18 +46,18 @@ class WorldMap @Inject constructor() {
     fun neighbors(cityId: String): List<TravelConnection> =
         connections.filter { it.fromCityId == cityId || it.toCityId == cityId }
 
-    fun terrainBetween(fromCityId: String, toCityId: String): TerrainType? {
-        return connections.find {
-            (it.fromCityId == fromCityId && it.toCityId == toCityId) ||
-            (it.fromCityId == toCityId && it.toCityId == fromCityId)
+    fun terrainBetween(cityA: String, cityB: String): TerrainType? {
+        return connections.firstOrNull { 
+            (it.fromCityId == cityA && it.toCityId == cityB) ||
+            (it.fromCityId == cityB && it.toCityId == cityA)
         }?.terrain
     }
 
-    fun isConnected(from: String, to: String) = terrainBetween(from, to) != null
+    fun isConnected(cityA: String, cityB: String): Boolean = terrainBetween(cityA, cityB) != null
 
-    fun link(from: String, to: String, terrain: TerrainType) {
-        if (!isConnected(from, to)) {
-            connections.add(TravelConnection(from, to, terrain))
+    fun link(id1: String, id2: String, terrain: TerrainType) {
+        if (!isConnected(id1, id2)) {
+            connections.add(TravelConnection(id1, id2, terrain))
         }
     }
 }

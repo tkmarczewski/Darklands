@@ -15,6 +15,7 @@ class ExplorationSystem @Inject constructor(
             TerrainType.MOUNTAIN -> 20
             TerrainType.RIVER -> 8
             TerrainType.SWAMP -> 15
+            TerrainType.TRAIL -> 12
         }
     }
 }

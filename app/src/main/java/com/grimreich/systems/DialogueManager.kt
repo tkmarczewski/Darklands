@@ -63,6 +63,7 @@ class DialogueManager @Inject constructor(
     }
 
     private fun glitchText(text: String): String {
+        if (text.isEmpty()) return text
         val chars = text.toCharArray()
         repeat(maxOf(1, text.length / 20)) {
             val idx = Random.nextInt(chars.size)

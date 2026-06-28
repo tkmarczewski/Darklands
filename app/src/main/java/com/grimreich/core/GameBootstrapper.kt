@@ -1,11 +1,12 @@
 package com.grimreich.core
 
+import com.grimreich.grimreich.v1.NPC
 import com.grimreich.systems.DialogueManager
 import com.grimreich.systems.QuestEngine
 import com.grimreich.systems.QuestManifest
+import com.grimreich.world.HeroPool
 import com.grimreich.world.CityCatalogue
 import com.grimreich.world.ItemCatalogue
-import com.grimreich.world.HeroPool
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -38,7 +39,7 @@ class GameBootstrapper @Inject constructor(
         questManifest.seed() 
         dialogueManager.seedBasicDialogues()
         worldMap.clear()
-        worldMap.seedStage1()
+        worldMap.seedStage1(seed)
 
         // Reset repository state to a clean template
         gameRepository.replaceState(GameState())
@@ -66,7 +67,7 @@ class GameBootstrapper @Inject constructor(
             state.grimCurrentRegion = cityCatalogue.startingCityId
             state.gold = GameConstants.INITIAL_GOLD
 
-            // Initial pool of recruits - using world.HeroPool for correct data depth
+            // Initial pool of recruits
             state.hireableHeroes.addAll(heroPool.generatePool(GameConstants.MAX_RECRUITS_POOL_SIZE))
         }
 

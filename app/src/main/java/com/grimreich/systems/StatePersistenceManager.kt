@@ -28,7 +28,10 @@ class StatePersistenceManager @Inject constructor(
 
     fun persist(session: SessionStateDto) {
         try {
-            sessionFile.writeText(json.encodeToString(SessionStateDto.serializer(), session))
+            val tmp = File(sessionFile.parentFile, sessionFile.name + ".tmp")
+            tmp.writeText(json.encodeToString(SessionStateDto.serializer(), session))
+            if (sessionFile.exists()) sessionFile.delete()
+            tmp.renameTo(sessionFile)
         } catch (e: Exception) {
             Log.e(TAG, "Blad zapisu sesji do pliku: $sessionFileName", e)
         }

@@ -44,9 +44,9 @@ class GameRepository @Inject constructor(
 
     fun updateState(transform: (GameState) -> Unit) {
         synchronized(this) {
-            val current = _gameState.value
-            transform(current)
-            _gameState.value = current.deepCopy() 
+            val mutable = _gameState.value.deepCopy()
+            transform(mutable)
+            _gameState.value = mutable
             persistCurrentState()
         }
     }
@@ -66,14 +66,18 @@ class GameRepository @Inject constructor(
     }
 
     fun restoreIfAvailable(): Boolean {
-        val restored = persistence.restore() ?: return false
-        if (restored.version < 3) {
-            persistence.clear()
-            return false
+        val restored = persistence.restore()
+        if (restored != null) {
+            if (restored.version < 3) {
+                persistence.clear()
+                return false
+            }
+            _gameState.value = restored.toDomain()
+            sync()
+            return true
         }
-        _gameState.value = restored.toDomain()
-        sync()
-        return true
+        persistence.clear()
+        return false
     }
 
     fun persistCurrentState() {

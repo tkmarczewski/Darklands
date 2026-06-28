@@ -32,6 +32,7 @@ object TravelRules {
             TerrainType.MOUNTAIN -> 3
             TerrainType.RIVER -> 2
             TerrainType.SWAMP -> 3
+            TerrainType.TRAIL -> 2
         }
         return max(1, terrainBase + (hoursSpent / 3))
     }
@@ -52,6 +53,7 @@ object TravelRules {
             TerrainType.MOUNTAIN -> listOf("combat_raubritter_scouts", "combat_undead", "combat_dragon")
             TerrainType.RIVER -> listOf("combat_bandits", "combat_wolves")
             TerrainType.SWAMP -> listOf("combat_undead", "combat_cultists")
+            TerrainType.TRAIL -> listOf("combat_bandits", "combat_wolves")
         }
         return if (options.isEmpty()) null else options[random.nextInt(options.size)]
     }

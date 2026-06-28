@@ -22,7 +22,7 @@ data class QuestDefinition(
     val steps: List<QuestStep>,
     val cityId: String,
     val originNpcId: String,
-    val prerequisiteQuestId: String? = null // New: Supporting chains
+    val prerequisiteQuestId: String? = null
 )
 
 @Singleton
@@ -37,7 +37,9 @@ class QuestEngine @Inject constructor(
 
     fun getDefinition(id: String) = registry[id]
 
-    fun getStatus(questId: String): QuestStatus {
+    fun getStatus(questId: String, visited: MutableSet<String> = mutableSetOf()): QuestStatus {
+        if (!visited.add(questId)) return QuestStatus.LOCKED
+        
         val state = gameRepository.currentState()
         
         // 1. Check if completed
@@ -50,7 +52,7 @@ class QuestEngine @Inject constructor(
         // 3. Chain logic: Check prerequisites
         val def = registry[questId]
         if (def?.prerequisiteQuestId != null) {
-            val prereqStatus = getStatus(def.prerequisiteQuestId)
+            val prereqStatus = getStatus(def.prerequisiteQuestId, visited)
             return if (prereqStatus == QuestStatus.COMPLETED) QuestStatus.AVAILABLE else QuestStatus.LOCKED
         }
 
@@ -61,9 +63,10 @@ class QuestEngine @Inject constructor(
         if (getStatus(questId) != QuestStatus.AVAILABLE) return
 
         gameRepository.updateState { state ->
-            val currentProgress = state.quest.progress[questId] ?: QuestProgress(questId)
-            state.quest.progress[questId] = currentProgress.copy(status = QuestStatus.ACTIVE)
-            state.quest.activeQuestIds.add(questId)
+            if (!state.quest.activeQuestIds.contains(questId)) {
+                state.quest.activeQuestIds.add(questId)
+            }
+            state.quest.progress[questId] = QuestProgress(questId = questId, status = QuestStatus.ACTIVE)
         }
     }
 
@@ -89,8 +92,9 @@ class QuestEngine @Inject constructor(
             
             if (p.status == QuestStatus.OBJECTIVE_MET) {
                 state.quest.progress[questId] = p.copy(status = QuestStatus.COMPLETED)
-                state.quest.activeQuestIds.remove(questId)
                 state.quest.completedQuestIds.add(questId)
+                state.quest.progress.remove(questId)
+                state.quest.activeQuestIds.remove(questId)
                 state.gold += def.rewardGold
                 state.logEntries.add("Ukończono zadanie: ${def.title}. Otrzymano ${def.rewardGold} G.")
             }
