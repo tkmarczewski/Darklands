@@ -79,3 +79,9 @@ fun payAbilityCost(hero: Hero, ability: Ability) {
         CostType.NONE -> Unit
     }
 }
+
+fun tryPayAbilityCost(hero: Hero, ability: Ability): Boolean {
+    if (!canPayAbilityCost(hero, ability)) return false
+    payAbilityCost(hero, ability)
+    return true
+}

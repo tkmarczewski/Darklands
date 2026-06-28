@@ -111,4 +111,34 @@ object TradingEngine {
         state.gold += sellPrice
         return "Sprzedano ${item.name} za $sellPrice G."
     }
+
+    fun buyWithFactionModifier(
+        state: GameState,
+        cityId: String,
+        type: TradeGoodType,
+        factionId: String,
+        qty: Int = 1
+    ): String {
+        val market = CityMarketCatalog.getMarket(cityId) ?: return "Brak rynku w tej lokacji."
+        val rep = state.reputation.globalFactions[factionId] ?: 0
+        val modifier = FactionReputationSystem.buyModifier(rep)
+        val unitPrice = (market.getPrice(type) * modifier).toInt().coerceAtLeast(1)
+        val total = unitPrice * qty
+        if (state.gold < total) return "Brak złota. Potrzeba $total G."
+        val good = TradeGoodCatalog.findByType(type) ?: return "Błąd towaru."
+        state.gold -= total
+        repeat(qty) {
+            state.inventory.add(Item(
+                id = "trade_${type.name.lowercase()}_${state.world.day}", 
+                name = good.name, 
+                value = unitPrice,
+                type = "trade_good",
+                weight = good.weight.toDouble(),
+                rarity = "normal",
+                lore = good.description,
+                effects = emptyMap()
+            ))
+        }
+        return "Kupiono ${good.name} x$qty za $total G (zniżka frakcyjna)."
+    }
 }

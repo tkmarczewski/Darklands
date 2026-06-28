@@ -2,32 +2,42 @@ package com.grimreich.systems
 
 import com.grimreich.core.CombatSkill
 import com.grimreich.core.SkillType
+import com.grimreich.core.SkillResult
 import com.grimreich.core.StatusEffect
 import com.grimreich.core.StatusEffectType
-import kotlin.random.Random
 
 object SkillCatalogue {
-    
+
     val allSkills = listOf(
-        CombatSkill("bash", "Taran", SkillType.MELEE, staminaCost = 10, description = "Silny cios tarczą. Szansa na ogłuszenie.") { user, target ->
-            val dmg = 5 + user.strength / 2
-            target.hp -= dmg
-            if (Random.nextFloat() < 0.3f) {
-                target.morale -= 15
-                "Bohater uderza taranem! $dmg obrażeń. Przeciwnik traci morale."
-            } else {
-                "Bohater uderza taranem! $dmg obrażeń."
-            }
-        },
-        CombatSkill("holy_strike", "Święte Pchnięcie", SkillType.PRAYER, favorCost = 20, description = "Atak pobłogosławioną bronią.") { user, target ->
-            val dmg = 10 + user.intelligence / 2
-            target.hp -= dmg
-            target.activeEffects.add(StatusEffect(StatusEffectType.FIRE, 2, 5))
-            "Święty ogień oczyszcza wroga! $dmg obrażeń i podpalenie."
-        },
-        CombatSkill("poison_blade", "Zatrucie ostrza", SkillType.ALCHEMY, staminaCost = 5, description = "Nakłada trzustkę na broń.") { _, target ->
+        CombatSkill(
+            id = "poison_blade",
+            name = "Ostrze Trucizny",
+            type = SkillType.MELEE,
+            staminaCost = 5
+        ) { _, target ->
             target.activeEffects.add(StatusEffect(StatusEffectType.POISON, 4, 3))
-            "Broń ocieka trucizną! Wróg zostaje otruty."
+            SkillResult(damage = 0, statusApplied = true, message = "Broń ocieka trucizną! Wróg zostaje otruty.")
+        },
+
+        CombatSkill(
+            id = "bash",
+            name = "Taran",
+            type = SkillType.MELEE,
+            staminaCost = 8
+        ) { user, target ->
+            val dmg = (user.strength / 2) + 6
+            target.hp = (target.hp - dmg).coerceAtLeast(0)
+            SkillResult(damage = dmg, message = "Potężne uderzenie tarczą: $dmg obrażeń.")
+        },
+
+        CombatSkill(
+            id = "prayer_shield",
+            name = "Modlitwa Ochrony",
+            type = SkillType.PRAYER,
+            favorCost = 5
+        ) { user, _ ->
+            user.armor += 5
+            SkillResult(statusApplied = true, message = "Boska osłona wzmacnia pancerz o +5.")
         }
     )
 }

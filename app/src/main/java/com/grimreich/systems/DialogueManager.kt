@@ -29,7 +29,6 @@ class DialogueManager @Inject constructor(
         val baseNode = nodes[id] ?: return null
         val stability = gameRepositoryProvider.get().currentState().world.globalStability
         
-        // Project Cipher: Apply glitches based on stability
         return if (stability < 40) {
             applyWorldEffects(baseNode, stability)
         } else {
@@ -38,13 +37,20 @@ class DialogueManager @Inject constructor(
     }
 
     fun makeChoice(choice: DialogueChoice): DialogueNode? {
-        val state = gameRepositoryProvider.get().currentState()
+        val repo = gameRepositoryProvider.get()
+        val state = repo.currentState()
         
-        // Execute side effects
         choice.onSelect(state)
         
-        activeDialogueId = choice.targetNodeId
-        return if (choice.targetNodeId == "end") null else getNode(choice.targetNodeId)
+        val target = choice.targetNodeId
+        if (target != "end" && getNode(target) == null) {
+            repo.log("[Dialogue] Missing target node: $target")
+            activeDialogueId = null
+            return null
+        }
+
+        activeDialogueId = if (target == "end") null else target
+        return activeDialogueId?.let { getNode(it) }
     }
 
     fun getPortrait(npcId: String): String {

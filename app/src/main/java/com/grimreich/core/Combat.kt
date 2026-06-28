@@ -58,6 +58,12 @@ data class StatusEffect(
 // ==================== COMBAT MODELS ====================
 enum class SkillType { MELEE, RANGED, PRAYER, ALCHEMY }
 
+data class SkillResult(
+    val damage: Int = 0,
+    val statusApplied: Boolean = false,
+    val message: String = ""
+)
+
 data class CombatSkill(
     val id: String,
     val name: String,
@@ -65,7 +71,7 @@ data class CombatSkill(
     val staminaCost: Int = 0,
     val favorCost: Int = 0,
     val description: String = "",
-    val effect: (CombatantState, CombatantState) -> String
+    val effect: (CombatantState, CombatantState) -> SkillResult
 )
 
 enum class WoundType { NONE, LIGHT, SERIOUS, CRITICAL }
@@ -124,22 +130,23 @@ class CombatRound @Inject constructor(
                 WoundType.NONE, WoundType.NONE, log)
         }
 
-        // FIX BUG-01 + BUG-03: Skill damage measured via HP delta; counterattack always runs
         val skill = SkillCatalogue.allSkills.find { it.id == skillId }
         val dmgToDefender: Int
         if (skill != null && attacker.endurance >= skill.staminaCost) {
             attacker.endurance -= skill.staminaCost
             log.add("${attacker.name} używa ${skill.name}!")
-            val hpBefore = defender.hp                    // FIX BUG-01: measure HP before skill
-            val msg = skill.effect(attacker, defender)
-            log.add(msg)
-            dmgToDefender = (hpBefore - defender.hp).coerceAtLeast(0) // FIX BUG-01: real damage
+            val hpBefore = defender.hp
+            val result = skill.effect(attacker, defender)
+            if (result.message.isNotBlank()) log.add(result.message)
+            dmgToDefender = maxOf(result.damage, (hpBefore - defender.hp).coerceAtLeast(0))
+            if (result.statusApplied && dmgToDefender == 0) {
+                log.add("Efekt specjalny został zastosowany.")
+            }
         } else {
             if (skill != null) log.add("${attacker.name} jest zbyt zmęczony na ${skill.name}!")
             dmgToDefender = resolveAttack(attacker, defender, log)
         }
 
-        // FIX BUG-03: counterattack always happens regardless of skill use
         val dmgToAttacker = if (!isDefeated(defender)) {
             resolveCounterAttack(attacker, defender, log)
         } else {
@@ -204,7 +211,6 @@ class CombatRound @Inject constructor(
         defender.morale    = moraleSystem.moraleAfterHit(defender.morale, dmg)
         log.add("${attacker.name} atakuje ${defender.name}: $dmg obrażeń.")
 
-        // FIX BUG-04: >= 10 so charisma exactly 10 also triggers regen
         if (attacker.charisma >= 10) {
             val regen = ((attacker.charisma - 10).coerceAtLeast(0) / 2 + 1) *
                 GrimConstants.Combat.CHARISMA_MORALE_REGEN
@@ -268,7 +274,6 @@ class CombatRound @Inject constructor(
                     combatant.morale = (combatant.morale - 1).coerceAtLeast(0)
                     log.add("${combatant.name} jest przemarznięty.")
                 }
-                // FIX BUG-05: WET now has mechanical effect — synergy damage when SHOCK is also active
                 StatusEffectType.WET -> {
                     log.add("${combatant.name} jest przemoczony.")
                     val shockActive = combatant.activeEffects.any {
@@ -311,13 +316,12 @@ class CombatRound @Inject constructor(
         }
     }
 
-    // FIX BUG-02: Correct wound threshold order — SERIOUS before LIGHT
     private fun computeWound(state: CombatantState): WoundType {
         val hpPercent = if (state.maxHp > 0) state.hp.toFloat() / state.maxHp else 0f
         return when {
             hpPercent <= 0f                                                          -> WoundType.CRITICAL
-            hpPercent <= GrimConstants.Combat.WOUND_THRESHOLD_SERIOUS && state.endurance < 10 -> WoundType.SERIOUS
-            hpPercent <= GrimConstants.Combat.WOUND_THRESHOLD_LIGHT   && state.endurance < 5  -> WoundType.LIGHT
+            hpPercent <= GrimConstants.Combat.WOUND_THRESHOLD_SERIOUS && state.endurance < 5  -> WoundType.SERIOUS
+            hpPercent <= GrimConstants.Combat.WOUND_THRESHOLD_LIGHT   && state.endurance < 10 -> WoundType.LIGHT
             else                                                                     -> WoundType.NONE
         }
     }
@@ -329,7 +333,6 @@ class CombatRound @Inject constructor(
         val healHp = (hero.maxHp * GrimConstants.Combat.HP_RECOVERY_RATIO)
             .toInt().coerceAtLeast(1)
         hero.hp = (hero.hp + healHp).coerceAtMost(hero.maxHp)
-        // FIX BUG-06: Use random range between MIN and MAX instead of always MIN
         val enduranceHeal = Random.nextInt(
             GrimConstants.Combat.POST_COMBAT_HEAL_HP_MIN,
             GrimConstants.Combat.POST_COMBAT_HEAL_HP_MAX + 1

@@ -28,6 +28,24 @@ object FactionCatalogue {
 }
 
 class FactionReputationSystem {
+    companion object {
+        fun reputationLabel(rep: Int): String = when {
+            rep <= -50 -> "WROGA"
+            rep <= -20 -> "ZŁA"
+            rep <= 20 -> "NEUTRALNA"
+            rep <= 50 -> "DOBRA"
+            else -> "WYBITNA"
+        }
+
+        fun buyModifier(rep: Int): Float {
+            return (1.0f - (rep * 0.02f)).coerceIn(0.7f, 1.3f)
+        }
+
+        fun sellModifier(rep: Int): Float {
+            return (1.0f + (rep * 0.02f)).coerceIn(0.7f, 1.3f)
+        }
+    }
+
     private val entries = mutableMapOf<String, FactionReputationEntry>()
 
     init {
@@ -46,24 +64,6 @@ class FactionReputationSystem {
     }
 
     fun getAll(): Map<String, Int> = entries.mapValues { it.value.reputation }
-
-    fun reputationLabel(rep: Int): String = when {
-        rep <= -50 -> "WROGA"
-        rep <= -20 -> "ZŁA"
-        rep <= 20 -> "NEUTRALNA"
-        rep <= 50 -> "DOBRA"
-        else -> "WYBITNA"
-    }
-
-    fun buyModifier(factionId: String): Float {
-        val rep = getReputation(factionId)
-        return (1.0f - (rep * 0.02f)).coerceIn(0.7f, 1.3f)
-    }
-
-    fun sellModifier(factionId: String): Float {
-        val rep = getReputation(factionId)
-        return (1.0f + (rep * 0.02f)).coerceIn(0.7f, 1.3f)
-    }
 
     fun summary(): String {
         return entries.values.joinToString("\n") { 
