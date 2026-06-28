@@ -118,9 +118,23 @@ data class CombatVisualEvent(
     val label: String = ""
 )
 
+interface CombatRandomProvider {
+    fun nextFloat(): Float
+    fun nextInt(until: Int): Int
+    fun nextInt(from: Int, until: Int): Int
+}
+
+@Singleton
+class DefaultCombatRandomProvider @Inject constructor() : CombatRandomProvider {
+    override fun nextFloat(): Float = Random.nextFloat()
+    override fun nextInt(until: Int): Int = Random.nextInt(until)
+    override fun nextInt(from: Int, until: Int): Int = Random.nextInt(from, until)
+}
+
 @Singleton
 class CombatRound @Inject constructor(
-    private val moraleSystem: MoraleSystem
+    private val moraleSystem: MoraleSystem,
+    private val randomProvider: CombatRandomProvider
 ) {
 
     fun resolveRound(
@@ -190,7 +204,7 @@ class CombatRound @Inject constructor(
         val dodgeChance = (GrimConstants.Combat.BASE_DODGE_CHANCE +
             ((defender.agility - 10) * GrimConstants.Combat.AGILITY_DODGE_MODIFIER))
             .coerceIn(0.05f, 0.8f)
-        val dodged = Random.nextFloat() < dodgeChance
+        val dodged = randomProvider.nextFloat() < dodgeChance
         if (dodged) {
             log.add("${defender.name} unika ataku!")
             return 0
@@ -209,13 +223,13 @@ class CombatRound @Inject constructor(
 
         val critChance = (attacker.perception * GrimConstants.Combat.PERCEPTION_CRIT_MODIFIER)
             .coerceAtMost(0.8f)
-        val isCrit   = Random.nextFloat() < critChance
+        val isCrit   = randomProvider.nextFloat() < critChance
         val critMod  = if (isCrit) GrimConstants.Combat.CRITICAL_HIT_MULTIPLIER else 1.0f
 
         val attackRoll = (rawAtk * attackerStatus.attackModifier() *
-            (0.7f + Random.nextFloat() * 0.6f) * critMod).toInt()
+            (0.7f + randomProvider.nextFloat() * 0.6f) * critMod).toInt()
         val defendRoll = (defArmor * defenderStatus.defenseModifier() *
-            (0.5f + Random.nextFloat() * 0.5f)).toInt()
+            (0.5f + randomProvider.nextFloat() * 0.5f)).toInt()
         val dmg = maxOf(1, attackRoll - defendRoll)
 
         if (isCrit) log.add("KRYTYK! ${attacker.name} zadaje potężny cios.")
@@ -244,9 +258,9 @@ class CombatRound @Inject constructor(
         val attackerStatus = moraleSystem.computeStatus(attacker.morale)
         val defenderStatus = moraleSystem.computeStatus(defender.morale)
         val counterAtk  = (defender.attackBase * defenderStatus.attackModifier() *
-            (0.6f + Random.nextFloat() * 0.8f)).toInt()
+            (0.6f + randomProvider.nextFloat() * 0.8f)).toInt()
         val attackerDef = (attacker.armor * attackerStatus.defenseModifier() *
-            (0.5f + Random.nextFloat() * 0.5f)).toInt()
+            (0.5f + randomProvider.nextFloat() * 0.5f)).toInt()
         val dmg = maxOf(0, counterAtk - attackerDef)
         attacker.hp        = (attacker.hp - dmg).coerceAtLeast(0)
         attacker.endurance = (attacker.endurance - dmg / 2).coerceAtLeast(0)
@@ -315,8 +329,8 @@ class CombatRound @Inject constructor(
     ) {
         val statusChance = GrimConstants.Combat.STATUS_CHANCE_BASE +
             ((attacker.intelligence - 10) * GrimConstants.Combat.STATUS_CHANCE_INT_MOD)
-        if (Random.nextFloat() < statusChance) {
-            val effectType = StatusEffectType.entries.toTypedArray().random()
+        if (randomProvider.nextFloat() < statusChance) {
+            val effectType = StatusEffectType.entries[randomProvider.nextInt(StatusEffectType.entries.size)]
             val existing   = defender.activeEffects.find { it.type == effectType }
             if (existing != null) {
                 existing.duration = (existing.duration + 2).coerceAtMost(10)
@@ -346,7 +360,7 @@ class CombatRound @Inject constructor(
         val healHp = (hero.maxHp * GrimConstants.Combat.HP_RECOVERY_RATIO)
             .toInt().coerceAtLeast(1)
         hero.hp = (hero.hp + healHp).coerceAtMost(hero.maxHp)
-        val enduranceHeal = Random.nextInt(
+        val enduranceHeal = randomProvider.nextInt(
             GrimConstants.Combat.POST_COMBAT_HEAL_HP_MIN,
             GrimConstants.Combat.POST_COMBAT_HEAL_HP_MAX + 1
         )

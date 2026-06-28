@@ -60,4 +60,13 @@ class WorldMap @Inject constructor() {
             connections.add(TravelConnection(id1, id2, terrain))
         }
     }
+
+    fun validateCityReferences(validCityIds: Set<String>): List<String> {
+        val issues = mutableListOf<String>()
+        connections.forEach {
+            if (it.fromCityId !in validCityIds) issues.add("Brak miasta fromCityId=${it.fromCityId}")
+            if (it.toCityId !in validCityIds) issues.add("Brak miasta toCityId=${it.toCityId}")
+        }
+        return issues.distinct()
+    }
 }

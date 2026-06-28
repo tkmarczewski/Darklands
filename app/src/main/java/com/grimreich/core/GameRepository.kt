@@ -101,6 +101,12 @@ class GameRepository @Inject constructor(
         }
     }
 
+    fun snapshotForTests(): GameState = _gameState.value.deepCopy()
+
+    fun replaceStateForTests(state: GameState) {
+        _gameState.value = state.deepCopy().also { it.normalizeState() }
+    }
+
     fun hasSession(): Boolean = persistence.exists()
 
     fun clearSessionAndReset() {

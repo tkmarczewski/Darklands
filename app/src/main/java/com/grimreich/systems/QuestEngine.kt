@@ -109,4 +109,16 @@ class QuestEngine @Inject constructor(
         val activeIds = gameRepository.currentState().quest.activeQuestIds
         return registry.values.filter { it.id in activeIds && it.cityId == cityId }
     }
+
+    fun validateQuestGraph(): List<String> {
+        val issues = mutableListOf<String>()
+        registry.values.forEach { def ->
+            def.prerequisiteQuestId?.let { prereq ->
+                if (registry[prereq] == null) {
+                    issues.add("Quest ${def.id} ma brakujący prerequisite: $prereq")
+                }
+            }
+        }
+        return issues.distinct()
+    }
 }

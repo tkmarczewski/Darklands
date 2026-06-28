@@ -31,6 +31,8 @@ class CityCatalogue @Inject constructor() {
     fun get(id: String?): CityData? = cities[id]
 
     fun all(): List<CityData> = cities.values.toList()
+    
+    fun allIds(): Set<String> = cities.keys
 
     fun clear() {
         cities.clear()

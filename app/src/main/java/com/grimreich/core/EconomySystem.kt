@@ -105,9 +105,18 @@ object TradingEngine {
         return "Kupiono ${good.name} x$safeQty za $totalCost G."
     }
 
+    fun quoteBuy(cityId: String, type: TradeGoodType, qty: Int = 1): Int {
+        val market = CityMarketCatalog.getMarket(cityId) ?: return 0
+        val safeQty = qty.coerceAtLeast(1)
+        return market.getPrice(type) * safeQty
+    }
+
+    fun quoteSell(item: Item): Int =
+        (item.value * GrimConstants.Economy.SELL_PRICE_MULTIPLIER).toInt().coerceAtLeast(1)
+
     fun sellItem(state: GameState, itemId: String): String {
         val item = state.inventory.find { it.id == itemId } ?: return "Brak przedmiotu."
-        val sellPrice = (item.value * GrimConstants.Economy.SELL_PRICE_MULTIPLIER).toInt().coerceAtLeast(1)
+        val sellPrice = quoteSell(item)
         state.inventory.remove(item)
         state.gold += sellPrice
         return "Sprzedano ${item.name} za $sellPrice G."
@@ -142,6 +151,13 @@ object TradingEngine {
             ))
         }
         return "Kupiono ${good.name} x$safeQty za $total G (zniżka frakcyjna)."
+    }
+
+    fun quoteBuyWithFactionModifier(cityId: String, type: TradeGoodType, factionId: String, qty: Int = 1, reputationValue: Int): Int {
+        val market = CityMarketCatalog.getMarket(cityId) ?: return 0
+        val safeQty = qty.coerceAtLeast(1)
+        val modifier = FactionReputationSystem.buyModifier(reputationValue)
+        return ((market.getPrice(type) * modifier).toInt().coerceAtLeast(1)) * safeQty
     }
 
     fun sellWithFactionModifier(

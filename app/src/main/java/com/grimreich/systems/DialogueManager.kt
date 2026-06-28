@@ -37,6 +37,13 @@ class DialogueManager @Inject constructor(
         }
     }
 
+    fun hasNode(id: String): Boolean = nodes.containsKey(id)
+
+    fun listMissingTargets(): List<String> = nodes.values
+        .flatMap { node -> node.choices.mapNotNull { it.targetNodeId } }
+        .filterNot { target -> target == "end" || nodes.containsKey(target) }
+        .distinct()
+
     fun makeChoice(choice: DialogueChoice): DialogueNode? {
         val repo = gameRepositoryProvider.get()
         val state = repo.currentState()

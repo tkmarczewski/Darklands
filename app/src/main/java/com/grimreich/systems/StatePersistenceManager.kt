@@ -92,4 +92,9 @@ class StatePersistenceManager @Inject constructor(
 
     fun hasPersistedSession(): Boolean = sessionFile.exists()
     fun hasPersistedSlots(): Boolean = slotsFile.exists()
+
+    fun debugPaths(): Map<String, String> = mapOf(
+        "session" to sessionFile.absolutePath,
+        "slots" to slotsFile.absolutePath
+    )
 }

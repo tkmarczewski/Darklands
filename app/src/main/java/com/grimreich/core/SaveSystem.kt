@@ -47,6 +47,12 @@ object SaveSystem {
 
     fun exportSlots(): Map<Int, SaveSnapshot> = slots.toMap()
 
+    fun clearAll() {
+        slots.clear()
+        autoSaveSnapshot = null
+        lastAutoSaveHash = 0
+    }
+
     fun saveToPersistence(persistence: com.grimreich.systems.StatePersistenceManager) {
         persistence.persistSlots(slots)
     }
