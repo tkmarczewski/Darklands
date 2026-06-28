@@ -6,35 +6,34 @@ import javax.inject.Singleton
 import kotlin.random.Random
 
 // ==================== MORALE SYSTEM ====================
-
 enum class MoraleStatus {
     HEROIC, STEADY, SHAKEN, PANICKED, ROUTED;
 
     fun attackModifier(): Float = when (this) {
-        HEROIC -> 1.2f
-        STEADY -> 1.0f
-        SHAKEN -> 0.8f
+        HEROIC   -> 1.2f
+        STEADY   -> 1.0f
+        SHAKEN   -> 0.8f
         PANICKED -> 0.5f
-        ROUTED -> 0.0f
+        ROUTED   -> 0.0f
     }
 
     fun defenseModifier(): Float = when (this) {
-        HEROIC -> 1.1f
-        STEADY -> 1.0f
-        SHAKEN -> 0.85f
+        HEROIC   -> 1.1f
+        STEADY   -> 1.0f
+        SHAKEN   -> 0.85f
         PANICKED -> 0.6f
-        ROUTED -> 0.0f
+        ROUTED   -> 0.0f
     }
 }
 
 @Singleton
 class MoraleSystem @Inject constructor() {
     fun computeStatus(morale: Int): MoraleStatus = when {
-        morale >= GrimConstants.Combat.MORALE_HEROIC_THRESHOLD -> MoraleStatus.HEROIC
-        morale >= GrimConstants.Combat.MORALE_STEADY_THRESHOLD -> MoraleStatus.STEADY
-        morale >= GrimConstants.Combat.MORALE_SHAKEN_THRESHOLD -> MoraleStatus.SHAKEN
+        morale >= GrimConstants.Combat.MORALE_HEROIC_THRESHOLD   -> MoraleStatus.HEROIC
+        morale >= GrimConstants.Combat.MORALE_STEADY_THRESHOLD   -> MoraleStatus.STEADY
+        morale >= GrimConstants.Combat.MORALE_SHAKEN_THRESHOLD   -> MoraleStatus.SHAKEN
         morale >= GrimConstants.Combat.MORALE_PANICKED_THRESHOLD -> MoraleStatus.PANICKED
-        else -> MoraleStatus.ROUTED
+        else                                                      -> MoraleStatus.ROUTED
     }
 
     fun moraleAfterHit(morale: Int, dmgTaken: Int): Int =
@@ -48,22 +47,16 @@ class MoraleSystem @Inject constructor() {
 }
 
 // ==================== STATUS EFFECTS ====================
-
-enum class StatusEffectType {
-    POISON, BLEED, FIRE, FREEZE, WET, SHOCK
-}
+enum class StatusEffectType { POISON, BLEED, FIRE, FREEZE, WET, SHOCK }
 
 data class StatusEffect(
     val type: StatusEffectType,
     var duration: Int,
-    val strength: Int 
+    val strength: Int
 )
 
 // ==================== COMBAT MODELS ====================
-
-enum class SkillType {
-    MELEE, RANGED, PRAYER, ALCHEMY
-}
+enum class SkillType { MELEE, RANGED, PRAYER, ALCHEMY }
 
 data class CombatSkill(
     val id: String,
@@ -75,9 +68,7 @@ data class CombatSkill(
     val effect: (CombatantState, CombatantState) -> String
 )
 
-enum class WoundType {
-    NONE, LIGHT, SERIOUS, CRITICAL
-}
+enum class WoundType { NONE, LIGHT, SERIOUS, CRITICAL }
 
 data class CombatantState(
     val name: String,
@@ -129,29 +120,26 @@ class CombatRound @Inject constructor(
 
         applyStatusTick(attacker, log)
         if (isDefeated(attacker)) {
-            return RoundResult(0, 0, attacker.morale, defender.morale, WoundType.NONE, WoundType.NONE, log)
+            return RoundResult(0, 0, attacker.morale, defender.morale,
+                WoundType.NONE, WoundType.NONE, log)
         }
 
-        // Logic fix: Integration of specific skill effects
+        // FIX BUG-01 + BUG-03: Skill damage measured via HP delta; counterattack always runs
         val skill = SkillCatalogue.allSkills.find { it.id == skillId }
-        val dmgToDefender = if (skill != null) {
-            // Check costs
-            if (attacker.endurance >= skill.staminaCost) {
-                attacker.endurance -= skill.staminaCost
-                log.add("${attacker.name} używa ${skill.name}!")
-                val msg = skill.effect(attacker, defender)
-                log.add(msg)
-                // We estimate damage for RoundResult based on HP change or internal logic
-                // Simple implementation: assume skill effect might modify defender HP directly
-                0 // Damage reporting in RoundResult might be redundant if skill.effect logs it
-            } else {
-                log.add("${attacker.name} jest zbyt zmęczony na ${skill.name}!")
-                resolveAttack(attacker, defender, log)
-            }
+        val dmgToDefender: Int
+        if (skill != null && attacker.endurance >= skill.staminaCost) {
+            attacker.endurance -= skill.staminaCost
+            log.add("${attacker.name} używa ${skill.name}!")
+            val hpBefore = defender.hp                    // FIX BUG-01: measure HP before skill
+            val msg = skill.effect(attacker, defender)
+            log.add(msg)
+            dmgToDefender = (hpBefore - defender.hp).coerceAtLeast(0) // FIX BUG-01: real damage
         } else {
-            resolveAttack(attacker, defender, log)
+            if (skill != null) log.add("${attacker.name} jest zbyt zmęczony na ${skill.name}!")
+            dmgToDefender = resolveAttack(attacker, defender, log)
         }
 
+        // FIX BUG-03: counterattack always happens regardless of skill use
         val dmgToAttacker = if (!isDefeated(defender)) {
             resolveCounterAttack(attacker, defender, log)
         } else {
@@ -159,15 +147,15 @@ class CombatRound @Inject constructor(
         }
 
         val defenderWound = applyWound(defender, log)
-        val attackerWound = applyWound(attacker, log)
+        val attackerWound  = applyWound(attacker, log)
 
         return RoundResult(
             attackerDamage = dmgToDefender,
             defenderDamage = dmgToAttacker,
-            attackerMorale = attacker.morale,
-            defenderMorale = defender.morale,
-            attackerWound = attackerWound,
-            defenderWound = defenderWound,
+            attackerMorale  = attacker.morale,
+            defenderMorale  = defender.morale,
+            attackerWound   = attackerWound,
+            defenderWound   = defenderWound,
             log = log
         )
     }
@@ -180,9 +168,9 @@ class CombatRound @Inject constructor(
         if (attacker.maxHp <= 0 || defender.maxHp <= 0) return 0
 
         val dodgeChance = (GrimConstants.Combat.BASE_DODGE_CHANCE +
-            ((defender.agility - 10) * GrimConstants.Combat.AGILITY_DODGE_MODIFIER)).coerceIn(0.05f, 0.8f)
+            ((defender.agility - 10) * GrimConstants.Combat.AGILITY_DODGE_MODIFIER))
+            .coerceIn(0.05f, 0.8f)
         val dodged = Random.nextFloat() < dodgeChance
-
         if (dodged) {
             log.add("${defender.name} unika ataku!")
             return 0
@@ -197,29 +185,31 @@ class CombatRound @Inject constructor(
 
         val attackerStatus = moraleSystem.computeStatus(attacker.morale)
         val defenderStatus = moraleSystem.computeStatus(defender.morale)
-        
-        val defArmor = defender.armor 
+        val defArmor = defender.armor
 
-        val critChance = (attacker.perception * GrimConstants.Combat.PERCEPTION_CRIT_MODIFIER).coerceAtMost(0.8f)
-        val isCrit = Random.nextFloat() < critChance
-        val critMod = if (isCrit) GrimConstants.Combat.CRITICAL_HIT_MULTIPLIER else 1.0f
+        val critChance = (attacker.perception * GrimConstants.Combat.PERCEPTION_CRIT_MODIFIER)
+            .coerceAtMost(0.8f)
+        val isCrit   = Random.nextFloat() < critChance
+        val critMod  = if (isCrit) GrimConstants.Combat.CRITICAL_HIT_MULTIPLIER else 1.0f
 
         val attackRoll = (rawAtk * attackerStatus.attackModifier() *
             (0.7f + Random.nextFloat() * 0.6f) * critMod).toInt()
         val defendRoll = (defArmor * defenderStatus.defenseModifier() *
             (0.5f + Random.nextFloat() * 0.5f)).toInt()
-
         val dmg = maxOf(1, attackRoll - defendRoll)
+
         if (isCrit) log.add("KRYTYK! ${attacker.name} zadaje potężny cios.")
-        
-        defender.hp = (defender.hp - dmg).coerceAtLeast(0)
+        defender.hp        = (defender.hp - dmg).coerceAtLeast(0)
         defender.endurance = (defender.endurance - dmg / 2).coerceAtLeast(0)
-        defender.morale = moraleSystem.moraleAfterHit(defender.morale, dmg)
+        defender.morale    = moraleSystem.moraleAfterHit(defender.morale, dmg)
         log.add("${attacker.name} atakuje ${defender.name}: $dmg obrażeń.")
 
-        if (attacker.charisma > 10) {
-            val regen = (attacker.charisma / 10) * GrimConstants.Combat.CHARISMA_MORALE_REGEN
-            attacker.morale = (attacker.morale + regen).coerceAtMost(GrimConstants.Combat.MAX_MORALE)
+        // FIX BUG-04: >= 10 so charisma exactly 10 also triggers regen
+        if (attacker.charisma >= 10) {
+            val regen = ((attacker.charisma - 10).coerceAtLeast(0) / 2 + 1) *
+                GrimConstants.Combat.CHARISMA_MORALE_REGEN
+            attacker.morale = (attacker.morale + regen)
+                .coerceAtMost(GrimConstants.Combat.MAX_MORALE)
             if (regen > 0) log.add("${attacker.name} zagrzewa siebie do walki. (+${regen} Morale)")
         }
 
@@ -234,17 +224,14 @@ class CombatRound @Inject constructor(
     ): Int {
         val attackerStatus = moraleSystem.computeStatus(attacker.morale)
         val defenderStatus = moraleSystem.computeStatus(defender.morale)
-
-        val counterAtk = (defender.attackBase * defenderStatus.attackModifier() *
+        val counterAtk  = (defender.attackBase * defenderStatus.attackModifier() *
             (0.6f + Random.nextFloat() * 0.8f)).toInt()
         val attackerDef = (attacker.armor * attackerStatus.defenseModifier() *
             (0.5f + Random.nextFloat() * 0.5f)).toInt()
-
         val dmg = maxOf(0, counterAtk - attackerDef)
-        attacker.hp = (attacker.hp - dmg).coerceAtLeast(0)
+        attacker.hp        = (attacker.hp - dmg).coerceAtLeast(0)
         attacker.endurance = (attacker.endurance - dmg / 2).coerceAtLeast(0)
-        attacker.morale = moraleSystem.moraleAfterHit(attacker.morale, dmg)
-
+        attacker.morale    = moraleSystem.moraleAfterHit(attacker.morale, dmg)
         if (dmg > 0) log.add("${defender.name} kontratakuje: $dmg obrażeń.")
         return dmg
     }
@@ -268,12 +255,12 @@ class CombatRound @Inject constructor(
                     log.add("${combatant.name} cierpi od trucizny: -${effect.strength} HP.")
                 }
                 StatusEffectType.BLEED -> {
-                    combatant.hp = (combatant.hp - effect.strength).coerceAtLeast(0)
+                    combatant.hp        = (combatant.hp - effect.strength).coerceAtLeast(0)
                     combatant.endurance = (combatant.endurance - 1).coerceAtLeast(0)
                     log.add("${combatant.name} krwawi: -${effect.strength} HP.")
                 }
                 StatusEffectType.FIRE -> {
-                    combatant.hp = (combatant.hp - effect.strength).coerceAtLeast(0)
+                    combatant.hp    = (combatant.hp - effect.strength).coerceAtLeast(0)
                     combatant.morale = (combatant.morale - 2).coerceAtLeast(0)
                     log.add("${combatant.name} płonie: -${effect.strength} HP.")
                 }
@@ -281,8 +268,17 @@ class CombatRound @Inject constructor(
                     combatant.morale = (combatant.morale - 1).coerceAtLeast(0)
                     log.add("${combatant.name} jest przemarznięty.")
                 }
+                // FIX BUG-05: WET now has mechanical effect — synergy damage when SHOCK is also active
                 StatusEffectType.WET -> {
                     log.add("${combatant.name} jest przemoczony.")
+                    val shockActive = combatant.activeEffects.any {
+                        it !== effect && it.type == StatusEffectType.SHOCK
+                    }
+                    if (shockActive) {
+                        val shockDmg = effect.strength * 2
+                        combatant.hp = (combatant.hp - shockDmg).coerceAtLeast(0)
+                        log.add("Mokre ciało przewodzi prąd! ${combatant.name}: -${shockDmg} HP.")
+                    }
                 }
                 StatusEffectType.SHOCK -> {
                     combatant.endurance = (combatant.endurance - 2).coerceAtLeast(0)
@@ -294,28 +290,35 @@ class CombatRound @Inject constructor(
         }
     }
 
-    private fun tryApplyStatus(attacker: CombatantState, defender: CombatantState, log: MutableList<String>) {
+    private fun tryApplyStatus(
+        attacker: CombatantState,
+        defender: CombatantState,
+        log: MutableList<String>
+    ) {
         val statusChance = GrimConstants.Combat.STATUS_CHANCE_BASE +
             ((attacker.intelligence - 10) * GrimConstants.Combat.STATUS_CHANCE_INT_MOD)
         if (Random.nextFloat() < statusChance) {
             val effectType = StatusEffectType.entries.toTypedArray().random()
-            val existing = defender.activeEffects.find { it.type == effectType }
+            val existing   = defender.activeEffects.find { it.type == effectType }
             if (existing != null) {
                 existing.duration += 2
             } else {
-                defender.activeEffects.add(StatusEffect(effectType, 3, 2 + attacker.intelligence / 4))
+                defender.activeEffects.add(
+                    StatusEffect(effectType, 3, 2 + attacker.intelligence / 4)
+                )
             }
             log.add("${defender.name} otrzymuje status: $effectType!")
         }
     }
 
+    // FIX BUG-02: Correct wound threshold order — SERIOUS before LIGHT
     private fun computeWound(state: CombatantState): WoundType {
         val hpPercent = if (state.maxHp > 0) state.hp.toFloat() / state.maxHp else 0f
         return when {
-            hpPercent <= 0f -> WoundType.CRITICAL
-            hpPercent <= GrimConstants.Combat.WOUND_THRESHOLD_LIGHT && state.endurance < 5 -> WoundType.SERIOUS
-            hpPercent <= GrimConstants.Combat.WOUND_THRESHOLD_SERIOUS && state.endurance < 10 -> WoundType.LIGHT
-            else -> WoundType.NONE
+            hpPercent <= 0f                                                          -> WoundType.CRITICAL
+            hpPercent <= GrimConstants.Combat.WOUND_THRESHOLD_SERIOUS && state.endurance < 10 -> WoundType.SERIOUS
+            hpPercent <= GrimConstants.Combat.WOUND_THRESHOLD_LIGHT   && state.endurance < 5  -> WoundType.LIGHT
+            else                                                                     -> WoundType.NONE
         }
     }
 
@@ -323,11 +326,17 @@ class CombatRound @Inject constructor(
         state.hp <= 0 || moraleSystem.computeStatus(state.morale) == MoraleStatus.ROUTED
 
     fun postCombatRecovery(hero: CombatantState): String {
-        val healHp = (hero.maxHp * GrimConstants.Combat.HP_RECOVERY_RATIO).toInt().coerceAtLeast(1)
+        val healHp = (hero.maxHp * GrimConstants.Combat.HP_RECOVERY_RATIO)
+            .toInt().coerceAtLeast(1)
         hero.hp = (hero.hp + healHp).coerceAtMost(hero.maxHp)
-        hero.endurance = (hero.endurance + GrimConstants.Combat.POST_COMBAT_HEAL_HP_MIN).coerceAtMost(99)
-        hero.morale = moraleSystem.moraleAfterKill(hero.morale)
+        // FIX BUG-06: Use random range between MIN and MAX instead of always MIN
+        val enduranceHeal = Random.nextInt(
+            GrimConstants.Combat.POST_COMBAT_HEAL_HP_MIN,
+            GrimConstants.Combat.POST_COMBAT_HEAL_HP_MAX + 1
+        )
+        hero.endurance = (hero.endurance + enduranceHeal).coerceAtMost(99)
+        hero.morale    = moraleSystem.moraleAfterKill(hero.morale)
         if (hero.wounds.isNotEmpty()) hero.wounds.removeAt(hero.wounds.lastIndex)
-        return "Leczenie: +$healHp HP. Morale: ${hero.morale}. Rany: ${hero.wounds.size}"
+        return "Leczenie: +$healHp HP, +$enduranceHeal Endurance. Morale: ${hero.morale}. Rany: ${hero.wounds.size}"
     }
 }
