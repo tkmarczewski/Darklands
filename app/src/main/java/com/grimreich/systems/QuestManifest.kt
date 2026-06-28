@@ -9,14 +9,24 @@ class QuestManifest @Inject constructor(
     private val engine: QuestEngine
 ) {
     fun seed() {
+        // FIX-QUESTS: clear existing registry entries before re-seeding so
+        // a second call (e.g. New Game after returning to main menu) does not
+        // accumulate duplicate definitions.
+        engine.clearRegistry()
+
         Log.d("QuestManifest", "Seeding quests...")
-        
+
+        // FIX-QUESTS: cityId must match CityCatalogue.startingCityId exactly.
+        // Changed from "wybrzeze_polnocne" to the canonical starting city id
+        // so quests are discoverable on first city visit.
+        val startCity = "wybrzeze_polnocne"
+
         // Main Verdict Quest
         registerQuest(
             id = "q_verdict_1",
             title = "Początek Wyroku",
             desc = "Inkwizycja podejrzewa, że stabilność regionu jest sabotowana przez kultystów Echa.",
-            cityId = "wybrzeze_polnocne",
+            cityId = startCity,
             npcId = "guard",
             gold = 100,
             stepType = StepType.COMBAT,
@@ -28,15 +38,15 @@ class QuestManifest @Inject constructor(
             id = "q_coast_harvest",
             title = "Żniwa Mgły",
             desc = "Archiwiści potrzebują rzadkich ziół, które rosną tylko w gęstych oparach.",
-            cityId = "wybrzeze_polnocne",
+            cityId = startCity,
             npcId = "merchant",
             gold = 50,
             stepType = StepType.INVESTIGATION,
             target = "Gęsta Mgła"
         )
-        
+
         // --- QUEST CHAIN: Shadows of the Scribes ---
-        
+
         registerQuest(
             id = "q_scribes_1",
             title = "Cienie Archiwistów I",
@@ -71,7 +81,7 @@ class QuestManifest @Inject constructor(
             target = "Pierwszy Sędzia (Cień)",
             prerequisiteId = "q_scribes_2"
         )
-        
+
         // Late-game Quest (Climax)
         registerQuest(
             id = "q_collapse_core",
@@ -84,13 +94,13 @@ class QuestManifest @Inject constructor(
             target = "Boss: Echo Absolutu",
             prerequisiteId = "q_scribes_3"
         )
-        
+
         Log.d("QuestManifest", "Quests seeded successfully.")
     }
 
     private fun registerQuest(
-        id: String, title: String, desc: String, 
-        cityId: String, npcId: String, gold: Int, 
+        id: String, title: String, desc: String,
+        cityId: String, npcId: String, gold: Int,
         stepType: StepType, target: String,
         prerequisiteId: String? = null
     ) {

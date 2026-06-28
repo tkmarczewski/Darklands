@@ -36,19 +36,22 @@ class GameBootstrapper @Inject constructor(
         cityCatalogue.clear()
         cityCatalogue.seedCanonical()
         itemCatalogue.seed()
-        questManifest.seed() 
         dialogueManager.seedBasicDialogues()
         worldMap.clear()
         worldMap.seedStage1(seed)
 
-        // Reset repository state to a clean template
+        // FIX-QUESTS: Reset state BEFORE seeding quests so the registry is
+        // populated into a clean slate, not later overwritten by replaceState().
         gameRepository.replaceState(GameState())
-        
+
+        // Seed quests AFTER state reset so they are always available.
+        questManifest.seed()
+
         gameRepository.updateState { state ->
             state.playerName = existingPlayerName
             state.heroName = existingHeroName
             state.unlockedLoreIds.addAll(existingLore)
-            
+
             state.persistentMeta.apply {
                 totalSessionsFinished = existingMeta.totalSessionsFinished
                 unlockedLegacyBuffs.addAll(existingMeta.unlockedLegacyBuffs)
@@ -64,6 +67,8 @@ class GameBootstrapper @Inject constructor(
             state.world.day = 1
             state.world.timeOfDay = "morning"
             state.world.location = cityCatalogue.startingCityId
+            // FIX-QUESTS: grimCurrentRegion must match startingCityId so that
+            // getAllRelevantQuestsForCity() finds quests for the starting city.
             state.grimCurrentRegion = cityCatalogue.startingCityId
             state.gold = GameConstants.INITIAL_GOLD
 

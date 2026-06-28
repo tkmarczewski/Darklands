@@ -35,6 +35,32 @@ class GameRootViewModel @Inject constructor(
 
     fun setMode(mode: GameScreenMode) {
         _mode.value = mode
+        // FIX-AUDIO: trigger music change on every screen transition
+        val route = when (mode) {
+            GameScreenMode.MAIN_MENU        -> "main_menu"
+            GameScreenMode.HUB             -> "hub"
+            GameScreenMode.CITY            -> "city"
+            GameScreenMode.WORLD_MAP       -> "map"
+            GameScreenMode.COMBAT          -> "combat"
+            GameScreenMode.TAVERN          -> "tavern"
+            GameScreenMode.MARKET          -> "market"
+            GameScreenMode.EXPEDITION      -> "expedition"
+            GameScreenMode.EVENTS          -> "events"
+            GameScreenMode.RITUAL          -> "ritual"
+            GameScreenMode.ENDING          -> "ending"
+            GameScreenMode.TEMPLE,
+            GameScreenMode.ALCHEMY,
+            GameScreenMode.DIALOGUE,
+            GameScreenMode.QUESTS,
+            GameScreenMode.CHRONICLE,
+            GameScreenMode.RECRUIT,
+            GameScreenMode.INVENTORY,
+            GameScreenMode.CHAR_DETAIL,
+            GameScreenMode.CHARACTER_CREATOR,
+            GameScreenMode.PLAYER_IDENTITY,
+            GameScreenMode.DEV_MENU        -> return  // no music change for UI-only screens
+        }
+        audioEngine.playForRoute(route)
     }
 
     fun startNewGame() {
@@ -49,11 +75,11 @@ class GameRootViewModel @Inject constructor(
     fun finalizeCharacterCreation(name: String, career: Career, attrs: Map<String, Int>, skills: List<HeroSkill>) {
         viewModelScope.launch {
             gameBootstrapper.bootstrapFreshWorld()
-            
+
             gameRepository.updateState { state ->
                 state.playerName = pendingPlayerName ?: "Wędrowiec"
                 state.heroName = name
-                
+
                 // Create the hero object from creation data
                 val hero = Hero(
                     id = "hero_main",
@@ -70,15 +96,15 @@ class GameRootViewModel @Inject constructor(
                     hp = 40,
                     maxHp = 40
                 )
-                
+
                 // Apply skills
                 skills.forEach { hero.skills[it.displayName] = 40 }
-                
+
                 state.party.add(hero)
                 state.activeHeroId = hero.id
                 state.logEntries.add("Bohater $name wyrusza w drogę.")
             }
-            
+
             gameRepository.persistCurrentState()
             setMode(GameScreenMode.HUB)
         }
@@ -103,13 +129,13 @@ class GameRootViewModel @Inject constructor(
             if (hero.attributePoints > 0) {
                 hero.attributePoints--
                 when (stat.lowercase()) {
-                    "strength", "siła" -> hero.strength++
-                    "agility", "zręczność" -> hero.agility++
+                    "strength", "siła"         -> hero.strength++
+                    "agility", "zręczność"     -> hero.agility++
                     "intelligence", "inteligencja" -> hero.intelligence++
                     "endurance", "wytrzymałość" -> hero.endurance++
-                    "perception", "percepcja" -> hero.perception++
-                    "charisma", "charyzma" -> hero.charisma++
-                    "piety", "pobożność" -> hero.piety++
+                    "perception", "percepcja"  -> hero.perception++
+                    "charisma", "charyzma"     -> hero.charisma++
+                    "piety", "pobożność"       -> hero.piety++
                 }
                 state.logEntries.add("${hero.name} rozwija swoją naturę: $stat +1.")
             }
