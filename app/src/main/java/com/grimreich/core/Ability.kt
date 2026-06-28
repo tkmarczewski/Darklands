@@ -64,7 +64,7 @@ fun canPayAbilityCost(hero: Hero, ability: Ability): Boolean = when (ability.cos
     CostType.MANA -> true
     CostType.STAMINA -> hero.endurance >= ability.costValue
     CostType.SANITY -> hero.sanity >= ability.costValue
-    CostType.HP -> hero.hp > ability.costValue
+    CostType.HP -> hero.hp > ability.costValue && hero.hp - ability.costValue >= 1
     CostType.NONE -> true
     CostType.PRAYER -> hero.piety >= ability.costValue
 }

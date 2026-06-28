@@ -50,8 +50,11 @@ data class Hero(
 ) {
     fun normalize() {
         hp = hp.coerceIn(0, maxHp)
-        sanity = sanity.coerceAtLeast(0)
-        endurance = endurance.coerceAtLeast(0)
+        sanity = sanity.coerceIn(0, 100)
+        endurance = endurance.coerceIn(0, 99)
+        divineFavor = divineFavor.coerceAtLeast(0)
+        corruption = corruption.coerceIn(0, 100)
+        morale = morale.coerceIn(0, 100)
     }
 
     fun getEquipmentBonus(stat: String, items: List<Item>): Int {

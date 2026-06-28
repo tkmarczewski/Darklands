@@ -39,7 +39,9 @@ class StatePersistenceManager @Inject constructor(
             val tmp = File(sessionFile.parentFile, sessionFile.name + ".tmp")
             tmp.writeText(json.encodeToString(SessionStateDto.serializer(), session))
             if (sessionFile.exists()) sessionFile.delete()
-            tmp.renameTo(sessionFile)
+            if (!tmp.renameTo(sessionFile)) {
+                Log.e(TAG, "Nie udalo sie przemianowac pliku sesji")
+            }
         } catch (e: Exception) {
             Log.e(TAG, "Blad zapisu sesji do pliku: $sessionFileName", e)
         }
@@ -68,7 +70,9 @@ class StatePersistenceManager @Inject constructor(
             val tmp = File(slotsFile.parentFile, slotsFile.name + ".tmp")
             tmp.writeText(data)
             if (slotsFile.exists()) slotsFile.delete()
-            tmp.renameTo(slotsFile)
+            if (!tmp.renameTo(slotsFile)) {
+                throw IllegalStateException("Nie udalo sie zapisac pliku slotow")
+            }
         } catch (e: Exception) {
             Log.e(TAG, "Blad zapisu slotow", e)
         }
@@ -81,7 +85,11 @@ class StatePersistenceManager @Inject constructor(
             gson.fromJson(slotsFile.readText(), type) ?: emptyMap()
         } catch (e: Exception) {
             Log.e(TAG, "Blad odczytu slotow", e)
+            if (slotsFile.exists()) slotsFile.delete()
             emptyMap()
         }
     }
+
+    fun hasPersistedSession(): Boolean = sessionFile.exists()
+    fun hasPersistedSlots(): Boolean = slotsFile.exists()
 }

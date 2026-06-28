@@ -96,6 +96,7 @@ data class CombatantState(
     fun normalize() {
         hp = hp.coerceIn(0, maxHp)
         endurance = endurance.coerceAtLeast(0)
+        morale = morale.coerceIn(0, GrimConstants.Combat.MAX_MORALE)
     }
 }
 
@@ -256,7 +257,7 @@ class CombatRound @Inject constructor(
 
     private fun applyWound(combatant: CombatantState, log: MutableList<String>): WoundType {
         val wound = computeWound(combatant)
-        if (wound != WoundType.NONE) {
+        if (wound != WoundType.NONE && !combatant.wounds.contains(wound)) {
             combatant.wounds.add(wound)
             log.add("${combatant.name} otrzymuje ranę: $wound")
         }
@@ -318,7 +319,7 @@ class CombatRound @Inject constructor(
             val effectType = StatusEffectType.entries.toTypedArray().random()
             val existing   = defender.activeEffects.find { it.type == effectType }
             if (existing != null) {
-                existing.duration += 2
+                existing.duration = (existing.duration + 2).coerceAtMost(10)
             } else {
                 defender.activeEffects.add(
                     StatusEffect(effectType, 3, 2 + attacker.intelligence / 4)
@@ -352,6 +353,7 @@ class CombatRound @Inject constructor(
         hero.endurance = (hero.endurance + enduranceHeal).coerceAtMost(99)
         hero.morale    = moraleSystem.moraleAfterKill(hero.morale)
         if (hero.wounds.isNotEmpty()) hero.wounds.removeAt(hero.wounds.lastIndex)
+        hero.normalize()
         return "Leczenie: +$healHp HP, +$enduranceHeal Endurance. Morale: ${hero.morale}. Rany: ${hero.wounds.size}"
     }
 }

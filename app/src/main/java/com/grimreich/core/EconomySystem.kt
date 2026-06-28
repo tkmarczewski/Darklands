@@ -86,10 +86,11 @@ object TradingEngine {
     fun buyGood(state: GameState, cityId: String, type: TradeGoodType, qty: Int = 1): String {
         val market = CityMarketCatalog.getMarket(cityId) ?: return "Brak rynku w tej lokacji."
         val good = TradeGoodCatalog.findByType(type) ?: return "Nieznany towar."
-        val totalCost = market.getPrice(type) * qty
+        val safeQty = qty.coerceAtLeast(1)
+        val totalCost = market.getPrice(type) * safeQty
         if (state.gold < totalCost) return "Brak złota. Potrzeba $totalCost G."
         state.gold -= totalCost
-        repeat(qty) {
+        repeat(safeQty) {
             state.inventory.add(Item(
                 id = "trade_${type.name.lowercase()}", 
                 name = good.name, 
@@ -101,7 +102,7 @@ object TradingEngine {
                 effects = emptyMap()
             ))
         }
-        return "Kupiono ${good.name} x$qty za $totalCost G."
+        return "Kupiono ${good.name} x$safeQty za $totalCost G."
     }
 
     fun sellItem(state: GameState, itemId: String): String {
@@ -120,14 +121,15 @@ object TradingEngine {
         qty: Int = 1
     ): String {
         val market = CityMarketCatalog.getMarket(cityId) ?: return "Brak rynku w tej lokacji."
+        val safeQty = qty.coerceAtLeast(1)
         val rep = state.reputation.globalFactions[factionId] ?: 0
         val modifier = FactionReputationSystem.buyModifier(rep)
         val unitPrice = (market.getPrice(type) * modifier).toInt().coerceAtLeast(1)
-        val total = unitPrice * qty
+        val total = unitPrice * safeQty
         if (state.gold < total) return "Brak złota. Potrzeba $total G."
         val good = TradeGoodCatalog.findByType(type) ?: return "Błąd towaru."
         state.gold -= total
-        repeat(qty) {
+        repeat(safeQty) {
             state.inventory.add(Item(
                 id = "trade_${type.name.lowercase()}_${state.world.day}", 
                 name = good.name, 
@@ -139,6 +141,21 @@ object TradingEngine {
                 effects = emptyMap()
             ))
         }
-        return "Kupiono ${good.name} x$qty za $total G (zniżka frakcyjna)."
+        return "Kupiono ${good.name} x$safeQty za $total G (zniżka frakcyjna)."
+    }
+
+    fun sellWithFactionModifier(
+        state: GameState,
+        itemId: String,
+        factionId: String
+    ): String {
+        val item = state.inventory.find { it.id == itemId } ?: return "Brak przedmiotu."
+        val rep = state.reputation.globalFactions[factionId] ?: 0
+        val modifier = FactionReputationSystem.sellModifier(rep)
+        val base = (item.value * GrimConstants.Economy.SELL_PRICE_MULTIPLIER).toInt().coerceAtLeast(1)
+        val finalPrice = (base * modifier).toInt().coerceAtLeast(1)
+        state.inventory.remove(item)
+        state.gold += finalPrice
+        return "Sprzedano ${item.name} za $finalPrice G."
     }
 }

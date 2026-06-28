@@ -36,13 +36,13 @@ object SaveSystem {
         snapshot = slots[slotId]
     )
 
-    fun getAllSlots(count: Int = 3): List<SaveSlot> = (0 until count).map { getSlot(it) }
+    fun getAllSlots(count: Int = 3): List<SaveSlot> = (0 until count.coerceAtLeast(0)).map { getSlot(it) }
 
     fun deleteSlot(slotId: Int) { slots.remove(slotId) }
 
     fun importSlots(persisted: Map<Int, SaveSnapshot>) {
         slots.clear()
-        slots.putAll(persisted)
+        slots.putAll(persisted.filterKeys { it >= 0 })
     }
 
     fun exportSlots(): Map<Int, SaveSnapshot> = slots.toMap()

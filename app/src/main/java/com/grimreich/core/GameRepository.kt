@@ -46,6 +46,7 @@ class GameRepository @Inject constructor(
         synchronized(this) {
             val mutable = _gameState.value.deepCopy()
             transform(mutable)
+            mutable.normalizeState()
             _gameState.value = mutable
             persistCurrentState()
         }

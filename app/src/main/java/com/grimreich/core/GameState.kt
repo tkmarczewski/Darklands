@@ -45,6 +45,13 @@ data class GameState(
         }
     }
 
+    fun normalizeState() {
+        if (gold < 0) gold = 0
+        party.forEach { it.normalize() }
+        hireableHeroes.forEach { it.normalize() }
+        trimLogs()
+    }
+
     fun deepCopy(): GameState = GameState(
         grimEngine = GrimWorldEngineFactory.create().also {
             it.echoIntensity = grimEchoIntensity
