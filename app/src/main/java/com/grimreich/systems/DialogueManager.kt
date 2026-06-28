@@ -1,6 +1,7 @@
 package com.grimreich.systems
 
 import com.grimreich.core.GameRepository
+import com.grimreich.core.QuestStatus
 import com.grimreich.grimreich.v1.DialogueChoice
 import com.grimreich.grimreich.v1.DialogueNode
 import dagger.Lazy
@@ -28,13 +29,7 @@ class DialogueManager @Inject constructor(
     fun getNode(id: String): DialogueNode? {
         val baseNode = nodes[id] ?: return null
         val stability = gameRepositoryProvider.get().currentState().world.globalStability
-        
-        // Project Cipher: Apply glitches based on stability
-        return if (stability < 40) {
-            applyWorldEffects(baseNode, stability)
-        } else {
-            baseNode
-        }
+        return if (stability < 40) applyWorldEffects(baseNode, stability) else baseNode
     }
 
     fun hasNode(id: String): Boolean = nodes.containsKey(id)
@@ -47,29 +42,24 @@ class DialogueManager @Inject constructor(
     fun makeChoice(choice: DialogueChoice): DialogueNode? {
         val repo = gameRepositoryProvider.get()
         val state = repo.currentState()
-        
         choice.onSelect(state)
         state.trimLogs()
-        
         val target = choice.targetNodeId
         if (target != "end" && getNode(target) == null) {
             repo.log("[Dialogue] Missing target node: $target")
             activeDialogueId = null
             return null
         }
-
         activeDialogueId = if (target == "end") null else target
         return activeDialogueId?.let { getNode(it) }
     }
 
-    fun getPortrait(npcId: String): String {
-        return when (npcId) {
-            "guard" -> "port_guard"
-            "merchant" -> "port_merchant"
-            "aelion" -> "port_prophet"
-            "mira" -> "port_mira"
-            else -> "port_knight"
-        }
+    fun getPortrait(npcId: String): String = when (npcId.lowercase()) {
+        "guard", "straznik" -> "port_guard"
+        "merchant", "kupiec" -> "port_merchant"
+        "aelion" -> "port_prophet"
+        "mira" -> "port_mira"
+        else -> "port_knight"
     }
 
     private fun applyWorldEffects(node: DialogueNode, stability: Int): DialogueNode {
@@ -90,7 +80,7 @@ class DialogueManager @Inject constructor(
     fun seedBasicDialogues() {
         if (nodes.isNotEmpty()) return
 
-        // 1. GUARD
+        // ── 1. GUARD ─────────────────────────────────────────────────────────
         registerNode(DialogueNode(
             id = "guard_start", npcId = "guard",
             text = "Stój! Mgła gęstnieje, a prawo musi być przestrzegane. Czego szukasz w cieniu murów?",
@@ -112,24 +102,31 @@ class DialogueManager @Inject constructor(
             )
         ))
 
+        // FIX: guard_report_back now sets FINALIZE flag so DialogueViewModel
+        // calls questEngine.completeQuest("q_verdict_1") after the dialogue ends.
+        // Gold reward is handled inside completeQuest() via rewardGold on the definition.
+        // An idempotent flag also guards against double-rewards if node is revisited.
         registerNode(DialogueNode(
             id = "guard_report_back", npcId = "guard",
             text = "Dobra robota, Kotwico. Inkwizycja dziękuje za Twoją służbę. Oto zapłata.",
             choices = listOf(
                 DialogueChoice("Ku chwale Zakonu.", "end", onSelect = { s ->
-                    val rewardFlag = "reward_guard_report_back"
-                    if (!s.grantedRewardFlags.contains(rewardFlag)) {
-                        s.gold += 100
-                        s.reputation.globalFactions["KNIGHTS"] = (s.reputation.globalFactions["KNIGHTS"] ?: 0) + 10
-                        s.grantedRewardFlags.add(rewardFlag)
+                    // Mark for engine-level completion (gold via rewardGold in QuestDefinition).
+                    // Guard against double-trigger if player re-opens this node somehow.
+                    val flag = "finalize_guard_q_verdict_1"
+                    if (!s.grantedRewardFlags.contains(flag)) {
+                        s.pendingQuestId = "FINALIZE:q_verdict_1"
+                        s.grantedRewardFlags.add(flag)
+                        s.reputation.globalFactions["KNIGHTS"] =
+                            (s.reputation.globalFactions["KNIGHTS"] ?: 0) + 10
                     } else {
-                        s.logEntries.add("Nagroda od strażnika została już odebrana.")
+                        s.logEntries.add("[Wyrok] Zadanie zostało już ukończone.")
                     }
                 })
             )
         ))
 
-        // 2. MERCHANT
+        // ── 2. MERCHANT ──────────────────────────────────────────────────────
         registerNode(DialogueNode(
             id = "merchant_start", npcId = "merchant",
             text = "Witaj, podróżniku. Mam towary, których nie znajdziesz nigdzie indziej... za odpowiednią cenę.",
@@ -148,7 +145,36 @@ class DialogueManager @Inject constructor(
             )
         ))
 
-        // 3. AELION (Regional Hero)
+        // FIX: previously missing node — caused crash/empty dialogue for q_coast_harvest
+        registerNode(DialogueNode(
+            id = "merchant_quest_check", npcId = "merchant",
+            text = "Archiwiści potrzebują tych ziół pilnie. Żniwa Mgły to ryzykowna wyprawa, ale zapłata jest uczciwa.",
+            choices = listOf(
+                DialogueChoice("Przyjmuję zlecenie.", "end", onSelect = { state ->
+                    questEngine.get().activateQuest("q_coast_harvest")
+                    state.pendingQuestId = null
+                }),
+                DialogueChoice("Zbyt ryzykowne.", "end")
+            )
+        ))
+
+        registerNode(DialogueNode(
+            id = "merchant_report_back", npcId = "merchant",
+            text = "Doskonale! Dostarczyłeś zioła w idealnym stanie. Inkasuj zapłatę, podróżniku.",
+            choices = listOf(
+                DialogueChoice("Do usług.", "end", onSelect = { s ->
+                    val flag = "finalize_merchant_q_coast_harvest"
+                    if (!s.grantedRewardFlags.contains(flag)) {
+                        s.pendingQuestId = "FINALIZE:q_coast_harvest"
+                        s.grantedRewardFlags.add(flag)
+                    } else {
+                        s.logEntries.add("[Żniwa Mgły] Zadanie zostało już ukończone.")
+                    }
+                })
+            )
+        ))
+
+        // ── 3. AELION ─────────────────────────────────────────────────────────
         registerNode(DialogueNode(
             id = "aelion_start", npcId = "aelion",
             text = "Kotwico... Twoja obecność tutaj jest jak pęknięcie na tafli jeziora. Czy wiesz, że ten świat jest tylko snem Sędziów?",
@@ -174,8 +200,8 @@ class DialogueManager @Inject constructor(
                 DialogueChoice("Zrobię to.", "end")
             )
         ))
-        
-        // 4. MIRA (Regional Hero)
+
+        // ── 4. MIRA ───────────────────────────────────────────────────────────
         registerNode(DialogueNode(
             id = "mira_start", npcId = "mira",
             text = "Lustra nie kłamią, podróżniku. Widzę w Twoim odbiciu wiele wersji GrimReich. Która z nich jest prawdziwa?",
@@ -185,12 +211,56 @@ class DialogueManager @Inject constructor(
                 DialogueChoice("To nie ma znaczenia.", "end")
             )
         ))
-        
+
         registerNode(DialogueNode(
             id = "mira_wisdom", npcId = "mira",
             text = "Słusznie. Prawda jest jedynie sumą wszystkich echa. Jeśli chcesz wiedzieć więcej, przynieś mi Esencję Odbicia.",
             choices = listOf(
                 DialogueChoice("Będę pamiętał.", "end")
+            )
+        ))
+
+        // FIX: previously missing node — caused crash/empty dialogue for q_scribes_*
+        registerNode(DialogueNode(
+            id = "mira_quest_check", npcId = "mira",
+            text = "Kronika pęka w szwach. Widzę w niej cienie, które nie powinny tam być. Pomożesz mi zbadać to?",
+            choices = listOf(
+                DialogueChoice("Przyjmuję zadanie Cieni.", "end", onSelect = { state ->
+                    // Activate whichever scribes quest is currently AVAILABLE in the chain
+                    val engine = questEngine.get()
+                    val nextQuest = listOf("q_scribes_1", "q_scribes_2", "q_scribes_3", "q_collapse_core")
+                        .firstOrNull { engine.getStatus(it) == QuestStatus.AVAILABLE }
+                    nextQuest?.let {
+                        engine.activateQuest(it)
+                        state.pendingQuestId = null
+                    }
+                }),
+                DialogueChoice("Jeszcze nie teraz.", "end")
+            )
+        ))
+
+        registerNode(DialogueNode(
+            id = "mira_report_back", npcId = "mira",
+            text = "Kronika mówi prawdę po raz pierwszy od wieków. Twoja determinacja otwiera kolejną ścieżkę.",
+            choices = listOf(
+                DialogueChoice("Co dalej?", "end", onSelect = { s ->
+                    // Find which scribes quest is OBJECTIVE_MET and finalize it
+                    val metQuest = s.quest.progress.values.find { progress ->
+                        progress.status == QuestStatus.OBJECTIVE_MET &&
+                            progress.questId.startsWith("q_scribes_") || 
+                            progress.questId == "q_collapse_core" && 
+                            progress.status == QuestStatus.OBJECTIVE_MET
+                    }
+                    metQuest?.let { progress ->
+                        val flag = "finalize_mira_${progress.questId}"
+                        if (!s.grantedRewardFlags.contains(flag)) {
+                            s.pendingQuestId = "FINALIZE:${progress.questId}"
+                            s.grantedRewardFlags.add(flag)
+                        } else {
+                            s.logEntries.add("[${progress.questId}] Zadanie zostało już ukończone.")
+                        }
+                    }
+                })
             )
         ))
     }
