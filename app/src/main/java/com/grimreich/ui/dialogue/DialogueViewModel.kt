@@ -54,7 +54,7 @@ class DialogueViewModel @Inject constructor(
                         currentNode = node,
                         npcName = npcName,
                         npcRole = npcRole,
-                        npcPortrait = "port_knight", // Default for now
+                        npcPortrait = dialogueManager.getPortrait(npcRole.lowercase()),
                         backgroundDrawable = city?.backgroundDrawable ?: "bg_generic_city",
                         availableChoices = choices,
                         worldStability = state.world.globalStability
@@ -66,17 +66,23 @@ class DialogueViewModel @Inject constructor(
 
     private fun checkRequirements(choice: DialogueChoice, state: GameState): Boolean {
         // Logic check: e.g. gold, items, quest status
-        if (choice.requiredReputation > 0) {
-            // Check global or city rep?
-        }
         return true
     }
 
     fun choose(choice: DialogueChoice) {
+        var questToFinalize: String? = null
+
         gameRepository.updateState { state ->
+            // PRE-FINALIZATION CHECK
+            val pendingFinalize = state.pendingQuestId
+            if (pendingFinalize != null && pendingFinalize.startsWith("FINALIZE:")) {
+                questToFinalize = pendingFinalize.removePrefix("FINALIZE:")
+                state.pendingQuestId = null
+            }
+
             state.pendingDialogueNodeId = choice.targetNodeId
             
-            // Execute logic-level effects defined in the choice
+            // Execute logic-level effects defined in the choice (e.g. adding reward flags)
             choice.onSelect(state)
             
             if (choice.targetNodeId == "end") {
@@ -85,5 +91,8 @@ class DialogueViewModel @Inject constructor(
                 state.pendingDialogueNodeId = null
             }
         }
+
+        // EXECUTE ENGINE FINALIZATION OUTSIDE SYNC BLOCK
+        questToFinalize?.let { questEngine.completeQuest(it) }
     }
 }

@@ -136,6 +136,7 @@ class DialogueManager @Inject constructor(
             choices = listOf(
                 DialogueChoice("Pokaż mi swoje towary (RYNEK).", "end"),
                 DialogueChoice("Co wiesz o tym regionie?", "merchant_info"),
+                DialogueChoice("Czy potrzebujesz pomocy?", "merchant_quest_check"),
                 DialogueChoice("Do widzenia.", "end")
             )
         ))
@@ -145,6 +146,33 @@ class DialogueManager @Inject constructor(
             text = "Ceny rosną, a stabilność spada. Mówią, że Archiwiści znowu zaczęli śnić.",
             choices = listOf(
                 DialogueChoice("Interesujące.", "merchant_start")
+            )
+        ))
+
+        registerNode(DialogueNode(
+            id = "merchant_quest_check", npcId = "merchant",
+            text = "Archiwiści potrzebują rzadkich ziół z mgły. To niebezpieczna robota, ale dobrze płatna.",
+            choices = listOf(
+                DialogueChoice("Przyjmuję zlecenie (Żniwa Mgły).", "end", onSelect = { state ->
+                    questEngine.get().activateQuest("q_coast_harvest")
+                    state.pendingQuestId = null
+                }),
+                DialogueChoice("Może później.", "end")
+            )
+        ))
+
+        registerNode(DialogueNode(
+            id = "merchant_report_back", npcId = "merchant",
+            text = "Dobra robota. Zioła dotarły całe. Możemy zamknąć sprawę. Oto Twoje złoto.",
+            choices = listOf(
+                DialogueChoice("W porządku.", "end", onSelect = { s ->
+                    val flag = "reward_merchant_report_back"
+                    if (!s.grantedRewardFlags.contains(flag)) {
+                        s.gold += 50
+                        s.grantedRewardFlags.add(flag)
+                        s.logEntries.add("Odebrano nagrodę: Żniwa Mgły.")
+                    }
+                })
             )
         ))
 
@@ -182,6 +210,7 @@ class DialogueManager @Inject constructor(
             choices = listOf(
                 DialogueChoice("Wszystkie są prawdziwe.", "mira_wisdom"),
                 DialogueChoice("Żadna nie jest prawdziwa.", "mira_wisdom"),
+                DialogueChoice("Potrzebuję Twojej wiedzy.", "mira_quest_check"),
                 DialogueChoice("To nie ma znaczenia.", "end")
             )
         ))
@@ -191,6 +220,43 @@ class DialogueManager @Inject constructor(
             text = "Słusznie. Prawda jest jedynie sumą wszystkich echa. Jeśli chcesz wiedzieć więcej, przynieś mi Esencję Odbicia.",
             choices = listOf(
                 DialogueChoice("Będę pamiętał.", "end")
+            )
+        ))
+
+        registerNode(DialogueNode(
+            id = "mira_quest_check", npcId = "mira",
+            text = "Kronika została naruszona. Widzę w niej cienie, które nie powinny tam być. Pomożesz mi zbadać to?",
+            choices = listOf(
+                DialogueChoice("Przyjmuję zadanie Cieni.", "end", onSelect = { state ->
+                    val engine = questEngine.get()
+                    when {
+                        engine.getStatus("q_scribes_1") == com.grimreich.core.QuestStatus.AVAILABLE -> engine.activateQuest("q_scribes_1")
+                        engine.getStatus("q_scribes_2") == com.grimreich.core.QuestStatus.AVAILABLE -> engine.activateQuest("q_scribes_2")
+                        engine.getStatus("q_scribes_3") == com.grimreich.core.QuestStatus.AVAILABLE -> engine.activateQuest("q_scribes_3")
+                        engine.getStatus("q_collapse_core") == com.grimreich.core.QuestStatus.AVAILABLE -> engine.activateQuest("q_collapse_core")
+                    }
+                    state.pendingQuestId = null
+                }),
+                DialogueChoice("Nie teraz.", "end")
+            )
+        ))
+
+        registerNode(DialogueNode(
+            id = "mira_report_back", npcId = "mira",
+            text = "Dobrze. Zamknijmy ten rozdział i zobaczmy, co odsłoni następny.",
+            choices = listOf(
+                DialogueChoice("Jestem gotów.", "end", onSelect = { s ->
+                    val q = s.quest.progress.values.find { 
+                        it.status == com.grimreich.core.QuestStatus.OBJECTIVE_MET && 
+                        it.questId.startsWith("q_scribes_") 
+                    }
+                    q?.let {
+                        val flag = "reward_${it.questId}"
+                        if (!s.grantedRewardFlags.contains(flag)) {
+                            s.grantedRewardFlags.add(flag)
+                        }
+                    }
+                })
             )
         ))
     }

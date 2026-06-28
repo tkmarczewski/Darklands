@@ -38,20 +38,17 @@ class QuestEngine @Inject constructor(
     fun getDefinition(id: String) = registry[id]
 
     fun getStatus(questId: String, visited: MutableSet<String> = mutableSetOf()): QuestStatus {
-        val def = registry[questId] ?: return QuestStatus.LOCKED // FIX: Strictly locked if not in registry
+        val def = registry[questId] ?: return QuestStatus.LOCKED
         
         if (!visited.add(questId)) return QuestStatus.LOCKED
         
         val state = gameRepository.currentState()
         
-        // 1. Check if completed
         if (state.quest.completedQuestIds.contains(questId)) return QuestStatus.COMPLETED
         
-        // 2. Check if active
         val progress = state.quest.progress[questId]
         if (progress != null) return progress.status
         
-        // 3. Chain logic: Check prerequisites
         if (def.prerequisiteQuestId != null) {
             val prereqStatus = getStatus(def.prerequisiteQuestId, visited)
             return if (prereqStatus == QuestStatus.COMPLETED) QuestStatus.AVAILABLE else QuestStatus.LOCKED
@@ -92,12 +89,13 @@ class QuestEngine @Inject constructor(
             val def = registry[questId] ?: return@updateState
             
             if (p.status == QuestStatus.OBJECTIVE_MET) {
-                state.quest.progress[questId] = p.copy(status = QuestStatus.COMPLETED)
+                // FIX: Reward first, then remove from active tracking
+                state.gold += def.rewardGold
+                state.logEntries.add("Ukończono zadanie: ${def.title}. Otrzymano ${def.rewardGold} G.")
+                
                 state.quest.completedQuestIds.add(questId)
                 state.quest.progress.remove(questId)
                 state.quest.activeQuestIds.remove(questId)
-                state.gold += def.rewardGold
-                state.logEntries.add("Ukończono zadanie: ${def.title}. Otrzymano ${def.rewardGold} G.")
             }
         }
     }
