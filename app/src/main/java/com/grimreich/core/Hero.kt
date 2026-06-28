@@ -1,6 +1,7 @@
 package com.grimreich.core
 
 import com.grimreich.core.mutations.Mutation
+import com.grimreich.grimreich.v1.Item
 
 data class Hero(
     val id: String,
@@ -47,13 +48,24 @@ data class Hero(
         "weapon" to null, "armor" to null, "helmet" to null, "shield" to null, "accessory" to null
     )
 ) {
-    fun getEquipmentBonus(stat: String, items: List<com.grimreich.grimreich.v1.Item>): Int {
+    fun normalize() {
+        hp = hp.coerceIn(0, maxHp)
+        sanity = sanity.coerceAtLeast(0)
+        endurance = endurance.coerceAtLeast(0)
+    }
+
+    fun getEquipmentBonus(stat: String, items: List<Item>): Int {
+        if (equipment.isEmpty()) return 0
         val equippedIds = equipment.values.filterNotNull()
         return items.filter { it.id in equippedIds }
             .sumOf { it.effects[stat] ?: 0 }
     }
 
-    fun effectiveAttack(items: List<com.grimreich.grimreich.v1.Item>): Int = 5 + (strength / 2) + getEquipmentBonus("attack", items)
-    fun effectiveDefense(items: List<com.grimreich.grimreich.v1.Item>): Int = (agility / 2) + getEquipmentBonus("defense", items)
-    fun effectiveArmor(items: List<com.grimreich.grimreich.v1.Item>): Int = getEquipmentBonus("armor", items)
+    fun effectiveAttack(items: List<Item>): Int = 
+        (strength / 2).coerceAtLeast(1) + getEquipmentBonus("attack", items)
+        
+    fun effectiveDefense(items: List<Item>): Int = 
+        (agility / 2).coerceAtLeast(1) + getEquipmentBonus("defense", items)
+        
+    fun effectiveArmor(items: List<Item>): Int = getEquipmentBonus("armor", items)
 }

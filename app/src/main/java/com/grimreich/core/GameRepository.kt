@@ -51,10 +51,12 @@ class GameRepository @Inject constructor(
         }
     }
 
-    fun log(msg: String) {
-        updateState { 
-            it.logEntries.add(msg)
-            if (it.logEntries.size > GameConstants.MAX_LOG_ENTRIES) it.logEntries.removeAt(0)
+    fun log(message: String) {
+        updateState { state ->
+            state.logEntries.add(message)
+            while (state.logEntries.size > GameConstants.MAX_LOG_ENTRIES) {
+                state.logEntries.removeAt(0)
+            }
         }
     }
 
@@ -67,6 +69,7 @@ class GameRepository @Inject constructor(
 
     fun restoreIfAvailable(): Boolean {
         val restored = persistence.restore()
+        SaveSystem.restoreFromPersistence(persistence)
         if (restored != null) {
             if (restored.version < 3) {
                 persistence.clear()
@@ -81,18 +84,18 @@ class GameRepository @Inject constructor(
     }
 
     fun persistCurrentState() {
-        // Sync engine stats to state before persisting
         val stateSnapshot = _gameState.value.deepCopy().also {
             it.grimEchoIntensity = it.grimEngine.echoIntensity
             it.grimMutationPhase = it.grimEngine.mutationPhase
         }
-
+        
         repositoryScope.launch {
             try {
                 val dto = stateSnapshot.toDto()
                 persistence.persist(dto)
+                SaveSystem.saveToPersistence(persistence)
             } catch (e: Exception) {
-                e.printStackTrace()
+                log("[Persistence] Save failed: ${e.message ?: "unknown error"}")
             }
         }
     }

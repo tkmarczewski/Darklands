@@ -36,8 +36,15 @@ data class GameState(
     var lastSaveTimestamp: Long = System.currentTimeMillis(),
     
     var grimEchoIntensity: Float = 0f,
-    var grimMutationPhase: Int = 0
+    var grimMutationPhase: Int = 0,
+    val grantedRewardFlags: MutableSet<String> = mutableSetOf()
 ) {
+    fun trimLogs() {
+        while (logEntries.size > GameConstants.MAX_LOG_ENTRIES) {
+            logEntries.removeAt(0)
+        }
+    }
+
     fun deepCopy(): GameState = GameState(
         grimEngine = GrimWorldEngineFactory.create().also {
             it.echoIntensity = grimEchoIntensity
@@ -102,6 +109,7 @@ data class GameState(
         isExpeditionActive = isExpeditionActive,
         lastSaveTimestamp = lastSaveTimestamp,
         grimEchoIntensity = grimEchoIntensity,
-        grimMutationPhase = grimMutationPhase
+        grimMutationPhase = grimMutationPhase,
+        grantedRewardFlags = grantedRewardFlags.toMutableSet()
     )
 }

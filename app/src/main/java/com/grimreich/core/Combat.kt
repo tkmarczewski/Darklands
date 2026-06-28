@@ -92,7 +92,12 @@ data class CombatantState(
     var piety: Int = 5,
     var activeEffects: MutableList<StatusEffect> = mutableListOf(),
     var wounds: MutableList<WoundType> = mutableListOf()
-)
+) {
+    fun normalize() {
+        hp = hp.coerceIn(0, maxHp)
+        endurance = endurance.coerceAtLeast(0)
+    }
+}
 
 data class RoundResult(
     val attackerDamage: Int,
@@ -155,6 +160,13 @@ class CombatRound @Inject constructor(
 
         val defenderWound = applyWound(defender, log)
         val attackerWound  = applyWound(attacker, log)
+
+        attacker.normalize()
+        defender.normalize()
+        
+        if (log.size > 50) {
+            while (log.size > 50) log.removeAt(0)
+        }
 
         return RoundResult(
             attackerDamage = dmgToDefender,

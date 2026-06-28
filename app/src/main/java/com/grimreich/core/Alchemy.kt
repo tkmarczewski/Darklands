@@ -1,6 +1,5 @@
 package com.grimreich.core
 
-import com.grimreich.systems.AlchemySystem
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -21,12 +20,16 @@ class AlchemyCore @Inject constructor(
     private val gameRepository: GameRepository
 ) {
     fun brew(hero: Hero): String {
+        hero.normalize()
         val alchSkill = hero.skills.getOrDefault("ALCH", 5)
         return when {
             alchSkill >= GrimConstants.Character.SPECIALIZED_SKILL_BASE_VALUE -> "Uwarzono mistrzowski eliksir."
             alchSkill >= 15 -> "Powstał solidny eliksir."
             alchSkill >= 8 -> "Powstała słaba, ale użyteczna mikstura."
-            else -> "Mikstura nie wyszła."
+            else -> {
+                if (hero.endurance > 0) hero.endurance = (hero.endurance - 1).coerceAtLeast(0)
+                "Mikstura nie wyszła. (-1 Endurance)"
+            }
         }
     }
 }

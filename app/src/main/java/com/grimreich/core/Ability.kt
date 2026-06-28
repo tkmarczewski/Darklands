@@ -85,3 +85,14 @@ fun tryPayAbilityCost(hero: Hero, ability: Ability): Boolean {
     payAbilityCost(hero, ability)
     return true
 }
+
+fun refundAbilityCost(hero: Hero, ability: Ability) {
+    when (ability.costType) {
+        CostType.MANA -> Unit
+        CostType.STAMINA -> hero.endurance = (hero.endurance + ability.costValue).coerceAtMost(99)
+        CostType.SANITY -> hero.sanity = (hero.sanity + ability.costValue).coerceAtMost(100)
+        CostType.HP -> hero.hp = (hero.hp + ability.costValue).coerceAtMost(hero.maxHp)
+        CostType.PRAYER -> hero.piety = (hero.piety + ability.costValue).coerceAtMost(99)
+        CostType.NONE -> Unit
+    }
+}

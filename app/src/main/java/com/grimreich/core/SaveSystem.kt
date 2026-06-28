@@ -19,13 +19,13 @@ object SaveSystem {
             version   = SAVE_VERSION,
             timestamp = System.currentTimeMillis(),
             label     = label.ifEmpty { "Save ${slotId + 1}" },
-            state     = gameState
+            state     = gameState.deepCopy()
         )
         slots[slotId] = snapshot
         return snapshot
     }
 
-    fun load(slotId: Int = 0): SaveSnapshot? = slots[slotId]
+    fun load(slotId: Int = 0): SaveSnapshot? = slots[slotId]?.copy(state = slots[slotId]!!.state.deepCopy())
 
     fun isCompatible(snapshot: SaveSnapshot): Boolean {
         return snapshot.version >= 1 && snapshot.version <= SAVE_VERSION
@@ -47,6 +47,14 @@ object SaveSystem {
 
     fun exportSlots(): Map<Int, SaveSnapshot> = slots.toMap()
 
+    fun saveToPersistence(persistence: com.grimreich.systems.StatePersistenceManager) {
+        persistence.persistSlots(slots)
+    }
+
+    fun restoreFromPersistence(persistence: com.grimreich.systems.StatePersistenceManager) {
+        importSlots(persistence.restoreSlots())
+    }
+
     // ==================== AUTOSAVE ====================
     fun autoSave(gameState: GameState): Boolean {
         val hash = computeStateHash(gameState)
@@ -55,16 +63,15 @@ object SaveSystem {
             version   = SAVE_VERSION,
             timestamp = System.currentTimeMillis(),
             label     = "Autosave",
-            state     = gameState
+            state     = gameState.deepCopy()
         )
         lastAutoSaveHash = hash
         return true
     }
 
-    fun loadAutoSave(): SaveSnapshot? = autoSaveSnapshot
+    fun loadAutoSave(): SaveSnapshot? = autoSaveSnapshot?.copy(state = autoSaveSnapshot!!.state.deepCopy())
     fun hasAutoSave(): Boolean = autoSaveSnapshot != null
 
-    // FIX BUG-07: Deterministic hash based on key state fields instead of fragile hashCode()
     private fun computeStateHash(state: GameState): Int {
         return java.util.Objects.hash(
             state.gold,
@@ -83,7 +90,6 @@ object SaveSystem {
         val message: String
     )
 
-    // FIX BUG-08: Actually validate key state fields instead of always returning true
     fun validate(snapshot: SaveSnapshot): ValidationResult {
         val compatible = isCompatible(snapshot)
         val isValid = snapshot.version >= 1 &&
@@ -104,7 +110,6 @@ object SaveSystem {
 
     fun migrateIfNeeded(snapshot: SaveSnapshot): SaveSnapshot {
         if (snapshot.version == SAVE_VERSION) return snapshot
-        // Migracja z wersji 1/2 do 3 — bazowa ścieżka
         return snapshot.copy(version = SAVE_VERSION)
     }
 }

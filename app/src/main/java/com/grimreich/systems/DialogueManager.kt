@@ -29,6 +29,7 @@ class DialogueManager @Inject constructor(
         val baseNode = nodes[id] ?: return null
         val stability = gameRepositoryProvider.get().currentState().world.globalStability
         
+        // Project Cipher: Apply glitches based on stability
         return if (stability < 40) {
             applyWorldEffects(baseNode, stability)
         } else {
@@ -41,6 +42,7 @@ class DialogueManager @Inject constructor(
         val state = repo.currentState()
         
         choice.onSelect(state)
+        state.trimLogs()
         
         val target = choice.targetNodeId
         if (target != "end" && getNode(target) == null) {
@@ -108,8 +110,14 @@ class DialogueManager @Inject constructor(
             text = "Dobra robota, Kotwico. Inkwizycja dziękuje za Twoją służbę. Oto zapłata.",
             choices = listOf(
                 DialogueChoice("Ku chwale Zakonu.", "end", onSelect = { s ->
-                    s.gold += 100
-                    s.reputation.globalFactions["KNIGHTS"] = (s.reputation.globalFactions["KNIGHTS"] ?: 0) + 10
+                    val rewardFlag = "reward_guard_report_back"
+                    if (!s.grantedRewardFlags.contains(rewardFlag)) {
+                        s.gold += 100
+                        s.reputation.globalFactions["KNIGHTS"] = (s.reputation.globalFactions["KNIGHTS"] ?: 0) + 10
+                        s.grantedRewardFlags.add(rewardFlag)
+                    } else {
+                        s.logEntries.add("Nagroda od strażnika została już odebrana.")
+                    }
                 })
             )
         ))
