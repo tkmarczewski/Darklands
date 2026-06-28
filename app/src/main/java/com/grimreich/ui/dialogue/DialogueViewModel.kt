@@ -40,21 +40,21 @@ class DialogueViewModel @Inject constructor(
                 val npcName = state.pendingDialogueNpcName ?: ""
                 val npcRole = state.pendingDialogueNpcRole ?: ""
                 val nodeId = state.pendingDialogueNodeId ?: "start"
-                
+
                 val cityId = state.grimCurrentRegion
                 val city = cityCatalogue.get(cityId)
-                
+
                 val node = dialogueManager.getNode(nodeId)
                 val choices = node?.choices?.map { choice ->
                     choice to checkRequirements(choice, state)
                 } ?: emptyList()
 
-                _uiState.update { 
+                _uiState.update {
                     it.copy(
                         currentNode = node,
                         npcName = npcName,
                         npcRole = npcRole,
-                        npcPortrait = "port_knight", // Default for now
+                        npcPortrait = dialogueManager.getPortrait(npcRole.lowercase()),
                         backgroundDrawable = city?.backgroundDrawable ?: "bg_generic_city",
                         availableChoices = choices,
                         worldStability = state.world.globalStability
@@ -65,25 +65,36 @@ class DialogueViewModel @Inject constructor(
     }
 
     private fun checkRequirements(choice: DialogueChoice, state: GameState): Boolean {
-        // Logic check: e.g. gold, items, quest status
         if (choice.requiredReputation > 0) {
-            // Check global or city rep?
+            // TODO: check city/global reputation when rep system is wired up
         }
         return true
     }
 
     fun choose(choice: DialogueChoice) {
+        // Extract quest-finalization flag BEFORE the synchronized updateState block
+        // so we can call questEngine.completeQuest() outside the lock.
+        var questToFinalize: String? = null
+
         gameRepository.updateState { state ->
+            val pending = state.pendingQuestId
+            if (pending != null && pending.startsWith("FINALIZE:")) {
+                questToFinalize = pending.removePrefix("FINALIZE:")
+                state.pendingQuestId = null
+            }
+
             state.pendingDialogueNodeId = choice.targetNodeId
-            
-            // Execute logic-level effects defined in the choice
             choice.onSelect(state)
-            
+
             if (choice.targetNodeId == "end") {
                 state.pendingDialogueNpcName = null
                 state.pendingDialogueNpcRole = null
                 state.pendingDialogueNodeId = null
             }
         }
+
+        // Must be called OUTSIDE the synchronized updateState block to avoid deadlock.
+        // completeQuest() internally calls updateState() again.
+        questToFinalize?.let { questEngine.completeQuest(it) }
     }
 }
