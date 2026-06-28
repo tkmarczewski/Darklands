@@ -9,6 +9,7 @@ import com.google.gson.reflect.TypeToken
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.serialization.json.Json
 import java.io.File
+import java.io.FileOutputStream
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -35,24 +36,33 @@ class StatePersistenceManager @Inject constructor(
     private val slotsFile: File get() = File(context.filesDir, slotsFileName)
 
     fun persist(session: SessionStateDto) {
-        try {
-            val tmp = File(sessionFile.parentFile, sessionFile.name + ".tmp")
-            tmp.writeText(json.encodeToString(SessionStateDto.serializer(), session))
-            if (sessionFile.exists()) sessionFile.delete()
-            if (!tmp.renameTo(sessionFile)) {
-                Log.e(TAG, "Nie udalo sie przemianowac pliku sesji")
+        synchronized(this) {
+            try {
+                Log.d(TAG, "Persisting session to: ${sessionFile.absolutePath}")
+                val jsonString = json.encodeToString(SessionStateDto.serializer(), session)
+                FileOutputStream(sessionFile).use { fos ->
+                    fos.write(jsonString.toByteArray())
+                    fos.flush()
+                    fos.fd.sync()
+                }
+                Log.d(TAG, "Session persisted successfully. Size: ${sessionFile.length()} bytes")
+            } catch (e: Exception) {
+                Log.e(TAG, "Blad zapisu sesji do pliku: $sessionFileName", e)
             }
-        } catch (e: Exception) {
-            Log.e(TAG, "Blad zapisu sesji do pliku: $sessionFileName", e)
         }
     }
 
     fun restore(): SessionStateDto? {
-        if (!sessionFile.exists()) return null
+        if (!sessionFile.exists()) {
+            Log.d(TAG, "Session file does not exist: ${sessionFile.absolutePath}")
+            return null
+        }
         return try {
-            json.decodeFromString(SessionStateDto.serializer(), sessionFile.readText())
+            val content = sessionFile.readText()
+            Log.d(TAG, "Restoring session. Content size: ${content.length}")
+            json.decodeFromString(SessionStateDto.serializer(), content)
         } catch (e: Exception) {
-            Log.e(TAG, "Blad wczytywania sesji z pliku: $sessionFileName. Gra zostanie zresetowana.", e)
+            Log.e(TAG, "Blad wczytywania sesji z pliku: $sessionFileName", e)
             null
         }
     }
@@ -60,21 +70,25 @@ class StatePersistenceManager @Inject constructor(
     fun exists(): Boolean = sessionFile.exists()
 
     fun clear() {
+        Log.d(TAG, "Clearing persistence")
         if (sessionFile.exists()) sessionFile.delete()
         if (slotsFile.exists()) slotsFile.delete()
     }
 
     fun persistSlots(slots: Map<Int, SaveSnapshot>) {
-        try {
-            val data = gson.toJson(slots)
-            val tmp = File(slotsFile.parentFile, slotsFile.name + ".tmp")
-            tmp.writeText(data)
-            if (slotsFile.exists()) slotsFile.delete()
-            if (!tmp.renameTo(slotsFile)) {
-                throw IllegalStateException("Nie udalo sie zapisac pliku slotow")
+        synchronized(this) {
+            try {
+                Log.d(TAG, "Persisting slots to: ${slotsFile.absolutePath}")
+                val data = gson.toJson(slots)
+                FileOutputStream(slotsFile).use { fos ->
+                    fos.write(data.toByteArray())
+                    fos.flush()
+                    fos.fd.sync()
+                }
+                Log.d(TAG, "Slots persisted successfully.")
+            } catch (e: Exception) {
+                Log.e(TAG, "Blad zapisu slotow", e)
             }
-        } catch (e: Exception) {
-            Log.e(TAG, "Blad zapisu slotow", e)
         }
     }
 
