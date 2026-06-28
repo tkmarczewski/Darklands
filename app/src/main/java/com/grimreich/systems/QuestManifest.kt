@@ -1,5 +1,6 @@
 package com.grimreich.systems
 
+import android.util.Log
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -8,6 +9,8 @@ class QuestManifest @Inject constructor(
     private val engine: QuestEngine
 ) {
     fun seed() {
+        Log.d("QuestManifest", "Seeding quests...")
+        
         // Main Verdict Quest
         registerQuest(
             id = "q_verdict_1",
@@ -81,6 +84,8 @@ class QuestManifest @Inject constructor(
             target = "Boss: Echo Absolutu",
             prerequisiteId = "q_scribes_3"
         )
+        
+        Log.d("QuestManifest", "Quests seeded successfully.")
     }
 
     private fun registerQuest(

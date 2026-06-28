@@ -38,6 +38,8 @@ class QuestEngine @Inject constructor(
     fun getDefinition(id: String) = registry[id]
 
     fun getStatus(questId: String, visited: MutableSet<String> = mutableSetOf()): QuestStatus {
+        val def = registry[questId] ?: return QuestStatus.LOCKED // FIX: Strictly locked if not in registry
+        
         if (!visited.add(questId)) return QuestStatus.LOCKED
         
         val state = gameRepository.currentState()
@@ -50,8 +52,7 @@ class QuestEngine @Inject constructor(
         if (progress != null) return progress.status
         
         // 3. Chain logic: Check prerequisites
-        val def = registry[questId]
-        if (def?.prerequisiteQuestId != null) {
+        if (def.prerequisiteQuestId != null) {
             val prereqStatus = getStatus(def.prerequisiteQuestId, visited)
             return if (prereqStatus == QuestStatus.COMPLETED) QuestStatus.AVAILABLE else QuestStatus.LOCKED
         }
@@ -73,7 +74,7 @@ class QuestEngine @Inject constructor(
     fun advanceStep(questId: String) {
         gameRepository.updateState { state ->
             val p = state.quest.progress[questId] ?: return@updateState
-            if (p.status != QuestStatus.ACTIVE) return@updateState // Guard
+            if (p.status != QuestStatus.ACTIVE) return@updateState
 
             val def = registry[questId] ?: return@updateState
             
@@ -108,6 +109,13 @@ class QuestEngine @Inject constructor(
     fun getActiveQuestsForCity(cityId: String): List<QuestDefinition> {
         val activeIds = gameRepository.currentState().quest.activeQuestIds
         return registry.values.filter { it.id in activeIds && it.cityId == cityId }
+    }
+    
+    fun getAllRelevantQuestsForCity(cityId: String): List<QuestDefinition> {
+        val state = gameRepository.currentState()
+        return registry.values.filter { 
+            it.cityId == cityId && (it.id in state.quest.activeQuestIds || getStatus(it.id) == QuestStatus.AVAILABLE)
+        }
     }
 
     fun validateQuestGraph(): List<String> {

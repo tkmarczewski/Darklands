@@ -42,14 +42,15 @@ class ProceduralNpcGenerator @Inject constructor() {
         // 2. CANONICAL ROLES
         val roles = listOf("Merchant", "Guard", "Mystic", "Beggar")
         roles.forEach { role ->
-            if (random.nextBoolean()) {
+            // FIX: Guaranteed spawn for starting city or if stability is high
+            val guaranteed = cityId == "wybrzeze_polnocne" && (role == "Guard" || role == "Merchant")
+            if (guaranteed || random.nextBoolean()) {
                 val npcName = if (isGrim20) {
                     "INSTANCJA_${role.uppercase().take(3)}_${(100..999).random(random)}"
                 } else {
                     generateName(role, random)
                 }
 
-                // OBS-10: NPC infestation chance based on world stability
                 val infestationChance = if (worldStability < 20) 0.4f else if (worldStability < 50) 0.1f else 0.01f
                 val isInfested = random.nextFloat() < infestationChance
 

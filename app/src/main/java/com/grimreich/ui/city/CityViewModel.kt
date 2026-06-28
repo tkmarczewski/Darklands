@@ -31,7 +31,9 @@ class CityViewModel @Inject constructor(
             .onEach { state ->
                 val cityId = state.grimCurrentRegion
                 val cityData = cityCatalogue.get(cityId)
-                val quests = questEngine.getActiveQuestsForCity(cityId)
+                
+                // FIX: Include both active AND available quests for this city
+                val quests = questEngine.getAllRelevantQuestsForCity(cityId)
                 val generatedNpcs = npcGenerator.generateForCity(cityId, state)
 
                 val stability = state.world.globalStability
@@ -63,7 +65,6 @@ class CityViewModel @Inject constructor(
         val state = gameRepository.currentState()
         val cityId = state.grimCurrentRegion
         
-        // CHECK FOR QUEST COMPLETION (OBJECTIVE_MET)
         val questToComplete = state.quest.progress.values.find {
             val def = questEngine.getDefinition(it.questId)
             it.status == QuestStatus.OBJECTIVE_MET && def?.cityId == cityId && def.originNpcId.lowercase() == role.lowercase()
@@ -90,7 +91,15 @@ class CityViewModel @Inject constructor(
 
     fun selectQuestAndOpenDialogue(quest: QuestDefinition, onDialogue: () -> Unit) {
         toggleQuestMenu(false)
-        startDialogue(quest.originNpcId.uppercase(), quest.originNpcId, "${quest.originNpcId}_start", onDialogue)
+        val status = questEngine.getStatus(quest.id)
+        
+        val targetNode = if (status == QuestStatus.ACTIVE || status == QuestStatus.OBJECTIVE_MET) {
+            "${quest.originNpcId.lowercase()}_quest_check"
+        } else {
+            "${quest.originNpcId.lowercase()}_start"
+        }
+
+        startDialogue(quest.originNpcId.uppercase(), quest.originNpcId, targetNode, onDialogue)
     }
 }
 
