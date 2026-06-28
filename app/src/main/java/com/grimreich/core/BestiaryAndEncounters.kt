@@ -7,46 +7,28 @@ import com.grimreich.grimreich.v1.Item
  * AI, loot tables i definicje encounterów bojowych.
  */
 
-// ────────── ENEMY TYPES ────────────────────────────────────────────────────
-
+// ────────── ENEMY TYPES ──────────────────────────────────────────────────────
 enum class EnemyType {
     // Ludzcy
-    BANDIT,
-    BANDIT_LEADER,
-    CITY_GUARD,
-    RAUBRITTER_SOLDIER,
-    RAUBRITTER_KNIGHT,
-    RAUBRITTER_BOSS,
+    BANDIT, BANDIT_LEADER, CITY_GUARD,
+    RAUBRITTER_SOLDIER, RAUBRITTER_KNIGHT, RAUBRITTER_BOSS,
     MERCENARY,
-    
     // Kult
-    CULTIST,
-    CULTIST_PRIEST,
-    DEMON_MINOR,
-    DEMON_MAJOR,
-    
+    CULTIST, CULTIST_PRIEST, DEMON_MINOR, DEMON_MAJOR,
     // Nieumarli
-    SKELETON,
-    SKELETON_WARRIOR,
-    ZOMBIE,
-    GHOST,
-    
+    SKELETON, SKELETON_WARRIOR, ZOMBIE, GHOST,
     // Zwierzęta
-    WOLF,
-    WOLF_PACK_LEADER,
-    WILD_BOAR,
-    
+    WOLF, WOLF_PACK_LEADER, WILD_BOAR,
     // Specjalne
-    WITCH,
-    DRAGON
+    WITCH, DRAGON
 }
 
 enum class EnemyAI {
-    AGGRESSIVE,      // atakuje zawsze
-    DEFENSIVE,       // broni się, nie ściga
-    TACTICAL,        // sprytny, ucieka gdy przegrywa
-    BERSERK,         // walczy do śmierci
-    RANGED           // preferuje dystans
+    AGGRESSIVE,  // atakuje zawsze
+    DEFENSIVE,   // broni się, nie ściga
+    TACTICAL,    // sprytny, ucieka gdy przegrywa
+    BERSERK,     // walczy do śmierci
+    RANGED       // preferuje dystans
 }
 
 data class EnemyStats(
@@ -69,11 +51,10 @@ data class Enemy(
 data class LootTable(
     val goldMin: Int,
     val goldMax: Int,
-    val itemChances: Map<Item, Double> = emptyMap()
+    val itemChances: Map<String, Float> = emptyMap()
 )
 
-// ────────── BESTIARY CATALOG ──────────────────────────────────────────────
-
+// ────────── BESTIARY CATALOG ─────────────────────────────────────────────────
 object Bestiary {
     private val enemies = mapOf(
         EnemyType.BANDIT to Enemy(
@@ -124,6 +105,15 @@ object Bestiary {
             lootTable = LootTable(goldMin = 200, goldMax = 500),
             xpReward = 100
         ),
+        // FIX BUG-10: Added missing MERCENARY entry (used in combat_inn_brawl encounter)
+        EnemyType.MERCENARY to Enemy(
+            type = EnemyType.MERCENARY,
+            name = "Najemnik",
+            stats = EnemyStats(maxHp = 35, attack = 20, defense = 15, speed = 14, morale = 12),
+            ai = EnemyAI.AGGRESSIVE,
+            lootTable = LootTable(goldMin = 15, goldMax = 40),
+            xpReward = 18
+        ),
         EnemyType.CULTIST to Enemy(
             type = EnemyType.CULTIST,
             name = "Kultysta",
@@ -172,6 +162,24 @@ object Bestiary {
             lootTable = LootTable(goldMin = 5, goldMax = 20),
             xpReward = 18
         ),
+        // FIX BUG-10: Added missing ZOMBIE entry
+        EnemyType.ZOMBIE to Enemy(
+            type = EnemyType.ZOMBIE,
+            name = "Zombie",
+            stats = EnemyStats(maxHp = 30, attack = 10, defense = 5, speed = 5, morale = 50),
+            ai = EnemyAI.AGGRESSIVE,
+            lootTable = LootTable(goldMin = 0, goldMax = 5),
+            xpReward = 10
+        ),
+        // FIX BUG-10: Added missing GHOST entry
+        EnemyType.GHOST to Enemy(
+            type = EnemyType.GHOST,
+            name = "Duch",
+            stats = EnemyStats(maxHp = 25, attack = 18, defense = 0, speed = 14, morale = 50),
+            ai = EnemyAI.BERSERK,
+            lootTable = LootTable(goldMin = 0, goldMax = 0),
+            xpReward = 20
+        ),
         EnemyType.WOLF to Enemy(
             type = EnemyType.WOLF,
             name = "Wilk",
@@ -187,6 +195,15 @@ object Bestiary {
             ai = EnemyAI.TACTICAL,
             lootTable = LootTable(goldMin = 0, goldMax = 0),
             xpReward = 12
+        ),
+        // FIX BUG-10: Added missing WILD_BOAR entry
+        EnemyType.WILD_BOAR to Enemy(
+            type = EnemyType.WILD_BOAR,
+            name = "Dzik",
+            stats = EnemyStats(maxHp = 28, attack = 16, defense = 10, speed = 12, morale = 8),
+            ai = EnemyAI.BERSERK,
+            lootTable = LootTable(goldMin = 0, goldMax = 0),
+            xpReward = 8
         ),
         EnemyType.WITCH to Enemy(
             type = EnemyType.WITCH,
@@ -207,30 +224,28 @@ object Bestiary {
     )
 
     fun get(type: EnemyType): Enemy = enemies[type] ?: Enemy(
-        type = EnemyType.BANDIT,
-        name = "Błąd Rzeczywistości (Bandyta)",
-        stats = EnemyStats(maxHp = 25, attack = 15, defense = 10, speed = 12, morale = 8),
-        ai = EnemyAI.AGGRESSIVE,
+        type      = EnemyType.BANDIT,
+        name      = "Błąd Rzeczywistości (Bandyta)",
+        stats     = EnemyStats(maxHp = 25, attack = 15, defense = 10, speed = 12, morale = 8),
+        ai        = EnemyAI.AGGRESSIVE,
         lootTable = LootTable(goldMin = 5, goldMax = 20),
-        xpReward = 10
+        xpReward  = 10
     )
-    
-    // New: Scale enemy to specific level or world ontological intensity
+
     fun scaleToLevel(enemy: Enemy, level: Int, echoIntensity: Float = 0f): Enemy {
         val multiplier = 1.0f + (level - 1) * 0.1f + (echoIntensity * 0.5f)
         return enemy.copy(
             stats = enemy.stats.copy(
-                maxHp = (enemy.stats.maxHp * multiplier).toInt(),
-                attack = (enemy.stats.attack * multiplier).toInt(),
-                defense = (enemy.stats.defense * multiplier).toInt()
+                maxHp  = (enemy.stats.maxHp  * multiplier).toInt(),
+                attack = (enemy.stats.attack  * multiplier).toInt(),
+                defense= (enemy.stats.defense * multiplier).toInt()
             ),
             xpReward = (enemy.xpReward * multiplier).toInt()
         )
     }
 }
 
-// ────────── ENCOUNTER DEFINITIONS ─────────────────────────────────────────
-
+// ────────── ENCOUNTER DEFINITIONS ───────────────────────────────────────────
 data class BattleEncounter(
     val id: String,
     val name: String,
@@ -244,8 +259,7 @@ object EncounterCatalog {
             id = "combat_bandits",
             name = "Bandyci",
             enemies = listOf(
-                EnemyType.BANDIT, EnemyType.BANDIT, EnemyType.BANDIT,
-                EnemyType.BANDIT_LEADER
+                EnemyType.BANDIT, EnemyType.BANDIT, EnemyType.BANDIT, EnemyType.BANDIT_LEADER
             ),
             difficulty = 2
         ),
@@ -267,8 +281,7 @@ object EncounterCatalog {
             id = "combat_wolves",
             name = "Wataha wilków",
             enemies = listOf(
-                EnemyType.WOLF, EnemyType.WOLF, EnemyType.WOLF,
-                EnemyType.WOLF_PACK_LEADER
+                EnemyType.WOLF, EnemyType.WOLF, EnemyType.WOLF, EnemyType.WOLF_PACK_LEADER
             ),
             difficulty = 2
         ),
@@ -276,8 +289,7 @@ object EncounterCatalog {
             id = "combat_undead",
             name = "Szkielety",
             enemies = listOf(
-                EnemyType.SKELETON, EnemyType.SKELETON, EnemyType.SKELETON,
-                EnemyType.SKELETON_WARRIOR
+                EnemyType.SKELETON, EnemyType.SKELETON, EnemyType.SKELETON, EnemyType.SKELETON_WARRIOR
             ),
             difficulty = 2
         ),
@@ -294,8 +306,7 @@ object EncounterCatalog {
             id = "combat_raubritter_scouts",
             name = "Zwiadowcy raubrittera",
             enemies = listOf(
-                EnemyType.RAUBRITTER_SOLDIER, EnemyType.RAUBRITTER_SOLDIER,
-                EnemyType.RAUBRITTER_KNIGHT
+                EnemyType.RAUBRITTER_SOLDIER, EnemyType.RAUBRITTER_SOLDIER, EnemyType.RAUBRITTER_KNIGHT
             ),
             difficulty = 3
         ),
@@ -318,10 +329,11 @@ object EncounterCatalog {
     )
 
     fun get(id: String): BattleEncounter = encounters[id] ?: BattleEncounter(
-        id = "error_fallback",
-        name = "Błąd Paradygmatu",
-        enemies = listOf(EnemyType.BANDIT),
+        id         = "error_fallback",
+        name       = "Błąd Paradygmatu",
+        enemies    = listOf(EnemyType.BANDIT),
         difficulty = 1
     )
+
     fun all(): List<BattleEncounter> = encounters.values.toList()
 }
