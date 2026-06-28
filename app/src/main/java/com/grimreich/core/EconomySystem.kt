@@ -1,120 +1,114 @@
 package com.grimreich.core
 
-// ==================== TRADE GOOD TYPES ====================
+import com.grimreich.grimreich.v1.Item
 
 enum class TradeGoodType {
-    // Basics
-    GRAIN, SALT, IRON_ORE, TIMBER, WOOL,
-    // Crafted
-    CLOTH, WEAPONS, TOOLS, LEATHER_GOODS,
-    // Luxuries
-    SPICES, WINE, SILK, JEWELRY
+    GRAIN,
+    SALT,
+    IRON_ORE,
+    TIMBER,
+    WOOL,
+    CLOTH,
+    WEAPONS,
+    TOOLS,
+    LEATHER_GOODS,
+    SPICES,
+    WINE,
+    SILK,
+    JEWELRY
 }
-
-// ==================== TRADE GOOD MODEL ====================
 
 data class TradeGood(
     val type: TradeGoodType,
     val name: String,
     val basePrice: Int,
-    val weight: Int, // in dkg
+    val weight: Int,
     val description: String
 )
 
-// ==================== TRADE GOOD CATALOG ====================
-
 object TradeGoodCatalog {
     val goods = listOf(
-        TradeGood(TradeGoodType.GRAIN, "Zboże", 10, 100, "Podstawowe pożywienie."),
-        TradeGood(TradeGoodType.SALT, "Sól", 25, 50, "Białe złoto północy."),
-        TradeGood(TradeGoodType.IRON_ORE, "Ruda żelaza", 40, 200, "Surowiec do wyrobu broni."),
-        TradeGood(TradeGoodType.TIMBER, "Drewno", 15, 250, "Materiał budowlany."),
-        TradeGood(TradeGoodType.WOOL, "Wełna", 20, 80, "Surowiec na ubrania."),
-        TradeGood(TradeGoodType.CLOTH, "Sukno", 50, 60, "Wytworny materiał."),
-        TradeGood(TradeGoodType.WEAPONS, "Broń", 150, 150, "Miecze i topory."),
-        TradeGood(TradeGoodType.TOOLS, "Narzędzia", 80, 120, "Niezbędne w rzemiośle."),
-        TradeGood(TradeGoodType.LEATHER_GOODS, "Wyroby skórzane", 60, 90, "Buty i pasy."),
-        TradeGood(TradeGoodType.SPICES, "Przyprawy", 300, 10, "Egzotyczne aromaty."),
-        TradeGood(TradeGoodType.WINE, "Wino", 120, 100, "Trunek dla szlachty."),
-        TradeGood(TradeGoodType.SILK, "Jedwab", 500, 20, "Najdroższy materiał."),
-        TradeGood(TradeGoodType.JEWELRY, "Biżuteria", 800, 5, "Złoto i klejnoty.")
+        TradeGood(TradeGoodType.GRAIN, "Zboże", 5, 2, "Podstawowa żywność."),
+        TradeGood(TradeGoodType.SALT, "Sól", 10, 1, "Białe złoto północy."),
+        TradeGood(TradeGoodType.IRON_ORE, "Ruda Żelaza", 15, 3, "Surowiec dla kowali."),
+        TradeGood(TradeGoodType.TIMBER, "Drewno", 8, 4, "Budulec i opał."),
+        TradeGood(TradeGoodType.WOOL, "Wełna", 12, 1, "Ciepły materiał."),
+        TradeGood(TradeGoodType.CLOTH, "Płótno", 20, 1, "Gotowa tkanina."),
+        TradeGood(TradeGoodType.WEAPONS, "Broń", 50, 2, "Żelazo gotowe do walki."),
+        TradeGood(TradeGoodType.TOOLS, "Narzędzia", 30, 2, "Niezbędne w rzemiośle."),
+        TradeGood(TradeGoodType.LEATHER_GOODS, "Wyroby Skórzane", 25, 1, "Trwałe i lekkie."),
+        TradeGood(TradeGoodType.SPICES, "Przyprawy", 100, 1, "Luksus z dalekich krain."),
+        TradeGood(TradeGoodType.WINE, "Wino", 40, 2, "Napój bogaczy i mnichów."),
+        TradeGood(TradeGoodType.SILK, "Jedwab", 150, 1, "Niezwykle rzadka tkanina."),
+        TradeGood(TradeGoodType.JEWELRY, "Biżuteria", 300, 1, "Oznaka statusu.")
     )
 
-    fun findByType(type: TradeGoodType) = goods.firstOrNull { it.type == type }
+    fun findByType(type: TradeGoodType) = goods.find { it.type == type }
 }
-
-// ==================== CITY MARKET LOGIC ====================
 
 data class CityMarket(
     val cityId: String,
-    val priceModifiers: Map<TradeGoodType, Int> // percent of base price, e.g. 120 means 120%
+    val priceModifiers: Map<TradeGoodType, Int>
 ) {
     fun getPrice(type: TradeGoodType): Int {
-        val base = TradeGoodCatalog.findByType(type)?.basePrice ?: 0
-        val mod = priceModifiers[type] ?: 100
-        return (base * mod) / 100
+        val base = TradeGoodCatalog.findByType(type)?.basePrice ?: 10
+        val mod = priceModifiers[type] ?: 0
+        return (base + mod).coerceAtLeast(1)
     }
 }
 
 object CityMarketCatalog {
-    val markets: Map<String, CityMarket> = mapOf(
-        "wybrzeze_polnocne" to CityMarket(
-            cityId = "wybrzeze_polnocne",
-            priceModifiers = mapOf(
-                TradeGoodType.SALT to 70, // Plenty of salt from the sea
-                TradeGoodType.GRAIN to 130, // Hard to grow in the mist
-                TradeGoodType.SPICES to 150
-            )
-        ),
-        "serce_krainy" to CityMarket(
-            cityId = "serce_krainy",
-            priceModifiers = mapOf(
-                TradeGoodType.WINE to 80,
-                TradeGoodType.SILK to 90,
-                TradeGoodType.IRON_ORE to 120
-            )
-        ),
-        "rowniny_koronne" to CityMarket(
-            cityId = "rowniny_koronne",
-            priceModifiers = mapOf(
-                TradeGoodType.GRAIN to 70, // Fertile lands
-                TradeGoodType.WOOL to 80,
-                TradeGoodType.WEAPONS to 130
-            )
-        ),
-        "pogranicze_stepowe" to CityMarket(
-            cityId = "pogranicze_stepowe",
-            priceModifiers = mapOf(
-                TradeGoodType.WEAPONS to 90,
-                TradeGoodType.LEATHER_GOODS to 70,
-                TradeGoodType.WINE to 140
-            )
-        ),
-        "poludniowe_ruiny" to CityMarket(
-            cityId = "poludniowe_ruiny",
-            priceModifiers = mapOf(
-                TradeGoodType.TOOLS to 120,
-                TradeGoodType.CLOTH to 110,
-                TradeGoodType.SALT to 130
-            )
-        ),
-        "gory_poludniowe" to CityMarket(
-            cityId = "gory_poludniowe",
-            priceModifiers = mapOf(
-                TradeGoodType.IRON_ORE to 70, // Mining region
-                TradeGoodType.JEWELRY to 80,
-                TradeGoodType.GRAIN to 160
-            )
-        ),
-        "ziemie_dzikie" to CityMarket(
-            cityId = "ziemie_dzikie",
-            priceModifiers = mapOf(
-                TradeGoodType.TIMBER to 50, // Massive forests
-                TradeGoodType.LEATHER_GOODS to 80,
-                TradeGoodType.SILK to 200
-            )
-        )
+    private val markets = mapOf(
+        "wybrzeze_polnocne" to CityMarket("wybrzeze_polnocne", mapOf(
+            TradeGoodType.SALT to -3,
+            TradeGoodType.SPICES to 20
+        )),
+        "twierdza_zelazna" to CityMarket("twierdza_zelazna", mapOf(
+            TradeGoodType.IRON_ORE to -5,
+            TradeGoodType.WEAPONS to -10,
+            TradeGoodType.GRAIN to 5
+        )),
+        "port_mglisty" to CityMarket("port_mglisty", mapOf(
+            TradeGoodType.SILK to -30,
+            TradeGoodType.WINE to -5,
+            TradeGoodType.TOOLS to 10
+        )),
+        "opactwo_ciszy" to CityMarket("opactwo_ciszy", mapOf(
+            TradeGoodType.WINE to 15,
+            TradeGoodType.CLOTH to -5
+        ))
     )
 
-    fun getMarket(cityId: String) = markets[cityId]
+    fun getMarket(cityId: String): CityMarket? = markets[cityId]
+}
+
+object TradingEngine {
+    fun buyGood(state: GameState, cityId: String, type: TradeGoodType, qty: Int = 1): String {
+        val market = CityMarketCatalog.getMarket(cityId) ?: return "Brak rynku w tej lokacji."
+        val good = TradeGoodCatalog.findByType(type) ?: return "Nieznany towar."
+        val totalCost = market.getPrice(type) * qty
+        if (state.gold < totalCost) return "Brak złota. Potrzeba $totalCost G."
+        state.gold -= totalCost
+        repeat(qty) {
+            state.inventory.add(Item(
+                id = "trade_${type.name.lowercase()}", 
+                name = good.name, 
+                value = market.getPrice(type),
+                type = "trade_good",
+                weight = good.weight.toDouble(),
+                rarity = "normal",
+                lore = good.description,
+                effects = emptyMap()
+            ))
+        }
+        return "Kupiono ${good.name} x$qty za $totalCost G."
+    }
+
+    fun sellItem(state: GameState, itemId: String): String {
+        val item = state.inventory.find { it.id == itemId } ?: return "Brak przedmiotu."
+        val sellPrice = (item.value * GrimConstants.Economy.SELL_PRICE_MULTIPLIER).toInt().coerceAtLeast(1)
+        state.inventory.remove(item)
+        state.gold += sellPrice
+        return "Sprzedano ${item.name} za $sellPrice G."
+    }
 }

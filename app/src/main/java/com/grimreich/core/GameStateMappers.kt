@@ -29,7 +29,9 @@ fun GameState.toDto(): SessionStateDto = SessionStateDto(
     unlockedLoreIds = unlockedLoreIds.toList(),
     persistentMeta = persistentMeta.toDto(),
     isExpeditionActive = isExpeditionActive,
-    lastSaveTimestamp = lastSaveTimestamp
+    lastSaveTimestamp = lastSaveTimestamp,
+    grimEchoIntensity = grimEchoIntensity,
+    grimMutationPhase = grimMutationPhase
 )
 
 fun SessionStateDto.toDomain(): GameState = GameState(
@@ -53,6 +55,8 @@ fun SessionStateDto.toDomain(): GameState = GameState(
     prayer = prayer.toDomain(),
     world = world.toDomain(),
     combat = combat.toDomain(),
+    grimEchoIntensity = grimEchoIntensity,
+    grimMutationPhase = grimMutationPhase
 ).also {
     it.knownNpcs.putAll(knownNpcs.mapValues { entry -> entry.value.map { it.toDomain() } })
     it.unlockedLoreIds.addAll(unlockedLoreIds)
@@ -138,7 +142,7 @@ fun CareerEntryDto.toDomain(): CareerEntry = CareerEntry(
 fun CareerEntry.toDto(): CareerEntryDto = CareerEntryDto(
     careerName = career.name,
     yearsServed = yearsServed,
-    levelReached = 0, // Legacy support
+    levelReached = 0,
     dateReached = 0
 )
 

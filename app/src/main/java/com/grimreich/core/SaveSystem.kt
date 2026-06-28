@@ -40,6 +40,13 @@ object SaveSystem {
 
     fun deleteSlot(slotId: Int) { slots.remove(slotId) }
 
+    fun importSlots(persisted: Map<Int, SaveSnapshot>) {
+        slots.clear()
+        slots.putAll(persisted)
+    }
+
+    fun exportSlots(): Map<Int, SaveSnapshot> = slots.toMap()
+
     // ==================== AUTOSAVE ====================
     fun autoSave(gameState: GameState): Boolean {
         val hash = computeStateHash(gameState)

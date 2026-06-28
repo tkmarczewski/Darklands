@@ -54,6 +54,6 @@ data class Hero(
     }
 
     fun effectiveAttack(items: List<com.grimreich.grimreich.v1.Item>): Int = 5 + (strength / 2) + getEquipmentBonus("attack", items)
-    fun effectiveDefense(items: List<com.grimreich.grimreich.v1.Item>): Int = (agility / 3) + getEquipmentBonus("defense", items)
+    fun effectiveDefense(items: List<com.grimreich.grimreich.v1.Item>): Int = (agility / 2) + getEquipmentBonus("defense", items)
     fun effectiveArmor(items: List<com.grimreich.grimreich.v1.Item>): Int = getEquipmentBonus("armor", items)
 }

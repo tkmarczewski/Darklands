@@ -4,54 +4,60 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class PersistentMetaDto(
-    val totalSessionsFinished: Int = 0,
-    val unlockedLegacyBuffs: List<String> = emptyList(),
-    val maxMetaAwarenessReached: Int = 0
+    var totalSessionsFinished: Int,
+    val unlockedLegacyBuffs: List<String>,
+    var maxMetaAwarenessReached: Int
 )
 
 @Serializable
 data class QuestProgressDto(
     val questId: String,
     val status: String,
-    val currentStepIndex: Int = 0,
-    val variables: Map<String, Int> = emptyMap()
+    val currentStepIndex: Int,
+    val variables: Map<String, Int>
 )
 
 @Serializable
 data class QuestStateDto(
-    val activeQuestIds: List<String> = emptyList(),
-    val completedQuestIds: List<String> = emptyList(),
-    val progress: Map<String, QuestProgressDto> = emptyMap()
+    val activeQuestIds: List<String>,
+    val completedQuestIds: List<String>,
+    val progress: Map<String, QuestProgressDto>
 )
 
 @Serializable
 data class SessionStateDto(
-    val version: Int = 3,
-    val playerName: String? = null,
-    val heroName: String? = null,
-    val characterNameLocked: Boolean = false,
-    val metaAwarenessLevel: Int = 0,
-    val grimCurrentRegion: String = "wybrzeze_polnocne",
-    val pendingQuestId: String? = null,
-    val pendingDialogueNpcName: String? = null,
-    val pendingDialogueNpcRole: String? = null,
-    val pendingDialogueNodeId: String? = null,
-    val party: List<HeroDto> = emptyList(),
-    val hireableHeroes: List<HeroDto> = emptyList(),
-    val activeHeroId: String? = null,
-    val inventory: List<ItemDto> = emptyList(),
-    val logEntries: List<String> = emptyList(),
-    val gold: Int = 100,
-    val quest: QuestStateDto = QuestStateDto(),
-    val reputation: ReputationStateDto = ReputationStateDto(),
-    val prayer: PrayerStateDto = PrayerStateDto(),
-    val world: WorldStateDto = WorldStateDto(),
-    val combat: CombatStateDto = CombatStateDto(),
-    val knownNpcs: Map<String, List<NpcDto>> = emptyMap(),
-    val unlockedLoreIds: List<String> = emptyList(),
-    val persistentMeta: PersistentMetaDto = PersistentMetaDto(),
-    val isExpeditionActive: Boolean = false,
-    val lastSaveTimestamp: Long = 0
+    val version: Int,
+    var playerName: String? = null,
+    var heroName: String? = null,
+    var characterNameLocked: Boolean = false,
+    var metaAwarenessLevel: Int = 0,
+
+    var grimCurrentRegion: String = "wybrzeze_polnocne",
+    var pendingQuestId: String? = null,
+    var pendingDialogueNpcName: String? = null,
+    var pendingDialogueNpcRole: String? = null,
+    var pendingDialogueNodeId: String? = null,
+
+    val party: List<HeroDto>,
+    val hireableHeroes: List<HeroDto>,
+    var activeHeroId: String? = null,
+    val inventory: List<ItemDto>,
+    val logEntries: List<String>,
+    var gold: Int,
+
+    val quest: QuestStateDto,
+    val reputation: ReputationStateDto,
+    val prayer: PrayerStateDto,
+    val world: WorldStateDto,
+    val combat: CombatStateDto,
+    val knownNpcs: Map<String, List<NpcDto>>,
+    val unlockedLoreIds: List<String>,
+    val persistentMeta: PersistentMetaDto,
+    var isExpeditionActive: Boolean,
+    var lastSaveTimestamp: Long,
+    
+    var grimEchoIntensity: Float = 0f,
+    var grimMutationPhase: Int = 0
 )
 
 @Serializable
@@ -77,14 +83,14 @@ data class HeroDto(
     val portraitRes: String,
     val hp: Int,
     val maxHp: Int,
-    val isDead: Boolean = false,
-    val activeMutations: List<MutationDto> = emptyList(),
-    val currentCareer: String? = null,
-    val trait: String? = null,
-    val skills: Map<String, Int> = emptyMap(),
-    val equipment: Map<String, String?> = emptyMap(),
-    val careerHistory: List<CareerEntryDto> = emptyList(),
-    val abilities: List<AbilityDto> = emptyList()
+    val isDead: Boolean,
+    val activeMutations: List<MutationDto>,
+    val currentCareer: String?,
+    val trait: String?,
+    val skills: Map<String, Int>,
+    val equipment: Map<String, String?>,
+    val careerHistory: List<CareerEntryDto>,
+    val abilities: List<AbilityDto>
 )
 
 @Serializable
@@ -116,69 +122,62 @@ data class ItemDto(
     val id: String,
     val name: String,
     val type: String,
-    val slot: String? = null,
-    val value: Int = 0,
-    val weight: Double = 0.0,
-    val rarity: String = "COMMON",
-    val lore: String? = null,
-    val effects: Map<String, Int> = emptyMap()
+    val slot: String?,
+    val value: Int,
+    val weight: Double,
+    val rarity: String,
+    val lore: String?,
+    val effects: Map<String, Int>
 )
 
 @Serializable
 data class ReputationStateDto(
-    val cityFactions: Map<String, Map<String, Int>> = emptyMap(),
-    val globalFactions: Map<String, Int> = emptyMap()
+    val cityFactions: Map<String, Map<String, Int>>,
+    val globalFactions: Map<String, Int>
 )
 
 @Serializable
 data class PrayerStateDto(
-    val faith: Int = 0,
-    val virtue: Int = 0,
-    val sins: Int = 0,
-    val blessings: List<String> = emptyList()
+    val faith: Int,
+    val virtue: Int,
+    val sins: Int,
+    val blessings: List<String>
 )
 
 @Serializable
 data class WorldStateDto(
-    val region: String = "Pogranicze",
-    val location: String = "wybrzeze_polnocne",
-    val day: Int = 1,
-    val timeOfDay: String = "morning",
-    val fatigue: Int = 0,
-    val lastEncounter: String = "",
-    val season: String = "AUTUMN",
-    val globalStability: Int = 100,
-    val weather: String = "CLEAR",
-    val echoIntensity: Float = 0f,
-    val collapseProgress: Float = 0f,
-    val ontologicalLevel: Int = 0,
-    val discoveredLocations: List<String> = emptyList(),
-    val cityEntryCount: Int = 0,
-    val verdictIncidentsSeen: Int = 0
+    val region: String,
+    val location: String,
+    val day: Int,
+    val timeOfDay: String,
+    val fatigue: Int,
+    val lastEncounter: String,
+    val season: String,
+    val globalStability: Int,
+    val weather: String,
+    val echoIntensity: Float,
+    val collapseProgress: Float,
+    val ontologicalLevel: Int,
+    val discoveredLocations: List<String>,
+    val cityEntryCount: Int,
+    val verdictIncidentsSeen: Int
 )
 
 @Serializable
 data class CombatStateDto(
-    val active: Boolean = false,
-    val round: Int = 1,
-    val enemyName: String = "",
-    val enemyHp: Int = 0,
-    val enemyMaxHp: Int = 0,
-    val enemyAttack: Int = 0,
-    val enemyDefense: Int = 0,
-    val enemyAgility: Int = 10,
-    val enemyIntelligence: Int = 10,
-    val enemyStrength: Int = 10,
-    val enemyEffects: List<StatusEffectDto> = emptyList(),
-    val heroEffects: List<StatusEffectDto> = emptyList(),
-    val log: List<String> = emptyList()
-)
-
-@Serializable
-data class StatusEffectDto(
-    val type: String,
-    val duration: Int,
-    val magnitude: Int
+    val active: Boolean,
+    val round: Int,
+    val enemyName: String,
+    val enemyHp: Int,
+    val enemyMaxHp: Int,
+    val enemyAttack: Int,
+    val enemyDefense: Int,
+    val enemyAgility: Int,
+    val enemyIntelligence: Int,
+    val enemyStrength: Int,
+    val enemyEffects: List<StatusEffectDto>,
+    val heroEffects: List<StatusEffectDto>,
+    val log: List<String>
 )
 
 @Serializable
@@ -190,4 +189,11 @@ data class NpcDto(
     val personality: String = "Normal",
     val startNodeId: String? = null,
     val stability: Float = 1.0f
+)
+
+@Serializable
+data class StatusEffectDto(
+    val type: String,
+    val duration: Int,
+    val magnitude: Int
 )

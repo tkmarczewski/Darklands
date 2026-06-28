@@ -2,7 +2,10 @@ package com.grimreich.systems
 
 import android.content.Context
 import android.util.Log
+import com.grimreich.core.SaveSnapshot
 import com.grimreich.core.SessionStateDto
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.serialization.json.Json
 import java.io.File
@@ -22,9 +25,14 @@ class StatePersistenceManager @Inject constructor(
         encodeDefaults = true
         prettyPrint = false
     }
+    
+    private val gson = Gson()
 
     private val sessionFileName = "current_session.json"
     private val sessionFile: File get() = File(context.filesDir, sessionFileName)
+    
+    private val slotsFileName = "save_slots.json"
+    private val slotsFile: File get() = File(context.filesDir, slotsFileName)
 
     fun persist(session: SessionStateDto) {
         try {
@@ -50,8 +58,30 @@ class StatePersistenceManager @Inject constructor(
     fun exists(): Boolean = sessionFile.exists()
 
     fun clear() {
-        if (sessionFile.exists()) {
-            sessionFile.delete()
+        if (sessionFile.exists()) sessionFile.delete()
+        if (slotsFile.exists()) slotsFile.delete()
+    }
+
+    fun persistSlots(slots: Map<Int, SaveSnapshot>) {
+        try {
+            val data = gson.toJson(slots)
+            val tmp = File(slotsFile.parentFile, slotsFile.name + ".tmp")
+            tmp.writeText(data)
+            if (slotsFile.exists()) slotsFile.delete()
+            tmp.renameTo(slotsFile)
+        } catch (e: Exception) {
+            Log.e(TAG, "Blad zapisu slotow", e)
+        }
+    }
+
+    fun restoreSlots(): Map<Int, SaveSnapshot> {
+        if (!slotsFile.exists()) return emptyMap()
+        return try {
+            val type = object : TypeToken<Map<Int, SaveSnapshot>>() {}.type
+            gson.fromJson(slotsFile.readText(), type) ?: emptyMap()
+        } catch (e: Exception) {
+            Log.e(TAG, "Blad odczytu slotow", e)
+            emptyMap()
         }
     }
 }

@@ -8,7 +8,14 @@ data class Ability(
     val costValue: Int = 0
 )
 
-enum class CostType { NONE, PRAYER, HP, SANITY }
+enum class CostType {
+    NONE,
+    PRAYER,
+    HP,
+    SANITY,
+    MANA,
+    STAMINA
+}
 
 object AbilityRegistry {
     val SOLARIAN_STRIKE = Ability(
@@ -51,4 +58,24 @@ object AbilityRegistry {
     )
 
     fun all() = listOf(SOLARIAN_STRIKE, SHADOW_VEIL, IRON_SKIN, HOLY_RAGE, MIND_READ)
+}
+
+fun canPayAbilityCost(hero: Hero, ability: Ability): Boolean = when (ability.costType) {
+    CostType.MANA -> true
+    CostType.STAMINA -> hero.endurance >= ability.costValue
+    CostType.SANITY -> hero.sanity >= ability.costValue
+    CostType.HP -> hero.hp > ability.costValue
+    CostType.NONE -> true
+    CostType.PRAYER -> hero.piety >= ability.costValue
+}
+
+fun payAbilityCost(hero: Hero, ability: Ability) {
+    when (ability.costType) {
+        CostType.MANA -> Unit
+        CostType.STAMINA -> hero.endurance = (hero.endurance - ability.costValue).coerceAtLeast(0)
+        CostType.SANITY -> hero.sanity = (hero.sanity - ability.costValue).coerceAtLeast(0)
+        CostType.HP -> hero.hp = (hero.hp - ability.costValue).coerceAtLeast(1)
+        CostType.PRAYER -> hero.piety = (hero.piety - ability.costValue).coerceAtLeast(0)
+        CostType.NONE -> Unit
+    }
 }

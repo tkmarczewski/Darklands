@@ -9,6 +9,9 @@ class GrimWorldEngine(
     private val artifactSystem: ArtifactSystem,
     private val avatarSystem: AvatarSystem
 ) {
+    var echoIntensity: Float = 0f
+    var mutationPhase: Int = 0
+
     val query: GrimWorldQuery = GrimWorldQuery(
         regionSystem,
         npcSystem,

@@ -33,10 +33,16 @@ data class GameState(
     val unlockedLoreIds: MutableSet<String> = mutableSetOf(),
     val persistentMeta: PersistentMeta = PersistentMeta(),
     var isExpeditionActive: Boolean = false,
-    var lastSaveTimestamp: Long = System.currentTimeMillis()
+    var lastSaveTimestamp: Long = System.currentTimeMillis(),
+    
+    var grimEchoIntensity: Float = 0f,
+    var grimMutationPhase: Int = 0
 ) {
     fun deepCopy(): GameState = GameState(
-        grimEngine = GrimWorldEngineFactory.create(),
+        grimEngine = GrimWorldEngineFactory.create().also {
+            it.echoIntensity = grimEchoIntensity
+            it.mutationPhase = grimMutationPhase
+        },
         playerName = playerName,
         heroName = heroName,
         characterNameLocked = characterNameLocked,
@@ -67,7 +73,7 @@ data class GameState(
         }.toMutableList(),
         activeHeroId = activeHeroId,
         inventory = inventory.map { it.copy() }.toMutableList(),
-        logEntries = logEntries.toMutableList(),
+        logEntries = logEntries.takeLast(GameConstants.MAX_LOG_ENTRIES).toMutableList(),
         gold = gold,
         quest = QuestState(
             activeQuestIds = quest.activeQuestIds.toMutableSet(),
@@ -94,6 +100,8 @@ data class GameState(
             unlockedLegacyBuffs = persistentMeta.unlockedLegacyBuffs.toMutableSet()
         ),
         isExpeditionActive = isExpeditionActive,
-        lastSaveTimestamp = lastSaveTimestamp
+        lastSaveTimestamp = lastSaveTimestamp,
+        grimEchoIntensity = grimEchoIntensity,
+        grimMutationPhase = grimMutationPhase
     )
 }
