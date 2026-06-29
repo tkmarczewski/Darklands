@@ -33,11 +33,17 @@ class GameRootViewModel @Inject constructor(
     // Temporary storage for character creation
     private var pendingPlayerName: String? = null
 
+    init {
+        // Initial music for main menu
+        audioEngine.playForRoute("main_menu")
+    }
+
     fun setMode(mode: GameScreenMode) {
         _mode.value = mode
-        // FIX-AUDIO: trigger music change on every screen transition
         val route = when (mode) {
             GameScreenMode.MAIN_MENU        -> "main_menu"
+            GameScreenMode.PLAYER_IDENTITY,
+            GameScreenMode.CHARACTER_CREATOR -> "character_creator"
             GameScreenMode.HUB             -> "hub"
             GameScreenMode.CITY            -> "city"
             GameScreenMode.WORLD_MAP       -> "map"
@@ -56,9 +62,7 @@ class GameRootViewModel @Inject constructor(
             GameScreenMode.RECRUIT,
             GameScreenMode.INVENTORY,
             GameScreenMode.CHAR_DETAIL,
-            GameScreenMode.CHARACTER_CREATOR,
-            GameScreenMode.PLAYER_IDENTITY,
-            GameScreenMode.DEV_MENU        -> return  // no music change for UI-only screens
+            GameScreenMode.DEV_MENU        -> return
         }
         audioEngine.playForRoute(route)
     }

@@ -140,6 +140,21 @@ fun GameNavHost(
             )
         }
 
+        composable(GameRoute.Tavern.route) {
+            TavernScreen(
+                viewModel = hiltViewModel(),
+                onHire = { root.setMode(GameScreenMode.RECRUIT) },
+                onExit = { root.setMode(GameScreenMode.CITY) }
+            )
+        }
+
+        composable(GameRoute.Recruit.route) {
+            RecruitmentScreen(
+                onBack = { root.setMode(GameScreenMode.TAVERN) },
+                viewModel = hiltViewModel()
+            )
+        }
+
         composable(GameRoute.Expedition.route) {
             ExpeditionScreen(
                 viewModel = hiltViewModel(),
