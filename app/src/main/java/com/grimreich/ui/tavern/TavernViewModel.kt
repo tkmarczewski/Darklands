@@ -29,6 +29,7 @@ class TavernViewModel @Inject constructor(
     }
 
     fun rest() {
+<<<<<<< HEAD
         val currentGold = gameRepository.currentState().gold
         if (currentGold < 50) { 
             updateLog("Brak złota na nocleg (50 G).")
@@ -40,6 +41,22 @@ class TavernViewModel @Inject constructor(
             state.gold -= 50
             msg = travelSystem.restDirect(state)
         }
+=======
+        // Atomic: check and deduct inside a single updateState{} to avoid
+        // race conditions between the read and the write.
+        var canRest = false
+        gameRepository.updateState { state ->
+            if (state.gold >= 50) {
+                state.gold -= 50
+                canRest = true
+            }
+        }
+
+        if (!canRest) {
+            updateLog("Brak złota na nocleg (50 G).")
+            return
+        }
+>>>>>>> 24fc303f56b7de1e179936d0ad6ff6d56db8e086
 
         updateLog(msg)
         refresh()

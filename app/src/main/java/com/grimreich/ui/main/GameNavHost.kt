@@ -9,9 +9,6 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.grimreich.ui.main.HubScreen
-import com.grimreich.ui.main.MainMenuScreen
-import com.grimreich.ui.main.ExpeditionScreen
 import com.grimreich.ui.city.CityScreen
 import com.grimreich.ui.city.MarketScreen
 import com.grimreich.ui.combat.CombatScreen
@@ -21,13 +18,10 @@ import com.grimreich.ui.alchemy.AlchemyScreen
 import com.grimreich.ui.quests.QuestJournalScreen
 import com.grimreich.ui.inventory.InventoryScreen
 import com.grimreich.ui.ritual.RitualScreen
-import com.grimreich.ui.main.EndingScreen
 import com.grimreich.ui.DevMenuScreen
 import com.grimreich.ui.map.WorldMapScreen
 import com.grimreich.ui.dialogue.DialogueScreen
 import com.grimreich.ui.dialogue.DialogueViewModel
-import com.grimreich.ui.main.PlayerIdentityScreen
-import com.grimreich.ui.main.CharacterCreatorScreen
 import com.grimreich.ui.alchemy.AlchemyViewModel
 
 sealed class GameRoute(val route: String) {
@@ -51,6 +45,12 @@ sealed class GameRoute(val route: String) {
     object Ritual : GameRoute("ritual")
     object Ending : GameRoute("ending")
     object CharDetail : GameRoute("char_detail")
+<<<<<<< HEAD
+=======
+    // Temple and Events are not yet implemented; they redirect to safe fallbacks.
+    object Temple : GameRoute("city")   // fallback: stay in city until TempleScreen lands
+    object Events : GameRoute("hub")    // fallback: back to hub until EventsScreen lands
+>>>>>>> 24fc303f56b7de1e179936d0ad6ff6d56db8e086
 }
 
 @Composable
@@ -62,9 +62,10 @@ fun GameNavHost(
 
     LaunchedEffect(mode) {
         val route = when (mode) {
-            GameScreenMode.MAIN_MENU -> GameRoute.MainMenu.route
-            GameScreenMode.PLAYER_IDENTITY -> GameRoute.PlayerIdentity.route
+            GameScreenMode.MAIN_MENU         -> GameRoute.MainMenu.route
+            GameScreenMode.PLAYER_IDENTITY   -> GameRoute.PlayerIdentity.route
             GameScreenMode.CHARACTER_CREATOR -> GameRoute.CharacterCreator.route
+<<<<<<< HEAD
             GameScreenMode.HUB -> GameRoute.Hub.route
             GameScreenMode.WORLD_MAP -> GameRoute.WorldMap.route
             GameScreenMode.CITY -> GameRoute.City.route
@@ -83,6 +84,27 @@ fun GameNavHost(
             GameScreenMode.ENDING -> GameRoute.Ending.route
             GameScreenMode.CHAR_DETAIL -> GameRoute.CharDetail.route
             else -> GameRoute.MainMenu.route
+=======
+            GameScreenMode.HUB               -> GameRoute.Hub.route
+            GameScreenMode.WORLD_MAP         -> GameRoute.WorldMap.route
+            GameScreenMode.CITY              -> GameRoute.City.route
+            GameScreenMode.MARKET            -> GameRoute.Market.route
+            GameScreenMode.ALCHEMY           -> GameRoute.Alchemy.route
+            GameScreenMode.COMBAT            -> GameRoute.Combat.route
+            GameScreenMode.TAVERN            -> GameRoute.Tavern.route
+            GameScreenMode.DIALOGUE          -> GameRoute.Dialogue.route
+            GameScreenMode.QUESTS            -> GameRoute.Quests.route
+            GameScreenMode.RECRUIT           -> GameRoute.Recruit.route
+            GameScreenMode.INVENTORY         -> GameRoute.Inventory.route
+            GameScreenMode.CHRONICLE         -> GameRoute.Chronicle.route
+            GameScreenMode.EXPEDITION        -> GameRoute.Expedition.route
+            GameScreenMode.DEV_MENU          -> GameRoute.DevMenu.route
+            GameScreenMode.RITUAL            -> GameRoute.Ritual.route
+            GameScreenMode.ENDING            -> GameRoute.Ending.route
+            GameScreenMode.CHAR_DETAIL       -> GameRoute.CharDetail.route
+            GameScreenMode.TEMPLE            -> GameRoute.Temple.route   // fallback to city
+            GameScreenMode.EVENTS            -> GameRoute.Events.route   // fallback to hub
+>>>>>>> 24fc303f56b7de1e179936d0ad6ff6d56db8e086
         }
         navController.navigate(route) {
             popUpTo(0)
@@ -92,7 +114,7 @@ fun GameNavHost(
     NavHost(navController = navController, startDestination = GameRoute.MainMenu.route) {
         composable(GameRoute.MainMenu.route) {
             MainMenuScreen(
-                onNewGame = { root.startNewGame() }, 
+                onNewGame = { root.startNewGame() },
                 onContinue = { root.restoreSessionIfValid() },
                 onExit = { /* exit app */ },
                 onDevMenu = { root.setMode(GameScreenMode.DEV_MENU) }
@@ -109,12 +131,14 @@ fun GameNavHost(
 
         composable(GameRoute.CharacterCreator.route) {
             CharacterCreatorScreen(
-                onStartGame = { name, career, attrs, skills -> root.finalizeCharacterCreation(name, career, attrs, skills) },
+                onStartGame = { name, career, attrs, skills ->
+                    root.finalizeCharacterCreation(name, career, attrs, skills)
+                },
                 onBack = { root.setMode(GameScreenMode.PLAYER_IDENTITY) },
                 viewModel = hiltViewModel()
             )
         }
-        
+
         composable(GameRoute.Hub.route) {
             HubScreen(
                 viewModel = hiltViewModel(),
@@ -135,7 +159,7 @@ fun GameNavHost(
                 onMarket = { root.setMode(GameScreenMode.MARKET) },
                 onAlchemy = { root.setMode(GameScreenMode.ALCHEMY) },
                 onTavern = { root.setMode(GameScreenMode.TAVERN) },
-                onTemple = { /* open temple */ },
+                onTemple = { root.setMode(GameScreenMode.TEMPLE) },
                 onRecruit = { root.setMode(GameScreenMode.RECRUIT) },
                 onDialogue = { root.setMode(GameScreenMode.DIALOGUE) },
                 onExit = { root.setMode(GameScreenMode.HUB) }
@@ -171,7 +195,7 @@ fun GameNavHost(
                 onExit = { root.setMode(GameScreenMode.HUB) }
             )
         }
-        
+
         composable(GameRoute.Dialogue.route) {
             DialogueScreen(
                 viewModel = hiltViewModel<DialogueViewModel>(),
@@ -193,7 +217,7 @@ fun GameNavHost(
                 onBack = { root.setMode(GameScreenMode.HUB) }
             )
         }
-        
+
         composable(GameRoute.Chronicle.route) {
             ChronicleScreen(
                 onBack = { root.setMode(GameScreenMode.HUB) }
@@ -203,6 +227,20 @@ fun GameNavHost(
         composable(GameRoute.WorldMap.route) {
             WorldMapScreen(
                 viewModel = hiltViewModel(),
+                onBack = { root.setMode(GameScreenMode.HUB) }
+            )
+        }
+
+        composable(GameRoute.Market.route) {
+            MarketScreen(
+                viewModel = hiltViewModel(),
+                onBack = { root.setMode(GameScreenMode.CITY) }
+            )
+        }
+
+        composable(GameRoute.CharDetail.route) {
+            CharDetailScreen(
+                viewModel = root,
                 onBack = { root.setMode(GameScreenMode.HUB) }
             )
         }
@@ -225,7 +263,7 @@ fun GameNavHost(
                 )
             }
         }
-        
+
         composable(GameRoute.Ending.route) {
             EndingScreen(
                 viewModel = hiltViewModel(),
