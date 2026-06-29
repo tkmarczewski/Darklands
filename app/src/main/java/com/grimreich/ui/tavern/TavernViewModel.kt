@@ -29,14 +29,19 @@ class TavernViewModel @Inject constructor(
     }
 
     fun rest() {
-        val currentGold = gameRepository.currentState().gold
-        if (currentGold < 50) { // Standard cost is 50 in UI
+        // Atomic: check and deduct inside a single updateState{} to avoid
+        // race conditions between the read and the write.
+        var canRest = false
+        gameRepository.updateState { state ->
+            if (state.gold >= 50) {
+                state.gold -= 50
+                canRest = true
+            }
+        }
+
+        if (!canRest) {
             updateLog("Brak złota na nocleg (50 G).")
             return
-        }
-        
-        gameRepository.updateState { state ->
-            state.gold -= 50
         }
 
         val msg = travelSystem.rest()
