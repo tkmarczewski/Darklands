@@ -1,13 +1,13 @@
 package com.grimreich.systems
 
 import com.grimreich.core.GameState
+import com.grimreich.core.GameRepository
+import dagger.Lazy
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.random.Random
 
-enum class EncounterType {
-    COMBAT, INTERACTIVE, RESOURCE
-}
+enum class EncounterType { COMBAT, INTERACTIVE, RESOURCE }
 
 data class EncounterChoice(
     val label: String,
@@ -28,7 +28,7 @@ data class Encounter(
 @Singleton
 class EncounterSystem @Inject constructor(
     private val lootSystem: LootSystem,
-    private val chronicleSystem: dagger.Lazy<ChronicleSystem>
+    private val chronicleSystem: Lazy<ChronicleSystem>
 ) {
     private val encounters = mutableListOf(
         Encounter(
@@ -36,7 +36,7 @@ class EncounterSystem @Inject constructor(
             EncounterType.INTERACTIVE,
             listOf(
                 EncounterChoice("Sprawdź", "Znalazłeś porzuconą torbę.") { state ->
-                    lootSystem.awardLoot(1.0f)
+                    lootSystem.awardLootDirect(state, 1.0f)
                 },
                 EncounterChoice("Ignoruj", "Przeszedłeś obok.") { "Bezpieczeństwo przede wszystkim." }
             )
@@ -65,7 +65,7 @@ class EncounterSystem @Inject constructor(
         ),
         // --- NARRATIVE ECHO EVENTS ---
         Encounter(
-            "echo_frozen_archivist", "Zamarznięty Archiwista", "Na środku traktu stoi postać pokryta szronem, mimo upału. Trzyma w rękach księgę, której strony przewracają się same. 'Wszystko musi zostać skatalogowane, zanim zniknie', szepcze Archiwista.",
+            "echo_frozen_archivist", "Zamarznięty Archiwista", "Na środku traktu stoi postać pokryta szronem, mimo upału. Trzyma w rękach księgę, której strony przewracają się same. 'Wszystko musi zostać skatalogowane, zanim zniknie', szepcze Archiwiista.",
             EncounterType.INTERACTIVE,
             listOf(
                 EncounterChoice("[Intelligence 14] Pomóż mu skatalogować otoczenie", "Pamięć jest kotwicą.", "intelligence", 14) { s ->
@@ -101,7 +101,6 @@ class EncounterSystem @Inject constructor(
 
     fun rollEncounter(random: Random, state: GameState): Encounter? {
         // --- FACTION RAIDS ---
-        // Logic fix: Factions are indexed by their names in ReputationSystem
         val hostileFactions = state.reputation.globalFactions.filter { it.value <= -50 }.keys
         if (hostileFactions.isNotEmpty() && random.nextFloat() < 0.2f) {
             val factionId = hostileFactions.toList().random(random)

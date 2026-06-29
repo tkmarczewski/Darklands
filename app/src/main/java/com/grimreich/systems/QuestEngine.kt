@@ -1,6 +1,7 @@
 package com.grimreich.systems
 
 import com.grimreich.core.GameRepository
+import com.grimreich.core.GameState
 import com.grimreich.core.QuestStatus
 import com.grimreich.core.QuestProgress
 import javax.inject.Inject
@@ -14,17 +15,6 @@ data class QuestStep(
     val targetId: String
 )
 
-data class QuestDefinition(
-    val id: String,
-    val title: String,
-    val description: String,
-    val rewardGold: Int,
-    val steps: List<QuestStep>,
-    val cityId: String,
-    val originNpcId: String,
-    val prerequisiteQuestId: String? = null
-)
-
 @Singleton
 class QuestEngine @Inject constructor(
     private val gameRepository: GameRepository
@@ -35,75 +25,87 @@ class QuestEngine @Inject constructor(
         registry[definition.id] = definition
     }
 
-    // FIX-QUESTS: allow QuestManifest to clear stale entries before re-seeding
     fun clearRegistry() {
         registry.clear()
     }
 
     fun getDefinition(id: String) = registry[id]
 
-    fun getStatus(questId: String, visited: MutableSet<String> = mutableSetOf()): QuestStatus {
+    fun getStatus(questId: String, state: GameState? = null, visited: MutableSet<String> = mutableSetOf()): QuestStatus {
         val def = registry[questId] ?: return QuestStatus.LOCKED
-
         if (!visited.add(questId)) return QuestStatus.LOCKED
 
-        val state = gameRepository.currentState()
+        val actualState = state ?: gameRepository.currentState()
+        
+        if (actualState.quest.completedQuestIds.contains(questId)) return QuestStatus.COMPLETED
 
-        if (state.quest.completedQuestIds.contains(questId)) return QuestStatus.COMPLETED
-
-        val progress = state.quest.progress[questId]
+        val progress = actualState.quest.progress[questId]
         if (progress != null) return progress.status
 
         if (def.prerequisiteQuestId != null) {
-            val prereqStatus = getStatus(def.prerequisiteQuestId, visited)
+            val prereqStatus = getStatus(def.prerequisiteQuestId, actualState, visited)
             return if (prereqStatus == QuestStatus.COMPLETED) QuestStatus.AVAILABLE else QuestStatus.LOCKED
         }
 
         return QuestStatus.AVAILABLE
     }
 
-    fun activateQuest(questId: String) {
-        if (getStatus(questId) != QuestStatus.AVAILABLE) return
+    // --- STATE MUTATING METHODS ---
 
-        gameRepository.updateState { state ->
+    /**
+     * Activates a quest. Should be called within updateState.
+     */
+    fun activateQuestDirect(state: GameState, questId: String) {
+        val status = getStatus(questId, state) 
+        if (status == QuestStatus.AVAILABLE) {
             if (!state.quest.activeQuestIds.contains(questId)) {
                 state.quest.activeQuestIds.add(questId)
             }
             state.quest.progress[questId] = QuestProgress(questId = questId, status = QuestStatus.ACTIVE)
+            state.logEntries.add("Nowe zadanie: ${registry[questId]?.title}")
+        }
+    }
+
+    fun activateQuest(questId: String) {
+        gameRepository.updateState { activateQuestDirect(it, questId) }
+    }
+
+    fun advanceStepDirect(state: GameState, questId: String) {
+        val p = state.quest.progress[questId] ?: return
+        if (p.status != QuestStatus.ACTIVE) return
+
+        val def = registry[questId] ?: return
+
+        if (p.currentStepIndex < def.steps.size - 1) {
+            state.quest.progress[questId] = p.copy(currentStepIndex = p.currentStepIndex + 1)
+        } else {
+            state.quest.progress[questId] = p.copy(status = QuestStatus.OBJECTIVE_MET)
         }
     }
 
     fun advanceStep(questId: String) {
-        gameRepository.updateState { state ->
-            val p = state.quest.progress[questId] ?: return@updateState
-            if (p.status != QuestStatus.ACTIVE) return@updateState
+        gameRepository.updateState { advanceStepDirect(it, questId) }
+    }
 
-            val def = registry[questId] ?: return@updateState
+    fun completeQuestDirect(state: GameState, questId: String) {
+        val p = state.quest.progress[questId] ?: return
+        val def = registry[questId] ?: return
 
-            if (p.currentStepIndex < def.steps.size - 1) {
-                state.quest.progress[questId] = p.copy(currentStepIndex = p.currentStepIndex + 1)
-            } else {
-                state.quest.progress[questId] = p.copy(status = QuestStatus.OBJECTIVE_MET)
-            }
+        if (p.status == QuestStatus.OBJECTIVE_MET) {
+            state.gold += def.rewardGold
+            state.logEntries.add("Ukończono zadanie: ${def.title}. Otrzymano ${def.rewardGold} G.")
+
+            state.quest.completedQuestIds.add(questId)
+            state.quest.progress.remove(questId)
+            state.quest.activeQuestIds.remove(questId)
         }
     }
 
     fun completeQuest(questId: String) {
-        gameRepository.updateState { state ->
-            val p = state.quest.progress[questId] ?: return@updateState
-            val def = registry[questId] ?: return@updateState
-
-            if (p.status == QuestStatus.OBJECTIVE_MET) {
-                // Reward first, then remove from active tracking
-                state.gold += def.rewardGold
-                state.logEntries.add("Ukończono zadanie: ${def.title}. Otrzymano ${def.rewardGold} G.")
-
-                state.quest.completedQuestIds.add(questId)
-                state.quest.progress.remove(questId)
-                state.quest.activeQuestIds.remove(questId)
-            }
-        }
+        gameRepository.updateState { completeQuestDirect(it, questId) }
     }
+
+    // --- QUERY METHODS ---
 
     fun getAvailableQuestsForCity(cityId: String): List<QuestDefinition> {
         return registry.values.filter { it.cityId == cityId && getStatus(it.id) == QuestStatus.AVAILABLE }
@@ -133,3 +135,14 @@ class QuestEngine @Inject constructor(
         return issues.distinct()
     }
 }
+
+data class QuestDefinition(
+    val id: String,
+    val title: String,
+    val description: String,
+    val rewardGold: Int,
+    val steps: List<QuestStep>,
+    val cityId: String,
+    val originNpcId: String,
+    val prerequisiteQuestId: String? = null
+)

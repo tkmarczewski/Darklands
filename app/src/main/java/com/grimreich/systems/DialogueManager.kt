@@ -1,12 +1,14 @@
 package com.grimreich.systems
 
 import com.grimreich.core.GameRepository
+import com.grimreich.core.GameState
 import com.grimreich.grimreich.v1.DialogueChoice
 import com.grimreich.grimreich.v1.DialogueNode
+import com.grimreich.systems.ChronicleSystem
+import com.grimreich.systems.QuestEngine
 import dagger.Lazy
 import javax.inject.Inject
 import javax.inject.Singleton
-import kotlin.random.Random
 
 @Singleton
 class DialogueManager @Inject constructor(
@@ -17,8 +19,8 @@ class DialogueManager @Inject constructor(
     private val nodes = mutableMapOf<String, DialogueNode>()
     private var activeDialogueId: String? = null
 
-    fun isDialogueActive(): Boolean = activeDialogueId != null
-    fun currentDialogueId(): String? = activeDialogueId
+    fun isDialogueActive() = activeDialogueId != null
+    fun currentDialogueId() = activeDialogueId
     fun endDialogue() { activeDialogueId = null }
 
     fun registerNode(node: DialogueNode) {
@@ -26,65 +28,49 @@ class DialogueManager @Inject constructor(
     }
 
     fun getNode(id: String): DialogueNode? {
-        val baseNode = nodes[id] ?: return null
-        val stability = gameRepositoryProvider.get().currentState().world.globalStability
+        val node = nodes[id] ?: return null
+        val state = gameRepositoryProvider.get().currentState()
         
-        // Project Cipher: Apply glitches based on stability
-        return if (stability < 40) {
-            applyWorldEffects(baseNode, stability)
-        } else {
-            baseNode
-        }
+        // Dynamic text processing (e.g. glitches based on world state)
+        val stability = state.world.globalStability
+        return if (stability < 30) applyWorldEffects(node, stability) else node
     }
 
-    fun hasNode(id: String): Boolean = nodes.containsKey(id)
+    fun hasNode(id: String) = nodes.containsKey(id)
 
-    fun listMissingTargets(): List<String> = nodes.values
-        .flatMap { node -> node.choices.mapNotNull { it.targetNodeId } }
-        .filterNot { target -> target == "end" || nodes.containsKey(target) }
-        .distinct()
+    fun listMissingTargets(): List<String> {
+        return nodes.values.flatMap { it.choices }.map { it.targetNodeId }.filter { it != "end" && !nodes.containsKey(it) }
+    }
 
     fun makeChoice(choice: DialogueChoice): DialogueNode? {
-        val repo = gameRepositoryProvider.get()
-        val state = repo.currentState()
-        
-        choice.onSelect(state)
-        state.trimLogs()
-        
-        val target = choice.targetNodeId
-        if (target != "end" && getNode(target) == null) {
-            repo.log("[Dialogue] Missing target node: $target")
-            activeDialogueId = null
+        // Requirements are now checked in ViewModel or via more complex logic
+        if (choice.targetNodeId == "end") {
+            endDialogue()
             return null
         }
-
-        activeDialogueId = if (target == "end") null else target
-        return activeDialogueId?.let { getNode(it) }
+        
+        activeDialogueId = choice.targetNodeId
+        return getNode(choice.targetNodeId)
     }
 
     fun getPortrait(npcId: String): String {
-        return when (npcId) {
+        return when (npcId.lowercase()) {
             "guard" -> "port_guard"
             "merchant" -> "port_merchant"
             "aelion" -> "port_prophet"
             "mira" -> "port_mira"
-            else -> "port_knight"
+            "mystic" -> "port_mystic"
+            else -> "port_generic"
         }
     }
 
     private fun applyWorldEffects(node: DialogueNode, stability: Int): DialogueNode {
-        val glitchedText = if (stability < 20) glitchText(node.text) else node.text
-        return node.copy(text = glitchedText)
+        return node.copy(text = glitchText(node.text))
     }
 
     private fun glitchText(text: String): String {
-        if (text.isEmpty()) return text
-        val chars = text.toCharArray()
-        repeat(maxOf(1, text.length / 20)) {
-            val idx = Random.nextInt(chars.size)
-            chars[idx] = if (Random.nextBoolean()) '?' else '#'
-        }
-        return String(chars)
+        val chars = "0101#@$%&".toCharArray()
+        return text.map { if (Math.random() < 0.1) chars.random() else it }.joinToString("")
     }
 
     fun seedBasicDialogues() {
@@ -105,7 +91,7 @@ class DialogueManager @Inject constructor(
             text = "Mamy problem z 'Wyrokiem'. Jeśli chcesz pomóc, weź to zlecenie.",
             choices = listOf(
                 DialogueChoice("Przyjmuję (ZADANIE: Wyrok).", "end", onSelect = { state ->
-                    questEngine.get().activateQuest("q_verdict_1")
+                    questEngine.get().activateQuestDirect(state, "q_verdict_1")
                     state.pendingQuestId = null
                 }),
                 DialogueChoice("Może później.", "end")
@@ -117,13 +103,10 @@ class DialogueManager @Inject constructor(
             text = "Dobra robota, Kotwico. Inkwizycja dziękuje za Twoją służbę. Oto zapłata.",
             choices = listOf(
                 DialogueChoice("Ku chwale Zakonu.", "end", onSelect = { s ->
-                    val rewardFlag = "reward_guard_report_back"
+                    val rewardFlag = "reward_guard_reputation"
                     if (!s.grantedRewardFlags.contains(rewardFlag)) {
-                        s.gold += 100
                         s.reputation.globalFactions["KNIGHTS"] = (s.reputation.globalFactions["KNIGHTS"] ?: 0) + 10
                         s.grantedRewardFlags.add(rewardFlag)
-                    } else {
-                        s.logEntries.add("Nagroda od strażnika została już odebrana.")
                     }
                 })
             )
@@ -154,7 +137,7 @@ class DialogueManager @Inject constructor(
             text = "Archiwiści potrzebują rzadkich ziół z mgły. To niebezpieczna robota, ale dobrze płatna.",
             choices = listOf(
                 DialogueChoice("Przyjmuję zlecenie (Żniwa Mgły).", "end", onSelect = { state ->
-                    questEngine.get().activateQuest("q_coast_harvest")
+                    questEngine.get().activateQuestDirect(state, "q_coast_harvest")
                     state.pendingQuestId = null
                 }),
                 DialogueChoice("Może później.", "end")
@@ -165,14 +148,7 @@ class DialogueManager @Inject constructor(
             id = "merchant_report_back", npcId = "merchant",
             text = "Dobra robota. Zioła dotarły całe. Możemy zamknąć sprawę. Oto Twoje złoto.",
             choices = listOf(
-                DialogueChoice("W porządku.", "end", onSelect = { s ->
-                    val flag = "reward_merchant_report_back"
-                    if (!s.grantedRewardFlags.contains(flag)) {
-                        s.gold += 50
-                        s.grantedRewardFlags.add(flag)
-                        s.logEntries.add("Odebrano nagrodę: Żniwa Mgły.")
-                    }
-                })
+                DialogueChoice("W porządku.", "end")
             )
         ))
 
@@ -230,10 +206,10 @@ class DialogueManager @Inject constructor(
                 DialogueChoice("Przyjmuję zadanie Cieni.", "end", onSelect = { state ->
                     val engine = questEngine.get()
                     when {
-                        engine.getStatus("q_scribes_1") == com.grimreich.core.QuestStatus.AVAILABLE -> engine.activateQuest("q_scribes_1")
-                        engine.getStatus("q_scribes_2") == com.grimreich.core.QuestStatus.AVAILABLE -> engine.activateQuest("q_scribes_2")
-                        engine.getStatus("q_scribes_3") == com.grimreich.core.QuestStatus.AVAILABLE -> engine.activateQuest("q_scribes_3")
-                        engine.getStatus("q_collapse_core") == com.grimreich.core.QuestStatus.AVAILABLE -> engine.activateQuest("q_collapse_core")
+                        engine.getStatus("q_scribes_1") == com.grimreich.core.QuestStatus.AVAILABLE -> engine.activateQuestDirect(state, "q_scribes_1")
+                        engine.getStatus("q_scribes_2") == com.grimreich.core.QuestStatus.AVAILABLE -> engine.activateQuestDirect(state, "q_scribes_2")
+                        engine.getStatus("q_scribes_3") == com.grimreich.core.QuestStatus.AVAILABLE -> engine.activateQuestDirect(state, "q_scribes_3")
+                        engine.getStatus("q_collapse_core") == com.grimreich.core.QuestStatus.AVAILABLE -> engine.activateQuestDirect(state, "q_collapse_core")
                     }
                     state.pendingQuestId = null
                 }),
@@ -245,18 +221,16 @@ class DialogueManager @Inject constructor(
             id = "mira_report_back", npcId = "mira",
             text = "Dobrze. Zamknijmy ten rozdział i zobaczmy, co odsłoni następny.",
             choices = listOf(
-                DialogueChoice("Jestem gotów.", "end", onSelect = { s ->
-                    val q = s.quest.progress.values.find { 
-                        it.status == com.grimreich.core.QuestStatus.OBJECTIVE_MET && 
-                        it.questId.startsWith("q_scribes_") 
-                    }
-                    q?.let {
-                        val flag = "reward_${it.questId}"
-                        if (!s.grantedRewardFlags.contains(flag)) {
-                            s.grantedRewardFlags.add(flag)
-                        }
-                    }
-                })
+                DialogueChoice("Jestem gotów.", "end")
+            )
+        ))
+
+        // 5. GENERIC FALLBACKS
+        registerNode(DialogueNode(
+            id = "quest_report_back_generic", npcId = "npc",
+            text = "Widzę, że zadanie zostało wykonane. Dziękuję za pomoc.",
+            choices = listOf(
+                DialogueChoice("Nie ma za co.", "end")
             )
         ))
     }

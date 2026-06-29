@@ -73,6 +73,8 @@ class CityViewModel @Inject constructor(
         val targetNode = if (questToComplete != null) {
             when (role.lowercase()) {
                 "guard", "straznik" -> "guard_report_back"
+                "merchant", "kupiec" -> "merchant_report_back"
+                "mira" -> "mira_report_back"
                 "mystic", "mistyk" -> "mystic_report_back"
                 else -> "quest_report_back_generic"
             }

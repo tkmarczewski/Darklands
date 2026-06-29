@@ -35,6 +35,10 @@ class GameRepository @Inject constructor(
     private val _gameState = MutableStateFlow(GameState())
     val gameState: StateFlow<GameState> = _gameState.asStateFlow()
 
+    init {
+        sync()
+    }
+
     fun currentState(): GameState = _gameState.value
 
     fun replaceState(newState: GameState) {
@@ -42,18 +46,20 @@ class GameRepository @Inject constructor(
         sync()
     }
 
-    fun updateState(transform: (GameState) -> Unit) {
+    fun updateState(shouldPersist: Boolean = true, transform: (GameState) -> Unit) {
         synchronized(this) {
             val mutable = _gameState.value.deepCopy()
             transform(mutable)
             mutable.normalizeState()
             _gameState.value = mutable
-            persistCurrentState()
+            if (shouldPersist) {
+                persistCurrentState()
+            }
         }
     }
 
     fun log(message: String) {
-        updateState { state ->
+        updateState(shouldPersist = false) { state ->
             state.logEntries.add(message)
             while (state.logEntries.size > GameConstants.MAX_LOG_ENTRIES) {
                 state.logEntries.removeAt(0)

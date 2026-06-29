@@ -83,7 +83,7 @@ class ExpeditionViewModel @Inject constructor(
                     shouldCombat = true
                 }
                 else -> {
-                    questEngine.advanceStep(questId)
+                    questEngine.advanceStepDirect(state, questId)
                     state.logEntries.add("Postęp w zadaniu: ${def.title}")
                 }
             }

@@ -1,9 +1,9 @@
 package com.grimreich.systems
 
-import android.content.Context
 import com.grimreich.core.GameRepository
-import com.grimreich.core.Season
+import com.grimreich.core.GameState
 import com.grimreich.core.WorldMap
+import com.grimreich.core.Season
 import com.grimreich.world.CityCatalogue
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -15,23 +15,28 @@ class TravelSystem @Inject constructor(
     private val cityCatalogue: CityCatalogue,
     private val encounterSystem: EncounterSystem
 ) {
-    fun rest(): String {
-        gameRepository.updateState { s ->
-            s.world.fatigue = 0
-            s.world.day += 1
-            s.world.timeOfDay = "morning"
-            s.world.season = currentSeason(s.world.day)
-            s.logEntries.add("Drużyna odpoczęła. Rozpoczyna się dzień ${s.world.day}.")
-        }
+    fun restDirect(state: GameState): String {
+        state.world.fatigue = 0
+        state.world.day += 1
+        state.world.timeOfDay = "morning"
+        state.world.season = currentSeason(state.world.day)
+        state.logEntries.add("Drużyna odpoczęła. Rozpoczyna się dzień ${state.world.day}.")
         return "Drużyna odpoczęła. Zmęczenie zresetowane, nowy dzień."
     }
 
-    private fun currentSeason(day: Int): Season {
-        val cycle = day % 360
-        return when {
-            cycle < 90 -> Season.SPRING
-            cycle < 180 -> Season.SUMMER
-            cycle < 270 -> Season.AUTUMN
+    fun rest(): String {
+        var msg = ""
+        gameRepository.updateState { s ->
+            msg = restDirect(s)
+        }
+        return msg
+    }
+
+    fun currentSeason(day: Int): Season {
+        return when ((day / 30) % 4) {
+            0 -> Season.SPRING
+            1 -> Season.SUMMER
+            2 -> Season.AUTUMN
             else -> Season.WINTER
         }
     }

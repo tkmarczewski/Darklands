@@ -50,6 +50,7 @@ sealed class GameRoute(val route: String) {
     object DevMenu : GameRoute("dev_menu")
     object Ritual : GameRoute("ritual")
     object Ending : GameRoute("ending")
+    object CharDetail : GameRoute("char_detail")
 }
 
 @Composable
@@ -80,6 +81,7 @@ fun GameNavHost(
             GameScreenMode.DEV_MENU -> GameRoute.DevMenu.route
             GameScreenMode.RITUAL -> GameRoute.Ritual.route
             GameScreenMode.ENDING -> GameRoute.Ending.route
+            GameScreenMode.CHAR_DETAIL -> GameRoute.CharDetail.route
             else -> GameRoute.MainMenu.route
         }
         navController.navigate(route) {
@@ -236,6 +238,17 @@ fun GameNavHost(
                 viewModel = hiltViewModel<AlchemyViewModel>(),
                 onBack = { root.setMode(GameScreenMode.CITY) }
             )
+        }
+
+        composable(GameRoute.CharDetail.route) {
+            val hero by root.inspectedHero.collectAsState()
+            hero?.let {
+                CharDetailScreen(
+                    hero = it,
+                    onUpgrade = { stat -> root.upgradeStat(it.id, stat) },
+                    onBack = { root.setMode(GameScreenMode.HUB) }
+                )
+            }
         }
     }
 }

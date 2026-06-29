@@ -1,6 +1,7 @@
 package com.grimreich.systems
 
 import com.grimreich.core.GameRepository
+import com.grimreich.core.GameState
 import com.grimreich.grimreich.v1.Item
 import com.grimreich.world.ItemCatalogue
 import javax.inject.Inject
@@ -17,12 +18,21 @@ class LootSystem @Inject constructor(
         return itemCatalogue.all().randomOrNull()
     }
 
-    fun awardLoot(chance: Float): String {
+    /**
+     * Awards loot directly to the state. Use this inside updateState blocks.
+     */
+    fun awardLootDirect(state: GameState, chance: Float): String {
         val item = rollLoot(chance) ?: return ""
-        gameRepository.updateState { s ->
-            s.inventory.add(item.copy())
-            s.logEntries.add("Zdobyto przedmiot: ${item.name}")
-        }
+        state.inventory.add(item.copy())
+        state.logEntries.add("Zdobyto przedmiot: ${item.name}")
         return "Zdobyto przedmiot: ${item.name}"
+    }
+
+    fun awardLoot(chance: Float): String {
+        var msg = ""
+        gameRepository.updateState { state ->
+            msg = awardLootDirect(state, chance)
+        }
+        return msg
     }
 }

@@ -142,7 +142,7 @@ class CombatSystem @Inject constructor(
                 state.pendingQuestId?.let { pending ->
                     if (pending.startsWith("COMBAT_WIN:")) {
                         val qId = pending.removePrefix("COMBAT_WIN:")
-                        questEngine.advanceStep(qId)
+                        questEngine.advanceStepDirect(state, qId)
                         state.pendingQuestId = null
                     }
                 }

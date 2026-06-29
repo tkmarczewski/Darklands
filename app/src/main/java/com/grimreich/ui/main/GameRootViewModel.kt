@@ -54,15 +54,15 @@ class GameRootViewModel @Inject constructor(
             GameScreenMode.EVENTS          -> "events"
             GameScreenMode.RITUAL          -> "ritual"
             GameScreenMode.ENDING          -> "ending"
-            GameScreenMode.TEMPLE,
-            GameScreenMode.ALCHEMY,
-            GameScreenMode.DIALOGUE,
-            GameScreenMode.QUESTS,
-            GameScreenMode.CHRONICLE,
-            GameScreenMode.RECRUIT,
-            GameScreenMode.INVENTORY,
-            GameScreenMode.CHAR_DETAIL,
-            GameScreenMode.DEV_MENU        -> return
+            GameScreenMode.TEMPLE          -> "ritual" // Fallback to ritual music
+            GameScreenMode.ALCHEMY         -> "alchemy"
+            GameScreenMode.DIALOGUE        -> "dialogue"
+            GameScreenMode.QUESTS          -> "hub" // Stay on hub/city music
+            GameScreenMode.CHRONICLE       -> "hub"
+            GameScreenMode.RECRUIT         -> "tavern"
+            GameScreenMode.INVENTORY       -> "hub"
+            GameScreenMode.CHAR_DETAIL     -> "hub"
+            GameScreenMode.DEV_MENU        -> "main_menu"
         }
         audioEngine.playForRoute(route)
     }
@@ -131,17 +131,22 @@ class GameRootViewModel @Inject constructor(
         gameRepository.updateState { state ->
             val hero = state.party.find { it.id == heroId } ?: return@updateState
             if (hero.attributePoints > 0) {
-                hero.attributePoints--
-                when (stat.lowercase()) {
-                    "strength", "siła"         -> hero.strength++
-                    "agility", "zręczność"     -> hero.agility++
-                    "intelligence", "inteligencja" -> hero.intelligence++
-                    "endurance", "wytrzymałość" -> hero.endurance++
-                    "perception", "percepcja"  -> hero.perception++
-                    "charisma", "charyzma"     -> hero.charisma++
-                    "piety", "pobożność"       -> hero.piety++
+                val normalizedStat = stat.uppercase()
+                var applied = true
+                when (normalizedStat) {
+                    "STRENGTH", "SIŁA", "STR"           -> hero.strength++
+                    "AGILITY", "ZRĘCZNOŚĆ", "AGI"       -> hero.agility++
+                    "INTELLIGENCE", "INTELIGENCJA", "INT" -> hero.intelligence++
+                    "ENDURANCE", "WYTRZYMAŁOŚĆ", "END"   -> hero.endurance++
+                    "PERCEPTION", "PERCEPCJA", "PER"     -> hero.perception++
+                    "CHARISMA", "CHARYZMA", "CHA"        -> hero.charisma++
+                    "PIETY", "POBOŻNOŚĆ", "PIE"          -> hero.piety++
+                    else -> applied = false
                 }
-                state.logEntries.add("${hero.name} rozwija swoją naturę: $stat +1.")
+                if (applied) {
+                    hero.attributePoints--
+                    state.logEntries.add("${hero.name} rozwija swoją naturę: $stat +1.")
+                }
             }
         }
     }
