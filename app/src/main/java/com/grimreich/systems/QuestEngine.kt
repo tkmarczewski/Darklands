@@ -36,11 +36,17 @@ class QuestEngine @Inject constructor(
         if (!visited.add(questId)) return QuestStatus.LOCKED
 
         val actualState = state ?: gameRepository.currentState()
-        
+
         if (actualState.quest.completedQuestIds.contains(questId)) return QuestStatus.COMPLETED
 
+        // FIX: Check progress map first (authoritative source of ACTIVE/OBJECTIVE_MET)
         val progress = actualState.quest.progress[questId]
         if (progress != null) return progress.status
+
+        // FIX: Guard against activeQuestIds desync - if quest is tracked as active
+        // but has no progress entry (corrupted state), treat it as ACTIVE to prevent
+        // it from appearing as AVAILABLE again and being double-activated.
+        if (actualState.quest.activeQuestIds.contains(questId)) return QuestStatus.ACTIVE
 
         if (def.prerequisiteQuestId != null) {
             val prereqStatus = getStatus(def.prerequisiteQuestId, actualState, visited)
@@ -56,7 +62,7 @@ class QuestEngine @Inject constructor(
      * Activates a quest. Should be called within updateState.
      */
     fun activateQuestDirect(state: GameState, questId: String) {
-        val status = getStatus(questId, state) 
+        val status = getStatus(questId, state)
         if (status == QuestStatus.AVAILABLE) {
             if (!state.quest.activeQuestIds.contains(questId)) {
                 state.quest.activeQuestIds.add(questId)
@@ -73,9 +79,7 @@ class QuestEngine @Inject constructor(
     fun advanceStepDirect(state: GameState, questId: String) {
         val p = state.quest.progress[questId] ?: return
         if (p.status != QuestStatus.ACTIVE) return
-
         val def = registry[questId] ?: return
-
         if (p.currentStepIndex < def.steps.size - 1) {
             state.quest.progress[questId] = p.copy(currentStepIndex = p.currentStepIndex + 1)
         } else {
@@ -90,11 +94,9 @@ class QuestEngine @Inject constructor(
     fun completeQuestDirect(state: GameState, questId: String) {
         val p = state.quest.progress[questId] ?: return
         val def = registry[questId] ?: return
-
         if (p.status == QuestStatus.OBJECTIVE_MET) {
             state.gold += def.rewardGold
-            state.logEntries.add("Ukończono zadanie: ${def.title}. Otrzymano ${def.rewardGold} G.")
-
+            state.logEntries.add("Uko\u0144czono zadanie: ${def.title}. Otrzymano ${def.rewardGold} G.")
             state.quest.completedQuestIds.add(questId)
             state.quest.progress.remove(questId)
             state.quest.activeQuestIds.remove(questId)
@@ -128,7 +130,7 @@ class QuestEngine @Inject constructor(
         registry.values.forEach { def ->
             def.prerequisiteQuestId?.let { prereq ->
                 if (registry[prereq] == null) {
-                    issues.add("Quest ${def.id} ma brakujący prerequisite: $prereq")
+                    issues.add("Quest ${def.id} ma brakuj\u0105cy prerequisite: $prereq")
                 }
             }
         }
