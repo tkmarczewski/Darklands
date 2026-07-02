@@ -26,12 +26,12 @@ class StatePersistenceManager @Inject constructor(
         encodeDefaults = true
         prettyPrint = false
     }
-    
+
     private val gson = Gson()
 
     private val sessionFileName = "current_session.json"
     private val sessionFile: File get() = File(context.filesDir, sessionFileName)
-    
+
     private val slotsFileName = "save_slots.json"
     private val slotsFile: File get() = File(context.filesDir, slotsFileName)
 
@@ -69,10 +69,31 @@ class StatePersistenceManager @Inject constructor(
 
     fun exists(): Boolean = sessionFile.exists()
 
+    /**
+     * Clears BOTH the session file and the slots file.
+     * Use this for a full reset (e.g. clearSessionAndReset).
+     * Do NOT use this when only an outdated/corrupt session needs removing -
+     * use [clearSessionOnly] to preserve manual save slots.
+     */
     fun clear() {
-        Log.d(TAG, "Clearing persistence")
+        Log.d(TAG, "Clearing persistence (session + slots)")
         if (sessionFile.exists()) sessionFile.delete()
         if (slotsFile.exists()) slotsFile.delete()
+    }
+
+    /**
+     * FIX: Clears only the session file, leaving the save slots file intact.
+     *
+     * Previously [GameRepository.restoreIfAvailable] called [clear] whenever a
+     * session was absent or had an outdated version. This wiped the save_slots.json
+     * file even though the player may have valid manual saves there.
+     *
+     * Use this when you only want to discard a stale/incompatible auto-save session
+     * without touching the player's manual save slots.
+     */
+    fun clearSessionOnly() {
+        Log.d(TAG, "Clearing session file only (slots preserved)")
+        if (sessionFile.exists()) sessionFile.delete()
     }
 
     fun persistSlots(slots: Map<Int, SaveSnapshot>) {
