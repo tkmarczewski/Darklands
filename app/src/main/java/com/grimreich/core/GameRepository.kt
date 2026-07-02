@@ -31,7 +31,7 @@ class GameRepository @Inject constructor(
     private val questEngine get() = questEngineProvider.get()
     private val dialogueManager get() = dialogueManagerProvider.get()
     private val questManifest get() = questManifestProvider.get()
-    
+
     private val _gameState = MutableStateFlow(GameState())
     val gameState: StateFlow<GameState> = _gameState.asStateFlow()
 
@@ -76,17 +76,30 @@ class GameRepository @Inject constructor(
 
     fun restoreIfAvailable(): Boolean {
         val restored = persistence.restore()
-        SaveSystem.restoreFromPersistence(persistence)
         if (restored != null) {
             if (restored.version < 3) {
-                persistence.clear()
+                // FIX (BUG-2a): Use clearSessionOnly() instead of clear().
+                // The old code called persistence.clear() here which deleted BOTH
+                // current_session.json AND save_slots.json. This meant that whenever
+                // a player had an outdated session (version < 3) the entire slots file
+                // was nuked, losing all manual saves.
+                // clearSessionOnly() deletes only the stale session file, preserving slots.
+                persistence.clearSessionOnly()
                 return false
             }
+            // FIX (BUG-2b): SaveSystem.restoreFromPersistence was previously called
+            // BEFORE the null-check on `restored`. When restored == null the code then
+            // called persistence.clear(), wiping slots even though they had just been
+            // loaded into memory (SaveSystem.importSlots). The in-memory slots survived,
+            // but the file was gone so they would be lost on next process death.
+            // Now slots are only restored when a valid session is present.
+            SaveSystem.restoreFromPersistence(persistence)
             _gameState.value = restored.toDomain()
             sync()
             return true
         }
-        persistence.clear()
+        // No session file present - do NOT clear anything.
+        // The player may have valid manual save slots even without an active session.
         return false
     }
 
@@ -95,7 +108,6 @@ class GameRepository @Inject constructor(
             it.grimEchoIntensity = it.grimEngine.echoIntensity
             it.grimMutationPhase = it.grimEngine.mutationPhase
         }
-        
         repositoryScope.launch {
             try {
                 val dto = stateSnapshot.toDto()
