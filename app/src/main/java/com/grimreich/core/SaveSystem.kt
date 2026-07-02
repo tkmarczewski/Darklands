@@ -25,7 +25,7 @@ object SaveSystem {
         return snapshot
     }
 
-    fun load(slotId: Int = 0): SaveSnapshot? = slots[slotId]?.copy(state = slots[slotId]!!.state.deepCopy())
+    fun load(slotId: Int = 0): SaveSnapshot? = slots[slotId]?.let { it.copy(state = it.state.deepCopy()) }
 
     fun isCompatible(snapshot: SaveSnapshot): Boolean {
         return snapshot.version >= 1 && snapshot.version <= SAVE_VERSION
