@@ -88,11 +88,19 @@ class CombatSystem @Inject constructor(
 
     private fun resolvePlayerAction(actionType: String): String {
         var status = ""
+        // FIX (deadlock): onCombatEnd must NOT be invoked inside updateState{},
+        // because updateState uses synchronized(this) on GameRepository.
+        // If the callback triggers another updateState call (e.g. from a quest
+        // system or UI handler), it would attempt to re-acquire the same lock on
+        // the same thread, causing a deadlock.
+        // Fix: capture the pending callback in a local variable inside updateState{},
+        // then invoke it AFTER the synchronized block completes.
+        var pendingCombatEndCallback: (() -> Unit)? = null
+
         // OPTIMIZATION: Only update repository once per round
         gameRepository.updateState { state ->
             val c = state.combat
             val hero = state.party.find { it.id == state.activeHeroId } ?: run { status = "Brak bohatera"; return@updateState }
-
             if (!c.active) { status = "Brak walki"; return@updateState }
 
             // FIX: Pass state to heroToCombatant so it reads from the mutable copy,
@@ -130,7 +138,9 @@ class CombatSystem @Inject constructor(
 
             if (combatRound.isDefeated(enemyState)) {
                 c.active = false
-                onCombatEnd?.invoke()
+                // FIX: Do NOT invoke onCombatEnd here - would deadlock synchronized(GameRepository).
+                // Capture it for invocation after updateState{} completes.
+                pendingCombatEndCallback = onCombatEnd
                 c.log.add("${c.enemyName} pokonany!")
                 state.pendingQuestId?.let { pending ->
                     if (pending.startsWith("COMBAT_WIN:")) {
@@ -145,11 +155,17 @@ class CombatSystem @Inject constructor(
                 c.active = false
                 hero.isDead = true
                 hero.hp = 0
-                onCombatEnd?.invoke()
+                // FIX: Do NOT invoke onCombatEnd here - would deadlock synchronized(GameRepository).
+                // Capture it for invocation after updateState{} completes.
+                pendingCombatEndCallback = onCombatEnd
             }
-
             status = "Runda ${c.round}"
         }
+
+        // FIX: Invoke the combat-end callback OUTSIDE of the synchronized updateState{} block
+        // to prevent deadlock when the callback itself calls updateState.
+        pendingCombatEndCallback?.invoke()
+
         return status
     }
 }
