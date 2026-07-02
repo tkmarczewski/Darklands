@@ -165,7 +165,7 @@ class HeroPool @Inject constructor() {
         val age = (career.minAge + 4).coerceAtLeast(16) + rng.nextInt(12)
 
         val ranges = statRangesFor(career)
-        fun roll(key: String): Int = ranges[key]!!.let { it.base + rng.nextInt(it.spread + 1) }
+        fun roll(key: String): Int = (ranges[key] ?: StatRange(10, 3)).let { it.base + rng.nextInt(it.spread + 1) }
 
         val str = roll("str")
         val agi = roll("agi")
