@@ -20,7 +20,7 @@ class DevMenuViewModel @Inject constructor(
     val currentQuestInfo: StateFlow<String> = _currentQuestInfo.asStateFlow()
 
     fun addLog(msg: String) {
-        _logEntries.value = _logEntries.value + msg
+                _logEntries.value = (_logEntries.value + msg).takeLast(100)
     }
 
     fun startQuest(id: String) {
