@@ -108,7 +108,7 @@ data class GameState(
             enemyEffects = combat.enemyEffects.toMutableList(),
             heroEffects = combat.heroEffects.toMutableList()
         ),
-        knownNpcs = knownNpcs.mapValues { it.value.map { n -> n.copy() } }.toMutableMap(),
+        knownNpcs = knownNpcs.mapValues { it.value.map { n -> n.copy() }.toMutableList() }.toMutableMap(),
         unlockedLoreIds = unlockedLoreIds.toMutableSet(),
         persistentMeta = persistentMeta.copy(
             unlockedLegacyBuffs = persistentMeta.unlockedLegacyBuffs.toMutableSet()
