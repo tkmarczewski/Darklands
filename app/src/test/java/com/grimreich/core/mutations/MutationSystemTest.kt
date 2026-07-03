@@ -34,9 +34,9 @@ class MutationSystemTest {
         val state = GameState(world = WorldState(globalStability = stability)).apply { party.add(hero) }
         
         `when`(gameRepository.currentState()).thenReturn(state)
-        `when`(gameRepository.updateState(any())).thenAnswer { invocation ->
+        `when`(gameRepository.updateState(any(), any())).thenAnswer { invocation ->
             @Suppress("UNCHECKED_CAST")
-            val transform = invocation.arguments[0] as (GameState) -> Unit
+            val transform = invocation.arguments[1] as (GameState) -> Unit
             transform(state)
         }
 
@@ -61,9 +61,9 @@ class MutationSystemTest {
         val state = GameState(world = WorldState(globalStability = 100)).apply { party.add(hero) }
         
         `when`(gameRepository.currentState()).thenReturn(state)
-        `when`(gameRepository.updateState(any())).thenAnswer { invocation ->
+        `when`(gameRepository.updateState(any(), any())).thenAnswer { invocation ->
             @Suppress("UNCHECKED_CAST")
-            val transform = invocation.arguments[0] as (GameState) -> Unit
+            val transform = invocation.arguments[1] as (GameState) -> Unit
             transform(state)
         }
 

@@ -45,12 +45,9 @@ sealed class GameRoute(val route: String) {
     object Ritual : GameRoute("ritual")
     object Ending : GameRoute("ending")
     object CharDetail : GameRoute("char_detail")
-<<<<<<< HEAD
-=======
     // Temple and Events are not yet implemented; they redirect to safe fallbacks.
     object Temple : GameRoute("city")   // fallback: stay in city until TempleScreen lands
     object Events : GameRoute("hub")    // fallback: back to hub until EventsScreen lands
->>>>>>> 24fc303f56b7de1e179936d0ad6ff6d56db8e086
 }
 
 @Composable
@@ -65,26 +62,6 @@ fun GameNavHost(
             GameScreenMode.MAIN_MENU         -> GameRoute.MainMenu.route
             GameScreenMode.PLAYER_IDENTITY   -> GameRoute.PlayerIdentity.route
             GameScreenMode.CHARACTER_CREATOR -> GameRoute.CharacterCreator.route
-<<<<<<< HEAD
-            GameScreenMode.HUB -> GameRoute.Hub.route
-            GameScreenMode.WORLD_MAP -> GameRoute.WorldMap.route
-            GameScreenMode.CITY -> GameRoute.City.route
-            GameScreenMode.MARKET -> GameRoute.Market.route
-            GameScreenMode.ALCHEMY -> GameRoute.Alchemy.route
-            GameScreenMode.COMBAT -> GameRoute.Combat.route
-            GameScreenMode.TAVERN -> GameRoute.Tavern.route
-            GameScreenMode.DIALOGUE -> GameRoute.Dialogue.route
-            GameScreenMode.QUESTS -> GameRoute.Quests.route
-            GameScreenMode.RECRUIT -> GameRoute.Recruit.route
-            GameScreenMode.INVENTORY -> GameRoute.Inventory.route
-            GameScreenMode.CHRONICLE -> GameRoute.Chronicle.route
-            GameScreenMode.EXPEDITION -> GameRoute.Expedition.route
-            GameScreenMode.DEV_MENU -> GameRoute.DevMenu.route
-            GameScreenMode.RITUAL -> GameRoute.Ritual.route
-            GameScreenMode.ENDING -> GameRoute.Ending.route
-            GameScreenMode.CHAR_DETAIL -> GameRoute.CharDetail.route
-            else -> GameRoute.MainMenu.route
-=======
             GameScreenMode.HUB               -> GameRoute.Hub.route
             GameScreenMode.WORLD_MAP         -> GameRoute.WorldMap.route
             GameScreenMode.CITY              -> GameRoute.City.route
@@ -104,7 +81,7 @@ fun GameNavHost(
             GameScreenMode.CHAR_DETAIL       -> GameRoute.CharDetail.route
             GameScreenMode.TEMPLE            -> GameRoute.Temple.route   // fallback to city
             GameScreenMode.EVENTS            -> GameRoute.Events.route   // fallback to hub
->>>>>>> 24fc303f56b7de1e179936d0ad6ff6d56db8e086
+            else                             -> GameRoute.MainMenu.route
         }
         navController.navigate(route) {
             popUpTo(0)
@@ -238,13 +215,6 @@ fun GameNavHost(
             )
         }
 
-        composable(GameRoute.CharDetail.route) {
-            CharDetailScreen(
-                viewModel = root,
-                onBack = { root.setMode(GameScreenMode.HUB) }
-            )
-        }
-
         composable(GameRoute.DevMenu.route) {
             DevMenuScreen(
                 onBack = { root.setMode(GameScreenMode.HUB) }
@@ -254,9 +224,11 @@ fun GameNavHost(
         composable(GameRoute.Ritual.route) {
             val ritualVm: com.grimreich.ui.ritual.RitualViewModel = hiltViewModel()
             val hero by ritualVm.deadHero.collectAsState()
+            val stability by ritualVm.globalStability.collectAsState()
             hero?.let {
                 RitualScreen(
                     hero = it,
+                    globalStability = stability,
                     ritualSystem = ritualVm.ritualSystem,
                     onRevived = { root.setMode(GameScreenMode.HUB) },
                     onSacrificed = { root.setMode(GameScreenMode.HUB) }

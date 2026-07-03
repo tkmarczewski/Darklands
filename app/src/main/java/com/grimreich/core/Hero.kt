@@ -36,7 +36,7 @@ data class Hero(
 
     // Kariera
     var currentCareer: Career? = null,
-    var careerHistory: MutableList<Career> = mutableListOf(),
+    var careerHistory: MutableList<CareerEntry> = mutableListOf(),
 
     // Cechy
     var trait: Trait? = null,

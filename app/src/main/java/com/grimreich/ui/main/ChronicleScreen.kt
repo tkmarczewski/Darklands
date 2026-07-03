@@ -10,10 +10,12 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.grimreich.R
 import com.grimreich.grimreich.v1.ChronicleEntry
 
 @Composable
@@ -31,7 +33,7 @@ fun ChronicleScreen(
             .padding(16.dp)
     ) {
         Text(
-            text = "KRONIKA ECHO",
+            text = stringResource(R.string.chronicle_title),
             color = Color(0xFFC0A060),
             fontSize = 24.sp,
             fontWeight = FontWeight.Bold,
@@ -42,7 +44,7 @@ fun ChronicleScreen(
         // Using entries.size vs hardcoded target for now
         val progress = if (entries.isNotEmpty()) (entries.size.toFloat() / 50f).coerceAtMost(1f) else 0f
         Column(modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp)) {
-            Text("DEKODOWANIE RZECZYWISTOŚCI: ${(progress * 100).toInt()}%", color = Color.Gray, fontSize = 10.sp)
+            Text(stringResource(R.string.chronicle_decode_prefix) + "${(progress * 100).toInt()}" + stringResource(R.string.chronicle_decode_suffix), color = Color.Gray, fontSize = 10.sp)
             LinearProgressIndicator(
                 progress = progress,
                 modifier = Modifier.fillMaxWidth().height(4.dp),
@@ -89,7 +91,7 @@ fun ChronicleScreen(
                     }
                 } else {
                     Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
-                        Text("Wybierz wpis, aby zgłębić wiedzę o Pęknięciu.", color = Color.DarkGray, fontSize = 12.sp)
+                        Text(stringResource(R.string.chronicle_select_hint), color = Color.DarkGray, fontSize = 12.sp)
                     }
                 }
             }
@@ -103,7 +105,7 @@ fun ChronicleScreen(
             modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2A2A2A))
         ) {
-            Text("POWRÓT", color = Color(0xFFC0A060))
+            Text(stringResource(R.string.btn_back), color = Color(0xFFC0A060))
         }
     }
 }

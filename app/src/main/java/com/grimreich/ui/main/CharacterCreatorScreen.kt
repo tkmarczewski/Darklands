@@ -11,10 +11,12 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.grimreich.R
 import com.grimreich.core.Career
 import com.grimreich.core.HeroSkill
 
@@ -36,7 +38,7 @@ fun CharacterCreatorScreen(
     ) {
         // Reduced header size
         Text(
-            text = "KREACJA BOHATERA",
+            text = stringResource(R.string.creator_header),
             color = Color(0xFFC0A060),
             fontSize = 20.sp,
             fontWeight = FontWeight.Bold
@@ -49,9 +51,9 @@ fun CharacterCreatorScreen(
             modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp),
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
-            ProgressItem("PROFESJA", active = state.stage == CreatorStage.CAREER)
-            ProgressItem("CECHY", active = state.stage == CreatorStage.ATTRIBUTES)
-            ProgressItem("SPECJALIZACJE", active = state.stage == CreatorStage.SKILLS)
+            ProgressItem(stringResource(R.string.creator_stage_career), active = state.stage == CreatorStage.CAREER)
+            ProgressItem(stringResource(R.string.creator_stage_attributes), active = state.stage == CreatorStage.ATTRIBUTES)
+            ProgressItem(stringResource(R.string.creator_stage_skills), active = state.stage == CreatorStage.SKILLS)
         }
 
         Spacer(modifier = Modifier.height(12.dp))
@@ -67,7 +69,7 @@ fun CharacterCreatorScreen(
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFC0A060)),
                 border = androidx.compose.foundation.BorderStroke(1.dp, Color.Black)
             ) {
-                Text("LOSUJ WSZYSTKO", fontSize = 9.sp, color = Color.Black, fontWeight = FontWeight.Bold)
+                Text(stringResource(R.string.btn_randomize_all), fontSize = 9.sp, color = Color.Black, fontWeight = FontWeight.Bold)
             }
         }
 
@@ -115,7 +117,7 @@ fun CharacterCreatorScreen(
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFC0A060)),
                 shape = MaterialTheme.shapes.extraSmall
             ) {
-                Text("POWRÓT", color = Color.Black, fontWeight = FontWeight.Bold)
+                Text(stringResource(R.string.btn_back), color = Color.Black, fontWeight = FontWeight.Bold)
             }
             Button(
                 onClick = {
@@ -134,7 +136,7 @@ fun CharacterCreatorScreen(
                 shape = MaterialTheme.shapes.extraSmall
             ) {
                 Text(
-                    text = if (state.stage == CreatorStage.SKILLS) "ZAKOŃCZ" else "DALEJ",
+                    text = if (state.stage == CreatorStage.SKILLS) stringResource(R.string.btn_finish) else stringResource(R.string.btn_next),
                     color = if (state.stage == CreatorStage.SKILLS) Color.White else Color.Black,
                     fontWeight = FontWeight.Bold
                 )
@@ -170,7 +172,7 @@ fun ProfessionStage(
             OutlinedTextField(
                 value = heroName,
                 onValueChange = onNameChange,
-                label = { Text("IMIĘ BOHATERA", color = Color.Gray, fontSize = 10.sp) },
+                label = { Text(stringResource(R.string.creator_name_hint), color = Color.Gray, fontSize = 10.sp) },
                 textStyle = androidx.compose.ui.text.TextStyle(color = Color.White, fontSize = 14.sp),
                 modifier = Modifier.weight(1f).height(56.dp),
                 colors = OutlinedTextFieldDefaults.colors(
@@ -185,13 +187,13 @@ fun ProfessionStage(
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFC0A060)),
                 shape = MaterialTheme.shapes.extraSmall
             ) {
-                Text("LOSUJ", color = Color.Black, fontSize = 10.sp, fontWeight = FontWeight.Bold)
+                Text(stringResource(R.string.btn_randomize), color = Color.Black, fontSize = 10.sp, fontWeight = FontWeight.Bold)
             }
         }
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        Text("WYBIERZ DROGĘ:", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 12.sp)
+        Text(stringResource(R.string.creator_select_path), color = Color.White, fontWeight = FontWeight.Bold, fontSize = 12.sp)
         
         LazyColumn(
             modifier = Modifier.weight(1f).padding(vertical = 4.dp),
@@ -230,7 +232,7 @@ fun AttributesStage(
     Column(modifier = Modifier.fillMaxSize()) {
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
             Text(
-                "DOSTĘPNE PUNKTY: $pointsRemaining",
+                stringResource(R.string.creator_points_label) + ": $pointsRemaining",
                 color = Color.Yellow,
                 fontWeight = FontWeight.Bold,
                 fontSize = 18.sp
@@ -242,7 +244,7 @@ fun AttributesStage(
                 modifier = Modifier.height(36.dp),
                 contentPadding = PaddingValues(horizontal = 8.dp)
             ) {
-                Text("LOSUJ", color = Color.Black, fontSize = 10.sp, fontWeight = FontWeight.Bold)
+                Text(stringResource(R.string.btn_randomize), color = Color.Black, fontSize = 10.sp, fontWeight = FontWeight.Bold)
             }
         }
         Spacer(modifier = Modifier.height(16.dp))
@@ -285,7 +287,7 @@ fun SkillsStage(
     Column(modifier = Modifier.fillMaxSize()) {
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
             Text(
-                "PUNKTY SPECJALIZACJI: $pointsRemaining",
+                stringResource(R.string.creator_stage_skills).uppercase() + ": $pointsRemaining",
                 color = Color.Yellow,
                 fontWeight = FontWeight.Bold,
                 fontSize = 18.sp
@@ -297,7 +299,7 @@ fun SkillsStage(
                 modifier = Modifier.height(36.dp),
                 contentPadding = PaddingValues(horizontal = 8.dp)
             ) {
-                Text("LOSUJ", color = Color.Black, fontSize = 10.sp, fontWeight = FontWeight.Bold)
+                Text(stringResource(R.string.btn_randomize), color = Color.Black, fontSize = 10.sp, fontWeight = FontWeight.Bold)
             }
         }
         Spacer(modifier = Modifier.height(16.dp))

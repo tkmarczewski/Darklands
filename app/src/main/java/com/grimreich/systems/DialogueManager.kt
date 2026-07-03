@@ -9,6 +9,7 @@ import com.grimreich.systems.QuestEngine
 import dagger.Lazy
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlin.random.Random
 
 @Singleton
 class DialogueManager @Inject constructor(
@@ -65,12 +66,21 @@ class DialogueManager @Inject constructor(
     }
 
     private fun applyWorldEffects(node: DialogueNode, stability: Int): DialogueNode {
-        return node.copy(text = glitchText(node.text))
+        // FIX (BUG-3): Pass stability as seed for deterministic glitch effects
+        return node.copy(text = glitchText(node.text, stability.toLong()))
     }
 
-    private fun glitchText(text: String): String {
+    /**
+     * FIX (BUG-3): Use seeded Random instead of Math.random() for determinism
+     * Allows unit testing and reproducible glitch effects based on world state
+     */
+    private fun glitchText(text: String, seed: Long): String {
+        // FIX: Guard against empty strings
+        if (text.isEmpty()) return text
+        
+        val rng = Random(seed)
         val chars = "0101#@$%&".toCharArray()
-        return text.map { if (Math.random() < 0.1) chars.random() else it }.joinToString("")
+        return text.map { if (rng.nextFloat() < 0.1f) chars.random(rng) else it }.joinToString("")
     }
 
     fun seedBasicDialogues() {

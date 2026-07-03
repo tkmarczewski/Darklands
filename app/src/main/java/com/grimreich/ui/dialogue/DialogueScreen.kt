@@ -81,7 +81,12 @@ fun DialogueScreen(
                 
                 Column {
                     Text(
-                        text = if (state.worldStability < 35 && Random.nextFloat() < 0.2f) "NULL_PTR_EXCEPTION" else state.npcName.uppercase(),
+                        text = when {
+                            state.npcName.isBlank() -> "???"
+                            state.worldStability < 35 && Random.nextFloat() < 0.2f -> 
+                                state.npcName.uppercase().take(5) + "_ERR"
+                            else -> state.npcName.uppercase()
+                        },
                         color = if (state.worldStability < 20) Color.Red else Color(0xFFC0A060),
                         fontWeight = FontWeight.Bold,
                         fontSize = 20.sp,

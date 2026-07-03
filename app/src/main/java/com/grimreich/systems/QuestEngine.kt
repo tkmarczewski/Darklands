@@ -69,6 +69,9 @@ class QuestEngine @Inject constructor(
             }
             state.quest.progress[questId] = QuestProgress(questId = questId, status = QuestStatus.ACTIVE)
             state.logEntries.add("Nowe zadanie: ${registry[questId]?.title}")
+        } else {
+            // FIX (BUG-4): Add validation logging for unexpected status
+            state.logEntries.add("⚠️ UWAGA: Zadanie $questId nie jest dostępne (status: $status)")
         }
     }
 

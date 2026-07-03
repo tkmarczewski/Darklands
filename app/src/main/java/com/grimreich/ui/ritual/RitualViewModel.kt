@@ -18,6 +18,10 @@ class RitualViewModel @Inject constructor(
     private val _deadHero = MutableStateFlow<Hero?>(null)
     val deadHero: StateFlow<Hero?> = _deadHero.asStateFlow()
 
+    val globalStability: StateFlow<Int> = gameRepository.gameState
+        .map { it.world.globalStability }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), 100)
+
     init {
         gameRepository.gameState
             .onEach { state ->

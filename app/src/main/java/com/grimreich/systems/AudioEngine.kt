@@ -31,12 +31,40 @@ class AudioEngine @Inject constructor(
 
     init {
         // FIX (BUG-2): Observe stability changes in real-time via StateFlow
-        // instead of reading stale snapshots
+        // instead of reading stale snapshots. Dynamic pitch updates while playing.
         gameRepository.get().gameState
             .onEach { state ->
                 currentStability = state.world.globalStability
+                applyDynamicEffects()
             }
             .launchIn(scope)
+    }
+
+    private fun applyDynamicEffects() {
+        synchronized(lock) {
+            musicPlayer?.let { player ->
+                if (currentStability < 15) {
+                    try {
+                        val pitch = 0.85f + (android.os.SystemClock.elapsedRealtime() % 300) / 1000f
+                        player.setPlaybackParams(player.playbackParams.setPitch(pitch))
+                    } catch (ignore: Exception) {
+                        // Reset pitch if stability recovered
+                        try {
+                            if (player.playbackParams.pitch != 1.0f) {
+                                player.setPlaybackParams(player.playbackParams.setPitch(1.0f))
+                            }
+                        } catch (e: Exception) {}
+                    }
+                } else {
+                    try {
+                        // Reset pitch if stability recovered
+                        if (player.playbackParams.pitch != 1.0f) {
+                            player.setPlaybackParams(player.playbackParams.setPitch(1.0f))
+                        }
+                    } catch (e: Exception) {}
+                }
+            }
+        }
     }
 
     fun playMusic(resId: Int, loop: Boolean = true) {
@@ -45,25 +73,12 @@ class AudioEngine @Inject constructor(
 
             stopMusicInternal()
             try {
-                // FIX (BUG-2): Use the observable stability instead of stale snapshot
                 musicPlayer = MediaPlayer.create(context, resId)?.apply {
                     isLooping = loop
-                    
-                    // --- PITCH WOBBLE (Project Cipher) ---
-                    if (currentStability < 15) {
-                        try {
-                            // Simulating a "dying record player" effect
-                            val pitch = 0.85f + (android.os.SystemClock.elapsedRealtime() % 300) / 1000f
-                            setPlaybackParams(playbackParams.setPitch(pitch))
-                        } catch (e: Exception) {
-                            // Some devices might not support pitch shifting
-                            Log.w(TAG, "Pitch shifting not supported on this device", e)
-                        }
-                    }
-
                     start()
                 }
                 currentTrackResId = resId
+                applyDynamicEffects()
             } catch (e: Exception) {
                 Log.e(TAG, "Blad odtwarzania utworu resId=$resId", e)
                 musicPlayer = null

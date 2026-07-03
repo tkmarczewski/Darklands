@@ -19,6 +19,9 @@ class EchoSystem @Inject constructor(
 
     private val ECHO_FILE = "eternal_echoes.json"
     private val gson = Gson()
+    
+    // Defensive measure: Ensure transient if Hero ever gains non-serializable fields
+    @Transient
     private val eternalHeroes = mutableListOf<Hero>()
 
     init {

@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">GrimReich</string>
+    <string name="btn_start_adventure">START ADVENTURE</string>
+    <string name="btn_continue_adventure">CONTINUE ADVENTURE</string>
+    <string name="btn_back">← BACK</string>
+    <string name="btn_understand">I UNDERSTAND</string>
+    <string name="btn_yes">YES</string>
+    <string name="btn_no">NO</string>
+
+    <string name="menu_city">CITY</string>
+    <string name="menu_map">MAP</string>
+    <string name="menu_backpack">BACKPACK</string>
+    <string name="menu_quests">QUESTS</string>
+    <string name="menu_reputation">REPUTATION</string>
+    <string name="menu_saints">SAINTS</string>
+    <string name="menu_news">NEWS</string>
+    <string name="menu_transfer">TRANSFER</string>
+    <string name="menu_finale">FINALE</string>
+    <string name="menu_combat">COMBAT</string>
+
+    <string name="city_tavern">TAVERN</string>
+    <string name="city_market">MARKET</string>
+    <string name="city_temple">CHAPEL</string>
+    <string name="city_recruit">RECRUIT</string>
+
+    <string name="creator_title">HERO CREATION</string>
+    <string name="creator_name_hint">Hero name</string>
+    <string name="creator_profession">PROFESSION</string>
+    <string name="creator_points_prefix">Points to spend: </string>
+    <string name="creator_skills_title">SPECIALIZATIONS (CHOOSE 3)</string>
+
+    <string name="journal_title">CHRONICLES OF THE WORLD</string>
+    <string name="journal_empty">Your chronicles are silent. No attempts to repair reality have been made yet.</string>
+
+    <!-- Legacy Compatibility Strings -->
+    <string name="grimreich_mvp_prompt">System initializing...</string>
+    <string name="btn_quest">Quest</string>
+    <string name="btn_save">Save</string>
+    <string name="btn_load">Load</string>
+
+    <!-- Main Menu hardcoded strings -->
+    <string name="main_title">GRIMREICH</string>
+    <string name="main_subtitle">Do Not Attempt to Adjust The Picture. We Are Controlling Transmission.</string>
+    <string name="btn_new_game">NEW ADVENTURE</string>
+    <string name="btn_no_session">CONTINUATION (NO SESSION)</string>
+    <string name="btn_exit">EXIT</string>
+    <string name="dev_label">DEV</string>
+
+    <!-- Chronicle Screen -->
+    <string name="chronicle_title">CHRONICLE ECHO</string>
+    <string name="chronicle_decode_prefix">DECODING REALITY: </string>
+    <string name="chronicle_decode_suffix">%</string>
+    <string name="chronicle_select_hint">Select an entry to delve into the knowledge of the Breach.</string>
+
+    <!-- Character Creator Screen -->
+    <string name="creator_header">HERO CREATION</string>
+    <string name="creator_stage_career">PROFESSION</string>
+    <string name="creator_stage_attributes">ATTRIBUTES</string>
+    <string name="creator_stage_skills">SPECIALIZATIONS</string>
+    <string name="btn_randomize_all">RANDOMIZE ALL</string>
+    <string name="btn_randomize">RANDOMIZE</string>
+    <string name="creator_select_path">CHOOSE PATH:</string>
+    <string name="creator_points_label">AVAILABLE POINTS</string>
+    <string name="btn_next">NEXT</string>
+    <string name="btn_finish">FINISH</string>
+</resources>

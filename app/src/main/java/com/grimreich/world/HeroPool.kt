@@ -200,7 +200,7 @@ class HeroPool @Inject constructor() {
         Career.KNIGHT to mapOf("Slash" to 12, "Shield Bash" to 15, "Shield" to 35, "Intimidate" to 25),
         Career.MERCENARY to
                 mapOf("str" to 10, "agi" to 9, "per" to 8, "int" to 7, "end" to 11, "cha" to 8, "pie" to 7),
-            Career.THIEF ->
+            Career.THIEF to
                 mapOf("agi" to 12, "per" to 11, "stealth" to 12, "lockpick" to 10, "dagger" to 10),
             Career.ROGUE to
                 mapOf("agi" to 11, "per" to 10, "stealth" to 11, "dagger" to 10, "lockpick" to 9),
@@ -208,7 +208,7 @@ class HeroPool @Inject constructor() {
                 mapOf("int" to 12, "read" to 12, "alchemy" to 10, "herb_lore" to 9, "lore" to 8),
             Career.MONK to
                 mapOf("pie" to 13, "heal" to 12, "read" to 10, "mace" to 9, "prayer" to 8),
-            Career.GUARD ->
+            Career.GUARD to
                 mapOf("str" to 10, "end" to 10, "spear" to 10, "shield" to 9, "intimidate" to 8),
             Career.PHYSICIAN to
                 mapOf("int" to 11, "heal" to 11, "herb_lore" to 10, "read" to 8, "dagger" to 7),
@@ -216,7 +216,7 @@ class HeroPool @Inject constructor() {
                 mapOf("str" to 10, "craft" to 10, "appraise" to 9, "axe" to 8),
             Career.ALCHEMIST to
                 mapOf("int" to 12, "alchemy" to 11, "read" to 9, "herb_lore" to 8)
-        }
+        )
 
     // ── Koszt rekrutacji per profesja ────────────────────────────────────────
     fun hireCostFor(career: Career): Int =

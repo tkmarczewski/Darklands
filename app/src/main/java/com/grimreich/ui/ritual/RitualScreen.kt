@@ -17,11 +17,12 @@ import com.grimreich.systems.RitualSystem
 @Composable
 fun RitualScreen(
     hero: Hero,
+    globalStability: Int,
     ritualSystem: RitualSystem,
     onRevived: () -> Unit,
     onSacrificed: () -> Unit
 ) {
-    val canRevive = ritualSystem.canPerformResurrection(hero)
+    val canRevive = ritualSystem.canPerformResurrection(hero, globalStability)
 
     Column(
         modifier = Modifier

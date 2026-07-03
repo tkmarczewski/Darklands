@@ -32,9 +32,9 @@ class OntologicalEngineTest {
     fun `processRealityShift updates global stability`() {
         val initialState = GameState(world = WorldState(globalStability = 50))
         
-        `when`(gameRepository.updateState(any())).thenAnswer { invocation ->
+        `when`(gameRepository.updateState(any(), any())).thenAnswer { invocation ->
             @Suppress("UNCHECKED_CAST")
-            val transform = invocation.arguments[0] as (GameState) -> Unit
+            val transform = invocation.arguments[1] as (GameState) -> Unit
             transform(initialState)
         }
 
@@ -48,9 +48,9 @@ class OntologicalEngineTest {
     fun `processRealityShift drains stability during expedition`() {
         val initialState = GameState(world = WorldState(globalStability = 100), isExpeditionActive = true)
         
-        `when`(gameRepository.updateState(any())).thenAnswer { invocation ->
+        `when`(gameRepository.updateState(any(), any())).thenAnswer { invocation ->
             @Suppress("UNCHECKED_CAST")
-            val transform = invocation.arguments[0] as (GameState) -> Unit
+            val transform = invocation.arguments[1] as (GameState) -> Unit
             transform(initialState)
         }
 
@@ -65,9 +65,9 @@ class OntologicalEngineTest {
     fun `processRealityShift logs warning when stability is low`() {
         val lowStabilityState = GameState(world = WorldState(globalStability = 29))
         
-        `when`(gameRepository.updateState(any())).thenAnswer { invocation ->
+        `when`(gameRepository.updateState(any(), any())).thenAnswer { invocation ->
             @Suppress("UNCHECKED_CAST")
-            val transform = invocation.arguments[0] as (GameState) -> Unit
+            val transform = invocation.arguments[1] as (GameState) -> Unit
             transform(lowStabilityState)
         }
 

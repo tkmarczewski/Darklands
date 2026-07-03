@@ -15,13 +15,16 @@ import com.grimreich.ui.main.GameNavHost
 import com.grimreich.ui.main.GameRootViewModel
 import com.grimreich.ui.shared.DevMenuOverlay
 import com.grimreich.core.GameBootstrapper
+import com.grimreich.core.LanguageManager
 import com.grimreich.ui.theme.GrimTheme
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class MainActivity : ComponentActivity() {
+class MainActivity : LocalizedActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        LanguageManager.init(this)
         
         // --- IMMERSIVE MODE: Hide System Bars ---
         WindowCompat.setDecorFitsSystemWindows(window, false)

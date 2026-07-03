@@ -22,7 +22,17 @@ class LootSystem @Inject constructor(
      * Awards loot directly to the state. Use this inside updateState blocks.
      */
     fun awardLootDirect(state: GameState, chance: Float): String {
-        val item = rollLoot(chance) ?: return ""
+        // FIX (BUG-5): Handle empty catalogue explicitly
+        if (itemCatalogue.all().isEmpty()) {
+            state.logEntries.add("❌ BŁĄD: Katalog przedmiotów jest pusty!")
+            return "Błąd: Brak dostępnych przedmiotów"
+        }
+
+        val item = rollLoot(chance) ?: run {
+            state.logEntries.add("Przeszukano okolicę, ale nic nie znaleziono.")
+            return ""
+        }
+
         state.inventory.add(item.copy())
         state.logEntries.add("Zdobyto przedmiot: ${item.name}")
         return "Zdobyto przedmiot: ${item.name}"

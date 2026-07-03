@@ -16,7 +16,7 @@
     <string name="menu_saints">PROROCY</string>
     <string name="menu_news">WIEŚCI</string>
     <string name="menu_transfer">TRANSFER</string>
-    <string name="menu_finale">FINAŁ</string>
+    <string name="menu_finale">FINALE</string>
     <string name="menu_combat">WALKA</string>
 
     <string name="city_tavern">KARCZMA</string>
@@ -38,4 +38,30 @@
     <string name="btn_quest">Zadanie</string>
     <string name="btn_save">Zapisz</string>
     <string name="btn_load">Wczytaj</string>
+
+    <!-- Main Menu hardcoded strings - moved to resources -->
+    <string name="main_title">GRIMREICH</string>
+    <string name="main_subtitle">Do Not Attempt to Adjust The Picture. We Are Controlling Transmission.</string>
+    <string name="btn_new_game">NOWA PRZYGODA</string>
+    <string name="btn_no_session">KONTYNUACJA (BRAK SESJI)</string>
+    <string name="btn_exit">WYJŚCIE</string>
+    <string name="dev_label">DEV</string>
+
+    <!-- Chronicle Screen -->
+    <string name="chronicle_title">KRONIKA ECHO</string>
+    <string name="chronicle_decode_prefix">DEKODOWANIE RZECZYWISTOŚCI: </string>
+    <string name="chronicle_decode_suffix">%</string>
+    <string name="chronicle_select_hint">Wybierz wpis, aby zgłębić wiedzę o Pęknięciu.</string>
+
+    <!-- Character Creator Screen -->
+    <string name="creator_header">KREACJA BOHATERA</string>
+    <string name="creator_stage_career">PROFESJA</string>
+    <string name="creator_stage_attributes">CECHY</string>
+    <string name="creator_stage_skills">SPECJALIZACJE</string>
+    <string name="btn_randomize_all">LOSUJ WSZYSTKO</string>
+    <string name="btn_randomize">LOSUJ</string>
+    <string name="creator_select_path">WYBIERZ DROGĘ:</string>
+    <string name="creator_points_label">DOSTĘPNE PUNKTY</string>
+    <string name="btn_next">DALEJ</string>
+    <string name="btn_finish">ZAKOŃCZ</string>
 </resources>
