@@ -4,14 +4,20 @@ import android.content.Context
 import android.media.MediaPlayer
 import android.util.Log
 import com.grimreich.R
+import com.grimreich.core.GameRepository
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class AudioEngine @Inject constructor(
     @ApplicationContext private val context: Context,
-    private val gameRepository: dagger.Lazy<com.grimreich.core.GameRepository>
+    private val gameRepository: dagger.Lazy<GameRepository>
 ) {
     companion object {
         private const val TAG = "AudioEngine"
@@ -19,7 +25,19 @@ class AudioEngine @Inject constructor(
 
     private var musicPlayer: MediaPlayer? = null
     private var currentTrackResId: Int = 0
+    private var currentStability: Int = 100
     private val lock = Any()
+    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
+
+    init {
+        // FIX (BUG-2): Observe stability changes in real-time via StateFlow
+        // instead of reading stale snapshots
+        gameRepository.get().gameState
+            .onEach { state ->
+                currentStability = state.world.globalStability
+            }
+            .launchIn(scope)
+    }
 
     fun playMusic(resId: Int, loop: Boolean = true) {
         synchronized(lock) {
@@ -27,20 +45,19 @@ class AudioEngine @Inject constructor(
 
             stopMusicInternal()
             try {
-                val state = gameRepository.get().currentState()
-                val stability = state.world.globalStability
-                
+                // FIX (BUG-2): Use the observable stability instead of stale snapshot
                 musicPlayer = MediaPlayer.create(context, resId)?.apply {
                     isLooping = loop
                     
                     // --- PITCH WOBBLE (Project Cipher) ---
-                    if (stability < 15) {
+                    if (currentStability < 15) {
                         try {
                             // Simulating a "dying record player" effect
                             val pitch = 0.85f + (android.os.SystemClock.elapsedRealtime() % 300) / 1000f
                             setPlaybackParams(playbackParams.setPitch(pitch))
                         } catch (e: Exception) {
                             // Some devices might not support pitch shifting
+                            Log.w(TAG, "Pitch shifting not supported on this device", e)
                         }
                     }
 
@@ -76,13 +93,12 @@ class AudioEngine @Inject constructor(
     }
 
     fun playForRoute(route: String) {
-        val state = gameRepository.get().currentState()
-        val stability = state.world.globalStability
-
+        // FIX (BUG-2): Use the cached stability to avoid race conditions
         val track = when {
-            stability < 20 -> R.raw.ost_glitch_ambient
+            currentStability < 20 -> R.raw.ost_glitch_ambient
             route.contains("main_menu") -> R.raw.ost_main_menu
             route.contains("city") -> {
+                val state = gameRepository.get().currentState()
                 val currentCity = state.grimCurrentRegion.lowercase()
                 when {
                     currentCity.contains("zakon") || currentCity.contains("fortress") -> R.raw.ost_faction_order
@@ -91,6 +107,7 @@ class AudioEngine @Inject constructor(
                 }
             }
             route.contains("combat") -> {
+                val state = gameRepository.get().currentState()
                 if (state.combat.enemyMaxHp > 100) R.raw.ost_combat_boss else R.raw.ost_combat_normal
             }
             route.contains("expedition") || route.contains("events") -> R.raw.ost_exploration
@@ -102,4 +119,6 @@ class AudioEngine @Inject constructor(
         }
         playMusic(track)
     }
+
+    fun getCurrentStability(): Int = currentStability
 }
