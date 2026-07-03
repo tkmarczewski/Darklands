@@ -10,17 +10,17 @@ import javax.inject.Inject
 
 @HiltViewModel
 class DevMenuViewModel @Inject constructor(
-    private val questEngine: QuestEngine
+    private val questEngine: QuestEngine,
+    private val gameRepository: com.grimreich.core.GameRepository
 ) : ViewModel() {
 
-    private val _logEntries = MutableStateFlow<List<String>>(emptyList())
-    val logEntries: StateFlow<List<String>> = _logEntries.asStateFlow()
+    val logEntries: StateFlow<List<String>> = gameRepository.gameLogs
 
     private val _currentQuestInfo = MutableStateFlow("")
     val currentQuestInfo: StateFlow<String> = _currentQuestInfo.asStateFlow()
 
     fun addLog(msg: String) {
-                _logEntries.value = (_logEntries.value + msg).takeLast(100)
+        gameRepository.log(msg)
     }
 
     fun startQuest(id: String) {

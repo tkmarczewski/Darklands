@@ -17,7 +17,7 @@ object SaveSystem {
     private var lastAutoSaveHash: Int = 0
     private val gson = Gson()
 
-    fun save(gameState: GameState, slotId: Int = 0, label: String = ""): SaveSnapshot {
+    suspend fun save(gameState: GameState, slotId: Int = 0, label: String = ""): SaveSnapshot {
         val stateCopy = gameState.deepCopy()
         val stateJson = gson.toJson(stateCopy)
         val checksum = SaveIntegrity.generateChecksum(stateJson)
@@ -70,7 +70,7 @@ object SaveSystem {
     }
 
     // ==================== AUTOSAVE ====================
-    fun autoSave(gameState: GameState): Boolean {
+    suspend fun autoSave(gameState: GameState): Boolean {
         val hash = computeStateHash(gameState)
         if (hash == lastAutoSaveHash) return false
         
@@ -110,7 +110,7 @@ object SaveSystem {
         val message: String
     )
 
-    fun validate(snapshot: SaveSnapshot): ValidationResult {
+    suspend fun validate(snapshot: SaveSnapshot): ValidationResult {
         val compatible = isCompatible(snapshot)
         val stateJson = gson.toJson(snapshot.state)
         val checksumValid = snapshot.checksum?.let { SaveIntegrity.verify(stateJson, it) } ?: false

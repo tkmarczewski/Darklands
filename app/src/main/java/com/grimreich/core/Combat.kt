@@ -219,10 +219,17 @@ class CombatRound @Inject constructor(
 
         val attackerStatus = moraleSystem.computeStatus(attacker.morale)
         val defenderStatus = moraleSystem.computeStatus(defender.morale)
+
+        // FIX (M-01): Routed combatants deal NO damage
+        if (attackerStatus == MoraleStatus.ROUTED) {
+            log.add("${attacker.name} jest zbyt przerażony, by walczyć!")
+            return 0
+        }
+
         val defArmor = defender.armor
 
         val critChance = (attacker.perception * GrimConstants.Combat.PERCEPTION_CRIT_MODIFIER)
-            .coerceAtMost(0.8f)
+            .coerceIn(0f, 0.8f) // FIX (M-02): Clamp crit chance
         val isCrit   = randomProvider.nextFloat() < critChance
         val critMod  = if (isCrit) GrimConstants.Combat.CRITICAL_HIT_MULTIPLIER else 1.0f
 
@@ -257,6 +264,10 @@ class CombatRound @Inject constructor(
     ): Int {
         val attackerStatus = moraleSystem.computeStatus(attacker.morale)
         val defenderStatus = moraleSystem.computeStatus(defender.morale)
+        
+        // FIX (M-01): Routed defenders don't counter
+        if (defenderStatus == MoraleStatus.ROUTED) return 0
+
         val counterAtk  = (defender.attackBase * defenderStatus.attackModifier() *
             (0.6f + randomProvider.nextFloat() * 0.8f)).toInt()
         val attackerDef = (attacker.armor * attackerStatus.defenseModifier() *

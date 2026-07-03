@@ -24,7 +24,8 @@ data class HubUiState(
     val worldStability: Int = 100,
     val hubBackground: String = "",
     val hubTintColor: Color = Color.Transparent,
-    val atmosphericMessage: String = ""
+    val atmosphericMessage: String = "",
+    val latestLogs: List<String> = emptyList()
 )
 
 @HiltViewModel
@@ -46,42 +47,43 @@ class HubViewModel @Inject constructor(
     }
 
     init {
-        gameRepository.gameState
-            .onEach { state ->
-                val currentCityId = state.grimCurrentRegion
-                val city = cityCatalogue.get(currentCityId)
-                
-                val stability = state.world.globalStability
-                val tint = when {
-                    stability < 15 -> Color(0x66FF0000) // Dark Red Glitch
-                    stability < 35 -> Color(0x33AA0000) // Faint Red
-                    stability < 60 -> Color(0x22000000) // Dimming
-                    else -> Color.Transparent
-                }
-
-                val message = when {
-                    stability < 20 -> "Rzeczywistość rozpada się na Twoich oczach. Słyszysz statyczny szum kodu."
-                    stability < 40 -> "Powidoki i echa stają się codziennością. Ludzie boją się patrzeć w lustra."
-                    stability < 70 -> "Dni wydają się krótsze, a cienie dłuższe niż być powinny."
-                    else -> "W GrimReich panuje względny spokój, choć Mgła nigdy nie śpi."
-                }
-
-                _uiState.update { 
-                    it.copy(
-                        locationName = city?.name ?: "Nieznane Miejsce",
-                        day = state.world.day,
-                        timeOfDay = state.world.timeOfDay,
-                        gold = state.gold,
-                        activeQuestsCount = state.quest.activeQuestIds.size,
-                        expeditionQuestsCount = questEngine.getActiveQuestsForCity(currentCityId).size,
-                        party = state.party,
-                        worldStability = stability,
-                        hubBackground = city?.backgroundDrawable ?: "bg_generic_city",
-                        hubTintColor = tint,
-                        atmosphericMessage = message
-                    )
-                }
+        combine(gameRepository.gameState, gameRepository.gameLogs) { state, logs ->
+            state to logs
+        }.onEach { (state, logs) ->
+            val currentCityId = state.grimCurrentRegion
+            val city = cityCatalogue.get(currentCityId)
+            
+            val stability = state.world.globalStability
+            val tint = when {
+                stability < 15 -> Color(0x66FF0000) // Dark Red Glitch
+                stability < 35 -> Color(0x33AA0000) // Faint Red
+                stability < 60 -> Color(0x22000000) // Dimming
+                else -> Color.Transparent
             }
-            .launchIn(viewModelScope)
+
+            val message = when {
+                stability < 20 -> "Rzeczywistość rozpada się na Twoich oczach. Słyszysz statyczny szum kodu."
+                stability < 40 -> "Powidoki i echa stają się codziennością. Ludzie boją się patrzeć w lustra."
+                stability < 70 -> "Dni wydają się krótsze, a cienie dłuższe niż być powinny."
+                else -> "W GrimReich panuje względny spokój, choć Mgła nigdy nie śpi."
+            }
+
+            _uiState.update { 
+                it.copy(
+                    locationName = city?.name ?: "Nieznane Miejsce",
+                    day = state.world.day,
+                    timeOfDay = state.world.timeOfDay,
+                    gold = state.gold,
+                    activeQuestsCount = state.quest.activeQuestIds.size,
+                    expeditionQuestsCount = questEngine.getActiveQuestsForCity(currentCityId).size,
+                    party = state.party,
+                    worldStability = stability,
+                    hubBackground = city?.backgroundDrawable ?: "bg_generic_city",
+                    hubTintColor = tint,
+                    atmosphericMessage = message,
+                    latestLogs = logs.takeLast(5).reversed()
+                )
+            }
+        }.launchIn(viewModelScope)
     }
 }

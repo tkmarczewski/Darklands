@@ -1,5 +1,6 @@
 package com.grimreich.core
 
+import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
@@ -8,7 +9,7 @@ import org.junit.Test
 class SaveSystemTest {
 
     @Test
-    fun saveAndLoad_shouldRoundTripSnapshot() {
+    fun saveAndLoad_shouldRoundTripSnapshot() = runBlocking {
         SaveSystem.clearAll()
         val state = GameState().apply { gold = 123 }
         SaveSystem.save(state, slotId = 1, label = "test")
@@ -21,7 +22,7 @@ class SaveSystemTest {
     }
 
     @Test
-    fun deleteSlot_shouldRemoveSnapshot() {
+    fun deleteSlot_shouldRemoveSnapshot() = runBlocking {
         SaveSystem.clearAll()
         SaveSystem.save(GameState(), slotId = 2, label = "to-delete")
         SaveSystem.deleteSlot(2)
@@ -29,7 +30,7 @@ class SaveSystemTest {
     }
 
     @Test
-    fun load_shouldReturnCopyNotLiveReference() {
+    fun load_shouldReturnCopyNotLiveReference() = runBlocking {
         SaveSystem.clearAll()
         val state = GameState().apply { gold = 50 }
         SaveSystem.save(state, slotId = 3, label = "copy-check")

@@ -1,5 +1,7 @@
 package com.grimreich.core
 
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.security.MessageDigest
 
 /**
@@ -11,19 +13,19 @@ object SaveIntegrity {
     private const val SALT = "GRIM_CIPHER_2026"
 
     /**
-     * Generates a SHA-256 checksum for the given JSON string.
+     * Generates a SHA-256 checksum for the given JSON string on a background thread.
      */
-    fun generateChecksum(json: String): String {
+    suspend fun generateChecksum(json: String): String = withContext(Dispatchers.Default) {
         val bytes = (json + SALT).toByteArray()
         val md = MessageDigest.getInstance("SHA-256")
         val digest = md.digest(bytes)
-        return digest.joinToString("") { "%02x".format(it) }
+        digest.joinToString("") { "%02x".format(it) }
     }
 
     /**
-     * Verifies if the provided checksum matches the JSON string.
+     * Verifies if the provided checksum matches the JSON string on a background thread.
      */
-    fun verify(json: String, checksum: String): Boolean {
+    suspend fun verify(json: String, checksum: String): Boolean {
         return generateChecksum(json) == checksum
     }
 }

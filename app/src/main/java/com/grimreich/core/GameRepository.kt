@@ -35,6 +35,10 @@ class GameRepository @Inject constructor(
     private val _gameState = MutableStateFlow(GameState())
     val gameState: StateFlow<GameState> = _gameState.asStateFlow()
 
+    // FIX (Performance): Separate log flow to avoid full GameState cloning on every message
+    private val _gameLogs = MutableStateFlow<List<String>>(emptyList())
+    val gameLogs: StateFlow<List<String>> = _gameLogs.asStateFlow()
+
     init {
         sync()
     }
@@ -59,10 +63,18 @@ class GameRepository @Inject constructor(
     }
 
     fun log(message: String) {
-        updateState(shouldPersist = false) { state ->
-            state.logEntries.add(message)
-            state.trimLogs()
+        // Optimized: Update the dedicated log stream instead of cloning GameState
+        val current = _gameLogs.value.toMutableList()
+        current.add(message)
+        if (current.size > GameConstants.MAX_LOG_ENTRIES) {
+            current.removeAt(0)
         }
+        _gameLogs.value = current
+        
+        // Also keep GameState in sync lazily for persistence, 
+        // but avoid immediate persistCurrentState() here.
+        _gameState.value.logEntries.add(message)
+        _gameState.value.trimLogs()
     }
 
     fun sync() {
@@ -82,7 +94,7 @@ class GameRepository @Inject constructor(
         }
     }
 
-    fun restoreIfAvailable(): Boolean {
+    suspend fun restoreIfAvailable(): Boolean {
         val restored = persistence.restore()
         if (restored != null) {
             if (restored.version < 3) {
@@ -102,7 +114,9 @@ class GameRepository @Inject constructor(
             // but the file was gone so they would be lost on next process death.
             // Now slots are only restored when a valid session is present.
             SaveSystem.restoreFromPersistence(persistence)
-            _gameState.value = restored.toDomain()
+            val domain = restored.toDomain()
+            _gameState.value = domain
+            _gameLogs.value = domain.logEntries.toList()
             sync()
             return true
         }

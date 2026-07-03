@@ -32,8 +32,4 @@ class MainMenuViewModel @Inject constructor(
     fun startNewGame() {
         gameRepository.clearSessionAndReset()
     }
-
-    fun continueGame(): Boolean {
-        return gameRepository.restoreIfAvailable()
-    }
 }

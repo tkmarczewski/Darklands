@@ -99,4 +99,20 @@ class CombatRoundTest {
 
         assertEquals("Should only have 1 unique wound of this type", 1, unit.wounds.distinct().size)
     }
+
+    @Test
+    fun routedAttacker_shouldDealZeroDamage() {
+        val morale = MoraleSystem()
+        val rng = FixedRandomProvider()
+        val combat = CombatRound(morale, rng)
+
+        // Morale = 0 is ROUTED
+        val attacker = makeCombatant(name = "Routed", morale = 0)
+        val defender = makeCombatant(name = "Target", hp = 100)
+
+        val result = combat.resolveRound(attacker, defender)
+
+        assertEquals("Routed attacker should deal 0 damage", 0, result.attackerDamage)
+        assertEquals("Defender HP should remain unchanged", 100, defender.hp)
+    }
 }

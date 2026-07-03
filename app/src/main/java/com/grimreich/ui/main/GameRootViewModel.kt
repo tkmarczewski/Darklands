@@ -114,13 +114,13 @@ class GameRootViewModel @Inject constructor(
         }
     }
 
-    fun restoreSessionIfValid(): Boolean {
-        if (gameRepository.restoreIfAvailable()) {
-            setMode(GameScreenMode.HUB)
-            return true
-        } else {
-            gameRepository.log("❌ Błąd wczytywania sesji: Zapis uszkodzony lub nieaktualny.")
-            return false
+    fun restoreSessionIfValid() {
+        viewModelScope.launch {
+            if (gameRepository.restoreIfAvailable()) {
+                setMode(GameScreenMode.HUB)
+            } else {
+                gameRepository.log("❌ Błąd wczytywania sesji: Zapis uszkodzony lub nieaktualny.")
+            }
         }
     }
 

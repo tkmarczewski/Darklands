@@ -1,12 +1,13 @@
 package com.grimreich.core
 
+import kotlinx.coroutines.runBlocking
 import org.junit.Assert.*
 import org.junit.Test
 
 class SaveIntegrityTest {
 
     @Test
-    fun `generateChecksum produces consistent output`() {
+    fun `generateChecksum produces consistent output`() = runBlocking {
         val json = "{\"gold\": 100, \"day\": 1}"
         val checksum1 = SaveIntegrity.generateChecksum(json)
         val checksum2 = SaveIntegrity.generateChecksum(json)
@@ -17,7 +18,7 @@ class SaveIntegrityTest {
     }
 
     @Test
-    fun `verify returns true for matching checksum`() {
+    fun `verify returns true for matching checksum`() = runBlocking {
         val json = "{\"gold\": 100}"
         val checksum = SaveIntegrity.generateChecksum(json)
         
@@ -25,7 +26,7 @@ class SaveIntegrityTest {
     }
 
     @Test
-    fun `verify returns false for tampered data`() {
+    fun `verify returns false for tampered data`() = runBlocking {
         val json = "{\"gold\": 100}"
         val tampered = "{\"gold\": 999999}"
         val checksum = SaveIntegrity.generateChecksum(json)
@@ -34,7 +35,7 @@ class SaveIntegrityTest {
     }
 
     @Test
-    fun `checksum handles large session strings`() {
+    fun `checksum handles large session strings`() = runBlocking {
         val largeJson = "A".repeat(10000)
         val checksum = SaveIntegrity.generateChecksum(largeJson)
         assertTrue(SaveIntegrity.verify(largeJson, checksum))

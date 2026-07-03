@@ -178,7 +178,14 @@ fun HubScreen(
                     Column(modifier = Modifier.padding(GameConstants.UI.PADDING_SMALL)) {
                         Text("OSTATNIE WIEŚCI:", color = Color.Gray, fontSize = 10.sp)
                         Spacer(modifier = Modifier.height(GameConstants.UI.PADDING_SMALL))
-                        Text("Mieszkańcy szepczą o powrocie Proroka Aeliona...", color = Color.LightGray, fontSize = 11.sp)
+                        
+                        if (state.latestLogs.isEmpty()) {
+                            Text("Cisza w eterze...", color = Color.DarkGray, fontSize = 11.sp)
+                        } else {
+                            state.latestLogs.forEach { log ->
+                                Text("- $log", color = Color.LightGray, fontSize = 11.sp, modifier = Modifier.padding(bottom = 4.dp))
+                            }
+                        }
                     }
                 }
             }
