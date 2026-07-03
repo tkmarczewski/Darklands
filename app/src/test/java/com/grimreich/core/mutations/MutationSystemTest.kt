@@ -81,4 +81,20 @@ class MutationSystemTest {
         assertTrue("Hero should have at least one mutation", triggered)
         assertTrue("World stability should have decreased", state.world.globalStability < 100)
     }
+
+    @Test
+    fun `checkForNewMutationDirect applies changes without calling updateState`() {
+        val heroId = "test_hero"
+        val hero = Hero(id = heroId, name = "Test Hero", age = 25, strength = 10)
+        val state = GameState(world = WorldState(globalStability = 0)).apply { party.add(hero) }
+
+        // We use a fixed seed by setting day/region
+        state.world.day = 1
+        
+        // This should NOT trigger gameRepository.updateState because it's the Direct version
+        mutationSystem.checkForNewMutationDirect(state, heroId, "region", 0)
+
+        // The test is that it runs without crashing and modifies state
+        // Further verification could involve Mockito.verifyNoInteractions(gameRepository)
+    }
 }

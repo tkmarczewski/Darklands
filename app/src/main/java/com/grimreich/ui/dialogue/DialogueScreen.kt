@@ -35,15 +35,19 @@ fun DialogueScreen(
     
     // GLITCH ANIMATION
     val infiniteTransition = rememberInfiniteTransition(label = "glitch")
-    val jitterX by infiniteTransition.animateFloat(
-        initialValue = -2f,
-        targetValue = 2f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(50, easing = LinearEasing),
-            repeatMode = RepeatMode.Reverse
-        ),
-        label = "jitter"
-    )
+    val jitterX by if (state.worldStability < 15) {
+        infiniteTransition.animateFloat(
+            initialValue = -2f,
+            targetValue = 2f,
+            animationSpec = infiniteRepeatable(
+                animation = tween(50, easing = LinearEasing),
+                repeatMode = RepeatMode.Reverse
+            ),
+            label = "jitter"
+        )
+    } else {
+        remember { mutableStateOf(0f) }
+    }
 
     Box(modifier = Modifier.fillMaxSize().background(Color.Black)) {
         // BACKGROUND

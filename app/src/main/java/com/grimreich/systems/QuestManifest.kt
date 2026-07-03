@@ -30,7 +30,7 @@ class QuestManifest @Inject constructor(
             npcId = "guard",
             gold = 100,
             stepType = StepType.COMBAT,
-            target = "Kultysta Echa"
+            target = "CULTIST"
         )
 
         // North Coast Secondary
@@ -66,7 +66,7 @@ class QuestManifest @Inject constructor(
             npcId = "mira",
             gold = 250,
             stepType = StepType.COMBAT,
-            target = "Echo Archiwisty",
+            target = "BANDIT", // fallback for pilot
             prerequisiteId = "q_scribes_1"
         )
 
@@ -78,7 +78,7 @@ class QuestManifest @Inject constructor(
             npcId = "mira",
             gold = 500,
             stepType = StepType.COMBAT,
-            target = "Pierwszy Sędzia (Cień)",
+            target = "RAUBRITTER_KNIGHT", // fallback for pilot
             prerequisiteId = "q_scribes_2"
         )
 
@@ -91,7 +91,7 @@ class QuestManifest @Inject constructor(
             npcId = "mira",
             gold = 500,
             stepType = StepType.COMBAT,
-            target = "Boss: Echo Absolutu",
+            target = "DEMON_MAJOR",
             prerequisiteId = "q_scribes_3"
         )
 

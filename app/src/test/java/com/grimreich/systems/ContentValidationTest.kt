@@ -27,6 +27,7 @@ class ContentValidationTest {
 
         // Create DialogueManager with mocked dependencies
         val manager = DialogueManager(
+            context = mock(android.content.Context::class.java),
             gameRepositoryProvider = dagger.Lazy { mockRepository },
             chronicleSystem = dagger.Lazy { mockChronicle },
             questEngine = dagger.Lazy { mockQuestEngine }
@@ -55,6 +56,7 @@ class ContentValidationTest {
         `when`(mockRepository.currentState()).thenReturn(GameState())
 
         val manager = DialogueManager(
+            context = mock(android.content.Context::class.java),
             gameRepositoryProvider = dagger.Lazy { mockRepository },
             chronicleSystem = dagger.Lazy { mock(ChronicleSystem::class.java) },
             questEngine = dagger.Lazy { mock(QuestEngine::class.java) }
@@ -96,6 +98,7 @@ class ContentValidationTest {
         `when`(mockRepository.currentState()).thenReturn(GameState())
 
         val manager = DialogueManager(
+            context = mock(android.content.Context::class.java),
             gameRepositoryProvider = dagger.Lazy { mockRepository },
             chronicleSystem = dagger.Lazy { mock(ChronicleSystem::class.java) },
             questEngine = dagger.Lazy { mock(QuestEngine::class.java) }

@@ -11,9 +11,13 @@ class CombatSystem @Inject constructor(
     private val inventorySystem: InventorySystem,
     private val moraleSystem: MoraleSystem,
     private val combatRound: CombatRound,
-    private val questEngine: QuestEngine
+    private val questEngine: QuestEngine,
+    private val experienceSystem: ExperienceSystem,
+    private val lootSystem: LootSystem,
+    private val itemCatalogue: com.grimreich.world.ItemCatalogue
 ) {
     private var onCombatEnd: (() -> Unit)? = null
+    private var currentEnemy: Enemy? = null
 
     // FIX: Accept GameState parameter to use the mutable copy inside updateState,
     // instead of calling gameRepository.currentState() which returns the stale snapshot.
@@ -36,22 +40,23 @@ class CombatSystem @Inject constructor(
         )
     }
 
-    fun startCombat(enemyName: String, enemyHp: Int, enemyAttack: Int, enemyDefense: Int, onEndCallback: (() -> Unit)? = null) {
+    fun startCombat(enemy: Enemy, onEndCallback: (() -> Unit)? = null) {
         onCombatEnd = onEndCallback
+        currentEnemy = enemy
         gameRepository.updateState { state ->
             val c = state.combat
             c.active = true
             c.round = 1
-            c.enemyName = enemyName
-            c.enemyHp = enemyHp
-            c.enemyMaxHp = enemyHp
-            c.enemyAttack = enemyAttack
-            c.enemyDefense = enemyDefense
-            c.enemyAgility = 10
-            c.enemyIntelligence = 10
-            c.enemyStrength = 10
+            c.enemyName = enemy.name
+            c.enemyHp = enemy.stats.maxHp
+            c.enemyMaxHp = enemy.stats.maxHp
+            c.enemyAttack = enemy.stats.attack
+            c.enemyDefense = enemy.stats.defense
+            c.enemyAgility = enemy.stats.speed
+            c.enemyIntelligence = 10 // default
+            c.enemyStrength = enemy.stats.attack / 2 // derivation
             c.log.clear()
-            c.log.add("Pojedynek z $enemyName rozpocz\u0119ty!")
+            c.log.add("Pojedynek z ${enemy.name} rozpocz\u0119ty!")
         }
     }
 
@@ -133,7 +138,8 @@ class CombatSystem @Inject constructor(
             hero.morale = heroState.morale
             c.log.addAll(result.log)
             if (c.log.size > 50) {
-                repeat(c.log.size - 50) { c.log.removeAt(0) }
+                val toRemove = c.log.size - 50
+                repeat(toRemove) { c.log.removeAt(0) }
             }
 
             if (combatRound.isDefeated(enemyState)) {
@@ -142,6 +148,31 @@ class CombatSystem @Inject constructor(
                 // Capture it for invocation after updateState{} completes.
                 pendingCombatEndCallback = onCombatEnd
                 c.log.add("${c.enemyName} pokonany!")
+                
+                // --- REWARDS sequence (Final Technical Polish) ---
+                currentEnemy?.let { enemy ->
+                    val gold = kotlin.random.Random.nextInt(enemy.lootTable.goldMin, enemy.lootTable.goldMax + 1)
+                    if (gold > 0) {
+                        state.gold += gold
+                        c.log.add("Zdobyto $gold G.")
+                    }
+                    
+                    // Grant XP to active hero
+                    val xpMsg = experienceSystem.addXp(state.activeHeroId ?: "", enemy.xpReward)
+                    c.log.add(xpMsg)
+                    
+                    // Roll for specific items in loot table
+                    enemy.lootTable.itemChances.forEach { (itemId, chance) ->
+                        if (kotlin.random.Random.nextFloat() < chance) {
+                            if (lootSystem.awardSpecificItemDirect(state, itemId)) {
+                                val item = itemCatalogue.get(itemId)
+                                c.log.add("Zdobyto: ${item?.name ?: itemId}")
+                            }
+                        }
+                    }
+                }
+                currentEnemy = null
+
                 state.pendingQuestId?.let { pending ->
                     if (pending.startsWith("COMBAT_WIN:")) {
                         val qId = pending.removePrefix("COMBAT_WIN:")

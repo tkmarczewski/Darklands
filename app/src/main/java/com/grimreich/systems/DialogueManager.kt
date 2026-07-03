@@ -1,5 +1,8 @@
 package com.grimreich.systems
 
+import android.content.Context
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import com.grimreich.core.GameRepository
 import com.grimreich.core.GameState
 import com.grimreich.grimreich.v1.DialogueChoice
@@ -7,18 +10,32 @@ import com.grimreich.grimreich.v1.DialogueNode
 import com.grimreich.systems.ChronicleSystem
 import com.grimreich.systems.QuestEngine
 import dagger.Lazy
+import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.random.Random
 
 @Singleton
 class DialogueManager @Inject constructor(
+    @ApplicationContext private val context: Context,
     private val gameRepositoryProvider: Lazy<GameRepository>,
     private val chronicleSystem: Lazy<ChronicleSystem>,
     private val questEngine: Lazy<QuestEngine>
 ) {
     private val nodes = mutableMapOf<String, DialogueNode>()
     private var activeDialogueId: String? = null
+    private val gson = Gson()
+
+    fun loadNodesFromAsset(fileName: String) {
+        try {
+            val jsonString = context.assets.open(fileName).bufferedReader().use { it.readText() }
+            val type = object : TypeToken<List<DialogueNode>>() {}.type
+            val loadedNodes: List<DialogueNode> = gson.fromJson(jsonString, type)
+            loadedNodes.forEach { registerNode(it) }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
 
     fun isDialogueActive() = activeDialogueId != null
     fun currentDialogueId() = activeDialogueId
@@ -85,6 +102,9 @@ class DialogueManager @Inject constructor(
 
     fun seedBasicDialogues() {
         if (nodes.isNotEmpty()) return
+
+        // Load external dialogues (Pilot)
+        loadNodesFromAsset("grimreich/dialogues_pilot.json")
 
         // 1. GUARD
         registerNode(DialogueNode(

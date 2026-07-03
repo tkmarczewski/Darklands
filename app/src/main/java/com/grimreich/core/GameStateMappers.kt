@@ -31,7 +31,8 @@ fun GameState.toDto(): SessionStateDto = SessionStateDto(
     isExpeditionActive = isExpeditionActive,
     lastSaveTimestamp = lastSaveTimestamp,
     grimEchoIntensity = grimEchoIntensity,
-    grimMutationPhase = grimMutationPhase
+    grimMutationPhase = grimMutationPhase,
+    checksum = null
 )
 
 fun SessionStateDto.toDomain(): GameState = GameState(

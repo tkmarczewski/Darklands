@@ -61,9 +61,7 @@ class GameRepository @Inject constructor(
     fun log(message: String) {
         updateState(shouldPersist = false) { state ->
             state.logEntries.add(message)
-            while (state.logEntries.size > GameConstants.MAX_LOG_ENTRIES) {
-                state.logEntries.removeAt(0)
-            }
+            state.trimLogs()
         }
     }
 
@@ -72,6 +70,16 @@ class GameRepository @Inject constructor(
         itemCatalogue.seed()
         dialogueManager.seedBasicDialogues()
         questManifest.seed()
+        
+        // Load pilot bestiary data
+        try {
+            val jsonString = persistence.assets().open("grimreich/bestiary_pilot.json").bufferedReader().use { it.readText() }
+            val type = object : com.google.gson.reflect.TypeToken<List<Enemy>>() {}.type
+            val loadedEnemies: List<Enemy> = com.google.gson.Gson().fromJson(jsonString, type)
+            Bestiary.loadFromList(loadedEnemies)
+        } catch (e: Exception) {
+            log("[Bestiary] Failed to load external data: ${e.message}")
+        }
     }
 
     fun restoreIfAvailable(): Boolean {

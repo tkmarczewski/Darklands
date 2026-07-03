@@ -40,8 +40,9 @@ data class GameState(
     val grantedRewardFlags: MutableSet<String> = mutableSetOf()
 ) {
     fun trimLogs() {
-        while (logEntries.size > GameConstants.MAX_LOG_ENTRIES) {
-            logEntries.removeAt(0)
+        if (logEntries.size > GameConstants.MAX_LOG_ENTRIES) {
+            val toRemove = logEntries.size - GameConstants.MAX_LOG_ENTRIES
+            repeat(toRemove) { logEntries.removeAt(0) }
         }
     }
 
@@ -87,7 +88,11 @@ data class GameState(
         }.toMutableList(),
         activeHeroId = activeHeroId,
         inventory = inventory.map { it.copy() }.toMutableList(),
-        logEntries = logEntries.takeLast(GameConstants.MAX_LOG_ENTRIES).toMutableList(),
+        logEntries = if (logEntries.size <= GameConstants.MAX_LOG_ENTRIES) {
+            logEntries.toMutableList()
+        } else {
+            logEntries.takeLast(GameConstants.MAX_LOG_ENTRIES).toMutableList()
+        },
         gold = gold,
         quest = QuestState(
             activeQuestIds = quest.activeQuestIds.toMutableSet(),

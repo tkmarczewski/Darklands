@@ -1,0 +1,32 @@
+[
+  {
+    "id": "merchant_start_ext",
+    "npcId": "merchant",
+    "text": "Witaj ponownie, Kotwico. Moje zapasy są ograniczone, ale dla Ciebie zawsze znajdzie się coś specjalnego.",
+    "choices": [
+      {
+        "text": "Pokaż co masz na sprzedaż.",
+        "targetNodeId": "end"
+      },
+      {
+        "text": "Słyszałeś o jakichś nowych pęknięciach?",
+        "targetNodeId": "merchant_info_ext"
+      },
+      {
+        "text": "Do widzenia.",
+        "targetNodeId": "end"
+      }
+    ]
+  },
+  {
+    "id": "merchant_info_ext",
+    "npcId": "merchant",
+    "text": "Rzeczywistość staje się coraz cieńsza. Niektórzy mówią, że słyszą głosy Archiwistów nawet za dnia.",
+    "choices": [
+      {
+        "text": "To niepokojące.",
+        "targetNodeId": "merchant_start_ext"
+      }
+    ]
+  }
+]

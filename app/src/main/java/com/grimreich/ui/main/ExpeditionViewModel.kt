@@ -27,7 +27,8 @@ class ExpeditionViewModel @Inject constructor(
     private val gameRepository: GameRepository,
     private val questEngine: QuestEngine,
     private val cityCatalogue: CityCatalogue,
-    private val encounterSystem: EncounterSystem
+    private val encounterSystem: EncounterSystem,
+    private val combatSystem: com.grimreich.systems.CombatSystem
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(ExpeditionUiState())
@@ -69,6 +70,8 @@ class ExpeditionViewModel @Inject constructor(
         val def = questEngine.getDefinition(questId) ?: return
         
         var shouldCombat = false
+        var enemyType: com.grimreich.core.EnemyType? = null
+
         gameRepository.updateState { state ->
             val progress = state.quest.progress[questId] ?: return@updateState
             val step = def.steps.getOrNull(progress.currentStepIndex) ?: return@updateState
@@ -76,11 +79,17 @@ class ExpeditionViewModel @Inject constructor(
             when (step.type) {
                 StepType.COMBAT -> {
                     state.pendingQuestId = "COMBAT_WIN:$questId"
-                    state.combat.active = true
-                    state.combat.enemyName = step.targetId
-                    state.combat.enemyHp = 60
-                    state.combat.enemyMaxHp = 60
-                    shouldCombat = true
+                    try {
+                        enemyType = com.grimreich.core.EnemyType.valueOf(step.targetId)
+                        shouldCombat = true
+                    } catch (e: Exception) {
+                        // Fallback if targetId is not a valid enum name
+                        state.combat.active = true
+                        state.combat.enemyName = step.targetId
+                        state.combat.enemyHp = 60
+                        state.combat.enemyMaxHp = 60
+                        shouldCombat = true
+                    }
                 }
                 else -> {
                     questEngine.advanceStepDirect(state, questId)
@@ -89,7 +98,13 @@ class ExpeditionViewModel @Inject constructor(
             }
         }
         
-        if (shouldCombat) onCombat()
+        if (shouldCombat) {
+            enemyType?.let { type ->
+                val enemy = com.grimreich.core.Bestiary.get(type)
+                combatSystem.startCombat(enemy)
+            }
+            onCombat()
+        }
     }
 
     fun dismissEncounter() {
@@ -103,16 +118,14 @@ class ExpeditionViewModel @Inject constructor(
             msg = choice.effect(state)
         }
         
-        if (msg.startsWith("POJEDYNEK:")) {
+        if (choice.combatEnemyType != null) {
+            val enemy = com.grimreich.core.Bestiary.get(choice.combatEnemyType)
+            combatSystem.startCombat(enemy)
+            _uiState.update { it.copy(encounterLog = "Rozpoczyna się starcie: ${enemy.name}!", activeEncounter = null) }
+        } else if (msg.startsWith("POJEDYNEK:")) {
+            // Legacy handling for any remaining string-based combat triggers
             val parts = msg.split(":")
-            if (parts.size >= 4) {
-                gameRepository.updateState { state ->
-                    state.combat.active = true
-                    state.combat.enemyName = parts[1]
-                    state.combat.enemyHp = parts[2].toIntOrNull() ?: 50
-                    state.combat.enemyMaxHp = state.combat.enemyHp
-                    state.combat.enemyAttack = parts[3].toIntOrNull() ?: 10
-                }
+            if (parts.size >= 2) {
                 _uiState.update { it.copy(encounterLog = "Rozpoczyna się starcie: ${parts[1]}!", activeEncounter = null) }
             }
         } else {

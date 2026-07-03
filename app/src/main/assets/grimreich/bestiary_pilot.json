@@ -1,0 +1,36 @@
+[
+  {
+    "type": "BANDIT",
+    "name": "Bandyta",
+    "stats": {
+      "maxHp": 25,
+      "attack": 15,
+      "defense": 10,
+      "speed": 12,
+      "morale": 8
+    },
+    "ai": "AGGRESSIVE",
+    "lootTable": {
+      "goldMin": 5,
+      "goldMax": 20
+    },
+    "xpReward": 10
+  },
+  {
+    "type": "WOLF",
+    "name": "Wilk",
+    "stats": {
+      "maxHp": 20,
+      "attack": 14,
+      "defense": 8,
+      "speed": 16,
+      "morale": 6
+    },
+    "ai": "AGGRESSIVE",
+    "lootTable": {
+      "goldMin": 0,
+      "goldMax": 0
+    },
+    "xpReward": 5
+  }
+]

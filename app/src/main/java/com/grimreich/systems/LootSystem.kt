@@ -45,4 +45,14 @@ class LootSystem @Inject constructor(
         }
         return msg
     }
+
+    /**
+     * Awards a specific item by ID. Part of Final Technical Polish.
+     */
+    fun awardSpecificItemDirect(state: GameState, itemId: String): Boolean {
+        val item = itemCatalogue.get(itemId) ?: return false
+        state.inventory.add(item.copy())
+        state.logEntries.add("Zdobyto przedmiot: ${item.name}")
+        return true
+    }
 }

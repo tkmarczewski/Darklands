@@ -7,7 +7,6 @@ import com.grimreich.core.GameRepository
 import com.grimreich.core.Hero
 import com.grimreich.grimreich.v1.Item
 import com.grimreich.systems.CombatSystem
-import com.grimreich.systems.QuestEngine
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import javax.inject.Inject
@@ -23,8 +22,7 @@ data class CombatUiState(
 @HiltViewModel
 class CombatViewModel @Inject constructor(
     private val gameRepository: GameRepository,
-    private val combatSystem: CombatSystem,
-    private val questEngine: QuestEngine
+    private val combatSystem: CombatSystem
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(CombatUiState())

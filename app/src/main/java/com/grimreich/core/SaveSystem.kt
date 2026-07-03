@@ -1,5 +1,7 @@
 package com.grimreich.core
 
+import com.google.gson.Gson
+
 const val SAVE_VERSION = 3
 
 // ==================== SAVE SYSTEM ====================
@@ -13,13 +15,19 @@ object SaveSystem {
     private val slots = mutableMapOf<Int, SaveSnapshot>()
     private var autoSaveSnapshot: SaveSnapshot? = null
     private var lastAutoSaveHash: Int = 0
+    private val gson = Gson()
 
     fun save(gameState: GameState, slotId: Int = 0, label: String = ""): SaveSnapshot {
+        val stateCopy = gameState.deepCopy()
+        val stateJson = gson.toJson(stateCopy)
+        val checksum = SaveIntegrity.generateChecksum(stateJson)
+
         val snapshot = SaveSnapshot(
             version   = SAVE_VERSION,
             timestamp = System.currentTimeMillis(),
             label     = label.ifEmpty { "Save ${slotId + 1}" },
-            state     = gameState.deepCopy()
+            state     = stateCopy,
+            checksum  = checksum
         )
         slots[slotId] = snapshot
         return snapshot
@@ -65,11 +73,17 @@ object SaveSystem {
     fun autoSave(gameState: GameState): Boolean {
         val hash = computeStateHash(gameState)
         if (hash == lastAutoSaveHash) return false
+        
+        val stateCopy = gameState.deepCopy()
+        val stateJson = gson.toJson(stateCopy)
+        val checksum = SaveIntegrity.generateChecksum(stateJson)
+
         autoSaveSnapshot = SaveSnapshot(
             version   = SAVE_VERSION,
             timestamp = System.currentTimeMillis(),
             label     = "Autosave",
-            state     = gameState.deepCopy()
+            state     = stateCopy,
+            checksum  = checksum
         )
         lastAutoSaveHash = hash
         return true
@@ -98,16 +112,22 @@ object SaveSystem {
 
     fun validate(snapshot: SaveSnapshot): ValidationResult {
         val compatible = isCompatible(snapshot)
+        val stateJson = gson.toJson(snapshot.state)
+        val checksumValid = snapshot.checksum?.let { SaveIntegrity.verify(stateJson, it) } ?: false
+
         val isValid = snapshot.version >= 1 &&
             snapshot.state.gold >= 0 &&
             snapshot.state.world.day >= 1 &&
-            snapshot.state.party.isNotEmpty()
+            snapshot.state.party.isNotEmpty() &&
+            checksumValid
+
         return ValidationResult(
             isValid      = isValid,
             version      = snapshot.version,
             isCompatible = compatible,
             message = when {
                 !compatible -> "Niezgodna wersja zapisu (${snapshot.version} vs $SAVE_VERSION)"
+                !checksumValid -> "Naruszona integralność zapisu (Checksum mismatch)"
                 !isValid    -> "Uszkodzony zapis — nieprawidłowy stan gry"
                 else        -> "Zapis poprawny (wersja ${snapshot.version})"
             }

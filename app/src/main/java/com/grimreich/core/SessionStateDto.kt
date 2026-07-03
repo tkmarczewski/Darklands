@@ -57,7 +57,8 @@ data class SessionStateDto(
     var lastSaveTimestamp: Long,
     
     var grimEchoIntensity: Float = 0f,
-    var grimMutationPhase: Int = 0
+    var grimMutationPhase: Int = 0,
+    val checksum: String? = null
 )
 
 @Serializable

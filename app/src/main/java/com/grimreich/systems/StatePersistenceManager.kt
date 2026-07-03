@@ -2,6 +2,7 @@ package com.grimreich.systems
 
 import android.content.Context
 import android.util.Log
+import com.grimreich.core.SaveIntegrity
 import com.grimreich.core.SaveSnapshot
 import com.grimreich.core.SessionStateDto
 import com.google.gson.Gson
@@ -39,9 +40,17 @@ class StatePersistenceManager @Inject constructor(
         synchronized(this) {
             try {
                 Log.d(TAG, "Persisting session to: ${sessionFile.absolutePath}")
-                val jsonString = json.encodeToString(SessionStateDto.serializer(), session)
+                
+                // FIX (Security): Add integrity checksum to auto-save session
+                val sessionWithoutChecksum = session.copy(checksum = null)
+                val dataJson = json.encodeToString(SessionStateDto.serializer(), sessionWithoutChecksum)
+                val checksum = SaveIntegrity.generateChecksum(dataJson)
+                val sessionWithChecksum = session.copy(checksum = checksum)
+                
+                val finalJsonString = json.encodeToString(SessionStateDto.serializer(), sessionWithChecksum)
+                
                 FileOutputStream(sessionFile).use { fos ->
-                    fos.write(jsonString.toByteArray())
+                    fos.write(finalJsonString.toByteArray())
                     fos.flush()
                     fos.fd.sync()
                 }
@@ -60,7 +69,17 @@ class StatePersistenceManager @Inject constructor(
         return try {
             val content = sessionFile.readText()
             Log.d(TAG, "Restoring session. Content size: ${content.length}")
-            json.decodeFromString(SessionStateDto.serializer(), content)
+            val session = json.decodeFromString(SessionStateDto.serializer(), content)
+            
+            // FIX (Security): Verify integrity checksum
+            val sessionWithoutChecksum = session.copy(checksum = null)
+            val dataJson = json.encodeToString(SessionStateDto.serializer(), sessionWithoutChecksum)
+            if (!SaveIntegrity.verify(dataJson, session.checksum ?: "")) {
+                Log.e(TAG, "Naruszona integralnosc sesji (Checksum mismatch)!")
+                return null
+            }
+            
+            session
         } catch (e: Exception) {
             Log.e(TAG, "Blad wczytywania sesji z pliku: $sessionFileName", e)
             null
@@ -127,6 +146,8 @@ class StatePersistenceManager @Inject constructor(
 
     fun hasPersistedSession(): Boolean = sessionFile.exists()
     fun hasPersistedSlots(): Boolean = slotsFile.exists()
+
+    fun assets(): android.content.res.AssetManager = context.assets
 
     fun debugPaths(): Map<String, String> = mapOf(
         "session" to sessionFile.absolutePath,

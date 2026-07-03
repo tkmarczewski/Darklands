@@ -1,6 +1,7 @@
 package com.grimreich.core.mutations
 
 import com.grimreich.core.GameRepository
+import com.grimreich.core.GameState
 import com.grimreich.core.Hero
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -17,7 +18,16 @@ class MutationSystem @Inject constructor(
     }
 
     fun checkForNewMutation(heroId: String, regionId: String, currentStability: Int) {
-        val state = gameRepository.currentState()
+        gameRepository.updateState { state ->
+            checkForNewMutationDirect(state, heroId, regionId, currentStability)
+        }
+    }
+
+    /**
+     * Direct version for use inside updateState blocks to avoid multiple state clones.
+     * Part of the Final Technical Polish.
+     */
+    fun checkForNewMutationDirect(state: GameState, heroId: String, regionId: String, currentStability: Int) {
         // Determinism fix: Seed based on hero and region for "cipher" consistency
         val seed = heroId.hashCode().toLong() + regionId.hashCode().toLong() + state.world.day.toLong()
         val rng = Random(seed)
@@ -25,42 +35,40 @@ class MutationSystem @Inject constructor(
         val mutationChance = if (currentStability < 50) 0.15f else 0.02f
         val evolutionChance = if (currentStability < 30) 0.10f else 0.03f
 
-        gameRepository.updateState { s ->
-            val hero = s.party.find { it.id == heroId } ?: return@updateState
+        val hero = state.party.find { it.id == heroId } ?: return
 
-            if (rng.nextFloat() < mutationChance) {
-                val available = MutationRegistry.allMutations.filter { m ->
-                    hero.activeMutations.none { it.id == m.id }
+        if (rng.nextFloat() < mutationChance) {
+            val available = MutationRegistry.allMutations.filter { m ->
+                hero.activeMutations.none { it.id == m.id }
+            }
+
+            if (available.isNotEmpty() && hero.activeMutations.size < MAX_MUTATIONS) {
+                val newMutation = available.random(rng).copy(tier = MutationTier.MANIFESTED)
+                hero.activeMutations.add(newMutation)
+                newMutation.attributeModifiers.forEach { (attr, mod) ->
+                    modifyHeroStat(hero, attr, mod)
+                }
+                state.world.globalStability = (state.world.globalStability + newMutation.stabilityImpact)
+                    .coerceIn(0, 100)
+                state.logEntries.add("${hero.name} manifestuje nową mutację: ${newMutation.name}!")
+            }
+        } else if (hero.activeMutations.isNotEmpty() && rng.nextFloat() < evolutionChance) {
+            val evolvable = hero.activeMutations.filter { it.tier != MutationTier.TRANSCENDENT }
+            if (evolvable.isNotEmpty()) {
+                val target = evolvable.random(rng)
+                val nextTier = when (target.tier) {
+                    MutationTier.DORMANT -> MutationTier.MANIFESTED
+                    MutationTier.MANIFESTED -> MutationTier.DOMINANT
+                    MutationTier.DOMINANT -> MutationTier.TRANSCENDENT
+                    MutationTier.TRANSCENDENT -> MutationTier.TRANSCENDENT
                 }
 
-                if (available.isNotEmpty() && hero.activeMutations.size < MAX_MUTATIONS) {
-                    val newMutation = available.random(rng).copy(tier = MutationTier.MANIFESTED)
-                    hero.activeMutations.add(newMutation)
-                    newMutation.attributeModifiers.forEach { (attr, mod) ->
-                        modifyHeroStat(hero, attr, mod)
-                    }
-                    s.world.globalStability = (s.world.globalStability + newMutation.stabilityImpact)
-                        .coerceIn(0, 100)
-                    s.logEntries.add("${hero.name} manifestuje nową mutację: ${newMutation.name}!")
-                }
-            } else if (hero.activeMutations.isNotEmpty() && rng.nextFloat() < evolutionChance) {
-                val evolvable = hero.activeMutations.filter { it.tier != MutationTier.TRANSCENDENT }
-                if (evolvable.isNotEmpty()) {
-                    val target = evolvable.random(rng)
-                    val nextTier = when (target.tier) {
-                        MutationTier.DORMANT -> MutationTier.MANIFESTED
-                        MutationTier.MANIFESTED -> MutationTier.DOMINANT
-                        MutationTier.DOMINANT -> MutationTier.TRANSCENDENT
-                        MutationTier.TRANSCENDENT -> MutationTier.TRANSCENDENT
-                    }
-
-                    val updated = target.copy(tier = nextTier)
-                    val index = hero.activeMutations.indexOfFirst { it.id == target.id }
-                    if (index != -1) {
-                        hero.activeMutations[index] = updated
-                        applyTierBonus(hero, updated)
-                        s.logEntries.add("Mutacja ${updated.name} u ${hero.name} ewoluowała do poziomu ${updated.tier}!")
-                    }
+                val updated = target.copy(tier = nextTier)
+                val index = hero.activeMutations.indexOfFirst { it.id == target.id }
+                if (index != -1) {
+                    hero.activeMutations[index] = updated
+                    applyTierBonus(hero, updated)
+                    state.logEntries.add("Mutacja ${updated.name} u ${hero.name} ewoluowała do poziomu ${updated.tier}!")
                 }
             }
         }

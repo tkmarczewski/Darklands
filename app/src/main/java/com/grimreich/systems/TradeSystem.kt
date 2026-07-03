@@ -46,7 +46,7 @@ class TradeSystem @Inject constructor(
      * Naprawiono: transakcja sprzedazy jest kompletna - item usuniety, gold dodany.
      */
     fun sellItem(item: Item, cityId: String): String {
-        val sellPrice = economySystem.sellItem(item)
+        val sellPrice = economySystem.calculateSellPrice(item)
         var result = ""
         gameRepository.updateState { state ->
             val found = state.inventory.find { it.id == item.id }

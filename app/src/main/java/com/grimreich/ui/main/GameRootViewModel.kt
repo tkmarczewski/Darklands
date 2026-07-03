@@ -118,8 +118,10 @@ class GameRootViewModel @Inject constructor(
         if (gameRepository.restoreIfAvailable()) {
             setMode(GameScreenMode.HUB)
             return true
+        } else {
+            gameRepository.log("❌ Błąd wczytywania sesji: Zapis uszkodzony lub nieaktualny.")
+            return false
         }
-        return false
     }
 
     fun inspectHero(heroId: String) {
