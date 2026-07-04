@@ -1,0 +1,95 @@
+[
+  {
+    "id": "q_verdict_1",
+    "title": "Początek Wyroku",
+    "description": "Inkwizycja podejrzewa, że stabilność regionu jest sabotowana przez kultystów Echa.",
+    "rewardGold": 100,
+    "cityId": "wybrzeze_polnocne",
+    "originNpcId": "guard",
+    "steps": [
+      {
+        "description": "Cel: CULTIST",
+        "type": "COMBAT",
+        "targetId": "CULTIST"
+      }
+    ]
+  },
+  {
+    "id": "q_coast_harvest",
+    "title": "Żniwa Mgły",
+    "description": "Archiwiści potrzebują rzadkich ziół, które rosną tylko w gęstych oparach.",
+    "rewardGold": 50,
+    "cityId": "wybrzeze_polnocne",
+    "originNpcId": "merchant",
+    "steps": [
+      {
+        "description": "Cel: Gęsta Mgła",
+        "type": "INVESTIGATION",
+        "targetId": "Gęsta Mgła"
+      }
+    ]
+  },
+  {
+    "id": "q_scribes_1",
+    "title": "Cienie Archiwistów I",
+    "description": "Mira twierdzi, że ktoś podmienia wpisy w Kronice Świata.",
+    "rewardGold": 150,
+    "cityId": "serce_krainy",
+    "originNpcId": "mira",
+    "steps": [
+      {
+        "description": "Cel: Pęknięta Kronika",
+        "type": "INVESTIGATION",
+        "targetId": "Pęknięta Kronika"
+      }
+    ]
+  },
+  {
+    "id": "q_scribes_2",
+    "title": "Cienie Archiwistów II",
+    "description": "Ślady prowadzą do zapomnianego skryptorium. Musisz wyeliminować Echa Archiwistów.",
+    "rewardGold": 250,
+    "cityId": "serce_krainy",
+    "originNpcId": "mira",
+    "prerequisiteQuestId": "q_scribes_1",
+    "steps": [
+      {
+        "description": "Cel: BANDIT",
+        "type": "COMBAT",
+        "targetId": "BANDIT"
+      }
+    ]
+  },
+  {
+    "id": "q_scribes_3",
+    "title": "Cienie Archiwistów III",
+    "description": "Finałowa konfrontacja z Cieniem Pierwszego Sędziego.",
+    "rewardGold": 500,
+    "cityId": "serce_krainy",
+    "originNpcId": "mira",
+    "prerequisiteQuestId": "q_scribes_2",
+    "steps": [
+      {
+        "description": "Cel: RAUBRITTER_KNIGHT",
+        "type": "COMBAT",
+        "targetId": "RAUBRITTER_KNIGHT"
+      }
+    ]
+  },
+  {
+    "id": "q_collapse_core",
+    "title": "Serce Kolapsu",
+    "description": "Dotrzyj do źródła anomalii w Sercu Krainy i spróbuj scalić paradygmat.",
+    "rewardGold": 500,
+    "cityId": "serce_krainy",
+    "originNpcId": "mira",
+    "prerequisiteQuestId": "q_scribes_3",
+    "steps": [
+      {
+        "description": "Cel: DEMON_MAJOR",
+        "type": "COMBAT",
+        "targetId": "DEMON_MAJOR"
+      }
+    ]
+  }
+]
