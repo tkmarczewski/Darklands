@@ -2,6 +2,7 @@ package com.grimreich.systems
 
 import com.grimreich.core.GameRepository
 import com.grimreich.core.GameState
+import com.grimreich.core.LootTable
 import com.grimreich.grimreich.v1.Item
 import com.grimreich.world.ItemCatalogue
 import javax.inject.Inject
@@ -54,5 +55,39 @@ class LootSystem @Inject constructor(
         state.inventory.add(item.copy())
         state.logEntries.add("Zdobyto przedmiot: ${item.name}")
         return true
+    }
+
+    /**
+     * Awards loot from a specific loot table.
+     * Centralizes logic previously scattered in CombatSystem.
+     */
+    fun awardLootFromTableDirect(state: GameState, lootTable: LootTable): List<String> {
+        val messages = mutableListOf<String>()
+        
+        // Gold reward
+        val gold = if (lootTable.goldMax > lootTable.goldMin) {
+            Random.nextInt(lootTable.goldMin, lootTable.goldMax + 1)
+        } else if (lootTable.goldMax == lootTable.goldMin && lootTable.goldMax > 0) {
+            lootTable.goldMax
+        } else 0
+
+        if (gold > 0) {
+            state.gold += gold
+            messages.add("Zdobyto $gold G.")
+        }
+
+        // Item rewards
+        lootTable.itemChances.forEach { (itemId, chance) ->
+            if (Random.nextFloat() < chance) {
+                val item = itemCatalogue.get(itemId)
+                if (item != null) {
+                    state.inventory.add(item.copy())
+                    messages.add("Zdobyto przedmiot: ${item.name}")
+                    state.logEntries.add("Zdobyto przedmiot: ${item.name}")
+                }
+            }
+        }
+
+        return messages
     }
 }

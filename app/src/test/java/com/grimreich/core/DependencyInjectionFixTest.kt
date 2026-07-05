@@ -27,7 +27,7 @@ class DependencyInjectionFixTest {
             gameRepositoryProvider = { repo!! } // Lazy resolution
         )
         
-        val questManifest = QuestManifest(questEngine)
+        val questManifest = QuestManifest(mockContext, questEngine)
         
         val dialogueManager = DialogueManager(
             context = mockContext,

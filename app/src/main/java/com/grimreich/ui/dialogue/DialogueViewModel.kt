@@ -83,7 +83,13 @@ class DialogueViewModel @Inject constructor(
             state.pendingDialogueNodeId = choice.targetNodeId
             
             // Execute logic-level effects defined in the choice (e.g. adding reward flags)
-            choice.onSelect(state)
+            // SAFED: Use let to handle potential runtime nulls from deserialization
+            choice.onSelect?.let { effector ->
+                effector(state)
+            }
+            
+            // Execute data-driven triggers from JSON via manager
+            dialogueManager.handleTrigger(state, choice.triggerEvent, choice.triggerValue)
             
             if (choice.targetNodeId == "end") {
                 state.pendingDialogueNpcName = null

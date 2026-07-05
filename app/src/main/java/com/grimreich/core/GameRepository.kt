@@ -40,7 +40,7 @@ class GameRepository @Inject constructor(
     val gameLogs: StateFlow<List<String>> = _gameLogs.asStateFlow()
 
     init {
-        sync()
+        // sync() removed to break circular dependency
     }
 
     fun currentState(): GameState = _gameState.value

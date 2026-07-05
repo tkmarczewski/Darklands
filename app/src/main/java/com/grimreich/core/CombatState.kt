@@ -11,6 +11,8 @@ data class CombatState(
     var enemyAgility: Int = 5,
     var enemyIntelligence: Int = 5,
     var enemyStrength: Int = 5,
+    var enemyStamina: Int = 10,
+    var heroStamina: Int = 10,
     var enemyEffects: MutableList<StatusEffect> = mutableListOf(),
     var heroEffects: MutableList<StatusEffect> = mutableListOf(),
     var log: MutableList<String> = mutableListOf()

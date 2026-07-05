@@ -84,7 +84,7 @@ fun GameNavHost(
             else                             -> GameRoute.MainMenu.route
         }
         navController.navigate(route) {
-            popUpTo(0)
+            launchSingleTop = true
         }
     }
 

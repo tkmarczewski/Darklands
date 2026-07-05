@@ -3,19 +3,21 @@ package com.grimreich.systems
 import com.grimreich.core.GameState
 import com.grimreich.core.Hero
 import com.grimreich.core.GameRepository
-import io.mockk.mockk
+import org.mockito.kotlin.mock
+import dagger.Lazy
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class ExperienceSystemTest {
 
-    private val gameRepository = mockk<GameRepository>(relaxed = true)
-    private val experienceSystem = ExperienceSystem(lazy { gameRepository })
+    private val gameRepository = mock<GameRepository>()
+    private val experienceSystem = ExperienceSystem(object : Lazy<GameRepository> {
+        override fun get(): GameRepository = gameRepository
+    })
 
     @Test
     fun `addPartyXpDirect adds XP and handles level up`() {
-        val hero = Hero(id = "hero1", name = "Hans", endurance = 10)
+        val hero = Hero(id = "hero1", name = "Hans", age = 25, endurance = 10)
         hero.normalize() // maxHp = 40
         
         val state = GameState(party = mutableListOf(hero))
@@ -34,7 +36,7 @@ class ExperienceSystemTest {
 
     @Test
     fun `level up multiple times in one go`() {
-        val hero = Hero(id = "hero1", name = "Hans")
+        val hero = Hero(id = "hero1", name = "Hans", age = 25)
         val state = GameState(party = mutableListOf(hero))
         
         // Level 1 -> 2: 100 XP

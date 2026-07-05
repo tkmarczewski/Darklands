@@ -23,7 +23,7 @@ class ConversationManager @Inject constructor(
 
     fun makeChoice(choice: DialogueChoice): DialogueNode? {
         gameRepository.updateState { state ->
-            choice.onSelect(state)
+            choice.onSelect?.invoke(state)
         }
         return if (choice.targetNodeId == "end") null else start(choice.targetNodeId)
     }

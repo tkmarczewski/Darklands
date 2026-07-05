@@ -1,40 +1,70 @@
 package com.grimreich.systems
 
+import com.grimreich.core.GameState
+import com.grimreich.core.Hero
 import com.grimreich.core.GameRepository
+import dagger.Lazy
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class ExperienceSystem @Inject constructor(
-    private val gameRepository: GameRepository
+    private val gameRepository: Lazy<GameRepository>
 ) {
     fun addXp(heroId: String, amount: Int): String {
-        var levelsGained = 0
-        var finalName = ""
-        var finalLevel = 1
-        var heroFound = false
-        
-        gameRepository.updateState { state ->
-            val hero = state.party.find { it.id == heroId } ?: return@updateState
-            heroFound = true
-            finalName = hero.name
-            hero.xp += amount
-            
-            while (hero.xp >= hero.level * 100) {
-                hero.xp -= hero.level * 100
-                hero.level++
-                hero.attributePoints += 2
-                levelsGained++
+        var msg = ""
+        gameRepository.get().updateState { state ->
+            val hero = state.party.find { it.id == heroId }
+            if (hero != null) {
+                val levels = applyXpDirect(hero, amount)
+                msg = if (levels > 0) {
+                    "Awans! ${hero.name} osiągnął poziom ${hero.level}."
+                } else {
+                    "Zdobyto $amount XP dla ${hero.name}."
+                }
             }
-            finalLevel = hero.level
         }
-        
-        if (!heroFound) return "Nie znaleziono bohatera."
+        return msg
+    }
 
-        return when {
-            levelsGained > 1 -> "Awans x$levelsGained! $finalName osiągnął poziom $finalLevel."
-            levelsGained == 1 -> "Awans! $finalName osiągnął poziom $finalLevel."
-            else -> "Zdobyto $amount XP dla $finalName."
+    fun addPartyXp(amount: Int): List<String> {
+        var msgs = listOf<String>()
+        gameRepository.get().updateState { state ->
+            msgs = addPartyXpDirect(state, amount)
         }
+        return msgs
+    }
+
+    /**
+     * Adds XP directly to state. Use this inside updateState blocks.
+     */
+    fun addPartyXpDirect(state: GameState, amount: Int): List<String> {
+        val messages = mutableListOf<String>()
+        state.party.filter { !it.isDead }.forEach { hero ->
+            val levels = applyXpDirect(hero, amount)
+            if (levels > 0) {
+                messages.add("Awans! ${hero.name} osiągnął poziom ${hero.level}.")
+            }
+        }
+        if (messages.isEmpty() && amount > 0) {
+            messages.add("Zdobyto $amount XP dla drużyny.")
+        }
+        return messages
+    }
+
+    /**
+     * Internal logic for applying XP and handling multiple levels.
+     * @return Number of levels gained.
+     */
+    private fun applyXpDirect(hero: Hero, amount: Int): Int {
+        hero.xp += amount
+        var levelsGained = 0
+        while (hero.xp >= hero.level * 100) {
+            hero.xp -= hero.level * 100
+            hero.level++
+            hero.attributePoints += 2
+            levelsGained++
+        }
+        return levelsGained
     }
 }

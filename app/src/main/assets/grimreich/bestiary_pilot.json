@@ -12,9 +12,34 @@
     "ai": "AGGRESSIVE",
     "lootTable": {
       "goldMin": 5,
-      "goldMax": 20
+      "goldMax": 20,
+      "itemChances": {
+        "sword_short": 0.1,
+        "pot_heal": 0.05
+      }
     },
     "xpReward": 10
+  },
+  {
+    "type": "BANDIT_LEADER",
+    "name": "Szef Bandytów",
+    "stats": {
+      "maxHp": 50,
+      "attack": 20,
+      "defense": 15,
+      "speed": 14,
+      "morale": 12
+    },
+    "ai": "TACTICAL",
+    "lootTable": {
+      "goldMin": 20,
+      "goldMax": 50,
+      "itemChances": {
+        "sword_long": 0.2,
+        "armor_leather": 0.1
+      }
+    },
+    "xpReward": 25
   },
   {
     "type": "WOLF",
@@ -29,8 +54,73 @@
     "ai": "AGGRESSIVE",
     "lootTable": {
       "goldMin": 0,
-      "goldMax": 0
+      "goldMax": 0,
+      "itemChances": {
+        "ing_herb": 0.2
+      }
     },
     "xpReward": 5
+  },
+  {
+    "type": "SKELETON",
+    "name": "Szkielet",
+    "stats": {
+      "maxHp": 15,
+      "attack": 12,
+      "defense": 5,
+      "speed": 10,
+      "morale": 20
+    },
+    "ai": "BERSERK",
+    "lootTable": {
+      "goldMin": 0,
+      "goldMax": 5,
+      "itemChances": {
+        "ing_bone": 0.5
+      }
+    },
+    "xpReward": 8
+  },
+  {
+    "type": "CITY_GUARD",
+    "name": "Strażnik Miejski",
+    "stats": {
+      "maxHp": 40,
+      "attack": 18,
+      "defense": 15,
+      "speed": 12,
+      "morale": 15
+    },
+    "ai": "DEFENSIVE",
+    "lootTable": {
+      "goldMin": 10,
+      "goldMax": 30,
+      "itemChances": {
+        "sword_basic": 0.1,
+        "mace_basic": 0.05
+      }
+    },
+    "xpReward": 15
+  },
+  {
+    "type": "RAUBRITTER_KNIGHT",
+    "name": "Rycerz Rozbójnik",
+    "stats": {
+      "maxHp": 80,
+      "attack": 25,
+      "defense": 20,
+      "speed": 15,
+      "morale": 18
+    },
+    "ai": "AGGRESSIVE",
+    "lootTable": {
+      "goldMin": 50,
+      "goldMax": 150,
+      "itemChances": {
+        "armor_plate_partial": 0.05,
+        "sword_long": 0.15
+      }
+    },
+    "xpReward": 50
   }
 ]

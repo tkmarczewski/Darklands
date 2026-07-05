@@ -91,7 +91,9 @@ data class DialogueChoice(
     val factionId: String? = null,
     val requiredAttributes: Map<String, Int> = emptyMap(),
     val requiredSkills: Map<String, Int> = emptyMap(),
-    val onSelect: (GameState) -> Unit = {}
+    val triggerEvent: String? = null,
+    val triggerValue: String? = null,
+    @Transient val onSelect: ((GameState) -> Unit)? = {}
 )
 
 data class DialogueNode(

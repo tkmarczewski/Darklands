@@ -125,8 +125,13 @@ class GameRootViewModel @Inject constructor(
     }
 
     fun inspectHero(heroId: String) {
+        val hero = gameRepository.currentState().party.find { it.id == heroId }
         _inspectedHeroId.value = heroId
-        setMode(GameScreenMode.CHAR_DETAIL)
+        if (hero != null && hero.isDead) {
+            setMode(GameScreenMode.RITUAL)
+        } else {
+            setMode(GameScreenMode.CHAR_DETAIL)
+        }
     }
 
     fun upgradeStat(heroId: String, stat: String) {
@@ -155,5 +160,11 @@ class GameRootViewModel @Inject constructor(
 
     fun saveGame() {
         gameRepository.persistCurrentState()
+    }
+
+    fun startDevCombat() {
+        val enemy = com.grimreich.core.Bestiary.get(com.grimreich.core.EnemyType.BANDIT)
+        combatSystem.startCombat(enemy)
+        setMode(GameScreenMode.COMBAT)
     }
 }

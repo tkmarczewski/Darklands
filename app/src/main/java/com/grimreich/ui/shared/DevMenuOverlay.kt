@@ -75,23 +75,25 @@ fun DevMenuOverlay(
                             Text("QUESTY")
                         }
                         Button(onClick = {
-                            val s = root.gameRepository.currentState()
-                            s.gold += GameConstants.DEV_GOLD_GIFT
-                            root.saveGame()
+                            root.gameRepository.updateState { state ->
+                                state.gold += GameConstants.DEV_GOLD_GIFT
+                            }
                         }) {
                             Text("+${GameConstants.DEV_GOLD_GIFT} GOLD")
                         }
                         Button(onClick = {
-                            val s = root.gameRepository.currentState()
-                            s.grimCurrentRegion = "twierdza_zakonu"
+                            root.gameRepository.updateState { state ->
+                                state.grimCurrentRegion = "twierdza_zakonu"
+                            }
                             root.setMode(GameScreenMode.CITY)
                             visible = false
                         }) {
                             Text("TP: TWIERDZA")
                         }
                         Button(onClick = {
-                            val s = root.gameRepository.currentState()
-                            s.grimCurrentRegion = "serce_krainy"
+                            root.gameRepository.updateState { state ->
+                                state.grimCurrentRegion = "serce_krainy"
+                            }
                             root.setMode(GameScreenMode.CITY)
                             visible = false
                         }) {
@@ -102,6 +104,12 @@ fun DevMenuOverlay(
                             visible = false
                         }) {
                             Text("GLITCH ON")
+                        }
+                        Button(onClick = {
+                            root.gameRepository.updateState { it.world.globalStability = 100 }
+                            visible = false
+                        }) {
+                            Text("GLITCH OFF")
                         }
                         Button(onClick = {
                             val s = root.gameRepository.currentState()
@@ -118,29 +126,86 @@ fun DevMenuOverlay(
                             Text("+POTION")
                         }
                         Button(onClick = {
-                            val s = root.gameRepository.currentState()
-                            val ralwingExists = s.party.any { it.id == "hero_ralwing" }
-                            if (!ralwingExists) {
-                                val ralwing = Hero(
-                                    id = "hero_ralwing",
-                                    name = "Ralwing",
-                                    age = 40,
-                                    strength = 18,
-                                    agility = 16,
-                                    endurance = 15,
-                                    perception = 12,
-                                    intelligence = 10,
-                                    charisma = 10,
-                                    piety = 10,
-                                    hp = 80,
-                                    maxHp = 80,
-                                    portraitRes = "port_knight"
-                                )
-                                s.party.add(ralwing)
-                                root.saveGame()
+                            root.gameRepository.updateState { state ->
+                                state.party.forEach { hero ->
+                                    hero.xp += 100
+                                    while (hero.xp >= hero.level * 100) {
+                                        hero.xp -= hero.level * 100
+                                        hero.level++
+                                        hero.attributePoints += 2
+                                    }
+                                }
+                            }
+                        }) {
+                            Text("+100 XP")
+                        }
+                        Button(onClick = {
+                            root.gameRepository.updateState { state ->
+                                val ralwingExists = state.party.any { it.id == "hero_ralwing" }
+                                if (!ralwingExists) {
+                                    val ralwing = Hero(
+                                        id = "hero_ralwing",
+                                        name = "Ralwing",
+                                        age = 40,
+                                        strength = 18,
+                                        agility = 16,
+                                        endurance = 15,
+                                        perception = 12,
+                                        intelligence = 10,
+                                        charisma = 10,
+                                        piety = 10,
+                                        hp = 50,
+                                        maxHp = 50,
+                                        portraitRes = "port_knight"
+                                    )
+                                    state.party.add(ralwing)
+                                }
+                                if (state.activeHeroId == null) {
+                                    state.activeHeroId = "hero_ralwing"
+                                }
                             }
                         }) {
                             Text("DODAJ RALWINGA")
+                        }
+                        Button(onClick = {
+                            root.startDevCombat()
+                            visible = false
+                        }) {
+                            Text("WALKA")
+                        }
+                        Button(onClick = {
+                            root.gameRepository.updateState { state ->
+                                state.party.find { it.id == state.activeHeroId }?.let { hero ->
+                                    hero.hp = 0
+                                    hero.isDead = true
+                                }
+                            }
+                            visible = false
+                        }) {
+                            Text("ZGIŃ")
+                        }
+                        Button(onClick = {
+                            val heroId = root.gameRepository.currentState().party.firstOrNull()?.id
+                            if (heroId != null) {
+                                root.inspectHero(heroId)
+                            }
+                            visible = false
+                        }) {
+                            Text("RITUAL")
+                        }
+                        Button(onClick = {
+                            root.gameRepository.updateState { state ->
+                                state.inventory.add(com.grimreich.grimreich.v1.Item(id = "ing_herb", name = "Zioła", type = "ingredient", effects = emptyMap()))
+                                state.inventory.add(com.grimreich.grimreich.v1.Item(id = "ing_herb", name = "Zioła", type = "ingredient", effects = emptyMap()))
+                            }
+                        }) {
+                            Text("+HERBS")
+                        }
+                        Button(onClick = {
+                            root.setMode(GameScreenMode.ENDING)
+                            visible = false
+                        }) {
+                            Text("FINAŁ")
                         }
                     }
                 }

@@ -1,16 +1,65 @@
 [
   {
-    "id": "merchant_start_ext",
-    "npcId": "merchant",
-    "text": "Witaj ponownie, Kotwico. Moje zapasy są ograniczone, ale dla Ciebie zawsze znajdzie się coś specjalnego.",
+    "id": "guard_start",
+    "npcId": "guard",
+    "text": "Stój! Mgła gęstnieje, a prawo musi być przestrzegane. Czego szukasz w cieniu murów?",
     "choices": [
       {
-        "text": "Pokaż co masz na sprzedaż.",
+        "text": "Czy coś niepokojącego działo się ostatnio?",
+        "targetNodeId": "guard_quest_check"
+      },
+      {
+        "text": "Tylko przechodzę.",
+        "targetNodeId": "end"
+      }
+    ]
+  },
+  {
+    "id": "guard_quest_check",
+    "npcId": "guard",
+    "text": "Mamy problem z 'Wyrokiem'. Jeśli chcesz pomóc, weź to zlecenie.",
+    "choices": [
+      {
+        "text": "Przyjmuję (ZADANIE: Wyrok).",
+        "targetNodeId": "end",
+        "triggerEvent": "ACTIVATE_QUEST",
+        "triggerValue": "q_verdict_1"
+      },
+      {
+        "text": "Może później.",
+        "targetNodeId": "end"
+      }
+    ]
+  },
+  {
+    "id": "guard_report_back",
+    "npcId": "guard",
+    "text": "Dobra robota, Kotwico. Inkwizycja dziękuje za Twoją służbę. Oto zapłata.",
+    "choices": [
+      {
+        "text": "Ku chwale Zakonu.",
+        "targetNodeId": "end",
+        "triggerEvent": "GRANT_REPUTATION",
+        "triggerValue": "KNIGHTS:10"
+      }
+    ]
+  },
+  {
+    "id": "merchant_start",
+    "npcId": "merchant",
+    "text": "Witaj, podróżniku. Mam towary, których nie znajdziesz nigdzie indziej... za odpowiednią cenę.",
+    "choices": [
+      {
+        "text": "Pokaż mi swoje towary (RYNEK).",
         "targetNodeId": "end"
       },
       {
-        "text": "Słyszałeś o jakichś nowych pęknięciach?",
-        "targetNodeId": "merchant_info_ext"
+        "text": "Co wiesz o tym regionie?",
+        "targetNodeId": "merchant_info"
+      },
+      {
+        "text": "Czy potrzebujesz pomocy?",
+        "targetNodeId": "merchant_quest_check"
       },
       {
         "text": "Do widzenia.",
@@ -19,13 +68,154 @@
     ]
   },
   {
-    "id": "merchant_info_ext",
+    "id": "merchant_info",
     "npcId": "merchant",
-    "text": "Rzeczywistość staje się coraz cieńsza. Niektórzy mówią, że słyszą głosy Archiwistów nawet za dnia.",
+    "text": "Ceny rosną, a stabilność spada. Mówią, że Archiwiści znowu zaczęli śnić.",
     "choices": [
       {
-        "text": "To niepokojące.",
-        "targetNodeId": "merchant_start_ext"
+        "text": "Interesujące.",
+        "targetNodeId": "merchant_start"
+      }
+    ]
+  },
+  {
+    "id": "merchant_quest_check",
+    "npcId": "merchant",
+    "text": "Archiwiści potrzebują rzadkich ziół z mgły. To niebezpieczna robota, ale dobrze płatna.",
+    "choices": [
+      {
+        "text": "Przyjmuję zlecenie (Żniwa Mgły).",
+        "targetNodeId": "end",
+        "triggerEvent": "ACTIVATE_QUEST",
+        "triggerValue": "q_coast_harvest"
+      },
+      {
+        "text": "Może później.",
+        "targetNodeId": "end"
+      }
+    ]
+  },
+  {
+    "id": "merchant_report_back",
+    "npcId": "merchant",
+    "text": "Dobra robota. Zioła dotarły całe. Możemy zamknąć sprawę. Oto Twoje złoto.",
+    "choices": [
+      {
+        "text": "W porządku.",
+        "targetNodeId": "end"
+      }
+    ]
+  },
+  {
+    "id": "aelion_start",
+    "npcId": "aelion",
+    "text": "Kotwico... Twoja obecność tutaj jest jak pęknięcie na tafli jeziora. Czy wiesz, że ten świat jest tylko snem Sędziów?",
+    "choices": [
+      {
+        "text": "Nie rozumiem.",
+        "targetNodeId": "aelion_meta"
+      },
+      {
+        "text": "Szukam sposobu na stabilizację Mgły.",
+        "targetNodeId": "aelion_quest"
+      },
+      {
+        "text": "Muszę iść.",
+        "targetNodeId": "end"
+      }
+    ]
+  },
+  {
+    "id": "aelion_meta",
+    "npcId": "aelion",
+    "text": "Gdy stabilność spadnie do zera, szyfr zostanie ujawniony. Wtedy zobaczymy surowy kod naszego przeznaczenia.",
+    "choices": [
+      {
+        "text": "Jak to możliwe?",
+        "targetNodeId": "aelion_start"
+      }
+    ]
+  },
+  {
+    "id": "aelion_quest",
+    "npcId": "aelion",
+    "text": "Aby ocalić GrimReich, musisz odnaleźć pozostałe relikwie. Zacznij od Wybrzeża Północnego.",
+    "choices": [
+      {
+        "text": "Zrobię to.",
+        "targetNodeId": "end"
+      }
+    ]
+  },
+  {
+    "id": "mira_start",
+    "npcId": "mira",
+    "text": "Lustra nie kłamią, podróżniku. Widzę w Twoim odbiciu wiele wersji GrimReich. Która z nich jest prawdziwa?",
+    "choices": [
+      {
+        "text": "Wszystkie są prawdziwe.",
+        "targetNodeId": "mira_wisdom"
+      },
+      {
+        "text": "Żadna nie jest prawdziwa.",
+        "targetNodeId": "mira_wisdom"
+      },
+      {
+        "text": "Potrzebuję Twojej wiedzy.",
+        "targetNodeId": "mira_quest_check"
+      },
+      {
+        "text": "To nie ma znaczenia.",
+        "targetNodeId": "end"
+      }
+    ]
+  },
+  {
+    "id": "mira_wisdom",
+    "npcId": "mira",
+    "text": "Słusznie. Prawda jest jedynie sumą wszystkich echa. Jeśli chcesz wiedzieć więcej, przynieś mi Esencję Odbicia.",
+    "choices": [
+      {
+        "text": "Będę pamiętał.",
+        "targetNodeId": "end"
+      }
+    ]
+  },
+  {
+    "id": "mira_quest_check",
+    "npcId": "mira",
+    "text": "Kronika została naruszona. Widzę w niej cienie, które nie powinny tam być. Pomożesz mi zbadać to?",
+    "choices": [
+      {
+        "text": "Przyjmuję zadanie Cieni.",
+        "targetNodeId": "end",
+        "triggerEvent": "ACTIVATE_QUEST_CHAIN"
+      },
+      {
+        "text": "Nie teraz.",
+        "targetNodeId": "end"
+      }
+    ]
+  },
+  {
+    "id": "mira_report_back",
+    "npcId": "mira",
+    "text": "Dobrze. Zamknijmy ten rozdział i zobaczmy, co odsłoni następny.",
+    "choices": [
+      {
+        "text": "Jestem gotów.",
+        "targetNodeId": "end"
+      }
+    ]
+  },
+  {
+    "id": "quest_report_back_generic",
+    "npcId": "npc",
+    "text": "Widzę, że zadanie zostało wykonane. Dziękuję za pomoc.",
+    "choices": [
+      {
+        "text": "Nie ma za co.",
+        "targetNodeId": "end"
       }
     ]
   }

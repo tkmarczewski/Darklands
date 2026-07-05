@@ -17,8 +17,9 @@ data class QuestStep(
 
 @Singleton
 class QuestEngine @Inject constructor(
-    private val gameRepository: GameRepository
+    private val gameRepositoryProvider: dagger.Lazy<GameRepository>
 ) {
+    private val gameRepository get() = gameRepositoryProvider.get()
     private val registry = mutableMapOf<String, QuestDefinition>()
 
     fun register(definition: QuestDefinition) {

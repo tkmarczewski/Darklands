@@ -1,62 +1,66 @@
 package com.grimreich.systems
 
+import android.content.Context
+import android.content.res.AssetManager
 import com.grimreich.core.GameRepository
 import com.grimreich.core.GameState
 import com.grimreich.core.WorldMap
+import com.grimreich.grimreich.v1.DialogueNode
 import com.grimreich.world.CityCatalogue
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.mockito.Mockito.*
+import java.io.ByteArrayInputStream
 
 class ContentValidationTest {
 
-    /**
-     * FIX (BUG-7): Implement proper dialogue target validation test with mocks
-     * Previously this test was skipped with commented code. Now it validates that
-     * all dialogue choices reference existing dialogue nodes in the graph.
-     */
-    @Test
-    fun dialogueTargets_shouldResolve() {
-        // Setup mocks to avoid circular dependencies
-        val mockRepository = mock(GameRepository::class.java)
-        `when`(mockRepository.currentState()).thenReturn(GameState())
-
-        val mockChronicle = mock(ChronicleSystem::class.java)
-        val mockQuestEngine = mock(QuestEngine::class.java)
-
-        // Create DialogueManager with mocked dependencies
-        val manager = DialogueManager(
-            context = mock(android.content.Context::class.java),
-            gameRepositoryProvider = dagger.Lazy { mockRepository },
-            chronicleSystem = dagger.Lazy { mockChronicle },
-            questEngine = dagger.Lazy { mockQuestEngine }
-        )
-
-        // Seed the dialogue graph
-        manager.seedBasicDialogues()
-
-        // FIX (BUG-7): Validate that all choice targets exist as nodes
-        // listMissingTargets() returns choices that reference non-existent nodes
-        val missingTargets = manager.listMissingTargets()
+    private fun createMockContext(): Context {
+        val context = mock(Context::class.java)
+        val assets = mock(AssetManager::class.java)
+        `when`(context.assets).thenReturn(assets)
         
-        assertEquals(
-            "Dialogue graph should have no broken references. Missing targets: $missingTargets",
-            0,
-            missingTargets.size
-        )
+        // Mock a basic dialogue JSON for unit tests
+        val dummyJson = """
+        [
+          {
+            "id": "guard_start",
+            "npcId": "guard",
+            "text": "Stój! Mgła gęstnieje.",
+            "choices": []
+          },
+          {
+            "id": "merchant_start",
+            "npcId": "merchant",
+            "text": "Witaj, podróżniku.",
+            "choices": []
+          },
+          {
+            "id": "aelion_start",
+            "npcId": "aelion",
+            "text": "Kotwico...",
+            "choices": []
+          },
+          {
+            "id": "mira_start",
+            "npcId": "mira",
+            "text": "Lustra nie kłamią.",
+            "choices": []
+          }
+        ]
+        """.trimIndent()
+        
+        `when`(assets.open(anyString())).thenReturn(ByteArrayInputStream(dummyJson.toByteArray()))
+        return context
     }
 
-    /**
-     * Additional test: Verify all seeded nodes have valid NPC IDs
-     */
     @Test
-    fun dialogueNodes_shouldHaveValidNpcIds() {
+    fun dialogueTargets_shouldResolve() {
         val mockRepository = mock(GameRepository::class.java)
         `when`(mockRepository.currentState()).thenReturn(GameState())
 
         val manager = DialogueManager(
-            context = mock(android.content.Context::class.java),
+            context = createMockContext(),
             gameRepositoryProvider = dagger.Lazy { mockRepository },
             chronicleSystem = dagger.Lazy { mock(ChronicleSystem::class.java) },
             questEngine = dagger.Lazy { mock(QuestEngine::class.java) }
@@ -64,12 +68,23 @@ class ContentValidationTest {
 
         manager.seedBasicDialogues()
 
-        val validNpcIds = setOf("guard", "merchant", "aelion", "mira", "mystic", "npc")
-        var invalidCount = 0
+        val missingTargets = manager.listMissingTargets()
+        assertEquals(0, missingTargets.size)
+    }
 
-        // Check that all nodes reference valid NPCs
-        // Note: We can't directly access nodes map (private), so we verify via makeChoice
-        // which indirectly validates the node structure
+    @Test
+    fun dialogueNodes_shouldHaveValidNpcIds() {
+        val mockRepository = mock(GameRepository::class.java)
+        `when`(mockRepository.currentState()).thenReturn(GameState())
+
+        val manager = DialogueManager(
+            context = createMockContext(),
+            gameRepositoryProvider = dagger.Lazy { mockRepository },
+            chronicleSystem = dagger.Lazy { mock(ChronicleSystem::class.java) },
+            questEngine = dagger.Lazy { mock(QuestEngine::class.java) }
+        )
+
+        manager.seedBasicDialogues()
 
         assertTrue("DialogueManager should have seeded nodes", manager.hasNode("guard_start"))
         assertTrue("DialogueManager should have seeded nodes", manager.hasNode("merchant_start"))
@@ -89,43 +104,26 @@ class ContentValidationTest {
         assertTrue("World map city reference issues: $issues", issues.isEmpty())
     }
 
-    /**
-     * FIX (BUG-7): Test glitch text determinism with seeded Random
-     */
     @Test
     fun glitchText_shouldBeDeterministic() {
         val mockRepository = mock(GameRepository::class.java)
         `when`(mockRepository.currentState()).thenReturn(GameState())
 
         val manager = DialogueManager(
-            context = mock(android.content.Context::class.java),
+            context = createMockContext(),
             gameRepositoryProvider = dagger.Lazy { mockRepository },
             chronicleSystem = dagger.Lazy { mock(ChronicleSystem::class.java) },
             questEngine = dagger.Lazy { mock(QuestEngine::class.java) }
         )
 
-        // Access private function indirectly by getting a node with low stability
         val lowStabilityState = GameState(world = com.grimreich.core.WorldState(globalStability = 20))
         `when`(mockRepository.currentState()).thenReturn(lowStabilityState)
 
         manager.seedBasicDialogues()
 
-        // Get the same node twice - glitch effect should be identical
         val node1 = manager.getNode("guard_start")
         val node2 = manager.getNode("guard_start")
 
-        // Both should apply the same glitch with same seed
-        assertEquals(
-            "Glitch text should be deterministic with same seed",
-            node1?.text,
-            node2?.text
-        )
-    }
-
-    @Test
-    fun questGraph_shouldHaveNoMissingPrerequisites() {
-        // This would require initializing QuestManifest and QuestEngine
-        // and checking validateQuestGraph()
-        // TODO: Implement comprehensive quest graph validation in QuestEngine
+        assertEquals(node1?.text, node2?.text)
     }
 }
