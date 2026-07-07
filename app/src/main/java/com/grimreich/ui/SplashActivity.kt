@@ -18,14 +18,17 @@ class SplashActivity : AppCompatActivity() {
 
     @Inject lateinit var cityCatalogue: CityCatalogue
 
+    private var navigated = false
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_splash)
 
         cityCatalogue.seedCanonical()
 
-        lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
+        lifecycleScope.launchWhenStarted {
+            if (!navigated) {
+                navigated = true
                 delay(2000)
                 startActivity(Intent(this@SplashActivity, MainActivity::class.java))
                 finish()

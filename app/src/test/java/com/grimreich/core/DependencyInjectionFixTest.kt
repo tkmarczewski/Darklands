@@ -24,7 +24,8 @@ class DependencyInjectionFixTest {
         var repo: GameRepository? = null
         
         val questEngine = QuestEngine(
-            gameRepositoryProvider = { repo!! } // Lazy resolution
+            gameRepositoryProvider = { repo!! }, // Lazy resolution
+            experienceSystemProvider = { mock(com.grimreich.systems.ExperienceSystem::class.java) }
         )
         
         val questManifest = QuestManifest(mockContext, questEngine)

@@ -12,8 +12,11 @@ enum class CityFaction {
 class ReputationSystem @Inject constructor(
     private val gameRepository: GameRepository
 ) {
+    private fun normalizeId(cityId: String): String =
+        cityId.lowercase().replace(" ", "_")
+
     fun modify(cityId: String, faction: CityFaction, delta: Int): Int {
-        val normalizedId = cityId.lowercase().replace(" ", "_")
+        val normalizedId = normalizeId(cityId)
         var result = 0
         gameRepository.updateState { s ->
             val factions = s.reputation.cityFactions.getOrPut(normalizedId) {
@@ -38,7 +41,7 @@ class ReputationSystem @Inject constructor(
     }
 
     fun score(cityId: String, faction: CityFaction): Int {
-        val normalizedId = cityId.lowercase().replace(" ", "_")
+        val normalizedId = normalizeId(cityId)
         return gameRepository.currentState()
             .reputation.cityFactions[normalizedId]
             ?.get(faction.name) ?: 0
@@ -56,9 +59,11 @@ class ReputationSystem @Inject constructor(
     }
 
     fun getCityRep(cityId: String): Int {
-        val normalizedId = cityId.lowercase().replace(" ", "_")
-        return gameRepository.currentState()
+        val normalizedId = normalizeId(cityId)
+        val values = gameRepository.currentState()
             .reputation.cityFactions[normalizedId]
-            ?.values?.average()?.toInt() ?: 0
+            ?.values
+        if (values.isNullOrEmpty()) return 0
+        return values.average().toInt()
     }
 }

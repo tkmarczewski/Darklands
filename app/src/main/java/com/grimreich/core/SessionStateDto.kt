@@ -106,7 +106,9 @@ data class CareerEntryDto(
 data class AbilityDto(
     val id: String,
     val name: String,
-    val type: String
+    val type: String,
+    val description: String? = null,
+    val costValue: Int? = null
 )
 
 @Serializable
@@ -114,6 +116,7 @@ data class MutationDto(
     val id: String,
     val name: String,
     val tier: String,
+    val category: String = "PHYSICAL",
     val attributeModifiers: Map<String, Int>,
     val stabilityImpact: Int
 )
@@ -158,6 +161,7 @@ data class WorldStateDto(
     val weather: String,
     val echoIntensity: Float,
     val collapseProgress: Float,
+    val collapseScenarioId: String? = null,
     val ontologicalLevel: Int,
     val discoveredLocations: List<String>,
     val cityEntryCount: Int,

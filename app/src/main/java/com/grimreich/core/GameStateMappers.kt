@@ -150,21 +150,24 @@ fun CareerEntry.toDto(): CareerEntryDto = CareerEntryDto(
 fun AbilityDto.toDomain(): Ability = AbilityRegistry.all().find { it.id == id } ?: Ability(
     id = id,
     name = name,
-    description = "",
+    description = description ?: "",
     costType = try { CostType.valueOf(type) } catch(e: Exception) { CostType.NONE },
-    costValue = 0
+    costValue = costValue ?: 0
 )
 
 fun Ability.toDto(): AbilityDto = AbilityDto(
     id = id,
     name = name,
-    type = costType.name
+    type = costType.name,
+    description = description,
+    costValue = costValue
 )
 
 fun Mutation.toDto(): MutationDto = MutationDto(
     id = id,
     name = name,
     tier = tier.name,
+    category = category.name,
     attributeModifiers = attributeModifiers,
     stabilityImpact = stabilityImpact
 )
@@ -173,7 +176,7 @@ fun MutationDto.toDomain(): Mutation = Mutation(
     id = id,
     name = name,
     description = "",
-    category = MutationCategory.PHYSICAL,
+    category = try { MutationCategory.valueOf(category) } catch (e: Exception) { MutationCategory.PHYSICAL },
     tier = try { MutationTier.valueOf(tier) } catch(e: Exception) { MutationTier.MANIFESTED },
     attributeModifiers = attributeModifiers,
     stabilityImpact = stabilityImpact
@@ -265,6 +268,7 @@ fun WorldState.toDto(): WorldStateDto = WorldStateDto(
     weather = weather.name,
     echoIntensity = echoIntensity,
     collapseProgress = collapseProgress,
+    collapseScenarioId = collapseScenarioId,
     ontologicalLevel = ontologicalLevel.level,
     discoveredLocations = discoveredLocations,
     cityEntryCount = cityEntryCount,
@@ -283,6 +287,7 @@ fun WorldStateDto.toDomain(): WorldState = WorldState().also {
     it.weather = try { WeatherType.valueOf(weather) } catch(e: Exception) { WeatherType.CLEAR }
     it.echoIntensity = echoIntensity
     it.collapseProgress = collapseProgress
+    it.collapseScenarioId = collapseScenarioId
     it.ontologicalLevel = try { OntologicalLevel.entries.find { l -> l.level == ontologicalLevel } ?: OntologicalLevel.MATERIAL } catch(e: Exception) { OntologicalLevel.MATERIAL }
     it.discoveredLocations.addAll(discoveredLocations)
     it.cityEntryCount = cityEntryCount

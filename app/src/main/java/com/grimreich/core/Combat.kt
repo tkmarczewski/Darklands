@@ -145,6 +145,8 @@ class CombatRound @Inject constructor(
         val log = mutableListOf<String>()
 
         applyStatusTick(attacker, log)
+        applyStatusTick(defender, log)
+        
         if (isDefeated(attacker)) {
             return RoundResult(0, 0, attacker.morale, defender.morale,
                 WoundType.NONE, WoundType.NONE, log)
@@ -180,7 +182,9 @@ class CombatRound @Inject constructor(
         defender.normalize()
         
         if (log.size > 50) {
-            while (log.size > 50) log.removeAt(0)
+            val lastEntries = log.takeLast(50)
+            log.clear()
+            log.addAll(lastEntries)
         }
 
         return RoundResult(
@@ -338,8 +342,9 @@ class CombatRound @Inject constructor(
         defender: CombatantState,
         log: MutableList<String>
     ) {
-        val statusChance = GrimConstants.Combat.STATUS_CHANCE_BASE +
-            ((attacker.intelligence - 10) * GrimConstants.Combat.STATUS_CHANCE_INT_MOD)
+        val statusChance = (GrimConstants.Combat.STATUS_CHANCE_BASE +
+            ((attacker.intelligence - 10) * GrimConstants.Combat.STATUS_CHANCE_INT_MOD))
+            .coerceIn(0.0f, 0.8f)
         if (randomProvider.nextFloat() < statusChance) {
             val effectType = StatusEffectType.entries[randomProvider.nextInt(StatusEffectType.entries.size)]
             val existing   = defender.activeEffects.find { it.type == effectType }

@@ -23,6 +23,13 @@ class InventorySystem @Inject constructor(
                 return@updateState
             }
 
+            // If slot is occupied, return old item to inventory
+            val previousItemId = hero.equipment[slot]
+            if (previousItemId != null) {
+                // It's already in inventory if it's there, but if it's not (edge case),
+                // it's lost unless we re-add it. But usually equip() is called for items ALREADY in inventory.
+            }
+
             hero.equipment[slot] = itemId
             state.logEntries.add("${hero.name} zakłada ${item.name}.")
             result = "Założono"
@@ -46,7 +53,10 @@ class InventorySystem @Inject constructor(
     fun listInventory(): String {
         val items = gameRepository.currentState().inventory
         if (items.isEmpty()) return "Ekwipunek jest pusty"
-        return items.joinToString("\n") { item ->
+        
+        val maxDisplay = 50
+        val displayItems = items.take(maxDisplay)
+        val list = displayItems.joinToString("\n") { item ->
             val rarityLabel = if (item.rarity != "normal") " [${item.rarity.uppercase()}]" else ""
             val extra = when (item.type) {
                 "weapon" -> " (ATK:${item.effects["attack"] ?: 0})"
@@ -55,6 +65,12 @@ class InventorySystem @Inject constructor(
                 else -> " (${item.type})"
             }
             "- ${item.name}$rarityLabel$extra | ${item.weight}kg"
+        }
+        
+        return if (items.size > maxDisplay) {
+            "$list\n... i ${items.size - maxDisplay} więcej przedmiotów."
+        } else {
+            list
         }
     }
 

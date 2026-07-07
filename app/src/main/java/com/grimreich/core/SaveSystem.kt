@@ -89,7 +89,7 @@ object SaveSystem {
         return true
     }
 
-    fun loadAutoSave(): SaveSnapshot? = autoSaveSnapshot?.copy(state = autoSaveSnapshot!!.state.deepCopy())
+    fun loadAutoSave(): SaveSnapshot? = autoSaveSnapshot?.let { it.copy(state = it.state.deepCopy()) }
     fun hasAutoSave(): Boolean = autoSaveSnapshot != null
 
     private fun computeStateHash(state: GameState): Int {
@@ -98,7 +98,9 @@ object SaveSystem {
             state.world.day,
             state.party.size,
             state.quest.activeQuestIds.size,
-            state.inventory.size
+            state.inventory.size,
+            state.reputation.globalFactions.size,
+            state.metaAwarenessLevel
         )
     }
 
@@ -118,7 +120,6 @@ object SaveSystem {
         val isValid = snapshot.version >= 1 &&
             snapshot.state.gold >= 0 &&
             snapshot.state.world.day >= 1 &&
-            snapshot.state.party.isNotEmpty() &&
             checksumValid
 
         return ValidationResult(

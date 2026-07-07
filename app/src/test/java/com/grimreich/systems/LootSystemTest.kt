@@ -16,7 +16,7 @@ class LootSystemTest {
 
     private val gameRepository = mock<GameRepository>()
     private val itemCatalogue = mock<ItemCatalogue>()
-    private val lootSystem = LootSystem(gameRepository, itemCatalogue)
+    private val lootSystem = LootSystem(gameRepository, itemCatalogue, com.grimreich.core.DefaultCombatRandomProvider())
 
     @Test
     fun `awardLootFromTableDirect awards gold correctly`() {

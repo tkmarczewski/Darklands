@@ -18,12 +18,16 @@ class CollapseEngine @Inject constructor(
         gameRepository.updateState { state ->
             state.world.collapseProgress = (state.world.collapseProgress + 0.01f).coerceAtMost(1.0f)
 
-            if (state.world.collapseProgress > 0.5f && activeScenario == null) {
-                activeScenario = decideScenario(state.prayer.faith, state.world.globalStability)
+            if (state.world.collapseProgress > 0.5f && state.world.collapseScenarioId == null) {
+                val scenario = decideScenario(state.prayer.faith, state.world.globalStability)
+                state.world.collapseScenarioId = scenario.name
             }
 
-            activeScenario?.let { scenario ->
-                when (scenario) {
+            val scenarioId = state.world.collapseScenarioId ?: return@updateState
+            val scenario = try { CollapseScenario.valueOf(scenarioId) } catch (e: Exception) { null }
+
+            scenario?.let { sc ->
+                when (sc) {
                     CollapseScenario.MIST_OBLIVION -> {
                         state.world.echoIntensity = (state.world.echoIntensity + 0.02f).coerceAtMost(1.0f)
                     }

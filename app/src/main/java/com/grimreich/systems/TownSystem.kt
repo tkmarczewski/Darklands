@@ -9,11 +9,16 @@ class TownSystem @Inject constructor(
     private val gameRepository: GameRepository
 ) {
     fun invest(cityId: String, amount: Int): String {
-        val state = gameRepository.currentState()
-        if (state.gold < amount) return "Brak złota!"
-        
-        state.gold -= amount
-        gameRepository.persistCurrentState()
-        return "Zainwestowano $amount zł w miasto $cityId."
+        var result = ""
+        gameRepository.updateState { state ->
+            if (state.gold < amount) {
+                result = "Brak złota!"
+                return@updateState
+            }
+            state.gold -= amount
+            state.logEntries.add("Zainwestowano $amount zł w miasto $cityId.")
+            result = "Zainwestowano $amount zł w miasto $cityId."
+        }
+        return result
     }
 }

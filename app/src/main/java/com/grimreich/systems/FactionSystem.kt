@@ -15,16 +15,14 @@ class FactionSystem @Inject constructor(
     private val reputationSystem: ReputationSystem
 ) {
     
-    private fun getCityId(): String = "wybrzeze_polnocne" 
-
-    fun getReputation(faction: FactionId): Int {
+    fun getReputation(faction: FactionId, cityId: String): Int {
         val cityFaction = mapToCityFaction(faction)
-        return reputationSystem.score(getCityId(), cityFaction)
+        return reputationSystem.score(cityId, cityFaction)
     }
 
-    fun modifyReputation(faction: FactionId, delta: Int) {
+    fun modifyReputation(faction: FactionId, cityId: String, delta: Int) {
         val cityFaction = mapToCityFaction(faction)
-        reputationSystem.modify(getCityId(), cityFaction, delta)
+        reputationSystem.modify(cityId, cityFaction, delta)
     }
 
     private fun mapToCityFaction(faction: FactionId): CityFaction = when (faction) {

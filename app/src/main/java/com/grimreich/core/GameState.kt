@@ -41,13 +41,15 @@ data class GameState(
 ) {
     fun trimLogs() {
         if (logEntries.size > GameConstants.MAX_LOG_ENTRIES) {
-            val toRemove = logEntries.size - GameConstants.MAX_LOG_ENTRIES
-            repeat(toRemove) { logEntries.removeAt(0) }
+            val last = logEntries.takeLast(GameConstants.MAX_LOG_ENTRIES)
+            logEntries.clear()
+            logEntries.addAll(last)
         }
     }
 
     fun normalizeState() {
         if (gold < 0) gold = 0
+        if (world.day < 1) world.day = 1
         party.forEach { it.normalize() }
         hireableHeroes.forEach { it.normalize() }
         trimLogs()

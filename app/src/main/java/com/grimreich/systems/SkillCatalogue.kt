@@ -25,6 +25,7 @@ object SkillCatalogue {
             type = SkillType.MELEE,
             staminaCost = 8
         ) { user, target ->
+            if (target.maxHp <= 0) return@CombatSkill SkillResult(message = "Cel jest już pokonany.")
             val dmg = (user.strength / 2) + 6
             target.hp = (target.hp - dmg).coerceAtLeast(0)
             SkillResult(damage = dmg, message = "Potężne uderzenie tarczą: $dmg obrażeń.")
@@ -36,7 +37,7 @@ object SkillCatalogue {
             type = SkillType.PRAYER,
             favorCost = 5
         ) { user, _ ->
-            user.armor += 5
+            user.armor = (user.armor + 5).coerceAtMost(50)
             SkillResult(statusApplied = true, message = "Boska osłona wzmacnia pancerz o +5.")
         }
     )
