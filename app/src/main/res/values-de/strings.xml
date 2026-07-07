@@ -84,4 +84,42 @@
     <string name="settings_language_title">SPRACHE WÄHLEN</string>
     <string name="settings_language_close">SCHLIESSEN</string>
     <string name="btn_language">SPRACHE</string>
+    <!-- Tavern Screen -->
+    <string name="tavern_title">SCHENKE ZUM GEBROCHENEN KRUG</string>
+    <string name="tavern_btn_rest">RUHEN (50 G)</string>
+    <string name="tavern_btn_gossip">GERÜCHTEN LAUSCHEN</string>
+    <string name="tavern_btn_hire">GEFÄHRTEN SUCHEN</string>
+    <string name="tavern_btn_exit">TRESEN VERLASSEN</string>
+    <string name="tavern_gold">GOLD: %1$d G</string>
+
+    <!-- Market Screen -->
+    <string name="market_title">MARKT</string>
+    <string name="market_gold">Gold: %1$d</string>
+    <string name="market_sell_label">DEIN INVENTAR</string>
+    <string name="market_buy_label">ZU VERKAUFEN</string>
+    <string name="market_btn_buy">KAUFEN</string>
+    <string name="market_btn_sell">VERKAUFEN</string>
+    <string name="market_price_format">%1$d G</string>
+
+    <!-- Inventory Screen -->
+    <string name="inventory_title">GRUPPENINVENTAR</string>
+    <string name="inventory_items_label">GEGENSTÄNDE</string>
+    <string name="inventory_btn_equip">AUSRÜSTEN</string>
+    <string name="inventory_hp_format">LP: %1$d/%2$d</string>
+    <string name="inventory_stats_format">ATK: %1$d | DEF: %2$d</string>
+
+    <!-- Recruitment Screen -->
+    <string name="recruit_title">REKRUTIERUNG</string>
+    <string name="recruit_subtitle">Verfügbare Söldner in dieser Schenke</string>
+    <string name="recruit_empty">Alle Söldner wurden angeheuert.</string>
+    <string name="recruit_btn_locked">GESPERRT</string>
+    <string name="recruit_stats_format">STÄ:%1$d BEW:%2$d INT:%3$d AUS:%4$d</string>
+    <string name="recruit_hp_format">LP: %1$d · WAH:%2$d CHA:%3$d FRÖ:%4$d</string>
+
+    <!-- Quest Journal -->
+    <string name="quest_journal_title">AUFTRAGSBUCH</string>
+    <string name="quest_journal_active">AKTIV</string>
+    <string name="quest_journal_completed">ABGESCHLOSSEN</string>
+    <string name="quest_journal_empty_active">Keine aktiven Aufträge.</string>
+    <string name="quest_journal_empty_completed">Keine abgeschlossenen Aufträge.</string>
 </resources>

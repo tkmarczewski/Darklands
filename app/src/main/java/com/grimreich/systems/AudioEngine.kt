@@ -42,25 +42,22 @@ class AudioEngine @Inject constructor(
 
     private fun applyDynamicEffects() {
         synchronized(lock) {
-            musicPlayer?.let { player ->
+            val player = musicPlayer
+            if (player != null && try { player.isPlaying } catch (e: Exception) { false }) {
                 if (currentStability < 15) {
                     try {
                         val pitch = 0.85f + (android.os.SystemClock.elapsedRealtime() % 300) / 1000f
                         player.setPlaybackParams(player.playbackParams.setPitch(pitch))
                     } catch (ignore: Exception) {
-                        // Reset pitch if stability recovered
+                        // Reset pitch if stability recovered or error occurred
                         try {
-                            if (player.playbackParams.pitch != 1.0f) {
-                                player.setPlaybackParams(player.playbackParams.setPitch(1.0f))
-                            }
+                            player.setPlaybackParams(player.playbackParams.setPitch(1.0f))
                         } catch (e: Exception) {}
                     }
                 } else {
                     try {
                         // Reset pitch if stability recovered
-                        if (player.playbackParams.pitch != 1.0f) {
-                            player.setPlaybackParams(player.playbackParams.setPitch(1.0f))
-                        }
+                        player.setPlaybackParams(player.playbackParams.setPitch(1.0f))
                     } catch (e: Exception) {}
                 }
             }

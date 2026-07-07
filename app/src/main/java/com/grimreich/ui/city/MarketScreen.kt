@@ -14,6 +14,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 
+import androidx.compose.ui.res.stringResource
+import com.grimreich.R
+
 @Composable
 fun MarketScreen(
     viewModel: MarketViewModel = hiltViewModel(),
@@ -31,21 +34,21 @@ fun MarketScreen(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Text("TARG", color = Color(0xFFE0C080), fontSize = 24.sp, fontWeight = FontWeight.Bold)
-            Text("Złoto: ${state.playerGold}", color = Color.Yellow, fontSize = 14.sp)
+            Text(stringResource(R.string.market_title), color = Color(0xFFE0C080), fontSize = 24.sp, fontWeight = FontWeight.Bold)
+            Text(stringResource(R.string.market_gold, state.playerGold), color = Color.Yellow, fontSize = 14.sp)
         }
 
         Text(state.cityName, color = Color.Gray, fontSize = 12.sp, modifier = Modifier.padding(bottom = 12.dp))
 
         Row(modifier = Modifier.weight(1f)) {
             Column(modifier = Modifier.weight(1f).padding(end = 8.dp)) {
-                Text("DO KUPIENIA", color = Color(0xFF888844), fontSize = 10.sp, fontWeight = FontWeight.Bold)
+                Text(stringResource(R.string.market_buy_label), color = Color(0xFF888844), fontSize = 10.sp, fontWeight = FontWeight.Bold)
                 LazyColumn(modifier = Modifier.weight(1f)) {
                     items(state.itemsForSale) { item ->
                         MarketItemRow(
                             name = item.name,
                             price = item.price,
-                            actionLabel = "KUP",
+                            actionLabel = stringResource(R.string.market_btn_buy),
                             enabled = state.playerGold >= item.price,
                             onClick = { viewModel.buy(item.id) }
                         )
@@ -60,18 +63,18 @@ fun MarketScreen(
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF400000)),
                     shape = MaterialTheme.shapes.extraSmall
                 ) {
-                    Text("POWRÓT", color = Color.White, fontWeight = FontWeight.Bold)
+                    Text(stringResource(R.string.btn_back), color = Color.White, fontWeight = FontWeight.Bold)
                 }
             }
 
             Column(modifier = Modifier.weight(1f).padding(start = 8.dp)) {
-                Text("TWÓJ EKWIPUNEK", color = Color(0xFF888844), fontSize = 10.sp, fontWeight = FontWeight.Bold)
+                Text(stringResource(R.string.market_sell_label), color = Color(0xFF888844), fontSize = 10.sp, fontWeight = FontWeight.Bold)
                 LazyColumn {
                     items(state.itemsToSell) { item ->
                         MarketItemRow(
                             name = item.name,
                             price = item.sellPrice,
-                            actionLabel = "SPRZEDAJ",
+                            actionLabel = stringResource(R.string.market_btn_sell),
                             enabled = true,
                             onClick = { viewModel.sell(item.id) }
                         )
@@ -104,7 +107,7 @@ private fun MarketItemRow(
         ) {
             Column(modifier = Modifier.weight(1f)) {
                 Text(name, color = Color.White, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
-                Text("$price zł", color = if (enabled) Color(0xFFE0C080) else Color.Red, fontSize = 11.sp)
+                Text(stringResource(R.string.market_price_format, price), color = if (enabled) Color(0xFFE0C080) else Color.Red, fontSize = 11.sp)
             }
             Button(
                 onClick = onClick,

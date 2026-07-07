@@ -18,6 +18,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.res.stringResource
+import com.grimreich.R
 import com.grimreich.grimreich.v1.Item
 import com.grimreich.core.Hero
 
@@ -48,7 +50,7 @@ fun InventoryScreen(viewModel: InventoryViewModel, onBack: () -> Unit) {
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "EKWIPUNEK DRUŻYNY",
+                    text = stringResource(R.string.inventory_title),
                     color = Color(0xFFC0A060),
                     fontSize = 24.sp,
                     fontWeight = FontWeight.Bold
@@ -58,7 +60,7 @@ fun InventoryScreen(viewModel: InventoryViewModel, onBack: () -> Unit) {
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF400000)),
                     shape = MaterialTheme.shapes.extraSmall
                 ) {
-                    Text("POWRÓT")
+                    Text(stringResource(R.string.btn_back))
                 }
             }
 
@@ -78,7 +80,7 @@ fun InventoryScreen(viewModel: InventoryViewModel, onBack: () -> Unit) {
 
                 // RIGHT: Inventory Grid & Details
                 Column(modifier = Modifier.weight(1.2f)) {
-                    Text("PRZEDMIOTY", color = Color(0xFFC0A060), fontSize = 10.sp, fontWeight = FontWeight.Bold)
+                    Text(stringResource(R.string.inventory_items_label), color = Color(0xFFC0A060), fontSize = 10.sp, fontWeight = FontWeight.Bold)
                     Spacer(modifier = Modifier.height(8.dp))
                     
                     LazyVerticalGrid(
@@ -120,10 +122,11 @@ fun HeroPaperDoll(hero: Hero, allItems: List<Item>, onUnequip: (String) -> Unit)
         ) {
             Column(modifier = Modifier.padding(12.dp), horizontalAlignment = Alignment.CenterHorizontally) {
                 Text(hero.name.uppercase(), color = Color.White, fontWeight = FontWeight.Bold)
-                Text("HP: ${hero.hp}/${hero.maxHp}", color = Color.Red, fontSize = 12.sp)
-                Text("ATK: ${hero.effectiveAttack(allItems)} | DEF: ${hero.effectiveDefense(allItems)}", color = Color.Gray, fontSize = 10.sp)
+                Text(stringResource(R.string.inventory_hp_format, hero.hp, hero.maxHp), color = Color.Red, fontSize = 12.sp)
+                Text(stringResource(R.string.inventory_stats_format, hero.effectiveAttack(allItems), hero.effectiveDefense(allItems)), color = Color.Gray, fontSize = 10.sp)
             }
         }
+
 
         // Equipment Slots Layout
         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -208,7 +211,7 @@ fun ItemDetailCard(item: Item, onEquip: () -> Unit) {
                         modifier = Modifier.height(30.dp),
                         contentPadding = PaddingValues(horizontal = 8.dp, vertical = 0.dp)
                     ) {
-                        Text("ZAŁÓŻ", fontSize = 10.sp)
+                        Text(stringResource(R.string.inventory_btn_equip), fontSize = 10.sp)
                     }
                 }
             }

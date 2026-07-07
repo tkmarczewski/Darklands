@@ -36,6 +36,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.compose.ui.res.stringResource
+import com.grimreich.R
 import com.grimreich.core.GameConstants
 import com.grimreich.core.Hero
 
@@ -53,7 +55,7 @@ fun RecruitmentScreen(
             .padding(16.dp)
     ) {
         Text(
-            text = "WERBUNEK",
+            text = stringResource(R.string.recruit_title),
             style = MaterialTheme.typography.headlineMedium,
             color = Color(0xFFC0A060),
             modifier = Modifier
@@ -61,7 +63,7 @@ fun RecruitmentScreen(
                 .align(Alignment.CenterHorizontally)
         )
         Text(
-            text = "Dostępni najemnicy w tej karczmie",
+            text = stringResource(R.string.recruit_subtitle),
             color = Color(0xFF888888),
             fontSize = 12.sp,
             modifier = Modifier
@@ -69,7 +71,7 @@ fun RecruitmentScreen(
                 .padding(bottom = 4.dp)
         )
         Text(
-            text = "Złoto: ${state.gold} zł",
+            text = stringResource(R.string.market_gold, state.gold),
             color = Color.Yellow,
             fontSize = 14.sp,
             modifier = Modifier
@@ -83,7 +85,7 @@ fun RecruitmentScreen(
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = "Wszyscy najemnicy zostali wynajęci.",
+                    text = stringResource(R.string.recruit_empty),
                     color = Color(0xFF666666),
                     fontSize = 14.sp
                 )
@@ -110,7 +112,7 @@ fun RecruitmentScreen(
             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF400000)),
             shape = MaterialTheme.shapes.extraSmall
         ) {
-            Text("POWRÓT", color = Color.White, fontWeight = FontWeight.Bold)
+            Text(stringResource(R.string.btn_back), color = Color.White, fontWeight = FontWeight.Bold)
         }
     }
 }
@@ -173,12 +175,12 @@ private fun HireableItem(
                     fontSize = 11.sp
                 )
                 Text(
-                    text = "SIŁ:${hero.strength} ZRC:${hero.agility} INT:${hero.intelligence} WYT:${hero.endurance}",
+                    text = stringResource(R.string.recruit_stats_format, hero.strength, hero.agility, hero.intelligence, hero.endurance),
                     color = Color.LightGray,
                     fontSize = 11.sp
                 )
                 Text(
-                    text = "HP: ${hero.maxHp} · PER:${hero.perception} CHA:${hero.charisma} PIE:${hero.piety}",
+                    text = stringResource(R.string.recruit_hp_format, hero.maxHp, hero.perception, hero.charisma, hero.piety),
                     color = Color(0xFF888888),
                     fontSize = 10.sp
                 )
@@ -209,7 +211,7 @@ private fun HireableItem(
                 )
             ) {
                 Text(
-                    text = if (canAfford) "$cost zł" else "ZABLOKOWANE",
+                    text = if (canAfford) stringResource(R.string.market_price_format, cost) else stringResource(R.string.recruit_btn_locked),
                     color = if (canAfford) Color.White else Color(0xFF666666),
                     fontSize = 12.sp
                 )

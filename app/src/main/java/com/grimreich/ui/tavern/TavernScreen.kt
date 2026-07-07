@@ -13,6 +13,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
+import androidx.compose.ui.res.stringResource
+import com.grimreich.R
+
 @Composable
 fun TavernScreen(viewModel: TavernViewModel, onHire: () -> Unit, onExit: () -> Unit) {
     val state by viewModel.uiState.collectAsState()
@@ -25,7 +28,7 @@ fun TavernScreen(viewModel: TavernViewModel, onHire: () -> Unit, onExit: () -> U
     ) {
         // HEADER
         Text(
-            text = "KARCZMA POD PĘKNIĘTYM KUFLEM",
+            text = stringResource(R.string.tavern_title),
             color = Color(0xFFE0C080),
             style = MaterialTheme.typography.titleLarge,
             fontWeight = FontWeight.Bold,
@@ -37,9 +40,9 @@ fun TavernScreen(viewModel: TavernViewModel, onHire: () -> Unit, onExit: () -> U
         Row(modifier = Modifier.fillMaxSize()) {
             // LEFT: Actions
             Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                TavernActionButton("ODPOCZYNEK (50 G)", onClick = { viewModel.rest() })
-                TavernActionButton("SŁUCHAJ PLOTEK", onClick = { viewModel.listenToGossip() })
-                TavernActionButton("SZUKAJ KOMPANÓW", onClick = onHire)
+                TavernActionButton(stringResource(R.string.tavern_btn_rest), onClick = { viewModel.rest() })
+                TavernActionButton(stringResource(R.string.tavern_btn_gossip), onClick = { viewModel.listenToGossip() })
+                TavernActionButton(stringResource(R.string.tavern_btn_hire), onClick = onHire)
                 
                 Spacer(modifier = Modifier.weight(1f))
                 
@@ -48,7 +51,7 @@ fun TavernScreen(viewModel: TavernViewModel, onHire: () -> Unit, onExit: () -> U
                     modifier = Modifier.fillMaxWidth(),
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2A2A2A))
                 ) {
-                    Text("ODEJDŹ OD LADY", color = Color(0xFFE0C080))
+                    Text(stringResource(R.string.tavern_btn_exit), color = Color(0xFFE0C080))
                 }
             }
 
@@ -73,7 +76,7 @@ fun TavernScreen(viewModel: TavernViewModel, onHire: () -> Unit, onExit: () -> U
                 Spacer(modifier = Modifier.height(8.dp))
                 
                 Text(
-                    text = "ZŁOTO: ${state.gold} G",
+                    text = stringResource(R.string.tavern_gold, state.gold),
                     color = Color(0xFFE0C080),
                     fontWeight = FontWeight.Bold,
                     fontSize = 16.sp,

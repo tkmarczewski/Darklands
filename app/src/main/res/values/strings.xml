@@ -84,4 +84,42 @@
     <string name="settings_language_title">WYBIERZ JĘZYK</string>
     <string name="settings_language_close">ZAMKNIJ</string>
     <string name="btn_language">JĘZYK</string>
+    <!-- Tavern Screen -->
+    <string name="tavern_title">KARCZMA POD PĘKNIĘTYM KUFLEM</string>
+    <string name="tavern_btn_rest">ODPOCZYNEK (50 G)</string>
+    <string name="tavern_btn_gossip">SŁUCHAJ PLOTEK</string>
+    <string name="tavern_btn_hire">SZUKAJ KOMPANÓW</string>
+    <string name="tavern_btn_exit">ODEJDŹ OD LADY</string>
+    <string name="tavern_gold">ZŁOTO: %1$d G</string>
+
+    <!-- Market Screen -->
+    <string name="market_title">TARG</string>
+    <string name="market_gold">Złoto: %1$d</string>
+    <string name="market_sell_label">TWÓJ EKWIPUNEK</string>
+    <string name="market_buy_label">DO KUPIENIA</string>
+    <string name="market_btn_buy">KUP</string>
+    <string name="market_btn_sell">SPRZEDAJ</string>
+    <string name="market_price_format">%1$d zł</string>
+
+    <!-- Inventory Screen -->
+    <string name="inventory_title">EKWIPUNEK DRUŻYNY</string>
+    <string name="inventory_items_label">PRZEDMIOTY</string>
+    <string name="inventory_btn_equip">ZAŁÓŻ</string>
+    <string name="inventory_hp_format">HP: %1$d/%2$d</string>
+    <string name="inventory_stats_format">ATK: %1$d | DEF: %2$d</string>
+
+    <!-- Recruitment Screen -->
+    <string name="recruit_title">WERBUNEK</string>
+    <string name="recruit_subtitle">Dostępni najemnicy w tej karczmie</string>
+    <string name="recruit_empty">Wszyscy najemnicy zostali wynajęci.</string>
+    <string name="recruit_btn_locked">ZABLOKOWANE</string>
+    <string name="recruit_stats_format">SIŁ:%1$d ZRC:%2$d INT:%3$d WYT:%4$d</string>
+    <string name="recruit_hp_format">HP: %1$d · PER:%2$d CHA:%3$d PIE:%4$d</string>
+
+    <!-- Quest Journal -->
+    <string name="quest_journal_title">DZIENNIK ZADAŃ</string>
+    <string name="quest_journal_active">AKTYWNE</string>
+    <string name="quest_journal_completed">UKOŃCZONE</string>
+    <string name="quest_journal_empty_active">Brak aktywnych zadań.</string>
+    <string name="quest_journal_empty_completed">Brak ukończonych zadań.</string>
 </resources>

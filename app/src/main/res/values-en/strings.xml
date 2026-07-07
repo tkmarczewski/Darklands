@@ -84,4 +84,42 @@
     <string name="settings_language_title">SELECT LANGUAGE</string>
     <string name="settings_language_close">CLOSE</string>
     <string name="btn_language">LANGUAGE</string>
+    <!-- Tavern Screen -->
+    <string name="tavern_title">THE CRACKED MUG TAVERN</string>
+    <string name="tavern_btn_rest">REST (50 G)</string>
+    <string name="tavern_btn_gossip">LISTEN TO GOSSIP</string>
+    <string name="tavern_btn_hire">LOOK FOR COMPANIONS</string>
+    <string name="tavern_btn_exit">LEAVE THE COUNTER</string>
+    <string name="tavern_gold">GOLD: %1$d G</string>
+
+    <!-- Market Screen -->
+    <string name="market_title">MARKET</string>
+    <string name="market_gold">Gold: %1$d</string>
+    <string name="market_sell_label">YOUR INVENTORY</string>
+    <string name="market_buy_label">FOR SALE</string>
+    <string name="market_btn_buy">BUY</string>
+    <string name="market_btn_sell">SELL</string>
+    <string name="market_price_format">%1$d G</string>
+
+    <!-- Inventory Screen -->
+    <string name="inventory_title">PARTY INVENTORY</string>
+    <string name="inventory_items_label">ITEMS</string>
+    <string name="inventory_btn_equip">EQUIP</string>
+    <string name="inventory_hp_format">HP: %1$d/%2$d</string>
+    <string name="inventory_stats_format">ATK: %1$d | DEF: %2$d</string>
+
+    <!-- Recruitment Screen -->
+    <string name="recruit_title">RECRUITMENT</string>
+    <string name="recruit_subtitle">Available mercenaries in this tavern</string>
+    <string name="recruit_empty">All mercenaries have been hired.</string>
+    <string name="recruit_btn_locked">LOCKED</string>
+    <string name="recruit_stats_format">STR:%1$d AGI:%2$d INT:%3$d END:%4$d</string>
+    <string name="recruit_hp_format">HP: %1$d · PER:%2$d CHA:%3$d PIE:%4$d</string>
+
+    <!-- Quest Journal -->
+    <string name="quest_journal_title">QUEST JOURNAL</string>
+    <string name="quest_journal_active">ACTIVE</string>
+    <string name="quest_journal_completed">COMPLETED</string>
+    <string name="quest_journal_empty_active">No active quests.</string>
+    <string name="quest_journal_empty_completed">No completed quests.</string>
 </resources>

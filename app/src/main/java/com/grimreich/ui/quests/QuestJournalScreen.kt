@@ -12,6 +12,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.res.stringResource
+import com.grimreich.R
 import com.grimreich.systems.QuestDefinition
 
 @Composable
@@ -28,18 +30,18 @@ fun QuestJournalScreen(
             .padding(16.dp)
     ) {
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-            Text("DZIENNIK ZADAŃ", color = Color(0xFFE0C080), fontSize = 24.sp, fontWeight = FontWeight.Bold)
+            Text(stringResource(R.string.quest_journal_title), color = Color(0xFFE0C080), fontSize = 24.sp, fontWeight = FontWeight.Bold)
             Button(onClick = onBack, colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2A2A2A))) {
-                Text("POWRÓT", color = Color.White)
+                Text(stringResource(R.string.btn_back), color = Color.White)
             }
         }
 
         Spacer(modifier = Modifier.height(16.dp))
 
         LazyColumn(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            item { SectionHeader("AKTYWNE") }
+            item { SectionHeader(stringResource(R.string.quest_journal_active)) }
             if (state.activeQuests.isEmpty()) {
-                item { Text("Brak aktywnych zadań.", color = Color.Gray, fontSize = 12.sp) }
+                item { Text(stringResource(R.string.quest_journal_empty_active), color = Color.Gray, fontSize = 12.sp) }
             } else {
                 items(state.activeQuests) { quest ->
                     QuestEntryCard(quest, isCompleted = false)
@@ -47,9 +49,9 @@ fun QuestJournalScreen(
             }
 
             item { Spacer(modifier = Modifier.height(24.dp)) }
-            item { SectionHeader("UKOŃCZONE") }
+            item { SectionHeader(stringResource(R.string.quest_journal_completed)) }
             if (state.completedQuests.isEmpty()) {
-                item { Text("Brak ukończonych zadań.", color = Color.Gray, fontSize = 12.sp) }
+                item { Text(stringResource(R.string.quest_journal_empty_completed), color = Color.Gray, fontSize = 12.sp) }
             } else {
                 items(state.completedQuests) { quest ->
                     QuestEntryCard(quest, isCompleted = true)
