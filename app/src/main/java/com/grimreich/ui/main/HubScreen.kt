@@ -27,6 +27,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.res.stringResource
+import com.grimreich.R
 import com.grimreich.core.GameConstants
 import com.grimreich.core.Hero
 import com.grimreich.ui.shared.WorldPhaseWidget
@@ -80,14 +82,14 @@ fun HubScreen(
             ) {
                 Column {
                     Text(
-                        text = state.locationName.uppercase(),
+                        text = state.locationNameRes?.let { stringResource(it) } ?: state.locationName.uppercase(),
                         color = Color(0xFFE0C080),
                         fontWeight = FontWeight.Bold,
                         fontSize = 14.sp,
                         letterSpacing = 1.sp
                     )
                     Text(
-                        text = "DZIEŃ ${state.day} | ${state.timeOfDay.uppercase()}",
+                        text = stringResource(R.string.hub_day, state.day) + " | ${state.timeOfDay.uppercase()}",
                         color = Color.Gray,
                         fontSize = 10.sp
                     )
@@ -118,19 +120,19 @@ fun HubScreen(
                         modifier = Modifier.fillMaxWidth(), 
                         horizontalArrangement = Arrangement.spacedBy(GameConstants.UI.PADDING_SMALL)
                     ) {
-                        HubNavButton("MIASTO", modifier = Modifier.weight(1f), onClick = onCity)
-                        HubNavButton("MAPA", modifier = Modifier.weight(1f), onClick = onMap)
-                        HubNavButton("PLECAK", modifier = Modifier.weight(1f), onClick = onInventory)
+                        HubNavButton(stringResource(R.string.menu_city), modifier = Modifier.weight(1f), onClick = onCity)
+                        HubNavButton(stringResource(R.string.menu_map), modifier = Modifier.weight(1f), onClick = onMap)
+                        HubNavButton(stringResource(R.string.menu_backpack), modifier = Modifier.weight(1f), onClick = onInventory)
                     }
                     Row(
                         modifier = Modifier.fillMaxWidth(), 
                         horizontalArrangement = Arrangement.spacedBy(GameConstants.UI.PADDING_SMALL)
                     ) {
-                        HubNavButton("ZADANIA", modifier = Modifier.weight(1f), onClick = onQuests)
-                        HubNavButton("DRUŻYNA", modifier = Modifier.weight(1f), color = Color(0xFF4A0000), onClick = { 
+                        HubNavButton(stringResource(R.string.menu_quests), modifier = Modifier.weight(1f), onClick = onQuests)
+                        HubNavButton(stringResource(R.string.hub_party), modifier = Modifier.weight(1f), color = Color(0xFF4A0000), onClick = { 
                             state.party.firstOrNull()?.id?.let { onCharacter(it) }
                         })
-                        HubNavButton("KRONIKA", modifier = Modifier.weight(1f), onClick = onWorldLog)
+                        HubNavButton(stringResource(R.string.journal_title), modifier = Modifier.weight(1f), onClick = onWorldLog)
                     }
 
                     Row(
@@ -139,7 +141,7 @@ fun HubScreen(
                     ) {
                         val expeditionCount = state.expeditionQuestsCount
                         HubNavButton(
-                            text = if (expeditionCount > 0) "WYRUSZ NA WYPRAWĘ ($expeditionCount)" else "BRAK CELÓW",
+                            text = if (expeditionCount > 0) stringResource(R.string.hub_btn_expedition, expeditionCount) else stringResource(R.string.hub_btn_no_targets),
                             modifier = Modifier.weight(1.5f),
                             color = if (expeditionCount > 0) Color(0xFFADFF2F) else Color(0xFF1A1A1A), 
                             enabled = expeditionCount > 0,
@@ -157,10 +159,10 @@ fun HubScreen(
                         modifier = Modifier.fillMaxWidth().height(100.dp)
                     ) {
                         Column(modifier = Modifier.padding(GameConstants.UI.PADDING_SMALL)) {
-                            Text("STATUS ŚWIATA", color = Color.Gray, fontSize = 10.sp, fontWeight = FontWeight.Bold)
+                            Text(stringResource(R.string.hub_world_status), color = Color.Gray, fontSize = 10.sp, fontWeight = FontWeight.Bold)
                             Spacer(modifier = Modifier.height(GameConstants.UI.PADDING_SMALL))
                             Text(
-                                text = state.atmosphericMessage,
+                                text = stringResource(state.atmosphericMessageRes),
                                 color = if (state.worldStability < 40) Color(0xFFB22222) else Color.LightGray,
                                 fontSize = 12.sp
                             )
@@ -176,11 +178,11 @@ fun HubScreen(
                     modifier = Modifier.weight(1f).fillMaxHeight()
                 ) {
                     Column(modifier = Modifier.padding(GameConstants.UI.PADDING_SMALL)) {
-                        Text("OSTATNIE WIEŚCI:", color = Color.Gray, fontSize = 10.sp)
+                        Text(stringResource(R.string.hub_news), color = Color.Gray, fontSize = 10.sp)
                         Spacer(modifier = Modifier.height(GameConstants.UI.PADDING_SMALL))
                         
                         if (state.latestLogs.isEmpty()) {
-                            Text("Cisza w eterze...", color = Color.DarkGray, fontSize = 11.sp)
+                            Text(stringResource(R.string.hub_news_empty), color = Color.DarkGray, fontSize = 11.sp)
                         } else {
                             state.latestLogs.forEach { log ->
                                 Text("- $log", color = Color.LightGray, fontSize = 11.sp, modifier = Modifier.padding(bottom = 4.dp))
@@ -193,7 +195,7 @@ fun HubScreen(
             Spacer(modifier = Modifier.height(GameConstants.UI.PADDING_MEDIUM))
 
             // BOTTOM: Party Strip
-            Text("TWOJA DRUŻYNA", color = Color.Gray, fontSize = 10.sp, fontWeight = FontWeight.Bold)
+            Text(stringResource(R.string.hub_party), color = Color.Gray, fontSize = 10.sp, fontWeight = FontWeight.Bold)
             Spacer(modifier = Modifier.height(4.dp))
             LazyRow(
                 modifier = Modifier.fillMaxWidth(),

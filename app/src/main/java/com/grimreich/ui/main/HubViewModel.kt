@@ -13,8 +13,11 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import javax.inject.Inject
 
+import com.grimreich.R
+
 data class HubUiState(
     val locationName: String = "",
+    val locationNameRes: Int? = null,
     val day: Int = 1,
     val timeOfDay: String = "",
     val gold: Int = 0,
@@ -24,7 +27,7 @@ data class HubUiState(
     val worldStability: Int = 100,
     val hubBackground: String = "",
     val hubTintColor: Color = Color.Transparent,
-    val atmosphericMessage: String = "",
+    val atmosphericMessageRes: Int = R.string.stability_high,
     val latestLogs: List<String> = emptyList()
 )
 
@@ -61,16 +64,17 @@ class HubViewModel @Inject constructor(
                 else -> Color.Transparent
             }
 
-            val message = when {
-                stability < 20 -> "Rzeczywistość rozpada się na Twoich oczach. Słyszysz statyczny szum kodu."
-                stability < 40 -> "Powidoki i echa stają się codziennością. Ludzie boją się patrzeć w lustra."
-                stability < 70 -> "Dni wydają się krótsze, a cienie dłuższe niż być powinny."
-                else -> "W GrimReich panuje względny spokój, choć Mgła nigdy nie śpi."
+            val messageRes = when {
+                stability < 20 -> R.string.stability_critical
+                stability < 40 -> R.string.stability_low
+                stability < 70 -> R.string.stability_medium
+                else -> R.string.stability_high
             }
 
             _uiState.update { 
                 it.copy(
-                    locationName = city?.name ?: "Nieznane Miejsce",
+                    locationName = city?.name ?: "",
+                    locationNameRes = if (city == null) R.string.hub_location_unknown else null,
                     day = state.world.day,
                     timeOfDay = state.world.timeOfDay,
                     gold = state.gold,
@@ -80,7 +84,7 @@ class HubViewModel @Inject constructor(
                     worldStability = stability,
                     hubBackground = city?.backgroundDrawable ?: "bg_generic_city",
                     hubTintColor = tint,
-                    atmosphericMessage = message,
+                    atmosphericMessageRes = messageRes,
                     latestLogs = logs.takeLast(5).reversed()
                 )
             }

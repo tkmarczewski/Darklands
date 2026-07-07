@@ -64,4 +64,24 @@
     <string name="creator_points_label">VERFÜGBARE PUNKTE</string>
     <string name="btn_next">WEITER</string>
     <string name="btn_finish">ABSCHLIESSEN</string>
+    <!-- Hub Screen -->
+    <string name="hub_day">TAG %1$d</string>
+    <string name="hub_world_status">WELTZUSTAND</string>
+    <string name="hub_news">LETZTE NEUIGKEITEN:</string>
+    <string name="hub_party">DEINE GRUPPE</string>
+    <string name="hub_news_empty">Stille im Äther...</string>
+    <string name="hub_location_unknown">Unbekannter Ort</string>
+    <string name="hub_btn_expedition">AUF EXPEDITION GEHEN (%1$d)</string>
+    <string name="hub_btn_no_targets">KEINE ZIELE</string>
+
+    <!-- World Stability Messages -->
+    <string name="stability_high">In GrimReich herrscht relativer Frieden, doch der Nebel schläft nie.</string>
+    <string name="stability_medium">Die Tage scheinen kürzer und die Schatten länger zu sein, als sie sein sollten.</string>
+    <string name="stability_low">Nachbilder und Echos werden zur Normalität. Die Menschen fürchten sich, in den Spiegel zu schauen.</string>
+    <string name="stability_critical">Die Realität zerfällt vor Ihren Augen. Sie hören das statische Brummen des Codes.</string>
+
+    <!-- Language Selector -->
+    <string name="settings_language_title">SPRACHE WÄHLEN</string>
+    <string name="settings_language_close">SCHLIESSEN</string>
+    <string name="btn_language">SPRACHE</string>
 </resources>

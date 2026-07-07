@@ -14,7 +14,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class SplashActivity : AppCompatActivity() {
+class SplashActivity : LocalizedActivity() {
 
     @Inject lateinit var cityCatalogue: CityCatalogue
 

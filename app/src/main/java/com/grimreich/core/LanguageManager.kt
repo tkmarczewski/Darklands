@@ -33,9 +33,25 @@ object LanguageManager {
     fun applyLanguage(context: Context, language: Language) {
         val locale = Locale(language.code)
         Locale.setDefault(locale)
+        val resources = context.resources
+        val config = Configuration(resources.configuration)
+        config.setLocale(locale)
+        
+        // This is deprecated but often necessary for immediate UI updates in legacy views
+        @Suppress("DEPRECATION")
+        resources.updateConfiguration(config, resources.displayMetrics)
+    }
+
+    /**
+     * Wraps context with the current locale for Compose/UI support.
+     */
+    fun wrapContext(context: Context): Context {
+        val language = getSavedLanguage()
+        val locale = Locale(language.code)
+        Locale.setDefault(locale)
         val config = Configuration(context.resources.configuration)
         config.setLocale(locale)
-        context.resources.updateConfiguration(config, context.resources.displayMetrics)
+        return context.createConfigurationContext(config)
     }
 
     fun getAvailableLanguages(): List<Language> = Language.entries.toList()

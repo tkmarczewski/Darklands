@@ -64,4 +64,24 @@
     <string name="creator_points_label">DOSTĘPNE PUNKTY</string>
     <string name="btn_next">DALEJ</string>
     <string name="btn_finish">ZAKOŃCZ</string>
+    <!-- Hub Screen -->
+    <string name="hub_day">DZIEŃ %1$d</string>
+    <string name="hub_world_status">STATUS ŚWIATA</string>
+    <string name="hub_news">OSTATNIE WIEŚCI:</string>
+    <string name="hub_party">TWOJA DRUŻYNA</string>
+    <string name="hub_news_empty">Cisza w eterze...</string>
+    <string name="hub_location_unknown">Nieznane Miejsce</string>
+    <string name="hub_btn_expedition">WYRUSZ NA WYPRAWĘ (%1$d)</string>
+    <string name="hub_btn_no_targets">BRAK CELÓW</string>
+
+    <!-- World Stability Messages -->
+    <string name="stability_high">W GrimReich panuje względny spokój, choć Mgła nigdy nie śpi.</string>
+    <string name="stability_medium">Dni wydają się krótsze, a cienie dłuższe niż być powinny.</string>
+    <string name="stability_low">Powidoki i echa stają się codziennością. Ludzie boją się patrzeć w lustra.</string>
+    <string name="stability_critical">Rzeczywistość rozpada się na Twoich oczach. Słyszysz statyczny szum kodu.</string>
+
+    <!-- Language Selector -->
+    <string name="settings_language_title">WYBIERZ JĘZYK</string>
+    <string name="settings_language_close">ZAMKNIJ</string>
+    <string name="btn_language">JĘZYK</string>
 </resources>

@@ -64,4 +64,24 @@
     <string name="creator_points_label">AVAILABLE POINTS</string>
     <string name="btn_next">NEXT</string>
     <string name="btn_finish">FINISH</string>
+    <!-- Hub Screen -->
+    <string name="hub_day">DAY %1$d</string>
+    <string name="hub_world_status">WORLD STATUS</string>
+    <string name="hub_news">LATEST NEWS:</string>
+    <string name="hub_party">YOUR PARTY</string>
+    <string name="hub_news_empty">Silence on the airwaves...</string>
+    <string name="hub_location_unknown">Unknown Location</string>
+    <string name="hub_btn_expedition">GO ON EXPEDITION (%1$d)</string>
+    <string name="hub_btn_no_targets">NO TARGETS</string>
+
+    <!-- World Stability Messages -->
+    <string name="stability_high">Relative peace reigns in GrimReich, though the Mist never sleeps.</string>
+    <string name="stability_medium">Days seem shorter and shadows longer than they should be.</string>
+    <string name="stability_low">Afterimages and echoes become commonplace. People fear looking into mirrors.</string>
+    <string name="stability_critical">Reality crumbles before your eyes. You hear the static hum of code.</string>
+
+    <!-- Language Selector -->
+    <string name="settings_language_title">SELECT LANGUAGE</string>
+    <string name="settings_language_close">CLOSE</string>
+    <string name="btn_language">LANGUAGE</string>
 </resources>

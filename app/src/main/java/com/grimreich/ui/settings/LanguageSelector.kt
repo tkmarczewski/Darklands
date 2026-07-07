@@ -13,6 +13,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.res.stringResource
+import com.grimreich.R
 import com.grimreich.core.LanguageManager
 
 @Composable
@@ -39,7 +41,7 @@ fun LanguageSelector(
             Spacer(modifier = Modifier.height(48.dp))
 
             Text(
-                text = "WYBIERZ JĘZYK",
+                text = stringResource(R.string.settings_language_title),
                 color = Color(0xFFC0A060),
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Bold
@@ -100,7 +102,7 @@ fun LanguageSelector(
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2A2A2A)),
                 shape = MaterialTheme.shapes.extraSmall
             ) {
-                Text("ZAMKNIJ", color = Color(0xFFC0A060))
+                Text(stringResource(R.string.settings_language_close), color = Color(0xFFC0A060))
             }
         }
     }

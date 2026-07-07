@@ -16,6 +16,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.grimreich.R
+import com.grimreich.core.LanguageManager
 import androidx.compose.ui.tooling.preview.Preview
 
 @Composable
@@ -28,6 +29,7 @@ fun MainMenuScreen(
 ) {
     val state by viewModel.uiState.collectAsState()
     val context = LocalContext.current
+    var showLanguageSelector by remember { mutableStateOf(false) }
 
     Box(modifier = Modifier.fillMaxSize().background(Color.Black), contentAlignment = Alignment.Center) {
         Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(16.dp)) {
@@ -55,6 +57,8 @@ fun MainMenuScreen(
                 onClick = onContinue
             )
 
+            MenuButton(stringResource(R.string.btn_language), onClick = { showLanguageSelector = true })
+
             MenuButton(stringResource(R.string.btn_exit), color = Color(0xFF4A0000), onClick = onExit)
             
             Spacer(modifier = Modifier.height(32.dp))
@@ -68,6 +72,18 @@ fun MainMenuScreen(
                     .align(Alignment.End)
                     .offset(x = (-16).dp)
                     .clickable { onDevMenu() }
+            )
+        }
+
+        if (showLanguageSelector) {
+            com.grimreich.ui.settings.LanguageSelector(
+                onDismiss = { showLanguageSelector = false },
+                onLanguageSelected = { lang ->
+                    LanguageManager.setLanguage(lang)
+                    // Trigger Activity Recreate to apply language globally
+                    (context as? Activity)?.recreate()
+                    showLanguageSelector = false
+                }
             )
         }
     }
