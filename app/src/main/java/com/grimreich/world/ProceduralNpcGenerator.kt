@@ -8,7 +8,9 @@ import javax.inject.Singleton
 import kotlin.random.Random
 
 @Singleton
-class ProceduralNpcGenerator @Inject constructor() {
+class ProceduralNpcGenerator @Inject constructor(
+    private val echoSystem: com.grimreich.core.EchoSystem
+) {
 
     fun generateForCity(cityId: String, state: GameState): List<NPC> {
         val random = Random(cityId.hashCode().toLong() + state.world.day.toLong())
@@ -18,6 +20,21 @@ class ProceduralNpcGenerator @Inject constructor() {
         val isGrim20 = worldStability < 35
 
         // 1. REGIONAL HEROES
+        // ... (existing logic)
+        
+        // --- ADD ECHO SPAWN ---
+        if (random.nextFloat() < 0.3f) {
+            echoSystem.getRandomEcho()?.let { echo ->
+                npcList.add(NPC(
+                    id = "echo_${echo.id}",
+                    name = "ECHO_${echo.name.uppercase().replace(" ", "_")}",
+                    role = "ECHO",
+                    startNodeId = "echo_start",
+                    stability = 0.1f,
+                    isInfested = true
+                ))
+            }
+        }
         if (cityId == "wybrzeze_polnocne") {
             npcList.add(NPC(
                 id = "aelion",

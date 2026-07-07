@@ -3,19 +3,20 @@ package com.grimreich.systems
 import com.grimreich.core.GameRepository
 import com.grimreich.core.GameState
 import com.grimreich.core.LootTable
+import com.grimreich.core.CombatRandomProvider
 import com.grimreich.grimreich.v1.Item
 import com.grimreich.world.ItemCatalogue
 import javax.inject.Inject
 import javax.inject.Singleton
-import kotlin.random.Random
 
 @Singleton
 class LootSystem @Inject constructor(
     private val gameRepository: GameRepository,
-    private val itemCatalogue: ItemCatalogue
+    private val itemCatalogue: ItemCatalogue,
+    private val random: CombatRandomProvider
 ) {
     fun rollLoot(chance: Float): Item? {
-        if (Random.nextFloat() > chance) return null
+        if (random.nextFloat() > chance) return null
         return itemCatalogue.all().randomOrNull()
     }
 
@@ -66,7 +67,7 @@ class LootSystem @Inject constructor(
         
         // Gold reward
         val gold = if (lootTable.goldMax > lootTable.goldMin) {
-            Random.nextInt(lootTable.goldMin, lootTable.goldMax + 1)
+            random.nextInt(lootTable.goldMin, lootTable.goldMax + 1)
         } else if (lootTable.goldMax == lootTable.goldMin && lootTable.goldMax > 0) {
             lootTable.goldMax
         } else 0
@@ -78,7 +79,7 @@ class LootSystem @Inject constructor(
 
         // Item rewards
         lootTable.itemChances.forEach { (itemId, chance) ->
-            if (Random.nextFloat() < chance) {
+            if (random.nextFloat() < chance) {
                 val item = itemCatalogue.get(itemId)
                 if (item != null) {
                     state.inventory.add(item.copy())

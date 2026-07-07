@@ -28,7 +28,9 @@ import kotlin.random.Random
 fun DialogueScreen(
     viewModel: DialogueViewModel,
     onExit: () -> Unit,
-    onMarket: () -> Unit
+    onMarket: () -> Unit,
+    onCombat: () -> Unit,
+    onRitual: () -> Unit
 ) {
     val state by viewModel.uiState.collectAsState()
     val context = LocalContext.current
@@ -139,17 +141,15 @@ fun DialogueScreen(
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         items(state.availableChoices) { (choice, isEnabled) ->
-                            DialogueChoiceBtn(choice.text, isEnabled, state.worldStability) { 
+                            DialogueChoiceBtn(
+                                text = choice.text,
+                                isEnabled = isEnabled,
+                                stability = state.worldStability,
+                                isCombat = choice.isCombatTrigger,
+                                reqAttr = choice.requiredAttributes?.keys?.firstOrNull()?.uppercase()
+                            ) {
                                 if (isEnabled) {
-                                    viewModel.choose(choice)
-                                    if (choice.targetNodeId == "end") {
-                                        // Logic fix: Only open market if it was an explicit trade choice
-                                        if (choice.text.uppercase().contains("HANDLUJ") || choice.text.uppercase().contains("RYNEK")) {
-                                            onMarket()
-                                        } else {
-                                            onExit()
-                                        }
-                                    }
+                                    viewModel.choose(choice, onExit, onCombat, onMarket, onRitual)
                                 }
                             }
                         }
@@ -161,7 +161,14 @@ fun DialogueScreen(
 }
 
 @Composable
-private fun DialogueChoiceBtn(text: String, isEnabled: Boolean = true, stability: Int = 100, onClick: () -> Unit) {
+private fun DialogueChoiceBtn(
+    text: String, 
+    isEnabled: Boolean = true, 
+    stability: Int = 100, 
+    isCombat: Boolean = false,
+    reqAttr: String? = null,
+    onClick: () -> Unit
+) {
     Surface(
         modifier = Modifier
             .fillMaxWidth()
@@ -170,7 +177,12 @@ private fun DialogueChoiceBtn(text: String, isEnabled: Boolean = true, stability
         color = if (isEnabled) Color(0xFF151515) else Color(0xFF0A0A0A),
         border = androidx.compose.foundation.BorderStroke(1.dp, if (isEnabled) Color(0xFF333333) else Color(0xFF111111))
     ) {
-        val label = if (stability < 40 && !isEnabled) "[USZKODZONE]" else if (isEnabled) "> $text" else "[ZABLOKOWANE] $text"
+        val prefix = when {
+            isCombat -> "[WALKA] "
+            reqAttr != null -> "[$reqAttr] "
+            else -> "> "
+        }
+        val label = if (stability < 40 && !isEnabled) "[USZKODZONE]" else if (isEnabled) "$prefix$text" else "[ZABLOKOWANE] $text"
         
         Text(
             text = label,

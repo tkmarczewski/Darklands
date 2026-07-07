@@ -102,6 +102,13 @@ class EncounterSystem @Inject constructor(
 
     var activeEncounter: Encounter? = null
 
+    /**
+     * Resets active encounter to null.
+     */
+    fun clearActiveEncounter() {
+        activeEncounter = null
+    }
+
     fun rollEncounter(random: Random, state: GameState): Encounter? {
         // --- FACTION RAIDS ---
         val hostileFactions = state.reputation.globalFactions.filter { it.value <= -50 }.keys
@@ -124,6 +131,7 @@ class EncounterSystem @Inject constructor(
         }
 
         if (random.nextFloat() > 0.3f) return null
+        if (encounters.isEmpty()) return null
         return encounters.random(random)
     }
 

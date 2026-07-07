@@ -33,7 +33,7 @@ class CityViewModel @Inject constructor(
                 val cityData = cityCatalogue.get(cityId)
                 
                 // FIX: Include both active AND available quests for this city
-                val quests = questEngine.getAllRelevantQuestsForCity(cityId)
+                val quests = questEngine.getAllRelevantQuestsForCity(cityId, state)
                 val generatedNpcs = npcGenerator.generateForCity(cityId, state)
 
                 val stability = state.world.globalStability

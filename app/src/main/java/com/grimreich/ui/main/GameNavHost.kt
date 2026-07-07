@@ -177,7 +177,9 @@ fun GameNavHost(
             DialogueScreen(
                 viewModel = hiltViewModel<DialogueViewModel>(),
                 onExit = { root.setMode(GameScreenMode.CITY) },
-                onMarket = { root.setMode(GameScreenMode.MARKET) }
+                onMarket = { root.setMode(GameScreenMode.MARKET) },
+                onCombat = { root.setMode(GameScreenMode.COMBAT) },
+                onRitual = { root.setMode(GameScreenMode.RITUAL) }
             )
         }
 

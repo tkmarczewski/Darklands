@@ -5,8 +5,13 @@
     "text": "Stój! Mgła gęstnieje, a prawo musi być przestrzegane. Czego szukasz w cieniu murów?",
     "choices": [
       {
-        "text": "Czy coś niepokojącego działo się ostatnio?",
+        "text": "[ZADANIE] Czy coś niepokojącego działo się ostatnio?",
         "targetNodeId": "guard_quest_check"
+      },
+      {
+        "text": "[CHARYZMA] Wyglądasz na zmęczonego. Odpocznij chwilę.",
+        "targetNodeId": "guard_relaxed",
+        "requiredAttributes": { "charisma": 12 }
       },
       {
         "text": "Tylko przechodzę.",
@@ -15,94 +20,84 @@
     ]
   },
   {
-    "id": "guard_quest_check",
+    "id": "guard_relaxed",
     "npcId": "guard",
-    "text": "Mamy problem z 'Wyrokiem'. Jeśli chcesz pomóc, weź to zlecenie.",
+    "text": "Dziękuję... rzadko kto tutaj dostrzega w nas ludzi. Jeśli chcesz pomóc, idź do Portu. Tam błąka się dezerter.",
     "choices": [
       {
-        "text": "Przyjmuję (ZADANIE: Wyrok).",
+        "text": "Sprawdzę to (ZADANIE: Dezerter).",
         "targetNodeId": "end",
         "triggerEvent": "ACTIVATE_QUEST",
-        "triggerValue": "q_verdict_1"
-      },
-      {
-        "text": "Może później.",
-        "targetNodeId": "end"
+        "triggerValue": "q_deserter"
       }
     ]
   },
   {
-    "id": "guard_report_back",
-    "npcId": "guard",
-    "text": "Dobra robota, Kotwico. Inkwizycja dziękuje za Twoją służbę. Oto zapłata.",
+    "id": "deserter_start",
+    "npcId": "deserter",
+    "text": "Nie zbliżaj się! Widziałem jak niebo mrugało... Widziałem liczby pod chmurami! Jesteśmy błędem!",
     "choices": [
       {
-        "text": "Ku chwale Zakonu.",
+        "text": "[SIŁA] Milcz i wracaj do posterunku albo zginiesz!",
+        "targetNodeId": "deserter_obey",
+        "requiredAttributes": { "strength": 14 }
+      },
+      {
+        "text": "[INTELIGENCJA] Powiedz mi o tym Szyfrze. Co dokładnie widziałeś?",
+        "targetNodeId": "deserter_truth",
+        "requiredAttributes": { "intelligence": 15 }
+      },
+      {
+        "text": "Jesteś niebezpieczny. Muszę cię uciszyć (WALKA).",
         "targetNodeId": "end",
+        "isCombatTrigger": true,
+        "triggerValue": "BANDIT"
+      }
+    ]
+  },
+  {
+    "id": "deserter_obey",
+    "npcId": "deserter",
+    "text": "Dobrze, dobrze! Nie krzycz... Wrócę. Ale wy i tak nie rozumiecie...",
+    "choices": [
+      {
+        "text": "Wracaj (ZAKOŃCZ ZADANIE).",
+        "targetNodeId": "end",
+        "triggerEvent": "COMPLETE_QUEST",
+        "triggerValue": "q_deserter"
+      }
+    ]
+  },
+  {
+    "id": "deserter_truth",
+    "npcId": "deserter",
+    "text": "Widziałem Szyfr... #000000... Wyraz 'NULL' wyryty w słońcu. Odchodzę do Miejsca Pomiędzy.",
+    "choices": [
+      {
+        "text": "Pozwól mu odejść (ZYSKAJ WIEDZĘ).",
+        "targetNodeId": "end",
+        "triggerEvent": "COMPLETE_QUEST",
+        "triggerValue": "q_deserter"
+      }
+    ]
+  },
+  {
+    "id": "echo_start",
+    "npcId": "echo",
+    "text": "...CZY MNIE PAMIĘTASZ? ...BYŁEM JEDNYM Z WAS... TERAZ JESTEM TYLKO CIENIEM W KODZIE...",
+    "choices": [
+      {
+        "text": "[MODLITWA] Pozwól mu zaznać pokoju.",
+        "targetNodeId": "end",
+        "requiredAttributes": { "piety": 14 },
         "triggerEvent": "GRANT_REPUTATION",
-        "triggerValue": "KNIGHTS:10"
-      }
-    ]
-  },
-  {
-    "id": "merchant_start",
-    "npcId": "merchant",
-    "text": "Witaj, podróżniku. Mam towary, których nie znajdziesz nigdzie indziej... za odpowiednią cenę.",
-    "choices": [
-      {
-        "text": "Pokaż mi swoje towary (RYNEK).",
-        "targetNodeId": "end"
+        "triggerValue": "ABSOLUTE:5"
       },
       {
-        "text": "Co wiesz o tym regionie?",
-        "targetNodeId": "merchant_info"
-      },
-      {
-        "text": "Czy potrzebujesz pomocy?",
-        "targetNodeId": "merchant_quest_check"
-      },
-      {
-        "text": "Do widzenia.",
-        "targetNodeId": "end"
-      }
-    ]
-  },
-  {
-    "id": "merchant_info",
-    "npcId": "merchant",
-    "text": "Ceny rosną, a stabilność spada. Mówią, że Archiwiści znowu zaczęli śnić.",
-    "choices": [
-      {
-        "text": "Interesujące.",
-        "targetNodeId": "merchant_start"
-      }
-    ]
-  },
-  {
-    "id": "merchant_quest_check",
-    "npcId": "merchant",
-    "text": "Archiwiści potrzebują rzadkich ziół z mgły. To niebezpieczna robota, ale dobrze płatna.",
-    "choices": [
-      {
-        "text": "Przyjmuję zlecenie (Żniwa Mgły).",
+        "text": "Znikaj, maro! (WALKA).",
         "targetNodeId": "end",
-        "triggerEvent": "ACTIVATE_QUEST",
-        "triggerValue": "q_coast_harvest"
-      },
-      {
-        "text": "Może później.",
-        "targetNodeId": "end"
-      }
-    ]
-  },
-  {
-    "id": "merchant_report_back",
-    "npcId": "merchant",
-    "text": "Dobra robota. Zioła dotarły całe. Możemy zamknąć sprawę. Oto Twoje złoto.",
-    "choices": [
-      {
-        "text": "W porządku.",
-        "targetNodeId": "end"
+        "isCombatTrigger": true,
+        "triggerValue": "RAUBRITTER_KNIGHT"
       }
     ]
   },
@@ -112,11 +107,12 @@
     "text": "Kotwico... Twoja obecność tutaj jest jak pęknięcie na tafli jeziora. Czy wiesz, że ten świat jest tylko snem Sędziów?",
     "choices": [
       {
-        "text": "Nie rozumiem.",
-        "targetNodeId": "aelion_meta"
+        "text": "[INTELIGENCJA] Jeśli to sen, kto nas śni?",
+        "targetNodeId": "aelion_meta",
+        "requiredAttributes": { "intelligence": 16 }
       },
       {
-        "text": "Szukam sposobu na stabilizację Mgły.",
+        "text": "Szukam relikwii.",
         "targetNodeId": "aelion_quest"
       },
       {
@@ -128,93 +124,110 @@
   {
     "id": "aelion_meta",
     "npcId": "aelion",
-    "text": "Gdy stabilność spadnie do zera, szyfr zostanie ujawniony. Wtedy zobaczymy surowy kod naszego przeznaczenia.",
+    "text": "Śnią nas Skrybowie Absolutni. Każdy twój krok, każda walka, to tylko linia w ich Kronice. Czy czujesz, jak stabilność świata drży, gdy o tym mówię?",
     "choices": [
       {
-        "text": "Jak to możliwe?",
-        "targetNodeId": "aelion_start"
+        "text": "To przerażające.",
+        "targetNodeId": "aelion_meta_end"
+      },
+      {
+        "text": "Nie wierzę w to.",
+        "targetNodeId": "end"
+      }
+    ]
+  },
+  {
+    "id": "aelion_meta_end",
+    "npcId": "aelion",
+    "text": "Strach jest tylko reakcją na prawdę. Szukaj Kotwicy, ona utrzyma ten sen w ryzach... jeszcze przez chwilę.",
+    "choices": [
+      {
+        "text": "Będę pamiętać.",
+        "targetNodeId": "end"
       }
     ]
   },
   {
     "id": "aelion_quest",
     "npcId": "aelion",
-    "text": "Aby ocalić GrimReich, musisz odnaleźć pozostałe relikwie. Zacznij od Wybrzeża Północnego.",
+    "text": "Relikwie są fragmentami poprzednich snów. Jeśli chcesz pomóc w stabilizacji, musisz odnaleźć Kotwicę Północy. Strażnik przy bramie wie więcej o pęknięciach w okolicy.",
     "choices": [
       {
-        "text": "Zrobię to.",
+        "text": "Pójdę do Strażnika.",
         "targetNodeId": "end"
       }
     ]
   },
   {
-    "id": "mira_start",
-    "npcId": "mira",
-    "text": "Lustra nie kłamią, podróżniku. Widzę w Twoim odbiciu wiele wersji GrimReich. Która z nich jest prawdziwa?",
+    "id": "guard_start",
+    "npcId": "guard",
+    "text": "Stój! Mgła gęstnieje, a prawo musi być przestrzegane. Czego szukasz w cieniu murów?",
     "choices": [
       {
-        "text": "Wszystkie są prawdziwe.",
-        "targetNodeId": "mira_wisdom"
+        "text": "[ZADANIE] Czy coś niepokojącego działo się ostatnio?",
+        "targetNodeId": "guard_quest_check"
       },
       {
-        "text": "Żadna nie jest prawdziwa.",
-        "targetNodeId": "mira_wisdom"
+        "text": "[CHARYZMA] Wyglądasz na zmęczonego. Odpocznij chwilę.",
+        "targetNodeId": "guard_relaxed",
+        "requiredAttributes": { "charisma": 12 }
       },
       {
-        "text": "Potrzebuję Twojej wiedzy.",
-        "targetNodeId": "mira_quest_check"
-      },
-      {
-        "text": "To nie ma znaczenia.",
+        "text": "Tylko przechodzę.",
         "targetNodeId": "end"
       }
     ]
   },
   {
-    "id": "mira_wisdom",
-    "npcId": "mira",
-    "text": "Słusznie. Prawda jest jedynie sumą wszystkich echa. Jeśli chcesz wiedzieć więcej, przynieś mi Esencję Odbicia.",
+    "id": "guard_quest_check",
+    "npcId": "guard",
+    "text": "Mgła wypluwa potwory... Inkwizycja szuka ochotników do wyeliminowania pewnego kultysty. Jesteś zainteresowany?",
     "choices": [
       {
-        "text": "Będę pamiętał.",
-        "targetNodeId": "end"
-      }
-    ]
-  },
-  {
-    "id": "mira_quest_check",
-    "npcId": "mira",
-    "text": "Kronika została naruszona. Widzę w niej cienie, które nie powinny tam być. Pomożesz mi zbadać to?",
-    "choices": [
-      {
-        "text": "Przyjmuję zadanie Cieni.",
+        "text": "Tak, pomogę (PRZYJMIJ: Wyrok Inkwizycji).",
         "targetNodeId": "end",
-        "triggerEvent": "ACTIVATE_QUEST_CHAIN"
+        "triggerEvent": "ACTIVATE_QUEST",
+        "triggerValue": "q_verdict_1"
       },
       {
-        "text": "Nie teraz.",
+        "text": "Może innym razem.",
         "targetNodeId": "end"
       }
     ]
   },
   {
-    "id": "mira_report_back",
-    "npcId": "mira",
-    "text": "Dobrze. Zamknijmy ten rozdział i zobaczmy, co odsłoni następny.",
+    "id": "merchant_start",
+    "npcId": "merchant",
+    "text": "Witaj, wędrowcze! Mam towary z całego Boreas, o ile masz złoto. Albo może szukasz pracy? Mgła utrudnia zbiory.",
     "choices": [
       {
-        "text": "Jestem gotów.",
+        "text": "Pokaż mi swoje towary.",
+        "targetNodeId": "end",
+        "triggerEvent": "OPEN_MARKET"
+      },
+      {
+        "text": "[ZADANIE] O jakich zbiorach mówisz?",
+        "targetNodeId": "merchant_quest_check"
+      },
+      {
+        "text": "Tylko się rozglądam.",
         "targetNodeId": "end"
       }
     ]
   },
   {
-    "id": "quest_report_back_generic",
-    "npcId": "npc",
-    "text": "Widzę, że zadanie zostało wykonane. Dziękuję za pomoc.",
+    "id": "merchant_quest_check",
+    "npcId": "merchant",
+    "text": "Archiwiści potrzebują rzadkich ziół z mgły. Płacę dobrze, jeśli przyniesiesz mi ich wystarczająco dużo.",
     "choices": [
       {
-        "text": "Nie ma za co.",
+        "text": "Zajmę się tym (PRZYJMIJ: Żniwa Mgły).",
+        "targetNodeId": "end",
+        "triggerEvent": "ACTIVATE_QUEST",
+        "triggerValue": "q_coast_harvest"
+      },
+      {
+        "text": "Nie mam na to czasu.",
         "targetNodeId": "end"
       }
     ]

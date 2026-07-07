@@ -33,12 +33,12 @@ class DialogueManager @Inject constructor(
             val loaded: List<DialogueNode> = gson.fromJson(json, type)
             loaded.forEach { registerNode(it) }
         } catch (e: Exception) {
-            android.util.Log.e("DialogueManager", "Failed to load dialogues from $path: ${e.message}")
+            android.util.Log.e("DialogueManager", "Error loading dialogues: ${e.message}")
         }
     }
 
-    fun isDialogueActive(): Boolean = activeDialogueId != null
-    fun currentDialogueId(): String? = activeDialogueId
+    fun isDialogueActive() = activeDialogueId != null
+    fun currentDialogueId() = activeDialogueId
     fun endDialogue() { activeDialogueId = null }
 
     fun registerNode(node: DialogueNode) {
@@ -46,37 +46,38 @@ class DialogueManager @Inject constructor(
     }
 
     fun getNode(id: String): DialogueNode? {
-        val node = nodes[id] ?: return null
-        val state = gameRepositoryProvider.get().currentState()
+        if (id == "end") return null
         
-        // Dynamic text processing (e.g. glitches based on world state)
-        val stability = state.world.globalStability
-        return if (stability < 30) applyWorldEffects(node, stability) else node
+        // FIX: Ensure pilot nodes are loaded if not present
+        if (nodes.isEmpty()) {
+            loadNodesFromAsset("grimreich/dialogues_pilot.json")
+        }
+        
+        return nodes[id]
     }
 
-    fun hasNode(id: String): Boolean = nodes.containsKey(id)
+    fun hasNode(id: String) = nodes.containsKey(id)
 
     fun listMissingTargets(): List<String> {
-        return nodes.values.flatMap { it.choices }
-            .map { it.targetNodeId }
-            .filter { it != "end" && !nodes.containsKey(it) }
+        val missing = mutableListOf<String>()
+        nodes.values.forEach { node ->
+            node.choices.forEach { choice ->
+                if (choice.targetNodeId != "end" && !nodes.containsKey(choice.targetNodeId)) {
+                    missing.add(choice.targetNodeId)
+                }
+            }
+        }
+        return missing
     }
 
     fun makeChoice(choice: DialogueChoice): DialogueNode? {
-        gameRepositoryProvider.get().updateState { state ->
-            // Execute hardcoded callback (if any)
-            choice.onSelect?.invoke(state)
-            
-            // Execute data-driven triggers from JSON
-            handleTrigger(state, choice.triggerEvent, choice.triggerValue)
-        }
-
+        val state = gameRepositoryProvider.get().currentState()
+        handleTrigger(state, choice.triggerEvent, choice.triggerValue)
+        
         if (choice.targetNodeId == "end") {
-            endDialogue()
+            activeDialogueId = null
             return null
         }
-        
-        activeDialogueId = choice.targetNodeId
         return getNode(choice.targetNodeId)
     }
 
@@ -88,12 +89,31 @@ class DialogueManager @Inject constructor(
                 value?.let { engine.activateQuestDirect(state, it) }
                 state.pendingQuestId = null
             }
+            "ADVANCE_QUEST" -> {
+                value?.let { engine.advanceStepDirect(state, it) }
+            }
+            "FAIL_QUEST" -> {
+                value?.let { engine.failQuestDirect(state, it) }
+            }
+            "COMPLETE_QUEST" -> {
+                value?.let { engine.completeQuestDirect(state, it) }
+            }
             "GRANT_REPUTATION" -> {
                 val parts = value?.split(":") ?: return
                 if (parts.size == 2) {
                     val faction = parts[0]
                     val amount = parts[1].toIntOrNull() ?: 0
                     state.reputation.globalFactions[faction] = (state.reputation.globalFactions[faction] ?: 0) + amount
+                }
+            }
+            "GIVE_ITEM" -> {
+                value?.let { itemId ->
+                    val repo = gameRepositoryProvider.get()
+                    val item = repo.itemCatalogue.get(itemId)
+                    if (item != null) {
+                        state.inventory.add(item.copy())
+                        state.logEntries.add("Otrzymano przedmiot: ${item.name}")
+                    }
                 }
             }
             "ACTIVATE_QUEST_CHAIN" -> {
@@ -109,42 +129,44 @@ class DialogueManager @Inject constructor(
         }
     }
 
-    fun getPortrait(npcId: String): String {
-        return when (npcId) {
-            "guard" -> "port_guard"
-            "merchant" -> "port_merchant"
-            "aelion" -> "port_aelion"
-            "mira" -> "port_mira"
-            "mystic" -> "port_mystic"
-            else -> "port_knight"
+    fun getPortrait(role: String): String {
+        return when (role.uppercase()) {
+            "GUARD" -> "port_guard"
+            "MERCHANT" -> "port_merchant"
+            "AELION" -> "port_aelion"
+            "MIRA" -> "port_mira"
+            "ECHO" -> "port_wraith"
+            else -> "port_peasant"
         }
     }
 
-    private fun applyWorldEffects(node: DialogueNode, stability: Int): DialogueNode {
-        // Use a deterministic seed based on node ID and current stability
-        val seed = node.id.hashCode().toLong() + stability
-        val glitchedText = glitchText(node.text, seed)
-        return node.copy(text = glitchedText)
+    fun applyWorldEffects(node: DialogueNode, stability: Int): DialogueNode {
+        if (stability > 40) return node
+        
+        val seed = node.id.hashCode().toLong()
+        return node.copy(
+            text = glitchText(node.text, seed)
+        )
     }
 
-    private fun glitchText(text: String, seed: Long): String {
-        val rng = Random(seed)
-        val chars = text.toCharArray()
-        val glitchChars = "ØΣΠΞΩλμ"
-        val glitchCount = (text.length * 0.1).toInt()
-        
-        repeat(glitchCount) {
-            val idx = rng.nextInt(chars.size)
-            if (!chars[idx].isWhitespace()) {
-                chars[idx] = glitchChars[rng.nextInt(glitchChars.length)]
+    fun glitchText(input: String, seed: Long): String {
+        val rand = Random(seed)
+        val sb = StringBuilder()
+        input.forEach { c ->
+            if (c == ' ') {
+                sb.append(' ')
+            } else if (rand.nextFloat() < 0.15f) {
+                val glitches = listOf('#', '@', '$', '%', '&', '0', '1', 'X')
+                sb.append(glitches.random(rand))
+            } else {
+                sb.append(c)
             }
         }
-        return String(chars)
+        return sb.toString()
     }
 
     fun seedBasicDialogues() {
-        if (nodes.isNotEmpty()) return
-        // Load external dialogues (Pilot)
+        nodes.clear()
         loadNodesFromAsset("grimreich/dialogues_pilot.json")
     }
 }

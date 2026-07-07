@@ -25,13 +25,17 @@ class CombatSystem @Inject constructor(
         val hero = state.party.find { it.id == state.activeHeroId } 
             ?: state.party.firstOrNull { !it.isDead }
             ?: return null
+        
+        // FIX (BUG-1): Use HP from CombatState if available, otherwise from Hero
+        val hp = if (state.combat.active && state.combat.heroHp > 0) state.combat.heroHp else hero.hp
+
         return CombatantState(
             name = hero.name,
-            hp = hero.hp,
+            hp = hp,
             maxHp = hero.maxHp,
             endurance = state.combat.heroStamina,
             morale = hero.morale,
-            armor = hero.effectiveArmor(state.inventory),
+            armor = hero.effectiveArmor(state.inventory) + state.combat.heroArmorBonus, // FIX (BUG-2): Apply bonus
             attackBase = hero.effectiveAttack(state.inventory),
             strength = hero.strength,
             agility = hero.agility,
@@ -48,15 +52,20 @@ class CombatSystem @Inject constructor(
         onCombatEnd = onEnd
         
         gameRepository.updateState { state ->
+            val hero = state.party.find { it.id == state.activeHeroId } ?: state.party.firstOrNull { !it.isDead }
+            
             state.combat.active = true
             state.combat.round = 1
             state.combat.enemyName = enemy.name
+            state.combat.enemyType = enemy.type.name // FIX (BUG-11): Save type
             state.combat.enemyHp = enemy.stats.maxHp
             state.combat.enemyMaxHp = enemy.stats.maxHp
             state.combat.enemyAttack = enemy.stats.attack
             state.combat.enemyDefense = enemy.stats.defense
             state.combat.enemyStamina = 10
             state.combat.heroStamina = 10
+            state.combat.heroArmorBonus = 0 // Reset
+            state.combat.heroHp = hero?.hp ?: 40 // FIX (BUG-1)
             state.combat.log.clear()
             state.combat.log.add("Początek walki z ${enemy.name}!")
         }
@@ -75,6 +84,10 @@ class CombatSystem @Inject constructor(
             if (item.effects.containsKey("heal")) {
                 val heal = item.effects["heal"] ?: 0
                 hero.hp = (hero.hp + heal).coerceAtMost(hero.maxHp)
+                // If in combat, sync to combat state too
+                if (state.combat.active) {
+                    state.combat.heroHp = hero.hp
+                }
                 state.inventory.remove(item)
                 msg = "Użyto ${item.name}: +$heal HP."
                 state.combat.log.add(msg)
@@ -101,7 +114,13 @@ class CombatSystem @Inject constructor(
 
         // AUDIT RECOVERY: Re-initialize enemy if lost on process death
         if (currentEnemy == null && gameRepository.currentState().combat.active) {
-            currentEnemy = Bestiary.get(EnemyType.BANDIT)
+            val savedTypeStr = gameRepository.currentState().combat.enemyType
+            val type = try { 
+                if (savedTypeStr != null) EnemyType.valueOf(savedTypeStr) else EnemyType.BANDIT 
+            } catch (e: Exception) { 
+                EnemyType.BANDIT 
+            }
+            currentEnemy = Bestiary.get(type)
         }
 
         gameRepository.updateState { state ->
@@ -123,13 +142,20 @@ class CombatSystem @Inject constructor(
                 activeEffects = c.enemyEffects.toMutableList()
             )
 
+            // FIX (BUG-3): Increment round BEFORE generating result label
+            c.round++
+            result = "Runda ${c.round}"
+
             val roundResult = when {
                 action.startsWith("SKILL:") -> {
                     val skillId = action.substringAfter("SKILL:")
                     combatRound.resolveRound(heroCombatant, enemyCombatant, skillId)
                 }
                 action == "DEFEND" -> {
+                    // FIX (BUG-2): Persist armor bonus
+                    c.heroArmorBonus += 5
                     heroCombatant.armor += 5
+                    // Hero defends, so enemy attacks
                     combatRound.resolveRound(enemyCombatant, heroCombatant)
                 }
                 else -> combatRound.resolveRound(heroCombatant, enemyCombatant)
@@ -139,8 +165,9 @@ class CombatSystem @Inject constructor(
             c.enemyHp = enemyCombatant.hp
             c.enemyStamina = enemyCombatant.endurance
             c.heroStamina = heroCombatant.endurance
+            c.heroHp = heroCombatant.hp // FIX (BUG-1)
             
-            // Sync back hero HP and morale
+            // Sync back hero HP and morale to persistent Hero object
             state.party.find { it.id == state.activeHeroId }?.let { h ->
                 h.hp = heroCombatant.hp
                 h.morale = heroCombatant.morale
@@ -151,13 +178,10 @@ class CombatSystem @Inject constructor(
                 pendingCombatEndCallback = onCombatEnd
                 c.log.add("${c.enemyName} pokonany!")
                 
-                // --- REWARDS sequence (Final Technical Polish) ---
                 currentEnemy?.let { enemyDef ->
-                    // Grant XP to all living party members
                     val xpMsgs = experienceSystem.addPartyXpDirect(state, enemyDef.xpReward)
                     xpMsgs.forEach { c.log.add(it) }
                     
-                    // Award loot using centralized LootSystem
                     val lootMsgs = lootSystem.awardLootFromTableDirect(state, enemyDef.lootTable)
                     lootMsgs.forEach { c.log.add(it) }
                 }
@@ -165,6 +189,7 @@ class CombatSystem @Inject constructor(
 
                 state.pendingQuestId?.let { pending ->
                     questEngine.advanceStepDirect(state, pending)
+                    state.pendingQuestId = null // FIX (BUG-7)
                 }
             } else if (heroCombatant.hp <= 0) {
                 c.active = false
@@ -172,9 +197,6 @@ class CombatSystem @Inject constructor(
                 state.party.find { it.id == state.activeHeroId }?.isDead = true
                 pendingCombatEndCallback = onCombatEnd
             }
-            
-            c.round++
-            result = "Runda ${c.round}"
         }
 
         // Invoke callback OUTSIDE synchronized block

@@ -93,6 +93,7 @@ data class DialogueChoice(
     val requiredSkills: Map<String, Int> = emptyMap(),
     val triggerEvent: String? = null,
     val triggerValue: String? = null,
+    val isCombatTrigger: Boolean = false,
     @Transient val onSelect: ((GameState) -> Unit)? = {}
 )
 

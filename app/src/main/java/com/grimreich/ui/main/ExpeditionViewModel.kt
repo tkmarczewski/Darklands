@@ -129,7 +129,7 @@ class ExpeditionViewModel @Inject constructor(
                 _uiState.update { it.copy(encounterLog = "Rozpoczyna się starcie: ${parts[1]}!", activeEncounter = null) }
             }
         } else {
-            encounterSystem.activeEncounter = null
+            encounterSystem.clearActiveEncounter()
             _uiState.update { it.copy(encounterLog = msg, activeEncounter = null) }
         }
     }

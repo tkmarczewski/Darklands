@@ -1,72 +1,81 @@
 package com.grimreich.systems
 
+import android.content.Context
 import com.grimreich.core.GameRepository
 import com.grimreich.core.Hero
+import com.grimreich.core.EchoSystem
+import com.grimreich.world.HeroPool
+import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class RitualSystem @Inject constructor(
-    private val gameRepository: GameRepository
+    private val gameRepository: GameRepository,
+    private val echoSystem: EchoSystem,
+    private val heroPool: HeroPool,
+    @ApplicationContext private val context: Context
 ) {
-    private val REVIVAL_STABILITY_DRAIN = 15
-    private val REVIVAL_CORRUPTION_GAIN = 20
-    private val REVIVAL_SANITY_LOSS = 15
-
-    /**
-     * Sprawdza czy mozna wykonac resurrekcje dla danego bohatera.
-     * Przyjmuje Hero jako parametr zamiast czytac currentState() wewnatrz,
-     * co pozwala na uzycie wewnatrz updateState{} na tej samej kopii stanu.
-     */
-    fun canPerformResurrection(hero: Hero, globalStability: Int): Boolean {
-        return hero.isDead && globalStability > REVIVAL_STABILITY_DRAIN
+    companion object {
+        const val REVIVAL_STABILITY_DRAIN = 15
+        const val REVIVAL_CORRUPTION_GAIN = 10
+        const val REVIVAL_SANITY_LOSS = 20
     }
 
-    /**
-     * Wykonuje resurrekcje bohatera.
-     *
-     * FIX 1 (TOCTOU): Poprzednia implementacja sprawdzala canPerformResurrection()
-     * na currentState() PRZED updateState{}, a mutacje wykonywala na deepCopy.
-     * Dwie rownoczesne korutyny mogly przejsc walidacje (oba widzia stabilnosc > drain),
-     * a potem obie odjac REVIVAL_STABILITY_DRAIN, powodujac podwojne odejscie stability.
-     * Fix: walidacja i mutacja na tej samej kopii wewnatrz updateState{}.
-     *
-     * FIX 2 (double-persist): updateState(shouldPersist=true) juz persystuje.
-     * Dodatkowe persistCurrentState() po nim bylo redundantne.
-     * Fix: usunieto zbedne persistCurrentState().
-     */
+    fun canPerformResurrection(hero: Hero, gold: Int): Boolean {
+        return hero.isDead && gold >= 50
+    }
+
     fun performResurrection(heroId: String): Boolean {
         var success = false
-        gameRepository.updateState { s ->
-            val h = s.party.find { it.id == heroId } ?: return@updateState
-            // FIX: walidacja na tej samej kopii co mutacja - brak TOCTOU
-            if (!canPerformResurrection(h, s.world.globalStability)) return@updateState
-
-            s.world.globalStability = (s.world.globalStability - REVIVAL_STABILITY_DRAIN).coerceAtLeast(0)
-            h.isDead = false
-            h.hp = h.maxHp / 2
-            h.corruption = (h.corruption + REVIVAL_CORRUPTION_GAIN).coerceAtMost(100)
-            h.sanity = (h.sanity - REVIVAL_SANITY_LOSS).coerceAtLeast(0)
-            s.logEntries.add("Rytual Echa powioddl sie. ${h.name} powraca z Otchlani, lecz fundamenty swiata drza.")
-            success = true
+        gameRepository.updateState { state ->
+            val hero = state.party.find { it.id == heroId }
+            if (hero != null && hero.isDead && state.gold >= 50) {
+                state.gold -= 50
+                hero.isDead = false
+                hero.hp = hero.maxHp / 2
+                hero.corruption += REVIVAL_CORRUPTION_GAIN
+                hero.sanity -= REVIVAL_SANITY_LOSS
+                
+                state.world.globalStability -= REVIVAL_STABILITY_DRAIN
+                state.logEntries.add("Wskrzeszono ${hero.name}. Rzeczywistość drży...")
+                success = true
+            }
         }
-        // FIX: brak persistCurrentState() - updateState domyslnie persystuje (shouldPersist=true)
         return success
     }
 
     /**
-     * Poswiecenie bohatera.
-     *
-     * FIX (double-persist): usunieto redundantne persistCurrentState() po updateState.
+     * Permanent death choice. Records the hero as an Echo and replaces them.
      */
     fun sacrificeHero(heroId: String) {
-        gameRepository.updateState { s ->
-            s.party.removeIf { it.id == heroId }
-            s.logEntries.add("Pozwolono odejsc duszy bohatera. Niech Absolut go prowadzi.")
-            if (s.activeHeroId == heroId) {
-                s.activeHeroId = s.party.firstOrNull()?.id
+        gameRepository.updateState { state ->
+            val heroIndex = state.party.indexOfFirst { it.id == heroId }
+            if (heroIndex != -1) {
+                val hero = state.party[heroIndex]
+                
+                // Record in EchoSystem
+                echoSystem.recordHero(hero, context)
+                
+                // Remove from party
+                state.party.removeAt(heroIndex)
+                
+                state.logEntries.add("Pozwolono odejść ${hero.name}. Ich dusza błąka się w pustce.")
+                
+                // Add replacement if party is empty or too small
+                if (state.party.isEmpty() || state.party.size < 3) {
+                    val newHero = heroPool.generateHero()
+                    state.party.add(newHero)
+                    state.logEntries.add("Nowy wędrowiec dołączył do drużyny: ${newHero.name}")
+                }
+                
+                // Ensure activeHeroId is valid
+                if (state.activeHeroId == heroId) {
+                    state.activeHeroId = state.party.firstOrNull()?.id
+                }
+                
+                state.world.globalStability += 5 // Peace brings some stability
             }
         }
-        // FIX: brak persistCurrentState() - updateState domyslnie persystuje
     }
 }

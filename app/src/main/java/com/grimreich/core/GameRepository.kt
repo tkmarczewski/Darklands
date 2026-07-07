@@ -8,13 +8,12 @@ import com.grimreich.systems.StatePersistenceManager
 import com.grimreich.world.CityCatalogue
 import com.grimreich.world.ItemCatalogue
 import dagger.Lazy
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -23,11 +22,13 @@ class GameRepository @Inject constructor(
     private val questEngineProvider: Lazy<QuestEngine>,
     private val dialogueManagerProvider: Lazy<DialogueManager>,
     private val questManifestProvider: Lazy<QuestManifest>,
-    private val persistence: StatePersistenceManager,
-    private val cityCatalogue: CityCatalogue,
-    private val itemCatalogue: ItemCatalogue,
+    val persistence: StatePersistenceManager,
+    val cityCatalogue: CityCatalogue,
+    val itemCatalogue: ItemCatalogue,
 ) {
     private val repositoryScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+    private val saveMutex = Mutex() // FIX (BUG-14): Prevent simultaneous writes
+
     private val questEngine get() = questEngineProvider.get()
     private val dialogueManager get() = dialogueManagerProvider.get()
     private val questManifest get() = questManifestProvider.get()
@@ -35,13 +36,8 @@ class GameRepository @Inject constructor(
     private val _gameState = MutableStateFlow(GameState())
     val gameState: StateFlow<GameState> = _gameState.asStateFlow()
 
-    // FIX (Performance): Separate log flow to avoid full GameState cloning on every message
     private val _gameLogs = MutableStateFlow<List<String>>(emptyList())
     val gameLogs: StateFlow<List<String>> = _gameLogs.asStateFlow()
-
-    init {
-        // sync() removed to break circular dependency
-    }
 
     fun currentState(): GameState = _gameState.value
 
@@ -56,25 +52,36 @@ class GameRepository @Inject constructor(
             transform(mutable)
             mutable.normalizeState()
             _gameState.value = mutable
+            
+            // Sync internal logs flow if logs were changed inside transform
+            if (mutable.logEntries.isNotEmpty()) {
+                _gameLogs.value = mutable.logEntries.toList()
+            }
+
             if (shouldPersist) {
                 persistCurrentState()
             }
         }
     }
 
+    /**
+     * Unified logging. FIX (BUG-4, BUG-9): Synchronized and consistent.
+     */
     fun log(message: String) {
-        // Optimized: Update the dedicated log stream instead of cloning GameState
-        val current = _gameLogs.value.toMutableList()
-        current.add(message)
-        if (current.size > GameConstants.MAX_LOG_ENTRIES) {
-            current.removeAt(0)
+        synchronized(this) {
+            // Update Flow for UI
+            val current = _gameLogs.value.toMutableList()
+            current.add(message)
+            if (current.size > GameConstants.MAX_LOG_ENTRIES) {
+                current.removeAt(0)
+            }
+            _gameLogs.value = current
+            
+            // Update State for persistence
+            _gameState.value.logEntries.clear()
+            _gameState.value.logEntries.addAll(current)
+            _gameState.value.trimLogs()
         }
-        _gameLogs.value = current
-        
-        // Also keep GameState in sync lazily for persistence, 
-        // but avoid immediate persistCurrentState() here.
-        _gameState.value.logEntries.add(message)
-        _gameState.value.trimLogs()
     }
 
     fun sync() {
@@ -83,7 +90,6 @@ class GameRepository @Inject constructor(
         dialogueManager.seedBasicDialogues()
         questManifest.seed()
         
-        // Load pilot bestiary data
         try {
             val jsonString = persistence.assets().open("grimreich/bestiary_pilot.json").bufferedReader().use { it.readText() }
             val type = object : com.google.gson.reflect.TypeToken<List<Enemy>>() {}.type
@@ -98,21 +104,9 @@ class GameRepository @Inject constructor(
         val restored = persistence.restore()
         if (restored != null) {
             if (restored.version < 3) {
-                // FIX (BUG-2a): Use clearSessionOnly() instead of clear().
-                // The old code called persistence.clear() here which deleted BOTH
-                // current_session.json AND save_slots.json. This meant that whenever
-                // a player had an outdated session (version < 3) the entire slots file
-                // was nuked, losing all manual saves.
-                // clearSessionOnly() deletes only the stale session file, preserving slots.
                 persistence.clearSessionOnly()
                 return false
             }
-            // FIX (BUG-2b): SaveSystem.restoreFromPersistence was previously called
-            // BEFORE the null-check on `restored`. When restored == null the code then
-            // called persistence.clear(), wiping slots even though they had just been
-            // loaded into memory (SaveSystem.importSlots). The in-memory slots survived,
-            // but the file was gone so they would be lost on next process death.
-            // Now slots are only restored when a valid session is present.
             SaveSystem.restoreFromPersistence(persistence)
             val domain = restored.toDomain()
             _gameState.value = domain
@@ -120,8 +114,6 @@ class GameRepository @Inject constructor(
             sync()
             return true
         }
-        // No session file present - do NOT clear anything.
-        // The player may have valid manual save slots even without an active session.
         return false
     }
 
@@ -131,12 +123,16 @@ class GameRepository @Inject constructor(
             it.grimMutationPhase = it.grimEngine.mutationPhase
         }
         repositoryScope.launch {
-            try {
-                val dto = stateSnapshot.toDto()
-                persistence.persist(dto)
-                SaveSystem.saveToPersistence(persistence)
-            } catch (e: Exception) {
-                log("[Persistence] Save failed: ${e.message ?: "unknown error"}")
+            // FIX (BUG-14): Sequential saving via Mutex
+            saveMutex.withLock {
+                try {
+                    val dto = stateSnapshot.toDto()
+                    persistence.persist(dto)
+                    SaveSystem.saveToPersistence(persistence)
+                } catch (e: Exception) {
+                    // Avoid recursive log call if log fails persistence
+                    android.util.Log.e("GameRepository", "Save failed", e)
+                }
             }
         }
     }
@@ -152,5 +148,6 @@ class GameRepository @Inject constructor(
     fun clearSessionAndReset() {
         persistence.clear()
         _gameState.value = GameState()
+        _gameLogs.value = emptyList()
     }
 }

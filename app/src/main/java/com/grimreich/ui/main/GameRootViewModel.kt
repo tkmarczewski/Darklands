@@ -68,6 +68,7 @@ class GameRootViewModel @Inject constructor(
     }
 
     fun startNewGame() {
+        gameRepository.clearSessionAndReset()
         setMode(GameScreenMode.PLAYER_IDENTITY)
     }
 
@@ -129,7 +130,7 @@ class GameRootViewModel @Inject constructor(
         _inspectedHeroId.value = heroId
         if (hero != null && hero.isDead) {
             setMode(GameScreenMode.RITUAL)
-        } else {
+        } else if (hero != null) {
             setMode(GameScreenMode.CHAR_DETAIL)
         }
     }

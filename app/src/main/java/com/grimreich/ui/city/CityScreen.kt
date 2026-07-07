@@ -19,6 +19,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.grimreich.systems.QuestCategory
 import com.grimreich.ui.effects.glitchEffect
 import com.grimreich.systems.QuestDefinition
 
@@ -160,17 +161,55 @@ fun CityScreen(
                             Text("Brak aktywnych zadań dla tej lokacji.", color = Color.Gray, fontSize = 14.sp)
                         }
                     } else {
-                        LazyColumn(modifier = Modifier.heightIn(max = 300.dp)) {
+                        LazyColumn(modifier = Modifier.heightIn(max = 400.dp)) {
                             items(state.activeLocalQuests) { quest ->
+                                val color = when(quest.category) {
+                                    QuestCategory.COMBAT -> Color(0xFFB22222)
+                                    QuestCategory.SOCIAL -> Color(0xFF4682B4)
+                                    QuestCategory.INVESTIGATION -> Color(0xFFDAA520)
+                                    QuestCategory.MIXED -> Color(0xFF9932CC)
+                                }
+                                val icon = when(quest.category) {
+                                    QuestCategory.COMBAT -> "⚔️"
+                                    QuestCategory.SOCIAL -> "💬"
+                                    QuestCategory.INVESTIGATION -> "🔍"
+                                    QuestCategory.MIXED -> "💠"
+                                }
+
                                 Surface(
-                                    modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp).clickable { 
-                                        viewModel.selectQuestAndOpenDialogue(quest, onDialogue)
-                                    },
-                                    color = Color(0xFF111111),
-                                    border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFF222222))
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(vertical = 4.dp)
+                                        .clickable { 
+                                            viewModel.selectQuestAndOpenDialogue(quest, onDialogue)
+                                        },
+                                    color = Color(0xFF0F0F0F),
+                                    shape = MaterialTheme.shapes.extraSmall,
+                                    border = androidx.compose.foundation.BorderStroke(1.dp, color.copy(alpha = 0.3f))
                                 ) {
                                     Column(modifier = Modifier.padding(12.dp)) {
-                                        Text(quest.title, color = Color.White, fontWeight = FontWeight.Bold, fontSize = 14.sp)
+                                        Row(verticalAlignment = Alignment.CenterVertically) {
+                                            Text(icon, fontSize = 18.sp, modifier = Modifier.padding(end = 8.dp))
+                                            Text(
+                                                text = quest.title.uppercase(),
+                                                color = Color.White,
+                                                fontWeight = FontWeight.ExtraBold,
+                                                fontSize = 13.sp,
+                                                letterSpacing = 1.sp
+                                            )
+                                        }
+                                        Spacer(modifier = Modifier.height(4.dp))
+                                        Text(
+                                            text = quest.description,
+                                            color = Color.Gray,
+                                            fontSize = 10.sp,
+                                            lineHeight = 12.sp
+                                        )
+                                        Spacer(modifier = Modifier.height(8.dp))
+                                        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                                            Text("LVL: ${quest.recommendedLevel}", color = color, fontSize = 9.sp, fontWeight = FontWeight.Bold)
+                                            Text("${quest.rewardGold} G", color = Color(0xFFE0C080), fontSize = 9.sp, fontWeight = FontWeight.Bold)
+                                        }
                                     }
                                 }
                             }

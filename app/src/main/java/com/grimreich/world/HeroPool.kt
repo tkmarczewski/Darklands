@@ -5,16 +5,14 @@ import com.grimreich.core.Hero
 import java.util.UUID
 import javax.inject.Inject
 import javax.inject.Singleton
-import kotlin.random.Random
 
 /*
  * HeroPool — generator losowej puli bohaterów do rekrutacji.
- * Każde wywołanie [generatePool] zwraca 4 w pełni losowych najemników:
- * imię, wiek, profesja, 7 atrybutów, umiejętności startowe, wyposażenie.
- * HeroPool jest Singleton — generator jest jeden, ale pula jest zawsze świeża.
  */
 @Singleton
-class HeroPool @Inject constructor() {
+class HeroPool @Inject constructor(
+    private val random: com.grimreich.core.CombatRandomProvider
+) {
 
     // ── Pule losowych imion ──────────────────────────────────────────────────
     private val maleFirstNames = listOf(
@@ -135,18 +133,17 @@ class HeroPool @Inject constructor() {
         return (1..count).map { generateHero() }
     }
 
-    private fun generateHero(): Hero {
-        val rng = Random.Default
-        val career = recruitableCareers.random(rng)
-        val isFemale = rng.nextBoolean()
-        val firstName = if (isFemale) femaleFirstNames.random(rng) else maleFirstNames.random(rng)
-        val lastName = lastNames.random(rng)
+    fun generateHero(): Hero {
+        val career = recruitableCareers.random()
+        val isFemale = random.nextFloat() < 0.5f
+        val firstName = if (isFemale) femaleFirstNames.random() else maleFirstNames.random()
+        val lastName = lastNames.random()
         val name = "$firstName $lastName"
 
-        val age = (career.minAge + 4).coerceAtLeast(16) + rng.nextInt(12)
+        val age = (career.minAge + 4).coerceAtLeast(16) + random.nextInt(12)
         val ranges = statRangesFor(career)
         fun roll(key: String): Int =
-            (ranges[key] ?: StatRange(10, 3)).let { it.base + rng.nextInt(it.spread + 1) }
+            (ranges[key] ?: StatRange(10, 3)).let { it.base + random.nextInt(it.spread + 1) }
 
         val str = roll("str")
         val agi = roll("agi")
@@ -156,19 +153,16 @@ class HeroPool @Inject constructor() {
         val cha = roll("cha")
         val pie = roll("pie")
 
-        val maxHp = end * 2 + 18 + rng.nextInt(8)
-        val weapon = weaponByCareer[career]?.random(rng)
-        val armor = armorByCareer[career]?.random(rng)
+        val maxHp = end * 2 + 18 + random.nextInt(8)
+        val weapon = weaponByCareer[career]?.random()
+        val armor = armorByCareer[career]?.random()
 
         val skills = skillsByCareer[career]
-            ?.mapValues { (_, base) -> (base + rng.nextInt(11) - 5).coerceAtLeast(1) }
+            ?.mapValues { (_, base) -> (base + random.nextInt(11) - 5).coerceAtLeast(1) }
             ?.toMutableMap() ?: mutableMapOf()
 
         val portrait = portraitByCareer[career] ?: "port_knight"
 
-        // FIX: Include "accessory" slot to match the default equipment map in Hero.kt.
-        // Hero.kt default is weapon, armor, helmet, shield, accessory — missing accessory here
-        // would cause inconsistency when equipment code expects all 5 slots.
         return Hero(
             id = UUID.randomUUID().toString(),
             name = name,

@@ -57,13 +57,24 @@ class ExperienceSystem @Inject constructor(
      * @return Number of levels gained.
      */
     private fun applyXpDirect(hero: Hero, amount: Int): Int {
+        if (amount <= 0) return 0
         hero.xp += amount
         var levelsGained = 0
+        
+        // FIX: Ensure level is at least 1
+        if (hero.level < 1) hero.level = 1
+        
+        // Scaling XP requirement: level * 100
         while (hero.xp >= hero.level * 100) {
             hero.xp -= hero.level * 100
             hero.level++
+            
+            // FIX: Grant attribute points on level up (2 per level)
             hero.attributePoints += 2
+            
             levelsGained++
+            // Safety break
+            if (levelsGained > 50) break
         }
         return levelsGained
     }
