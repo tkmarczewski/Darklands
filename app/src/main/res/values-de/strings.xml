@@ -122,4 +122,27 @@
     <string name="quest_journal_completed">ABGESCHLOSSEN</string>
     <string name="quest_journal_empty_active">Keine aktiven Aufträge.</string>
     <string name="quest_journal_empty_completed">Keine abgeschlossenen Aufträge.</string>
+    <!-- Player Identity Screen -->
+    <string name="identity_title">WIE WERDEN SIE GENANNT, WANDERER?</string>
+    <string name="identity_desc">Dieser Name gehört dir, nicht dem Helden. Er wird in den Chroniken der Welt festgehalten.</string>
+    <string name="identity_hint">DEIN NAME</string>
+
+    <!-- City Screen -->
+    <string name="city_btn_exit">ZURÜCK ZUM HUB</string>
+    <string name="city_residents_label">BEWOHNER:</string>
+    <string name="city_empty_residents">Die Straßen sind leer...</string>
+    <string name="city_quest_menu_title">AUFTRAG WÄHLEN</string>
+    <string name="city_quest_menu_empty">Keine aktiven Aufträge für diesen Ort.</string>
+    <string name="city_btn_no_quests">KEINE AUFTRÄGE</string>
+    <string name="city_btn_quests_count">AUFTRÄGE (%1$d)</string>
+
+    <!-- Ending Screen -->
+    <string name="ending_title">SITZUNGSEPILOG</string>
+    <string name="ending_decision_label">DEINE ENTSCHEIDUNG, ANKER:</string>
+    <string name="ending_btn_ascend">AUFSTIEG</string>
+    <string name="ending_desc_ascend">Übernehmen Sie die Kontrolle über den Code und werden Sie ein Schreiber.</string>
+    <string name="ending_btn_reboot">NEUSTART</string>
+    <string name="ending_desc_reboot">Setzen Sie die Sitzung zurück und beginnen Sie mit größerem Bewusstsein von vorne.</string>
+    <string name="ending_btn_delete">ZERSTÖRUNG</string>
+    <string name="ending_desc_delete">Die Welt ist ein Fehler. Lass sie löschen.</string>
 </resources>

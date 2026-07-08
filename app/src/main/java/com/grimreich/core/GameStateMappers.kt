@@ -30,8 +30,9 @@ fun GameState.toDto(): SessionStateDto = SessionStateDto(
     persistentMeta = persistentMeta.toDto(),
     isExpeditionActive = isExpeditionActive,
     lastSaveTimestamp = lastSaveTimestamp,
-    grimEchoIntensity = grimEchoIntensity,
+    grimEchoIntensity = world.echoIntensity,
     grimMutationPhase = grimMutationPhase,
+    grantedRewardFlags = grantedRewardFlags.toList(),
     checksum = null
 )
 
@@ -56,8 +57,8 @@ fun SessionStateDto.toDomain(): GameState = GameState(
     prayer = prayer.toDomain(),
     world = world.toDomain(),
     combat = combat.toDomain(),
-    grimEchoIntensity = grimEchoIntensity,
-    grimMutationPhase = grimMutationPhase
+    grimMutationPhase = grimMutationPhase,
+    grantedRewardFlags = grantedRewardFlags.toMutableSet()
 ).also {
     it.knownNpcs.putAll(knownNpcs.mapValues { entry -> entry.value.map { it.toDomain() } })
     it.unlockedLoreIds.addAll(unlockedLoreIds)
@@ -68,6 +69,8 @@ fun SessionStateDto.toDomain(): GameState = GameState(
     }
     it.isExpeditionActive = isExpeditionActive
     it.lastSaveTimestamp = lastSaveTimestamp
+    it.grimEngine.echoIntensity = it.world.echoIntensity
+    it.grimEngine.mutationPhase = it.grimMutationPhase
 }
 
 fun Hero.toDto(): HeroDto = HeroDto(

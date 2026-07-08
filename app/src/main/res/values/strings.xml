@@ -122,4 +122,27 @@
     <string name="quest_journal_completed">UKOŃCZONE</string>
     <string name="quest_journal_empty_active">Brak aktywnych zadań.</string>
     <string name="quest_journal_empty_completed">Brak ukończonych zadań.</string>
+    <!-- Player Identity Screen -->
+    <string name="identity_title">JAK CIĘ ZWĄ, WĘDROWCZE?</string>
+    <string name="identity_desc">To imię należy do Ciebie, nie do bohatera. Będzie ono zapisane w Kronikach Świata.</string>
+    <string name="identity_hint">TWOJE IMIĘ</string>
+
+    <!-- City Screen -->
+    <string name="city_btn_exit">POWRÓT DO HUB</string>
+    <string name="city_residents_label">MIESZKAŃCY:</string>
+    <string name="city_empty_residents">Ulice są puste...</string>
+    <string name="city_quest_menu_title">WYBIERZ ZADANIE</string>
+    <string name="city_quest_menu_empty">Brak aktywnych zadań dla tej lokacji.</string>
+    <string name="city_btn_no_quests">BRAK ZADAŃ</string>
+    <string name="city_btn_quests_count">QUESTY (%1$d)</string>
+
+    <!-- Ending Screen -->
+    <string name="ending_title">EPILOG SESJI</string>
+    <string name="ending_decision_label">TWOJA DECYZJA, KOTWICO:</string>
+    <string name="ending_btn_ascend">ASCENDENCJA</string>
+    <string name="ending_desc_ascend">Przejmij kontrolę nad kodem i zostań Skrybą.</string>
+    <string name="ending_btn_reboot">REBOOT</string>
+    <string name="ending_desc_reboot">Zresetuj sesję i zacznij od nowa z większą świadomością.</string>
+    <string name="ending_btn_delete">DESTRUKCJA</string>
+    <string name="ending_desc_delete">Świat jest błędem. Pozwól go wymazać.</string>
 </resources>

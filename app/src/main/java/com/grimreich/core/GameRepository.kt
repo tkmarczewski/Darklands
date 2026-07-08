@@ -119,7 +119,7 @@ class GameRepository @Inject constructor(
 
     fun persistCurrentState() {
         val stateSnapshot = _gameState.value.deepCopy().also {
-            it.grimEchoIntensity = it.grimEngine.echoIntensity
+            it.world.echoIntensity = it.grimEngine.echoIntensity
             it.grimMutationPhase = it.grimEngine.mutationPhase
         }
         repositoryScope.launch {

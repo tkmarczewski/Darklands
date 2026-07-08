@@ -13,6 +13,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 
+import androidx.compose.ui.res.stringResource
+import com.grimreich.R
+import androidx.hilt.navigation.compose.hiltViewModel
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PlayerIdentityScreen(
@@ -29,14 +33,14 @@ fun PlayerIdentityScreen(
             modifier = Modifier.widthIn(max = 400.dp)
         ) {
             Text(
-                text = "JAK CIĘ ZWĄ, WĘDROWCZE?",
+                text = stringResource(R.string.identity_title),
                 color = Color(0xFFC0A060),
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Bold
             )
 
             Text(
-                text = "To imię należy do Ciebie, nie do bohatera. Będzie ono zapisane w Kronikach Świata.",
+                text = stringResource(R.string.identity_desc),
                 color = Color.Gray,
                 fontSize = 14.sp,
                 textAlign = TextAlign.Center
@@ -45,9 +49,9 @@ fun PlayerIdentityScreen(
             OutlinedTextField(
                 value = name,
                 onValueChange = { name = it },
-                label = { Text("TWOJE IMIĘ") },
+                label = { Text(stringResource(R.string.identity_hint)) },
                 modifier = Modifier.fillMaxWidth(),
-                colors = TextFieldDefaults.outlinedTextFieldColors(
+                colors = OutlinedTextFieldDefaults.colors(
                     focusedTextColor = Color.White,
                     unfocusedTextColor = Color.White,
                     focusedBorderColor = Color(0xFFC0A060),
@@ -63,11 +67,11 @@ fun PlayerIdentityScreen(
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4A0000)),
                 shape = MaterialTheme.shapes.extraSmall
             ) {
-                Text("DALEJ", color = Color.White, fontWeight = FontWeight.Bold)
+                Text(stringResource(R.string.btn_next), color = Color.White, fontWeight = FontWeight.Bold)
             }
 
             TextButton(onClick = onBack) {
-                Text("POWRÓT", color = Color.Gray)
+                Text(stringResource(R.string.btn_back), color = Color.Gray)
             }
         }
     }

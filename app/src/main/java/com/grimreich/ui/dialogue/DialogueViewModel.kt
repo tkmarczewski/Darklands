@@ -67,8 +67,9 @@ class DialogueViewModel @Inject constructor(
     private fun checkRequirements(choice: DialogueChoice, state: GameState): Boolean {
         val hero = state.party.find { it.id == state.activeHeroId } ?: return false
         
-        // Check attributes
-        choice.requiredAttributes.forEach { (attr, value) ->
+        // Check attributes (Safe access for GSON-instantiated null maps)
+        val attrs = choice.requiredAttributes ?: emptyMap()
+        attrs.forEach { (attr, value) ->
             val heroVal = when (attr.uppercase()) {
                 "STR", "STRENGTH", "SIŁA" -> hero.strength
                 "INT", "INTELLIGENCE", "INTELIGENCJA" -> hero.intelligence

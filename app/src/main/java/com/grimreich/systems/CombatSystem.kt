@@ -99,10 +99,10 @@ class CombatSystem @Inject constructor(
     fun useEchoSkill(skillId: String): String {
         var msg = ""
         gameRepository.updateState { state ->
-            if (state.grimEchoIntensity > 0.5f) {
+            if (state.world.echoIntensity > 0.5f) {
                 msg = "Użyto mocy echa: $skillId!"
                 state.combat.log.add(msg)
-                state.grimEchoIntensity -= 0.1f
+                state.world.echoIntensity -= 0.1f
             }
         }
         return msg
@@ -188,7 +188,9 @@ class CombatSystem @Inject constructor(
                 currentEnemy = null
 
                 state.pendingQuestId?.let { pending ->
-                    questEngine.advanceStepDirect(state, pending)
+                    // FIX (AUDIT-1): Handle "FINALIZE:" prefix used in CityViewModel
+                    val rawId = pending.removePrefix("FINALIZE:")
+                    questEngine.advanceStepDirect(state, rawId)
                     state.pendingQuestId = null // FIX (BUG-7)
                 }
             } else if (heroCombatant.hp <= 0) {

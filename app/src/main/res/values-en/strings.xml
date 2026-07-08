@@ -122,4 +122,27 @@
     <string name="quest_journal_completed">COMPLETED</string>
     <string name="quest_journal_empty_active">No active quests.</string>
     <string name="quest_journal_empty_completed">No completed quests.</string>
+    <!-- Player Identity Screen -->
+    <string name="identity_title">HOW ARE YOU CALLED, WANDERER?</string>
+    <string name="identity_desc">This name belongs to you, not the hero. It will be recorded in the Chronicles of the World.</string>
+    <string name="identity_hint">YOUR NAME</string>
+
+    <!-- City Screen -->
+    <string name="city_btn_exit">RETURN TO HUB</string>
+    <string name="city_residents_label">RESIDENTS:</string>
+    <string name="city_empty_residents">The streets are empty...</string>
+    <string name="city_quest_menu_title">SELECT QUEST</string>
+    <string name="city_quest_menu_empty">No active quests for this location.</string>
+    <string name="city_btn_no_quests">NO QUESTS</string>
+    <string name="city_btn_quests_count">QUESTS (%1$d)</string>
+
+    <!-- Ending Screen -->
+    <string name="ending_title">SESSION EPILOGUE</string>
+    <string name="ending_decision_label">YOUR DECISION, ANCHOR:</string>
+    <string name="ending_btn_ascend">ASCENSION</string>
+    <string name="ending_desc_ascend">Take control of the code and become a Scribe.</string>
+    <string name="ending_btn_reboot">REBOOT</string>
+    <string name="ending_desc_reboot">Reset the session and start anew with greater awareness.</string>
+    <string name="ending_btn_delete">DESTRUCTION</string>
+    <string name="ending_desc_delete">The world is an error. Let it be erased.</string>
 </resources>

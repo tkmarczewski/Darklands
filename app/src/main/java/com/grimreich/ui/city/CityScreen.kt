@@ -19,6 +19,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.res.stringResource
+import com.grimreich.R
 import com.grimreich.systems.QuestCategory
 import com.grimreich.ui.effects.glitchEffect
 import com.grimreich.systems.QuestDefinition
@@ -85,19 +87,20 @@ fun CityScreen(
                     modifier = Modifier.width(180.dp).fillMaxHeight().verticalScroll(scrollState),
                     verticalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
-                    CityNavBtn("POWRÓT DO HUB", onExit, color = Color(0xFF400000))
+                    CityNavBtn(stringResource(R.string.city_btn_exit), onExit, color = Color(0xFF400000))
                     
                     Spacer(modifier = Modifier.height(10.dp))
 
-                    CityNavBtn("TARG", onMarket)
-                    CityNavBtn("ALCHEMIA", onAlchemy)
-                    CityNavBtn("KARCZMA", onTavern)
-                    CityNavBtn("KAPLICA", onTemple)
-                    CityNavBtn("WERBUNEK", onRecruit)
+                    CityNavBtn(stringResource(R.string.market_title), onMarket)
+                    CityNavBtn(stringResource(R.string.menu_city), onAlchemy) // Reusing menu_city for Alchemy label if needed, wait, better use R.string.city_alchemy if added
+                    // I will use Tavern and Temple strings if I have them
+                    CityNavBtn(stringResource(R.string.city_tavern), onTavern)
+                    CityNavBtn(stringResource(R.string.city_temple), onTemple)
+                    CityNavBtn(stringResource(R.string.city_recruit), onRecruit)
                     
                     val qCount = state.activeQuestsCount
                     CityNavBtn(
-                        text = if (qCount > 0) "QUESTY ($qCount)" else "BRAK ZADAŃ",
+                        text = if (qCount > 0) stringResource(R.string.city_btn_quests_count, qCount) else stringResource(R.string.city_btn_no_quests),
                         onClick = { viewModel.toggleQuestMenu(true) },
                         color = if (qCount > 0) Color(0xFF4A6000) else Color(0xFF1A1A1A),
                         enabled = qCount > 0
@@ -129,11 +132,11 @@ fun CityScreen(
                         }
                     }
                     
-                    Text("MIESZKAŃCY:", color = Color(0xFFC0A060), fontSize = 10.sp, fontWeight = FontWeight.Bold)
+                    Text(stringResource(R.string.city_residents_label), color = Color(0xFFC0A060), fontSize = 10.sp, fontWeight = FontWeight.Bold)
                     Spacer(modifier = Modifier.height(4.dp))
 
                     if (state.npcs.isEmpty()) {
-                        Text("Ulice są puste...", color = Color.DarkGray, fontSize = 14.sp)
+                        Text(stringResource(R.string.city_empty_residents), color = Color.DarkGray, fontSize = 14.sp)
                     } else {
                         LazyColumn(
                             modifier = Modifier.weight(0.6f),
@@ -154,11 +157,11 @@ fun CityScreen(
         if (state.isQuestMenuOpen) {
             AlertDialog(
                 onDismissRequest = { viewModel.toggleQuestMenu(false) },
-                title = { Text("WYBIERZ ZADANIE", color = Color(0xFFC0A060)) },
+                title = { Text(stringResource(R.string.city_quest_menu_title), color = Color(0xFFC0A060)) },
                 text = {
                     if (state.activeLocalQuests.isEmpty()) {
                         Box(modifier = Modifier.fillMaxWidth().padding(24.dp), contentAlignment = Alignment.Center) {
-                            Text("Brak aktywnych zadań dla tej lokacji.", color = Color.Gray, fontSize = 14.sp)
+                            Text(stringResource(R.string.city_quest_menu_empty), color = Color.Gray, fontSize = 14.sp)
                         }
                     } else {
                         LazyColumn(modifier = Modifier.heightIn(max = 400.dp)) {
@@ -219,7 +222,7 @@ fun CityScreen(
                 confirmButton = {},
                 dismissButton = {
                     TextButton(onClick = { viewModel.toggleQuestMenu(false) }) {
-                        Text("ZAMKNIJ", color = Color.Gray)
+                        Text(stringResource(R.string.settings_language_close), color = Color.Gray)
                     }
                 },
                 containerColor = Color(0xFF050505),

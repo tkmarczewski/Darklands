@@ -58,6 +58,7 @@ data class SessionStateDto(
     
     var grimEchoIntensity: Float = 0f,
     var grimMutationPhase: Int = 0,
+    val grantedRewardFlags: List<String> = emptyList(),
     val checksum: String? = null
 )
 

@@ -13,6 +13,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.grimreich.ui.effects.glitchEffect
 
+import androidx.compose.ui.res.stringResource
+import com.grimreich.R
+import com.grimreich.ui.effects.glitchEffect
+
 @Composable
 fun EndingScreen(
     viewModel: EndingViewModel,
@@ -30,7 +34,7 @@ fun EndingScreen(
         verticalArrangement = Arrangement.Center
     ) {
         Text(
-            text = "EPILOG SESJI",
+            text = stringResource(R.string.ending_title),
             color = Color(0xFFC0A060),
             fontSize = 32.sp,
             fontWeight = FontWeight.Bold
@@ -50,7 +54,7 @@ fun EndingScreen(
         Spacer(modifier = Modifier.height(48.dp))
 
         Text(
-            text = "TWOJA DECYZJA, KOTWICO:",
+            text = stringResource(R.string.ending_decision_label),
             color = Color.White,
             fontSize = 12.sp,
             fontWeight = FontWeight.Bold
@@ -58,21 +62,31 @@ fun EndingScreen(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        EndingButton("ASCENDENCJA", "Przejmij kontrolę nad kodem i zostań Skrybą.") {
+        EndingButton(
+            stringResource(R.string.ending_btn_ascend), 
+            stringResource(R.string.ending_desc_ascend)
+        ) {
             viewModel.ascend()
             onFinish()
         }
 
         Spacer(modifier = Modifier.height(12.dp))
 
-        EndingButton("REBOOT", "Zresetuj sesję i zacznij od nowa z większą świadomością.") {
+        EndingButton(
+            stringResource(R.string.ending_btn_reboot), 
+            stringResource(R.string.ending_desc_reboot)
+        ) {
             viewModel.reboot()
             onFinish()
         }
 
         Spacer(modifier = Modifier.height(12.dp))
 
-        EndingButton("DESTRUKCJA", "Świat jest błędem. Pozwól go wymazać.", Color.Red) {
+        EndingButton(
+            stringResource(R.string.ending_btn_delete), 
+            stringResource(R.string.ending_desc_delete), 
+            Color.Red
+        ) {
             viewModel.delete()
             onFinish()
         }
