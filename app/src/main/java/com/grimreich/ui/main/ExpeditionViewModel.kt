@@ -3,6 +3,7 @@ package com.grimreich.ui.main
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.grimreich.core.GameRepository
+import com.grimreich.core.CombatRandomProvider
 import com.grimreich.systems.QuestEngine
 import com.grimreich.systems.QuestDefinition
 import com.grimreich.systems.StepType
@@ -13,7 +14,6 @@ import com.grimreich.systems.EncounterChoice
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import javax.inject.Inject
-import kotlin.random.Random
 
 data class ExpeditionUiState(
     val regionName: String = "",
@@ -28,7 +28,8 @@ class ExpeditionViewModel @Inject constructor(
     private val questEngine: QuestEngine,
     private val cityCatalogue: CityCatalogue,
     private val encounterSystem: EncounterSystem,
-    private val combatSystem: com.grimreich.systems.CombatSystem
+    private val combatSystem: com.grimreich.systems.CombatSystem,
+    private val random: CombatRandomProvider
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(ExpeditionUiState())
@@ -54,7 +55,7 @@ class ExpeditionViewModel @Inject constructor(
                 // Deterministic and controlled encounter roll
                 if (!hasRolledForCurrentVisit && encounterSystem.activeEncounter == null && _uiState.value.encounterLog == null) {
                     hasRolledForCurrentVisit = true
-                    val rolled = encounterSystem.rollEncounter(Random(System.currentTimeMillis()), state)
+                    val rolled = encounterSystem.rollEncounter(random, state)
                     if (rolled != null) {
                         encounterSystem.selectEncounter(rolled)
                         _uiState.update { it.copy(activeEncounter = rolled) }
