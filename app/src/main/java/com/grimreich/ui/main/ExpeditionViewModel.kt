@@ -91,14 +91,20 @@ class ExpeditionViewModel @Inject constructor(
                 StepType.COMBAT -> {
                     state.pendingQuestId = "COMBAT_WIN:$questId"
                     val tid = step.targetId.trim().uppercase()
-                    try {
-                        enemyType = com.grimreich.core.EnemyType.valueOf(tid)
-                        shouldCombat = true
-                        android.util.Log.i("ExpeditionViewModel", "[COMBAT] Resolved target $tid for quest $questId")
-                    } catch (e: Exception) {
-                        android.util.Log.w("ExpeditionViewModel", "[COMBAT] Unknown enemy type '$tid', using fallback Bandit")
+                    if (tid.isBlank()) {
+                        android.util.Log.e("ExpeditionViewModel", "[COMBAT] Empty targetId for quest $questId")
                         enemyType = com.grimreich.core.EnemyType.BANDIT
                         shouldCombat = true
+                    } else {
+                        try {
+                            enemyType = com.grimreich.core.EnemyType.valueOf(tid)
+                            shouldCombat = true
+                            android.util.Log.i("ExpeditionViewModel", "[COMBAT] Resolved target $tid for quest $questId")
+                        } catch (e: Exception) {
+                            android.util.Log.w("ExpeditionViewModel", "[COMBAT] Unknown enemy type '$tid', using fallback Bandit")
+                            enemyType = com.grimreich.core.EnemyType.BANDIT
+                            shouldCombat = true
+                        }
                     }
                 }
                 StepType.DIALOGUE -> {

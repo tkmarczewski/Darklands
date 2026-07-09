@@ -73,13 +73,7 @@ class GameBootstrapper @Inject constructor(
             // getAllRelevantQuestsForCity() finds quests for the starting city.
             state.grimCurrentRegion = cityCatalogue.startingCityId
             
-            // Easter Egg: Ralwing
-            if (state.heroName == "Ralwing") {
-                state.gold = 3000
-                state.logEntries.add("Felix Anderson: 'Złoto dla wiedzy i mroku'.")
-            } else {
-                state.gold = GameConstants.INITIAL_GOLD
-            }
+            state.gold = GameConstants.INITIAL_GOLD
 
             // Inicjalizacja sesji - cytat
             val playerName = state.playerName ?: "Nieznajomy"

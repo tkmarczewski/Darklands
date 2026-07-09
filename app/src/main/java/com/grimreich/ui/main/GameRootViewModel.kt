@@ -30,7 +30,8 @@ class GameRootViewModel @Inject constructor(
         id?.let { state.party.find { h -> h.id == it } }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), null)
 
-    private var pendingPlayerName: String? = null
+    private var _pendingPlayerName: String? = null
+    val pendingPlayerName: String? get() = _pendingPlayerName
 
     init {
         audioEngine.playForRoute("main_menu")
@@ -74,7 +75,7 @@ class GameRootViewModel @Inject constructor(
     }
 
     fun setPlayerIdentity(name: String) {
-        pendingPlayerName = name
+        _pendingPlayerName = name
         setMode(GameScreenMode.CHARACTER_CREATOR)
     }
 
@@ -83,8 +84,9 @@ class GameRootViewModel @Inject constructor(
             gameBootstrapper.bootstrapFreshWorld()
 
             gameRepository.updateState { state ->
-                state.playerName = pendingPlayerName ?: "Wędrowiec"
-                val isRalwing = state.playerName?.trim()?.lowercase() == "ralwing"
+                state.playerName = _pendingPlayerName ?: "Wędrowiec"
+                val isRalwing = state.playerName?.trim()?.equals("ralwing", ignoreCase = true) == true || 
+                                name.trim().equals("ralwing", ignoreCase = true)
                 
                 val finalHeroName = if (isRalwing) "Felix Anderson" else name
                 state.heroName = finalHeroName

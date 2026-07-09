@@ -24,10 +24,11 @@ import com.grimreich.core.HeroSkill
 fun CharacterCreatorScreen(
     onStartGame: (String, Career, Map<String, Int>, List<HeroSkill>) -> Unit,
     onBack: () -> Unit,
+    initialHeroName: String = "",
     viewModel: CharacterCreatorViewModel = hiltViewModel()
 ) {
     val state by viewModel.uiState.collectAsState()
-    var heroName by remember { mutableStateOf("") }
+    var heroName by remember { mutableStateOf(initialHeroName) }
 
     Column(
         modifier = Modifier

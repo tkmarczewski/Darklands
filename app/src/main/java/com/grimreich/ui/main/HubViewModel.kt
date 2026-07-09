@@ -86,7 +86,8 @@ class HubViewModel @Inject constructor(
                     gold = state.gold,
                     activeQuestsCount = state.quest.activeQuestIds.size,
                     expeditionQuestsCount = state.quest.activeQuestIds.count { id -> 
-                        questEngine.getDefinition(id)?.cityId != currentCityId 
+                        val def = questEngine.getDefinition(id)
+                        def != null && def.cityId == currentCityId
                     },
                     party = state.party,
                     worldStability = stability,
