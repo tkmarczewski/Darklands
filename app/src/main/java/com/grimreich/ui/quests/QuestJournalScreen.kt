@@ -75,7 +75,10 @@ fun QuestEntryCard(quest: QuestDefinition, isCompleted: Boolean, objective: Stri
         shape = MaterialTheme.shapes.extraSmall
     ) {
         Column(modifier = Modifier.padding(12.dp).fillMaxWidth()) {
-            Text(quest.title, color = if (isCompleted) Color.Gray else Color.White, fontWeight = FontWeight.Bold)
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                Text(quest.title, color = if (isCompleted) Color.Gray else Color.White, fontWeight = FontWeight.Bold)
+                Text(quest.cityId.uppercase(), color = Color.DarkGray, fontSize = 9.sp, fontWeight = FontWeight.Bold)
+            }
             Text(quest.description, color = Color.DarkGray, fontSize = 11.sp)
             if (!isCompleted && objective != null) {
                 Spacer(modifier = Modifier.height(8.dp))

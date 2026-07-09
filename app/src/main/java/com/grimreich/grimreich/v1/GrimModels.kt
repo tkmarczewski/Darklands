@@ -91,6 +91,7 @@ data class DialogueChoice(
     val factionId: String? = null,
     val requiredAttributes: Map<String, Int> = emptyMap(),
     val requiredSkills: Map<String, Int> = emptyMap(),
+    val requiredQuestId: String? = null,
     val triggerEvent: String? = null,
     val triggerValue: String? = null,
     val isCombatTrigger: Boolean = false,

@@ -203,6 +203,11 @@
         "requiredQuestId": "q_fortress_letter"
       },
       {
+        "text": "Mam sprawę do Dowódcy (Wymaga: Dowód na sabotaż).",
+        "targetNodeId": "fortress_commander_letter",
+        "requiredQuestId": "q_verdict_1"
+      },
+      {
         "text": "Chcę wejść do środka.",
         "targetNodeId": "fortress_denied"
       }
