@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.*
 import javax.inject.Inject
 
 data class QuestJournalUiState(
-    val activeQuests: List<QuestDefinition> = emptyList(),
+    val activeQuests: List<Pair<QuestDefinition, String>> = emptyList(),
     val completedQuests: List<QuestDefinition> = emptyList()
 )
 
@@ -26,7 +26,11 @@ class QuestJournalViewModel @Inject constructor(
     init {
         gameRepository.gameState
             .onEach { state ->
-                val active = state.quest.activeQuestIds.mapNotNull { questEngine.getDefinition(it) }
+                val active = state.quest.activeQuestIds.mapNotNull { qId ->
+                    questEngine.getDefinition(qId)?.let { def ->
+                        def to questEngine.getCurrentObjective(qId, state)
+                    }
+                }
                 val completed = state.quest.completedQuestIds.mapNotNull { questEngine.getDefinition(it) }
                 
                 _uiState.update { 

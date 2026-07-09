@@ -67,32 +67,57 @@ class ExpeditionViewModel @Inject constructor(
         gameRepository.updateState { it.isExpeditionActive = true }
     }
 
-    fun startQuest(questId: String, onCombat: () -> Unit) {
+    fun startQuest(questId: String, onCombat: () -> Unit, onDialogue: () -> Unit) {
         val def = questEngine.getDefinition(questId) ?: return
+        android.util.Log.d("ExpeditionViewModel", "[QUEST] Starting quest interaction: $questId")
         
         var shouldCombat = false
+        var shouldDialogue = false
         var enemyType: com.grimreich.core.EnemyType? = null
 
         gameRepository.updateState { state ->
-            val progress = state.quest.progress[questId] ?: return@updateState
-            val step = def.steps.getOrNull(progress.currentStepIndex) ?: return@updateState
+            val progress = state.quest.progress[questId] ?: run {
+                android.util.Log.e("ExpeditionViewModel", "[QUEST] No progress found for $questId")
+                return@updateState
+            }
+            val step = def.steps.getOrNull(progress.currentStepIndex) ?: run {
+                android.util.Log.e("ExpeditionViewModel", "[QUEST] No step found at index ${progress.currentStepIndex} for $questId")
+                return@updateState
+            }
+            
+            android.util.Log.d("ExpeditionViewModel", "[QUEST] Step Type: ${step.type}, Target: ${step.targetId}")
             
             when (step.type) {
                 StepType.COMBAT -> {
                     state.pendingQuestId = "COMBAT_WIN:$questId"
+                    val tid = step.targetId.trim().uppercase()
                     try {
-                        enemyType = com.grimreich.core.EnemyType.valueOf(step.targetId)
+                        enemyType = com.grimreich.core.EnemyType.valueOf(tid)
                         shouldCombat = true
+                        android.util.Log.i("ExpeditionViewModel", "[COMBAT] Resolved target $tid for quest $questId")
                     } catch (e: Exception) {
-                        // Fallback if targetId is not a valid enum name
-                        state.combat.active = true
-                        state.combat.enemyName = step.targetId
-                        state.combat.enemyHp = 60
-                        state.combat.enemyMaxHp = 60
+                        android.util.Log.w("ExpeditionViewModel", "[COMBAT] Unknown enemy type '$tid', using fallback Bandit")
+                        enemyType = com.grimreich.core.EnemyType.BANDIT
                         shouldCombat = true
                     }
                 }
+                StepType.DIALOGUE -> {
+                    state.pendingDialogueNodeId = step.targetId
+                    state.pendingDialogueNpcRole = def.originNpcId // Fallback to origin if not specified in target
+                    state.pendingDialogueNpcName = "Kontakt"
+                    shouldDialogue = true
+                }
+                StepType.INVESTIGATION -> {
+                    // FIX: Investigation steps now show a message and advance
+                    android.util.Log.i("ExpeditionViewModel", "[QUEST] Investigation step triggered for $questId")
+                    questEngine.advanceStepDirect(state, questId)
+                    val msg = "Zbadano cel: ${step.targetId}. Cel zadania został osiągnięty."
+                    state.logEntries.add(msg)
+                    // We trigger a local encounter log to let the player know
+                    _uiState.update { it.copy(encounterLog = msg) }
+                }
                 else -> {
+                    android.util.Log.i("ExpeditionViewModel", "[QUEST] Direct advancement for non-interactive step.")
                     questEngine.advanceStepDirect(state, questId)
                     state.logEntries.add("Postęp w zadaniu: ${def.title}")
                 }
@@ -105,6 +130,8 @@ class ExpeditionViewModel @Inject constructor(
                 combatSystem.startCombat(enemy)
             }
             onCombat()
+        } else if (shouldDialogue) {
+            onDialogue()
         }
     }
 

@@ -76,6 +76,54 @@ fun DevMenuOverlay(
                                 state.gold += GameConstants.DEV_GOLD_GIFT
                             }
                         }
+                        DevBtn("FORCE_SYNC") {
+                            root.gameRepository.sync()
+                        }
+                        DevBtn("GIVE HERO") {
+                            root.gameRepository.updateState { state ->
+                                if (state.party.isEmpty()) {
+                                    val hero = com.grimreich.core.Hero(
+                                        id = "dev_hero",
+                                        name = "DevHero",
+                                        currentCareer = com.grimreich.core.Career.MERCENARY
+                                    )
+                                    state.party.add(hero)
+                                    state.activeHeroId = "dev_hero"
+                                }
+                            }
+                        }
+                        DevBtn("TEST FLOW") {
+                            root.gameRepository.sync()
+                            root.gameRepository.updateState { state ->
+                                if (state.party.isEmpty()) {
+                                    val hero = com.grimreich.core.Hero(
+                                        id = "dev_hero",
+                                        name = "DevHero",
+                                        currentCareer = com.grimreich.core.Career.MERCENARY
+                                    )
+                                    state.party.add(hero)
+                                    state.activeHeroId = "dev_hero"
+                                }
+                                state.grimCurrentRegion = "wybrzeze_polnocne"
+                                state.gold += 1000
+                            }
+                            root.setMode(GameScreenMode.HUB)
+                            visible = false
+                        }
+                        DevBtn("DUMP STATE") {
+                            val state = root.gameRepository.currentState()
+                            android.util.Log.e("DUMP", "CITY: ${state.grimCurrentRegion}")
+                            android.util.Log.e("DUMP", "PARTY SIZE: ${state.party.size}")
+                            state.party.forEach { android.util.Log.e("DUMP", "  - ${it.name} (${it.id})") }
+                            android.util.Log.e("DUMP", "ACTIVE QUESTS: ${state.quest.activeQuestIds}")
+                        }
+                        DevBtn("TP: NORTH") {
+                            root.gameRepository.updateState { state ->
+                                state.grimCurrentRegion = "wybrzeze_polnocne"
+                            }
+                            root.setMode(GameScreenMode.CITY)
+                            visible = false
+                        }
                         DevBtn("TP: TWIERDZA") {
                             root.gameRepository.updateState { state ->
                                 state.grimCurrentRegion = "twierdza_zakonu"

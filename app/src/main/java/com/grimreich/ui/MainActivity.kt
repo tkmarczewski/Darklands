@@ -23,8 +23,6 @@ import dagger.hilt.android.AndroidEntryPoint
 class MainActivity : LocalizedActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        LanguageManager.init(this)
         
         // --- IMMERSIVE MODE: Hide System Bars ---
         WindowCompat.setDecorFitsSystemWindows(window, false)

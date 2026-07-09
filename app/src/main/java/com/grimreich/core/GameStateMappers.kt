@@ -1,10 +1,12 @@
 package com.grimreich.core
 
-import com.grimreich.grimreich.v1.*
-import com.grimreich.core.mutations.*
+import com.grimreich.core.mutations.Mutation
+import com.grimreich.grimreich.v1.NPC
+import com.grimreich.grimreich.v1.Item
+import com.grimreich.grimreich.v1.GrimWorldEngineFactory
 
 fun GameState.toDto(): SessionStateDto = SessionStateDto(
-    version = 3,
+    version = 1,
     playerName = playerName,
     heroName = heroName,
     characterNameLocked = characterNameLocked,
@@ -30,47 +32,39 @@ fun GameState.toDto(): SessionStateDto = SessionStateDto(
     persistentMeta = persistentMeta.toDto(),
     isExpeditionActive = isExpeditionActive,
     lastSaveTimestamp = lastSaveTimestamp,
-    grimEchoIntensity = world.echoIntensity,
+    grimEchoIntensity = 0f, // Deprecated or handle via grimEngine if needed
     grimMutationPhase = grimMutationPhase,
-    grantedRewardFlags = grantedRewardFlags.toList(),
-    checksum = null
+    grantedRewardFlags = grantedRewardFlags.toList()
 )
 
-fun SessionStateDto.toDomain(): GameState = GameState(
-    playerName = playerName,
-    heroName = heroName,
-    characterNameLocked = characterNameLocked,
-    metaAwarenessLevel = metaAwarenessLevel,
-    grimCurrentRegion = grimCurrentRegion,
-    pendingQuestId = pendingQuestId,
-    pendingDialogueNpcName = pendingDialogueNpcName,
-    pendingDialogueNpcRole = pendingDialogueNpcRole,
-    pendingDialogueNodeId = pendingDialogueNodeId,
-    party = party.map { it.toDomain() }.toMutableList(),
-    hireableHeroes = hireableHeroes.map { it.toDomain() }.toMutableList(),
-    activeHeroId = activeHeroId,
-    inventory = inventory.map { it.toDomain() }.toMutableList(),
-    logEntries = logEntries.toMutableList(),
-    gold = gold,
-    quest = quest.toDomain(),
-    reputation = reputation.toDomain(),
-    prayer = prayer.toDomain(),
-    world = world.toDomain(),
-    combat = combat.toDomain(),
-    grimMutationPhase = grimMutationPhase,
-    grantedRewardFlags = grantedRewardFlags.toMutableSet()
-).also {
+fun SessionStateDto.toDomain(): GameState = GameState().also {
+    it.playerName = playerName
+    it.heroName = heroName
+    it.characterNameLocked = characterNameLocked
+    it.metaAwarenessLevel = metaAwarenessLevel
+    it.grimCurrentRegion = grimCurrentRegion
+    it.pendingQuestId = pendingQuestId
+    it.pendingDialogueNpcName = pendingDialogueNpcName
+    it.pendingDialogueNpcRole = pendingDialogueNpcRole
+    it.pendingDialogueNodeId = pendingDialogueNodeId
+    it.party.addAll(party.map { dto -> dto.toDomain() })
+    it.hireableHeroes.addAll(hireableHeroes.map { dto -> dto.toDomain() })
+    it.activeHeroId = activeHeroId
+    it.inventory.addAll(inventory.map { dto -> dto.toDomain() })
+    it.logEntries.addAll(logEntries)
+    it.gold = gold
+    it.quest = quest.toDomain()
+    it.reputation = reputation.toDomain()
+    it.prayer = prayer.toDomain()
+    it.world = world.toDomain()
+    it.combat = combat.toDomain()
     it.knownNpcs.putAll(knownNpcs.mapValues { entry -> entry.value.map { it.toDomain() } })
     it.unlockedLoreIds.addAll(unlockedLoreIds)
-    it.persistentMeta.apply {
-        totalSessionsFinished = persistentMeta.totalSessionsFinished
-        unlockedLegacyBuffs.addAll(persistentMeta.unlockedLegacyBuffs)
-        maxMetaAwarenessReached = persistentMeta.maxMetaAwarenessReached
-    }
+    it.persistentMeta = persistentMeta.toDomain()
     it.isExpeditionActive = isExpeditionActive
     it.lastSaveTimestamp = lastSaveTimestamp
-    it.grimEngine.echoIntensity = it.world.echoIntensity
-    it.grimEngine.mutationPhase = it.grimMutationPhase
+    it.grimMutationPhase = grimMutationPhase
+    it.grantedRewardFlags.addAll(grantedRewardFlags)
 }
 
 fun Hero.toDto(): HeroDto = HeroDto(
@@ -128,33 +122,33 @@ fun HeroDto.toDomain(): Hero = Hero(
     hp = hp,
     maxHp = maxHp,
     isDead = isDead,
-    currentCareer = currentCareer?.let { try { Career.valueOf(it) } catch(e: Exception) { null } },
-    trait = trait?.let { try { Trait.valueOf(it) } catch(e: Exception) { null } }
+    currentCareer = currentCareer?.let { Career.valueOf(it) },
+    trait = trait?.let { Trait.valueOf(it) }
 ).also {
-    it.activeMutations.addAll(activeMutations.map { m -> m.toDomain() })
+    it.activeMutations.addAll(activeMutations.map { dto -> dto.toDomain() })
     it.skills.putAll(skills)
     it.equipment.putAll(equipment)
-    it.careerHistory.addAll(careerHistory.map { ce -> ce.toDomain() })
-    it.abilities.addAll(abilities.map { a -> a.toDomain() })
+    it.careerHistory.addAll(careerHistory.map { it.toDomain() })
+    it.abilities.addAll(abilities.map { it.toDomain() })
 }
 
 fun CareerEntryDto.toDomain(): CareerEntry = CareerEntry(
-    career = try { Career.valueOf(careerName) } catch (e: Exception) { Career.MERCENARY },
+    career = Career.valueOf(careerName),
     yearsServed = yearsServed
 )
 
 fun CareerEntry.toDto(): CareerEntryDto = CareerEntryDto(
     careerName = career.name,
     yearsServed = yearsServed,
-    levelReached = 0,
-    dateReached = 0
+    levelReached = 1, // Default
+    dateReached = 0L // Default
 )
 
-fun AbilityDto.toDomain(): Ability = AbilityRegistry.all().find { it.id == id } ?: Ability(
+fun AbilityDto.toDomain(): Ability = Ability(
     id = id,
     name = name,
     description = description ?: "",
-    costType = try { CostType.valueOf(type) } catch(e: Exception) { CostType.NONE },
+    costType = CostType.valueOf(type),
     costValue = costValue ?: 0
 )
 
@@ -179,8 +173,8 @@ fun MutationDto.toDomain(): Mutation = Mutation(
     id = id,
     name = name,
     description = "",
-    category = try { MutationCategory.valueOf(category) } catch (e: Exception) { MutationCategory.PHYSICAL },
-    tier = try { MutationTier.valueOf(tier) } catch(e: Exception) { MutationTier.MANIFESTED },
+    category = com.grimreich.core.mutations.MutationCategory.valueOf(category),
+    tier = com.grimreich.core.mutations.MutationTier.valueOf(tier),
     attributeModifiers = attributeModifiers,
     stabilityImpact = stabilityImpact
 )
@@ -215,11 +209,11 @@ fun QuestState.toDto(): QuestStateDto = QuestStateDto(
     progress = progress.mapValues { it.value.toDto() }
 )
 
-fun QuestStateDto.toDomain(): QuestState = QuestState(
-    activeQuestIds = activeQuestIds.toMutableSet(),
-    completedQuestIds = completedQuestIds.toMutableSet(),
-    progress = progress.mapValues { it.value.toDomain() }.toMutableMap()
-)
+fun QuestStateDto.toDomain(): QuestState = QuestState().also {
+    it.activeQuestIds.addAll(activeQuestIds)
+    it.completedQuestIds.addAll(completedQuestIds)
+    it.progress.putAll(progress.mapValues { entry -> entry.value.toDomain() })
+}
 
 fun QuestProgress.toDto(): QuestProgressDto = QuestProgressDto(
     questId = questId,
@@ -236,13 +230,13 @@ fun QuestProgressDto.toDomain(): QuestProgress = QuestProgress(
 )
 
 fun ReputationState.toDto(): ReputationStateDto = ReputationStateDto(
-    cityFactions = cityFactions.mapValues { it.value.toMap() },
-    globalFactions = globalFactions.toMap()
+    globalFactions = globalFactions.toMap(),
+    cityFactions = cityFactions.mapValues { it.value.toMap() }
 )
 
 fun ReputationStateDto.toDomain(): ReputationState = ReputationState().also {
+    it.globalFactions.putAll(globalFactions)
     it.cityFactions.putAll(cityFactions.mapValues { entry -> entry.value.toMutableMap() })
-    it.globalFactions.putAll(globalFactions.toMutableMap())
 }
 
 fun PrayerState.toDto(): PrayerStateDto = PrayerStateDto(
@@ -252,10 +246,11 @@ fun PrayerState.toDto(): PrayerStateDto = PrayerStateDto(
     blessings = blessings
 )
 
-fun PrayerStateDto.toDomain(): PrayerState = PrayerState().also {
-    it.faith = faith
-    it.virtue = virtue
-    it.sins = sins
+fun PrayerStateDto.toDomain(): PrayerState = PrayerState(
+    faith = faith,
+    virtue = virtue,
+    sins = sins
+).also {
     it.blessings.addAll(blessings)
 }
 
@@ -278,23 +273,24 @@ fun WorldState.toDto(): WorldStateDto = WorldStateDto(
     verdictIncidentsSeen = verdictIncidentsSeen
 )
 
-fun WorldStateDto.toDomain(): WorldState = WorldState().also {
-    it.region = region
-    it.location = location
-    it.day = day
-    it.timeOfDay = timeOfDay
-    it.fatigue = fatigue
-    it.lastEncounter = lastEncounter
-    it.season = try { Season.valueOf(season) } catch(e: Exception) { Season.AUTUMN }
-    it.globalStability = globalStability
-    it.weather = try { WeatherType.valueOf(weather) } catch(e: Exception) { WeatherType.CLEAR }
-    it.echoIntensity = echoIntensity
-    it.collapseProgress = collapseProgress
-    it.collapseScenarioId = collapseScenarioId
-    it.ontologicalLevel = try { OntologicalLevel.entries.find { l -> l.level == ontologicalLevel } ?: OntologicalLevel.MATERIAL } catch(e: Exception) { OntologicalLevel.MATERIAL }
+fun WorldStateDto.toDomain(): WorldState = WorldState(
+    region = region,
+    location = location,
+    day = day,
+    timeOfDay = timeOfDay,
+    fatigue = fatigue,
+    lastEncounter = lastEncounter,
+    season = Season.valueOf(season),
+    globalStability = globalStability,
+    weather = WeatherType.valueOf(weather),
+    echoIntensity = echoIntensity,
+    collapseProgress = collapseProgress,
+    collapseScenarioId = collapseScenarioId,
+    ontologicalLevel = com.grimreich.grimreich.v1.OntologicalLevel.entries.find { it.level == ontologicalLevel } ?: com.grimreich.grimreich.v1.OntologicalLevel.MATERIAL,
+    cityEntryCount = cityEntryCount,
+    verdictIncidentsSeen = verdictIncidentsSeen
+).also {
     it.discoveredLocations.addAll(discoveredLocations)
-    it.cityEntryCount = cityEntryCount
-    it.verdictIncidentsSeen = verdictIncidentsSeen
 }
 
 fun CombatState.toDto(): CombatStateDto = CombatStateDto(
@@ -310,7 +306,9 @@ fun CombatState.toDto(): CombatStateDto = CombatStateDto(
     enemyStrength = enemyStrength,
     enemyEffects = enemyEffects.map { it.toDto() },
     heroEffects = heroEffects.map { it.toDto() },
-    log = log
+    log = log,
+    currentTargetHeroId = currentTargetHeroId,
+    activeHeroId = activeHeroId
 )
 
 fun CombatStateDto.toDomain(): CombatState = CombatState().also {
@@ -324,6 +322,8 @@ fun CombatStateDto.toDomain(): CombatState = CombatState().also {
     it.enemyAgility = enemyAgility
     it.enemyIntelligence = enemyIntelligence
     it.enemyStrength = enemyStrength
+    it.currentTargetHeroId = currentTargetHeroId
+    it.activeHeroId = activeHeroId
     it.heroEffects.addAll(heroEffects.map { effect -> effect.toDomain() })
     it.enemyEffects.addAll(enemyEffects.map { effect -> effect.toDomain() })
     it.log.addAll(log)
@@ -356,7 +356,7 @@ fun StatusEffect.toDto(): StatusEffectDto = StatusEffectDto(
 )
 
 fun StatusEffectDto.toDomain(): StatusEffect = StatusEffect(
-    type = try { StatusEffectType.valueOf(type) } catch(e: Exception) { StatusEffectType.POISON },
+    type = StatusEffectType.valueOf(type),
     duration = duration,
     strength = magnitude
 )
@@ -366,3 +366,10 @@ fun PersistentMeta.toDto(): PersistentMetaDto = PersistentMetaDto(
     unlockedLegacyBuffs = unlockedLegacyBuffs.toList(),
     maxMetaAwarenessReached = maxMetaAwarenessReached
 )
+
+fun PersistentMetaDto.toDomain(): PersistentMeta = PersistentMeta(
+    totalSessionsFinished = totalSessionsFinished,
+    maxMetaAwarenessReached = maxMetaAwarenessReached
+).also {
+    it.unlockedLegacyBuffs.addAll(unlockedLegacyBuffs)
+}

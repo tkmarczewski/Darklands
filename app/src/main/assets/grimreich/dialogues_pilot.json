@@ -51,7 +51,8 @@
         "text": "Jesteś niebezpieczny. Muszę cię uciszyć (WALKA).",
         "targetNodeId": "end",
         "isCombatTrigger": true,
-        "triggerValue": "BANDIT"
+        "triggerEvent": "ADVANCE_QUEST",
+        "triggerValue": "q_deserter"
       }
     ]
   },
@@ -63,7 +64,7 @@
       {
         "text": "Wracaj (ZAKOŃCZ ZADANIE).",
         "targetNodeId": "end",
-        "triggerEvent": "COMPLETE_QUEST",
+        "triggerEvent": "ADVANCE_QUEST",
         "triggerValue": "q_deserter"
       }
     ]
@@ -76,105 +77,8 @@
       {
         "text": "Pozwól mu odejść (ZYSKAJ WIEDZĘ).",
         "targetNodeId": "end",
-        "triggerEvent": "COMPLETE_QUEST",
+        "triggerEvent": "ADVANCE_QUEST",
         "triggerValue": "q_deserter"
-      }
-    ]
-  },
-  {
-    "id": "echo_start",
-    "npcId": "echo",
-    "text": "...CZY MNIE PAMIĘTASZ? ...BYŁEM JEDNYM Z WAS... TERAZ JESTEM TYLKO CIENIEM W KODZIE...",
-    "choices": [
-      {
-        "text": "[MODLITWA] Pozwól mu zaznać pokoju.",
-        "targetNodeId": "end",
-        "requiredAttributes": { "piety": 14 },
-        "triggerEvent": "GRANT_REPUTATION",
-        "triggerValue": "ABSOLUTE:5"
-      },
-      {
-        "text": "Znikaj, maro! (WALKA).",
-        "targetNodeId": "end",
-        "isCombatTrigger": true,
-        "triggerValue": "RAUBRITTER_KNIGHT"
-      }
-    ]
-  },
-  {
-    "id": "aelion_start",
-    "npcId": "aelion",
-    "text": "Kotwico... Twoja obecność tutaj jest jak pęknięcie na tafli jeziora. Czy wiesz, że ten świat jest tylko snem Sędziów?",
-    "choices": [
-      {
-        "text": "[INTELIGENCJA] Jeśli to sen, kto nas śni?",
-        "targetNodeId": "aelion_meta",
-        "requiredAttributes": { "intelligence": 16 }
-      },
-      {
-        "text": "Szukam relikwii.",
-        "targetNodeId": "aelion_quest"
-      },
-      {
-        "text": "Muszę iść.",
-        "targetNodeId": "end"
-      }
-    ]
-  },
-  {
-    "id": "aelion_meta",
-    "npcId": "aelion",
-    "text": "Śnią nas Skrybowie Absolutni. Każdy twój krok, każda walka, to tylko linia w ich Kronice. Czy czujesz, jak stabilność świata drży, gdy o tym mówię?",
-    "choices": [
-      {
-        "text": "To przerażające.",
-        "targetNodeId": "aelion_meta_end"
-      },
-      {
-        "text": "Nie wierzę w to.",
-        "targetNodeId": "end"
-      }
-    ]
-  },
-  {
-    "id": "aelion_meta_end",
-    "npcId": "aelion",
-    "text": "Strach jest tylko reakcją na prawdę. Szukaj Kotwicy, ona utrzyma ten sen w ryzach... jeszcze przez chwilę.",
-    "choices": [
-      {
-        "text": "Będę pamiętać.",
-        "targetNodeId": "end"
-      }
-    ]
-  },
-  {
-    "id": "aelion_quest",
-    "npcId": "aelion",
-    "text": "Relikwie są fragmentami poprzednich snów. Jeśli chcesz pomóc w stabilizacji, musisz odnaleźć Kotwicę Północy. Strażnik przy bramie wie więcej o pęknięciach w okolicy.",
-    "choices": [
-      {
-        "text": "Pójdę do Strażnika.",
-        "targetNodeId": "end"
-      }
-    ]
-  },
-  {
-    "id": "guard_start",
-    "npcId": "guard",
-    "text": "Stój! Mgła gęstnieje, a prawo musi być przestrzegane. Czego szukasz w cieniu murów?",
-    "choices": [
-      {
-        "text": "[ZADANIE] Czy coś niepokojącego działo się ostatnio?",
-        "targetNodeId": "guard_quest_check"
-      },
-      {
-        "text": "[CHARYZMA] Wyglądasz na zmęczonego. Odpocznij chwilę.",
-        "targetNodeId": "guard_relaxed",
-        "requiredAttributes": { "charisma": 12 }
-      },
-      {
-        "text": "Tylko przechodzę.",
-        "targetNodeId": "end"
       }
     ]
   },
@@ -229,6 +133,243 @@
       {
         "text": "Nie mam na to czasu.",
         "targetNodeId": "end"
+      }
+    ]
+  },
+  {
+    "id": "guard_verdict_done",
+    "npcId": "guard",
+    "text": "Kultysta nie żyje? Doskonale. Inkwizycja dziękuje za usunięcie tej skazy na paradygmacie. Przygotuj się, wkrótce możesz być potrzebny w Twierdzy.",
+    "choices": [
+      {
+        "text": "Zrozumiałem (ODBIERZ NAGRODĘ).",
+        "targetNodeId": "end",
+        "triggerEvent": "COMPLETE_QUEST",
+        "triggerValue": "q_verdict_1"
+      }
+    ]
+  },
+  {
+    "id": "guard_deserter_done",
+    "npcId": "guard",
+    "text": "Dezerter uciszony? Prawo Boreas znów jest silne. Widzę w tobie potencjał, którego nie wolno zmarnować na tym pustkowiu.",
+    "choices": [
+      {
+        "text": "Dziękuję (ODBIERZ NAGRODĘ).",
+        "targetNodeId": "end",
+        "triggerEvent": "COMPLETE_QUEST",
+        "triggerValue": "q_deserter"
+      }
+    ]
+  },
+  {
+    "id": "merchant_report_back",
+    "npcId": "merchant",
+    "text": "Masz te zioła? Widzę blask echa w twoich oczach... to dobra partia. Może zainteresuje cię Twierdza Żelazna? Mam tam list do dowódcy.",
+    "choices": [
+      {
+        "text": "Proszę, oto zioła (ZAKOŃCZ).",
+        "targetNodeId": "merchant_next_task",
+        "triggerEvent": "COMPLETE_QUEST",
+        "triggerValue": "q_coast_harvest"
+      }
+    ]
+  },
+  {
+    "id": "merchant_next_task",
+    "npcId": "merchant",
+    "text": "Skoro jesteś taki sprawny... Dostarcz ten list do Twierdzy Żelaznej. Dowódca Ferrum zapłaci ci godziwie za trud podróży.",
+    "choices": [
+      {
+        "text": "Dobrze, zajmę się tym (ZADANIE: List do Twierdzy).",
+        "targetNodeId": "end",
+        "triggerEvent": "ACTIVATE_QUEST",
+        "triggerValue": "q_fortress_letter"
+      },
+      {
+        "text": "Nie teraz.",
+        "targetNodeId": "end"
+      }
+    ]
+  },
+  {
+    "id": "fortress_guard_start",
+    "npcId": "guard",
+    "text": "Stój! Twierdza Żelazna nie przyjmuje uchodźców. Tylko ci z uprawnieniami lub sprawami do Dowódcy mogą przejść przez bramę.",
+    "choices": [
+      {
+        "text": "[ZADANIE] Mam list od kupca z Wybrzeża.",
+        "targetNodeId": "fortress_commander_letter",
+        "requiredQuestId": "q_fortress_letter"
+      },
+      {
+        "text": "Chcę wejść do środka.",
+        "targetNodeId": "fortress_denied"
+      }
+    ]
+  },
+  {
+    "id": "fortress_commander_letter",
+    "npcId": "guard",
+    "text": "List od starego Aldousa? No dobrze... Dowódca Ferrum czeka w bastionie. Możesz wejść.",
+    "choices": [
+      {
+        "text": "Dziękuję (ZAKOŃCZ DOSTAWĘ).",
+        "targetNodeId": "end",
+        "triggerEvent": "COMPLETE_QUEST",
+        "triggerValue": "q_fortress_letter"
+      }
+    ]
+  },
+  {
+    "id": "fortress_denied",
+    "npcId": "guard",
+    "text": "Nie ma mowy. Wróć, gdy będziesz miał realny powód, by marnować nasz czas.",
+    "choices": [
+      {
+        "text": "Odejdź.",
+        "targetNodeId": "end"
+      }
+    ]
+  },
+  {
+    "id": "mira_start",
+    "npcId": "mira",
+    "text": "Słowa w Kronice same się zmieniają... Jakby rzeczywistość próbowała wymazać własną historię. Czy pomożesz mi ją ocalić?",
+    "choices": [
+      {
+        "text": "[ZADANIE] Zbadam te pęknięcia.",
+        "targetNodeId": "end",
+        "triggerEvent": "ACTIVATE_QUEST",
+        "triggerValue": "q_scribes_1"
+      }
+    ]
+  },
+  {
+    "id": "mira_report_back",
+    "npcId": "mira",
+    "text": "Kronika znów drży... Czy odnalazłeś to, co zostało podmienione? Każdy wpis ma znaczenie dla stabilności tego snu.",
+    "choices": [
+      {
+        "text": "Tak, oto dowody (ZAKOŃCZ).",
+        "targetNodeId": "end",
+        "triggerEvent": "COMPLETE_QUEST",
+        "triggerValue": "q_scribes_1"
+      }
+    ]
+  },
+  {
+    "id": "aelion_start",
+    "npcId": "aelion",
+    "text": "Kotwico... Twoja obecność tutaj jest jak pęknięcie na tafli jeziora. Czy wiesz, że ten świat jest tylko snem Sędziów?",
+    "choices": [
+      {
+        "text": "[INTELIGENCJA] Jeśli to sen, kto nas śni?",
+        "targetNodeId": "aelion_meta",
+        "requiredAttributes": { "intelligence": 16 }
+      },
+      {
+        "text": "Szukam relikwii.",
+        "targetNodeId": "aelion_quest"
+      },
+      {
+        "text": "Muszę iść.",
+        "targetNodeId": "end"
+      }
+    ]
+  },
+  {
+    "id": "aelion_meta",
+    "npcId": "aelion",
+    "text": "Śnią nas Skrybowie Absolutni. Każdy twój krok, każda walka, to tylko linia v ich Kronice. Czy czujesz, jak stabilność świata drży, gdy o tym mówię?",
+    "choices": [
+      {
+        "text": "To przerażające.",
+        "targetNodeId": "aelion_meta_end"
+      },
+      {
+        "text": "Nie wierzę w to.",
+        "targetNodeId": "end"
+      }
+    ]
+  },
+  {
+    "id": "aelion_meta_end",
+    "npcId": "aelion",
+    "text": "Strach jest tylko reakcją na prawdę. Szukaj Kotwicy, ona utrzyma ten sen w ryzach... jeszcze przez chwilę.",
+    "choices": [
+      {
+        "text": "Będę pamiętać.",
+        "targetNodeId": "end"
+      }
+    ]
+  },
+  {
+    "id": "aelion_quest",
+    "npcId": "aelion",
+    "text": "Relikwie są fragmentami poprzednich snów. Jeśli chcesz pomóc v stabilizacji, musisz odnaleźć Kotwicę Północy. Strażnik przy bramie wie więcej o pęknięciach v okolicy.",
+    "choices": [
+      {
+        "text": "Pójdę do Strażnika.",
+        "targetNodeId": "end"
+      }
+    ]
+  },
+  {
+    "id": "mystic_start",
+    "npcId": "mystic",
+    "text": "Czuję echo v twoich słowach. Czy szukasz prawdy o tym świecie, czy tylko ukojenia v modlitwie?",
+    "choices": [
+      {
+        "text": "Chcę wiedzieć więcej.",
+        "targetNodeId": "end"
+      },
+      {
+        "text": "Potrzebuję pomocy.",
+        "targetNodeId": "end"
+      }
+    ]
+  },
+  {
+    "id": "beggar_start",
+    "npcId": "beggar",
+    "text": "Daj miedziaka... Albo powiedz mi, że to wszystko to tylko zły sen. Widzę kolory, których nie ma...",
+    "choices": [
+      {
+        "text": "Daj złoto (1 G).",
+        "targetNodeId": "end",
+        "triggerEvent": "GRANT_REPUTATION",
+        "triggerValue": "CITY:1"
+      },
+      {
+        "text": "Odejdź.",
+        "targetNodeId": "end"
+      }
+    ]
+  },
+  {
+    "id": "mystic_report_back",
+    "npcId": "mystic",
+    "text": "Twoja aura uległa zmianie... Czy Szyfr przemówił do ciebie podczas rytuału?",
+    "choices": [
+      {
+        "text": "Zadanie wykonane. Świat stał się nieco jaśniejszy (ZAKOŃCZ).",
+        "targetNodeId": "end",
+        "triggerEvent": "COMPLETE_QUEST",
+        "triggerValue": "ACTIVE"
+      }
+    ]
+  },
+  {
+    "id": "quest_report_back_generic",
+    "npcId": "npc",
+    "text": "A więc udało ci się? Doskonale. Twoje wysiłki nie pójdą na marne, wędrowcze.",
+    "choices": [
+      {
+        "text": "Dziękuję za nagrodę (ZAKOŃCZ).",
+        "targetNodeId": "end",
+        "triggerEvent": "COMPLETE_QUEST",
+        "triggerValue": "ACTIVE"
       }
     ]
   }

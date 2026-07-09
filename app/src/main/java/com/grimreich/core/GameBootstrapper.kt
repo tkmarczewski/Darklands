@@ -2,6 +2,7 @@ package com.grimreich.core
 
 import com.grimreich.grimreich.v1.NPC
 import com.grimreich.systems.DialogueManager
+import com.grimreich.systems.AtmosphericLogSystem
 import com.grimreich.systems.QuestEngine
 import com.grimreich.systems.QuestManifest
 import com.grimreich.world.HeroPool
@@ -18,6 +19,7 @@ class GameBootstrapper @Inject constructor(
     private val questEngine: QuestEngine,
     private val questManifest: QuestManifest,
     private val dialogueManager: DialogueManager,
+    private val atmosphericLogSystem: AtmosphericLogSystem,
     private val cityCatalogue: CityCatalogue,
     private val itemCatalogue: ItemCatalogue,
     private val worldMap: WorldMap,
@@ -70,7 +72,19 @@ class GameBootstrapper @Inject constructor(
             // FIX-QUESTS: grimCurrentRegion must match startingCityId so that
             // getAllRelevantQuestsForCity() finds quests for the starting city.
             state.grimCurrentRegion = cityCatalogue.startingCityId
-            state.gold = GameConstants.INITIAL_GOLD
+            
+            // Easter Egg: Ralwing
+            if (state.heroName == "Ralwing") {
+                state.gold = 3000
+                state.logEntries.add("Felix Anderson: 'Złoto dla wiedzy i mroku'.")
+            } else {
+                state.gold = GameConstants.INITIAL_GOLD
+            }
+
+            // Inicjalizacja sesji - cytat
+            val playerName = state.playerName ?: "Nieznajomy"
+            val heroName = state.heroName ?: "Wędrowiec"
+            state.logEntries.add(atmosphericLogSystem.getRandomMessage(System.currentTimeMillis(), playerName, heroName))
 
             // Initial pool of recruits
             state.hireableHeroes.addAll(heroPool.generatePool(GameConstants.MAX_RECRUITS_POOL_SIZE))

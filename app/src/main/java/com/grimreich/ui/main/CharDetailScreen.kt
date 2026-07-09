@@ -30,6 +30,7 @@ import com.grimreich.core.Hero
 fun CharDetailScreen(
     hero: Hero,
     onUpgrade: (String) -> Unit,
+    onRandomize: () -> Unit,
     onBack: () -> Unit
 ) {
     Column(
@@ -45,17 +46,27 @@ fun CharDetailScreen(
                 Text(hero.currentCareer?.displayName ?: "Bez profesji", color = Color(0xFFC0A060), fontSize = 14.sp)
             }
             if (hero.attributePoints > 0) {
-                Surface(
-                    color = Color(0xFFB22222),
-                    shape = MaterialTheme.shapes.extraSmall
-                ) {
-                    Text(
-                        text = "PUNKTY: ${hero.attributePoints}",
-                        color = Color.White,
-                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.Bold
-                    )
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Button(
+                        onClick = onRandomize,
+                        modifier = Modifier.height(32.dp).padding(end = 8.dp),
+                        contentPadding = PaddingValues(horizontal = 8.dp, vertical = 0.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4A6000))
+                    ) {
+                        Text("LOSUJ", color = Color.White, fontSize = 10.sp, fontWeight = FontWeight.Bold)
+                    }
+                    Surface(
+                        color = Color(0xFFB22222),
+                        shape = MaterialTheme.shapes.extraSmall
+                    ) {
+                        Text(
+                            text = "PUNKTY: ${hero.attributePoints}",
+                            color = Color.White,
+                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
                 }
             }
         }

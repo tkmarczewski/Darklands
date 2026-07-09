@@ -6,6 +6,7 @@ import com.grimreich.core.CombatState
 import com.grimreich.core.GameRepository
 import com.grimreich.core.Hero
 import com.grimreich.grimreich.v1.Item
+import com.grimreich.core.CombatSkill
 import com.grimreich.systems.CombatSystem
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
@@ -15,7 +16,7 @@ data class CombatUiState(
     val combat: CombatState = CombatState(),
     val party: List<Hero> = emptyList(),
     val potions: List<Item> = emptyList(),
-    val availableSkills: List<com.grimreich.core.CombatSkill> = emptyList(),
+    val availableSkills: List<CombatSkill> = emptyList(),
     val worldStability: Int = 100
 )
 
@@ -35,8 +36,7 @@ class CombatViewModel @Inject constructor(
                     it.copy(
                         combat = state.combat,
                         party = state.party,
-                        potions = state.inventory.filter { it.type == "potion" },
-                        availableSkills = com.grimreich.systems.SkillCatalogue.allSkills,
+                        potions = state.inventory.filter { it.effects.containsKey("heal") },
                         worldStability = state.world.globalStability
                     )
                 }
@@ -51,7 +51,7 @@ class CombatViewModel @Inject constructor(
     fun defend() {
         combatSystem.playerDefend()
     }
-    
+
     fun useSkill(skillId: String) {
         combatSystem.useSkill(skillId)
     }
@@ -63,11 +63,16 @@ class CombatViewModel @Inject constructor(
     fun useEchoSkill(type: String) {
         combatSystem.useEchoSkill(type)
     }
+    
+    fun selectHero(heroId: String) {
+        combatSystem.setActiveHero(heroId)
+    }
 
     fun exitCombat(onExit: () -> Unit) {
-        val state = gameRepository.currentState()
-        if (!state.combat.active) {
-            onExit()
+        gameRepository.updateState { 
+            it.combat.active = false 
+            it.combat.log.clear()
         }
+        onExit()
     }
 }

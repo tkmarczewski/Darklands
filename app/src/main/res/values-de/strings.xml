@@ -19,8 +19,9 @@
     <string name="menu_finale">FINALE</string>
     <string name="menu_combat">KAMPF</string>
 
-    <string name="city_tavern">SCHENKE</string>
     <string name="city_market">MARKT</string>
+    <string name="city_alchemy">ALCHEMIE</string>
+    <string name="city_tavern">SCHENKE</string>
     <string name="city_temple">KAPELLE</string>
     <string name="city_recruit">REKRUTIEREN</string>
 
@@ -145,4 +146,12 @@
     <string name="ending_desc_reboot">Setzen Sie die Sitzung zurück und beginnen Sie mit größerem Bewusstsein von vorne.</string>
     <string name="ending_btn_delete">ZERSTÖRUNG</string>
     <string name="ending_desc_delete">Die Welt ist ein Fehler. Lass sie löschen.</string>
+
+    <!-- Combat Screen -->
+    <string name="combat_btn_attack">ANGRIFF</string>
+    <string name="combat_btn_defend">VERTEIDIGEN</string>
+    <string name="combat_btn_revision">REVISION</string>
+    <string name="combat_btn_overwrite">ÜBERSCHREIBEN</string>
+    <string name="combat_btn_exit">KAMPF BEENDEN</string>
+    <string name="combat_btn_glitch_exit">LOOP_VERLASSEN</string>
 </resources>

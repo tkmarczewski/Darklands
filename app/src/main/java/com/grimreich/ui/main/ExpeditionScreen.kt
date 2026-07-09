@@ -22,7 +22,8 @@ import com.grimreich.systems.EncounterChoice
 fun ExpeditionScreen(
     viewModel: ExpeditionViewModel,
     onBack: () -> Unit,
-    onCombat: () -> Unit
+    onCombat: () -> Unit,
+    onDialogue: () -> Unit
 ) {
     val state by viewModel.uiState.collectAsState()
 
@@ -49,7 +50,7 @@ fun ExpeditionScreen(
                     LazyColumn(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(12.dp)) {
                         items(state.activeQuests) { quest ->
                             QuestActionCard(quest) {
-                                viewModel.startQuest(quest.id, onCombat)
+                                viewModel.startQuest(quest.id, onCombat, onDialogue)
                             }
                         }
                     }

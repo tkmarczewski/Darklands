@@ -16,7 +16,7 @@ class ExperienceSystem @Inject constructor(
         gameRepository.get().updateState { state ->
             val hero = state.party.find { it.id == heroId }
             if (hero != null) {
-                val levels = applyXpDirect(hero, amount)
+                val levels = applyXpDirect(hero, amount, state)
                 msg = if (levels > 0) {
                     "Awans! ${hero.name} osiągnął poziom ${hero.level}."
                 } else {
@@ -41,7 +41,7 @@ class ExperienceSystem @Inject constructor(
     fun addPartyXpDirect(state: GameState, amount: Int): List<String> {
         val messages = mutableListOf<String>()
         state.party.filter { !it.isDead }.forEach { hero ->
-            val levels = applyXpDirect(hero, amount)
+            val levels = applyXpDirect(hero, amount, state)
             if (levels > 0) {
                 messages.add("Awans! ${hero.name} osiągnął poziom ${hero.level}.")
             }
@@ -56,7 +56,7 @@ class ExperienceSystem @Inject constructor(
      * Internal logic for applying XP and handling multiple levels.
      * @return Number of levels gained.
      */
-    private fun applyXpDirect(hero: Hero, amount: Int): Int {
+    private fun applyXpDirect(hero: Hero, amount: Int, state: GameState? = null): Int {
         if (amount <= 0) return 0
         hero.xp += amount
         var levelsGained = 0
@@ -71,6 +71,8 @@ class ExperienceSystem @Inject constructor(
             
             // FIX: Grant attribute points on level up (2 per level)
             hero.attributePoints += 2
+            
+            state?.logEntries?.add("BOHATER AWANSOWAŁ! ${hero.name} jest teraz na poziomie ${hero.level}. Otrzymano 2 punkty cech.")
             
             levelsGained++
             // Safety break

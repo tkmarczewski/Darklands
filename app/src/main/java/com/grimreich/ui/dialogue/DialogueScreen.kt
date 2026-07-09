@@ -111,7 +111,7 @@ fun DialogueScreen(
                 border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFF222222))
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
-                    val rawText = state.currentNode?.text ?: "Cisza... (Sesja utraciła spójność)"
+                    val rawText = state.currentNode?.text ?: "Stoisz w milczeniu. Echo przeszłości powoli zanika..."
                     val displayedText = if (state.worldStability < 25) {
                         rawText.map { if (Random.nextFloat() < 0.05f) '?' else it }.joinToString("")
                     } else rawText
@@ -125,13 +125,13 @@ fun DialogueScreen(
                     
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    if (state.availableChoices.isEmpty()) {
+                    if (state.availableChoices.isEmpty() || state.currentNode == null) {
                         Button(
                             onClick = onExit,
                             modifier = Modifier.fillMaxWidth(),
                             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF400000))
                         ) {
-                            Text("WYJDŹ (BŁĄD PARADYGMATU)")
+                            Text("ZAKOŃCZ ROZMOWĘ")
                         }
                     }
                     
@@ -140,17 +140,15 @@ fun DialogueScreen(
                         modifier = Modifier.weight(1f).fillMaxWidth(),
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        items(state.availableChoices) { (choice, isEnabled) ->
+                        items(state.availableChoices) { info ->
                             DialogueChoiceBtn(
-                                text = choice.text,
-                                isEnabled = isEnabled,
+                                text = info.choice.text,
+                                isEnabled = info.isEnabled,
                                 stability = state.worldStability,
-                                isCombat = choice.isCombatTrigger,
-                                reqAttr = choice.requiredAttributes?.keys?.firstOrNull()?.uppercase()
+                                isCombat = info.choice.isCombatTrigger,
+                                helperHero = info.activeHeroName
                             ) {
-                                if (isEnabled) {
-                                    viewModel.choose(choice, onExit, onCombat, onMarket, onRitual)
-                                }
+                                viewModel.choose(info.choice, onExit, onCombat, onMarket, onRitual)
                             }
                         }
                     }
@@ -166,7 +164,7 @@ private fun DialogueChoiceBtn(
     isEnabled: Boolean = true, 
     stability: Int = 100, 
     isCombat: Boolean = false,
-    reqAttr: String? = null,
+    helperHero: String? = null,
     onClick: () -> Unit
 ) {
     Surface(
@@ -177,12 +175,12 @@ private fun DialogueChoiceBtn(
         color = if (isEnabled) Color(0xFF151515) else Color(0xFF0A0A0A),
         border = androidx.compose.foundation.BorderStroke(1.dp, if (isEnabled) Color(0xFF333333) else Color(0xFF111111))
     ) {
-        val prefix = when {
-            isCombat -> "[WALKA] "
-            reqAttr != null -> "[$reqAttr] "
-            else -> "> "
+        val label = when {
+            stability < 40 && !isEnabled -> "[USZKODZONE]"
+            helperHero != null -> "(${helperHero.uppercase()}) $text"
+            isCombat -> "[WALKA] $text"
+            else -> "> $text"
         }
-        val label = if (stability < 40 && !isEnabled) "[USZKODZONE]" else if (isEnabled) "$prefix$text" else "[ZABLOKOWANE] $text"
         
         Text(
             text = label,

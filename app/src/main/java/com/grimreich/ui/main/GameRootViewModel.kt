@@ -30,15 +30,16 @@ class GameRootViewModel @Inject constructor(
         id?.let { state.party.find { h -> h.id == it } }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), null)
 
-    // Temporary storage for character creation
     private var pendingPlayerName: String? = null
 
     init {
-        // Initial music for main menu
         audioEngine.playForRoute("main_menu")
     }
 
     fun setMode(mode: GameScreenMode) {
+        if (mode == GameScreenMode.MAIN_MENU) {
+            gameRepository.persistCurrentState()
+        }
         _mode.value = mode
         val route = when (mode) {
             GameScreenMode.MAIN_MENU        -> "main_menu"
@@ -54,10 +55,10 @@ class GameRootViewModel @Inject constructor(
             GameScreenMode.EVENTS          -> "events"
             GameScreenMode.RITUAL          -> "ritual"
             GameScreenMode.ENDING          -> "ending"
-            GameScreenMode.TEMPLE          -> "ritual" // Fallback to ritual music
+            GameScreenMode.TEMPLE          -> "ritual"
             GameScreenMode.ALCHEMY         -> "alchemy"
             GameScreenMode.DIALOGUE        -> "dialogue"
-            GameScreenMode.QUESTS          -> "hub" // Stay on hub/city music
+            GameScreenMode.QUESTS          -> "hub"
             GameScreenMode.CHRONICLE       -> "hub"
             GameScreenMode.RECRUIT         -> "tavern"
             GameScreenMode.INVENTORY       -> "hub"
@@ -83,31 +84,63 @@ class GameRootViewModel @Inject constructor(
 
             gameRepository.updateState { state ->
                 state.playerName = pendingPlayerName ?: "Wędrowiec"
-                state.heroName = name
+                val isRalwing = state.playerName?.trim()?.lowercase() == "ralwing"
+                
+                val finalHeroName = if (isRalwing) "Felix Anderson" else name
+                state.heroName = finalHeroName
 
-                // Create the hero object from creation data
-                val hero = Hero(
-                    id = "hero_main",
-                    name = name,
-                    age = 20, // default
-                    currentCareer = career,
-                    strength = attrs["Str"] ?: 10,
-                    agility = attrs["Agi"] ?: 10,
-                    perception = attrs["Per"] ?: 10,
-                    intelligence = attrs["Int"] ?: 10,
-                    endurance = attrs["End"] ?: 10,
-                    charisma = attrs["Cha"] ?: 10,
-                    piety = attrs["Pie"] ?: 10,
-                    hp = 40,
-                    maxHp = 40
-                )
-
-                // Apply skills
-                skills.forEach { hero.skills[it.displayName] = 40 }
+                val hero = if (isRalwing) {
+                    // FORTUNA FELIXA
+                    state.gold = 3000
+                    
+                    Hero(
+                        id = "hero_main",
+                        name = "Felix Anderson",
+                        age = 35,
+                        currentCareer = Career.SCHOLAR,
+                        strength = 8,
+                        agility = 10,
+                        perception = 18,
+                        intelligence = 20,
+                        endurance = 10,
+                        charisma = 18,
+                        piety = 15,
+                        hp = 35,
+                        maxHp = 35
+                    ).apply {
+                        this.skills.put("Alchemia", 60)
+                        this.skills.put("Czytanie i Pisanie", 80)
+                        this.skills.put("Religia", 50)
+                    }
+                } else {
+                    Hero(
+                        id = "hero_main",
+                        name = name,
+                        age = 20,
+                        currentCareer = career,
+                        strength = attrs["Str"] ?: 10,
+                        agility = attrs["Agi"] ?: 10,
+                        perception = attrs["Per"] ?: 10,
+                        intelligence = attrs["Int"] ?: 10,
+                        endurance = attrs["End"] ?: 10,
+                        charisma = attrs["Cha"] ?: 10,
+                        piety = attrs["Pie"] ?: 10,
+                        hp = 40,
+                        maxHp = 40
+                    ).apply {
+                        skills.forEach { this.skills.put(it.displayName, 40) }
+                    }
+                }
 
                 state.party.add(hero)
                 state.activeHeroId = hero.id
-                state.logEntries.add("Bohater $name wyrusza w drogę.")
+                
+                // --- KLIMATYCZNY START SESJI ---
+                state.logEntries.add("Niech na świecie zapanuje pokój... choćby na tę jedną chwilę.")
+                
+                if (isRalwing) {
+                    state.logEntries.add("[SYSTEM] Paradygmat Ralwing aktywowany. Witaj, Felixie.")
+                }
             }
 
             gameRepository.persistCurrentState()
@@ -119,8 +152,6 @@ class GameRootViewModel @Inject constructor(
         viewModelScope.launch {
             if (gameRepository.restoreIfAvailable()) {
                 setMode(GameScreenMode.HUB)
-            } else {
-                gameRepository.log("❌ Błąd wczytywania sesji: Zapis uszkodzony lub nieaktualny.")
             }
         }
     }
@@ -159,12 +190,36 @@ class GameRootViewModel @Inject constructor(
         }
     }
 
+    fun randomizeAttributes(heroId: String) {
+        gameRepository.updateState { state ->
+            val hero = state.party.find { it.id == heroId } ?: return@updateState
+            val points = hero.attributePoints
+            if (points > 0) {
+                val stats = listOf("STR", "AGI", "INT", "END", "PER", "CHA", "PIE")
+                repeat(points) {
+                    val target = stats.random()
+                    when (target) {
+                        "STR" -> hero.strength++
+                        "AGI" -> hero.agility++
+                        "INT" -> hero.intelligence++
+                        "END" -> hero.endurance++
+                        "PER" -> hero.perception++
+                        "CHA" -> hero.charisma++
+                        "PIE" -> hero.piety++
+                    }
+                }
+                hero.attributePoints = 0
+                state.logEntries.add("${hero.name} poddaje się przeznaczeniu (losowy rozwój).")
+            }
+        }
+    }
+
     fun saveGame() {
         gameRepository.persistCurrentState()
     }
 
     fun startDevCombat() {
-        val enemy = com.grimreich.core.Bestiary.get(com.grimreich.core.EnemyType.BANDIT)
+        val enemy = Bestiary.get(EnemyType.BANDIT)
         combatSystem.startCombat(enemy)
         setMode(GameScreenMode.COMBAT)
     }

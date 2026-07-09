@@ -19,8 +19,9 @@
     <string name="menu_finale">FINALE</string>
     <string name="menu_combat">WALKA</string>
 
-    <string name="city_tavern">KARCZMA</string>
     <string name="city_market">TARG</string>
+    <string name="city_alchemy">ALCHEMIA</string>
+    <string name="city_tavern">KARCZMA</string>
     <string name="city_temple">KAPLICA</string>
     <string name="city_recruit">WERBUNEK</string>
 
@@ -39,7 +40,7 @@
     <string name="btn_save">Zapisz</string>
     <string name="btn_load">Wczytaj</string>
 
-    <!-- Main Menu hardcoded strings - moved to resources -->
+    <!-- Main Menu hardcoded strings -->
     <string name="main_title">GRIMREICH</string>
     <string name="main_subtitle">Do Not Attempt to Adjust The Picture. We Are Controlling Transmission.</string>
     <string name="btn_new_game">NOWA PRZYGODA</string>
@@ -49,9 +50,9 @@
 
     <!-- Chronicle Screen -->
     <string name="chronicle_title">KRONIKA ECHO</string>
-    <string name="chronicle_decode_prefix">DEKODOWANIE RZECZYWISTOŚCI: </string>
+    <string name="chronicle_decode_prefix">DECODING REALITY: </string>
     <string name="chronicle_decode_suffix">%</string>
-    <string name="chronicle_select_hint">Wybierz wpis, aby zgłębić wiedzę o Pęknięciu.</string>
+    <string name="chronicle_select_hint">Select an entry to delve into the knowledge of the Breach.</string>
 
     <!-- Character Creator Screen -->
     <string name="creator_header">KREACJA BOHATERA</string>
@@ -64,13 +65,15 @@
     <string name="creator_points_label">DOSTĘPNE PUNKTY</string>
     <string name="btn_next">DALEJ</string>
     <string name="btn_finish">ZAKOŃCZ</string>
-    <!-- Hub Screen -->
+
+    <!-- Hub Screen (Renamed to OBOZOWISKO) -->
+    <string name="hub_title">OBOZOWISKO</string>
     <string name="hub_day">DZIEŃ %1$d</string>
     <string name="hub_world_status">STATUS ŚWIATA</string>
-    <string name="hub_news">OSTATNIE WIEŚCI:</string>
+    <string name="hub_news">KRONIKA WYDARZEŃ:</string>
     <string name="hub_party">TWOJA DRUŻYNA</string>
-    <string name="hub_news_empty">Cisza w eterze...</string>
-    <string name="hub_location_unknown">Nieznane Miejsce</string>
+    <string name="hub_news_empty">Kronika milczy. Cisza przed burzą...</string>
+    <string name="hub_location_unknown">Nieznane Pustkowie</string>
     <string name="hub_btn_expedition">WYRUSZ NA WYPRAWĘ (%1$d)</string>
     <string name="hub_btn_no_targets">BRAK CELÓW</string>
 
@@ -110,7 +113,7 @@
 
     <!-- Recruitment Screen -->
     <string name="recruit_title">WERBUNEK</string>
-    <string name="recruit_subtitle">Dostępni najemnicy w tej karczmie</string>
+    <string name="recruit_subtitle">Dostępni najemnicy v tej karczmie</string>
     <string name="recruit_empty">Wszyscy najemnicy zostali wynajęci.</string>
     <string name="recruit_btn_locked">ZABLOKOWANE</string>
     <string name="recruit_stats_format">SIŁ:%1$d ZRC:%2$d INT:%3$d WYT:%4$d</string>
@@ -124,11 +127,11 @@
     <string name="quest_journal_empty_completed">Brak ukończonych zadań.</string>
     <!-- Player Identity Screen -->
     <string name="identity_title">JAK CIĘ ZWĄ, WĘDROWCZE?</string>
-    <string name="identity_desc">To imię należy do Ciebie, nie do bohatera. Będzie ono zapisane w Kronikach Świata.</string>
+    <string name="identity_desc">To imię należy do Ciebie, nie do bohatera. Będzie ono zapisane v Kronikach Świata.</string>
     <string name="identity_hint">TWOJE IMIĘ</string>
 
     <!-- City Screen -->
-    <string name="city_btn_exit">POWRÓT DO HUB</string>
+    <string name="city_btn_exit">POWRÓT DO OBOZOWISKA</string>
     <string name="city_residents_label">MIESZKAŃCY:</string>
     <string name="city_empty_residents">Ulice są puste...</string>
     <string name="city_quest_menu_title">WYBIERZ ZADANIE</string>
@@ -145,4 +148,12 @@
     <string name="ending_desc_reboot">Zresetuj sesję i zacznij od nowa z większą świadomością.</string>
     <string name="ending_btn_delete">DESTRUKCJA</string>
     <string name="ending_desc_delete">Świat jest błędem. Pozwól go wymazać.</string>
+
+    <!-- Combat Screen -->
+    <string name="combat_btn_attack">ATAK</string>
+    <string name="combat_btn_defend">OBRONA</string>
+    <string name="combat_btn_revision">REWIZJA</string>
+    <string name="combat_btn_overwrite">NADPISANIE</string>
+    <string name="combat_btn_exit">ZAKOŃCZ WALKĘ</string>
+    <string name="combat_btn_glitch_exit">WYJDŹ_Z_PĘTLI</string>
 </resources>

@@ -21,6 +21,26 @@
     "xpReward": 10
   },
   {
+    "type": "CULTIST",
+    "name": "Kultysta Echa",
+    "stats": {
+      "maxHp": 30,
+      "attack": 18,
+      "defense": 8,
+      "speed": 11,
+      "morale": 20
+    },
+    "ai": "BERSERK",
+    "lootTable": {
+      "goldMin": 10,
+      "goldMax": 30,
+      "itemChances": {
+        "ing_herb": 0.3
+      }
+    },
+    "xpReward": 15
+  },
+  {
     "type": "BANDIT_LEADER",
     "name": "Szef Bandytów",
     "stats": {

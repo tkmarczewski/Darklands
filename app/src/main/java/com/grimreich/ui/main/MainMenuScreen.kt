@@ -31,6 +31,10 @@ fun MainMenuScreen(
     val context = LocalContext.current
     var showLanguageSelector by remember { mutableStateOf(false) }
 
+    LaunchedEffect(Unit) {
+        viewModel.refresh()
+    }
+
     Box(modifier = Modifier.fillMaxSize().background(Color.Black), contentAlignment = Alignment.Center) {
         Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(16.dp)) {
             Text(

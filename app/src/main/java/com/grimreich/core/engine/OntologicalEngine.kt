@@ -16,15 +16,24 @@ class OntologicalEngine @Inject constructor(
     fun processRealityShift() {
         gameRepository.updateState { state ->
             // Random fluctuations in stability
-            var shift = Random.nextInt(-2, 3)
+            val baseShift = Random.nextInt(-2, 3)
+            var shift = baseShift
+            var reason = "natural fluctuation"
 
             // If expedition is active, stability drain is much harsher
             if (state.isExpeditionActive) {
                 shift -= 5 // Constant drain
-                if (Random.nextFloat() < 0.3f) shift -= 3 // Extra spikes
+                reason = "expedition drain"
+                if (Random.nextFloat() < 0.3f) {
+                    shift -= 3 // Extra spikes
+                    reason = "expedition rift spike"
+                }
             }
 
-            state.world.globalStability = (state.world.globalStability + shift).coerceIn(0, 100)
+            val oldStability = state.world.globalStability
+            state.world.globalStability = (oldStability + shift).coerceIn(0, 100)
+            
+            android.util.Log.d("OntologicalEngine", "[STABILITY] Shift: $shift ($reason). From $oldStability to ${state.world.globalStability}")
 
             // BUG-R3-08: Added critical stability warning threshold at <= 10
             when {
@@ -32,6 +41,15 @@ class OntologicalEngine @Inject constructor(
                     gameRepository.log("KRYTYCZNE: Stabilność rzeczywistości osiągnęła poziom krytyczny (${state.world.globalStability})!")
                 state.world.globalStability < 30 ->
                     gameRepository.log("Rzeczywistość staje się niestabilna...")
+            }
+
+            // --- PASSIVE HEALING DURING TIME PASSAGE ---
+            // Based on Endurance. Every shift heals 5% of Max HP.
+            state.party.forEach { hero ->
+                if (!hero.isDead && hero.hp < hero.maxHp) {
+                    val healAmount = (hero.maxHp * 0.05f).toInt().coerceAtLeast(1)
+                    hero.hp = (hero.hp + healAmount).coerceAtMost(hero.maxHp)
+                }
             }
         }
     }

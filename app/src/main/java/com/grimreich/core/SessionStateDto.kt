@@ -183,7 +183,9 @@ data class CombatStateDto(
     val enemyStrength: Int,
     val enemyEffects: List<StatusEffectDto>,
     val heroEffects: List<StatusEffectDto>,
-    val log: List<String>
+    val log: List<String>,
+    val currentTargetHeroId: String? = null,
+    val activeHeroId: String? = null
 )
 
 @Serializable

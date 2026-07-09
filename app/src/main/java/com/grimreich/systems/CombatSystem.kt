@@ -17,25 +17,16 @@ class CombatSystem @Inject constructor(
 ) {
     private var onCombatEnd: (() -> Unit)? = null
     private var currentEnemy: Enemy? = null
-    
-    // Captured to avoid deadlock in synchronized block
     private var pendingCombatEndCallback: (() -> Unit)? = null
 
-    private fun heroToCombatant(state: GameState): CombatantState? {
-        val hero = state.party.find { it.id == state.activeHeroId } 
-            ?: state.party.firstOrNull { !it.isDead }
-            ?: return null
-        
-        // FIX (BUG-1): Use HP from CombatState if available, otherwise from Hero
-        val hp = if (state.combat.active && state.combat.heroHp > 0) state.combat.heroHp else hero.hp
-
+    private fun heroToCombatant(state: GameState, hero: Hero): CombatantState {
         return CombatantState(
             name = hero.name,
-            hp = hp,
+            hp = hero.hp,
             maxHp = hero.maxHp,
-            endurance = state.combat.heroStamina,
+            endurance = 10,
             morale = hero.morale,
-            armor = hero.effectiveArmor(state.inventory) + state.combat.heroArmorBonus, // FIX (BUG-2): Apply bonus
+            armor = hero.effectiveArmor(state.inventory),
             attackBase = hero.effectiveAttack(state.inventory),
             strength = hero.strength,
             agility = hero.agility,
@@ -43,7 +34,7 @@ class CombatSystem @Inject constructor(
             perception = hero.perception,
             piety = hero.piety,
             charisma = hero.charisma,
-            activeEffects = state.combat.heroEffects.toMutableList()
+            activeEffects = mutableListOf()
         )
     }
 
@@ -52,20 +43,16 @@ class CombatSystem @Inject constructor(
         onCombatEnd = onEnd
         
         gameRepository.updateState { state ->
-            val hero = state.party.find { it.id == state.activeHeroId } ?: state.party.firstOrNull { !it.isDead }
-            
             state.combat.active = true
             state.combat.round = 1
             state.combat.enemyName = enemy.name
-            state.combat.enemyType = enemy.type.name // FIX (BUG-11): Save type
+            state.combat.enemyType = enemy.type.name
             state.combat.enemyHp = enemy.stats.maxHp
             state.combat.enemyMaxHp = enemy.stats.maxHp
             state.combat.enemyAttack = enemy.stats.attack
             state.combat.enemyDefense = enemy.stats.defense
             state.combat.enemyStamina = 10
-            state.combat.heroStamina = 10
-            state.combat.heroArmorBonus = 0 // Reset
-            state.combat.heroHp = hero?.hp ?: 40 // FIX (BUG-1)
+            state.combat.activeHeroId = state.party.firstOrNull { !it.isDead }?.id
             state.combat.log.clear()
             state.combat.log.add("Początek walki z ${enemy.name}!")
         }
@@ -75,19 +62,20 @@ class CombatSystem @Inject constructor(
     fun playerDefend() = resolvePlayerAction("DEFEND")
     fun useSkill(skillId: String) = resolvePlayerAction("SKILL:$skillId")
     
+    fun setActiveHero(heroId: String) {
+        gameRepository.updateState { it.combat.activeHeroId = heroId }
+    }
+
     fun usePotion(itemId: String): String {
         var msg = ""
         gameRepository.updateState { state ->
-            val hero = state.party.find { it.id == state.activeHeroId } ?: return@updateState
+            val heroId = state.combat.activeHeroId ?: state.party.firstOrNull { !it.isDead }?.id ?: return@updateState
+            val hero = state.party.find { it.id == heroId } ?: return@updateState
             val item = state.inventory.find { it.id == itemId } ?: return@updateState
             
             if (item.effects.containsKey("heal")) {
                 val heal = item.effects["heal"] ?: 0
                 hero.hp = (hero.hp + heal).coerceAtMost(hero.maxHp)
-                // If in combat, sync to combat state too
-                if (state.combat.active) {
-                    state.combat.heroHp = hero.hp
-                }
                 state.inventory.remove(item)
                 msg = "Użyto ${item.name}: +$heal HP."
                 state.combat.log.add(msg)
@@ -112,7 +100,6 @@ class CombatSystem @Inject constructor(
         var result = ""
         pendingCombatEndCallback = null
 
-        // AUDIT RECOVERY: Re-initialize enemy if lost on process death
         if (currentEnemy == null && gameRepository.currentState().combat.active) {
             val savedTypeStr = gameRepository.currentState().combat.enemyType
             val type = try { 
@@ -126,8 +113,20 @@ class CombatSystem @Inject constructor(
         gameRepository.updateState { state ->
             val c = state.combat
             val enemy = currentEnemy ?: return@updateState
-            val heroCombatant = heroToCombatant(state) ?: return@updateState
             
+            val activeHero = state.party.find { it.id == c.activeHeroId } 
+                ?: state.party.firstOrNull { !it.isDead } 
+                ?: return@updateState
+            
+            val heroCombatant = heroToCombatant(state, activeHero)
+            
+            val aliveHeroes = state.party.filter { !it.isDead }
+            if (aliveHeroes.isEmpty()) return@updateState
+            
+            val targetHero = aliveHeroes.random()
+            c.currentTargetHeroId = targetHero.id
+            val targetCombatant = heroToCombatant(state, targetHero)
+
             val enemyCombatant = CombatantState(
                 name = enemy.name,
                 hp = c.enemyHp,
@@ -142,36 +141,56 @@ class CombatSystem @Inject constructor(
                 activeEffects = c.enemyEffects.toMutableList()
             )
 
-            // FIX (BUG-3): Increment round BEFORE generating result label
             c.round++
             result = "Runda ${c.round}"
 
-            val roundResult = when {
+            val playerRound = when {
                 action.startsWith("SKILL:") -> {
                     val skillId = action.substringAfter("SKILL:")
                     combatRound.resolveRound(heroCombatant, enemyCombatant, skillId)
                 }
                 action == "DEFEND" -> {
-                    // FIX (BUG-2): Persist armor bonus
-                    c.heroArmorBonus += 5
-                    heroCombatant.armor += 5
-                    // Hero defends, so enemy attacks
-                    combatRound.resolveRound(enemyCombatant, heroCombatant)
+                    targetCombatant.armor += 5
+                    null
                 }
                 else -> combatRound.resolveRound(heroCombatant, enemyCombatant)
             }
 
-            c.log.addAll(roundResult.log)
+            if (enemyCombatant.hp > 0) {
+                val enemyRound = combatRound.resolveRound(enemyCombatant, targetCombatant)
+                c.log.addAll(enemyRound.log)
+                targetHero.hp = targetCombatant.hp
+                if (targetHero.hp <= 0) {
+                    targetHero.isDead = true
+                    c.log.add("TRAGEDIA: ${targetHero.name} poległ!")
+                    state.logEntries.add("ZADANIE: Odzyskaj ciało ${targetHero.name} i zanieś je do Kaplicy.")
+                    
+                    val corpse = lootSystem.itemCatalogue.get("quest_corpse")?.copy(
+                        name = "Zwłoki: ${targetHero.name}",
+                        id = "corpse_${targetHero.id}"
+                    )
+                    if (corpse != null) state.inventory.add(corpse)
+                }
+            }
+
+            if (playerRound != null) {
+                c.log.addAll(playerRound.log)
+                activeHero.hp = heroCombatant.hp
+                if (activeHero.hp <= 0 && !activeHero.isDead) {
+                    activeHero.isDead = true
+                    c.log.add("TRAGEDIA: ${activeHero.name} poległ!")
+                    state.logEntries.add("ZADANIE: Odzyskaj ciało ${activeHero.name} i zanieś je do Kaplicy.")
+                    
+                    val corpse = lootSystem.itemCatalogue.get("quest_corpse")?.copy(
+                        name = "Zwłoki: ${activeHero.name}",
+                        id = "corpse_${activeHero.id}"
+                    )
+                    if (corpse != null) state.inventory.add(corpse)
+                }
+            }
+            
             c.enemyHp = enemyCombatant.hp
             c.enemyStamina = enemyCombatant.endurance
-            c.heroStamina = heroCombatant.endurance
-            c.heroHp = heroCombatant.hp // FIX (BUG-1)
-            
-            // Sync back hero HP and morale to persistent Hero object
-            state.party.find { it.id == state.activeHeroId }?.let { h ->
-                h.hp = heroCombatant.hp
-                h.morale = heroCombatant.morale
-            }
 
             if (enemyCombatant.hp <= 0) {
                 c.active = false
@@ -181,29 +200,24 @@ class CombatSystem @Inject constructor(
                 currentEnemy?.let { enemyDef ->
                     val xpMsgs = experienceSystem.addPartyXpDirect(state, enemyDef.xpReward)
                     xpMsgs.forEach { c.log.add(it) }
-                    
                     val lootMsgs = lootSystem.awardLootFromTableDirect(state, enemyDef.lootTable)
                     lootMsgs.forEach { c.log.add(it) }
                 }
                 currentEnemy = null
 
                 state.pendingQuestId?.let { pending ->
-                    // FIX (AUDIT-1): Handle "FINALIZE:" prefix used in CityViewModel
-                    val rawId = pending.removePrefix("FINALIZE:")
+                    val rawId = pending.removePrefix("FINALIZE:").removePrefix("COMBAT_WIN:")
                     questEngine.advanceStepDirect(state, rawId)
-                    state.pendingQuestId = null // FIX (BUG-7)
+                    state.pendingQuestId = null
                 }
-            } else if (heroCombatant.hp <= 0) {
+            } else if (state.party.all { it.isDead }) {
                 c.active = false
-                c.log.add("Porażka! ${heroCombatant.name} poległ w walce.")
-                state.party.find { it.id == state.activeHeroId }?.isDead = true
+                c.log.add("Cała drużyna poległa!")
                 pendingCombatEndCallback = onCombatEnd
             }
         }
 
-        // Invoke callback OUTSIDE synchronized block
         pendingCombatEndCallback?.invoke()
-        
         return result
     }
 }

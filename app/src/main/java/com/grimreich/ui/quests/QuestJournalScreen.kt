@@ -43,8 +43,8 @@ fun QuestJournalScreen(
             if (state.activeQuests.isEmpty()) {
                 item { Text(stringResource(R.string.quest_journal_empty_active), color = Color.Gray, fontSize = 12.sp) }
             } else {
-                items(state.activeQuests) { quest ->
-                    QuestEntryCard(quest, isCompleted = false)
+                items(state.activeQuests) { (quest, objective) ->
+                    QuestEntryCard(quest, isCompleted = false, objective = objective)
                 }
             }
 
@@ -68,7 +68,7 @@ fun SectionHeader(title: String) {
 }
 
 @Composable
-fun QuestEntryCard(quest: QuestDefinition, isCompleted: Boolean) {
+fun QuestEntryCard(quest: QuestDefinition, isCompleted: Boolean, objective: String? = null) {
     Surface(
         color = Color(0xFF151515),
         border = androidx.compose.foundation.BorderStroke(1.dp, if (isCompleted) Color.Gray else Color(0xFFADFF2F)),
@@ -77,6 +77,10 @@ fun QuestEntryCard(quest: QuestDefinition, isCompleted: Boolean) {
         Column(modifier = Modifier.padding(12.dp).fillMaxWidth()) {
             Text(quest.title, color = if (isCompleted) Color.Gray else Color.White, fontWeight = FontWeight.Bold)
             Text(quest.description, color = Color.DarkGray, fontSize = 11.sp)
+            if (!isCompleted && objective != null) {
+                Spacer(modifier = Modifier.height(8.dp))
+                Text("CEL: $objective", color = Color(0xFFADFF2F), fontSize = 11.sp, fontWeight = FontWeight.SemiBold)
+            }
         }
     }
 }

@@ -23,8 +23,15 @@ data class DialogueUiState(
     val npcRole: String = "",
     val npcPortrait: String = "port_peasant",
     val backgroundDrawable: String = "bg_city_default",
-    val availableChoices: List<Pair<DialogueChoice, Boolean>> = emptyList(),
+    val availableChoices: List<ChoiceInfo> = emptyList(), // ZMIANA: Bardziej szczegółowe info
     val worldStability: Int = 100
+)
+
+data class ChoiceInfo(
+    val choice: DialogueChoice,
+    val isVisible: Boolean,
+    val isEnabled: Boolean,
+    val activeHeroName: String? = null // Jeśli inna postać przejmuje rozmowę
 )
 
 @HiltViewModel
@@ -45,11 +52,25 @@ class DialogueViewModel @Inject constructor(
                 val nodeId = state.pendingDialogueNodeId ?: "start"
                 val node = dialogueManager.getNode(nodeId)
                 
+                val choicesInfo = node?.choices?.map { choice ->
+                    val mainHero = state.party.find { it.id == state.activeHeroId }
+                    val mainCanDo = mainHero?.let { checkHeroRequirements(choice, it, state) } ?: false
+                    
+                    if (mainCanDo) {
+                        ChoiceInfo(choice, isVisible = true, isEnabled = true)
+                    } else {
+                        // Sprawdzamy czy ktoś inny może przejąć rozmowę
+                        val helper = state.party.find { it.id != state.activeHeroId && checkHeroRequirements(choice, it, state) }
+                        if (helper != null) {
+                            ChoiceInfo(choice, isVisible = true, isEnabled = true, activeHeroName = helper.name)
+                        } else {
+                            // Ukrywamy opcję jeśli nikt nie spełnia wymagań (brak frustracji gracza)
+                            ChoiceInfo(choice, isVisible = false, isEnabled = false)
+                        }
+                    }
+                }?.filter { it.isVisible } ?: emptyList()
+
                 val currentCity = cityCatalogue.get(state.grimCurrentRegion)
-                
-                val choicesWithAvailability = node?.choices?.map { choice ->
-                    choice to checkRequirements(choice, state)
-                } ?: emptyList()
 
                 _uiState.value = DialogueUiState(
                     currentNode = node?.let { dialogueManager.applyWorldEffects(it, state.world.globalStability) },
@@ -57,17 +78,14 @@ class DialogueViewModel @Inject constructor(
                     npcRole = state.pendingDialogueNpcRole ?: "Mieszkaniec",
                     npcPortrait = dialogueManager.getPortrait(state.pendingDialogueNpcRole ?: ""),
                     backgroundDrawable = currentCity?.backgroundDrawable ?: "bg_city_default",
-                    availableChoices = choicesWithAvailability,
+                    availableChoices = choicesInfo,
                     worldStability = state.world.globalStability
                 )
             }
         }
     }
 
-    private fun checkRequirements(choice: DialogueChoice, state: GameState): Boolean {
-        val hero = state.party.find { it.id == state.activeHeroId } ?: return false
-        
-        // Check attributes (Safe access for GSON-instantiated null maps)
+    private fun checkHeroRequirements(choice: DialogueChoice, hero: com.grimreich.core.Hero, state: GameState): Boolean {
         val attrs = choice.requiredAttributes ?: emptyMap()
         attrs.forEach { (attr, value) ->
             val heroVal = when (attr.uppercase()) {
@@ -76,16 +94,14 @@ class DialogueViewModel @Inject constructor(
                 "AGI", "AGILITY", "ZRĘCZNOŚĆ" -> hero.agility
                 "CHA", "CHARISMA", "CHARYZMA" -> hero.charisma
                 "PIETY", "POBOŻNOŚĆ" -> hero.piety
-                else -> 100 // Unknown attr -> auto-fail unless intentional
+                else -> 100
             }
             if (heroVal < value) return false
         }
 
-        // Special quest requirements encoded in triggers (Legacy support)
+        // Reszta warunków (questy, złoto) jest globalna dla drużyny
         if (choice.triggerEvent == "QUEST_ACTIVE" && !state.quest.activeQuestIds.contains(choice.triggerValue)) return false
         if (choice.triggerEvent == "QUEST_COMPLETED" && !state.quest.completedQuestIds.contains(choice.triggerValue)) return false
-        
-        // Gold check (Convention: If triggerEvent is GOLD, triggerValue is amount)
         if (choice.triggerEvent == "REQUIRE_GOLD") {
             val amount = choice.triggerValue?.toIntOrNull() ?: 0
             if (state.gold < amount) return false
@@ -97,13 +113,26 @@ class DialogueViewModel @Inject constructor(
     fun choose(choice: DialogueChoice, onEnd: () -> Unit, onCombat: () -> Unit, onMarket: () -> Unit, onRitual: () -> Unit) {
         val state = gameRepository.currentState()
         
+        // WYKRYWANIE POMOCY: Jeśli opcja została wybrana przez "pomocnika", ustawiamy go jako aktywnego
+        val choiceInfo = _uiState.value.availableChoices.find { it.choice == choice }
+        choiceInfo?.activeHeroName?.let { helperName ->
+            val helper = state.party.find { it.name == helperName }
+            if (helper != null) {
+                gameRepository.updateState { it.activeHeroId = helper.id }
+                state.logEntries.add("${helper.name} przejmuje inicjatywę w rozmowie.")
+            }
+        }
+
         // Handle triggers (quest advances, item giving, etc)
         dialogueManager.handleTrigger(state, choice.triggerEvent, choice.triggerValue)
 
         // SPECIAL TRANSITIONS
         if (choice.triggerEvent == "START_COMBAT" || choice.isCombatTrigger) {
             val enemyType = try { 
-                com.grimreich.core.EnemyType.valueOf(choice.triggerValue ?: "BANDIT") 
+                // FIX: If it's a combat trigger but triggerEvent is ADVANCE_QUEST (common for mixed choices),
+                // use a default enemy type if none provided in triggerValue.
+                val typeStr = (if (choice.triggerEvent == "START_COMBAT") choice.triggerValue else choice.triggerValue) ?: "BANDIT"
+                com.grimreich.core.EnemyType.valueOf(typeStr.trim().uppercase())
             } catch (e: Exception) { 
                 com.grimreich.core.EnemyType.BANDIT 
             }

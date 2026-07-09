@@ -167,12 +167,18 @@ object EncounterCatalog {
         )
     )
 
-    fun get(id: String): BattleEncounter = encounters[id] ?: BattleEncounter(
-        id         = "error_fallback",
-        name       = "Błąd Paradygmatu",
-        enemies    = listOf(EnemyType.BANDIT),
-        difficulty = 1
-    )
+    fun get(id: String): BattleEncounter {
+        val encounter = encounters[id]
+        if (encounter == null) {
+            android.util.Log.e("EncounterCatalog", "UNRESOLVED ENCOUNTER ID: $id - Fallback to Paradigm Error")
+        }
+        return encounter ?: BattleEncounter(
+            id         = "error_fallback",
+            name       = "Błąd Paradygmatu",
+            enemies    = listOf(EnemyType.BANDIT),
+            difficulty = 1
+        )
+    }
 
     fun all(): List<BattleEncounter> = encounters.values.toList()
 }

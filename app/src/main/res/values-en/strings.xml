@@ -19,8 +19,9 @@
     <string name="menu_finale">FINALE</string>
     <string name="menu_combat">COMBAT</string>
 
-    <string name="city_tavern">TAVERN</string>
     <string name="city_market">MARKET</string>
+    <string name="city_alchemy">ALCHEMY</string>
+    <string name="city_tavern">TAVERN</string>
     <string name="city_temple">CHAPEL</string>
     <string name="city_recruit">RECRUIT</string>
 
@@ -64,14 +65,16 @@
     <string name="creator_points_label">AVAILABLE POINTS</string>
     <string name="btn_next">NEXT</string>
     <string name="btn_finish">FINISH</string>
-    <!-- Hub Screen -->
+
+    <!-- Hub Screen (Renamed to OBOZOWISKO) -->
+    <string name="hub_title">OBOZOWISKO</string>
     <string name="hub_day">DAY %1$d</string>
     <string name="hub_world_status">WORLD STATUS</string>
-    <string name="hub_news">LATEST NEWS:</string>
+    <string name="hub_news">CHRONICLE OF EVENTS:</string>
     <string name="hub_party">YOUR PARTY</string>
-    <string name="hub_news_empty">Silence on the airwaves...</string>
-    <string name="hub_location_unknown">Unknown Location</string>
-    <string name="hub_btn_expedition">GO ON EXPEDITION (%1$d)</string>
+    <string name="hub_news_empty">The chronicle is silent...</string>
+    <string name="hub_location_unknown">Unknown Wasteland</string>
+    <string name="hub_btn_expedition">START EXPEDITION (%1$d)</string>
     <string name="hub_btn_no_targets">NO TARGETS</string>
 
     <!-- World Stability Messages -->
@@ -128,7 +131,7 @@
     <string name="identity_hint">YOUR NAME</string>
 
     <!-- City Screen -->
-    <string name="city_btn_exit">RETURN TO HUB</string>
+    <string name="city_btn_exit">RETURN TO OBOZOWISKO</string>
     <string name="city_residents_label">RESIDENTS:</string>
     <string name="city_empty_residents">The streets are empty...</string>
     <string name="city_quest_menu_title">SELECT QUEST</string>
@@ -145,4 +148,12 @@
     <string name="ending_desc_reboot">Reset the session and start anew with greater awareness.</string>
     <string name="ending_btn_delete">DESTRUCTION</string>
     <string name="ending_desc_delete">The world is an error. Let it be erased.</string>
+
+    <!-- Combat Screen -->
+    <string name="combat_btn_attack">ATTACK</string>
+    <string name="combat_btn_defend">DEFEND</string>
+    <string name="combat_btn_revision">REVISION</string>
+    <string name="combat_btn_overwrite">OVERWRITE</string>
+    <string name="combat_btn_exit">END COMBAT</string>
+    <string name="combat_btn_glitch_exit">EXIT_LOOP</string>
 </resources>

@@ -51,9 +51,26 @@
     ]
   },
   {
+    "id": "q_fortress_letter",
+    "title": "List do Twierdzy",
+    "description": "Dostarcz pilną wiadomość od kupca z Wybrzeża do dowódcy Twierdzy Żelaznej.",
+    "rewardGold": 80,
+    "cityId": "twierdza_zelazna",
+    "originNpcId": "guard",
+    "category": "SOCIAL",
+    "recommendedLevel": 2,
+    "steps": [
+      {
+        "description": "Dostarcz list do Dowódcy.",
+        "type": "DIALOGUE",
+        "targetId": "guard_report_back"
+      }
+    ]
+  },
+  {
     "id": "q_scribes_1",
     "title": "Cienie Archiwistów I",
-    "description": "Mira twierdzi, że ktoś podmienia wpisy w Kronice Świata.",
+    "description": "Mira twierdzi, że ktoś podmienia wpisy v Kronice Świata.",
     "rewardGold": 150,
     "cityId": "serce_krainy",
     "originNpcId": "mira",

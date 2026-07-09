@@ -9,56 +9,95 @@ class ChurchSystem @Inject constructor(
     private val gameRepository: GameRepository
 ) {
     fun pray(heroId: String): String {
-        var result = ""
+        var msg = ""
         gameRepository.updateState { state ->
             val hero = state.party.find { it.id == heroId } ?: return@updateState
-            
-            // Stability affects faith efficacy
-            val stability = state.world.globalStability
-            val gain = if (stability > 50) 10 else 5
-            
-            hero.piety = (hero.piety + 1).coerceAtMost(99)
-            state.prayer.faith = (state.prayer.faith + gain).coerceAtMost(100)
-            
-            result = "Modlitwa zakończona. Wiara wzmocniona (+${gain})."
-            state.logEntries.add("${hero.name} modli się przed ołtarzem.")
-            
-            if (stability < 20) {
-                state.logEntries.add("Słyszysz jedynie statyczny szum w odpowiedzi na modlitwę.")
-            }
+            state.prayer.faith += 5
+            hero.sanity = (hero.sanity + 10).coerceAtMost(100)
+            msg = "${hero.name} oddaje się modlitwie. Spokój spływa na jego duszę (+10 Sanity)."
+            state.logEntries.add(msg)
         }
-        return result
+        return msg
     }
 
-    fun makeOffering(amount: Int): String {
-        var result = ""
+    fun makeOffering(goldAmount: Int): String {
+        var msg = ""
         gameRepository.updateState { state ->
-            if (state.gold >= amount) {
-                state.gold -= amount
-                state.prayer.virtue += amount / 10
-                result = "Złożono ofiarę w wysokości $amount G."
-                state.logEntries.add(result)
+            if (state.gold >= goldAmount) {
+                state.gold -= goldAmount
+                state.prayer.faith += goldAmount / 2
+                msg = "Złożono ofiarę w wysokości $goldAmount zł. Bogowie patrzą łaskawiej (+${goldAmount/2} Faith)."
+                state.logEntries.add(msg)
             } else {
-                result = "Niewystarczająca ilość złota."
+                msg = "Nie masz wystarczająco dużo złota."
             }
         }
-        return result
+        return msg
+    }
+
+    fun performResurrection(heroId: String, negotiated: Boolean = false): String {
+        var msg = ""
+        gameRepository.updateState { state ->
+            val hero = state.party.find { it.id == heroId } ?: return@updateState
+            if (!hero.isDead) {
+                msg = "${hero.name} wciąż żyje."
+                return@updateState
+            }
+
+            val corpseId = "corpse_${hero.id}"
+            val corpseItem = state.inventory.find { it.id == corpseId }
+
+            if (corpseItem == null) {
+                msg = "Nie masz przy sobie ciała tego bohatera."
+                return@updateState
+            }
+
+            val baseGold = 300
+            val baseFaith = 100
+            val stabilityPenalty = if (negotiated) 30 else 15
+            val actualGold = if (negotiated) 150 else baseGold
+
+            if (state.prayer.faith < baseFaith || state.gold < actualGold) {
+                msg = "Rytuał wymaga większej ofiary (${baseFaith} Wiary i ${actualGold} Złota)."
+                return@updateState
+            }
+
+            state.prayer.faith -= baseFaith
+            state.gold -= actualGold
+            state.inventory.remove(corpseItem)
+
+            // Wskrzeszenie
+            hero.isDead = false
+            hero.hp = 1
+            hero.sanity = 5
+            hero.corruption += 30
+            
+            // Konsekwencja: Cień Towarzysza
+            state.logEntries.add("UWAGA: Odrodzenie ${hero.name} powołało do życia jego Cień.")
+            state.logEntries.add("Cień będzie nawiedzał Waszą sesję, karmiąc się stabilnością paradygmatu.")
+            
+            // SKRYTA CENA: Spadek stabilności świata
+            state.world.globalStability -= stabilityPenalty
+            
+            msg = "Rytuał dobiegł końca. ${hero.name} otwiera oczy, ale jego spojrzenie jest puste..."
+            state.logEntries.add(msg)
+            state.logEntries.add("Kapłan szepcze: 'Byłem pewien, że wiesz jaka jest cena... a mimo to przyszedłeś.'")
+            if (negotiated) {
+                state.logEntries.add("Głos w Twojej głowie: 'Targowałeś się o życie przyjaciela. Paradygmat zapamięta Twoje skąpstwo.'")
+            }
+        }
+        return msg
     }
 
     fun cleanseRelic(itemId: String): String {
-        var result = ""
+        var msg = ""
         gameRepository.updateState { state ->
             val item = state.inventory.find { it.id == itemId } ?: return@updateState
-            if (state.prayer.faith >= 30) {
-                state.prayer.faith -= 30
-                // For now, cleansing just logs success
-                result = "Relikwia ${item.name} została oczyszczona z wpływów echa."
-                state.logEntries.add(result)
-                state.world.globalStability = (state.world.globalStability + 5).coerceAtMost(100)
-            } else {
-                result = "Zbyt słaba wiara, by przeprowadzić rytuał oczyszczenia."
-            }
+            state.inventory.remove(item)
+            state.world.globalStability += 5
+            msg = "Oczyszczono relikwię: ${item.name}. Stabilność świata wzrosła."
+            state.logEntries.add(msg)
         }
-        return result
+        return msg
     }
 }

@@ -129,9 +129,15 @@ fun HubScreen(
                         horizontalArrangement = Arrangement.spacedBy(GameConstants.UI.PADDING_SMALL)
                     ) {
                         HubNavButton(stringResource(R.string.menu_quests), modifier = Modifier.weight(1f), onClick = onQuests)
-                        HubNavButton(stringResource(R.string.hub_party), modifier = Modifier.weight(1f), color = Color(0xFF4A0000), onClick = { 
-                            state.party.firstOrNull()?.id?.let { onCharacter(it) }
-                        })
+                        HubNavButton(
+                            text = stringResource(R.string.hub_party), 
+                            modifier = Modifier.weight(1f), 
+                            color = if (state.hasPendingLevelUp) Color(0xFFADFF2F) else Color(0xFF4A0000), 
+                            textColor = if (state.hasPendingLevelUp) Color.Black else Color(0xFFE0C080),
+                            onClick = { 
+                                state.party.firstOrNull()?.id?.let { onCharacter(it) }
+                            }
+                        )
                         HubNavButton(stringResource(R.string.journal_title), modifier = Modifier.weight(1f), onClick = onWorldLog)
                     }
 
@@ -172,18 +178,24 @@ fun HubScreen(
 
                 Spacer(modifier = Modifier.width(GameConstants.UI.PADDING_MEDIUM))
 
-                // RIGHT: World Log Summary
+                // RIGHT: World Log Summary (SCROLLABLE)
                 Surface(
                     color = Color(0x10FFFFFF),
                     modifier = Modifier.weight(1f).fillMaxHeight()
                 ) {
-                    Column(modifier = Modifier.padding(GameConstants.UI.PADDING_SMALL)) {
+                    val logScrollState = rememberScrollState()
+                    Column(
+                        modifier = Modifier
+                            .padding(GameConstants.UI.PADDING_SMALL)
+                            .verticalScroll(logScrollState)
+                    ) {
                         Text(stringResource(R.string.hub_news), color = Color.Gray, fontSize = 10.sp)
                         Spacer(modifier = Modifier.height(GameConstants.UI.PADDING_SMALL))
                         
                         if (state.latestLogs.isEmpty()) {
                             Text(stringResource(R.string.hub_news_empty), color = Color.DarkGray, fontSize = 11.sp)
                         } else {
+                            // Pokaż więcej logów niż tylko 5, jeśli chcemy przewijania
                             state.latestLogs.forEach { log ->
                                 Text("- $log", color = Color.LightGray, fontSize = 11.sp, modifier = Modifier.padding(bottom = 4.dp))
                             }
@@ -195,14 +207,22 @@ fun HubScreen(
             Spacer(modifier = Modifier.height(GameConstants.UI.PADDING_MEDIUM))
 
             // BOTTOM: Party Strip
-            Text(stringResource(R.string.hub_party), color = Color.Gray, fontSize = 10.sp, fontWeight = FontWeight.Bold)
-            Spacer(modifier = Modifier.height(4.dp))
-            LazyRow(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(GameConstants.UI.PADDING_SMALL)
+            Surface(
+                color = Color(0x20FFFFFF),
+                modifier = Modifier.fillMaxWidth().padding(top = 4.dp),
+                shape = MaterialTheme.shapes.extraSmall
             ) {
-                items(state.party) { hero ->
-                    PartyMemberCard(hero) { onCharacter(hero.id) }
+                Column(modifier = Modifier.padding(GameConstants.UI.PADDING_SMALL)) {
+                    Text(stringResource(R.string.hub_party), color = Color.Gray, fontSize = 10.sp, fontWeight = FontWeight.Bold)
+                    Spacer(modifier = Modifier.height(4.dp))
+                    LazyRow(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(GameConstants.UI.PADDING_SMALL)
+                    ) {
+                        items(state.party) { hero ->
+                            PartyMemberCard(hero) { onCharacter(hero.id) }
+                        }
+                    }
                 }
             }
         }

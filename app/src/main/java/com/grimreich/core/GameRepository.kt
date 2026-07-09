@@ -85,6 +85,7 @@ class GameRepository @Inject constructor(
     }
 
     fun sync() {
+        android.util.Log.d("GameRepository", "SYNC START: Seeding catalogues...")
         cityCatalogue.seedCanonical()
         itemCatalogue.seed()
         dialogueManager.seedBasicDialogues()
@@ -95,26 +96,35 @@ class GameRepository @Inject constructor(
             val type = object : com.google.gson.reflect.TypeToken<List<Enemy>>() {}.type
             val loadedEnemies: List<Enemy> = com.google.gson.Gson().fromJson(jsonString, type)
             Bestiary.loadFromList(loadedEnemies)
+            android.util.Log.d("GameRepository", "SYNC: Bestiary loaded successfully.")
         } catch (e: Exception) {
             log("[Bestiary] Failed to load external data: ${e.message}")
         }
+        android.util.Log.d("GameRepository", "SYNC END.")
     }
 
     suspend fun restoreIfAvailable(): Boolean {
-        val restored = persistence.restore()
-        if (restored != null) {
-            if (restored.version < 3) {
-                persistence.clearSessionOnly()
-                return false
+        return try {
+            val restored = persistence.restore()
+            if (restored != null) {
+                if (restored.version < 3) {
+                    persistence.clearSessionOnly()
+                    return false
+                }
+                SaveSystem.restoreFromPersistence(persistence)
+                val domain = restored.toDomain()
+                _gameState.value = domain
+                _gameLogs.value = domain.logEntries.toList()
+                sync()
+                true
+            } else {
+                false
             }
-            SaveSystem.restoreFromPersistence(persistence)
-            val domain = restored.toDomain()
-            _gameState.value = domain
-            _gameLogs.value = domain.logEntries.toList()
-            sync()
-            return true
+        } catch (e: Exception) {
+            android.util.Log.e("GameRepository", "Resilience: Restore failed, resetting session.", e)
+            clearSessionAndReset()
+            false
         }
-        return false
     }
 
     fun persistCurrentState() {
@@ -143,11 +153,13 @@ class GameRepository @Inject constructor(
         _gameState.value = state.deepCopy().also { it.normalizeState() }
     }
 
-    fun hasSession(): Boolean = persistence.exists()
+    fun hasSession(): Boolean = persistence.exists() && persistence.hasPersistedSession()
 
     fun clearSessionAndReset() {
+        android.util.Log.e("GameRepository", "CRITICAL: clearSessionAndReset() called!")
         persistence.clear()
         _gameState.value = GameState()
         _gameLogs.value = emptyList()
+        sync() // FIX: Re-seed registries for the new session
     }
 }

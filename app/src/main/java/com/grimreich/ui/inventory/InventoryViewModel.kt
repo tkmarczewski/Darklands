@@ -12,6 +12,7 @@ import javax.inject.Inject
 
 data class InventoryUiState(
     val activeHero: Hero? = null,
+    val party: List<Hero> = emptyList(),
     val inventory: List<Item> = emptyList(),
     val selectedItem: Item? = null
 )
@@ -58,9 +59,15 @@ class InventoryViewModel @Inject constructor(
         val heroId = selectedHeroId ?: state.activeHeroId
         val hero = state.party.find { it.id == heroId }
         
+        android.util.Log.d("InventoryViewModel", "[INVENTORY] Refresh. Party size: ${state.party.size}. Selected: $heroId")
+        state.party.forEach { h ->
+            android.util.Log.d("InventoryViewModel", "[INVENTORY]   - Hero: ${h.name} (${h.id})")
+        }
+
         _uiState.update { 
             it.copy(
                 activeHero = hero,
+                party = state.party,
                 inventory = state.inventory
             )
         }

@@ -45,9 +45,8 @@ sealed class GameRoute(val route: String) {
     object Ritual : GameRoute("ritual")
     object Ending : GameRoute("ending")
     object CharDetail : GameRoute("char_detail")
-    // Temple and Events are not yet implemented; they redirect to safe fallbacks.
-    object Temple : GameRoute("city")   // fallback: stay in city until TempleScreen lands
-    object Events : GameRoute("hub")    // fallback: back to hub until EventsScreen lands
+    object Temple : GameRoute("temple")
+    object Events : GameRoute("events")
 }
 
 @Composable
@@ -56,6 +55,7 @@ fun GameNavHost(
     navController: NavHostController = rememberNavController()
 ) {
     val mode by root.mode.collectAsState()
+    val context = androidx.compose.ui.platform.LocalContext.current
 
     LaunchedEffect(mode) {
         val route = when (mode) {
@@ -93,7 +93,7 @@ fun GameNavHost(
             MainMenuScreen(
                 onNewGame = { root.startNewGame() },
                 onContinue = { root.restoreSessionIfValid() },
-                onExit = { /* exit app */ },
+                onExit = { (context as? android.app.Activity)?.finish() },
                 onDevMenu = { root.setMode(GameScreenMode.DEV_MENU) }
             )
         }
@@ -162,7 +162,8 @@ fun GameNavHost(
             ExpeditionScreen(
                 viewModel = hiltViewModel(),
                 onBack = { root.setMode(GameScreenMode.HUB) },
-                onCombat = { root.setMode(GameScreenMode.COMBAT) }
+                onCombat = { root.setMode(GameScreenMode.COMBAT) },
+                onDialogue = { root.setMode(GameScreenMode.DIALOGUE) }
             )
         }
 
@@ -217,6 +218,13 @@ fun GameNavHost(
             )
         }
 
+        composable(GameRoute.Temple.route) {
+            com.grimreich.ui.city.TempleScreen(
+                viewModel = hiltViewModel(),
+                onBack = { root.setMode(GameScreenMode.CITY) }
+            )
+        }
+
         composable(GameRoute.DevMenu.route) {
             DevMenuScreen(
                 onBack = { root.setMode(GameScreenMode.HUB) }
@@ -258,6 +266,7 @@ fun GameNavHost(
                 CharDetailScreen(
                     hero = it,
                     onUpgrade = { stat -> root.upgradeStat(it.id, stat) },
+                    onRandomize = { root.randomizeAttributes(it.id) },
                     onBack = { root.setMode(GameScreenMode.HUB) }
                 )
             }

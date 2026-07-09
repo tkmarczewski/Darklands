@@ -27,58 +27,44 @@ class CityViewModel @Inject constructor(
     val uiState: StateFlow<CityUiState> = _uiState.asStateFlow()
 
     init {
+        android.util.Log.e("CityViewModel", "INIT: Observing GameState flow...")
         gameRepository.gameState
-            .onEach { state ->
-                val cityId = state.grimCurrentRegion
-                val cityData = cityCatalogue.get(cityId)
-                
-                // FIX: Include both active AND available quests for this city
-                val quests = questEngine.getAllRelevantQuestsForCity(cityId, state)
-                val generatedNpcs = npcGenerator.generateForCity(cityId, state)
-
-                val stability = state.world.globalStability
-                val isGrim20 = stability < 35
-                val finalGlitchIntensity = (state.world.echoIntensity + (100 - stability) / 50f).coerceAtMost(5f)
-
-                _uiState.update { 
-                    it.copy(
-                        cityName = if (isGrim20) "KRYPTA_PROCESU" else cityData?.name ?: "Nieznane",
-                        cityStatus = cityData?.loreDescription ?: socialEventSystem.cityAudience(cityId, stability),
-                        backgroundDrawable = cityData?.backgroundDrawable ?: "bg_region_north_coast",
-                        activeQuestsCount = quests.size,
-                        npcs = generatedNpcs,
-                        activeLocalQuests = quests,
-                        isGlitchActive = finalGlitchIntensity > 0.5f,
-                        glitchIntensity = finalGlitchIntensity,
-                        rulingFactionName = cityData?.rulingFaction ?: "Neutralna"
-                    )
-                }
-            }
+            .onEach { refresh() }
             .launchIn(viewModelScope)
     }
 
     fun toggleQuestMenu(open: Boolean) {
         _uiState.update { it.copy(isQuestMenuOpen = open) }
+        if (open) refresh()
     }
 
     fun startDialogue(name: String, role: String, node: String, onStart: () -> Unit) {
         val state = gameRepository.currentState()
         val cityId = state.grimCurrentRegion
         
+        // Szukamy zadania gotowego do oddania u tego NPC
         val questToComplete = state.quest.progress.values.find {
             val def = questEngine.getDefinition(it.questId)
-            it.status == QuestStatus.OBJECTIVE_MET && def?.cityId == cityId && def.originNpcId.lowercase() == role.lowercase()
+            it.status == QuestStatus.OBJECTIVE_MET && 
+            def?.cityId == cityId && def.originNpcId.lowercase() == role.lowercase()
         }
 
         val targetNode = if (questToComplete != null) {
-            when (role.lowercase()) {
-                "guard", "straznik" -> "guard_report_back"
-                "merchant", "kupiec" -> "merchant_report_back"
-                "mira" -> "mira_report_back"
-                "mystic", "mistyk" -> "mystic_report_back"
-                else -> "quest_report_back_generic"
+            when (questToComplete.questId) {
+                "q_verdict_1" -> "guard_verdict_done"
+                "q_deserter" -> "guard_deserter_done"
+                "q_coast_harvest" -> "merchant_report_back"
+                "q_scribes_1" -> "mira_report_back"
+                else -> when (role.lowercase()) {
+                    "guard", "straznik" -> "guard_report_back"
+                    "merchant", "kupiec" -> "merchant_report_back"
+                    "aelion" -> "aelion_quest"
+                    else -> "quest_report_back_generic"
+                }
             }
         } else node
+
+        android.util.Log.i("CityViewModel", "[DIALOGUE] Starting dialogue with $name ($role). Node: $targetNode. Quest to complete: ${questToComplete?.questId}")
 
         gameRepository.updateState { s ->
             s.pendingDialogueNpcName = name
@@ -86,6 +72,8 @@ class CityViewModel @Inject constructor(
             s.pendingDialogueNodeId = targetNode
             if (questToComplete != null) {
                 s.pendingQuestId = "FINALIZE:${questToComplete.questId}"
+            } else {
+                s.pendingQuestId = null
             }
         }
         onStart()
@@ -102,6 +90,35 @@ class CityViewModel @Inject constructor(
         }
 
         startDialogue(quest.originNpcId.uppercase(), quest.originNpcId, targetNode, onDialogue)
+    }
+
+    fun refresh() {
+        val state = gameRepository.currentState()
+        val cityId = state.grimCurrentRegion
+        val cityData = cityCatalogue.get(cityId)
+        
+        val quests = questEngine.getAllRelevantQuestsForCity(cityId, state)
+        val generatedNpcs = npcGenerator.generateForCity(cityId, state)
+
+        val stability = state.world.globalStability
+        val isGrim20 = stability < 35
+        val finalGlitchIntensity = (state.world.echoIntensity + (100 - stability) / 50f).coerceAtMost(5f)
+
+        android.util.Log.i("CityViewModel", "[REFRESH] City: $cityId, Quests: ${quests.size}")
+
+        _uiState.update { 
+            it.copy(
+                cityName = if (isGrim20) "KRYPTA_PROCESU" else cityData?.name ?: "Nieznane",
+                cityStatus = cityData?.loreDescription ?: socialEventSystem.cityAudience(cityId, stability),
+                backgroundDrawable = cityData?.backgroundDrawable ?: "bg_region_north_coast",
+                activeQuestsCount = quests.size,
+                npcs = generatedNpcs,
+                activeLocalQuests = quests,
+                isGlitchActive = finalGlitchIntensity > 0.5f,
+                glitchIntensity = finalGlitchIntensity,
+                rulingFactionName = cityData?.rulingFaction ?: "Neutralna"
+            )
+        }
     }
 }
 

@@ -84,19 +84,36 @@ class DialogueManager @Inject constructor(
     fun handleTrigger(state: GameState, event: String?, value: String?) {
         if (event == null) return
         val engine = questEngine.get()
+        android.util.Log.d("DialogueManager", "[DIALOGUE] Trigger firing: $event -> $value")
         when (event) {
             "ACTIVATE_QUEST" -> {
-                value?.let { engine.activateQuestDirect(state, it) }
+                value?.let { 
+                    engine.activateQuestDirect(state, it) 
+                    android.util.Log.i("DialogueManager", "[QUEST] Activated via dialogue: $it")
+                }
                 state.pendingQuestId = null
             }
             "ADVANCE_QUEST" -> {
-                value?.let { engine.advanceStepDirect(state, it) }
+                value?.let { 
+                    engine.advanceStepDirect(state, it) 
+                    android.util.Log.i("DialogueManager", "[QUEST] Advanced via dialogue: $it")
+                }
             }
             "FAIL_QUEST" -> {
                 value?.let { engine.failQuestDirect(state, it) }
             }
             "COMPLETE_QUEST" -> {
-                value?.let { engine.completeQuestDirect(state, it) }
+                val targetId = if (value == "ACTIVE") {
+                    state.pendingQuestId?.removePrefix("FINALIZE:")
+                } else {
+                    value
+                }
+                
+                targetId?.let { 
+                    engine.completeQuestDirect(state, it) 
+                    android.util.Log.i("DialogueManager", "[QUEST] Completed via dialogue: $it")
+                }
+                state.pendingQuestId = null
             }
             "GRANT_REPUTATION" -> {
                 val parts = value?.split(":") ?: return
@@ -104,6 +121,7 @@ class DialogueManager @Inject constructor(
                     val faction = parts[0]
                     val amount = parts[1].toIntOrNull() ?: 0
                     state.reputation.globalFactions[faction] = (state.reputation.globalFactions[faction] ?: 0) + amount
+                    android.util.Log.i("DialogueManager", "[REP] Granted $amount to $faction")
                 }
             }
             "GIVE_ITEM" -> {
@@ -113,10 +131,17 @@ class DialogueManager @Inject constructor(
                     if (item != null) {
                         state.inventory.add(item.copy())
                         state.logEntries.add("Otrzymano przedmiot: ${item.name}")
+                        android.util.Log.i("DialogueManager", "[ITEM] Granted: $itemId")
                     }
                 }
             }
+            "OPEN_MARKET" -> {
+                android.util.Log.i("DialogueManager", "[DIALOGUE] Trigger: OPEN_MARKET")
+                // Sygnał do ViewModelu, by otworzył rynek po zamknięciu dialogu
+                state.logEntries.add("Otwierasz okno handlu...")
+            }
             "ACTIVATE_QUEST_CHAIN" -> {
+                android.util.Log.d("DialogueManager", "[QUEST] Activating quest chain...")
                 // Special logic for Mira's quest chain progression
                 when {
                     engine.getStatus("q_scribes_1", state) == com.grimreich.core.QuestStatus.AVAILABLE -> engine.activateQuestDirect(state, "q_scribes_1")

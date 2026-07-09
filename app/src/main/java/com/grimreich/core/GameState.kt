@@ -1,9 +1,12 @@
 package com.grimreich.core
 
-import com.grimreich.grimreich.v1.*
+import com.grimreich.grimreich.v1.NPC
+import com.grimreich.grimreich.v1.Item
+import com.grimreich.grimreich.v1.GrimWorldEngine
+import com.grimreich.grimreich.v1.GrimWorldEngineFactory
 
 data class GameState(
-    @Transient val grimEngine: GrimWorldEngine = GrimWorldEngineFactory.create(),
+    var grimEngine: GrimWorldEngine = GrimWorldEngineFactory.create(),
 
     var playerName: String? = null,
     var heroName: String? = null,
@@ -22,106 +25,69 @@ data class GameState(
     var activeHeroId: String? = null,
     val inventory: MutableList<Item> = mutableListOf(),
     val logEntries: MutableList<String> = mutableListOf(),
-    var gold: Int = 100,
+    var gold: Int = 0,
 
     var quest: QuestState = QuestState(),
-    val reputation: ReputationState = ReputationState(),
-    val prayer: PrayerState = PrayerState(),
-    val world: WorldState = WorldState(),
-    val combat: CombatState = CombatState(),
+    var reputation: ReputationState = ReputationState(),
+    var prayer: PrayerState = PrayerState(),
+    var world: WorldState = WorldState(),
+    var combat: CombatState = CombatState(),
     val knownNpcs: MutableMap<String, List<NPC>> = mutableMapOf(),
     val unlockedLoreIds: MutableSet<String> = mutableSetOf(),
-    val persistentMeta: PersistentMeta = PersistentMeta(),
+    var persistentMeta: PersistentMeta = PersistentMeta(),
     var isExpeditionActive: Boolean = false,
-    var lastSaveTimestamp: Long = System.currentTimeMillis(),
-    
+    var lastSaveTimestamp: Long = 0,
+
     var grimMutationPhase: Int = 0,
-    val grantedRewardFlags: MutableSet<String> = mutableSetOf()
+    val grantedRewardFlags: MutableSet<String> = mutableSetOf(),
+    val companionShadows: MutableList<Hero> = mutableListOf()
 ) {
     fun trimLogs() {
-        if (logEntries.size > GameConstants.MAX_LOG_ENTRIES) {
-            val last = logEntries.takeLast(GameConstants.MAX_LOG_ENTRIES)
-            logEntries.clear()
-            logEntries.addAll(last)
+        if (logEntries.size > 100) {
+            val toRemove = logEntries.size - 100
+            repeat(toRemove) { logEntries.removeAt(0) }
         }
     }
 
     fun normalizeState() {
         if (gold < 0) gold = 0
         if (world.day < 1) world.day = 1
-        party.forEach { it.normalize() }
-        hireableHeroes.forEach { it.normalize() }
         trimLogs()
+        party.forEach { it.normalize() }
     }
 
-    fun deepCopy(): GameState = GameState(
-        grimEngine = GrimWorldEngineFactory.create().also {
-            it.echoIntensity = world.echoIntensity
-            it.mutationPhase = grimMutationPhase
-        },
-        playerName = playerName,
-        heroName = heroName,
-        characterNameLocked = characterNameLocked,
-        metaAwarenessLevel = metaAwarenessLevel,
-        grimCurrentRegion = grimCurrentRegion,
-        grimPendingExpeditionName = grimPendingExpeditionName,
-        pendingQuestId = pendingQuestId,
-        pendingDialogueNpcName = pendingDialogueNpcName,
-        pendingDialogueNpcRole = pendingDialogueNpcRole,
-        pendingDialogueNodeId = pendingDialogueNodeId,
-        party = party.map { hero ->
-            hero.copy(
-                careerHistory = hero.careerHistory.toMutableList(),
-                abilities = hero.abilities.map { it.copy() }.toMutableList(),
-                skills = hero.skills.toMutableMap(),
-                activeMutations = hero.activeMutations.map { it.copy() }.toMutableList(),
-                equipment = hero.equipment.toMutableMap()
-            )
-        }.toMutableList(),
-        hireableHeroes = hireableHeroes.map { hero ->
-            hero.copy(
-                careerHistory = hero.careerHistory.toMutableList(),
-                abilities = hero.abilities.map { it.copy() }.toMutableList(),
-                skills = hero.skills.toMutableMap(),
-                activeMutations = hero.activeMutations.map { it.copy() }.toMutableList(),
-                equipment = hero.equipment.toMutableMap()
-            )
-        }.toMutableList(),
-        activeHeroId = activeHeroId,
-        inventory = inventory.map { it.copy() }.toMutableList(),
-        logEntries = if (logEntries.size <= GameConstants.MAX_LOG_ENTRIES) {
-            logEntries.toMutableList()
-        } else {
-            logEntries.takeLast(GameConstants.MAX_LOG_ENTRIES).toMutableList()
-        },
-        gold = gold,
-        quest = QuestState(
-            activeQuestIds = quest.activeQuestIds.toMutableSet(),
-            completedQuestIds = quest.completedQuestIds.toMutableSet(),
-            progress = quest.progress.mapValues { it.value.copy(variables = it.value.variables.toMap()) }.toMutableMap()
+    fun deepCopy(): GameState = this.copy(
+        grimEngine = this.grimEngine, // Not deeply copied, system handled
+        party = this.party.map { it.copy() }.toMutableList(),
+        hireableHeroes = this.hireableHeroes.map { it.copy() }.toMutableList(),
+        inventory = this.inventory.map { it.copy() }.toMutableList(),
+        logEntries = this.logEntries.toMutableList(),
+        quest = this.quest.copy(
+            activeQuestIds = this.quest.activeQuestIds.toMutableSet(),
+            completedQuestIds = this.quest.completedQuestIds.toMutableSet(),
+            progress = this.quest.progress.mapValues { it.value.copy() }.toMutableMap()
         ),
-        reputation = reputation.copy(
-            cityFactions = reputation.cityFactions.mapValues { it.value.toMutableMap() }.toMutableMap()
+        reputation = this.reputation.copy(
+            globalFactions = this.reputation.globalFactions.toMutableMap(),
+            cityFactions = this.reputation.cityFactions.mapValues { it.value.toMutableMap() }.toMutableMap()
         ),
-        prayer = prayer.copy(
-            blessings = prayer.blessings.toMutableList()
+        prayer = this.prayer.copy(
+            blessings = this.prayer.blessings.toMutableList()
         ),
-        world = world.copy(
-            discoveredLocations = world.discoveredLocations.toMutableList()
+        world = this.world.copy(
+            discoveredLocations = this.world.discoveredLocations.toMutableList()
         ),
-        combat = combat.copy(
-            log = combat.log.toMutableList(),
-            enemyEffects = combat.enemyEffects.toMutableList(),
-            heroEffects = combat.heroEffects.toMutableList()
+        combat = this.combat.copy(
+            enemyEffects = this.combat.enemyEffects.toMutableList(),
+            heroEffects = this.combat.heroEffects.toMutableList(),
+            log = this.combat.log.toMutableList()
         ),
-        knownNpcs = knownNpcs.mapValues { it.value.map { n -> n.copy() }.toMutableList() }.toMutableMap(),
-        unlockedLoreIds = unlockedLoreIds.toMutableSet(),
-        persistentMeta = persistentMeta.copy(
-            unlockedLegacyBuffs = persistentMeta.unlockedLegacyBuffs.toMutableSet()
+        knownNpcs = this.knownNpcs.mapValues { it.value.toList() }.toMutableMap(),
+        unlockedLoreIds = this.unlockedLoreIds.toMutableSet(),
+        persistentMeta = this.persistentMeta.copy(
+            unlockedLegacyBuffs = this.persistentMeta.unlockedLegacyBuffs.toMutableSet()
         ),
-        isExpeditionActive = isExpeditionActive,
-        lastSaveTimestamp = lastSaveTimestamp,
-        grimMutationPhase = grimMutationPhase,
-        grantedRewardFlags = grantedRewardFlags.toMutableSet()
+        grantedRewardFlags = this.grantedRewardFlags.toMutableSet(),
+        companionShadows = this.companionShadows.map { it.copy() }.toMutableList()
     )
 }

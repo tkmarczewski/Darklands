@@ -53,13 +53,19 @@ class RecruitmentViewModel @Inject constructor(
         val state = gameRepository.currentState()
         val cost = _uiState.value.hireCosts[hero.id] ?: 100
         
-        if (state.gold < cost || state.party.size >= GameConstants.MAX_PARTY_SIZE) return
+        android.util.Log.d("RecruitmentViewModel", "[RECRUIT] Attempting to hire ${hero.name}. Cost: $cost, Gold: ${state.gold}, Party: ${state.party.size}")
+
+        if (state.gold < cost || state.party.size >= GameConstants.MAX_PARTY_SIZE) {
+            android.util.Log.w("RecruitmentViewModel", "[RECRUIT] Hire failed: Insufficient gold or party full.")
+            return
+        }
 
         gameRepository.updateState { s ->
             s.gold -= cost
             s.party.add(hero)
             s.hireableHeroes.removeIf { it.id == hero.id }
             s.logEntries.add("Zrekrutowano: ${hero.name} za $cost zł.")
+            android.util.Log.i("RecruitmentViewModel", "[RECRUIT] Successfully hired ${hero.name}. New party size: ${s.party.size}")
         }
     }
 }

@@ -2,6 +2,7 @@ package com.grimreich.ui.combat
 
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -13,7 +14,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.grimreich.R
 import com.grimreich.core.GameConstants
 import kotlin.random.Random
 
@@ -69,10 +72,43 @@ fun CombatScreen(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // HEROES
-        state.party.forEach { hero ->
-            CombatantRow(hero.name, hero.hp, hero.maxHp, isEnemy = false, stability = state.worldStability, jitter = jitterX)
-            Spacer(modifier = Modifier.height(4.dp))
+        // HEROES (Party List / Selector)
+        Row(
+            modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            state.party.forEach { hero ->
+                val isTarget = state.combat.currentTargetHeroId == hero.id
+                val isActive = state.combat.activeHeroId == hero.id
+                
+                Surface(
+                    modifier = Modifier
+                        .weight(1f)
+                        .clickable(enabled = !hero.isDead) { viewModel.selectHero(hero.id) },
+                    color = if (isActive) Color(0xFF333300) else Color(0xFF111111),
+                    border = androidx.compose.foundation.BorderStroke(
+                        if (isTarget) 2.dp else 1.dp,
+                        if (isTarget) Color.Red else if (isActive) Color.Yellow else Color.DarkGray
+                    ),
+                    shape = MaterialTheme.shapes.extraSmall
+                ) {
+                    Column(modifier = Modifier.padding(4.dp)) {
+                        Text(
+                            hero.name.uppercase(), 
+                            color = if (hero.isDead) Color.Gray else Color.White, 
+                            fontSize = 10.sp, 
+                            fontWeight = FontWeight.Bold,
+                            maxLines = 1
+                        )
+                        LinearProgressIndicator(
+                            progress = { if (hero.maxHp > 0) hero.hp.toFloat() / hero.maxHp else 0f },
+                            modifier = Modifier.fillMaxWidth().height(2.dp),
+                            color = if (hero.hp < 10) Color.Red else Color(0xFFADFF2F),
+                            trackColor = Color.Black
+                        )
+                    }
+                }
+            }
         }
 
         Spacer(modifier = Modifier.height(12.dp))
@@ -98,14 +134,14 @@ fun CombatScreen(
             Spacer(modifier = Modifier.height(8.dp))
 
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                CombatButton("ATAK", Color(0xFF800000), modifier = Modifier.weight(1f)) { viewModel.attack() }
-                CombatButton("OBRONA", Color(0xFF444444), modifier = Modifier.weight(1f)) { viewModel.defend() }
+                CombatButton(stringResource(R.string.combat_btn_attack), Color(0xFF800000), modifier = Modifier.weight(1f)) { viewModel.attack() }
+                CombatButton(stringResource(R.string.combat_btn_defend), Color(0xFF444444), modifier = Modifier.weight(1f)) { viewModel.defend() }
             }
             Spacer(modifier = Modifier.height(8.dp))
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                val revLabel = if (state.worldStability < 40) "REWIZJA_v2" else "REWIZJA"
+                val revLabel = if (state.worldStability < 40) stringResource(R.string.combat_btn_revision) + "_v2" else stringResource(R.string.combat_btn_revision)
                 CombatButton(revLabel, Color(0xFF004488), modifier = Modifier.weight(1f)) { viewModel.useEchoSkill("REVISION") }
-                CombatButton("NADPISANIE", Color(0xFF440088), modifier = Modifier.weight(1f)) { viewModel.useEchoSkill("OVERWRITE") }
+                CombatButton(stringResource(R.string.combat_btn_overwrite), Color(0xFF440088), modifier = Modifier.weight(1f)) { viewModel.useEchoSkill("OVERWRITE") }
             }
         } else {
             Button(
@@ -113,7 +149,7 @@ fun CombatScreen(
                 modifier = Modifier.fillMaxWidth().height(50.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = if (state.worldStability < 10) Color.Red else Color(0xFF2A2A2A))
             ) {
-                Text(if (state.worldStability < 5) "WYJDŹ_Z_PĘTLI" else "ZAKOŃCZ WALKĘ", color = Color.White, fontWeight = FontWeight.Bold)
+                Text(if (state.worldStability < 5) stringResource(R.string.combat_btn_glitch_exit) else stringResource(R.string.combat_btn_exit), color = Color.White, fontWeight = FontWeight.Bold)
             }
         }
     }

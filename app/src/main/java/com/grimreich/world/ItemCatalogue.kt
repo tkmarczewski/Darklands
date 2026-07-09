@@ -56,5 +56,15 @@ class ItemCatalogue @Inject constructor() {
         register(Item(id = "ing_bone", name = "Kość", type = "ingredient", value = 2, weight = 0.5))
         register(Item(id = "ing_feather", name = "Pióro", type = "ingredient", value = 3, weight = 0.05))
         register(Item(id = "ing_echo_dust", name = "Pył Echa", type = "ingredient", value = 15, weight = 0.1))
+
+        // QUEST ITEMS
+        register(Item(
+            id = "quest_corpse", 
+            name = "Zwłoki towarzysza", 
+            type = "quest", 
+            value = 0, 
+            weight = 50.0, 
+            lore = "Ciało, które niegdyś miało duszę. Ciężkie i emanujące chłodem."
+        ))
     }
 }

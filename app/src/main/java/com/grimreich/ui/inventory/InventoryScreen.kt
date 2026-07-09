@@ -4,9 +4,11 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -69,6 +71,27 @@ fun InventoryScreen(viewModel: InventoryViewModel, onBack: () -> Unit) {
             Row(modifier = Modifier.fillMaxSize()) {
                 // LEFT: Hero Visual & Slots
                 Column(modifier = Modifier.weight(1f), horizontalAlignment = Alignment.CenterHorizontally) {
+                    // HERO SELECTOR
+                    if (state.party.size > 1) {
+                        LazyRow(
+                            modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                            contentPadding = PaddingValues(horizontal = 4.dp)
+                        ) {
+                            items(state.party) { h ->
+                                val isSelected = h.id == hero?.id
+                                Box(
+                                    modifier = Modifier
+                                        .background(if (isSelected) Color(0xFFC0A060) else Color(0xFF1A1A1A), MaterialTheme.shapes.extraSmall)
+                                        .clickable { viewModel.selectHero(h.id) }
+                                        .padding(horizontal = 12.dp, vertical = 6.dp)
+                                ) {
+                                    Text(h.name.uppercase(), color = if (isSelected) Color.Black else Color.Gray, fontSize = 10.sp, fontWeight = FontWeight.Bold)
+                                }
+                            }
+                        }
+                    }
+
                     if (hero != null) {
                         HeroPaperDoll(hero, state.inventory) { slot -> 
                             viewModel.unequipItem(slot)

@@ -16,7 +16,8 @@ data class CityData(
     val primaryArtifact: String,
     val events: MutableList<String> = mutableListOf(),
     val prophet: String? = null,
-    val marketStock: List<String> = emptyList()
+    val marketStock: List<String> = emptyList(),
+    val isQuestAccessLocked: Boolean = false // NOWE
 )
 
 @Singleton
@@ -31,7 +32,7 @@ class CityCatalogue @Inject constructor() {
     fun get(id: String?): CityData? = cities[id]
 
     fun all(): List<CityData> = cities.values.toList()
-    
+
     fun allIds(): Set<String> = cities.keys
 
     fun clear() {

@@ -36,6 +36,7 @@ fun CityScreen(
     onDialogue: () -> Unit,
     onExit: () -> Unit
 ) {
+    android.util.Log.e("CityScreen", "COMPOSING: CityScreen")
     val state by viewModel.uiState.collectAsState()
     val context = LocalContext.current
 
@@ -92,8 +93,7 @@ fun CityScreen(
                     Spacer(modifier = Modifier.height(10.dp))
 
                     CityNavBtn(stringResource(R.string.market_title), onMarket)
-                    CityNavBtn(stringResource(R.string.menu_city), onAlchemy) // Reusing menu_city for Alchemy label if needed, wait, better use R.string.city_alchemy if added
-                    // I will use Tavern and Temple strings if I have them
+                    CityNavBtn(stringResource(R.string.city_alchemy), onAlchemy)
                     CityNavBtn(stringResource(R.string.city_tavern), onTavern)
                     CityNavBtn(stringResource(R.string.city_temple), onTemple)
                     CityNavBtn(stringResource(R.string.city_recruit), onRecruit)
