@@ -5,6 +5,8 @@ import androidx.lifecycle.viewModelScope
 import com.grimreich.core.*
 import com.grimreich.systems.AudioEngine
 import com.grimreich.systems.CombatSystem
+import com.grimreich.systems.ContentError
+import com.grimreich.systems.ContentValidator
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -19,11 +21,19 @@ class GameRootViewModel @Inject constructor(
     val gameRepository: GameRepository,
     private val gameBootstrapper: GameBootstrapper,
     private val combatSystem: CombatSystem,
-    private val audioEngine: AudioEngine
+    private val audioEngine: AudioEngine,
+    private val contentValidator: ContentValidator
 ) : ViewModel() {
 
     private val _mode = MutableStateFlow(GameScreenMode.MAIN_MENU)
     val mode: StateFlow<GameScreenMode> = _mode.asStateFlow()
+
+    private val _contentErrors = MutableStateFlow<List<ContentError>>(emptyList())
+    val contentErrors: StateFlow<List<ContentError>> = _contentErrors.asStateFlow()
+
+    fun runContentValidation() {
+        _contentErrors.value = contentValidator.validateAll()
+    }
 
     private val _inspectedHeroId = MutableStateFlow<String?>(null)
     val inspectedHero: StateFlow<Hero?> = combine(gameRepository.gameState, _inspectedHeroId) { state, id ->

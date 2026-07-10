@@ -42,6 +42,10 @@ class DialogueManager @Inject constructor(
         nodes[node.id] = node
     }
 
+    fun getAllNodes(): Map<String, DialogueNode> = nodes
+
+    fun hasNode(nodeId: String): Boolean = nodes.containsKey(nodeId)
+
     fun getNode(id: String): DialogueNode? {
         if (id == "end") return null
         

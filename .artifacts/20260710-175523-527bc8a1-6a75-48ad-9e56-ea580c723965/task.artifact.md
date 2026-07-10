@@ -12,7 +12,13 @@
 - [x] Poprawa `GameLoopController.kt` (podróż do celu questa, reset registry)
 - [x] Integracja systemów z resztą kodu
 
-## Etap 3: UI / UX Refaktor [/]
-- [ ] Modernizacja City i Expedition (UiEffect, Route/Content split)
-- [ ] Implementacja Character Hub (Bohater | Ekwipunek | Drużyna)
-- [ ] Usunięcie legacy "magic string protocol" z UI
+## Etap 3: UI / UX Refaktor [ZAKOŃCZONO]
+- [x] Modernizacja City i Expedition (UiEffect, Route/Content split)
+- [x] Implementacja Character Hub (Bohater | Ekwipunek | Drużyna)
+- [x] Usunięcie legacy "magic string protocol" z UI
+
+## Etap 4: Content Validator i Integralność Danych [/]
+- [ ] Implementacja `ContentValidator.kt`
+- [ ] Integracja z `GameBootstrapper.kt` (fail-fast w debug)
+- [ ] Naprawa niespójności w obecnych plikach JSON
+- [ ] Testy jednostkowe walidatora

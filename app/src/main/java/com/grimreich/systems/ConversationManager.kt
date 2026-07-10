@@ -17,6 +17,10 @@ class ConversationManager @Inject constructor(
         dialogueNodes[node.id] = node
     }
 
+    fun getAllNodes(): Map<String, DialogueNode> = dialogueNodes
+
+    fun hasNode(nodeId: String): Boolean = dialogueNodes.containsKey(nodeId)
+
     fun start(nodeId: String): DialogueNode? {
         return dialogueNodes[nodeId]?.let { applyEchoEffect(it) }
     }

@@ -1,5 +1,6 @@
 package com.grimreich.core
 
+import android.util.Log
 import com.grimreich.grimreich.v1.NPC
 import com.grimreich.systems.DialogueManager
 import com.grimreich.systems.AtmosphericLogSystem
@@ -8,6 +9,8 @@ import com.grimreich.systems.QuestManifest
 import com.grimreich.world.HeroPool
 import com.grimreich.world.CityCatalogue
 import com.grimreich.world.ItemCatalogue
+import com.grimreich.systems.ContentValidator
+import com.grimreich.systems.ErrorSeverity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -22,6 +25,7 @@ class GameBootstrapper @Inject constructor(
     private val atmosphericLogSystem: AtmosphericLogSystem,
     private val cityCatalogue: CityCatalogue,
     private val itemCatalogue: ItemCatalogue,
+    private val contentValidator: ContentValidator,
     private val worldMap: WorldMap,
     private val heroPool: HeroPool
 ) {
@@ -48,6 +52,14 @@ class GameBootstrapper @Inject constructor(
 
         // Seed quests AFTER state reset so they are always available.
         questManifest.seed()
+
+        // Run content validation after everything is seeded
+        val validationErrors = contentValidator.validateAll()
+        val criticalCount = validationErrors.count { it.severity == ErrorSeverity.CRITICAL }
+        if (criticalCount > 0) {
+            Log.e("GameBootstrapper", "CRITICAL CONTENT ERROR DETECTED! Found $criticalCount critical issues.")
+            // In debug builds we could show an error UI or a persistent notification
+        }
 
         gameRepository.updateState { state ->
             state.playerName = existingPlayerName

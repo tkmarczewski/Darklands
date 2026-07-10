@@ -23,6 +23,8 @@ class QuestEngine @Inject constructor(
 
     fun getDefinition(id: String) = registry[id]
 
+    fun getAllDefinitions(): Collection<QuestDefinition> = registry.values
+
     fun getStatus(questId: String, state: GameState? = null, visited: MutableSet<String> = mutableSetOf()): QuestStatus {
         val actualState = state ?: gameRepository.currentState()
 

@@ -27,23 +27,44 @@ fun DevMenuOverlay(
     content: @Composable () -> Unit
 ) {
     var visible by remember { mutableStateOf(false) }
+    val contentErrors by root.contentErrors.collectAsState()
 
     Box(modifier = Modifier.fillMaxSize()) {
         content()
 
-        Text(
-            text = if (visible) "[X]" else "[DEV]",
-            color = if (visible) Color.Red else Color.Gray,
-            fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace,
-            fontSize = 12.sp,
+        Column(
             modifier = Modifier
                 .align(Alignment.TopEnd)
                 .padding(8.dp)
-                .zIndex(100f)
-                .background(Color(0xCC000000))
-                .clickable { visible = !visible }
-                .padding(horizontal = 6.dp, vertical = 4.dp)
-        )
+                .zIndex(100f),
+            horizontalAlignment = Alignment.End
+        ) {
+            if (contentErrors.isNotEmpty()) {
+                val criticalCount = contentErrors.count { it.severity == com.grimreich.systems.ErrorSeverity.CRITICAL }
+                Text(
+                    text = "![${contentErrors.size} ERR / $criticalCount CRIT]!",
+                    color = if (criticalCount > 0) Color.Red else Color.Yellow,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 10.sp,
+                    modifier = Modifier
+                        .background(Color.Black.copy(alpha = 0.8f))
+                        .padding(4.dp)
+                        .clickable { visible = true }
+                )
+                Spacer(modifier = Modifier.height(4.dp))
+            }
+
+            Text(
+                text = if (visible) "[X]" else "[DEV]",
+                color = if (visible) Color.Red else Color.Gray,
+                fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace,
+                fontSize = 12.sp,
+                modifier = Modifier
+                    .background(Color(0xCC000000))
+                    .clickable { visible = !visible }
+                    .padding(horizontal = 6.dp, vertical = 4.dp)
+            )
+        }
 
         AnimatedVisibility(
             visible = visible,
@@ -61,12 +82,34 @@ fun DevMenuOverlay(
                 Column(modifier = Modifier.padding(12.dp)) {
                     Text("SYSTEM_OVERRIDE_V1", color = Color.Red, fontWeight = FontWeight.Bold, fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace)
 
+                    if (contentErrors.isNotEmpty()) {
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Surface(
+                            color = Color.Red.copy(alpha = 0.1f),
+                            modifier = Modifier.fillMaxWidth().heightIn(max = 200.dp)
+                        ) {
+                            androidx.compose.foundation.lazy.LazyColumn(modifier = Modifier.padding(8.dp)) {
+                                item { Text("CONTENT_ERRORS_DETECTED:", color = Color.Red, fontSize = 10.sp, fontWeight = FontWeight.ExtraBold) }
+                                items(contentErrors.size) { index ->
+                                    val error = contentErrors[index]
+                                    Text(
+                                        text = "> ${error.message}",
+                                        color = if (error.severity == com.grimreich.systems.ErrorSeverity.CRITICAL) Color.Red else Color.Yellow,
+                                        fontSize = 10.sp,
+                                        lineHeight = 12.sp
+                                    )
+                                }
+                            }
+                        }
+                    }
+
                     Spacer(modifier = Modifier.height(8.dp))
 
                     FlowRow(
                         horizontalArrangement = Arrangement.spacedBy(8.dp),
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
+                        DevBtn("VALIDATE") { root.runContentValidation() }
                         DevBtn("HUB") { root.setMode(GameScreenMode.HUB); visible = false }
                         DevBtn("MAPA") { root.setMode(GameScreenMode.WORLD_MAP); visible = false }
                         DevBtn("MIASTO") { root.setMode(GameScreenMode.CITY); visible = false }
