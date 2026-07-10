@@ -5,6 +5,12 @@
     "text": "Stój! Mgła gęstnieje, a prawo musi być przestrzegane. Czego szukasz w cieniu murów?",
     "choices": [
       {
+        "text": "[ZADANIE] Melduję wykonanie wyroku (Wyrok Inkwizycji).",
+        "targetNodeId": "guard_verdict_done",
+        "triggerEvent": "QUEST_OBJECTIVE_MET",
+        "triggerValue": "q_verdict_1"
+      },
+      {
         "text": "[ZADANIE] Czy coś niepokojącego działo się ostatnio?",
         "targetNodeId": "guard_quest_check"
       },
@@ -104,6 +110,12 @@
     "npcId": "merchant",
     "text": "Witaj, wędrowcze! Mam towary z całego Boreas, o ile masz złoto. Albo może szukasz pracy? Mgła utrudnia zbiory.",
     "choices": [
+      {
+        "text": "[ZADANIE] Przynoszę zioła z mgły (Żniwa Mgły).",
+        "targetNodeId": "merchant_report_back",
+        "triggerEvent": "QUEST_OBJECTIVE_MET",
+        "triggerValue": "q_coast_harvest"
+      },
       {
         "text": "Pokaż mi swoje towary.",
         "targetNodeId": "end",
@@ -362,6 +374,17 @@
         "targetNodeId": "end",
         "triggerEvent": "COMPLETE_QUEST",
         "triggerValue": "ACTIVE"
+      }
+    ]
+  },
+  {
+    "id": "guard_report_back",
+    "npcId": "guard",
+    "text": "Melduję się u Dowódcy. Mam wiadomość z Wybrzeża.",
+    "choices": [
+      {
+        "text": "Przekaż list (ZAKOŃCZ).",
+        "targetNodeId": "fortress_commander_letter"
       }
     ]
   },

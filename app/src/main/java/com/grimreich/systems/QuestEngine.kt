@@ -138,6 +138,11 @@ class QuestEngine @Inject constructor(
         }
     }
 
+    fun isObjectiveMet(questId: String, state: GameState? = null): Boolean {
+        val s = state ?: gameRepository.currentState()
+        return s.quest.progress[questId]?.status == QuestStatus.OBJECTIVE_MET
+    }
+
     fun getActiveQuestsForCity(cityId: String): List<QuestDefinition> {
         val state = gameRepository.currentState()
         return state.quest.activeQuestIds

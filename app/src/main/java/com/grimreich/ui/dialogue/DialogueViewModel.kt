@@ -103,6 +103,7 @@ class DialogueViewModel @Inject constructor(
         if (choice.requiredQuestId != null && !state.quest.activeQuestIds.contains(choice.requiredQuestId)) return false
 
         if (choice.triggerEvent == "QUEST_ACTIVE" && !state.quest.activeQuestIds.contains(choice.triggerValue)) return false
+        if (choice.triggerEvent == "QUEST_OBJECTIVE_MET" && !questEngine.isObjectiveMet(choice.triggerValue ?: "", state)) return false
         if (choice.triggerEvent == "QUEST_COMPLETED" && !state.quest.completedQuestIds.contains(choice.triggerValue)) return false
         if (choice.triggerEvent == "REQUIRE_GOLD") {
             val amount = choice.triggerValue?.toIntOrNull() ?: 0

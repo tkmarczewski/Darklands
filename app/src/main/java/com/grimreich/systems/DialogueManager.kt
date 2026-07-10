@@ -93,6 +93,7 @@ class DialogueManager @Inject constructor(
                 }
                 state.pendingQuestId = null
             }
+            "QUEST_OBJECTIVE_MET" -> Unit
             "ADVANCE_QUEST" -> {
                 value?.let { 
                     engine.advanceStepDirect(state, it) 

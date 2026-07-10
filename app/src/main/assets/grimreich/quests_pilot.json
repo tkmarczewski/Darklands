@@ -63,7 +63,7 @@
       {
         "description": "Dostarcz list do Dowódcy.",
         "type": "DIALOGUE",
-        "targetId": "guard_report_back"
+        "targetId": "fortress_commander_letter"
       }
     ]
   },
