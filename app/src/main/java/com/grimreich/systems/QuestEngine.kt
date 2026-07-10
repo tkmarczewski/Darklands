@@ -1,9 +1,6 @@
 package com.grimreich.systems
 
-import com.grimreich.core.GameRepository
-import com.grimreich.core.GameState
-import com.grimreich.core.QuestStatus
-import com.grimreich.core.QuestProgress
+import com.grimreich.core.*
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -17,12 +14,10 @@ class QuestEngine @Inject constructor(
     private val registry = mutableMapOf<String, QuestDefinition>()
 
     fun register(definition: QuestDefinition) {
-        android.util.Log.i("QuestEngine", "[QUEST] REGISTERING: ${definition.id} for city ${definition.cityId}")
         registry[definition.id] = definition
     }
 
     fun clearRegistry() {
-        android.util.Log.w("QuestEngine", "[QUEST] REGISTRY CLEARED!")
         registry.clear()
     }
 
@@ -41,25 +36,17 @@ class QuestEngine @Inject constructor(
             return if (hasCorpse) QuestStatus.AVAILABLE else QuestStatus.LOCKED
         }
 
-        val def = registry[questId] ?: run {
-            android.util.Log.e("QuestEngine", "[QUEST] Status check failed: Registry missing ID $questId")
-            return QuestStatus.LOCKED
-        }
-        if (!visited.add(questId)) {
-            android.util.Log.e("QuestEngine", "[QUEST] Circular dependency detected for $questId")
-            return QuestStatus.LOCKED
-        }
+        val def = registry[questId] ?: return QuestStatus.LOCKED
+        if (!visited.add(questId)) return QuestStatus.LOCKED
 
         if (actualState.quest.completedQuestIds.contains(questId)) return QuestStatus.COMPLETED
         
         val progress = actualState.quest.progress[questId]
-        if (progress != null) {
-            return progress.status
-        }
+        if (progress != null) return progress.status
 
-        if (actualState.quest.activeQuestIds.contains(questId)) {
-            return QuestStatus.ACTIVE
-        }
+        if (actualState.quest.activeQuestIds.contains(questId)) return QuestStatus.ACTIVE
+
+        if (actualState.metaAwarenessLevel < def.requiredMetaAwareness) return QuestStatus.LOCKED
 
         if (def.prerequisiteQuestId != null) {
             val preStatus = getStatus(def.prerequisiteQuestId, actualState, visited)
@@ -69,21 +56,16 @@ class QuestEngine @Inject constructor(
         return QuestStatus.AVAILABLE
     }
 
-    fun activateQuest(questId: String) {
-        activateQuestDirect(gameRepository.currentState(), questId)
-    }
+    fun activateQuest(questId: String) = activateQuestDirect(gameRepository.currentState(), questId)
 
     fun activateQuestDirect(state: GameState, questId: String) {
         if (getStatus(questId, state) != QuestStatus.AVAILABLE) return
         
         state.quest.activeQuestIds.add(questId)
         state.quest.progress[questId] = QuestProgress(questId = questId, status = QuestStatus.ACTIVE)
-        android.util.Log.i("QuestEngine", "[QUEST] ACTIVATED: $questId")
     }
 
-    fun advanceStep(questId: String) {
-        advanceStepDirect(gameRepository.currentState(), questId)
-    }
+    fun advanceStep(questId: String) = advanceStepDirect(gameRepository.currentState(), questId)
 
     fun advanceStepDirect(state: GameState, questId: String) {
         val p = state.quest.progress[questId] ?: return
@@ -98,9 +80,7 @@ class QuestEngine @Inject constructor(
         }
     }
 
-    fun completeQuest(questId: String) {
-        completeQuestDirect(gameRepository.currentState(), questId)
-    }
+    fun completeQuest(questId: String) = completeQuestDirect(gameRepository.currentState(), questId)
 
     fun completeQuestDirect(state: GameState, questId: String) {
         val p = state.quest.progress[questId] ?: return
@@ -115,7 +95,6 @@ class QuestEngine @Inject constructor(
         experienceSystem.addPartyXpDirect(state, def.recommendedLevel * 50)
         
         state.logEntries.add("ZADANIE UKOŃCZONE: ${def.title}. Nagroda: ${def.rewardGold} zł.")
-        android.util.Log.i("QuestEngine", "[QUEST] COMPLETED: $questId")
     }
 
     fun failQuestDirect(state: GameState, questId: String) {
@@ -123,7 +102,6 @@ class QuestEngine @Inject constructor(
         state.quest.progress[questId]?.let {
             state.quest.progress[questId] = it.copy(status = QuestStatus.FAILED)
         }
-        android.util.Log.w("QuestEngine", "[QUEST] FAILED: $questId")
     }
 
     fun getCurrentObjective(questId: String, state: GameState? = null): String {
@@ -150,40 +128,21 @@ class QuestEngine @Inject constructor(
             .filter { it.cityId == cityId }
     }
 
-    fun getAllRelevantQuestsForCity(cityId: String, state: GameState?): List<QuestDefinition> {
-        val s = state ?: gameRepository.currentState()
-        return registry.values.filter { it.cityId == cityId }.filter { def ->
-            val stat = getStatus(def.id, s)
-            stat == QuestStatus.AVAILABLE || stat == QuestStatus.ACTIVE || stat == QuestStatus.OBJECTIVE_MET
-        }
+    fun getVisibleQuestBoard(state: GameState): Map<String, List<QuestDefinition>> {
+        return registry.values.filter {
+            !it.isHidden && getStatus(it.id, state) == QuestStatus.AVAILABLE
+        }.sortedWith(compareBy<QuestDefinition> { it.chainId ?: "zzz" }.thenBy { it.chainOrder }.thenBy { it.recommendedLevel })
+        .groupBy { it.cityId }
     }
-
-    fun validateQuestGraph(): List<String> {
-        val issues = mutableListOf<String>()
-        registry.keys.forEach { id ->
-            val visited = mutableSetOf<String>()
-            if (hasCycle(id, visited, mutableSetOf())) {
-                issues.add("Cycle detected involving quest: $id")
-            }
-        }
-        return issues
-    }
-
-    private fun hasCycle(id: String, visited: MutableSet<String>, stack: MutableSet<String>): Boolean {
-        if (stack.contains(id)) return true
-        if (visited.contains(id)) return false
-        visited.add(id)
-        stack.add(id)
-        registry[id]?.prerequisiteQuestId?.let { pre ->
-            if (hasCycle(pre, visited, stack)) return true
-        }
-        stack.remove(id)
-        return false
-    }
+    
+    fun getAvailableQuestsForCity(cityId: String, state: GameState): List<QuestDefinition> =
+        registry.values.filter {
+            it.cityId == cityId && !it.isHidden && getStatus(it.id, state) == QuestStatus.AVAILABLE
+        }.sortedWith(compareBy<QuestDefinition> { it.chainId ?: "zzz" }.thenBy { it.chainOrder }.thenBy { it.recommendedLevel })
 }
 
-enum class StepType { COMBAT, DIALOGUE, INVESTIGATION, SOCIAL }
-enum class QuestCategory { COMBAT, SOCIAL, INVESTIGATION, MIXED }
+enum class StepType { COMBAT, DIALOGUE, INVESTIGATION, SOCIAL, META, EXPEDITION }
+enum class QuestCategory { COMBAT, SOCIAL, INVESTIGATION, MIXED, META, ANOMALY, DRAMA, BEAST, INTRIGUE }
 
 data class QuestStep(
     val description: String,
@@ -201,5 +160,11 @@ data class QuestDefinition(
     val originNpcId: String,
     val prerequisiteQuestId: String? = null,
     val category: QuestCategory = QuestCategory.MIXED,
-    val recommendedLevel: Int = 1
+    val recommendedLevel: Int = 1,
+    val chainId: String? = null,
+    val chainOrder: Int = 0,
+    val minWorldDay: Int = 1,
+    val requiredMetaAwareness: Int = 0,
+    val repeatable: Boolean = false,
+    val isHidden: Boolean = false
 )

@@ -1,0 +1,67 @@
+[
+  {
+    "id": "q_scribes_1",
+    "title": "Cienie Archiwistów I: Szyfr Pęknięcia",
+    "description": "Mira potrzebuje kogoś, kto odczyta zapisy v Pękniętej Kronice. Wymaga wysokiej inteligencji, by dostrzec anomalie.",
+    "rewardGold": 250,
+    "cityId": "serce_krainy",
+    "originNpcId": "mira",
+    "category": "INVESTIGATION",
+    "recommendedLevel": 3,
+    "chainId": "chain_scribes",
+    "chainOrder": 1,
+    "steps": [
+      { "description": "Zbadaj Pękniętą Kronikę (Test INT).", "type": "INVESTIGATION", "targetId": "cracked_chronicle_int_test" },
+      { "description": "Skonfrontuj się z Mirą.", "type": "DIALOGUE", "targetId": "mira_report_back" }
+    ]
+  },
+  {
+    "id": "q_verdict_1",
+    "title": "Gabinet bez śladów: Logika Wyroku",
+    "description": "Ravenn prosi o zbadanie miejsca zbrodni. Wymagana wysoka percepcja, by dostrzec runy ukryte v cieniu.",
+    "rewardGold": 300,
+    "cityId": "opactwo_ciszy",
+    "originNpcId": "ravenn",
+    "category": "INTRIGUE",
+    "recommendedLevel": 4,
+    "chainId": "chain_verdict",
+    "chainOrder": 1,
+    "minWorldDay": 7,
+    "steps": [
+      { "description": "Przeszukaj gabinet (Test PER).", "type": "INVESTIGATION", "targetId": "verdict_office_per_test" },
+      { "description": "Zanalizuj runy.", "type": "DIALOGUE", "targetId": "verdict_runes" }
+    ]
+  },
+  {
+    "id": "q_blood_5_hard",
+    "title": "Wspomnienie, Którego Nie Było: Rytuał Krwi",
+    "description": "Rytualista żąda ofiary z Twojego poczytania. Wymagana wysoka pobożność (PIETY) lub siła woli (WILLPOWER).",
+    "rewardGold": 450,
+    "cityId": "twierdza_zelazna",
+    "originNpcId": "ritualist",
+    "category": "META",
+    "recommendedLevel": 6,
+    "chainId": "chain_blood",
+    "chainOrder": 5,
+    "steps": [
+      { "description": "Przetrwaj próbę rytualną (Test WILL).", "type": "META", "targetId": "blood_ritual_will_test" },
+      { "description": "Skonfrontuj się z cieniem.", "type": "COMBAT", "targetId": "PAST_SHADE_ELITE" }
+    ]
+  },
+  {
+    "id": "q_meta_1",
+    "title": "Margines na stronie: Objawienie",
+    "description": "Margines Kroniki zawiera tekst, który staje się zrozumiały tylko dla umysłów otwartych na meta-percepcję.",
+    "rewardGold": 0,
+    "cityId": "serce_krainy",
+    "originNpcId": "archivist",
+    "category": "META",
+    "recommendedLevel": 1,
+    "chainId": "chain_meta",
+    "chainOrder": 1,
+    "requiredMetaAwareness": 1,
+    "steps": [
+      { "description": "Zrozum adnotację (Wymaga wysokiej PER/INT).", "type": "META", "targetId": "margin_note_complex" }
+    ]
+  }
+]

@@ -12,7 +12,9 @@ class GameLoopController @Inject constructor(
     private val gameBootstrapper: GameBootstrapper,
     private val questEngine: QuestEngine,
     private val travelSystem: TravelSystem,
-    private val cityCatalogue: CityCatalogue
+    private val cityCatalogue: CityCatalogue,
+    private val cityVisitCampaignSystem: CityVisitCampaignSystem,
+    private val metaObservationSystem: MetaObservationSystem
 ) {
     companion object {
         private const val TAG = "GameLoopController"
@@ -42,6 +44,7 @@ class GameLoopController @Inject constructor(
     }
 
     fun cityScreen(playerState: PlayerState): CityScreenState {
+        cityVisitCampaignSystem.onCityEntered(playerState.currentCityId)
         return CityScreenState(
             cityId = playerState.currentCityId,
             gold = playerState.gold,
@@ -91,6 +94,7 @@ class GameLoopController @Inject constructor(
         if (status == QuestStatus.OBJECTIVE_MET) {
             Log.i(TAG, "Zadanie $questId gotowe do zakonczenia. Finalizacja...")
             questEngine.completeQuest(questId)
+            metaObservationSystem.onQuestCompleted(questId)
             return playerState.copy(activeQuestId = null)
         }
         return playerState

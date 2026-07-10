@@ -21,7 +21,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.res.stringResource
 import com.grimreich.R
-import com.grimreich.systems.QuestCategory
+import com.grimreich.core.QuestCategory
 import com.grimreich.ui.effects.glitchEffect
 import com.grimreich.systems.QuestDefinition
 
@@ -36,12 +36,10 @@ fun CityScreen(
     onDialogue: () -> Unit,
     onExit: () -> Unit
 ) {
-    android.util.Log.e("CityScreen", "COMPOSING: CityScreen")
     val state by viewModel.uiState.collectAsState()
     val context = LocalContext.current
 
     Box(modifier = Modifier.fillMaxSize().background(Color.Black)) {
-        // BACKGROUND
         val bgResId = context.resources.getIdentifier(state.backgroundDrawable, "drawable", context.packageName)
         if (bgResId != 0) {
             Image(
@@ -58,7 +56,6 @@ fun CityScreen(
         Box(modifier = Modifier.fillMaxSize().background(Color(0x60000000)))
 
         Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
-            // HEADER
             Surface(
                 modifier = Modifier.fillMaxWidth().height(60.dp),
                 color = Color(0xCC000000),
@@ -82,36 +79,29 @@ fun CityScreen(
             Spacer(modifier = Modifier.height(16.dp))
 
             Row(modifier = Modifier.weight(1f).fillMaxWidth()) {
-                // LEFT: Nav Actions (SCROLLABLE)
                 val scrollState = rememberScrollState()
                 Column(
                     modifier = Modifier.width(180.dp).fillMaxHeight().verticalScroll(scrollState),
                     verticalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
                     CityNavBtn(stringResource(R.string.city_btn_exit), onExit, color = Color(0xFF400000))
-                    
                     Spacer(modifier = Modifier.height(10.dp))
-
                     CityNavBtn(stringResource(R.string.market_title), onMarket)
                     CityNavBtn(stringResource(R.string.city_alchemy), onAlchemy)
                     CityNavBtn(stringResource(R.string.city_tavern), onTavern)
                     CityNavBtn(stringResource(R.string.city_temple), onTemple)
                     CityNavBtn(stringResource(R.string.city_recruit), onRecruit)
                     
-                    val qCount = state.activeQuestsCount
                     CityNavBtn(
-                        text = if (qCount > 0) stringResource(R.string.city_btn_quests_count, qCount) else stringResource(R.string.city_btn_no_quests),
+                        text = "ZADANIA",
                         onClick = { viewModel.toggleQuestMenu(true) },
-                        color = if (qCount > 0) Color(0xFF4A6000) else Color(0xFF1A1A1A),
-                        enabled = qCount > 0
+                        color = Color(0xFF4A6000)
                     )
-                    
                     Spacer(modifier = Modifier.weight(1f))
                 }
 
                 Spacer(modifier = Modifier.width(16.dp))
 
-                // RIGHT: NPC List & Lore
                 Column(modifier = Modifier.weight(1f).fillMaxHeight()) {
                     Surface(
                         color = Color(0x60000000),
@@ -132,11 +122,11 @@ fun CityScreen(
                         }
                     }
                     
-                    Text(stringResource(R.string.city_residents_label), color = Color(0xFFC0A060), fontSize = 10.sp, fontWeight = FontWeight.Bold)
+                    Text("MIESZKAŃCY", color = Color(0xFFC0A060), fontSize = 10.sp, fontWeight = FontWeight.Bold)
                     Spacer(modifier = Modifier.height(4.dp))
 
                     if (state.npcs.isEmpty()) {
-                        Text(stringResource(R.string.city_empty_residents), color = Color.DarkGray, fontSize = 14.sp)
+                        Text("Pusto.", color = Color.DarkGray, fontSize = 14.sp)
                     } else {
                         LazyColumn(
                             modifier = Modifier.weight(0.6f),
@@ -153,66 +143,33 @@ fun CityScreen(
             }
         }
 
-        // QUEST SELECTION OVERLAY
         if (state.isQuestMenuOpen) {
             AlertDialog(
                 onDismissRequest = { viewModel.toggleQuestMenu(false) },
-                title = { Text(stringResource(R.string.city_quest_menu_title), color = Color(0xFFC0A060)) },
+                title = { Text("TABLICA OGŁOSZEŃ", color = Color(0xFFC0A060)) },
                 text = {
-                    if (state.activeLocalQuests.isEmpty()) {
-                        Box(modifier = Modifier.fillMaxWidth().padding(24.dp), contentAlignment = Alignment.Center) {
-                            Text(stringResource(R.string.city_quest_menu_empty), color = Color.Gray, fontSize = 14.sp)
-                        }
-                    } else {
-                        LazyColumn(modifier = Modifier.heightIn(max = 400.dp)) {
-                            items(state.activeLocalQuests) { quest ->
-                                val color = when(quest.category) {
-                                    QuestCategory.COMBAT -> Color(0xFFB22222)
-                                    QuestCategory.SOCIAL -> Color(0xFF4682B4)
-                                    QuestCategory.INVESTIGATION -> Color(0xFFDAA520)
-                                    QuestCategory.MIXED -> Color(0xFF9932CC)
+                    LazyColumn(modifier = Modifier.heightIn(max = 400.dp)) {
+                        state.allAvailableQuests.forEach { (city, quests) ->
+                            item { Text(city.uppercase(), color = Color.Gray, fontSize = 10.sp, fontWeight = FontWeight.Bold) }
+                            items(quests) { quest ->
+                                val color = when(quest.category.name) {
+                                    "COMBAT" -> Color(0xFFB22222)
+                                    "SOCIAL" -> Color(0xFF4682B4)
+                                    "INVESTIGATION" -> Color(0xFFDAA520)
+                                    "META" -> Color(0xFF551A8B)
+                                    else -> Color(0xFF9932CC)
                                 }
-                                val icon = when(quest.category) {
-                                    QuestCategory.COMBAT -> "⚔️"
-                                    QuestCategory.SOCIAL -> "💬"
-                                    QuestCategory.INVESTIGATION -> "🔍"
-                                    QuestCategory.MIXED -> "💠"
-                                }
-
                                 Surface(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(vertical = 4.dp)
-                                        .clickable { 
-                                            viewModel.selectQuestAndOpenDialogue(quest, onDialogue)
-                                        },
+                                    modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp).clickable { 
+                                        viewModel.selectQuestAndOpenDialogue(quest, onDialogue)
+                                    },
                                     color = Color(0xFF0F0F0F),
                                     shape = MaterialTheme.shapes.extraSmall,
                                     border = androidx.compose.foundation.BorderStroke(1.dp, color.copy(alpha = 0.3f))
                                 ) {
                                     Column(modifier = Modifier.padding(12.dp)) {
-                                        Row(verticalAlignment = Alignment.CenterVertically) {
-                                            Text(icon, fontSize = 18.sp, modifier = Modifier.padding(end = 8.dp))
-                                            Text(
-                                                text = quest.title.uppercase(),
-                                                color = Color.White,
-                                                fontWeight = FontWeight.ExtraBold,
-                                                fontSize = 13.sp,
-                                                letterSpacing = 1.sp
-                                            )
-                                        }
-                                        Spacer(modifier = Modifier.height(4.dp))
-                                        Text(
-                                            text = quest.description,
-                                            color = Color.Gray,
-                                            fontSize = 10.sp,
-                                            lineHeight = 12.sp
-                                        )
-                                        Spacer(modifier = Modifier.height(8.dp))
-                                        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                                            Text("LVL: ${quest.recommendedLevel}", color = color, fontSize = 9.sp, fontWeight = FontWeight.Bold)
-                                            Text("${quest.rewardGold} G", color = Color(0xFFE0C080), fontSize = 9.sp, fontWeight = FontWeight.Bold)
-                                        }
+                                        Text(text = quest.title.uppercase(), color = Color.White, fontWeight = FontWeight.ExtraBold, fontSize = 13.sp)
+                                        Text(text = quest.description, color = Color.Gray, fontSize = 10.sp)
                                     }
                                 }
                             }
@@ -222,11 +179,10 @@ fun CityScreen(
                 confirmButton = {},
                 dismissButton = {
                     TextButton(onClick = { viewModel.toggleQuestMenu(false) }) {
-                        Text(stringResource(R.string.settings_language_close), color = Color.Gray)
+                        Text("ZAMKNIJ", color = Color.Gray)
                     }
                 },
-                containerColor = Color(0xFF050505),
-                shape = MaterialTheme.shapes.extraSmall
+                containerColor = Color(0xFF050505)
             )
         }
     }
@@ -238,19 +194,10 @@ private fun CityNavBtn(text: String, onClick: () -> Unit, color: Color = Color(0
         onClick = onClick,
         enabled = enabled,
         modifier = Modifier.fillMaxWidth().height(44.dp),
-        colors = ButtonDefaults.buttonColors(
-            containerColor = color,
-            disabledContainerColor = Color(0xFF0F0F0F)
-        ),
-        shape = MaterialTheme.shapes.extraSmall,
-        border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFF333333))
+        colors = ButtonDefaults.buttonColors(containerColor = color),
+        shape = MaterialTheme.shapes.extraSmall
     ) {
-        Text(
-            text = text, 
-            color = if (enabled) Color(0xFFE0C080) else Color.DarkGray, 
-            fontSize = 12.sp, 
-            fontWeight = FontWeight.Bold
-        )
+        Text(text = text, color = Color(0xFFE0C080), fontSize = 12.sp, fontWeight = FontWeight.Bold)
     }
 }
 
@@ -259,8 +206,7 @@ private fun NpcRow(name: String, role: String, onClick: () -> Unit) {
     Surface(
         modifier = Modifier.fillMaxWidth().clickable { onClick() },
         color = Color(0xFF111111),
-        shape = MaterialTheme.shapes.extraSmall,
-        border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFF222222))
+        shape = MaterialTheme.shapes.extraSmall
     ) {
         Column(modifier = Modifier.padding(12.dp)) {
             Text(text = name, color = Color.White, fontWeight = FontWeight.SemiBold, fontSize = 15.sp)

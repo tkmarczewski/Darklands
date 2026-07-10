@@ -15,19 +15,8 @@ class QuestManifest @Inject constructor(
     private val gson = Gson()
 
     fun seed() {
-        // FIX-QUESTS: clear existing registry entries before re-seeding
         engine.clearRegistry()
-
-        // Load quests from external JSON
-        loadQuestsFromAsset("grimreich/quests_pilot.json")
-        
-        // Validate graph after loading
-        val issues = engine.validateQuestGraph()
-        if (issues.isNotEmpty()) {
-            issues.forEach { android.util.Log.e("QuestManifest", "QUEST GRAPH ERROR: $it") }
-        } else {
-            android.util.Log.d("QuestManifest", "Quest graph validated successfully.")
-        }
+        loadQuestsFromAsset("grimreich/quests_extended.json")
     }
 
     private fun loadQuestsFromAsset(path: String) {
@@ -37,9 +26,6 @@ class QuestManifest @Inject constructor(
             val loaded: List<QuestDefinition> = gson.fromJson(json, type)
             loaded.forEach { engine.register(it) }
             android.util.Log.d("QuestManifest", "✅ Loaded ${loaded.size} quests from $path")
-            loaded.forEach { 
-                android.util.Log.d("QuestManifest", "Registered quest: ${it.id} (${it.title}) for city ${it.cityId}")
-            }
         } catch (e: Exception) {
             android.util.Log.e("QuestManifest", "❌ Failed to load quests from $path: ${e.message}", e)
         }

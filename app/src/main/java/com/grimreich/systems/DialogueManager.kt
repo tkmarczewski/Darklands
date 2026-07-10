@@ -7,8 +7,6 @@ import com.grimreich.core.GameRepository
 import com.grimreich.core.GameState
 import com.grimreich.grimreich.v1.DialogueChoice
 import com.grimreich.grimreich.v1.DialogueNode
-import com.grimreich.systems.ChronicleSystem
-import com.grimreich.systems.QuestEngine
 import dagger.Lazy
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
@@ -19,7 +17,6 @@ import kotlin.random.Random
 class DialogueManager @Inject constructor(
     @ApplicationContext private val context: Context,
     private val gameRepositoryProvider: Lazy<GameRepository>,
-    private val chronicleSystem: Lazy<ChronicleSystem>,
     private val questEngine: Lazy<QuestEngine>
 ) {
     private val nodes = mutableMapOf<String, DialogueNode>()
@@ -48,26 +45,11 @@ class DialogueManager @Inject constructor(
     fun getNode(id: String): DialogueNode? {
         if (id == "end") return null
         
-        // FIX: Ensure pilot nodes are loaded if not present
         if (nodes.isEmpty()) {
             loadNodesFromAsset("grimreich/dialogues_pilot.json")
         }
         
         return nodes[id]
-    }
-
-    fun hasNode(id: String) = nodes.containsKey(id)
-
-    fun listMissingTargets(): List<String> {
-        val missing = mutableListOf<String>()
-        nodes.values.forEach { node ->
-            node.choices.forEach { choice ->
-                if (choice.targetNodeId != "end" && !nodes.containsKey(choice.targetNodeId)) {
-                    missing.add(choice.targetNodeId)
-                }
-            }
-        }
-        return missing
     }
 
     fun makeChoice(choice: DialogueChoice): DialogueNode? {
@@ -89,15 +71,12 @@ class DialogueManager @Inject constructor(
             "ACTIVATE_QUEST" -> {
                 value?.let { 
                     engine.activateQuestDirect(state, it) 
-                    android.util.Log.i("DialogueManager", "[QUEST] Activated via dialogue: $it")
                 }
                 state.pendingQuestId = null
             }
-            "QUEST_OBJECTIVE_MET" -> Unit
             "ADVANCE_QUEST" -> {
                 value?.let { 
                     engine.advanceStepDirect(state, it) 
-                    android.util.Log.i("DialogueManager", "[QUEST] Advanced via dialogue: $it")
                 }
             }
             "FAIL_QUEST" -> {
@@ -112,9 +91,16 @@ class DialogueManager @Inject constructor(
                 
                 targetId?.let { 
                     engine.completeQuestDirect(state, it) 
-                    android.util.Log.i("DialogueManager", "[QUEST] Completed via dialogue: $it")
                 }
                 state.pendingQuestId = null
+            }
+            "INCREMENT_META" -> {
+                val inc = value?.toIntOrNull() ?: 1
+                state.metaAwarenessLevel += inc
+                state.logEntries.add("Czujesz, że ktoś dopisał uwagę na marginesie twojej sesji.")
+            }
+            "SET_WORLD_FLAG" -> {
+                value?.let { state.quest.worldFlags.add(it) }
             }
             "GRANT_REPUTATION" -> {
                 val parts = value?.split(":") ?: return
@@ -122,7 +108,6 @@ class DialogueManager @Inject constructor(
                     val faction = parts[0]
                     val amount = parts[1].toIntOrNull() ?: 0
                     state.reputation.globalFactions[faction] = (state.reputation.globalFactions[faction] ?: 0) + amount
-                    android.util.Log.i("DialogueManager", "[REP] Granted $amount to $faction")
                 }
             }
             "GIVE_ITEM" -> {
@@ -132,25 +117,11 @@ class DialogueManager @Inject constructor(
                     if (item != null) {
                         state.inventory.add(item.copy())
                         state.logEntries.add("Otrzymano przedmiot: ${item.name}")
-                        android.util.Log.i("DialogueManager", "[ITEM] Granted: $itemId")
                     }
                 }
             }
             "OPEN_MARKET" -> {
-                android.util.Log.i("DialogueManager", "[DIALOGUE] Trigger: OPEN_MARKET")
-                // Sygnał do ViewModelu, by otworzył rynek po zamknięciu dialogu
                 state.logEntries.add("Otwierasz okno handlu...")
-            }
-            "ACTIVATE_QUEST_CHAIN" -> {
-                android.util.Log.d("DialogueManager", "[QUEST] Activating quest chain...")
-                // Special logic for Mira's quest chain progression
-                when {
-                    engine.getStatus("q_scribes_1", state) == com.grimreich.core.QuestStatus.AVAILABLE -> engine.activateQuestDirect(state, "q_scribes_1")
-                    engine.getStatus("q_scribes_2", state) == com.grimreich.core.QuestStatus.AVAILABLE -> engine.activateQuestDirect(state, "q_scribes_2")
-                    engine.getStatus("q_scribes_3", state) == com.grimreich.core.QuestStatus.AVAILABLE -> engine.activateQuestDirect(state, "q_scribes_3")
-                    engine.getStatus("q_collapse_core", state) == com.grimreich.core.QuestStatus.AVAILABLE -> engine.activateQuestDirect(state, "q_collapse_core")
-                }
-                state.pendingQuestId = null
             }
         }
     }
@@ -168,11 +139,8 @@ class DialogueManager @Inject constructor(
 
     fun applyWorldEffects(node: DialogueNode, stability: Int): DialogueNode {
         if (stability > 40) return node
-        
         val seed = node.id.hashCode().toLong()
-        return node.copy(
-            text = glitchText(node.text, seed)
-        )
+        return node.copy(text = glitchText(node.text, seed))
     }
 
     fun glitchText(input: String, seed: Long): String {

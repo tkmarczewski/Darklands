@@ -5,7 +5,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 enum class EndingType {
-    GOOD, PRAGMATIC, REDEMPTION, CORRUPTED
+    GOOD, PRAGMATIC, REDEMPTION, CORRUPTED, OBSERVED
 }
 
 data class Ending(
@@ -21,17 +21,25 @@ class EndingSystem @Inject constructor(
 ) {
     fun shouldTriggerMetaEnding(): Boolean {
         val s = gameRepository.currentState()
-        // Trigger if stability is critical or enough regional heroes are settled (using chronicle entries as proxy)
         val heroEndings = listOf("lore_aelion_ascension", "lore_mira_ascension", "lore_ferrun_iron_wall", "lore_noctyros_update")
         val resolvedCount = heroEndings.count { chronicleSystem.isUnlocked(it) }
+
+        val observedReady = s.metaAwarenessLevel >= 4 && s.quest.completedQuestIds.contains("q_meta_7")
         
-        return s.world.globalStability < 10 || resolvedCount >= 4
+        return observedReady || s.world.globalStability < 10 || resolvedCount >= 4
     }
 
     fun resolveEnding(gameState: GameState): Ending {
+        if (gameState.quest.completedQuestIds.contains("q_meta_7") && gameState.metaAwarenessLevel >= 4) {
+            return Ending(
+                EndingType.OBSERVED,
+                "Margines Sesji",
+                "To nie bohater był obserwowany. Skrybowie Absolutu od początku notowali ciebie — podmiot wyboru, czytelnika, sprawcę sesji. Bohater był tylko figurą zapisu."
+            )
+        }
+        
         val faith = gameState.prayer.faith
         val virtue = gameState.prayer.virtue
-        val cityRep = gameState.reputation.cityFactions.values.sumOf { it.values.sum() }
         val sins = gameState.prayer.sins
         val stability = gameState.world.globalStability
         
