@@ -49,12 +49,12 @@ class MarketViewModel @Inject constructor(
         val stock = city?.marketStock ?: emptyList()
         val forSale = stock.mapNotNull { itemId ->
             itemCatalogue.get(itemId)?.let { item ->
-                MarketItem(item.id, item.name, item.value, (item.value * 0.5).toInt())
+                MarketItem(item.templateId, item.name, item.value, (item.value * 0.5).toInt())
             }
         }
 
         val toSell = state.inventory.map { item ->
-            MarketItem(item.id, item.name, item.value, (item.value * 0.5).toInt())
+            MarketItem(item.instanceId, item.name, item.value, (item.value * 0.5).toInt())
         }
 
         _uiState.update { 
@@ -77,18 +77,18 @@ class MarketViewModel @Inject constructor(
 
         gameRepository.updateState { s ->
             s.gold -= item.value
-            s.inventory.add(item.copy())
+            itemCatalogue.createInstance(itemId)?.let { s.inventory.add(it) }
             s.logEntries.add("Kupiono: ${item.name} za ${item.value} G.")
         }
     }
 
     fun sell(itemId: String) {
         val state = gameRepository.currentState()
-        val item = state.inventory.find { it.id == itemId } ?: return
+        val item = state.inventory.find { it.instanceId == itemId } ?: return
         val price = (item.value * 0.5).toInt()
 
         gameRepository.updateState { s ->
-            val toRemove = s.inventory.find { it.id == itemId }
+            val toRemove = s.inventory.find { it.instanceId == itemId }
             if (toRemove != null) {
                 s.inventory.remove(toRemove)
                 s.gold += price

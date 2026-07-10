@@ -10,11 +10,11 @@ class InventorySystem @Inject constructor(
     private val gameRepository: GameRepository
 ) {
 
-    fun equip(heroId: String, itemId: String): String {
+    fun equip(heroId: String, instanceId: String): String {
         var result = ""
         gameRepository.updateState { state ->
             val hero = state.party.find { it.id == heroId } ?: run { result = "Brak bohatera"; return@updateState }
-            val item = state.inventory.find { it.id == itemId } ?: run { result = "Brak przedmiotu"; return@updateState }
+            val item = state.inventory.find { it.instanceId == instanceId } ?: run { result = "Brak przedmiotu"; return@updateState }
             val slot = item.slot ?: run { result = "Brak slotu"; return@updateState }
             
             val minStr = item.effects["minStrength"] ?: 0
@@ -23,14 +23,7 @@ class InventorySystem @Inject constructor(
                 return@updateState
             }
 
-            // If slot is occupied, return old item to inventory
-            val previousItemId = hero.equipment[slot]
-            if (previousItemId != null) {
-                // It's already in inventory if it's there, but if it's not (edge case),
-                // it's lost unless we re-add it. But usually equip() is called for items ALREADY in inventory.
-            }
-
-            hero.equipment[slot] = itemId
+            hero.equipment[slot] = instanceId
             state.logEntries.add("${hero.name} zakłada ${item.name}.")
             result = "Założono"
         }
@@ -41,8 +34,8 @@ class InventorySystem @Inject constructor(
         var result = ""
         gameRepository.updateState { state ->
             val hero = state.party.find { it.id == heroId } ?: return@updateState
-            val itemId = hero.equipment[slot] ?: return@updateState
-            val item = state.inventory.find { it.id == itemId }
+            val instanceId = hero.equipment[slot] ?: return@updateState
+            val item = state.inventory.find { it.instanceId == instanceId }
             hero.equipment[slot] = null
             result = "Zdjęto ${item?.name ?: "przedmiot"}"
             state.logEntries.add("${hero.name} zdejmuje przedmiot.")
@@ -79,18 +72,18 @@ class InventorySystem @Inject constructor(
         val hero  = state.party.firstOrNull { it.id == heroId } ?: return 0f
         return hero.equipment.values
             .filterNotNull()
-            .mapNotNull { id -> state.inventory.firstOrNull { it.id == id } }
+            .mapNotNull { instId -> state.inventory.firstOrNull { it.instanceId == instId } }
             .sumOf { it.weight }
             .toFloat()
     }
 
-    fun transferItem(fromHeroId: String, toHeroId: String, itemId: String): String {
+    fun transferItem(fromHeroId: String, toHeroId: String, instanceId: String): String {
         var result = ""
         gameRepository.updateState { state ->
             val from = state.party.find { it.id == fromHeroId } ?: run { result = "Brak nadawcy"; return@updateState }
             val to = state.party.find { it.id == toHeroId } ?: run { result = "Brak odbiorcy"; return@updateState }
             
-            val equippedSlot = from.equipment.entries.firstOrNull { it.value == itemId }?.key
+            val equippedSlot = from.equipment.entries.firstOrNull { it.value == instanceId }?.key
             if (equippedSlot != null) {
                 from.equipment[equippedSlot] = null
             }
@@ -101,9 +94,9 @@ class InventorySystem @Inject constructor(
         return result
     }
 
-    fun itemDetail(itemId: String): String {
-        val item = gameRepository.currentState().inventory.firstOrNull { it.id == itemId }
-            ?: return "Nie znaleziono: $itemId"
+    fun itemDetail(instanceId: String): String {
+        val item = gameRepository.currentState().inventory.firstOrNull { it.instanceId == instanceId }
+            ?: return "Nie znaleziono: $instanceId"
         val effects = item.effects.entries.joinToString(", ") { (k, v) -> "$k=$v" }
         return buildString {
             appendLine(item.name)
@@ -113,10 +106,10 @@ class InventorySystem @Inject constructor(
         }.trim()
     }
 
-    fun useItem(itemId: String): String {
+    fun useItem(instanceId: String): String {
         var result = ""
         gameRepository.updateState { state ->
-            val item = state.inventory.find { it.id == itemId } ?: run { result = "Brak"; return@updateState }
+            val item = state.inventory.find { it.instanceId == instanceId } ?: run { result = "Brak"; return@updateState }
             val activeHeroId = state.activeHeroId ?: return@updateState
             val targetHero = state.party.find { it.id == activeHeroId } ?: return@updateState
 
@@ -136,10 +129,10 @@ class InventorySystem @Inject constructor(
     fun getEquippedItems(hero: Hero): EquippedItems {
         val state = gameRepository.currentState()
         val gear = EquippedItems()
-        hero.equipment["weapon"]?.let { id -> gear.weapon = state.inventory.find { it.id == id } }
-        hero.equipment["armor"]?.let { id -> gear.bodyArmor = state.inventory.find { it.id == id } }
-        hero.equipment["helmet"]?.let { id -> gear.helmet = state.inventory.find { it.id == id } }
-        hero.equipment["shield"]?.let { id -> gear.shield = state.inventory.find { it.id == id } }
+        hero.equipment["weapon"]?.let { instId -> gear.weapon = state.inventory.find { it.instanceId == instId } }
+        hero.equipment["armor"]?.let { instId -> gear.bodyArmor = state.inventory.find { it.instanceId == instId } }
+        hero.equipment["helmet"]?.let { instId -> gear.helmet = state.inventory.find { it.instanceId == instId } }
+        hero.equipment["shield"]?.let { instId -> gear.shield = state.inventory.find { it.instanceId == instId } }
         return gear
     }
 }

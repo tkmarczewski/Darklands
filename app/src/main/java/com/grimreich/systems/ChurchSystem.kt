@@ -45,7 +45,7 @@ class ChurchSystem @Inject constructor(
             }
 
             val corpseId = "corpse_${hero.id}"
-            val corpseItem = state.inventory.find { it.id == corpseId }
+            val corpseItem = state.inventory.find { it.instanceId == corpseId }
 
             if (corpseItem == null) {
                 msg = "Nie masz przy sobie ciała tego bohatera."
@@ -92,7 +92,7 @@ class ChurchSystem @Inject constructor(
     fun cleanseRelic(itemId: String): String {
         var msg = ""
         gameRepository.updateState { state ->
-            val item = state.inventory.find { it.id == itemId } ?: return@updateState
+            val item = state.inventory.find { it.instanceId == itemId } ?: return@updateState
             state.inventory.remove(item)
             state.world.globalStability += 5
             msg = "Oczyszczono relikwię: ${item.name}. Stabilność świata wzrosła."

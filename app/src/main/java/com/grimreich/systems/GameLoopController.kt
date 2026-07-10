@@ -11,6 +11,7 @@ class GameLoopController @Inject constructor(
     private val gameRepository: GameRepository,
     private val gameBootstrapper: GameBootstrapper,
     private val questEngine: QuestEngine,
+    private val questManifest: QuestManifest,
     private val travelSystem: TravelSystem,
     private val cityCatalogue: CityCatalogue,
     private val cityVisitCampaignSystem: CityVisitCampaignSystem,
@@ -32,6 +33,7 @@ class GameLoopController @Inject constructor(
             Log.i(TAG, "Rozpoczynam bootstrap swiata GrimReich (seed=$seed)")
             gameRepository.clearSessionAndReset()
             gameBootstrapper.bootstrapFreshWorld(seed)
+            questManifest.seed()
 
             val startingCityId = cityCatalogue.startingCityId
             return PlayerState(currentCityId = startingCityId)
@@ -59,10 +61,22 @@ class GameLoopController @Inject constructor(
     }
 
     fun travelToQuest(playerState: PlayerState): Pair<PlayerState, TravelScreenState> {
+        val state = gameRepository.currentState()
         val questId = playerState.activeQuestId ?: error("Brak aktywnego zadania")
         val quest = questEngine.getDefinition(questId) ?: error("Nieznane zadanie: $questId")
+        val progress = state.quest.progress[questId]
 
-        val destinationCity = quest.cityId
+        val destinationCity = if (progress != null && progress.status == QuestStatus.ACTIVE) {
+            val step = quest.steps.getOrNull(progress.currentStepIndex)
+            if (step != null && step.type == StepType.EXPEDITION) {
+                step.targetId
+            } else {
+                quest.cityId
+            }
+        } else {
+            quest.cityId
+        }
+
         Log.i(TAG, "Podroz do celu zadania: $destinationCity (Quest: $questId)")
 
         if (playerState.currentCityId != destinationCity) {

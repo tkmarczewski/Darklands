@@ -39,7 +39,7 @@ class AlchemySystem @Inject constructor(
             }
             
             for ((ingId, qty) in recipe.ingredients) {
-                val count = state.inventory.count { it.id == ingId }
+                val count = state.inventory.count { it.templateId == ingId }
                 if (count < qty) {
                     result = "Brak składnika: $ingId ($count/$qty)."
                     return@updateState
@@ -48,10 +48,10 @@ class AlchemySystem @Inject constructor(
 
             recipe.ingredients.forEach { (ingId, qty) ->
                 repeat(qty) {
-                    state.inventory.find { it.id == ingId }?.let { state.inventory.remove(it) }
+                    state.inventory.find { it.templateId == ingId }?.let { state.inventory.remove(it) }
                 }
             }
-            state.inventory.add(resultItem.copy())
+            itemCatalogue.createInstance(recipe.resultItemId)?.let { state.inventory.add(it) }
             result = "Sukces! Uwarzono ${resultItem.name}."
             state.logEntries.add("Alchemia: $result")
         }

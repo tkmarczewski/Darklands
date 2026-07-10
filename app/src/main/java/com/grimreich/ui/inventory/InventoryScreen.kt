@@ -115,7 +115,7 @@ fun InventoryScreen(viewModel: InventoryViewModel, onBack: () -> Unit) {
                         items(state.inventory) { item ->
                             InventoryItemBox(
                                 item = item,
-                                isSelected = state.selectedItem?.id == item.id,
+                                isSelected = state.selectedItem?.instanceId == item.instanceId,
                                 onClick = { viewModel.selectItem(item) }
                             )
                         }
@@ -171,7 +171,7 @@ fun HeroPaperDoll(hero: Hero, allItems: List<Item>, onUnequip: (String) -> Unit)
 @Composable
 fun EquipmentSlot(slotName: String, itemId: String?, allItems: List<Item>, onClick: (String) -> Unit) {
     val context = LocalContext.current
-    val item = itemId?.let { id -> allItems.find { it.id == id } }
+    val item = itemId?.let { id -> allItems.find { it.instanceId == id } }
     val iconResId = item?.properties?.get("icon")?.toString()?.let { 
         context.resources.getIdentifier(it, "drawable", context.packageName) 
     } ?: 0

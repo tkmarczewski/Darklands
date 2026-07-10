@@ -32,20 +32,23 @@ class QuestEngine @Inject constructor(
             if (hero == null || !hero.isDead) return QuestStatus.LOCKED
             
             val corpseId = "corpse_${hero.id}"
-            val hasCorpse = actualState.inventory.any { it.id == corpseId }
+            val hasCorpse = actualState.inventory.any { it.instanceId == corpseId }
             return if (hasCorpse) QuestStatus.AVAILABLE else QuestStatus.LOCKED
         }
 
         val def = registry[questId] ?: return QuestStatus.LOCKED
         if (!visited.add(questId)) return QuestStatus.LOCKED
 
-        if (actualState.quest.completedQuestIds.contains(questId)) return QuestStatus.COMPLETED
+        if (actualState.quest.completedQuestIds.contains(questId)) {
+            return if (def.repeatable) QuestStatus.AVAILABLE else QuestStatus.COMPLETED
+        }
         
-        val progress = actualState.quest.progress[questId]
-        if (progress != null) return progress.status
+        if (actualState.quest.activeQuestIds.contains(questId)) {
+            val progress = actualState.quest.progress[questId]
+            return progress?.status ?: QuestStatus.ACTIVE
+        }
 
-        if (actualState.quest.activeQuestIds.contains(questId)) return QuestStatus.ACTIVE
-
+        if (actualState.world.day < def.minWorldDay) return QuestStatus.LOCKED
         if (actualState.metaAwarenessLevel < def.requiredMetaAwareness) return QuestStatus.LOCKED
 
         if (def.prerequisiteQuestId != null) {
@@ -83,6 +86,7 @@ class QuestEngine @Inject constructor(
     fun completeQuest(questId: String) = completeQuestDirect(gameRepository.currentState(), questId)
 
     fun completeQuestDirect(state: GameState, questId: String) {
+        if (state.quest.completedQuestIds.contains(questId)) return
         val p = state.quest.progress[questId] ?: return
         if (p.status != QuestStatus.OBJECTIVE_MET && p.status != QuestStatus.ACTIVE) return
         
@@ -125,7 +129,7 @@ class QuestEngine @Inject constructor(
         val state = gameRepository.currentState()
         return state.quest.activeQuestIds
             .mapNotNull { registry[it] }
-            .filter { it.cityId == cityId }
+            .filter { it.cityId == cityId || it.steps.getOrNull(state.quest.progress[it.id]?.currentStepIndex ?: -1)?.targetId == cityId }
     }
 
     fun getVisibleQuestBoard(state: GameState): Map<String, List<QuestDefinition>> {

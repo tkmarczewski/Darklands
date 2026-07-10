@@ -13,7 +13,6 @@ data class GameState(
     var characterNameLocked: Boolean = false,
     var metaAwarenessLevel: Int = 0,
 
-    var grimCurrentRegion: String = "wybrzeze_polnocne",
     var grimPendingExpeditionName: String? = null,
     var pendingQuestId: String? = null,
     var pendingDialogueNpcName: String? = null,
@@ -42,6 +41,10 @@ data class GameState(
     val grantedRewardFlags: MutableSet<String> = mutableSetOf(),
     val companionShadows: MutableList<Hero> = mutableListOf()
 ) {
+    var grimCurrentRegion: String 
+        get() = world.locationId
+        set(value) { world.locationId = value }
+
     fun trimLogs() {
         if (logEntries.size > 100) {
             val toRemove = logEntries.size - 100
@@ -50,10 +53,22 @@ data class GameState(
     }
 
     fun normalizeState() {
-        if (gold < 0) gold = 0
-        if (world.day < 1) world.day = 1
-        trimLogs()
+        gold = gold.coerceAtLeast(0)
+
+        world.day = world.day.coerceAtLeast(1)
+        world.fatigue = world.fatigue.coerceAtLeast(0)
+        world.globalStability = world.globalStability.coerceIn(0, 100)
+        world.echoIntensity = world.echoIntensity.coerceIn(0f, 1f)
+        world.collapseProgress = world.collapseProgress.coerceIn(0f, 1f)
+
         party.forEach { it.normalize() }
+
+        activeHeroId = party
+            .firstOrNull { !it.isDead }
+            ?.id
+            ?.takeIf { candidate -> party.any { it.id == candidate } }
+
+        trimLogs()
     }
 
     fun deepCopy(): GameState = this.copy(

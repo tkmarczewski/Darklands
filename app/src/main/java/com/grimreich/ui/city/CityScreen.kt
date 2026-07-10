@@ -33,10 +33,36 @@ fun CityScreen(
     onTavern: () -> Unit,
     onTemple: () -> Unit,
     onRecruit: () -> Unit,
-    onDialogue: () -> Unit,
+    onDialogue: (String, String, String) -> Unit,
     onExit: () -> Unit
 ) {
     val state by viewModel.uiState.collectAsState()
+
+    LaunchedEffect(Unit) {
+        viewModel.uiEffect.collect { effect ->
+            when (effect) {
+                is CityUiEffect.NavigateToDialogue -> onDialogue(effect.name, effect.role, effect.node)
+                CityUiEffect.NavigateToMarket -> onMarket()
+                CityUiEffect.NavigateToAlchemy -> onAlchemy()
+                CityUiEffect.NavigateToTavern -> onTavern()
+                CityUiEffect.NavigateToTemple -> onTemple()
+                CityUiEffect.NavigateToRecruit -> onRecruit()
+                CityUiEffect.NavigateToExit -> onExit()
+            }
+        }
+    }
+
+    CityContent(
+        state = state,
+        onEvent = viewModel::onEvent
+    )
+}
+
+@Composable
+fun CityContent(
+    state: CityUiState,
+    onEvent: (CityUiEvent) -> Unit
+) {
     val context = LocalContext.current
 
     Box(modifier = Modifier.fillMaxSize().background(Color.Black)) {
@@ -84,17 +110,17 @@ fun CityScreen(
                     modifier = Modifier.width(180.dp).fillMaxHeight().verticalScroll(scrollState),
                     verticalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
-                    CityNavBtn(stringResource(R.string.city_btn_exit), onExit, color = Color(0xFF400000))
+                    CityNavBtn(stringResource(R.string.city_btn_exit), { onEvent(CityUiEvent.OnExitClick) }, color = Color(0xFF400000))
                     Spacer(modifier = Modifier.height(10.dp))
-                    CityNavBtn(stringResource(R.string.market_title), onMarket)
-                    CityNavBtn(stringResource(R.string.city_alchemy), onAlchemy)
-                    CityNavBtn(stringResource(R.string.city_tavern), onTavern)
-                    CityNavBtn(stringResource(R.string.city_temple), onTemple)
-                    CityNavBtn(stringResource(R.string.city_recruit), onRecruit)
+                    CityNavBtn(stringResource(R.string.market_title), { onEvent(CityUiEvent.OnMarketClick) })
+                    CityNavBtn(stringResource(R.string.city_alchemy), { onEvent(CityUiEvent.OnAlchemyClick) })
+                    CityNavBtn(stringResource(R.string.city_tavern), { onEvent(CityUiEvent.OnTavernClick) })
+                    CityNavBtn(stringResource(R.string.city_temple), { onEvent(CityUiEvent.OnTempleClick) })
+                    CityNavBtn(stringResource(R.string.city_recruit), { onEvent(CityUiEvent.OnRecruitClick) })
                     
                     CityNavBtn(
                         text = "ZADANIA",
-                        onClick = { viewModel.toggleQuestMenu(true) },
+                        onClick = { onEvent(CityUiEvent.ToggleQuestMenu(true)) },
                         color = Color(0xFF4A6000)
                     )
                     Spacer(modifier = Modifier.weight(1f))
@@ -134,7 +160,7 @@ fun CityScreen(
                         ) {
                             items(state.npcs) { npc ->
                                 NpcRow(npc.name, npc.role) {
-                                    viewModel.startDialogue(npc.name, npc.role, npc.startNodeId ?: "end", onDialogue)
+                                    onEvent(CityUiEvent.OnNpcClick(npc))
                                 }
                             }
                         }
@@ -145,7 +171,7 @@ fun CityScreen(
 
         if (state.isQuestMenuOpen) {
             AlertDialog(
-                onDismissRequest = { viewModel.toggleQuestMenu(false) },
+                onDismissRequest = { onEvent(CityUiEvent.ToggleQuestMenu(false)) },
                 title = { Text("TABLICA OGŁOSZEŃ", color = Color(0xFFC0A060)) },
                 text = {
                     LazyColumn(modifier = Modifier.heightIn(max = 400.dp)) {
@@ -161,7 +187,7 @@ fun CityScreen(
                                 }
                                 Surface(
                                     modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp).clickable { 
-                                        viewModel.selectQuestAndOpenDialogue(quest, onDialogue)
+                                        onEvent(CityUiEvent.OnQuestClick(quest))
                                     },
                                     color = Color(0xFF0F0F0F),
                                     shape = MaterialTheme.shapes.extraSmall,
@@ -178,7 +204,7 @@ fun CityScreen(
                 },
                 confirmButton = {},
                 dismissButton = {
-                    TextButton(onClick = { viewModel.toggleQuestMenu(false) }) {
+                    TextButton(onClick = { onEvent(CityUiEvent.ToggleQuestMenu(false)) }) {
                         Text("ZAMKNIJ", color = Color.Gray)
                     }
                 },

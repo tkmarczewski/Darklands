@@ -71,7 +71,7 @@ class CombatSystem @Inject constructor(
         gameRepository.updateState { state ->
             val heroId = state.combat.activeHeroId ?: state.party.firstOrNull { !it.isDead }?.id ?: return@updateState
             val hero = state.party.find { it.id == heroId } ?: return@updateState
-            val item = state.inventory.find { it.id == itemId } ?: return@updateState
+            val item = state.inventory.find { it.instanceId == itemId } ?: return@updateState
             
             if (item.effects.containsKey("heal")) {
                 val heal = item.effects["heal"] ?: 0
@@ -166,8 +166,8 @@ class CombatSystem @Inject constructor(
                     state.logEntries.add("ZADANIE: Odzyskaj ciało ${targetHero.name} i zanieś je do Kaplicy.")
                     
                     val corpse = lootSystem.itemCatalogue.get("quest_corpse")?.copy(
-                        name = "Zwłoki: ${targetHero.name}",
-                        id = "corpse_${targetHero.id}"
+                        instanceId = "corpse_${targetHero.id}",
+                        name = "Zwłoki: ${targetHero.name}"
                     )
                     if (corpse != null) state.inventory.add(corpse)
                 }
@@ -182,8 +182,8 @@ class CombatSystem @Inject constructor(
                     state.logEntries.add("ZADANIE: Odzyskaj ciało ${activeHero.name} i zanieś je do Kaplicy.")
                     
                     val corpse = lootSystem.itemCatalogue.get("quest_corpse")?.copy(
-                        name = "Zwłoki: ${activeHero.name}",
-                        id = "corpse_${activeHero.id}"
+                        instanceId = "corpse_${activeHero.id}",
+                        name = "Zwłoki: ${activeHero.name}"
                     )
                     if (corpse != null) state.inventory.add(corpse)
                 }

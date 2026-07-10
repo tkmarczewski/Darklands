@@ -63,6 +63,15 @@ data class SessionStateDto(
 )
 
 @Serializable
+data class SaveSnapshotDto(
+    val version: Int,
+    val timestamp: Long,
+    val label: String,
+    val session: SessionStateDto,
+    val checksum: String? = null
+)
+
+@Serializable
 data class HeroDto(
     val id: String,
     val name: String,
@@ -124,7 +133,8 @@ data class MutationDto(
 
 @Serializable
 data class ItemDto(
-    val id: String,
+    val instanceId: String,
+    val templateId: String,
     val name: String,
     val type: String,
     val slot: String?,
@@ -152,7 +162,7 @@ data class PrayerStateDto(
 @Serializable
 data class WorldStateDto(
     val region: String,
-    val location: String,
+    val locationId: String,
     val day: Int,
     val timeOfDay: String,
     val fatigue: Int,

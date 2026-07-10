@@ -81,7 +81,7 @@ data class Hero(
     fun getEquipmentBonus(statName: String, allItems: List<Item>): Int {
         var bonus = 0
         equipment.values.filterNotNull().forEach { itemId ->
-            val item = allItems.find { it.id == itemId }
+            val item = allItems.find { it.instanceId == itemId }
             item?.effects?.get(statName)?.let { bonus += it }
         }
         return bonus
@@ -102,7 +102,7 @@ data class Hero(
     private fun getEquipmentArmor(allItems: List<Item>): Int {
         var armor = 0
         equipment.values.filterNotNull().forEach { itemId ->
-            val item = allItems.find { it.id == itemId }
+            val item = allItems.find { it.instanceId == itemId }
             item?.effects?.get("armor")?.let { armor += it }
         }
         return armor

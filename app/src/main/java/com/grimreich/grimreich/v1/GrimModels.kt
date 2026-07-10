@@ -63,7 +63,8 @@ data class ChronicleEntry(
 data class Boss(val id: String, val name: String, val level: Int, val lootTable: RewardTable)
 
 data class Item(
-    val id: String,
+    val instanceId: String,
+    val templateId: String,
     val name: String,
     val type: String,
     val slot: String? = null,

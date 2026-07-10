@@ -3,6 +3,7 @@ package com.grimreich.ui.city
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.grimreich.core.GameRepository
+import com.grimreich.core.GameState
 import com.grimreich.core.QuestStatus
 import com.grimreich.world.CityCatalogue
 import com.grimreich.systems.SocialEventSystem
@@ -13,7 +14,30 @@ import com.grimreich.systems.QuestDefinition
 import com.grimreich.systems.AtmosphericDescriptionSystem
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
 import javax.inject.Inject
+
+sealed interface CityUiEvent {
+    data class ToggleQuestMenu(val open: Boolean) : CityUiEvent
+    data class OnNpcClick(val npc: NPC) : CityUiEvent
+    data class OnQuestClick(val quest: QuestDefinition) : CityUiEvent
+    data object OnExitClick : CityUiEvent
+    data object OnMarketClick : CityUiEvent
+    data object OnAlchemyClick : CityUiEvent
+    data object OnTavernClick : CityUiEvent
+    data object OnTempleClick : CityUiEvent
+    data object OnRecruitClick : CityUiEvent
+}
+
+sealed interface CityUiEffect {
+    data class NavigateToDialogue(val name: String, val role: String, val node: String) : CityUiEffect
+    data object NavigateToExit : CityUiEffect
+    data object NavigateToMarket : CityUiEffect
+    data object NavigateToAlchemy : CityUiEffect
+    data object NavigateToTavern : CityUiEffect
+    data object NavigateToTemple : CityUiEffect
+    data object NavigateToRecruit : CityUiEffect
+}
 
 @HiltViewModel
 class CityViewModel @Inject constructor(
@@ -28,18 +52,42 @@ class CityViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(CityUiState())
     val uiState: StateFlow<CityUiState> = _uiState.asStateFlow()
 
+    private val _uiEffect = MutableSharedFlow<CityUiEffect>()
+    val uiEffect = _uiEffect.asSharedFlow()
+
     init {
         gameRepository.gameState
-            .onEach { refresh() }
+            .onEach { updateUiState(it) }
             .launchIn(viewModelScope)
     }
 
-    fun toggleQuestMenu(open: Boolean) {
-        _uiState.update { it.copy(isQuestMenuOpen = open) }
-        if (open) refresh()
+    fun onEvent(event: CityUiEvent) {
+        when (event) {
+            is CityUiEvent.ToggleQuestMenu -> toggleQuestMenu(event.open)
+            is CityUiEvent.OnNpcClick -> startNpcDialogue(event.npc)
+            is CityUiEvent.OnQuestClick -> selectQuestAndOpenDialogue(event.quest)
+            CityUiEvent.OnExitClick -> emitEffect(CityUiEffect.NavigateToExit)
+            CityUiEvent.OnMarketClick -> emitEffect(CityUiEffect.NavigateToMarket)
+            CityUiEvent.OnAlchemyClick -> emitEffect(CityUiEffect.NavigateToAlchemy)
+            CityUiEvent.OnTavernClick -> emitEffect(CityUiEffect.NavigateToTavern)
+            CityUiEvent.OnTempleClick -> emitEffect(CityUiEffect.NavigateToTemple)
+            CityUiEvent.OnRecruitClick -> emitEffect(CityUiEffect.NavigateToRecruit)
+        }
     }
 
-    fun startDialogue(name: String, role: String, node: String, onStart: () -> Unit) {
+    private fun toggleQuestMenu(open: Boolean) {
+        _uiState.update { it.copy(isQuestMenuOpen = open) }
+    }
+
+    private fun emitEffect(effect: CityUiEffect) {
+        viewModelScope.launch { _uiEffect.emit(effect) }
+    }
+
+    private fun startNpcDialogue(npc: NPC) {
+        startDialogue(npc.name, npc.role, npc.startNodeId ?: "generic_start")
+    }
+
+    private fun startDialogue(name: String, role: String, node: String) {
         val state = gameRepository.currentState()
         val cityId = state.grimCurrentRegion
         
@@ -64,10 +112,11 @@ class CityViewModel @Inject constructor(
             s.pendingDialogueNodeId = targetNode
             s.pendingQuestId = if (questToComplete != null) "FINALIZE:${questToComplete.questId}" else null
         }
-        onStart()
+        
+        emitEffect(CityUiEffect.NavigateToDialogue(name, role, targetNode))
     }
 
-    fun selectQuestAndOpenDialogue(quest: QuestDefinition, onDialogue: () -> Unit) {
+    private fun selectQuestAndOpenDialogue(quest: QuestDefinition) {
         toggleQuestMenu(false)
         val status = questEngine.getStatus(quest.id)
         
@@ -77,11 +126,10 @@ class CityViewModel @Inject constructor(
             "${quest.originNpcId.lowercase()}_start"
         }
 
-        startDialogue(quest.originNpcId.uppercase(), quest.originNpcId, targetNode, onDialogue)
+        startDialogue(quest.originNpcId.uppercase(), quest.originNpcId, targetNode)
     }
 
-    fun refresh() {
-        val state = gameRepository.currentState()
+    private fun updateUiState(state: GameState) {
         val cityId = state.grimCurrentRegion
         val cityData = cityCatalogue.get(cityId)
         
@@ -101,7 +149,6 @@ class CityViewModel @Inject constructor(
                 npcs = generatedNpcs,
                 activeLocalQuests = localAvailable,
                 allAvailableQuests = allAvailable,
-                isQuestMenuOpen = it.isQuestMenuOpen,
                 isGlitchActive = finalGlitchIntensity > 0.5f,
                 glitchIntensity = finalGlitchIntensity,
                 rulingFactionName = cityData?.rulingFaction ?: "Neutralna"

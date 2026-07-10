@@ -31,7 +31,12 @@ class TradeSystem @Inject constructor(
                 return@updateState
             }
             state.gold -= price
-            state.inventory.add(item.copy())
+            val boughtItem = if (item.instanceId.isEmpty()) {
+                item.copy(instanceId = java.util.UUID.randomUUID().toString())
+            } else {
+                item.copy()
+            }
+            state.inventory.add(boughtItem)
             state.logEntries.add("Kupiono ${item.name} za $price zl.")
             result = "Kupiono ${item.name} za $price zl."
         }
@@ -49,7 +54,7 @@ class TradeSystem @Inject constructor(
         val sellPrice = economySystem.calculateSellPrice(item)
         var result = ""
         gameRepository.updateState { state ->
-            val found = state.inventory.find { it.id == item.id }
+            val found = state.inventory.find { it.instanceId == item.instanceId }
             if (found == null) {
                 result = "Nie masz tego przedmiotu w ekwipunku."
                 return@updateState

@@ -180,7 +180,8 @@ fun MutationDto.toDomain(): Mutation = Mutation(
 )
 
 fun Item.toDto(): ItemDto = ItemDto(
-    id = id,
+    instanceId = instanceId,
+    templateId = templateId,
     name = name,
     type = type,
     slot = slot,
@@ -192,7 +193,8 @@ fun Item.toDto(): ItemDto = ItemDto(
 )
 
 fun ItemDto.toDomain(): Item = Item(
-    id = id,
+    instanceId = instanceId,
+    templateId = templateId,
     name = name,
     type = type,
     slot = slot,
@@ -256,7 +258,7 @@ fun PrayerStateDto.toDomain(): PrayerState = PrayerState(
 
 fun WorldState.toDto(): WorldStateDto = WorldStateDto(
     region = region,
-    location = location,
+    locationId = locationId,
     day = day,
     timeOfDay = timeOfDay,
     fatigue = fatigue,
@@ -275,7 +277,7 @@ fun WorldState.toDto(): WorldStateDto = WorldStateDto(
 
 fun WorldStateDto.toDomain(): WorldState = WorldState(
     region = region,
-    location = location,
+    locationId = locationId,
     day = day,
     timeOfDay = timeOfDay,
     fatigue = fatigue,
@@ -373,3 +375,19 @@ fun PersistentMetaDto.toDomain(): PersistentMeta = PersistentMeta(
 ).also {
     it.unlockedLegacyBuffs.addAll(unlockedLegacyBuffs)
 }
+
+fun SaveSnapshot.toDto(): SaveSnapshotDto = SaveSnapshotDto(
+    version = version,
+    timestamp = timestamp,
+    label = label,
+    session = state.toDto(),
+    checksum = checksum
+)
+
+fun SaveSnapshotDto.toDomain(): SaveSnapshot = SaveSnapshot(
+    version = version,
+    timestamp = timestamp,
+    label = label,
+    state = session.toDomain(),
+    checksum = checksum
+)

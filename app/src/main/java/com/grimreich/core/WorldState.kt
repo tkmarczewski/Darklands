@@ -4,7 +4,7 @@ import com.grimreich.grimreich.v1.OntologicalLevel
 
 data class WorldState(
     var region: String = "town",
-    var location: String = "Grimhold",
+    var locationId: String = "wybrzeze_polnocne",
     var day: Int = 1,
     var timeOfDay: String = "morning",
     var fatigue: Int = 0,

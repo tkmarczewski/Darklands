@@ -46,7 +46,7 @@ class InventoryViewModel @Inject constructor(
     fun equipItem() {
         val heroId = selectedHeroId ?: gameRepository.currentState().activeHeroId ?: return
         val item = _uiState.value.selectedItem ?: return
-        inventorySystem.equip(heroId, item.id)
+        inventorySystem.equip(heroId, item.instanceId)
     }
 
     fun unequipItem(slot: String) {

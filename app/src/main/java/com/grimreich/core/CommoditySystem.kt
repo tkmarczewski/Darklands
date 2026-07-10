@@ -92,7 +92,8 @@ object TradingEngine {
         state.gold -= totalCost
         repeat(safeQty) {
             state.inventory.add(Item(
-                id = "trade_${type.name.lowercase()}", 
+                instanceId = "trade_${type.name.lowercase()}_${java.util.UUID.randomUUID()}",
+                templateId = "trade_${type.name.lowercase()}", 
                 name = good.name, 
                 value = market.getPrice(type),
                 type = "trade_good",
@@ -115,7 +116,7 @@ object TradingEngine {
         (item.value * GrimConstants.Economy.SELL_PRICE_MULTIPLIER).toInt().coerceAtLeast(1)
 
     fun sellItem(state: GameState, itemId: String): String {
-        val item = state.inventory.find { it.id == itemId } ?: return "Brak przedmiotu."
+        val item = state.inventory.find { it.instanceId == itemId } ?: return "Brak przedmiotu."
         val sellPrice = quoteSell(item)
         state.inventory.remove(item)
         state.gold += sellPrice
@@ -140,7 +141,8 @@ object TradingEngine {
         state.gold -= total
         repeat(safeQty) {
             state.inventory.add(Item(
-                id = "trade_${type.name.lowercase()}_${state.world.day}", 
+                instanceId = "trade_${type.name.lowercase()}_${state.world.day}_${java.util.UUID.randomUUID()}",
+                templateId = "trade_${type.name.lowercase()}", 
                 name = good.name, 
                 value = unitPrice,
                 type = "trade_good",
@@ -165,7 +167,7 @@ object TradingEngine {
         itemId: String,
         factionId: String
     ): String {
-        val item = state.inventory.find { it.id == itemId } ?: return "Brak przedmiotu."
+        val item = state.inventory.find { it.instanceId == itemId } ?: return "Brak przedmiotu."
         val rep = state.reputation.globalFactions[factionId] ?: 0
         val modifier = FactionReputationSystem.sellModifier(rep)
         val base = (item.value * GrimConstants.Economy.SELL_PRICE_MULTIPLIER).toInt().coerceAtLeast(1)

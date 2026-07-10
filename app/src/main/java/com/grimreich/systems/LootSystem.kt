@@ -17,23 +17,23 @@ class LootSystem @Inject constructor(
 ) {
     fun rollLoot(chance: Float): Item? {
         if (random.nextFloat() > chance) return null
-        return itemCatalogue.getRandomItem()
+        return itemCatalogue.getRandomItemInstance()
     }
 
     fun awardLootDirect(state: GameState, chance: Float): String {
         val item = rollLoot(chance)
         return if (item != null) {
-            state.inventory.add(item.copy())
+            state.inventory.add(item)
             "Znaleziono przedmiot: ${item.name}"
         } else {
             "Nie znaleziono nic wartościowego."
         }
     }
 
-    fun awardSpecificItemDirect(state: GameState, itemId: String): Boolean {
-        val item = itemCatalogue.get(itemId)
+    fun awardSpecificItemDirect(state: GameState, templateId: String): Boolean {
+        val item = itemCatalogue.createInstance(templateId)
         return if (item != null) {
-            state.inventory.add(item.copy())
+            state.inventory.add(item)
             true
         } else {
             false
@@ -49,11 +49,11 @@ class LootSystem @Inject constructor(
                 messages.add("Zdobyto $gold złota.")
             }
         }
-        table.itemChances.forEach { (itemId, chance) ->
+        table.itemChances.forEach { (templateId, chance) ->
             if (random.nextFloat() <= chance) {
-                val item = itemCatalogue.get(itemId)
+                val item = itemCatalogue.createInstance(templateId)
                 if (item != null) {
-                    state.inventory.add(item.copy())
+                    state.inventory.add(item)
                     messages.add("Zdobyto przedmiot: ${item.name}")
                 }
             }

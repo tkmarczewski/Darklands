@@ -26,7 +26,27 @@ fun ExpeditionScreen(
     onDialogue: () -> Unit
 ) {
     val state by viewModel.uiState.collectAsState()
+    LaunchedEffect(Unit) {
+        viewModel.uiEffect.collect { effect ->
+            when (effect) {
+                ExpeditionUiEffect.NavigateToCombat -> onCombat()
+                ExpeditionUiEffect.NavigateToDialogue -> onDialogue()
+                ExpeditionUiEffect.NavigateBack -> onBack()
+            }
+        }
+    }
 
+    ExpeditionContent(
+        state = state,
+        onEvent = viewModel::onEvent
+    )
+}
+
+@Composable
+fun ExpeditionContent(
+    state: ExpeditionUiState,
+    onEvent: (ExpeditionUiEvent) -> Unit
+) {
     Box(modifier = Modifier.fillMaxSize().background(Color.Black)) {
         Column(
             modifier = Modifier.fillMaxSize().padding(16.dp),
@@ -36,21 +56,27 @@ fun ExpeditionScreen(
             
             Spacer(modifier = Modifier.height(24.dp))
 
-            // Logic fix: Show encounter if active, otherwise show quests
-            if (state.activeEncounter != null) {
-                EncounterView(state.activeEncounter!!, onChoice = { viewModel.handleEncounterChoice(it) })
-            } else if (state.encounterLog != null) {
-                EncounterLogView(state.encounterLog!!, onDismiss = { viewModel.dismissEncounter() })
-            } else {
-                if (state.activeQuests.isEmpty()) {
-                    Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.Center) {
-                        Text("Brak aktywnych celów w tym regionie.", color = Color.DarkGray)
-                    }
-                } else {
-                    LazyColumn(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                        items(state.activeQuests) { quest ->
-                            QuestActionCard(quest) {
-                                viewModel.startQuest(quest.id, onCombat, onDialogue)
+            when (val content = state.content) {
+                ExpeditionContentState.Loading -> {
+                    CircularProgressIndicator(color = Color.Yellow)
+                }
+                is ExpeditionContentState.EncounterActive -> {
+                    EncounterView(content.encounter, onChoice = { onEvent(ExpeditionUiEvent.OnEncounterChoiceClick(it)) })
+                }
+                is ExpeditionContentState.EncounterLog -> {
+                    EncounterLogView(content.message, onDismiss = { onEvent(ExpeditionUiEvent.OnDismissEncounter) })
+                }
+                is ExpeditionContentState.QuestList -> {
+                    if (content.quests.isEmpty()) {
+                        Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.Center) {
+                            Text("Brak aktywnych celów w tym regionie.", color = Color.DarkGray)
+                        }
+                    } else {
+                        LazyColumn(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                            items(content.quests) { quest ->
+                                QuestActionCard(quest) {
+                                    onEvent(ExpeditionUiEvent.OnQuestClick(quest.id))
+                                }
                             }
                         }
                     }
@@ -60,7 +86,8 @@ fun ExpeditionScreen(
             Spacer(modifier = Modifier.height(16.dp))
 
             Button(
-                onClick = onBack,
+                onClick = { onEvent(ExpeditionUiEvent.OnBackClick) },
+                enabled = state.canLeave,
                 modifier = Modifier.fillMaxWidth().height(50.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF400000))
             ) {
