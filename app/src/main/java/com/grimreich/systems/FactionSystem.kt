@@ -1,5 +1,6 @@
 package com.grimreich.systems
 
+import com.grimreich.core.FactionReputationSystem
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -12,24 +13,24 @@ enum class FactionId {
  */
 @Singleton
 class FactionSystem @Inject constructor(
-    private val reputationSystem: ReputationSystem
+    private val reputationSystem: FactionReputationSystem
 ) {
     
     fun getReputation(faction: FactionId, cityId: String): Int {
-        val cityFaction = mapToCityFaction(faction)
-        return reputationSystem.score(cityId, cityFaction)
+        val factionId = mapToFactionId(faction)
+        return reputationSystem.getReputation(factionId)
     }
 
     fun modifyReputation(faction: FactionId, cityId: String, delta: Int) {
-        val cityFaction = mapToCityFaction(faction)
-        reputationSystem.modify(cityId, cityFaction, delta)
+        val factionId = mapToFactionId(faction)
+        reputationSystem.changeReputation(factionId, delta)
     }
 
-    private fun mapToCityFaction(faction: FactionId): CityFaction = when (faction) {
-        FactionId.CHURCH -> CityFaction.CHURCH
-        FactionId.COMMONERS -> CityFaction.COMMONERS
-        FactionId.NOBILITY -> CityFaction.KNIGHTS
-        FactionId.ALCHEMISTS -> CityFaction.MERCHANTS
+    private fun mapToFactionId(faction: FactionId): String = when (faction) {
+        FactionId.CHURCH -> "CHURCH"
+        FactionId.COMMONERS -> "PEASANTS"
+        FactionId.NOBILITY -> "NOBILITY"
+        FactionId.ALCHEMISTS -> "SCHOLARS"
     }
     
     fun getFactionLabel(faction: FactionId): String = when (faction) {

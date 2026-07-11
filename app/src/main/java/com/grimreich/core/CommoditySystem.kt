@@ -2,6 +2,11 @@ package com.grimreich.core
 
 import com.grimreich.grimreich.v1.Item
 
+interface EconomyCalculator {
+    fun priceInCity(cityId: String, basePrice: Int): Int
+    fun calculateSellPrice(item: Item): Int
+}
+
 enum class TradeGoodType {
     GRAIN,
     SALT,
@@ -83,11 +88,15 @@ object CityMarketCatalog {
 }
 
 object TradingEngine {
+    private var calculator: EconomyCalculator? = null
+    fun initialize(calc: EconomyCalculator) { calculator = calc }
+
     fun buyGood(state: GameState, cityId: String, type: TradeGoodType, qty: Int = 1): String {
         val market = CityMarketCatalog.getMarket(cityId) ?: return "Brak rynku w tej lokacji."
         val good = TradeGoodCatalog.findByType(type) ?: return "Nieznany towar."
         val safeQty = qty.coerceAtLeast(1)
-        val totalCost = market.getPrice(type) * safeQty
+        val unitPrice = calculator?.priceInCity(cityId, good.basePrice) ?: market.getPrice(type)
+        val totalCost = unitPrice * safeQty
         if (state.gold < totalCost) return "Brak złota. Potrzeba $totalCost G."
         state.gold -= totalCost
         repeat(safeQty) {
@@ -95,7 +104,7 @@ object TradingEngine {
                 instanceId = "trade_${type.name.lowercase()}_${java.util.UUID.randomUUID()}",
                 templateId = "trade_${type.name.lowercase()}", 
                 name = good.name, 
-                value = market.getPrice(type),
+                value = good.basePrice,
                 type = "trade_good",
                 weight = good.weight.toDouble(),
                 rarity = "normal",
@@ -108,12 +117,14 @@ object TradingEngine {
 
     fun quoteBuy(cityId: String, type: TradeGoodType, qty: Int = 1): Int {
         val market = CityMarketCatalog.getMarket(cityId) ?: return 0
+        val good = TradeGoodCatalog.findByType(type) ?: return 0
         val safeQty = qty.coerceAtLeast(1)
-        return market.getPrice(type) * safeQty
+        val unitPrice = calculator?.priceInCity(cityId, good.basePrice) ?: market.getPrice(type)
+        return unitPrice * safeQty
     }
 
     fun quoteSell(item: Item): Int =
-        (item.value * GrimConstants.Economy.SELL_PRICE_MULTIPLIER).toInt().coerceAtLeast(1)
+        calculator?.calculateSellPrice(item) ?: (item.value * GrimConstants.Economy.SELL_PRICE_MULTIPLIER).toInt().coerceAtLeast(1)
 
     fun sellItem(state: GameState, itemId: String): String {
         val item = state.inventory.find { it.instanceId == itemId } ?: return "Brak przedmiotu."
@@ -130,21 +141,26 @@ object TradingEngine {
         factionId: String,
         qty: Int = 1
     ): String {
-        val market = CityMarketCatalog.getMarket(cityId) ?: return "Brak rynku w tej lokacji."
+        val good = TradeGoodCatalog.findByType(type) ?: return "Błąd towaru."
         val safeQty = qty.coerceAtLeast(1)
-        val rep = state.reputation.globalFactions[factionId] ?: 0
-        val modifier = FactionReputationSystem.buyModifier(rep)
-        val unitPrice = (market.getPrice(type) * modifier).toInt().coerceAtLeast(1)
+        val unitPrice = calculator?.priceInCity(cityId, good.basePrice) ?: run {
+            // Fallback for missing calculator
+            val market = CityMarketCatalog.getMarket(cityId) ?: return "Brak rynku."
+            val rep = state.reputation.globalFactions[factionId] ?: 0
+            val modifier = FactionReputationSystem.buyModifier(rep)
+            (market.getPrice(type) * modifier).toInt().coerceAtLeast(1)
+        }
+        
         val total = unitPrice * safeQty
         if (state.gold < total) return "Brak złota. Potrzeba $total G."
-        val good = TradeGoodCatalog.findByType(type) ?: return "Błąd towaru."
+        
         state.gold -= total
         repeat(safeQty) {
             state.inventory.add(Item(
                 instanceId = "trade_${type.name.lowercase()}_${state.world.day}_${java.util.UUID.randomUUID()}",
                 templateId = "trade_${type.name.lowercase()}", 
                 name = good.name, 
-                value = unitPrice,
+                value = good.basePrice,
                 type = "trade_good",
                 weight = good.weight.toDouble(),
                 rarity = "normal",
@@ -152,14 +168,17 @@ object TradingEngine {
                 effects = emptyMap()
             ))
         }
-        return "Kupiono ${good.name} x$safeQty za $total G (zniżka frakcyjna)."
+        return "Kupiono ${good.name} x$safeQty za $total G."
     }
 
     fun quoteBuyWithFactionModifier(cityId: String, type: TradeGoodType, factionId: String, qty: Int = 1, reputationValue: Int): Int {
-        val market = CityMarketCatalog.getMarket(cityId) ?: return 0
+        val good = TradeGoodCatalog.findByType(type) ?: return 0
         val safeQty = qty.coerceAtLeast(1)
-        val modifier = FactionReputationSystem.buyModifier(reputationValue)
-        return ((market.getPrice(type) * modifier).toInt().coerceAtLeast(1)) * safeQty
+        return (calculator?.priceInCity(cityId, good.basePrice) ?: run {
+            val market = CityMarketCatalog.getMarket(cityId) ?: return 0
+            val modifier = FactionReputationSystem.buyModifier(reputationValue)
+            ((market.getPrice(type) * modifier).toInt().coerceAtLeast(1))
+        }) * safeQty
     }
 
     fun sellWithFactionModifier(
@@ -168,12 +187,9 @@ object TradingEngine {
         factionId: String
     ): String {
         val item = state.inventory.find { it.instanceId == itemId } ?: return "Brak przedmiotu."
-        val rep = state.reputation.globalFactions[factionId] ?: 0
-        val modifier = FactionReputationSystem.sellModifier(rep)
-        val base = (item.value * GrimConstants.Economy.SELL_PRICE_MULTIPLIER).toInt().coerceAtLeast(1)
-        val finalPrice = (base * modifier).toInt().coerceAtLeast(1)
+        val sellPrice = quoteSell(item)
         state.inventory.remove(item)
-        state.gold += finalPrice
-        return "Sprzedano ${item.name} za $finalPrice G."
+        state.gold += sellPrice
+        return "Sprzedano ${item.name} za $sellPrice G."
     }
 }

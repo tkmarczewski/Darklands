@@ -1,5 +1,7 @@
 package com.grimreich.core
 
+import javax.inject.Inject
+
 enum class FactionType { CHURCH, NOBILITY, MERCHANTS, PEASANTS, OUTLAWS, MILITARY, SCHOLARS }
 
 data class Faction(
@@ -9,10 +11,6 @@ data class Faction(
     val description: String
 )
 
-data class FactionReputationEntry(
-    val factionId: String,
-    var reputation: Int
-)
 
 object FactionCatalogue {
     val factions = listOf(
@@ -21,13 +19,16 @@ object FactionCatalogue {
         Faction("MERCHANTS", "Gildia Kupiecka", FactionType.MERCHANTS, "Władcy handlu i esencji."),
         Faction("PEASANTS", "Chłopi", FactionType.PEASANTS, "Ludzie starający się przetrwać."),
         Faction("OUTLAWS", "Bandyci", FactionType.OUTLAWS, "Ci, którzy odrzucili prawo."),
-        Faction("MILITARY", "Wojsko", FactionType.MILITARY, "Ostatnia linia obrony murów.")
+        Faction("MILITARY", "Wojsko", FactionType.MILITARY, "Ostatnia linia obrony murów."),
+        Faction("SCHOLARS", "Kolegium Uczonych", FactionType.SCHOLARS, "Badacze pęknięć rzeczywistości.")
     )
 
     fun findById(id: String) = factions.find { it.id == id }
 }
 
-class FactionReputationSystem {
+class FactionReputationSystem @Inject constructor(
+    private val gameRepository: GameRepository
+) {
     companion object {
         fun reputationLabel(rep: Int): String = when {
             rep <= -50 -> "WROGA"
@@ -46,29 +47,29 @@ class FactionReputationSystem {
         }
     }
 
-    private val entries = mutableMapOf<String, FactionReputationEntry>()
-
-    init {
-        FactionCatalogue.factions.forEach { 
-            entries[it.id] = FactionReputationEntry(it.id, 0)
-        }
-    }
-
-    fun getReputation(factionId: String): Int = entries[factionId]?.reputation ?: 0
+    fun getReputation(factionId: String): Int = 
+        gameRepository.currentState().reputation.globalFactions[factionId] ?: 0
 
     fun changeReputation(factionId: String, delta: Int): String {
-        val entry = entries[factionId] ?: return "Nieznana frakcja"
-        entry.reputation = (entry.reputation + delta).coerceIn(-100, 100)
-        val label = reputationLabel(entry.reputation)
-        return "Twoja reputacja u ${FactionCatalogue.findById(factionId)?.name} zmieniła się na: $label ($delta)"
+        var result = ""
+        gameRepository.updateState { state ->
+            val current = state.reputation.globalFactions[factionId] ?: 0
+            val next = (current + delta).coerceIn(-100, 100)
+            state.reputation.globalFactions[factionId] = next
+            
+            val label = reputationLabel(next)
+            result = "Twoja reputacja u ${FactionCatalogue.findById(factionId)?.name} zmieniła się na: $label ($delta)"
+        }
+        return result
     }
 
-    fun getAll(): Map<String, Int> = entries.mapValues { it.value.reputation }
+    fun getAll(): Map<String, Int> = gameRepository.currentState().reputation.globalFactions
 
     fun summary(): String {
-        return entries.values.joinToString("\n") { 
-            val name = FactionCatalogue.findById(it.factionId)?.name ?: it.factionId
-            "$name: ${reputationLabel(it.reputation)} (${it.reputation})"
+        val factions = gameRepository.currentState().reputation.globalFactions
+        return factions.entries.joinToString("\n") { (id, rep) -> 
+            val name = FactionCatalogue.findById(id)?.name ?: id
+            "$name: ${reputationLabel(rep)} ($rep)"
         }
     }
 }

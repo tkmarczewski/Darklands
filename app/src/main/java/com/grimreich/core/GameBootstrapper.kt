@@ -27,9 +27,12 @@ class GameBootstrapper @Inject constructor(
     private val itemCatalogue: ItemCatalogue,
     private val contentValidator: ContentValidator,
     private val worldMap: WorldMap,
-    private val heroPool: HeroPool
+    private val heroPool: HeroPool,
+    private val economySystem: com.grimreich.systems.EconomySystem
 ) {
     suspend fun bootstrapFreshWorld(seed: Int = 1) = withContext(Dispatchers.IO) {
+        // Initialize TradingEngine with real calculator
+        com.grimreich.core.TradingEngine.initialize(economySystem)
         val oldState = gameRepository.currentState()
         val existingPlayerName = oldState.playerName
         val existingHeroName = oldState.heroName

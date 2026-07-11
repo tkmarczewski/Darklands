@@ -10,32 +10,46 @@ enum class CollapseScenario {
 
 @Singleton
 class CollapseEngine @Inject constructor(
-    private val gameRepository: GameRepository
+    private val gameRepository: GameRepository,
+    private val worldStabilitySystem: WorldStabilitySystem
 ) {
     var activeScenario: CollapseScenario? = null
 
-    fun tick() {
-        gameRepository.updateState { state ->
-            state.world.collapseProgress = (state.world.collapseProgress + 0.01f).coerceAtMost(1.0f)
+    /**
+     * Główny tick upadku świata.
+     * FIX: Zmieniono mutacje bezpośrednie na WorldStabilitySystem, co zapewnia
+     * clamping oraz poprawne logowanie zmian.
+     */
+    fun tick(reason: String = "Upływ czasu") {
+        val state = gameRepository.currentState()
+        
+        // Zwiększamy postęp upadku
+        worldStabilitySystem.advanceCollapse(0.01f, reason)
 
-            if (state.world.collapseProgress > 0.5f && state.world.collapseScenarioId == null) {
-                val scenario = decideScenario(state.prayer.faith, state.world.globalStability)
-                state.world.collapseScenarioId = scenario.name
+        // Jeżeli przekroczono próg, decydujemy o scenariuszu
+        if (state.world.collapseProgress > 0.5f && state.world.collapseScenarioId == null) {
+            gameRepository.updateState { s ->
+                val scenario = decideScenario(s.prayer.faith, s.world.globalStability)
+                s.world.collapseScenarioId = scenario.name
             }
+        }
 
-            val scenarioId = state.world.collapseScenarioId ?: return@updateState
-            val scenario = try { CollapseScenario.valueOf(scenarioId) } catch (e: Exception) { null }
+        val scenarioId = gameRepository.currentState().world.collapseScenarioId ?: return
+        val scenario = try { CollapseScenario.valueOf(scenarioId) } catch (e: Exception) { null }
 
-            scenario?.let { sc ->
-                when (sc) {
-                    CollapseScenario.MIST_OBLIVION -> {
-                        state.world.echoIntensity = (state.world.echoIntensity + 0.02f).coerceAtMost(1.0f)
-                    }
-                    CollapseScenario.BLOOD_RUIN -> {
-                        state.party.forEach { h -> h.hp = (h.hp - 1).coerceAtLeast(0) }
-                    }
-                    else -> {}
+        scenario?.let { sc ->
+            when (sc) {
+                CollapseScenario.MIST_OBLIVION -> {
+                    // Dodatkowy efekt scenariusza: wzrost echa
+                    worldStabilitySystem.changeEcho(0.02f, "Scenariusz Upadku: ${sc.name}")
                 }
+                CollapseScenario.BLOOD_RUIN -> {
+                    // Dodatkowy efekt scenariusza: obrażenia drużyny
+                    gameRepository.updateState { s ->
+                        s.party.forEach { h -> h.hp = (h.hp - 1).coerceAtLeast(0) }
+                    }
+                }
+                else -> {}
             }
         }
     }
