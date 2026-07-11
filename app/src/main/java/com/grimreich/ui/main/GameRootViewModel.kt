@@ -7,6 +7,7 @@ import com.grimreich.systems.AudioEngine
 import com.grimreich.systems.CombatSystem
 import com.grimreich.systems.ContentError
 import com.grimreich.systems.ContentValidator
+import com.grimreich.systems.EndingSystem
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -22,11 +23,15 @@ class GameRootViewModel @Inject constructor(
     private val gameBootstrapper: GameBootstrapper,
     private val combatSystem: CombatSystem,
     private val audioEngine: AudioEngine,
-    private val contentValidator: ContentValidator
+    private val contentValidator: ContentValidator,
+    private val endingSystem: EndingSystem
 ) : ViewModel() {
 
     private val _mode = MutableStateFlow(GameScreenMode.MAIN_MENU)
     val mode: StateFlow<GameScreenMode> = _mode.asStateFlow()
+
+    private val _ending = MutableStateFlow(EndingSystem.GameEnding.NONE)
+    val ending: StateFlow<EndingSystem.GameEnding> = _ending.asStateFlow()
 
     private val _contentErrors = MutableStateFlow<List<ContentError>>(emptyList())
     val contentErrors: StateFlow<List<ContentError>> = _contentErrors.asStateFlow()
@@ -45,6 +50,18 @@ class GameRootViewModel @Inject constructor(
 
     init {
         audioEngine.playForRoute("main_menu")
+
+        // Ending observer
+        gameRepository.gameState
+            .map { endingSystem.checkEndingConditions(it) }
+            .distinctUntilChanged()
+            .onEach { end ->
+                if (end != EndingSystem.GameEnding.NONE) {
+                    _ending.value = end
+                    setMode(GameScreenMode.ENDING)
+                }
+            }
+            .launchIn(viewModelScope)
     }
 
     fun setMode(mode: GameScreenMode) {

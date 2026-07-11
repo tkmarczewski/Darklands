@@ -254,6 +254,7 @@ fun GameNavHost(
         composable(GameRoute.Ending.route) {
             EndingScreen(
                 viewModel = hiltViewModel(),
+                root = root,
                 onFinish = { root.setMode(GameScreenMode.MAIN_MENU) }
             )
         }

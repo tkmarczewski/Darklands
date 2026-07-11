@@ -57,7 +57,16 @@ class CityViewModel @Inject constructor(
 
     init {
         gameRepository.gameState
-            .onEach { updateUiState(it) }
+            .map { it.grimCurrentRegion to it.world.day }
+            .distinctUntilChanged()
+            .onEach { updateUiState(gameRepository.currentState()) }
+            .launchIn(viewModelScope)
+            
+        // Separate flow for non-structural updates (gold, stability etc)
+        gameRepository.gameState
+            .map { Triple(it.gold, it.world.globalStability, it.world.echoIntensity) }
+            .distinctUntilChanged()
+            .onEach { updateVisualsOnly(gameRepository.currentState()) }
             .launchIn(viewModelScope)
     }
 
@@ -152,6 +161,18 @@ class CityViewModel @Inject constructor(
                 isGlitchActive = finalGlitchIntensity > 0.5f,
                 glitchIntensity = finalGlitchIntensity,
                 rulingFactionName = cityData?.rulingFaction ?: "Neutralna"
+            )
+        }
+    }
+
+    private fun updateVisualsOnly(state: GameState) {
+        val stability = state.world.globalStability
+        val finalGlitchIntensity = (state.world.echoIntensity + (100 - stability) / 50f).coerceAtMost(5f)
+        
+        _uiState.update {
+            it.copy(
+                isGlitchActive = finalGlitchIntensity > 0.5f,
+                glitchIntensity = finalGlitchIntensity
             )
         }
     }

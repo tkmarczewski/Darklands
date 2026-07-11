@@ -19,6 +19,32 @@ class EndingSystem @Inject constructor(
     private val gameRepository: GameRepository,
     private val chronicleSystem: ChronicleSystem
 ) {
+    enum class GameEnding {
+        NONE, TOTAL_COLLAPSE, ECHO_DOMINION, FAITH_ASCENSION, RESTORATION, ABANDONED
+    }
+
+    fun checkEndingConditions(state: GameState): GameEnding {
+        return when {
+            state.world.collapseProgress >= 1.0f -> GameEnding.TOTAL_COLLAPSE
+            state.world.echoIntensity >= 1.0f -> GameEnding.ECHO_DOMINION
+            state.party.all { it.isDead } -> GameEnding.ABANDONED
+            state.world.globalStability >= 90 && state.prayer.faith >= 80 -> GameEnding.FAITH_ASCENSION
+            state.world.globalStability >= 95 -> GameEnding.RESTORATION
+            else -> GameEnding.NONE
+        }
+    }
+
+    fun getEndingDescription(ending: GameEnding): String {
+        return when (ending) {
+            GameEnding.TOTAL_COLLAPSE -> "Rzeczywistość rozpadła się na Twoich oczach. Szyfr przestał istnieć, a wraz z nim wszystko, co znałeś."
+            GameEnding.ECHO_DOMINION -> "Echo pochłonęło Boreas. Świat stał się szeptem w pustce, a Twoi bohaterowie - jedynie usterkami w nieskończonym cyklu."
+            GameEnding.FAITH_ASCENSION -> "Wiara Twojej drużyny stała się nową Kotwicą. Bogowie uśmiechnęli się, a mrok został wyparty poza krawędź snu."
+            GameEnding.RESTORATION -> "Stabilność została przywrócona. Paradygmat Boreas przetrwał, a pęknięcia zaczęły się goić."
+            GameEnding.ABANDONED -> "Pustka pochłonęła ostatnie ślady Twojej obecności. Nikt nie opowie Twojej historii."
+            else -> ""
+        }
+    }
+
     fun shouldTriggerMetaEnding(): Boolean {
         val s = gameRepository.currentState()
         val heroEndings = listOf("lore_aelion_ascension", "lore_mira_ascension", "lore_ferrun_iron_wall", "lore_noctyros_update")

@@ -7,6 +7,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -20,9 +21,18 @@ import com.grimreich.ui.effects.glitchEffect
 @Composable
 fun EndingScreen(
     viewModel: EndingViewModel,
+    root: GameRootViewModel,
     onFinish: () -> Unit
 ) {
     val state by viewModel.uiState.collectAsState()
+    val endingType by root.ending.collectAsState()
+    val context = LocalContext.current
+
+    val endingDescription = remember(endingType) {
+        // We can get the text from string resources or use a manager
+        // For simplicity using a static mapping for now or extending EndingUiState
+        state.summary 
+    }
 
     Column(
         modifier = Modifier
@@ -34,7 +44,7 @@ fun EndingScreen(
         verticalArrangement = Arrangement.Center
     ) {
         Text(
-            text = stringResource(R.string.ending_title),
+            text = "SESJA ZAKOŃCZONA",
             color = Color(0xFFC0A060),
             fontSize = 32.sp,
             fontWeight = FontWeight.Bold
@@ -43,7 +53,7 @@ fun EndingScreen(
         Spacer(modifier = Modifier.height(24.dp))
 
         Text(
-            text = state.summary,
+            text = endingDescription,
             color = Color.LightGray,
             fontSize = 14.sp,
             textAlign = TextAlign.Start,
