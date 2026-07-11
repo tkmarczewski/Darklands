@@ -20,19 +20,17 @@ android {
         versionName = "1.0.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
-    buildFeatures { 
-        viewBinding = true 
+    buildFeatures {
+        viewBinding = true
         compose = true
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
-
     kotlinOptions {
         jvmTarget = '17'
     }
-
     buildTypes {
         release {
             minifyEnabled = false
@@ -55,7 +53,7 @@ jacoco {
 }
 
 tasks.withType(Test) {
-    configure<JacocoTaskExtension> {
+    configure {
         destinationFile = file("build/jacoco/testDebugUnitTest.exec")
     }
 }
@@ -65,188 +63,56 @@ task jacocoTestReport(type: JacocoReport, dependsOn: 'testDebugUnitTest') {
         xml.required = true
         html.required = true
     }
-
     def fileFilter = [
-        '**/*-mock.class',
         '**/R.class',
         '**/R$*.class',
-        '**/BuildConfig.*\
-
-',
-        '**/*_Factory*.*\
-
-',
-        '**/*_MembersInjector*.*\
-
-',
-        '**/*_Provide*Factory*.*\
-
-',
-        '**/*_Hilt*.*\
-
-',
-        '**/*_GeneratedInjector*.*\
-
-',
-        '**/*_Impl*.*\
-
-',
-        '**/*ViewModel*.*\
-
-', // Composables, ViewModels
-        '**/*Composable*.*\
-
-',
-        '**/*Screen*.*\
-
-',
-        '**/*Activity*.*\
-
-',
-        '**/*Fragment*.*\
-
-',
-        '**/*View*.*\
-
-',
-        '**/*Binding*.*\
-
-',
-        '**/*Dto*.*\
-
-',
-        '**/*Models*.*'  // DTO i Modele
+        '**/BuildConfig.*',
+        '**/Manifest*.*',
+        '**/*_Factory*.*',
+        '**/*_MembersInjector*.*',
+        '**/*_Provide*Factory*.*',
+        '**/*_Hilt*.*',
+        '**/*_GeneratedInjector*.*',
+        '**/*_Impl*.*',
+        '**/*ViewModel*.*',
+        '**/*Composable*.*',
+        '**/*Screen*.*',
+        '**/*Activity*.*',
+        '**/*Fragment*.*',
+        '**/*View*.*',
+        '**/*Binding*.*',
+        '**/*Dto*.*',
+        '**/*Models*.*',
+        '**/*-mock.class'
     ]
-
     def debugTree = fileTree(dir: "${buildDir}/intermediates/javac/debug/classes", excludes: fileFilter)
     def mainKotlin = fileTree(dir: "${buildDir}/tmp/kotlin-classes/debug", excludes: fileFilter)
     def generatedSources = fileTree(dir: "${buildDir}/generated", excludes: fileFilter)
-
     sourceDirectories.setFrom(files(["src/main/java", "src/main/kotlin"]))
     classDirectories.setFrom(files([debugTree, mainKotlin, generatedSources]))
     executionData.setFrom(file("${buildDir}/jacoco/testDebugUnitTest.exec"))
-
     doFirst {
         file("${buildDir}/jacoco").mkdirs()
     }
-
     afterEvaluate {
         classDirectories.setFrom(files(classDirectories.files.collect {
             fileTree(dir: it, excludes: fileFilter)
         }))
     }
-
     violationRules {
         rule {
             element = 'BUNDLE'
             limit {
                 counter = 'LINE'
-                value = 0.50
-                minimum = value
+                minimum = 0.50
             }
         }
-
         rule {
             element = 'PACKAGE'
             includes = ['com.grimreich.core', 'com.grimreich.systems']
             limit {
                 counter = 'LINE'
-                value = 0.70
-                minimum = value
-            }
-        }
-    }
-}
-
-tasks.withType(Test) {
-    configure<JacocoTaskExtension> {
-        // Aby generować raport coverage dla testów jednostkowych
-        // Odwzorowuje domyślne ścieżki generowane przez Android Gradle Plugin
-        destinationFile = file("build/jacoco/testDebugUnitTest.exec")
-        // Inne ustawienia JacocoTaskExtension, jeśli potrzebne
-    }
-}
-
-task jacocoTestReport(type: JacocoReport, dependsOn: 'testDebugUnitTest') {
-    reports {
-        xml.required = true
-        html.required = true
-    }
-
-    def fileFilter = ['**/*-mock.class', '**/R.class', '**/R$*.class', '**/BuildConfig.*\
-
-', '**/Manifest*.*\
-
-', '**/*_Factory*.*\
-
-', '**/*_MembersInjector*.*\
-
-', '**/*_Provide*Factory*.*\
-
-', '**/*_Hilt*.*\
-
-', '**/*_GeneratedInjector*.*\
-
-', '**/*_Impl*.*\
-
-', '**/*ViewModel*.*\
-
-', // Composables, ViewModels
-                    '**/*Composable*.*\
-
-', '**/*Screen*.*\
-
-', '**/*Activity*.*\
-
-', '**/*Fragment*.*\
-
-', '**/*View*.*\
-
-', '**/*Binding*.*\
-
-', '**/*Dto*.*\
-
-', '**/*Models*.*\
-
-' // DTO i Modele
-    ]
-
-    def debugTree = fileTree(dir: "${buildDir}/intermediates/javac/debug/classes", excludes: fileFilter)
-    def mainKotlin = fileTree(dir: "${buildDir}/tmp/kotlin-classes/debug", excludes: fileFilter)
-    def generatedSources = fileTree(dir: "${buildDir}/generated", excludes: fileFilter)
-
-    sourceDirectories.setFrom(files(["src/main/java", "src/main/kotlin"]))
-    classDirectories.setFrom(files([debugTree, mainKotlin, generatedSources]))
-    executionData.setFrom(file("${buildDir}/jacoco/testDebugUnitTest.exec"))
-
-    doFirst {
-        file("${buildDir}/jacoco").mkdirs()
-    }
-
-    afterEvaluate {
-        classDirectories.setFrom(files(classDirectories.files.collect {
-            fileTree(dir: it, excludes: fileFilter)
-        }))
-    }
-
-    // Minimalne progi pokrycia dla kluczowych pakietów
-    violationRules {
-        rule {
-            element = 'BUNDLE'
-            limit {
-                counter = 'LINE'
-                value = 0.50 // Przykładowy próg 50% dla linii
-                minimum = value
-            }
-        }
-
-        rule {
-            element = 'PACKAGE'
-            includes = ['com.grimreich.core', 'com.grimreich.systems']
-            limit {
-                counter = 'LINE'
-                value = 0.70 // Przykładowy próg 70% dla linii w core i systems
-                minimum = value
+                minimum = 0.70
             }
         }
     }
@@ -260,7 +126,7 @@ dependencies {
     implementation 'com.google.android.material:material:1.11.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
     implementation 'com.google.code.gson:gson:2.10.1'
-    
+
     // COMPOSE
     def composeBom = platform('androidx.compose:compose-bom:2024.05.00')
     implementation composeBom
@@ -280,15 +146,14 @@ dependencies {
     androidTestImplementation "com.google.dagger:hilt-android-testing:2.55"
     kspTest "com.google.dagger:hilt-android-compiler:2.55"
     kspAndroidTest "com.google.dagger:hilt-android-compiler:2.55"
-    
+
     // SERIALIZATION
     implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3"
 
     testImplementation 'junit:junit:4.13.2'
     testImplementation 'org.jetbrains.kotlin:kotlin-test'
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.10.1'
-    // For Hilt unit tests
-    testImplementation "com.google.dagger:hilt-android-testing:2.59.2"
+    testImplementation "com.google.dagger:hilt-android-testing:2.55"
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.10.1'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
