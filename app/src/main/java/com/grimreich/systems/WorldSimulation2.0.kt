@@ -1,6 +1,8 @@
 package com.grimreich.systems
 
 import com.grimreich.core.GameRepository
+import com.grimreich.systems.CollapseEngine
+import com.grimreich.systems.CollapseEvent
 import javax.inject.Inject
 import javax.inject.Singleton
 

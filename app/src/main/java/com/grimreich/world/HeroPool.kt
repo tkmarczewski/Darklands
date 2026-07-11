@@ -79,7 +79,7 @@ class HeroPool @Inject constructor(
         Career.GUARD to listOf("armor_leather"),
         Career.PHYSICIAN to listOf("armor_cloth"),
         Career.CRAFTSMAN to listOf("armor_leather"),
-        Career.ALCHEMIST to listOf("staff_basic", "dagger_basic")
+        Career.ALCHEMIST to listOf("armor_cloth")
     )
 
     // ── Zakres atrybutów per profesja ────────────────────────────────────────
@@ -199,7 +199,7 @@ class HeroPool @Inject constructor(
             Career.ROGUE to
                 mapOf("agi" to 11, "per" to 10, "stealth" to 11, "dagger" to 10, "lockpick" to 9),
             Career.SCHOLAR to
-                mapOf("int" to 12, "read" to 12, "alchemy" to 10, "herb_lore" to 9, "lore" to 8),
+                mapOf("int" to 12, "read" to 12, "ALCH" to 10, "herb_lore" to 9, "lore" to 8),
             Career.MONK to
                 mapOf("pie" to 13, "heal" to 12, "read" to 10, "mace" to 9, "prayer" to 8),
             Career.GUARD to
@@ -209,7 +209,7 @@ class HeroPool @Inject constructor(
             Career.CRAFTSMAN to
                 mapOf("str" to 10, "craft" to 10, "appraise" to 9, "axe" to 8),
             Career.ALCHEMIST to
-                mapOf("int" to 12, "alchemy" to 11, "read" to 9, "herb_lore" to 8)
+                mapOf("int" to 12, "ALCH" to 11, "read" to 9, "herb_lore" to 8)
         )
 
     // ── Koszt rekrutacji per profesja ────────────────────────────────────────

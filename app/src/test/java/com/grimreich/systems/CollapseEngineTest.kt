@@ -8,6 +8,7 @@ import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
+import com.grimreich.contracts.CollapseRandomProvider
 
 class CollapseEngineTest {
 
@@ -24,7 +25,7 @@ class CollapseEngineTest {
         // updateState is hard to mock with whenever due to lambda, but we can use real impl if we have a simple repo mock or just test the logic
         
         worldStabilitySystem = WorldStabilitySystem(gameRepository)
-        collapseEngine = CollapseEngine(gameRepository, worldStabilitySystem)
+        collapseEngine = CollapseEngine(gameRepository, worldStabilitySystem, mock<CollapseRandomProvider>())
     }
 
     @Test

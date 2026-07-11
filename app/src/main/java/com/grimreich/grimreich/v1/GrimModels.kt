@@ -50,7 +50,11 @@ data class NPC(
     val isInfested: Boolean = false,
     val isRegionalHero: Boolean = false,
     val interactionHistory: MutableMap<String, Int> = mutableMapOf()
-)
+) {
+    fun deepCopy(): NPC = this.copy(
+        interactionHistory = this.interactionHistory.toMutableMap()
+    )
+}
 
 data class ChronicleEntry(
     val id: String,

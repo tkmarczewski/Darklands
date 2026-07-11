@@ -1,10 +1,12 @@
+package com.grimreich.systems
+
 import com.grimreich.contracts.CollapseRandomProvider
+import com.grimreich.core.GameRepository
+import com.grimreich.core.GameState
 import com.grimreich.grimreich.v1.CollapseScenario
-import com.grimreich.grimreich.v1.CollapseScenario
+import com.grimreich.systems.CollapseEvent
 import javax.inject.Inject
 import javax.inject.Singleton
-import kotlin.random.Random
-
 
 @Singleton
 class CollapseEngine @Inject constructor(
@@ -12,36 +14,29 @@ class CollapseEngine @Inject constructor(
     private val worldStabilitySystem: WorldStabilitySystem,
     private val collapseRandomProvider: CollapseRandomProvider
 ) {
-    // Usunięto: var activeScenario: CollapseScenario? = null - jest w WorldState
 
-    /**
-     * Główny tick upadku świata wywoływany przez zdarzenia domenowe.
-     */
     fun processCollapseEvent(event: CollapseEvent) {
         gameRepository.updateState { state ->
             processCollapseEventDirect(state, event)
         }
     }
 
-    fun processCollapseEventDirect(state: com.grimreich.core.GameState, event: CollapseEvent) {
+    fun processCollapseEventDirect(state: GameState, event: CollapseEvent) {
         val progressBefore = state.world.collapseProgress
         
-        // 1. Advance progress
         worldStabilitySystem.advanceCollapseDirect(state, event)
         
         val progressAfter = state.world.collapseProgress
 
-        // 2. Decide scenario if threshold crossed
         if (progressBefore <= 0.5f && progressAfter > 0.5f && state.world.collapseScenarioId == null) {
             val scenario = decideScenario(state.prayer.faith, state.world.globalStability)
             state.world.collapseScenarioId = scenario.name
         }
 
-        // 3. Apply one-time threshold effects
         applyThresholdEffectsDirect(state, progressBefore, progressAfter)
     }
 
-    private fun applyThresholdEffectsDirect(state: com.grimreich.core.GameState, before: Float, after: Float) {
+    private fun applyThresholdEffectsDirect(state: GameState, before: Float, after: Float) {
         val thresholds = listOf(0.6f, 0.75f, 0.9f, 1.0f)
         
         thresholds.forEach { threshold ->
@@ -53,7 +48,7 @@ class CollapseEngine @Inject constructor(
         }
     }
 
-    private fun triggerEffectDirect(state: com.grimreich.core.GameState, threshold: Float) {
+    private fun triggerEffectDirect(state: GameState, threshold: Float) {
         val scenarioId = state.world.collapseScenarioId ?: return
         val scenario = try { CollapseScenario.valueOf(scenarioId) } catch (e: Exception) { return }
 

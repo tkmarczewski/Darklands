@@ -5,6 +5,9 @@ import com.grimreich.core.GameState
 import com.grimreich.core.WorldMap
 import com.grimreich.core.Season
 import com.grimreich.world.CityCatalogue
+import com.grimreich.systems.EncounterSystem
+import com.grimreich.systems.CollapseEngine
+import com.grimreich.systems.CollapseEvent
 import javax.inject.Inject
 import javax.inject.Singleton
 

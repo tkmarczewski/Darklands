@@ -51,8 +51,9 @@ data class GameState(
 
     fun trimLogs() {
         if (logEntries.size > 100) {
-            val toRemove = logEntries.size - 100
-            repeat(toRemove) { logEntries.removeAt(0) }
+            val trimmed = logEntries.takeLast(100)
+            logEntries.clear()
+            logEntries.addAll(trimmed)
         }
     }
 
@@ -100,7 +101,7 @@ data class GameState(
             heroEffects = this.combat.heroEffects.toMutableList(),
             log = this.combat.log.toMutableList()
         ),
-        knownNpcs = this.knownNpcs.mapValues { it.value.toList() }.toMutableMap(),
+        knownNpcs = this.knownNpcs.mapValues { it.value.map { n -> n.deepCopy() } }.toMutableMap(),
         unlockedLoreIds = this.unlockedLoreIds.toMutableSet(),
         persistentMeta = this.persistentMeta.copy(
             unlockedLegacyBuffs = this.persistentMeta.unlockedLegacyBuffs.toMutableSet()

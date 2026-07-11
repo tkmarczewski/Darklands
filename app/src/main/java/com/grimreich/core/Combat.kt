@@ -169,7 +169,15 @@ class CombatRound @Inject constructor(
                 val hpBefore = defender.hp
                 val result = skill.effect(attacker, defender)
                 if (result.message.isNotBlank()) log.add(result.message)
-                dmgToDefender = maxOf(result.damage, (hpBefore - defender.hp).coerceAtLeast(0))
+                
+                // FIX (BUG-07): Apply damage if not already applied inside effect
+                val appliedDmg = (hpBefore - defender.hp).coerceAtLeast(0)
+                val bonusDmg = result.damage
+                if (bonusDmg > 0) {
+                    defender.hp = (defender.hp - bonusDmg).coerceAtLeast(0)
+                }
+                dmgToDefender = appliedDmg + bonusDmg
+
                 if (result.statusApplied && dmgToDefender == 0) {
                     log.add("Efekt specjalny został zastosowany.")
                 }

@@ -12,15 +12,23 @@ data class SaveSlot(
 )
 
 object SaveSystem {
-    private val slots = mutableMapOf<Int, SaveSnapshot>()
+    private val slots = java.util.concurrent.ConcurrentHashMap<Int, SaveSnapshot>()
     private var autoSaveSnapshot: SaveSnapshot? = null
     private var lastAutoSaveHash: Int = 0
-    private val gson = Gson()
+    private val gson = com.google.gson.Gson()
 
     suspend fun save(gameState: GameState, slotId: Int = 0, label: String = ""): SaveSnapshot {
         val stateCopy = gameState.deepCopy()
         val stateJson = gson.toJson(stateCopy)
-        val checksum = SaveIntegrity.generateChecksum(stateJson)
+        
+        // BUG-02: Ensure cancellation safety
+        val checksum = try {
+            SaveIntegrity.generateChecksum(stateJson)
+        } catch (e: kotlinx.coroutines.CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            ""
+        }
 
         val snapshot = SaveSnapshot(
             version   = SAVE_VERSION,
@@ -76,7 +84,15 @@ object SaveSystem {
         
         val stateCopy = gameState.deepCopy()
         val stateJson = gson.toJson(stateCopy)
-        val checksum = SaveIntegrity.generateChecksum(stateJson)
+        
+        // BUG-02: Ensure cancellation safety
+        val checksum = try {
+            SaveIntegrity.generateChecksum(stateJson)
+        } catch (e: kotlinx.coroutines.CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            ""
+        }
 
         autoSaveSnapshot = SaveSnapshot(
             version   = SAVE_VERSION,

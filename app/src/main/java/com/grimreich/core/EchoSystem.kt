@@ -29,10 +29,10 @@ class EchoSystem @Inject constructor(
     private val eternalHeroes = mutableListOf<Hero>()
 
     init {
-        loadEchoes()
+        // BUG-03: Moved to loadEchoesAsync to prevent blocking main thread during Hilt init
     }
 
-    private fun loadEchoes() {
+    suspend fun loadEchoesAsync() = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
         val file = File(context.filesDir, ECHO_FILE)
         if (file.exists()) {
             try {

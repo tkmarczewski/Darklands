@@ -7,16 +7,13 @@ import javax.inject.Singleton
 class InjurySystem @Inject constructor(
     private val gameRepository: GameRepository
 ) {
-    companion object {
-        private const val SANITY_CAP = 100
-    }
 
     fun applyInjury(heroId: String, damage: Int) {
         gameRepository.updateState { state ->
             val hero = state.party.find { it.id == heroId } ?: return@updateState
             if (hero.maxHp <= 0) return@updateState
             if (damage > hero.maxHp / 2) {
-                hero.sanity = (hero.sanity - 5).coerceIn(0, SANITY_CAP)
+                hero.sanity = (hero.sanity - 5).coerceAtLeast(0)
                 state.logEntries.add("${hero.name} odniósł ciężką ranę psychiczną.")
             }
         }

@@ -15,7 +15,8 @@ data class BossState(
 
 @Singleton
 class BossBattleSystem @Inject constructor(
-    private val partyRepository: PartyRepository
+    private val partyRepository: PartyRepository,
+    private val gameRepository: com.grimreich.core.GameRepository
 ) {
     fun startBoss(gameState: GameState): BossState = BossState()
 
@@ -28,11 +29,15 @@ class BossBattleSystem @Inject constructor(
         if (boss.hp <= 72 && boss.phase == 1) {
             boss.phase = 2
             boss.armor += 5
-            boss.statusEffects.add("enraged")
+            if (!boss.statusEffects.contains("enraged")) {
+                boss.statusEffects.add("enraged")
+            }
         }
         if (boss.hp <= 36 && boss.phase == 2) {
             boss.phase = 3
-            boss.statusEffects.add("corrupted_aura")
+            if (!boss.statusEffects.contains("corrupted_aura")) {
+                boss.statusEffects.add("corrupted_aura")
+            }
         }
 
         return when {
@@ -51,9 +56,18 @@ class BossBattleSystem @Inject constructor(
             else -> 8
         }
         val dmg = maxOf(1, baseDmg - heroDefenseBonus(gameState) / 2)
-        val hero = partyRepository.activeHero() ?: return "Brak aktywnego bohatera."
-        hero.hp = (hero.hp - dmg).coerceAtLeast(0)
-        return "Boss atakuje! Tracisz $dmg HP. Twoje HP: ${hero.hp}"
+        val activeId = gameState.activeHeroId ?: return "Brak aktywnego bohatera."
+        
+        var finalHp = 0
+        gameRepository.updateState { s ->
+            val h = s.party.find { it.id == activeId }
+            if (h != null) {
+                h.hp = (h.hp - dmg).coerceAtLeast(0)
+                finalHp = h.hp
+            }
+        }
+        
+        return "Boss atakuje! Tracisz $dmg HP. Twoje HP: $finalHp"
     }
 
     fun isDefeated(boss: BossState) = boss.hp <= 0

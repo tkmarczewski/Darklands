@@ -23,6 +23,7 @@ class GameRepository @Inject constructor(
     private val dialogueManagerProvider: Lazy<DialogueManager>,
     private val questManifestProvider: Lazy<QuestManifest>,
     private val economySystemProvider: Lazy<com.grimreich.core.EconomyCalculator>,
+    private val echoSystemProvider: Lazy<EchoSystem>,
     val persistence: StatePersistenceManager,
     val cityCatalogue: CityCatalogue,
     val itemCatalogue: ItemCatalogue,
@@ -84,6 +85,10 @@ class GameRepository @Inject constructor(
         itemCatalogue.seed()
         dialogueManager.seedBasicDialogues()
         questManifest.seed()
+        
+        repositoryScope.launch {
+            echoSystemProvider.get().loadEchoesAsync()
+        }
         
         com.grimreich.core.TradingEngine.initialize(economySystemProvider.get())
         
