@@ -14,4 +14,8 @@ abstract class AppModule {
     @Binds
     @Singleton
     abstract fun bindCombatRandomProvider(impl: DefaultCombatRandomProvider): CombatRandomProvider
+
+    @Binds
+    @Singleton
+    abstract fun bindEconomyCalculator(impl: com.grimreich.systems.EconomySystem): com.grimreich.core.EconomyCalculator
 }

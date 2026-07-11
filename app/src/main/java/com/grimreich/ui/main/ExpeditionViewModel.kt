@@ -136,7 +136,7 @@ class ExpeditionViewModel @Inject constructor(
             
             when (step.type) {
                 StepType.COMBAT -> {
-                    state.pendingQuestId = "COMBAT_WIN:$questId"
+                    state.pendingAction = com.grimreich.core.PendingWorldAction.QuestCombatWin(questId)
                     val tid = step.targetId.trim().uppercase()
                     enemyType = try {
                         com.grimreich.core.EnemyType.valueOf(tid)
@@ -146,9 +146,12 @@ class ExpeditionViewModel @Inject constructor(
                     shouldCombat = true
                 }
                 StepType.DIALOGUE -> {
-                    state.pendingDialogueNodeId = step.targetId
-                    state.pendingDialogueNpcRole = def.originNpcId
-                    state.pendingDialogueNpcName = "Kontakt"
+                    state.pendingAction = com.grimreich.core.PendingWorldAction.Dialogue(
+                        npcName = "Kontakt",
+                        npcRole = def.originNpcId,
+                        nodeId = step.targetId,
+                        relatedQuestId = questId
+                    )
                     shouldDialogue = true
                 }
                 StepType.INVESTIGATION -> {

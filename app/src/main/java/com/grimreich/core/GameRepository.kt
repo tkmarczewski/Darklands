@@ -22,6 +22,7 @@ class GameRepository @Inject constructor(
     private val questEngineProvider: Lazy<QuestEngine>,
     private val dialogueManagerProvider: Lazy<DialogueManager>,
     private val questManifestProvider: Lazy<QuestManifest>,
+    private val economySystemProvider: Lazy<com.grimreich.core.EconomyCalculator>,
     val persistence: StatePersistenceManager,
     val cityCatalogue: CityCatalogue,
     val itemCatalogue: ItemCatalogue,
@@ -90,6 +91,9 @@ class GameRepository @Inject constructor(
         itemCatalogue.seed()
         dialogueManager.seedBasicDialogues()
         questManifest.seed()
+        
+        // Initialize static TradingEngine with the injected EconomySystem
+        com.grimreich.core.TradingEngine.initialize(economySystemProvider.get())
         
         try {
             val jsonString = persistence.assets().open("grimreich/bestiary_pilot.json").bufferedReader().use { it.readText() }

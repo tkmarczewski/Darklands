@@ -20,7 +20,6 @@ class DialogueManager @Inject constructor(
     private val questEngine: Lazy<QuestEngine>
 ) {
     private val nodes = mutableMapOf<String, DialogueNode>()
-    private var activeDialogueId: String? = null
     private val gson = Gson()
 
     fun loadNodesFromAsset(path: String) {
@@ -33,10 +32,6 @@ class DialogueManager @Inject constructor(
             android.util.Log.e("DialogueManager", "Error loading dialogues: ${e.message}")
         }
     }
-
-    fun isDialogueActive() = activeDialogueId != null
-    fun currentDialogueId() = activeDialogueId
-    fun endDialogue() { activeDialogueId = null }
 
     fun registerNode(node: DialogueNode) {
         nodes[node.id] = node
@@ -61,7 +56,6 @@ class DialogueManager @Inject constructor(
         handleTrigger(state, choice.triggerEvent, choice.triggerValue)
         
         if (choice.targetNodeId == "end") {
-            activeDialogueId = null
             return null
         }
         return getNode(choice.targetNodeId)
@@ -76,7 +70,7 @@ class DialogueManager @Inject constructor(
                 value?.let { 
                     engine.activateQuestDirect(state, it) 
                 }
-                state.pendingQuestId = null
+                state.pendingAction = com.grimreich.core.PendingWorldAction.None
             }
             "ADVANCE_QUEST" -> {
                 value?.let { 
@@ -87,8 +81,9 @@ class DialogueManager @Inject constructor(
                 value?.let { engine.failQuestDirect(state, it) }
             }
             "COMPLETE_QUEST" -> {
-                val targetId = if (value == "ACTIVE") {
-                    state.pendingQuestId?.removePrefix("FINALIZE:")
+                val action = state.pendingAction
+                val targetId = if (value == "ACTIVE" && action is com.grimreich.core.PendingWorldAction.Dialogue) {
+                    action.relatedQuestId
                 } else {
                     value
                 }
@@ -96,7 +91,7 @@ class DialogueManager @Inject constructor(
                 targetId?.let { 
                     engine.completeQuestDirect(state, it) 
                 }
-                state.pendingQuestId = null
+                state.pendingAction = com.grimreich.core.PendingWorldAction.None
             }
             "INCREMENT_META" -> {
                 val inc = value?.toIntOrNull() ?: 1

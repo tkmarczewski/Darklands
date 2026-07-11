@@ -13,7 +13,8 @@ class TravelSystem @Inject constructor(
     private val gameRepository: GameRepository,
     private val worldMap: WorldMap,
     private val cityCatalogue: CityCatalogue,
-    private val encounterSystem: EncounterSystem
+    private val encounterSystem: EncounterSystem,
+    private val collapseEngine: CollapseEngine
 ) {
     fun restDirect(state: GameState): String {
         state.world.fatigue = 0
@@ -21,6 +22,10 @@ class TravelSystem @Inject constructor(
         state.world.timeOfDay = "morning"
         state.world.season = currentSeason(state.world.day)
         state.logEntries.add("Drużyna odpoczęła. Rozpoczyna się dzień ${state.world.day}.")
+        
+        // Trigger day ended collapse event
+        collapseEngine.processCollapseEventDirect(state, CollapseEvent.DayEnded)
+
         return "Drużyna odpoczęła. Zmęczenie zresetowane, nowy dzień."
     }
 
@@ -61,12 +66,17 @@ class TravelSystem @Inject constructor(
             s.world.fatigue = (s.world.fatigue + fatigueCost).coerceAtMost(100)
             
             // Time progression
-            if (s.world.timeOfDay == "morning") s.world.timeOfDay = "evening"
-            else {
+            if (s.world.timeOfDay == "morning") {
+                s.world.timeOfDay = "evening"
+            } else {
                 s.world.timeOfDay = "morning"
                 s.world.day += 1
                 s.world.season = currentSeason(s.world.day)
+                collapseEngine.processCollapseEventDirect(s, CollapseEvent.DayEnded)
             }
+            
+            // Travel also contributes to collapse based on fatigue
+            collapseEngine.processCollapseEventDirect(s, CollapseEvent.TravelCompleted(fatigueCost))
             
             if (!s.world.discoveredLocations.contains(destCityId)) {
                 s.world.discoveredLocations.add(destCityId)

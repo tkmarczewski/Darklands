@@ -11,11 +11,7 @@ fun GameState.toDto(): SessionStateDto = SessionStateDto(
     heroName = heroName,
     characterNameLocked = characterNameLocked,
     metaAwarenessLevel = metaAwarenessLevel,
-    grimCurrentRegion = grimCurrentRegion,
-    pendingQuestId = pendingQuestId,
-    pendingDialogueNpcName = pendingDialogueNpcName,
-    pendingDialogueNpcRole = pendingDialogueNpcRole,
-    pendingDialogueNodeId = pendingDialogueNodeId,
+    pendingAction = pendingAction.toDto(),
     party = party.map { it.toDto() },
     hireableHeroes = hireableHeroes.map { it.toDto() },
     activeHeroId = activeHeroId,
@@ -32,9 +28,9 @@ fun GameState.toDto(): SessionStateDto = SessionStateDto(
     persistentMeta = persistentMeta.toDto(),
     isExpeditionActive = isExpeditionActive,
     lastSaveTimestamp = lastSaveTimestamp,
-    grimEchoIntensity = 0f, // Deprecated or handle via grimEngine if needed
     grimMutationPhase = grimMutationPhase,
-    grantedRewardFlags = grantedRewardFlags.toList()
+    grantedRewardFlags = grantedRewardFlags.toList(),
+    companionShadows = companionShadows.map { it.toDto() }
 )
 
 fun SessionStateDto.toDomain(): GameState = GameState().also {
@@ -42,11 +38,7 @@ fun SessionStateDto.toDomain(): GameState = GameState().also {
     it.heroName = heroName
     it.characterNameLocked = characterNameLocked
     it.metaAwarenessLevel = metaAwarenessLevel
-    it.grimCurrentRegion = grimCurrentRegion
-    it.pendingQuestId = pendingQuestId
-    it.pendingDialogueNpcName = pendingDialogueNpcName
-    it.pendingDialogueNpcRole = pendingDialogueNpcRole
-    it.pendingDialogueNodeId = pendingDialogueNodeId
+    it.pendingAction = pendingAction.toDomain()
     it.party.addAll(party.map { dto -> dto.toDomain() })
     it.hireableHeroes.addAll(hireableHeroes.map { dto -> dto.toDomain() })
     it.activeHeroId = activeHeroId
@@ -65,6 +57,21 @@ fun SessionStateDto.toDomain(): GameState = GameState().also {
     it.lastSaveTimestamp = lastSaveTimestamp
     it.grimMutationPhase = grimMutationPhase
     it.grantedRewardFlags.addAll(grantedRewardFlags)
+    it.companionShadows.addAll(companionShadows.map { dto -> dto.toDomain() })
+}
+
+fun PendingWorldAction.toDto(): PendingWorldActionDto = when (this) {
+    PendingWorldAction.None -> PendingWorldActionDto.None
+    is PendingWorldAction.ResolveQuest -> PendingWorldActionDto.ResolveQuest(questId)
+    is PendingWorldAction.QuestCombatWin -> PendingWorldActionDto.QuestCombatWin(questId)
+    is PendingWorldAction.Dialogue -> PendingWorldActionDto.Dialogue(npcName, npcRole, nodeId, relatedQuestId)
+}
+
+fun PendingWorldActionDto.toDomain(): PendingWorldAction = when (this) {
+    PendingWorldActionDto.None -> PendingWorldAction.None
+    is PendingWorldActionDto.ResolveQuest -> PendingWorldAction.ResolveQuest(questId)
+    is PendingWorldActionDto.QuestCombatWin -> PendingWorldAction.QuestCombatWin(questId)
+    is PendingWorldActionDto.Dialogue -> PendingWorldAction.Dialogue(npcName, npcRole, nodeId, relatedQuestId)
 }
 
 fun Hero.toDto(): HeroDto = HeroDto(
@@ -96,7 +103,8 @@ fun Hero.toDto(): HeroDto = HeroDto(
     skills = skills,
     equipment = equipment,
     careerHistory = careerHistory.map { it.toDto() },
-    abilities = abilities.map { it.toDto() }
+    abilities = abilities.map { it.toDto() },
+    passiveAbilities = passiveAbilities.toList()
 )
 
 fun HeroDto.toDomain(): Hero = Hero(
@@ -130,6 +138,7 @@ fun HeroDto.toDomain(): Hero = Hero(
     it.equipment.putAll(equipment)
     it.careerHistory.addAll(careerHistory.map { it.toDomain() })
     it.abilities.addAll(abilities.map { it.toDomain() })
+    it.passiveAbilities.addAll(passiveAbilities)
 }
 
 fun CareerEntryDto.toDomain(): CareerEntry = CareerEntry(
@@ -272,7 +281,8 @@ fun WorldState.toDto(): WorldStateDto = WorldStateDto(
     ontologicalLevel = ontologicalLevel.level,
     discoveredLocations = discoveredLocations,
     cityEntryCount = cityEntryCount,
-    verdictIncidentsSeen = verdictIncidentsSeen
+    verdictIncidentsSeen = verdictIncidentsSeen,
+    reachedThresholds = reachedThresholds.toList()
 )
 
 fun WorldStateDto.toDomain(): WorldState = WorldState(
@@ -293,6 +303,7 @@ fun WorldStateDto.toDomain(): WorldState = WorldState(
     verdictIncidentsSeen = verdictIncidentsSeen
 ).also {
     it.discoveredLocations.addAll(discoveredLocations)
+    it.reachedThresholds.addAll(reachedThresholds)
 }
 
 fun CombatState.toDto(): CombatStateDto = CombatStateDto(
@@ -310,7 +321,9 @@ fun CombatState.toDto(): CombatStateDto = CombatStateDto(
     heroEffects = heroEffects.map { it.toDto() },
     log = log,
     currentTargetHeroId = currentTargetHeroId,
-    activeHeroId = activeHeroId
+    activeHeroId = activeHeroId,
+    initiativeOrder = initiativeOrder.map { it.toDto() },
+    currentTurnIndex = currentTurnIndex
 )
 
 fun CombatStateDto.toDomain(): CombatState = CombatState().also {
@@ -326,10 +339,15 @@ fun CombatStateDto.toDomain(): CombatState = CombatState().also {
     it.enemyStrength = enemyStrength
     it.currentTargetHeroId = currentTargetHeroId
     it.activeHeroId = activeHeroId
+    it.currentTurnIndex = currentTurnIndex
     it.heroEffects.addAll(heroEffects.map { effect -> effect.toDomain() })
     it.enemyEffects.addAll(enemyEffects.map { effect -> effect.toDomain() })
+    it.initiativeOrder.addAll(initiativeOrder.map { it.toDomain() })
     it.log.addAll(log)
 }
+
+fun InitiativeSlot.toDto(): InitiativeSlotDto = InitiativeSlotDto(id, isPlayer, initiativeValue)
+fun InitiativeSlotDto.toDomain(): InitiativeSlot = InitiativeSlot(id, isPlayer, initiativeValue)
 
 fun NpcDto.toDomain(): NPC = NPC(
     id = id,

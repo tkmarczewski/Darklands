@@ -33,7 +33,6 @@ class DependencyInjectionFixTest {
         val dialogueManager = DialogueManager(
             context = mockContext,
             gameRepositoryProvider = { repo!! },
-            chronicleSystem = dagger.Lazy { mock(com.grimreich.systems.ChronicleSystem::class.java) },
             questEngine = dagger.Lazy { questEngine }
         )
 
@@ -42,6 +41,7 @@ class DependencyInjectionFixTest {
             questEngineProvider = { questEngine },
             dialogueManagerProvider = { dialogueManager },
             questManifestProvider = { questManifest },
+            economySystemProvider = { mock(com.grimreich.core.EconomyCalculator::class.java) },
             persistence = mockPersistence,
             cityCatalogue = cityCatalogue,
             itemCatalogue = itemCatalogue

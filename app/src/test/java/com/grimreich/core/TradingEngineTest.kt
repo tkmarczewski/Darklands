@@ -7,9 +7,18 @@ import org.junit.Test
 
 class TradingEngineTest {
 
-    private fun makeItem(id: String = "x", name: String = "Test", baseValue: Int = 1): Item {
+    private val mockCalculator = object : EconomyCalculator {
+        override fun priceInCity(cityId: String, basePrice: Int): Int = basePrice
+        override fun calculateSellPrice(item: Item): Int {
+            val price = (item.value * 0.6).toInt()
+            return if (price < 1 && item.value > 0) 1 else price
+        }
+    }
+
+    private fun makeItem(instanceId: String = "x", name: String = "Test", baseValue: Int = 1): Item {
         return Item(
-            id = id,
+            instanceId = instanceId,
+            templateId = "test_item",
             name = name,
             value = baseValue,
             type = "trade_good",
@@ -18,6 +27,10 @@ class TradingEngineTest {
             lore = "",
             effects = emptyMap()
         )
+    }
+
+    init {
+        TradingEngine.initialize(mockCalculator)
     }
 
     @Test
@@ -35,7 +48,10 @@ class TradingEngineTest {
 
     @Test
     fun buyGood_shouldDecreaseGoldAndAddInventory() {
-        val state = GameState().apply { gold = 10_000 }
+        val state = GameState().apply { 
+            gold = 10_000 
+            world.locationId = "wybrzeze_polnocne"
+        }
 
         val beforeGold = state.gold
         val result = TradingEngine.buyGood(state, "wybrzeze_polnocne", TradeGoodType.SALT, 2)
@@ -47,17 +63,17 @@ class TradingEngineTest {
 
     @Test
     fun sellItem_shouldIncreaseGoldAndRemoveInventory() {
-        val item = makeItem(id = "trade_test", name = "Towar", baseValue = 100)
+        val item = makeItem(instanceId = "trade_test", name = "Towar", baseValue = 100)
         val state = GameState().apply {
             gold = 0
             inventory.add(item)
         }
 
-        val result = TradingEngine.sellItem(state, item.id)
+        val result = TradingEngine.sellItem(state, item.instanceId)
 
         assertTrue(result.contains("Sprzedano"))
         // Base value 100 * multiplier 0.6 = 60
         assertEquals("Gold should be 60", 60, state.gold)
-        assertTrue("Item should be removed from inventory", state.inventory.none { it.id == item.id })
+        assertTrue("Item should be removed from inventory", state.inventory.none { it.instanceId == item.instanceId })
     }
 }

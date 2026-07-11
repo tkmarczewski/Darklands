@@ -74,6 +74,14 @@ object SkillCatalogue {
             val dmg = target.maxHp / 3
             target.hp = (target.hp - dmg).coerceAtLeast(0)
             SkillResult(damage = dmg, message = "Przerażający szept echa rozdziera jaźń przeciwnika. Zadano $dmg obrażeń.")
+        },
+
+        CombatSkill(
+            id = "system_defend",
+            name = "Obrona",
+            type = SkillType.MELEE
+        ) { _, _ ->
+            SkillResult(message = "Przyjmuje postawę obronną.")
         }
     )
 }

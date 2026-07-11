@@ -51,54 +51,33 @@ object TradeGoodCatalog {
     fun findByType(type: TradeGoodType) = goods.find { it.type == type }
 }
 
-data class CityMarket(
-    val cityId: String,
-    val priceModifiers: Map<TradeGoodType, Int>
-) {
-    fun getPrice(type: TradeGoodType): Int {
-        val base = TradeGoodCatalog.findByType(type)?.basePrice ?: 10
-        val mod = priceModifiers[type] ?: 0
-        return (base + mod).coerceAtLeast(1)
-    }
-}
-
-object CityMarketCatalog {
-    private val markets = mapOf(
-        "wybrzeze_polnocne" to CityMarket("wybrzeze_polnocne", mapOf(
-            TradeGoodType.SALT to -3,
-            TradeGoodType.SPICES to 20
-        )),
-        "twierdza_zelazna" to CityMarket("twierdza_zelazna", mapOf(
-            TradeGoodType.IRON_ORE to -5,
-            TradeGoodType.WEAPONS to -10,
-            TradeGoodType.GRAIN to 5
-        )),
-        "port_mglisty" to CityMarket("port_mglisty", mapOf(
-            TradeGoodType.SILK to -30,
-            TradeGoodType.WINE to -5,
-            TradeGoodType.TOOLS to 10
-        )),
-        "opactwo_ciszy" to CityMarket("opactwo_ciszy", mapOf(
-            TradeGoodType.WINE to 15,
-            TradeGoodType.CLOTH to -5
-        ))
-    )
-
-    fun getMarket(cityId: String): CityMarket? = markets[cityId]
-}
-
 object TradingEngine {
+    private const val MAX_TRADE_QUANTITY = 99
     private var calculator: EconomyCalculator? = null
-    fun initialize(calc: EconomyCalculator) { calculator = calc }
+    
+    fun initialize(calc: EconomyCalculator) { 
+        calculator = calc 
+    }
+
+    private fun getCalculator(): EconomyCalculator = 
+        calculator ?: error("TradingEngine must be initialized with an EconomyCalculator before use.")
 
     fun buyGood(state: GameState, cityId: String, type: TradeGoodType, qty: Int = 1): String {
-        val market = CityMarketCatalog.getMarket(cityId) ?: return "Brak rynku w tej lokacji."
+        if (cityId != state.grimCurrentRegion) {
+            return "Nie znajdujesz się w tej lokacji."
+        }
+
         val good = TradeGoodCatalog.findByType(type) ?: return "Nieznany towar."
-        val safeQty = qty.coerceAtLeast(1)
-        val unitPrice = calculator?.priceInCity(cityId, good.basePrice) ?: market.getPrice(type)
-        val totalCost = unitPrice * safeQty
-        if (state.gold < totalCost) return "Brak złota. Potrzeba $totalCost G."
-        state.gold -= totalCost
+        val safeQty = qty.coerceIn(1, MAX_TRADE_QUANTITY)
+        
+        val unitPrice = getCalculator().priceInCity(cityId, good.basePrice)
+        val totalCost = unitPrice.toLong() * safeQty.toLong()
+        
+        if (state.gold < totalCost) {
+            return "Brak złota. Potrzeba $totalCost G."
+        }
+        
+        state.gold -= totalCost.toInt()
         repeat(safeQty) {
             state.inventory.add(Item(
                 instanceId = "trade_${type.name.lowercase()}_${java.util.UUID.randomUUID()}",
@@ -116,76 +95,16 @@ object TradingEngine {
     }
 
     fun quoteBuy(cityId: String, type: TradeGoodType, qty: Int = 1): Int {
-        val market = CityMarketCatalog.getMarket(cityId) ?: return 0
         val good = TradeGoodCatalog.findByType(type) ?: return 0
-        val safeQty = qty.coerceAtLeast(1)
-        val unitPrice = calculator?.priceInCity(cityId, good.basePrice) ?: market.getPrice(type)
-        return unitPrice * safeQty
+        val safeQty = qty.coerceIn(1, MAX_TRADE_QUANTITY)
+        val unitPrice = getCalculator().priceInCity(cityId, good.basePrice)
+        return (unitPrice.toLong() * safeQty.toLong()).toInt()
     }
 
     fun quoteSell(item: Item): Int =
-        calculator?.calculateSellPrice(item) ?: (item.value * GrimConstants.Economy.SELL_PRICE_MULTIPLIER).toInt().coerceAtLeast(1)
+        getCalculator().calculateSellPrice(item)
 
     fun sellItem(state: GameState, itemId: String): String {
-        val item = state.inventory.find { it.instanceId == itemId } ?: return "Brak przedmiotu."
-        val sellPrice = quoteSell(item)
-        state.inventory.remove(item)
-        state.gold += sellPrice
-        return "Sprzedano ${item.name} za $sellPrice G."
-    }
-
-    fun buyWithFactionModifier(
-        state: GameState,
-        cityId: String,
-        type: TradeGoodType,
-        factionId: String,
-        qty: Int = 1
-    ): String {
-        val good = TradeGoodCatalog.findByType(type) ?: return "Błąd towaru."
-        val safeQty = qty.coerceAtLeast(1)
-        val unitPrice = calculator?.priceInCity(cityId, good.basePrice) ?: run {
-            // Fallback for missing calculator
-            val market = CityMarketCatalog.getMarket(cityId) ?: return "Brak rynku."
-            val rep = state.reputation.globalFactions[factionId] ?: 0
-            val modifier = FactionReputationSystem.buyModifier(rep)
-            (market.getPrice(type) * modifier).toInt().coerceAtLeast(1)
-        }
-        
-        val total = unitPrice * safeQty
-        if (state.gold < total) return "Brak złota. Potrzeba $total G."
-        
-        state.gold -= total
-        repeat(safeQty) {
-            state.inventory.add(Item(
-                instanceId = "trade_${type.name.lowercase()}_${state.world.day}_${java.util.UUID.randomUUID()}",
-                templateId = "trade_${type.name.lowercase()}", 
-                name = good.name, 
-                value = good.basePrice,
-                type = "trade_good",
-                weight = good.weight.toDouble(),
-                rarity = "normal",
-                lore = good.description,
-                effects = emptyMap()
-            ))
-        }
-        return "Kupiono ${good.name} x$safeQty za $total G."
-    }
-
-    fun quoteBuyWithFactionModifier(cityId: String, type: TradeGoodType, factionId: String, qty: Int = 1, reputationValue: Int): Int {
-        val good = TradeGoodCatalog.findByType(type) ?: return 0
-        val safeQty = qty.coerceAtLeast(1)
-        return (calculator?.priceInCity(cityId, good.basePrice) ?: run {
-            val market = CityMarketCatalog.getMarket(cityId) ?: return 0
-            val modifier = FactionReputationSystem.buyModifier(reputationValue)
-            ((market.getPrice(type) * modifier).toInt().coerceAtLeast(1))
-        }) * safeQty
-    }
-
-    fun sellWithFactionModifier(
-        state: GameState,
-        itemId: String,
-        factionId: String
-    ): String {
         val item = state.inventory.find { it.instanceId == itemId } ?: return "Brak przedmiotu."
         val sellPrice = quoteSell(item)
         state.inventory.remove(item)

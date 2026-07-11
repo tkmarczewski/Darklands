@@ -49,7 +49,13 @@ class DialogueViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             gameRepository.gameState.collect { state ->
-                val nodeId = state.pendingDialogueNodeId ?: "start"
+                val action = state.pendingAction
+                val (nodeId, npcName, npcRole) = if (action is com.grimreich.core.PendingWorldAction.Dialogue) {
+                    Triple(action.nodeId, action.npcName, action.npcRole)
+                } else {
+                    Triple("start", "Nieznajomy", "Mieszkaniec")
+                }
+                
                 val node = dialogueManager.getNode(nodeId)
                 
                 val choicesInfo = node?.choices?.map { choice ->
@@ -74,9 +80,9 @@ class DialogueViewModel @Inject constructor(
 
                 _uiState.value = DialogueUiState(
                     currentNode = node?.let { dialogueManager.applyWorldEffects(it, state.world.globalStability) },
-                    npcName = state.pendingDialogueNpcName ?: "Nieznajomy",
-                    npcRole = state.pendingDialogueNpcRole ?: "Mieszkaniec",
-                    npcPortrait = dialogueManager.getPortrait(state.pendingDialogueNpcRole ?: ""),
+                    npcName = npcName,
+                    npcRole = npcRole,
+                    npcPortrait = dialogueManager.getPortrait(npcRole),
                     backgroundDrawable = currentCity?.backgroundDrawable ?: "bg_city_default",
                     availableChoices = choicesInfo,
                     worldStability = state.world.globalStability
@@ -142,7 +148,7 @@ class DialogueViewModel @Inject constructor(
             val enemy = com.grimreich.core.Bestiary.get(enemyType)
             if (enemy != null) {
                 combatSystem.startCombat(enemy)
-                gameRepository.updateState { it.pendingDialogueNodeId = null }
+                gameRepository.updateState { it.pendingAction = com.grimreich.core.PendingWorldAction.None }
                 onCombat()
                 return
             }
@@ -160,14 +166,15 @@ class DialogueViewModel @Inject constructor(
 
         if (choice.targetNodeId == "end") {
             gameRepository.updateState { 
-                it.pendingDialogueNodeId = null 
-                it.pendingDialogueNpcName = null
-                it.pendingDialogueNpcRole = null
+                it.pendingAction = com.grimreich.core.PendingWorldAction.None
             }
             onEnd()
         } else {
-            gameRepository.updateState { 
-                it.pendingDialogueNodeId = choice.targetNodeId
+            gameRepository.updateState { s ->
+                val current = s.pendingAction
+                if (current is com.grimreich.core.PendingWorldAction.Dialogue) {
+                    s.pendingAction = current.copy(nodeId = choice.targetNodeId)
+                }
             }
         }
     }

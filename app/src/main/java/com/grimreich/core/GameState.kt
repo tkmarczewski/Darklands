@@ -5,6 +5,18 @@ import com.grimreich.grimreich.v1.Item
 import com.grimreich.grimreich.v1.GrimWorldEngine
 import com.grimreich.grimreich.v1.GrimWorldEngineFactory
 
+sealed interface PendingWorldAction {
+    data object None : PendingWorldAction
+    data class ResolveQuest(val questId: String) : PendingWorldAction
+    data class QuestCombatWin(val questId: String) : PendingWorldAction
+    data class Dialogue(
+        val npcName: String,
+        val npcRole: String,
+        val nodeId: String,
+        val relatedQuestId: String? = null
+    ) : PendingWorldAction
+}
+
 data class GameState(
     var grimEngine: GrimWorldEngine = GrimWorldEngineFactory.create(),
 
@@ -13,11 +25,7 @@ data class GameState(
     var characterNameLocked: Boolean = false,
     var metaAwarenessLevel: Int = 0,
 
-    var grimPendingExpeditionName: String? = null,
-    var pendingQuestId: String? = null,
-    var pendingDialogueNpcName: String? = null,
-    var pendingDialogueNpcRole: String? = null,
-    var pendingDialogueNodeId: String? = null,
+    var pendingAction: PendingWorldAction = PendingWorldAction.None,
 
     val party: MutableList<Hero> = mutableListOf(),
     val hireableHeroes: MutableList<Hero> = mutableListOf(),

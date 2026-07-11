@@ -16,41 +16,62 @@ class CollapseEngine @Inject constructor(
     var activeScenario: CollapseScenario? = null
 
     /**
-     * Główny tick upadku świata.
-     * FIX: Zmieniono mutacje bezpośrednie na WorldStabilitySystem, co zapewnia
-     * clamping oraz poprawne logowanie zmian.
+     * Główny tick upadku świata wywoływany przez zdarzenia domenowe.
      */
-    fun tick(reason: String = "Upływ czasu") {
-        val state = gameRepository.currentState()
-        
-        // Zwiększamy postęp upadku
-        worldStabilitySystem.advanceCollapse(0.01f, reason)
+    fun processCollapseEvent(event: CollapseEvent) {
+        gameRepository.updateState { state ->
+            processCollapseEventDirect(state, event)
+        }
+    }
 
-        // Jeżeli przekroczono próg, decydujemy o scenariuszu
-        if (state.world.collapseProgress > 0.5f && state.world.collapseScenarioId == null) {
-            gameRepository.updateState { s ->
-                val scenario = decideScenario(s.prayer.faith, s.world.globalStability)
-                s.world.collapseScenarioId = scenario.name
-            }
+    fun processCollapseEventDirect(state: com.grimreich.core.GameState, event: CollapseEvent) {
+        val progressBefore = state.world.collapseProgress
+        
+        // 1. Advance progress
+        worldStabilitySystem.advanceCollapseDirect(state, event)
+        
+        val progressAfter = state.world.collapseProgress
+
+        // 2. Decide scenario if threshold crossed
+        if (progressBefore <= 0.5f && progressAfter > 0.5f && state.world.collapseScenarioId == null) {
+            val scenario = decideScenario(state.prayer.faith, state.world.globalStability)
+            state.world.collapseScenarioId = scenario.name
         }
 
-        val scenarioId = gameRepository.currentState().world.collapseScenarioId ?: return
-        val scenario = try { CollapseScenario.valueOf(scenarioId) } catch (e: Exception) { null }
+        // 3. Apply one-time threshold effects
+        applyThresholdEffectsDirect(state, progressBefore, progressAfter)
+    }
 
-        scenario?.let { sc ->
-            when (sc) {
-                CollapseScenario.MIST_OBLIVION -> {
-                    // Dodatkowy efekt scenariusza: wzrost echa
-                    worldStabilitySystem.changeEcho(0.02f, "Scenariusz Upadku: ${sc.name}")
+    private fun applyThresholdEffectsDirect(state: com.grimreich.core.GameState, before: Float, after: Float) {
+        val thresholds = listOf(0.6f, 0.75f, 0.9f, 1.0f)
+        
+        thresholds.forEach { threshold ->
+            if (before < threshold && after >= threshold) {
+                if (state.world.reachedThresholds.add(threshold)) {
+                    triggerEffectDirect(state, threshold)
                 }
-                CollapseScenario.BLOOD_RUIN -> {
-                    // Dodatkowy efekt scenariusza: obrażenia drużyny
-                    gameRepository.updateState { s ->
-                        s.party.forEach { h -> h.hp = (h.hp - 1).coerceAtLeast(0) }
-                    }
-                }
-                else -> {}
             }
+        }
+    }
+
+    private fun triggerEffectDirect(state: com.grimreich.core.GameState, threshold: Float) {
+        val scenarioId = state.world.collapseScenarioId ?: return
+        val scenario = try { CollapseScenario.valueOf(scenarioId) } catch (e: Exception) { return }
+
+        state.logEntries.add("KRYZYS: Przekroczono próg upadku ${(threshold * 100).toInt()}%!")
+
+        when (scenario) {
+            CollapseScenario.MIST_OBLIVION -> {
+                worldStabilitySystem.changeEchoDirect(state, 0.15f, "Próg Upadku")
+            }
+            CollapseScenario.BLOOD_RUIN -> {
+                state.party.forEach { h -> h.hp = (h.hp - (threshold * 10).toInt()).coerceAtLeast(0) }
+            }
+            else -> {}
+        }
+        
+        if (threshold >= 1.0f) {
+            state.logEntries.add("KONIEC: Rzeczywistość przestała istnieć.")
         }
     }
 

@@ -18,5 +18,6 @@ data class WorldState(
     var ontologicalLevel: OntologicalLevel = OntologicalLevel.MATERIAL,
     val discoveredLocations: MutableList<String> = mutableListOf(),
     var cityEntryCount: Int = 0, // TRACKS VISITS FOR VERDICT CAMPAIGN
-    var verdictIncidentsSeen: Int = 0
+    var verdictIncidentsSeen: Int = 0,
+    val reachedThresholds: MutableSet<Float> = mutableSetOf()
 )

@@ -116,10 +116,20 @@ class CityViewModel @Inject constructor(
         } else node
 
         gameRepository.updateState { s ->
-            s.pendingDialogueNpcName = name
-            s.pendingDialogueNpcRole = role
-            s.pendingDialogueNodeId = targetNode
-            s.pendingQuestId = if (questToComplete != null) "FINALIZE:${questToComplete.questId}" else null
+            if (questToComplete != null) {
+                s.pendingAction = com.grimreich.core.PendingWorldAction.Dialogue(
+                    npcName = name,
+                    npcRole = role,
+                    nodeId = targetNode,
+                    relatedQuestId = questToComplete.questId
+                )
+            } else {
+                s.pendingAction = com.grimreich.core.PendingWorldAction.Dialogue(
+                    npcName = name,
+                    npcRole = role,
+                    nodeId = targetNode
+                )
+            }
         }
         
         emitEffect(CityUiEffect.NavigateToDialogue(name, role, targetNode))

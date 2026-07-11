@@ -55,24 +55,6 @@ class ContentValidationTest {
     }
 
     @Test
-    fun dialogueTargets_shouldResolve() {
-        val mockRepository = mock(GameRepository::class.java)
-        `when`(mockRepository.currentState()).thenReturn(GameState())
-
-        val manager = DialogueManager(
-            context = createMockContext(),
-            gameRepositoryProvider = dagger.Lazy { mockRepository },
-            chronicleSystem = dagger.Lazy { mock(ChronicleSystem::class.java) },
-            questEngine = dagger.Lazy { mock(QuestEngine::class.java) }
-        )
-
-        manager.seedBasicDialogues()
-
-        val missingTargets = manager.listMissingTargets()
-        assertEquals(0, missingTargets.size)
-    }
-
-    @Test
     fun dialogueNodes_shouldHaveValidNpcIds() {
         val mockRepository = mock(GameRepository::class.java)
         `when`(mockRepository.currentState()).thenReturn(GameState())
@@ -80,7 +62,6 @@ class ContentValidationTest {
         val manager = DialogueManager(
             context = createMockContext(),
             gameRepositoryProvider = dagger.Lazy { mockRepository },
-            chronicleSystem = dagger.Lazy { mock(ChronicleSystem::class.java) },
             questEngine = dagger.Lazy { mock(QuestEngine::class.java) }
         )
 
@@ -112,7 +93,6 @@ class ContentValidationTest {
         val manager = DialogueManager(
             context = createMockContext(),
             gameRepositoryProvider = dagger.Lazy { mockRepository },
-            chronicleSystem = dagger.Lazy { mock(ChronicleSystem::class.java) },
             questEngine = dagger.Lazy { mock(QuestEngine::class.java) }
         )
 

@@ -15,13 +15,18 @@ class EconomySystem @Inject constructor(
     override fun priceInCity(cityId: String, basePrice: Int): Int {
         val city = cityCatalogue.get(cityId)
         val regionalModifier = city?.priceModifier ?: 1.0f
-        val rep = factionReputationSystem.getReputation("MERCHANTS")
+        
+        // Use either Merchants reputation or ruling faction reputation
+        val rulingFaction = city?.rulingFaction ?: "MERCHANTS"
+        val rep = factionReputationSystem.getReputation(rulingFaction)
+
         val reputationModifier = FactionReputationSystem.buyModifier(rep)
         val finalPrice = (basePrice * regionalModifier * reputationModifier).toInt()
         return if (finalPrice < 1 && basePrice > 0) 1 else finalPrice
     }
 
     override fun calculateSellPrice(item: Item): Int {
-        return (item.value * GrimConstants.Economy.SELL_PRICE_MULTIPLIER).toInt()
+        val price = (item.value * GrimConstants.Economy.SELL_PRICE_MULTIPLIER).toInt()
+        return if (price < 1 && item.value > 0) 1 else price
     }
 }

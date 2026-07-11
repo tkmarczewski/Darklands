@@ -37,6 +37,11 @@ class ContentValidator @Inject constructor(
         validateQuests()
         validateDialogues()
         validateCities()
+        validateItems()
+
+        if (questEngine.getAllDefinitions().isEmpty()) {
+            _errors.add(ContentError.QuestError("Quest registry is EMPTY. Manifest seeding might have failed.", ErrorSeverity.CRITICAL))
+        }
 
         if (_errors.isEmpty()) {
             Log.i("ContentValidator", "✅ Content validation passed! No issues found.")
@@ -100,6 +105,17 @@ class ContentValidator @Inject constructor(
                 if (itemCatalogue.findByTemplateId(itemId) == null) {
                     _errors.add(ContentError.CityError("City '${city.id}' market offers non-existent itemId: '$itemId'"))
                 }
+            }
+        }
+    }
+
+    private fun validateItems() {
+        itemCatalogue.allTemplates().forEach { item ->
+            if (item.value < 0) {
+                _errors.add(ContentError.ItemError("Item '${item.templateId}' has negative value: ${item.value}"))
+            }
+            if (item.weight < 0) {
+                _errors.add(ContentError.ItemError("Item '${item.templateId}' has negative weight: ${item.weight}"))
             }
         }
     }

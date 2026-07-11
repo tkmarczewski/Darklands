@@ -25,6 +25,23 @@ data class QuestStateDto(
 )
 
 @Serializable
+sealed interface PendingWorldActionDto {
+    @Serializable
+    data object None : PendingWorldActionDto
+    @Serializable
+    data class ResolveQuest(val questId: String) : PendingWorldActionDto
+    @Serializable
+    data class QuestCombatWin(val questId: String) : PendingWorldActionDto
+    @Serializable
+    data class Dialogue(
+        val npcName: String,
+        val npcRole: String,
+        val nodeId: String,
+        val relatedQuestId: String? = null
+    ) : PendingWorldActionDto
+}
+
+@Serializable
 data class SessionStateDto(
     val version: Int,
     var playerName: String? = null,
@@ -32,11 +49,7 @@ data class SessionStateDto(
     var characterNameLocked: Boolean = false,
     var metaAwarenessLevel: Int = 0,
 
-    var grimCurrentRegion: String = "wybrzeze_polnocne",
-    var pendingQuestId: String? = null,
-    var pendingDialogueNpcName: String? = null,
-    var pendingDialogueNpcRole: String? = null,
-    var pendingDialogueNodeId: String? = null,
+    var pendingAction: PendingWorldActionDto = PendingWorldActionDto.None,
 
     val party: List<HeroDto>,
     val hireableHeroes: List<HeroDto>,
@@ -59,6 +72,7 @@ data class SessionStateDto(
     var grimEchoIntensity: Float = 0f,
     var grimMutationPhase: Int = 0,
     val grantedRewardFlags: List<String> = emptyList(),
+    val companionShadows: List<HeroDto> = emptyList(),
     val checksum: String? = null
 )
 
@@ -101,7 +115,8 @@ data class HeroDto(
     val skills: Map<String, Int>,
     val equipment: Map<String, String?>,
     val careerHistory: List<CareerEntryDto>,
-    val abilities: List<AbilityDto>
+    val abilities: List<AbilityDto>,
+    val passiveAbilities: List<String> = emptyList()
 )
 
 @Serializable
@@ -176,7 +191,8 @@ data class WorldStateDto(
     val ontologicalLevel: Int,
     val discoveredLocations: List<String>,
     val cityEntryCount: Int,
-    val verdictIncidentsSeen: Int
+    val verdictIncidentsSeen: Int,
+    val reachedThresholds: List<Float> = emptyList()
 )
 
 @Serializable
@@ -195,7 +211,16 @@ data class CombatStateDto(
     val heroEffects: List<StatusEffectDto>,
     val log: List<String>,
     val currentTargetHeroId: String? = null,
-    val activeHeroId: String? = null
+    val activeHeroId: String? = null,
+    val initiativeOrder: List<InitiativeSlotDto> = emptyList(),
+    val currentTurnIndex: Int = 0
+)
+
+@Serializable
+data class InitiativeSlotDto(
+    val id: String,
+    val isPlayer: Boolean,
+    val initiativeValue: Int
 )
 
 @Serializable
