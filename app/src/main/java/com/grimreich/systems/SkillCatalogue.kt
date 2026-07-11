@@ -39,6 +39,41 @@ object SkillCatalogue {
         ) { user, _ ->
             user.armor = (user.armor + 5).coerceAtMost(50)
             SkillResult(statusApplied = true, message = "Boska osłona wzmacnia pancerz o +5.")
+        },
+
+        CombatSkill(
+            id = "echo_step",
+            name = "Krok Echa",
+            type = SkillType.ECHO,
+            echoCost = 0.05f,
+            description = "Nagasz rzeczywistość, by uniknąć trafienia. Zwiększa obronę kosztem echa."
+        ) { user, _ ->
+            user.armor += 10
+            SkillResult(statusApplied = true, message = "Rzeczywistość rozmywa się wokół Ciebie. +10 Pancerza.")
+        },
+
+        CombatSkill(
+            id = "righteous_fury",
+            name = "Słuszny Gniew",
+            type = SkillType.PRAYER,
+            favorCost = 15,
+            description = "Potężne uderzenie nasycone wiarą."
+        ) { user, target ->
+            val dmg = user.attackBase + (user.piety / 2)
+            target.hp = (target.hp - dmg).coerceAtLeast(0)
+            SkillResult(damage = dmg, message = "Święty blask poraża wroga za $dmg obrażeń.")
+        },
+
+        CombatSkill(
+            id = "mind_collapse",
+            name = "Zapaść Umysłu",
+            type = SkillType.ECHO,
+            echoCost = 0.15f,
+            description = "Przelewasz mrok prosto do umysłu wroga. Ogromne obrażenia, ale destabilizuje świat."
+        ) { user, target ->
+            val dmg = target.maxHp / 3
+            target.hp = (target.hp - dmg).coerceAtLeast(0)
+            SkillResult(damage = dmg, message = "Przerażający szept echa rozdziera jaźń przeciwnika. Zadano $dmg obrażeń.")
         }
     )
 }

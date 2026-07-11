@@ -59,7 +59,7 @@ data class StatusEffect(
 )
 
 // ==================== COMBAT MODELS ====================
-enum class SkillType { MELEE, RANGED, PRAYER, ALCHEMY }
+enum class SkillType { MELEE, RANGED, PRAYER, ALCHEMY, ECHO }
 
 data class SkillResult(
     val damage: Int = 0,
@@ -73,6 +73,7 @@ data class CombatSkill(
     val type: SkillType,
     val staminaCost: Int = 0,
     val favorCost: Int = 0,
+    val echoCost: Float = 0f,
     val description: String = "",
     val effect: (CombatantState, CombatantState) -> SkillResult
 )
@@ -157,18 +158,26 @@ class CombatRound @Inject constructor(
 
         val skill = SkillCatalogue.allSkills.find { it.id == skillId }
         val dmgToDefender: Int
-        if (skill != null && attacker.endurance >= skill.staminaCost) {
-            attacker.endurance -= skill.staminaCost
-            log.add("${attacker.name} używa ${skill.name}!")
-            val hpBefore = defender.hp
-            val result = skill.effect(attacker, defender)
-            if (result.message.isNotBlank()) log.add(result.message)
-            dmgToDefender = maxOf(result.damage, (hpBefore - defender.hp).coerceAtLeast(0))
-            if (result.statusApplied && dmgToDefender == 0) {
-                log.add("Efekt specjalny został zastosowany.")
+        if (skill != null) {
+            val hasResources = attacker.endurance >= skill.staminaCost && attacker.piety >= skill.favorCost
+            
+            if (hasResources) {
+                attacker.endurance -= skill.staminaCost
+                // favor (piety) is treated as a threshold stat, not consumed for now
+                
+                log.add("${attacker.name} używa ${skill.name}!")
+                val hpBefore = defender.hp
+                val result = skill.effect(attacker, defender)
+                if (result.message.isNotBlank()) log.add(result.message)
+                dmgToDefender = maxOf(result.damage, (hpBefore - defender.hp).coerceAtLeast(0))
+                if (result.statusApplied && dmgToDefender == 0) {
+                    log.add("Efekt specjalny został zastosowany.")
+                }
+            } else {
+                log.add("${attacker.name} nie ma wystarczających sił/wiary, by użyć ${skill.name}!")
+                dmgToDefender = 0
             }
         } else {
-            if (skill != null) log.add("${attacker.name} jest zbyt zmęczony na ${skill.name}!")
             dmgToDefender = resolveAttack(attacker, defender, log)
         }
 

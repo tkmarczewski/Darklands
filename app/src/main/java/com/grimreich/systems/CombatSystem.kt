@@ -79,8 +79,22 @@ class CombatSystem @Inject constructor(
 
     fun playerAttack() = resolvePlayerAction("ATTACK")
     fun playerDefend() = resolvePlayerAction("DEFEND")
-    fun useSkill(skillId: String) = resolvePlayerAction("SKILL:$skillId")
-    
+    fun useSkill(skillId: String) {
+        val skill = SkillCatalogue.allSkills.find { it.id == skillId } ?: return
+        
+        gameRepository.updateState { state ->
+            if (state.world.echoIntensity < skill.echoCost) return@updateState
+            state.world.echoIntensity -= skill.echoCost
+            
+            // Apply stability impact for mind_collapse
+            if (skill.id == "mind_collapse") {
+                state.world.globalStability = (state.world.globalStability - 10).coerceAtLeast(0)
+                state.logEntries.add("Użycie Zapaści Umysłu naruszyło strukturę regionu.")
+            }
+        }
+        resolvePlayerAction("SKILL:$skillId")
+    }
+
     fun setActiveHero(heroId: String) {
         gameRepository.updateState { it.combat.activeHeroId = heroId }
     }

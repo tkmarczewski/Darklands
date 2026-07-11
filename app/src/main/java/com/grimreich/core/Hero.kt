@@ -53,7 +53,8 @@ data class Hero(
 
     val abilities: MutableList<Ability> = mutableListOf(),
     val skills: MutableMap<String, Int> = mutableMapOf(),
-    val activeMutations: MutableList<Mutation> = mutableListOf()
+    val activeMutations: MutableList<Mutation> = mutableListOf(),
+    val passiveAbilities: MutableSet<String> = mutableSetOf()
 ) {
 
     /**
@@ -63,7 +64,7 @@ data class Hero(
     fun normalize() {
         // Dynamic Max HP calculation based on Endurance
         val oldMaxHp = maxHp
-        maxHp = endurance * GameConstants.HP_PER_ENDURANCE + GameConstants.HP_BASE_BONUS
+        maxHp = effectiveEndurance() * GameConstants.HP_PER_ENDURANCE + GameConstants.HP_BASE_BONUS
         
         // If max HP increased (e.g. via stat upgrade), grant the same amount of current HP
         if (maxHp > oldMaxHp && !isDead) {
@@ -78,6 +79,11 @@ data class Hero(
         endurance = endurance.coerceAtLeast(0)
     }
 
+    fun effectiveStrength(): Int = strength + (if (currentCareer == Career.MERCENARY || currentCareer == Career.KNIGHT) 2 else 0)
+    fun effectiveAgility(): Int = agility + (if (currentCareer == Career.THIEF || currentCareer == Career.ROGUE) 3 else 0)
+    fun effectiveIntelligence(): Int = intelligence + (if (currentCareer == Career.SCHOLAR || currentCareer == Career.ALCHEMIST) 4 else 0)
+    fun effectiveEndurance(): Int = endurance + (if (currentCareer == Career.MERCENARY || currentCareer == Career.GUARD) 2 else 0)
+
     fun getEquipmentBonus(statName: String, allItems: List<Item>): Int {
         var bonus = 0
         equipment.values.filterNotNull().forEach { itemId ->
@@ -88,11 +94,11 @@ data class Hero(
     }
 
     fun effectiveAttack(allItems: List<Item>): Int {
-        return strength + getEquipmentBonus("attack", allItems)
+        return effectiveStrength() + getEquipmentBonus("attack", allItems)
     }
 
     fun effectiveDefense(allItems: List<Item>): Int {
-        return agility + getEquipmentBonus("defense", allItems)
+        return effectiveAgility() + getEquipmentBonus("defense", allItems)
     }
 
     fun effectiveArmor(allItems: List<Item>): Int {

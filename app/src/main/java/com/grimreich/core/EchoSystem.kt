@@ -3,6 +3,8 @@ package com.grimreich.core
 import android.content.Context
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import com.grimreich.systems.WorldStabilitySystem
+import com.grimreich.world.ItemCatalogue
 import dagger.hilt.android.qualifiers.ApplicationContext
 import java.io.File
 import javax.inject.Inject
@@ -11,7 +13,9 @@ import javax.inject.Singleton
 @Singleton
 class EchoSystem @Inject constructor(
     @ApplicationContext private val context: Context,
-    private val gameRepository: GameRepository
+    private val gameRepository: GameRepository,
+    private val worldStabilitySystem: WorldStabilitySystem,
+    private val itemCatalogue: ItemCatalogue
 ) {
     companion object {
         private const val MAX_ETERNAL_HEROES = 15
@@ -69,5 +73,32 @@ class EchoSystem @Inject constructor(
 
     fun getRandomEcho(): Hero? {
         return if (eternalHeroes.isNotEmpty()) eternalHeroes.random() else null
+    }
+
+    /**
+     * Świadome wywołanie pęknięcia rzeczywistości.
+     * Obniża stabilność, ale generuje rzadki surowiec.
+     */
+    fun forceRealityLeak(regionId: String): String {
+        var result = ""
+        val state = gameRepository.currentState()
+        
+        if (state.world.locationId != regionId) {
+            return "Nie znajdujesz się w tym regionie."
+        }
+
+        worldStabilitySystem.changeStability(-20, "Rytuał Wymuszenia Echa")
+        
+        gameRepository.updateState { s ->
+            itemCatalogue.createInstance("ing_echo_dust")?.let { dust ->
+                s.inventory.add(dust)
+                result = "Rzeczywistość pęka... Otrzymano ${dust.name}."
+                s.logEntries.add("Echo: $result")
+            } ?: run {
+                result = "Rytuał nie powiódł się - brak esencji w tym miejscu."
+            }
+        }
+        
+        return result
     }
 }

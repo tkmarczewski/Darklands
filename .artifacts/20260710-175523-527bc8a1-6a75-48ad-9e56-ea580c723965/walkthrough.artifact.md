@@ -26,11 +26,19 @@ Przeniesiono warstwę prezentacji na standardy Jetpack Compose.
 - **Wzorzec Route/Content**: Ekrany `City` i `Expedition` zostały odchudzone. ViewModel komunikuje się z UI przez `UiEvent` i `UiEffect`.
 - **Sealed Content State**: W ekspedycji wyeliminowano ryzyko wyświetlania sprzecznych stanów (np. nakładanie się walki na listę zadań).
 
+## Etap 7: Potęga Echa i Rozwój Bohaterów
+Wprowadzono zaawansowane systemy progresji i interakcji ze światem.
+
+- **Umiejętności Echo & Wiary**: Dodano nowy typ zasobów w walce. Gracze mogą używać potężnych zdolności Echa, które trwale obniżają stabilność świata w zamian za zwycięstwo.
+- **Wpływ Kariery**: Profesje bohaterów (Najemnik, Uczony itp.) mają teraz realny wpływ na ich statystyki bazowe, co różnicuje role w drużynie.
+- **Rytuały Reality Leak**: Gracze mogą świadomie wywoływać pęknięcia rzeczywistości, aby pozyskiwać rzadkie surowce alchemiczne (Echo Dust).
+
 ## Weryfikacja Techniczna
 - Wszystkie systemy korzystają teraz z `instanceId` przy operacjach na ekwipunku.
 - `GameState.normalizeState()` zapewnia, że parametry świata nigdy nie wyjdą poza dopuszczalne zakresy (0-100 dla stabilności, 0-1 dla echa).
 - Wyeliminowano "magic strings" w komunikacji UI z silnikiem gry.
+- System Inicjatywy został w pełni zintegrowany z mechaniką tur.
 
 ---
 
-**System jest teraz stabilny, spójny i gotowy na masowe dodawanie nowej zawartości.**
+**System jest teraz stabilny, spójny i posiada głęboką warstwę mechaniczną gotową na wymagającą rozgrywkę.**
