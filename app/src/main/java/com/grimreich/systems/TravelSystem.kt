@@ -57,7 +57,7 @@ class TravelSystem @Inject constructor(
 
         gameRepository.updateState { s ->
             s.grimCurrentRegion = destCityId
-            s.world.location = destCityId
+            s.world.locationId = destCityId
             s.world.fatigue = (s.world.fatigue + fatigueCost).coerceAtMost(100)
             
             // Time progression

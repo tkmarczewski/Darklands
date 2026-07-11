@@ -1,5 +1,15 @@
 package com.grimreich.core
 
+import kotlinx.serialization.Serializable
+
+@Serializable
+data class InitiativeSlot(
+    val id: String,
+    val isPlayer: Boolean,
+    val initiativeValue: Int
+)
+
+@Serializable
 data class CombatState(
     var active: Boolean = false,
     var round: Int = 0,
@@ -16,9 +26,11 @@ data class CombatState(
     var enemyType: String? = null,
     var heroArmorBonus: Int = 0,
     var heroHp: Int = 0,
-    var currentTargetHeroId: String? = null, // NOWE: Cel ataku wroga
-    var activeHeroId: String? = null,        // NOWE: Kto teraz wykonuje akcję gracza
+    var currentTargetHeroId: String? = null,
+    var activeHeroId: String? = null,
     val enemyEffects: MutableList<StatusEffect> = mutableListOf(),
     val heroEffects: MutableList<StatusEffect> = mutableListOf(),
-    val log: MutableList<String> = mutableListOf()
+    val log: MutableList<String> = mutableListOf(),
+    val initiativeOrder: MutableList<InitiativeSlot> = mutableListOf(),
+    var currentTurnIndex: Int = 0
 )

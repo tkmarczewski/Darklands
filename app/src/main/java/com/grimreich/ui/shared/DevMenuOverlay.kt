@@ -190,10 +190,10 @@ fun DevMenuOverlay(
                             visible = false
                         }
                         DevBtn("+POTION") {
-                            val s = root.gameRepository.currentState()
                             root.gameRepository.updateState { state ->
                                 val item = com.grimreich.grimreich.v1.Item(
-                                    id = "potion_hp_" + System.currentTimeMillis(),
+                                    instanceId = "potion_hp_" + System.currentTimeMillis(),
+                                    templateId = "pot_heal",
                                     name = "Mikstura Zdrowia",
                                     type = "potion",
                                     effects = mapOf("heal" to 20)
@@ -261,8 +261,8 @@ fun DevMenuOverlay(
                         }
                         DevBtn("+HERBS") {
                             root.gameRepository.updateState { state ->
-                                state.inventory.add(com.grimreich.grimreich.v1.Item(id = "ing_herb", name = "Zioła", type = "ingredient", effects = emptyMap()))
-                                state.inventory.add(com.grimreich.grimreich.v1.Item(id = "ing_herb", name = "Zioła", type = "ingredient", effects = emptyMap()))
+                                state.inventory.add(com.grimreich.grimreich.v1.Item(instanceId = "ing_herb_1", templateId = "ing_herb", name = "Zioła", type = "ingredient", effects = emptyMap()))
+                                state.inventory.add(com.grimreich.grimreich.v1.Item(instanceId = "ing_herb_2", templateId = "ing_herb", name = "Zioła", type = "ingredient", effects = emptyMap()))
                             }
                         }
                         DevBtn("FINAŁ") {

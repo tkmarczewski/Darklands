@@ -140,7 +140,10 @@ fun GameNavHost(
                 onTavern = { root.setMode(GameScreenMode.TAVERN) },
                 onTemple = { root.setMode(GameScreenMode.TEMPLE) },
                 onRecruit = { root.setMode(GameScreenMode.RECRUIT) },
-                onDialogue = { root.setMode(GameScreenMode.DIALOGUE) },
+                onDialogue = { name, role, node -> 
+                    // root.setDialogueParams(...) if needed
+                    root.setMode(GameScreenMode.DIALOGUE) 
+                },
                 onExit = { root.setMode(GameScreenMode.HUB) }
             )
         }

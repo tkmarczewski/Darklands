@@ -10,7 +10,8 @@ object ArtifactCatalogue {
     fun getArtifacts(): List<Item> {
         return listOf(
             Item(
-                id = "art_forget",
+                instanceId = "",
+                templateId = "art_forget",
                 name = "Kielich Zapomnienia",
                 type = "artifact",
                 rarity = "LEGENDARY",
@@ -20,7 +21,8 @@ object ArtifactCatalogue {
                 effects = mapOf("sanity" to -20, "hp" to 50)
             ),
             Item(
-                id = "art_despair",
+                instanceId = "",
+                templateId = "art_despair",
                 name = "Sztandar Rozpaczy",
                 type = "artifact",
                 rarity = "LEGENDARY",
@@ -30,7 +32,8 @@ object ArtifactCatalogue {
                 effects = mapOf("morale" to 30, "strength" to 5)
             ),
             Item(
-                id = "art_mirror",
+                instanceId = "",
+                templateId = "art_mirror",
                 name = "Lustro Absolutu",
                 type = "artifact",
                 rarity = "LEGENDARY",
@@ -40,7 +43,8 @@ object ArtifactCatalogue {
                 effects = mapOf("intelligence" to 10, "sanity" to -5)
             ),
             Item(
-                id = "art_mask",
+                instanceId = "",
+                templateId = "art_mask",
                 name = "Maska Sereth",
                 type = "artifact",
                 rarity = "LEGENDARY",

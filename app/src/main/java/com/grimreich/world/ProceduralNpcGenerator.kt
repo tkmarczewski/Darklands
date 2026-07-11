@@ -16,26 +16,47 @@ class ProceduralNpcGenerator @Inject constructor(
     }
 
     fun generateForCity(cityId: String, state: GameState): List<NPC> {
-        val random = Random(cityId.hashCode().toLong() + state.world.day.toLong())
+        val seed = cityId.hashCode().toLong() + state.world.day.toLong()
+        val random = Random(seed)
         val npcList = mutableListOf<NPC>()
         
         val worldStability = state.world.globalStability
         val isGrim20 = worldStability < 35
 
+        // City Mood based on stability
+        val mood = when {
+            worldStability > 80 -> "PROSPEROUS"
+            worldStability > 50 -> "CALM"
+            worldStability > 25 -> "UNSETTLED"
+            else -> "DESPERATE"
+        }
+
         // 1. REGIONAL HEROES
-        // ... (existing logic)
+        // ...
         
         // --- ADD ECHO SPAWN ---
-        if (random.nextFloat() < 0.3f) {
-            echoSystem.getRandomEcho()?.let { echo ->
+        if (random.nextFloat() < 0.4f) {
+            val shadow = state.companionShadows.randomOrNull(random)
+            if (shadow != null) {
                 npcList.add(NPC(
-                    id = "echo_${echo.id}",
-                    name = "ECHO_${echo.name.uppercase().replace(" ", "_")}",
-                    role = "ECHO",
-                    startNodeId = "echo_start",
-                    stability = 0.1f,
+                    id = "echo_${shadow.id}",
+                    name = "ECHO_${shadow.name.uppercase().replace(" ", "_")}",
+                    role = "CIEŃ_TOWARZYSZA",
+                    startNodeId = "companion_shadow_start",
+                    stability = 0.05f,
                     isInfested = true
                 ))
+            } else {
+                echoSystem.getRandomEcho()?.let { echo ->
+                    npcList.add(NPC(
+                        id = "echo_${echo.id}",
+                        name = "ECHO_${echo.name.uppercase().replace(" ", "_")}",
+                        role = "ECHO",
+                        startNodeId = "echo_start",
+                        stability = 0.1f,
+                        isInfested = true
+                    ))
+                }
             }
         }
         if (cityId == "wybrzeze_polnocne") {
@@ -59,16 +80,27 @@ class ProceduralNpcGenerator @Inject constructor(
             ))
         }
 
-        // 2. CANONICAL ROLES
-        val roles = listOf("Merchant", "Guard", "Mystic", "Beggar")
-        roles.forEach { role ->
-            // FIX: Guaranteed spawn for starting city or if stability is high
+        // 2. CANONICAL ROLES with procedurally generated epithets
+        val baseRoles = listOf("Merchant", "Guard", "Mystic", "Beggar")
+        val activeRoles = when(mood) {
+            "PROSPEROUS" -> baseRoles + "Noble"
+            "DESPERATE" -> baseRoles + "Cultist"
+            else -> baseRoles
+        }
+
+        activeRoles.forEach { role ->
             val guaranteed = cityId == "wybrzeze_polnocne" && (role == "Guard" || role == "Merchant")
             if (guaranteed || random.nextBoolean()) {
+                val epithet = when(mood) {
+                    "PROSPEROUS" -> listOf("Zamożny", "Dumny", "Uczciwy").random(random)
+                    "DESPERATE" -> listOf("Głodny", "Obłąkany", "Cichy").random(random)
+                    else -> listOf("Zwykły", "Zmęczony", "Obcy").random(random)
+                }
+
                 val npcName = if (isGrim20) {
                     "INSTANCJA_${role.uppercase().take(3)}_${(100..999).random(random)}"
                 } else {
-                    generateName(role, random)
+                    "${generateName(role, random)} ($epithet)"
                 }
 
                 val infestationChance = if (worldStability < 20) 0.4f else if (worldStability < 50) 0.1f else 0.01f

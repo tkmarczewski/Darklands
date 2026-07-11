@@ -1,6 +1,7 @@
 package com.grimreich.core
 
 import com.grimreich.systems.SkillCatalogue
+import kotlinx.serialization.Serializable
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.random.Random
@@ -47,8 +48,10 @@ class MoraleSystem @Inject constructor() {
 }
 
 // ==================== STATUS EFFECTS ====================
+@Serializable
 enum class StatusEffectType { POISON, BLEED, FIRE, FREEZE, WET, SHOCK }
 
+@Serializable
 data class StatusEffect(
     val type: StatusEffectType,
     var duration: Int,

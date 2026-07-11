@@ -400,5 +400,45 @@
         "triggerValue": "ACTIVE"
       }
     ]
+  },
+  {
+    "id": "companion_shadow_start",
+    "npcId": "echo",
+    "text": "...pamiętasz mnie? Tam w mroku... było tak zimno. Czy ta kolejna próba ma w ogóle sens?",
+    "choices": [
+      {
+        "text": "Przepraszam, że zawiodłem.",
+        "targetNodeId": "companion_shadow_sad"
+      },
+      {
+        "text": "Twoja ofiara pozwoli nam przetrwać.",
+        "targetNodeId": "companion_shadow_util"
+      },
+      {
+        "text": "Odejdź w niebyt!",
+        "targetNodeId": "end"
+      }
+    ]
+  },
+  {
+    "id": "companion_shadow_sad",
+    "npcId": "echo",
+    "text": "Wybaczenie... to tylko kolejna linijka w Kronice. Nie czuję gniewu, tylko pustkę.",
+    "choices": [
+      { "text": "Żegnaj.", "targetNodeId": "end" }
+    ]
+  },
+  {
+    "id": "companion_shadow_util",
+    "npcId": "echo",
+    "text": "Więc niech tak będzie. Wykorzystaj moje Echo, zanim Szyfr całkowicie mnie wymaże.",
+    "choices": [
+      {
+        "text": "Przyjmij mądrość echa (+100 XP).",
+        "targetNodeId": "end",
+        "triggerEvent": "COMPLETE_QUEST",
+        "triggerValue": "ACTIVE"
+      }
+    ]
   }
 ]

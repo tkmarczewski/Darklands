@@ -55,6 +55,25 @@ class CombatSystem @Inject constructor(
             state.combat.activeHeroId = state.party.firstOrNull { !it.isDead }?.id
             state.combat.log.clear()
             state.combat.log.add("Początek walki z ${enemy.name}!")
+
+            // Build Initiative Order
+            val slots = mutableListOf<InitiativeSlot>()
+            state.party.filter { !it.isDead }.forEach { hero ->
+                val initVal = hero.agility * 2 + (0..3).random()
+                slots.add(InitiativeSlot(hero.id, true, initVal))
+            }
+            val enemyInit = enemy.stats.speed * 2 + (0..3).random()
+            slots.add(InitiativeSlot("ENEMY", false, enemyInit))
+            
+            state.combat.initiativeOrder.clear()
+            state.combat.initiativeOrder.addAll(slots.sortedByDescending { it.initiativeValue })
+            state.combat.currentTurnIndex = 0
+            
+            // Set first acting hero
+            val firstSlot = state.combat.initiativeOrder.firstOrNull()
+            if (firstSlot?.isPlayer == true) {
+                state.combat.activeHeroId = firstSlot.id
+            }
         }
     }
 
@@ -114,15 +133,34 @@ class CombatSystem @Inject constructor(
             val c = state.combat
             val enemy = currentEnemy ?: return@updateState
             
-            val activeHero = state.party.find { it.id == c.activeHeroId } 
-                ?: state.party.firstOrNull { !it.isDead } 
-                ?: return@updateState
+            // 1. Identify who's turn it is
+            if (c.initiativeOrder.isEmpty()) return@updateState
+            val currentSlot = c.initiativeOrder[c.currentTurnIndex]
             
-            val heroCombatant = heroToCombatant(state, activeHero)
+            val actingHero: Hero?
+            val heroCombatant: CombatantState
+            
+            if (currentSlot.isPlayer) {
+                actingHero = state.party.find { it.id == currentSlot.id } ?: return@updateState
+                if (actingHero.isDead) {
+                    advanceTurn(state)
+                    return@updateState
+                }
+                heroCombatant = heroToCombatant(state, actingHero)
+            } else {
+                // It's enemy's turn, but this function was called for player action?
+                // For now, we assume player action can only be called on player turn.
+                // In a full implementation, this might trigger AI turn first.
+                actingHero = state.party.find { it.id == c.activeHeroId } 
+                    ?: state.party.firstOrNull { !it.isDead } 
+                    ?: return@updateState
+                heroCombatant = heroToCombatant(state, actingHero)
+            }
             
             val aliveHeroes = state.party.filter { !it.isDead }
             if (aliveHeroes.isEmpty()) return@updateState
             
+            // Enemy targeting
             val targetHero = aliveHeroes.random()
             c.currentTargetHeroId = targetHero.id
             val targetCombatant = heroToCombatant(state, targetHero)
@@ -141,7 +179,10 @@ class CombatSystem @Inject constructor(
                 activeEffects = c.enemyEffects.toMutableList()
             )
 
-            c.round++
+            // Round increment only on full loop
+            if (c.currentTurnIndex == 0) {
+                c.round++
+            }
             result = "Runda ${c.round}"
 
             val playerRound = when {
@@ -150,13 +191,14 @@ class CombatSystem @Inject constructor(
                     combatRound.resolveRound(heroCombatant, enemyCombatant, skillId)
                 }
                 action == "DEFEND" -> {
-                    targetCombatant.armor += 5
+                    // FIX: Defend now targets the ACTING hero
+                    heroCombatant.armor += 5
                     null
                 }
                 else -> combatRound.resolveRound(heroCombatant, enemyCombatant)
             }
 
-            if (enemyCombatant.hp > 0) {
+            if (enemyCombatant.hp > 0 && !currentSlot.isPlayer) {
                 val enemyRound = combatRound.resolveRound(enemyCombatant, targetCombatant)
                 c.log.addAll(enemyRound.log)
                 targetHero.hp = targetCombatant.hp
@@ -170,22 +212,38 @@ class CombatSystem @Inject constructor(
                         name = "Zwłoki: ${targetHero.name}"
                     )
                     if (corpse != null) state.inventory.add(corpse)
+                    
+                    // Add to Companion Shadows for Etap 6
+                    if (state.companionShadows.none { it.id == targetHero.id }) {
+                        state.companionShadows.add(targetHero.copy())
+                    }
+                    
+                    // Remove from initiative
+                    state.combat.initiativeOrder.removeAll { it.id == targetHero.id }
                 }
             }
 
-            if (playerRound != null) {
+            if (playerRound != null && currentSlot.isPlayer) {
                 c.log.addAll(playerRound.log)
-                activeHero.hp = heroCombatant.hp
-                if (activeHero.hp <= 0 && !activeHero.isDead) {
-                    activeHero.isDead = true
-                    c.log.add("TRAGEDIA: ${activeHero.name} poległ!")
-                    state.logEntries.add("ZADANIE: Odzyskaj ciało ${activeHero.name} i zanieś je do Kaplicy.")
+                actingHero.hp = heroCombatant.hp
+                if (actingHero.hp <= 0 && !actingHero.isDead) {
+                    actingHero.isDead = true
+                    c.log.add("TRAGEDIA: ${actingHero.name} poległ!")
+                    state.logEntries.add("ZADANIE: Odzyskaj ciało ${actingHero.name} i zanieś je do Kaplicy.")
                     
                     val corpse = lootSystem.itemCatalogue.get("quest_corpse")?.copy(
-                        instanceId = "corpse_${activeHero.id}",
-                        name = "Zwłoki: ${activeHero.name}"
+                        instanceId = "corpse_${actingHero.id}",
+                        name = "Zwłoki: ${actingHero.name}"
                     )
                     if (corpse != null) state.inventory.add(corpse)
+
+                    // Add to Companion Shadows for Etap 6
+                    if (state.companionShadows.none { it.id == actingHero.id }) {
+                        state.companionShadows.add(actingHero.copy())
+                    }
+                    
+                    // Remove from initiative
+                    state.combat.initiativeOrder.removeAll { it.id == actingHero.id }
                 }
             }
             
@@ -214,10 +272,27 @@ class CombatSystem @Inject constructor(
                 c.active = false
                 c.log.add("Cała drużyna poległa!")
                 pendingCombatEndCallback = onCombatEnd
+            } else {
+                advanceTurn(state)
             }
         }
 
         pendingCombatEndCallback?.invoke()
         return result
+    }
+
+    private fun advanceTurn(state: GameState) {
+        val c = state.combat
+        if (c.initiativeOrder.isEmpty()) return
+        
+        c.currentTurnIndex = (c.currentTurnIndex + 1) % c.initiativeOrder.size
+        
+        val nextSlot = c.initiativeOrder[c.currentTurnIndex]
+        if (nextSlot.isPlayer) {
+            c.activeHeroId = nextSlot.id
+        } else {
+            // It's enemy's turn. In a real turn-based system, we'd trigger AI here.
+            // For now, we stay on previous hero or first alive.
+        }
     }
 }

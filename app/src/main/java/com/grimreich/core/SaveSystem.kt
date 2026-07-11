@@ -61,11 +61,11 @@ object SaveSystem {
         lastAutoSaveHash = 0
     }
 
-    fun saveToPersistence(persistence: com.grimreich.systems.StatePersistenceManager) {
+    suspend fun saveToPersistence(persistence: com.grimreich.systems.StatePersistenceManager) {
         persistence.persistSlots(slots)
     }
 
-    fun restoreFromPersistence(persistence: com.grimreich.systems.StatePersistenceManager) {
+    suspend fun restoreFromPersistence(persistence: com.grimreich.systems.StatePersistenceManager) {
         importSlots(persistence.restoreSlots())
     }
 

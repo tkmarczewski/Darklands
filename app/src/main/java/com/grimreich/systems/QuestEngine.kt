@@ -135,16 +135,27 @@ class QuestEngine @Inject constructor(
     }
 
     fun getVisibleQuestBoard(state: GameState): Map<String, List<QuestDefinition>> {
-        return registry.values.filter {
-            !it.isHidden && getStatus(it.id, state) == QuestStatus.AVAILABLE
-        }.sortedWith(compareBy<QuestDefinition> { it.chainId ?: "zzz" }.thenBy { it.chainOrder }.thenBy { it.recommendedLevel })
-        .groupBy { it.cityId }
+        return registry.values
+            .filter { !it.isHidden && getStatus(it.id, state) == QuestStatus.AVAILABLE }
+            .groupBy { it.cityId }
+            .mapValues { (cityId, quests) ->
+                val seed = cityId.hashCode().toLong() + (state.world.day / 3)
+                val cityRandom = kotlin.random.Random(seed)
+                quests.shuffled(cityRandom).take(3) // Max 3 quests per city
+            }
     }
     
-    fun getAvailableQuestsForCity(cityId: String, state: GameState): List<QuestDefinition> =
-        registry.values.filter {
+    fun getAvailableQuestsForCity(cityId: String, state: GameState): List<QuestDefinition> {
+        val allAvailable = registry.values.filter {
             it.cityId == cityId && !it.isHidden && getStatus(it.id, state) == QuestStatus.AVAILABLE
-        }.sortedWith(compareBy<QuestDefinition> { it.chainId ?: "zzz" }.thenBy { it.chainOrder }.thenBy { it.recommendedLevel })
+        }
+        
+        val seed = cityId.hashCode().toLong() + (state.world.day / 3)
+        val cityRandom = kotlin.random.Random(seed)
+        
+        return allAvailable.shuffled(cityRandom).take(3)
+            .sortedWith(compareBy<QuestDefinition> { it.chainId ?: "zzz" }.thenBy { it.chainOrder }.thenBy { it.recommendedLevel })
+    }
 }
 
 enum class StepType { COMBAT, DIALOGUE, INVESTIGATION, SOCIAL, META, EXPEDITION }

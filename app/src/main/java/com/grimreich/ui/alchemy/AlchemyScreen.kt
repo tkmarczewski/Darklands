@@ -81,7 +81,7 @@ fun AlchemyScreen(
                             Spacer(modifier = Modifier.height(16.dp))
                             Text("SKŁADNIKI:", color = Color.Gray, fontSize = 12.sp)
                             state.selectedRecipe!!.ingredients.forEach { (ingId, qty) ->
-                                val hasCount = state.inventory.count { it.id == ingId }
+                                val hasCount = state.inventory.count { it.templateId == ingId }
                                 Text(
                                     "- $ingId: $hasCount / $qty", 
                                     color = if (hasCount >= qty) Color.Green else Color.Red,

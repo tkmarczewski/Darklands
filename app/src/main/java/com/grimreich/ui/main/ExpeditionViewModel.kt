@@ -202,9 +202,3 @@ class ExpeditionViewModel @Inject constructor(
         gameRepository.updateState { it.isExpeditionActive = false }
     }
 }
-
-    override fun onCleared() {
-        super.onCleared()
-        gameRepository.updateState { it.isExpeditionActive = false }
-    }
-}

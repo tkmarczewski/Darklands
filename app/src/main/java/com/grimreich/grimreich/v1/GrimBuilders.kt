@@ -24,7 +24,8 @@ object GrimBuilders {
     fun boss(id: String = randomId("boss"), name: String = "Ancient Horror", level: Int = 10, lootTable: RewardTable = rewardTable()) = Boss(id, name, level, lootTable)
     
     fun item(
-        id: String = randomId("item"), 
+        instanceId: String = randomId("inst"), 
+        templateId: String = randomId("tmpl"), 
         name: String = "Rusty Blade", 
         type: String = "weapon", 
         slot: String? = null,
@@ -34,10 +35,10 @@ object GrimBuilders {
         lore: String = "",
         properties: Map<String, Any> = emptyMap(),
         effects: Map<String, Int> = emptyMap()
-    ) = Item(id = id, name = name, type = type, slot = slot, value = value, weight = weight, rarity = rarity, lore = lore, properties = properties.toMap(), effects = effects)
+    ) = Item(instanceId = instanceId, templateId = templateId, name = name, type = type, slot = slot, value = value, weight = weight, rarity = rarity, lore = lore, properties = properties.toMap(), effects = effects)
 
     fun lootEntry(itemId: String, weight: Int = 10, minQty: Int = 1, maxQty: Int = 1) = LootEntry(itemId, weight, minQty, maxQty)
-    fun rewardTable(id: String = randomId("reward"), entries: List<LootEntry> = listOf(lootEntry(item().id, 100))) = RewardTable(id, entries.toList())
+    fun rewardTable(id: String = randomId("reward"), entries: List<LootEntry> = listOf(lootEntry(item().templateId, 100))) = RewardTable(id, entries.toList())
     fun encounter(id: String = randomId("enc"), name: String = "Wandering Bandits", difficulty: Int = 1, possibleNpcs: List<String> = emptyList()) = Encounter(id, name, difficulty, possibleNpcs.toList())
     fun faction(id: String = randomId("faction"), name: String = "Order of the Candle", disposition: String = "neutral") = Faction(id, name, disposition)
     fun quest(id: String = randomId("quest"), title: String = "A Small Favor", description: String = "Help the tavern keeper.", rewards: RewardTable = rewardTable()) = Quest(id, title, description, rewards)

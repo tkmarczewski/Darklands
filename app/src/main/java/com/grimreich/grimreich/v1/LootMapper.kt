@@ -23,7 +23,7 @@ class LootMapper(private val itemsById: Map<String, Item>) {
     fun rollMany(table: RewardTable, trials: Int, rng: Random = Random.Default): Map<String, Int> {
         val result = mutableMapOf<String, Int>()
         repeat(trials) {
-            for ((item, qty) in rollReward(table, rng)) result[item.id] = result.getOrDefault(item.id, 0) + qty
+            for ((item, qty) in rollReward(table, rng)) result[item.templateId] = result.getOrDefault(item.templateId, 0) + qty
         }
         return result
     }

@@ -65,7 +65,7 @@ class BossBattleSystem @Inject constructor(
         val hero = partyRepository.activeHero() ?: return 0
         val equippedIds = hero.equipment.values.filterNotNull()
         return gameState.inventory
-            .filter { it.id in equippedIds }
+            .filter { it.instanceId in equippedIds }
             .sumOf { it.effects["attack"] ?: 0 }
     }
 
@@ -73,7 +73,7 @@ class BossBattleSystem @Inject constructor(
         val hero = partyRepository.activeHero() ?: return 0
         val equippedIds = hero.equipment.values.filterNotNull()
         return gameState.inventory
-            .filter { it.id in equippedIds }
+            .filter { it.instanceId in equippedIds }
             .sumOf { it.effects["defense"] ?: 0 }
     }
 }
