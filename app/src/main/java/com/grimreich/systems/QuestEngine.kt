@@ -90,13 +90,13 @@ class QuestEngine @Inject constructor(
     fun completeQuestDirect(state: GameState, questId: String) {
         if (state.quest.completedQuestIds.contains(questId)) return
         val p = state.quest.progress[questId] ?: return
-        if (p.status != QuestStatus.OBJECTIVE_MET && p.status != QuestStatus.ACTIVE) return
+        if (p.status != QuestStatus.OBJECTIVE_MET) return
         
         val def = registry[questId] ?: return
         state.quest.activeQuestIds.remove(questId)
         state.quest.completedQuestIds.add(questId)
         state.quest.progress[questId] = p.copy(status = QuestStatus.COMPLETED)
-        
+        state.gold += def.rewardGold
         state.gold += def.rewardGold
         experienceSystem.addPartyXpDirect(state, def.recommendedLevel * 50)
         
