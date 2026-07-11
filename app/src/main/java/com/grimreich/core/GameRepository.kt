@@ -28,7 +28,7 @@ class GameRepository @Inject constructor(
     val itemCatalogue: ItemCatalogue,
 ) {
     private val repositoryScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
-    private val saveMutex = Mutex() // FIX (BUG-14): Prevent simultaneous writes
+    private val saveMutex = Mutex()
 
     private val questEngine get() = questEngineProvider.get()
     private val dialogueManager get() = dialogueManagerProvider.get()
@@ -54,7 +54,6 @@ class GameRepository @Inject constructor(
             mutable.normalizeState()
             _gameState.value = mutable
             
-            // Sync internal logs flow if logs were changed inside transform
             if (mutable.logEntries.isNotEmpty()) {
                 _gameLogs.value = mutable.logEntries.toList()
             }
@@ -65,12 +64,8 @@ class GameRepository @Inject constructor(
         }
     }
 
-    /**
-     * Unified logging. FIX (BUG-4, BUG-9): Synchronized and consistent.
-     */
     fun log(message: String) {
         synchronized(this) {
-            // Update Flow for UI
             val current = _gameLogs.value.toMutableList()
             current.add(message)
             if (current.size > GameConstants.MAX_LOG_ENTRIES) {
@@ -78,7 +73,6 @@ class GameRepository @Inject constructor(
             }
             _gameLogs.value = current
             
-            // Update State for persistence
             _gameState.value.logEntries.clear()
             _gameState.value.logEntries.addAll(current)
             _gameState.value.trimLogs()
@@ -86,13 +80,11 @@ class GameRepository @Inject constructor(
     }
 
     fun sync() {
-        android.util.Log.d("GameRepository", "SYNC START: Seeding catalogues...")
         cityCatalogue.seedCanonical()
         itemCatalogue.seed()
         dialogueManager.seedBasicDialogues()
         questManifest.seed()
         
-        // Initialize static TradingEngine with the injected EconomySystem
         com.grimreich.core.TradingEngine.initialize(economySystemProvider.get())
         
         try {
@@ -100,11 +92,9 @@ class GameRepository @Inject constructor(
             val type = object : com.google.gson.reflect.TypeToken<List<Enemy>>() {}.type
             val loadedEnemies: List<Enemy> = com.google.gson.Gson().fromJson(jsonString, type)
             Bestiary.loadFromList(loadedEnemies)
-            android.util.Log.d("GameRepository", "SYNC: Bestiary loaded successfully.")
         } catch (e: Exception) {
             log("[Bestiary] Failed to load external data: ${e.message}")
         }
-        android.util.Log.d("GameRepository", "SYNC END.")
     }
 
     suspend fun restoreIfAvailable(): Boolean {
@@ -132,19 +122,14 @@ class GameRepository @Inject constructor(
     }
 
     fun persistCurrentState() {
-        val stateSnapshot = _gameState.value.deepCopy().also {
-            it.world.echoIntensity = it.grimEngine.echoIntensity
-            it.grimMutationPhase = it.grimEngine.mutationPhase
-        }
+        val stateSnapshot = _gameState.value.deepCopy()
         repositoryScope.launch {
-            // FIX (BUG-14): Sequential saving via Mutex
             saveMutex.withLock {
                 try {
                     val dto = stateSnapshot.toDto()
                     persistence.persist(dto)
                     SaveSystem.saveToPersistence(persistence)
                 } catch (e: Exception) {
-                    // Avoid recursive log call if log fails persistence
                     android.util.Log.e("GameRepository", "Save failed", e)
                 }
             }
@@ -160,10 +145,9 @@ class GameRepository @Inject constructor(
     fun hasSession(): Boolean = persistence.exists() && persistence.hasPersistedSession()
 
     fun clearSessionAndReset() {
-        android.util.Log.e("GameRepository", "CRITICAL: clearSessionAndReset() called!")
-        persistence.clear()
+        persistence.clearSessionOnly()
         _gameState.value = GameState()
         _gameLogs.value = emptyList()
-        sync() // FIX: Re-seed registries for the new session
+        sync()
     }
 }

@@ -157,3 +157,8 @@ data class WorldCollapse(
     var historyLoss: Int,
     var endingImpact: String
 )
+
+// Poprawna i jedyna definicja CollapseScenario
+enum class CollapseScenario {
+    MIST_OBLIVION, BLOOD_RUIN, REFLECTION_RECKONING, FULLNESS_ASCENSION, CHAOS_DOMINION, ZERO_END
+}

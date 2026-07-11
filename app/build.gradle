@@ -54,6 +54,204 @@ jacoco {
     toolVersion = "0.8.12"
 }
 
+tasks.withType(Test) {
+    configure<JacocoTaskExtension> {
+        destinationFile = file("build/jacoco/testDebugUnitTest.exec")
+    }
+}
+
+task jacocoTestReport(type: JacocoReport, dependsOn: 'testDebugUnitTest') {
+    reports {
+        xml.required = true
+        html.required = true
+    }
+
+    def fileFilter = [
+        '**/*-mock.class',
+        '**/R.class',
+        '**/R$*.class',
+        '**/BuildConfig.*\
+
+',
+        '**/*_Factory*.*\
+
+',
+        '**/*_MembersInjector*.*\
+
+',
+        '**/*_Provide*Factory*.*\
+
+',
+        '**/*_Hilt*.*\
+
+',
+        '**/*_GeneratedInjector*.*\
+
+',
+        '**/*_Impl*.*\
+
+',
+        '**/*ViewModel*.*\
+
+', // Composables, ViewModels
+        '**/*Composable*.*\
+
+',
+        '**/*Screen*.*\
+
+',
+        '**/*Activity*.*\
+
+',
+        '**/*Fragment*.*\
+
+',
+        '**/*View*.*\
+
+',
+        '**/*Binding*.*\
+
+',
+        '**/*Dto*.*\
+
+',
+        '**/*Models*.*'  // DTO i Modele
+    ]
+
+    def debugTree = fileTree(dir: "${buildDir}/intermediates/javac/debug/classes", excludes: fileFilter)
+    def mainKotlin = fileTree(dir: "${buildDir}/tmp/kotlin-classes/debug", excludes: fileFilter)
+    def generatedSources = fileTree(dir: "${buildDir}/generated", excludes: fileFilter)
+
+    sourceDirectories.setFrom(files(["src/main/java", "src/main/kotlin"]))
+    classDirectories.setFrom(files([debugTree, mainKotlin, generatedSources]))
+    executionData.setFrom(file("${buildDir}/jacoco/testDebugUnitTest.exec"))
+
+    doFirst {
+        file("${buildDir}/jacoco").mkdirs()
+    }
+
+    afterEvaluate {
+        classDirectories.setFrom(files(classDirectories.files.collect {
+            fileTree(dir: it, excludes: fileFilter)
+        }))
+    }
+
+    violationRules {
+        rule {
+            element = 'BUNDLE'
+            limit {
+                counter = 'LINE'
+                value = 0.50
+                minimum = value
+            }
+        }
+
+        rule {
+            element = 'PACKAGE'
+            includes = ['com.grimreich.core', 'com.grimreich.systems']
+            limit {
+                counter = 'LINE'
+                value = 0.70
+                minimum = value
+            }
+        }
+    }
+}
+
+tasks.withType(Test) {
+    configure<JacocoTaskExtension> {
+        // Aby generować raport coverage dla testów jednostkowych
+        // Odwzorowuje domyślne ścieżki generowane przez Android Gradle Plugin
+        destinationFile = file("build/jacoco/testDebugUnitTest.exec")
+        // Inne ustawienia JacocoTaskExtension, jeśli potrzebne
+    }
+}
+
+task jacocoTestReport(type: JacocoReport, dependsOn: 'testDebugUnitTest') {
+    reports {
+        xml.required = true
+        html.required = true
+    }
+
+    def fileFilter = ['**/*-mock.class', '**/R.class', '**/R$*.class', '**/BuildConfig.*\
+
+', '**/Manifest*.*\
+
+', '**/*_Factory*.*\
+
+', '**/*_MembersInjector*.*\
+
+', '**/*_Provide*Factory*.*\
+
+', '**/*_Hilt*.*\
+
+', '**/*_GeneratedInjector*.*\
+
+', '**/*_Impl*.*\
+
+', '**/*ViewModel*.*\
+
+', // Composables, ViewModels
+                    '**/*Composable*.*\
+
+', '**/*Screen*.*\
+
+', '**/*Activity*.*\
+
+', '**/*Fragment*.*\
+
+', '**/*View*.*\
+
+', '**/*Binding*.*\
+
+', '**/*Dto*.*\
+
+', '**/*Models*.*\
+
+' // DTO i Modele
+    ]
+
+    def debugTree = fileTree(dir: "${buildDir}/intermediates/javac/debug/classes", excludes: fileFilter)
+    def mainKotlin = fileTree(dir: "${buildDir}/tmp/kotlin-classes/debug", excludes: fileFilter)
+    def generatedSources = fileTree(dir: "${buildDir}/generated", excludes: fileFilter)
+
+    sourceDirectories.setFrom(files(["src/main/java", "src/main/kotlin"]))
+    classDirectories.setFrom(files([debugTree, mainKotlin, generatedSources]))
+    executionData.setFrom(file("${buildDir}/jacoco/testDebugUnitTest.exec"))
+
+    doFirst {
+        file("${buildDir}/jacoco").mkdirs()
+    }
+
+    afterEvaluate {
+        classDirectories.setFrom(files(classDirectories.files.collect {
+            fileTree(dir: it, excludes: fileFilter)
+        }))
+    }
+
+    // Minimalne progi pokrycia dla kluczowych pakietów
+    violationRules {
+        rule {
+            element = 'BUNDLE'
+            limit {
+                counter = 'LINE'
+                value = 0.50 // Przykładowy próg 50% dla linii
+                minimum = value
+            }
+        }
+
+        rule {
+            element = 'PACKAGE'
+            includes = ['com.grimreich.core', 'com.grimreich.systems']
+            limit {
+                counter = 'LINE'
+                value = 0.70 // Przykładowy próg 70% dla linii w core i systems
+                minimum = value
+            }
+        }
+    }
+}
+
 dependencies {
     implementation 'androidx.core:core-ktx:1.12.0'
     implementation 'androidx.appcompat:appcompat:1.6.1'

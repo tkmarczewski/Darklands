@@ -1,19 +1,18 @@
-package com.grimreich.systems
-
-import com.grimreich.core.GameRepository
+import com.grimreich.contracts.CollapseRandomProvider
+import com.grimreich.grimreich.v1.CollapseScenario
+import com.grimreich.grimreich.v1.CollapseScenario
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlin.random.Random
 
-enum class CollapseScenario {
-    MIST_OBLIVION, BLOOD_RUIN, REFLECTION_RECKONING, FULLNESS_ASCENSION, CHAOS_DOMINION, ZERO_END
-}
 
 @Singleton
 class CollapseEngine @Inject constructor(
     private val gameRepository: GameRepository,
-    private val worldStabilitySystem: WorldStabilitySystem
+    private val worldStabilitySystem: WorldStabilitySystem,
+    private val collapseRandomProvider: CollapseRandomProvider
 ) {
-    var activeScenario: CollapseScenario? = null
+    // Usunięto: var activeScenario: CollapseScenario? = null - jest w WorldState
 
     /**
      * Główny tick upadku świata wywoływany przez zdarzenia domenowe.
@@ -76,10 +75,11 @@ class CollapseEngine @Inject constructor(
     }
 
     private fun decideScenario(faith: Int, stability: Int): CollapseScenario {
+        val availableScenarios = CollapseScenario.entries.filter { it != CollapseScenario.ZERO_END }.toList()
         return when {
             faith > 70 -> CollapseScenario.FULLNESS_ASCENSION
             stability < 30 -> CollapseScenario.CHAOS_DOMINION
-            else -> CollapseScenario.entries.toTypedArray().random()
+            else -> collapseRandomProvider.chooseScenario(availableScenarios)
         }
     }
 }

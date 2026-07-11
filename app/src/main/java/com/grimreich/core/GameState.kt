@@ -2,8 +2,6 @@ package com.grimreich.core
 
 import com.grimreich.grimreich.v1.NPC
 import com.grimreich.grimreich.v1.Item
-import com.grimreich.grimreich.v1.GrimWorldEngine
-import com.grimreich.grimreich.v1.GrimWorldEngineFactory
 
 sealed interface PendingWorldAction {
     data object None : PendingWorldAction
@@ -18,8 +16,6 @@ sealed interface PendingWorldAction {
 }
 
 data class GameState(
-    var grimEngine: GrimWorldEngine = GrimWorldEngineFactory.create(),
-
     var playerName: String? = null,
     var heroName: String? = null,
     var characterNameLocked: Boolean = false,
@@ -80,7 +76,6 @@ data class GameState(
     }
 
     fun deepCopy(): GameState = this.copy(
-        grimEngine = this.grimEngine, // Not deeply copied, system handled
         party = this.party.map { it.copy() }.toMutableList(),
         hireableHeroes = this.hireableHeroes.map { it.copy() }.toMutableList(),
         inventory = this.inventory.map { it.copy() }.toMutableList(),

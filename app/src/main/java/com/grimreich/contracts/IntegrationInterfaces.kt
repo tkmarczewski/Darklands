@@ -1,5 +1,7 @@
 package com.grimreich.contracts
 
+import com.grimreich.grimreich.v1.CollapseScenario
+
 /**
  * Interface for providing a [WorldSnapshot] from the current game state.
  */
@@ -12,4 +14,8 @@ interface WorldSnapshotProvider {
  */
 interface WorldMutationResolver {
     fun resolve(snapshot: WorldSnapshot, context: SimulationTickContext)
+}
+
+interface CollapseRandomProvider {
+    fun chooseScenario(options: List<CollapseScenario>): CollapseScenario
 }
