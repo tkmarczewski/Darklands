@@ -70,7 +70,6 @@ class DialogueManager @Inject constructor(
                 value?.let { 
                     engine.activateQuestDirect(state, it) 
                 }
-                state.pendingAction = com.grimreich.core.PendingWorldAction.None
             }
             "ADVANCE_QUEST" -> {
                 value?.let { 
@@ -91,7 +90,6 @@ class DialogueManager @Inject constructor(
                 targetId?.let { 
                     engine.completeQuestDirect(state, it) 
                 }
-                state.pendingAction = com.grimreich.core.PendingWorldAction.None
             }
             "INCREMENT_META" -> {
                 val inc = value?.toIntOrNull() ?: 1
@@ -112,9 +110,9 @@ class DialogueManager @Inject constructor(
             "GIVE_ITEM" -> {
                 value?.let { itemId ->
                     val repo = gameRepositoryProvider.get()
-                    val item = repo.itemCatalogue.get(itemId)
+                    val item = repo.itemCatalogue.createInstance(itemId)
                     if (item != null) {
-                        state.inventory.add(item.copy())
+                        state.inventory.add(item)
                         state.logEntries.add("Otrzymano przedmiot: ${item.name}")
                     }
                 }

@@ -170,7 +170,7 @@ class CityViewModel @Inject constructor(
                 allAvailableQuests = allAvailable,
                 isGlitchActive = finalGlitchIntensity > 0.5f,
                 glitchIntensity = finalGlitchIntensity,
-                rulingFactionName = cityData?.rulingFaction ?: "Neutralna"
+                rulingFactionName = com.grimreich.core.FactionCatalogue.findById(cityData?.rulingFaction ?: "")?.name ?: "Neutralna"
             )
         }
     }

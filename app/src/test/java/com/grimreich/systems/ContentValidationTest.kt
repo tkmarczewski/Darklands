@@ -50,7 +50,7 @@ class ContentValidationTest {
         ]
         """.trimIndent()
         
-        `when`(assets.open(anyString())).thenReturn(ByteArrayInputStream(dummyJson.toByteArray()))
+        `when`(assets.open("grimreich/dialogues_pilot.json")).thenReturn(ByteArrayInputStream(dummyJson.toByteArray()))
         return context
     }
 
@@ -66,6 +66,11 @@ class ContentValidationTest {
         )
 
         manager.seedBasicDialogues()
+
+        val guardNode = manager.getNode("guard_start")
+        assertTrue("Node should exist", guardNode != null)
+        assertEquals("guard", guardNode?.npcId)
+        assertEquals("Stój! Mgła gęstnieje.", guardNode?.text)
 
         assertTrue("DialogueManager should have seeded nodes", manager.hasNode("guard_start"))
         assertTrue("DialogueManager should have seeded nodes", manager.hasNode("merchant_start"))
@@ -105,5 +110,39 @@ class ContentValidationTest {
         val node2 = manager.getNode("guard_start")
 
         assertEquals(node1?.text, node2?.text)
+    }
+
+    @Test
+    fun getNode_shouldReturnNullForNonExistentId() {
+        val manager = DialogueManager(
+            context = createMockContext(),
+            gameRepositoryProvider = dagger.Lazy { mock(GameRepository::class.java) },
+            questEngine = dagger.Lazy { mock(QuestEngine::class.java) }
+        )
+        manager.seedBasicDialogues()
+        
+        assertEquals(null, manager.getNode("non_existent"))
+    }
+
+    @Test
+    fun glitchText_shouldHandleEmptyString() {
+        val manager = DialogueManager(
+            context = mock(Context::class.java),
+            gameRepositoryProvider = dagger.Lazy { mock(GameRepository::class.java) },
+            questEngine = dagger.Lazy { mock(QuestEngine::class.java) }
+        )
+        
+        assertEquals("", manager.glitchText("", 123L))
+    }
+
+    @Test
+    fun getPortrait_shouldReturnDefaultForUnknownRole() {
+        val manager = DialogueManager(
+            context = mock(Context::class.java),
+            gameRepositoryProvider = dagger.Lazy { mock(GameRepository::class.java) },
+            questEngine = dagger.Lazy { mock(QuestEngine::class.java) }
+        )
+        
+        assertEquals("port_peasant", manager.getPortrait("UNKNOWN"))
     }
 }
