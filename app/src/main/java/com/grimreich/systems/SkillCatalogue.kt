@@ -15,7 +15,7 @@ object SkillCatalogue {
             type = SkillType.MELEE,
             staminaCost = 5
         ) { _, target ->
-            target.activeEffects.add(StatusEffect(StatusEffectType.POISON, 4, 3))
+            target.applyStatus(StatusEffectType.POISON, 3, 4, mutableListOf())
             SkillResult(damage = 0, statusApplied = true, message = "Broń ocieka trucizną! Wróg zostaje otruty.")
         },
 

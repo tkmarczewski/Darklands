@@ -27,25 +27,25 @@ data class TradeGood(
     val type: TradeGoodType,
     val name: String,
     val basePrice: Int,
-    val weight: Int,
+    val weight: Double,
     val description: String
 )
 
 object TradeGoodCatalog {
     val goods = listOf(
-        TradeGood(TradeGoodType.GRAIN, "Zboże", 5, 2, "Podstawowa żywność."),
-        TradeGood(TradeGoodType.SALT, "Sól", 10, 1, "Białe złoto północy."),
-        TradeGood(TradeGoodType.IRON_ORE, "Ruda Żelaza", 15, 3, "Surowiec dla kowali."),
-        TradeGood(TradeGoodType.TIMBER, "Drewno", 8, 4, "Budulec i opał."),
-        TradeGood(TradeGoodType.WOOL, "Wełna", 12, 1, "Ciepły materiał."),
-        TradeGood(TradeGoodType.CLOTH, "Płótno", 20, 1, "Gotowa tkanina."),
-        TradeGood(TradeGoodType.WEAPONS, "Broń", 50, 2, "Żelazo gotowe do walki."),
-        TradeGood(TradeGoodType.TOOLS, "Narzędzia", 30, 2, "Niezbędne w rzemiośle."),
-        TradeGood(TradeGoodType.LEATHER_GOODS, "Wyroby Skórzane", 25, 1, "Trwałe i lekkie."),
-        TradeGood(TradeGoodType.SPICES, "Przyprawy", 100, 1, "Luksus z dalekich krain."),
-        TradeGood(TradeGoodType.WINE, "Wino", 40, 2, "Napój bogaczy i mnichów."),
-        TradeGood(TradeGoodType.SILK, "Jedwab", 150, 1, "Niezwykle rzadka tkanina."),
-        TradeGood(TradeGoodType.JEWELRY, "Biżuteria", 300, 1, "Oznaka statusu.")
+        TradeGood(TradeGoodType.GRAIN, "Zboże", 5, 2.0, "Podstawowa żywność."),
+        TradeGood(TradeGoodType.SALT, "Sól", 10, 1.0, "Białe złoto północy."),
+        TradeGood(TradeGoodType.IRON_ORE, "Ruda Żelaza", 15, 3.0, "Surowiec dla kowali."),
+        TradeGood(TradeGoodType.TIMBER, "Drewno", 8, 4.0, "Budulec i opał."),
+        TradeGood(TradeGoodType.WOOL, "Wełna", 12, 1.0, "Ciepły materiał."),
+        TradeGood(TradeGoodType.CLOTH, "Płótno", 20, 1.0, "Gotowa tkanina."),
+        TradeGood(TradeGoodType.WEAPONS, "Broń", 50, 2.0, "Żelazo gotowe do walki."),
+        TradeGood(TradeGoodType.TOOLS, "Narzędzia", 30, 2.0, "Niezbędne w rzemiośle."),
+        TradeGood(TradeGoodType.LEATHER_GOODS, "Wyroby Skórzane", 25, 1.0, "Trwałe i lekkie."),
+        TradeGood(TradeGoodType.SPICES, "Przyprawy", 100, 1.0, "Luksus z dalekich krain."),
+        TradeGood(TradeGoodType.WINE, "Wino", 40, 2.0, "Napój bogaczy i mnichów."),
+        TradeGood(TradeGoodType.SILK, "Jedwab", 150, 1.0, "Niezwykle rzadka tkanina."),
+        TradeGood(TradeGoodType.JEWELRY, "Biżuteria", 300, 1.0, "Oznaka statusu.")
     )
 
     fun findByType(type: TradeGoodType) = goods.find { it.type == type }
@@ -85,7 +85,7 @@ object TradingEngine {
                 name = good.name, 
                 value = good.basePrice,
                 type = "trade_good",
-                weight = good.weight.toDouble(),
+                weight = good.weight,
                 rarity = "normal",
                 lore = good.description,
                 effects = emptyMap()

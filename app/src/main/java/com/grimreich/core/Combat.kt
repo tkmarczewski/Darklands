@@ -102,6 +102,54 @@ data class CombatantState(
         endurance = endurance.coerceAtLeast(0)
         morale = morale.coerceIn(0, GrimConstants.Combat.MAX_MORALE)
     }
+
+    /**
+     * Centralized method to apply status effects with synergistic logic.
+     * Part of Iteration 3 Faza 2 audit.
+     */
+    fun applyStatus(type: StatusEffectType, strength: Int, duration: Int, log: MutableList<String>) {
+        // SYNERGY: WET vs FIRE (Neutralization)
+        if (type == StatusEffectType.WET) {
+            activeEffects.find { it.type == StatusEffectType.FIRE }?.let {
+                activeEffects.remove(it)
+                log.add("Woda gasi płomienie na $name!")
+                return
+            }
+        }
+        if (type == StatusEffectType.FIRE) {
+            activeEffects.find { it.type == StatusEffectType.WET }?.let {
+                activeEffects.remove(it)
+                log.add("Ogień odparowuje wodę z $name!")
+                return
+            }
+        }
+
+        // SYNERGY: WET + FREEZE (Shatter)
+        if (type == StatusEffectType.FREEZE) {
+            activeEffects.find { it.type == StatusEffectType.WET }?.let {
+                val shatterDmg = 10
+                hp = (hp - shatterDmg).coerceAtLeast(0)
+                log.add("Mroźne powietrze ścina wodę na $name! NAGŁE PĘKNIĘCIE: -$shatterDmg HP.")
+                
+                // Bonus duration for freeze on wet target
+                val existing = activeEffects.find { it.type == StatusEffectType.FREEZE }
+                if (existing != null) {
+                    existing.duration = (existing.duration + duration + 1).coerceAtMost(10)
+                } else {
+                    activeEffects.add(StatusEffect(type, duration + 1, strength))
+                }
+                return
+            }
+        }
+
+        val existing = activeEffects.find { it.type == type }
+        if (existing != null) {
+            existing.duration = (existing.duration + duration).coerceAtMost(10)
+        } else {
+            activeEffects.add(StatusEffect(type, duration, strength))
+        }
+        log.add("$name otrzymuje status: ${type.name}!")
+    }
 }
 
 data class RoundResult(
@@ -362,9 +410,10 @@ class CombatRound @Inject constructor(
                         it !== effect && it.type == StatusEffectType.SHOCK
                     }
                     if (shockActive) {
-                        val shockDmg = effect.strength * 2
+                        // SYNERGY: Increased shock damage on wet targets
+                        val shockDmg = effect.strength * 3
                         combatant.hp = (combatant.hp - shockDmg).coerceAtLeast(0)
-                        log.add("Mokre ciało przewodzi prąd! ${combatant.name}: -${shockDmg} HP.")
+                        log.add("BŁYSKAWICA! Prąd przebiega przez mokre ciało ${combatant.name}: -$shockDmg HP!")
                     }
                 }
                 StatusEffectType.SHOCK -> {
@@ -387,15 +436,8 @@ class CombatRound @Inject constructor(
             .coerceIn(0.0f, 0.8f)
         if (randomProvider.nextFloat() < statusChance) {
             val effectType = StatusEffectType.entries[randomProvider.nextInt(StatusEffectType.entries.size)]
-            val existing   = defender.activeEffects.find { it.type == effectType }
-            if (existing != null) {
-                existing.duration = (existing.duration + 2).coerceAtMost(10)
-            } else {
-                defender.activeEffects.add(
-                    StatusEffect(effectType, 3, 2 + attacker.intelligence / 4)
-                )
-            }
-            log.add("${defender.name} otrzymuje status: $effectType!")
+            val strength = 2 + attacker.intelligence / 4
+            defender.applyStatus(effectType, strength, 3, log)
         }
     }
 

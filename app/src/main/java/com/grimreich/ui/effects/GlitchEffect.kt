@@ -14,6 +14,7 @@ import kotlin.random.Random
 /**
  * Applies a visual "reality glitch" effect to a Composable.
  * Uses jitter (shaking) and optional blur on API 31+.
+ * PERFORMANCE OPTIMIZED: Random calls are cached per tick.
  */
 fun Modifier.glitchEffect(active: Boolean, intensity: Float = 1f): Modifier = composed {
     if (!active) return@composed this
@@ -30,49 +31,53 @@ fun Modifier.glitchEffect(active: Boolean, intensity: Float = 1f): Modifier = co
         label = "tick"
     )
 
-    // Compute random jitter offsets based on the animation tick
-    val randomOffset = remember(tick) {
-        if (Random.nextFloat() < 0.4f * intensity) {
-            IntOffset(
-                Random.nextInt(-15, 16) * intensity.toInt().coerceAtLeast(1),
-                Random.nextInt(-8, 9) * intensity.toInt().coerceAtLeast(1)
-            )
-        } else {
-            IntOffset.Zero
+    // CACHED CALCULATIONS: Pre-compute random values to avoid heavy calls in graphicsLayer
+    val glitchParams by remember(tick, intensity) {
+        derivedStateOf {
+            val hasJitter = Random.nextFloat() < 0.4f * intensity
+            val jitter = if (hasJitter) {
+                IntOffset(
+                    Random.nextInt(-15, 16) * intensity.toInt().coerceAtLeast(1),
+                    Random.nextInt(-8, 9) * intensity.toInt().coerceAtLeast(1)
+                )
+            } else IntOffset.Zero
+
+            val hasScale = Random.nextFloat() < 0.1f * intensity
+            val scaleX = if (hasScale) 1f + (Random.nextFloat() - 0.5f) * 0.05f * intensity else 1f
+            val scaleY = if (hasScale) 1f + (Random.nextFloat() - 0.5f) * 0.05f * intensity else 1f
+
+            val hasBlur = Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && intensity > 0.8f && Random.nextFloat() < 0.2f
+            
+            val hasUIFlow = intensity > 3.0f && Random.nextFloat() < 0.05f
+            val rotation = if (hasUIFlow) (Random.nextFloat() - 0.5f) * 10f else 0f
+            val alpha = if (hasUIFlow) 0.6f + Random.nextFloat() * 0.4f else 1.0f
+
+            GlitchParams(jitter, scaleX, scaleY, hasBlur, rotation, alpha)
         }
     }
 
     this.graphicsLayer {
-        translationX = randomOffset.x.toFloat()
-        translationY = randomOffset.y.toFloat()
-        
-        // Scale fluctuation
-        if (Random.nextFloat() < 0.1f * intensity) {
-            scaleX = 1f + (Random.nextFloat() - 0.5f) * 0.05f * intensity
-            scaleY = 1f + (Random.nextFloat() - 0.5f) * 0.05f * intensity
-        }
+        translationX = glitchParams.jitter.x.toFloat()
+        translationY = glitchParams.jitter.y.toFloat()
+        scaleX = glitchParams.scaleX
+        scaleY = glitchParams.scaleY
+        rotationZ = glitchParams.rotation
+        alpha = glitchParams.alpha
 
         // Apply Blur on Android 12+ if intensity is high
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && intensity > 0.8f) {
-            if (Random.nextFloat() < 0.2f) {
-                renderEffect = RenderEffect.createBlurEffect(
-                    4f * intensity, 4f * intensity, android.graphics.Shader.TileMode.CLAMP
-                ).asComposeRenderEffect()
-            }
-        }
-
-        // --- UI DECAY (Phase 6) ---
-        if (intensity > 3.0f && Random.nextFloat() < 0.05f) {
-            rotationZ = (Random.nextFloat() - 0.5f) * 10f
-            alpha = 0.6f + Random.nextFloat() * 0.4f
-        }
-
-        // --- PALETTE ROT (Project Cipher) ---
-        if (intensity > 4.0f && Random.nextFloat() < 0.1f) {
-            // Simulate Chromatic Aberration via subtle scale and transparency shifts
-            scaleX = 1.05f
-            scaleY = 0.95f
-            // In a real custom shader we would separate RGB, here we flicker saturation
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && glitchParams.hasBlur) {
+            renderEffect = RenderEffect.createBlurEffect(
+                4f * intensity, 4f * intensity, android.graphics.Shader.TileMode.CLAMP
+            ).asComposeRenderEffect()
         }
     }
 }
+
+private data class GlitchParams(
+    val jitter: IntOffset,
+    val scaleX: Float,
+    val scaleY: Float,
+    val hasBlur: Boolean,
+    val rotation: Float,
+    val alpha: Float
+)
