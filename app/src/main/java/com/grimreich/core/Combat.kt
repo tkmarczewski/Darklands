@@ -170,13 +170,9 @@ class CombatRound @Inject constructor(
                 val result = skill.effect(attacker, defender)
                 if (result.message.isNotBlank()) log.add(result.message)
                 
-                // FIX (BUG-07): Apply damage if not already applied inside effect
-                val appliedDmg = (hpBefore - defender.hp).coerceAtLeast(0)
-                val bonusDmg = result.damage
-                if (bonusDmg > 0) {
-                    defender.hp = (defender.hp - bonusDmg).coerceAtLeast(0)
-                }
-                dmgToDefender = appliedDmg + bonusDmg
+                // BUG FIX: Skill results already applied to defender.hp inside skill.effect lambda.
+                // Manual subtraction removed to prevent double damage.
+                dmgToDefender = hpBefore - defender.hp
 
                 if (result.statusApplied && dmgToDefender == 0) {
                     log.add("Efekt specjalny został zastosowany.")
@@ -225,10 +221,13 @@ class CombatRound @Inject constructor(
     ): Int {
         if (attacker.maxHp <= 0 || defender.maxHp <= 0) return 0
 
-        val dodgeChance = (GrimConstants.Combat.BASE_DODGE_CHANCE +
+        // BALANCE FIX: Attacker's Perception now counters Defender's Agility-based dodge.
+        val baseDodge = (GrimConstants.Combat.BASE_DODGE_CHANCE +
             ((defender.agility - 10) * GrimConstants.Combat.AGILITY_DODGE_MODIFIER))
-            .coerceIn(0.05f, 0.8f)
-        val dodged = randomProvider.nextFloat() < dodgeChance
+        val perceptionBonus = (attacker.perception - 10) * 0.01f
+        val finalDodgeChance = (baseDodge - perceptionBonus).coerceIn(0.05f, 0.8f)
+        
+        val dodged = randomProvider.nextFloat() < finalDodgeChance
         if (dodged) {
             log.add("${defender.name} unika ataku!")
             return 0
@@ -270,8 +269,8 @@ class CombatRound @Inject constructor(
         log.add("${attacker.name} atakuje ${defender.name}: $dmg obrażeń.")
 
         if (attacker.charisma >= 10) {
-            val regen = ((attacker.charisma - 10).coerceAtLeast(0) / 2 + 1) *
-                GrimConstants.Combat.CHARISMA_MORALE_REGEN
+            // BALANCE FIX: Buffed charisma morale regen (removed divisor)
+            val regen = (attacker.charisma - 9) * GrimConstants.Combat.CHARISMA_MORALE_REGEN
             attacker.morale = (attacker.morale + regen)
                 .coerceAtMost(GrimConstants.Combat.MAX_MORALE)
             if (regen > 0) log.add("${attacker.name} zagrzewa siebie do walki. (+${regen} Morale)")

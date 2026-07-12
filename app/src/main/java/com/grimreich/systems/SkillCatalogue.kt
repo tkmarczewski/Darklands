@@ -59,7 +59,8 @@ object SkillCatalogue {
             favorCost = 15,
             description = "Potężne uderzenie nasycone wiarą."
         ) { user, target ->
-            val dmg = user.attackBase + (user.piety / 2)
+            // BALANCE FIX: Scaled with Piety instead of just attackBase
+            val dmg = user.attackBase + user.piety
             target.hp = (target.hp - dmg).coerceAtLeast(0)
             SkillResult(damage = dmg, message = "Święty blask poraża wroga za $dmg obrażeń.")
         },
@@ -71,7 +72,8 @@ object SkillCatalogue {
             echoCost = 0.15f,
             description = "Przelewasz mrok prosto do umysłu wroga. Ogromne obrażenia, ale destabilizuje świat."
         ) { user, target ->
-            val dmg = target.maxHp / 3
+            // BALANCE FIX: Fixed damage based on Intelligence to avoid boss one-shots
+            val dmg = 15 + user.intelligence
             target.hp = (target.hp - dmg).coerceAtLeast(0)
             SkillResult(damage = dmg, message = "Przerażający szept echa rozdziera jaźń przeciwnika. Zadano $dmg obrażeń.")
         },
