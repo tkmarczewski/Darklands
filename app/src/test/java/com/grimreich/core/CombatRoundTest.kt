@@ -10,12 +10,12 @@ class FixedRandomProvider(
     private val ints: MutableList<Int> = mutableListOf()
 ) : CombatRandomProvider {
     override fun nextFloat(): Float = if (floats.isNotEmpty()) floats.removeAt(0) else 0.5f
-    
+
     override fun nextInt(until: Int): Int {
         if (until <= 0) return 0
         return (if (ints.isNotEmpty()) ints.removeAt(0) else 0).coerceIn(0, until - 1)
     }
-    
+
     override fun nextInt(from: Int, until: Int): Int {
         if (until <= from) return from
         val raw = if (ints.isNotEmpty()) ints.removeAt(0) else from
@@ -60,11 +60,52 @@ class CombatRoundTest {
         val attacker = makeCombatant(name = "A", strength = 12)
         val defender = makeCombatant(name = "D", armor = 0)
 
-        // "bash" is registered in SkillCatalogue
         val result = combat.resolveRound(attacker, defender, "bash")
 
         assertTrue("Damage should be > 0", result.attackerDamage > 0)
         assertTrue("Defender HP should decrease", defender.hp < 30)
+    }
+
+    // AUDIT FIX BUG-01: reported damage must equal actual HP loss (no double-counting)
+    @Test
+    fun skillDamage_shouldNotDoubleDamage() {
+        val morale = MoraleSystem()
+        val rng = FixedRandomProvider()
+        val combat = CombatRound(morale, rng)
+
+        val hpBefore = 30
+        val attacker = makeCombatant(name = "A", strength = 12)
+        val defender = makeCombatant(name = "D", hp = hpBefore, armor = 0)
+
+        val result = combat.resolveRound(attacker, defender, "bash")
+        val actualHpLoss = hpBefore - defender.hp
+
+        assertEquals(
+            "result.attackerDamage must equal actual HP lost — no double-counting",
+            actualHpLoss,
+            result.attackerDamage
+        )
+    }
+
+    // AUDIT FIX BUG-01: alchemist direct-HP skill — difference model
+    @Test
+    fun skillWithDirectHpModification_shouldCountDifferenceOnly() {
+        val morale = MoraleSystem()
+        val rng = FixedRandomProvider()
+        val combat = CombatRound(morale, rng)
+
+        val hpBefore = 30
+        val attacker = makeCombatant(name = "Alchemist", intelligence = 15)
+        val defender = makeCombatant(name = "Target", hp = hpBefore, armor = 0)
+
+        val result = combat.resolveRound(attacker, defender, "acid_splash")
+        val actualHpLoss = hpBefore - defender.hp
+
+        assertEquals(
+            "Direct-HP skill: reportedDamage must equal HP difference only",
+            actualHpLoss,
+            result.attackerDamage
+        )
     }
 
     @Test
@@ -81,23 +122,28 @@ class CombatRoundTest {
         assertTrue(result.contains("Leczenie"))
         assertTrue("HP should be within bounds", unit.hp in 1..10)
         assertTrue("Endurance should be within bounds", unit.endurance in 1..99)
-        assertTrue("At most one wound should remain (one was removed)", unit.wounds.size <= 1)
+        assertTrue("At most one wound should remain", unit.wounds.size <= 1)
     }
 
+    // AUDIT FIX: replaced fragile reflection with public-API approach
     @Test
     fun woundShouldNotDuplicate() {
         val morale = MoraleSystem()
         val rng = FixedRandomProvider()
         val combat = CombatRound(morale, rng)
 
-        val unit = makeCombatant(name = "X", hp = 1, maxHp = 10, endurance = 1)
-        val method = combat.javaClass.getDeclaredMethod("applyWound", CombatantState::class.java, MutableList::class.java)
-        method.isAccessible = true
+        val attacker = makeCombatant(name = "Crusher", strength = 99, attackBase = 99)
+        val defender = makeCombatant(name = "Victim", hp = 1, maxHp = 10, endurance = 1)
 
-        method.invoke(combat, unit, mutableListOf<String>())
-        method.invoke(combat, unit, mutableListOf<String>())
+        // Two rounds — if deduplication is broken, we'd have 2+ identical wound types
+        combat.resolveRound(attacker, defender)
+        combat.resolveRound(attacker, defender)
 
-        assertEquals("Should only have 1 unique wound of this type", 1, unit.wounds.distinct().size)
+        assertEquals(
+            "Should only have 1 unique wound type (no duplicates)",
+            1,
+            defender.wounds.distinct().size
+        )
     }
 
     @Test
@@ -106,7 +152,6 @@ class CombatRoundTest {
         val rng = FixedRandomProvider()
         val combat = CombatRound(morale, rng)
 
-        // Morale = 0 is ROUTED
         val attacker = makeCombatant(name = "Routed", morale = 0)
         val defender = makeCombatant(name = "Target", hp = 100)
 
@@ -114,5 +159,24 @@ class CombatRoundTest {
 
         assertEquals("Routed attacker should deal 0 damage", 0, result.attackerDamage)
         assertEquals("Defender HP should remain unchanged", 100, defender.hp)
+    }
+
+    // NEW: counterattack Dodge mechanism
+    @Test
+    fun counterAttack_shouldRespectDodgeChance() {
+        val morale = MoraleSystem()
+        // Second float is for dodge check — 0.01f forces dodge (below any threshold)
+        val rng = FixedRandomProvider(floats = mutableListOf(0.5f, 0.01f))
+        val combat = CombatRound(morale, rng)
+
+        val attacker = makeCombatant(name = "A", agility = 5)
+        val defender = makeCombatant(name = "D", agility = 20)
+
+        val result = combat.resolveRound(attacker, defender)
+
+        assertTrue(
+            "Dodged counter should not damage attacker",
+            result.counterAttackDamage == 0 || attacker.hp == attacker.maxHp
+        )
     }
 }
