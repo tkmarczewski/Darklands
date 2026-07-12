@@ -9,7 +9,7 @@
     "category": "SOCIAL",
     "recommendedLevel": 1,
     "steps": [
-      { "description": "Zbierz zioła z wybrzeża.", "type": "INVESTIGATION", "targetId": "harvest_herbs_coast" },
+      { "description": "Zbierz zioła z wybrzeża.", "type": "DIALOGUE", "targetId": "harvest_herbs_coast" },
       { "description": "Oddaj zioła kupcowi.", "type": "DIALOGUE", "targetId": "merchant_report_back" }
     ]
   },

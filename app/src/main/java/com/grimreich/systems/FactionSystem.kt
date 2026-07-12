@@ -5,7 +5,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 enum class FactionId {
-    CHURCH, ALCHEMISTS, NOBILITY, COMMONERS
+    CHURCH, ALCHEMISTS, NOBILITY, COMMONERS, MILITARY, MERCHANTS
 }
 
 /**
@@ -31,6 +31,8 @@ class FactionSystem @Inject constructor(
         FactionId.COMMONERS -> "PEASANTS"
         FactionId.NOBILITY -> "NOBILITY"
         FactionId.ALCHEMISTS -> "SCHOLARS"
+        FactionId.MILITARY -> "MILITARY"
+        FactionId.MERCHANTS -> "MERCHANTS"
     }
     
     fun getFactionLabel(faction: FactionId): String = when (faction) {
@@ -38,5 +40,7 @@ class FactionSystem @Inject constructor(
         FactionId.ALCHEMISTS -> "Gildia Alchemików"
         FactionId.NOBILITY -> "Żelazna Szlachta"
         FactionId.COMMONERS -> "Pospólstwo"
+        FactionId.MILITARY -> "Wojsko Boreas"
+        FactionId.MERCHANTS -> "Gildia Kupiecka"
     }
 }

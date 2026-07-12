@@ -142,5 +142,25 @@
       }
     },
     "xpReward": 50
+  },
+  {
+    "type": "PAST_SHADE_ELITE",
+    "name": "Cień Przeszłości (Elitarny)",
+    "stats": {
+      "maxHp": 100,
+      "attack": 30,
+      "defense": 20,
+      "speed": 18,
+      "morale": 25
+    },
+    "ai": "TACTICAL",
+    "lootTable": {
+      "goldMin": 0,
+      "goldMax": 0,
+      "itemChances": {
+        "ing_echo_dust": 1.0
+      }
+    },
+    "xpReward": 100
   }
 ]

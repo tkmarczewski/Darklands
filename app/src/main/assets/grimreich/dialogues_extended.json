@@ -25,6 +25,24 @@
     ]
   },
   {
+    "id": "harvest_herbs_coast",
+    "npcId": "none",
+    "text": "Mgła na wybrzeżu jest gęsta i lodowata. Dostrzegasz błękitne kwiaty, które wydają się pulsować w rytm Twojego serca. To rzadkie zioła echa, których szuka kupiec.",
+    "choices": [
+      {
+        "text": "Zbierz zioła (Wymaga: Zwinność 12+).",
+        "targetNodeId": "end",
+        "requiredAttributes": { "agility": 12 },
+        "triggerEvent": "ADVANCE_QUEST",
+        "triggerValue": "q_coast_harvest"
+      },
+      {
+        "text": "Opuść to miejsce.",
+        "targetNodeId": "end"
+      }
+    ]
+  },
+  {
     "id": "verdict_office_per_test",
     "npcId": "ravenn",
     "text": "Gabinet jest sterylny, niemal przerażająco czysty. Ale pod kątem, v którym pada światło lampy gazowej, kurz na ścianach układa się v nienaturalne wzory. To nie kurz. To wyryte v eterze runy, które wymazują pamięć o tym, kto tu przebywał.",
