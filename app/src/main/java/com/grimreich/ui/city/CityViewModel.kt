@@ -49,30 +49,51 @@ class CityViewModel @Inject constructor(
     private val atmosphericDescriptionSystem: AtmosphericDescriptionSystem
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(CityUiState())
-    val uiState: StateFlow<CityUiState> = _uiState.asStateFlow()
+    private val _isQuestMenuOpen = MutableStateFlow(false)
+
+    val uiState: StateFlow<CityUiState> = combine(
+        gameRepository.gameState,
+        _isQuestMenuOpen
+    ) { state, questMenuOpen ->
+        val cityId = state.grimCurrentRegion
+        val cityData = cityCatalogue.get(cityId)
+        
+        val localAvailable = questEngine.getAvailableQuestsForCity(cityId, state)
+        val allAvailable = questEngine.getVisibleQuestBoard(state)
+        val generatedNpcs = npcGenerator.generateForCity(cityId, state)
+
+        val stability = state.world.globalStability
+        val isGrim20 = stability < 35
+        val finalGlitchIntensity = (state.world.echoIntensity + (100 - stability) / 50f).coerceAtMost(5f)
+
+        CityUiState(
+            cityName = if (isGrim20) "KRYPTA_PROCESU" else cityData?.name ?: "Nieznane",
+            cityStatus = atmosphericDescriptionSystem.getCityDescription(cityId),
+            backgroundDrawable = cityData?.backgroundDrawable ?: "bg_region_north_coast",
+            npcs = generatedNpcs,
+            activeLocalQuests = localAvailable,
+            allAvailableQuests = allAvailable,
+            isQuestMenuOpen = questMenuOpen,
+            isGlitchActive = finalGlitchIntensity > 0.5f,
+            glitchIntensity = finalGlitchIntensity,
+            rulingFactionName = com.grimreich.core.FactionCatalogue.findById(cityData?.rulingFaction ?: "")?.name ?: "Neutralna"
+        )
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = CityUiState()
+    )
 
     private val _uiEffect = MutableSharedFlow<CityUiEffect>()
     val uiEffect = _uiEffect.asSharedFlow()
 
     init {
-        gameRepository.gameState
-            .map { it.grimCurrentRegion to it.world.day }
-            .distinctUntilChanged()
-            .onEach { updateUiState(gameRepository.currentState()) }
-            .launchIn(viewModelScope)
-            
-        // Separate flow for non-structural updates (gold, stability etc)
-        gameRepository.gameState
-            .map { Triple(it.gold, it.world.globalStability, it.world.echoIntensity) }
-            .distinctUntilChanged()
-            .onEach { updateVisualsOnly(gameRepository.currentState()) }
-            .launchIn(viewModelScope)
+        // init body is now empty as state is handled via stateIn
     }
 
     fun onEvent(event: CityUiEvent) {
         when (event) {
-            is CityUiEvent.ToggleQuestMenu -> toggleQuestMenu(event.open)
+            is CityUiEvent.ToggleQuestMenu -> _isQuestMenuOpen.value = event.open
             is CityUiEvent.OnNpcClick -> startNpcDialogue(event.npc)
             is CityUiEvent.OnQuestClick -> selectQuestAndOpenDialogue(event.quest)
             CityUiEvent.OnExitClick -> emitEffect(CityUiEffect.NavigateToExit)
@@ -82,10 +103,6 @@ class CityViewModel @Inject constructor(
             CityUiEvent.OnTempleClick -> emitEffect(CityUiEffect.NavigateToTemple)
             CityUiEvent.OnRecruitClick -> emitEffect(CityUiEffect.NavigateToRecruit)
         }
-    }
-
-    private fun toggleQuestMenu(open: Boolean) {
-        _uiState.update { it.copy(isQuestMenuOpen = open) }
     }
 
     private fun emitEffect(effect: CityUiEffect) {
@@ -136,7 +153,7 @@ class CityViewModel @Inject constructor(
     }
 
     private fun selectQuestAndOpenDialogue(quest: QuestDefinition) {
-        toggleQuestMenu(false)
+        _isQuestMenuOpen.value = false
         val status = questEngine.getStatus(quest.id)
         
         val targetNode = if (status == QuestStatus.ACTIVE || status == QuestStatus.OBJECTIVE_MET) {
@@ -146,45 +163,6 @@ class CityViewModel @Inject constructor(
         }
 
         startDialogue(quest.originNpcId.uppercase(), quest.originNpcId, targetNode)
-    }
-
-    private fun updateUiState(state: GameState) {
-        val cityId = state.grimCurrentRegion
-        val cityData = cityCatalogue.get(cityId)
-        
-        val localAvailable = questEngine.getAvailableQuestsForCity(cityId, state)
-        val allAvailable = questEngine.getVisibleQuestBoard(state)
-        val generatedNpcs = npcGenerator.generateForCity(cityId, state)
-
-        val stability = state.world.globalStability
-        val isGrim20 = stability < 35
-        val finalGlitchIntensity = (state.world.echoIntensity + (100 - stability) / 50f).coerceAtMost(5f)
-
-        _uiState.update { 
-            it.copy(
-                cityName = if (isGrim20) "KRYPTA_PROCESU" else cityData?.name ?: "Nieznane",
-                cityStatus = atmosphericDescriptionSystem.getCityDescription(cityId),
-                backgroundDrawable = cityData?.backgroundDrawable ?: "bg_region_north_coast",
-                npcs = generatedNpcs,
-                activeLocalQuests = localAvailable,
-                allAvailableQuests = allAvailable,
-                isGlitchActive = finalGlitchIntensity > 0.5f,
-                glitchIntensity = finalGlitchIntensity,
-                rulingFactionName = com.grimreich.core.FactionCatalogue.findById(cityData?.rulingFaction ?: "")?.name ?: "Neutralna"
-            )
-        }
-    }
-
-    private fun updateVisualsOnly(state: GameState) {
-        val stability = state.world.globalStability
-        val finalGlitchIntensity = (state.world.echoIntensity + (100 - stability) / 50f).coerceAtMost(5f)
-        
-        _uiState.update {
-            it.copy(
-                isGlitchActive = finalGlitchIntensity > 0.5f,
-                glitchIntensity = finalGlitchIntensity
-            )
-        }
     }
 }
 

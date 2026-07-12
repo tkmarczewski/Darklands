@@ -11,9 +11,7 @@ import com.grimreich.systems.QuestEngine
 import com.grimreich.world.CityCatalogue
 import com.grimreich.systems.CombatSystem
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -43,53 +41,56 @@ class DialogueViewModel @Inject constructor(
     private val combatSystem: CombatSystem
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(DialogueUiState())
-    val uiState: StateFlow<DialogueUiState> = _uiState.asStateFlow()
+    val uiState: StateFlow<DialogueUiState> = gameRepository.gameState
+        .map { state ->
+            val action = state.pendingAction
+            val (nodeId, npcName, npcRole) = if (action is com.grimreich.core.PendingWorldAction.Dialogue) {
+                Triple(action.nodeId, action.npcName, action.npcRole)
+            } else {
+                Triple("start", "Nieznajomy", "Mieszkaniec")
+            }
+            
+            val node = dialogueManager.getNode(nodeId)
+            
+            val choicesInfo = node?.choices?.map { choice ->
+                val mainHero = state.party.find { it.id == state.activeHeroId }
+                val mainCanDo = mainHero?.let { checkHeroRequirements(choice, it, state) } ?: false
+                
+                if (mainCanDo) {
+                    ChoiceInfo(choice, isVisible = true, isEnabled = true)
+                } else {
+                    val helper = state.party.find { it.id != state.activeHeroId && checkHeroRequirements(choice, it, state) }
+                    if (helper != null) {
+                        ChoiceInfo(choice, isVisible = true, isEnabled = true, activeHeroName = helper.name)
+                    } else {
+                        // DESIGN CHOICE: Hidden by user request to ensure each playthrough 
+                        // with different stats/heroes reveals different content.
+                        ChoiceInfo(choice, isVisible = false, isEnabled = false)
+                    }
+                }
+            }?.filter { it.isVisible } ?: emptyList()
+
+            val currentCity = cityCatalogue.get(state.grimCurrentRegion)
+
+            DialogueUiState(
+                currentNode = node?.let { dialogueManager.applyWorldEffects(it, state.world.globalStability) },
+                npcName = npcName,
+                npcRole = npcRole,
+                npcPortrait = dialogueManager.getPortrait(npcRole),
+                backgroundDrawable = currentCity?.backgroundDrawable ?: "bg_city_default",
+                availableChoices = choicesInfo,
+                worldStability = state.world.globalStability
+            )
+        }
+        .distinctUntilChanged()
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = DialogueUiState()
+        )
 
     init {
-        viewModelScope.launch {
-            gameRepository.gameState.collect { state ->
-                val action = state.pendingAction
-                val (nodeId, npcName, npcRole) = if (action is com.grimreich.core.PendingWorldAction.Dialogue) {
-                    Triple(action.nodeId, action.npcName, action.npcRole)
-                } else {
-                    Triple("start", "Nieznajomy", "Mieszkaniec")
-                }
-                
-                val node = dialogueManager.getNode(nodeId)
-                
-                val choicesInfo = node?.choices?.map { choice ->
-                    val mainHero = state.party.find { it.id == state.activeHeroId }
-                    val mainCanDo = mainHero?.let { checkHeroRequirements(choice, it, state) } ?: false
-                    
-                    if (mainCanDo) {
-                        ChoiceInfo(choice, isVisible = true, isEnabled = true)
-                    } else {
-                        // Sprawdzamy czy ktoś inny może przejąć rozmowę
-                        val helper = state.party.find { it.id != state.activeHeroId && checkHeroRequirements(choice, it, state) }
-                        if (helper != null) {
-                            ChoiceInfo(choice, isVisible = true, isEnabled = true, activeHeroName = helper.name)
-                        } else {
-                            // DESIGN CHOICE: Hidden by user request to ensure each playthrough 
-                            // with different stats/heroes reveals different content.
-                            ChoiceInfo(choice, isVisible = false, isEnabled = false)
-                        }
-                    }
-                }?.filter { it.isVisible } ?: emptyList()
-
-                val currentCity = cityCatalogue.get(state.grimCurrentRegion)
-
-                _uiState.value = DialogueUiState(
-                    currentNode = node?.let { dialogueManager.applyWorldEffects(it, state.world.globalStability) },
-                    npcName = npcName,
-                    npcRole = npcRole,
-                    npcPortrait = dialogueManager.getPortrait(npcRole),
-                    backgroundDrawable = currentCity?.backgroundDrawable ?: "bg_city_default",
-                    availableChoices = choicesInfo,
-                    worldStability = state.world.globalStability
-                )
-            }
-        }
+        // init body is empty, state is handled via stateIn
     }
 
     private fun checkHeroRequirements(choice: DialogueChoice, hero: com.grimreich.core.Hero, state: GameState): Boolean {
@@ -124,7 +125,7 @@ class DialogueViewModel @Inject constructor(
         val state = gameRepository.currentState()
         
         // WYKRYWANIE POMOCY: Jeśli opcja została wybrana przez "pomocnika", ustawiamy go jako aktywnego
-        val choiceInfo = _uiState.value.availableChoices.find { it.choice == choice }
+        val choiceInfo = uiState.value.availableChoices.find { it.choice == choice }
         choiceInfo?.activeHeroName?.let { helperName ->
             val helper = state.party.find { it.name == helperName }
             if (helper != null) {

@@ -8,6 +8,7 @@ import com.grimreich.core.Hero
 import com.grimreich.grimreich.v1.Item
 import com.grimreich.core.CombatSkill
 import com.grimreich.systems.CombatSystem
+import com.grimreich.systems.SkillCatalogue
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import javax.inject.Inject
@@ -26,22 +27,25 @@ class CombatViewModel @Inject constructor(
     private val combatSystem: CombatSystem
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(CombatUiState())
-    val uiState: StateFlow<CombatUiState> = _uiState.asStateFlow()
+    val uiState: StateFlow<CombatUiState> = gameRepository.gameState
+        .map { state ->
+            CombatUiState(
+                combat = state.combat,
+                party = state.party,
+                potions = state.inventory.filter { it.effects.containsKey("heal") },
+                availableSkills = SkillCatalogue.allSkills,
+                worldStability = state.world.globalStability
+            )
+        }
+        .distinctUntilChanged()
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = CombatUiState()
+        )
 
     init {
-        gameRepository.gameState
-            .onEach { state ->
-                _uiState.update { 
-                    it.copy(
-                        combat = state.combat,
-                        party = state.party,
-                        potions = state.inventory.filter { it.effects.containsKey("heal") },
-                        worldStability = state.world.globalStability
-                    )
-                }
-            }
-            .launchIn(viewModelScope)
+        // No longer need manual collection into _uiState
     }
 
     fun attack() {

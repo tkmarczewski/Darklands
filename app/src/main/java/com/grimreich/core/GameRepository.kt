@@ -62,6 +62,7 @@ class GameRepository @Inject constructor(
     // instead of `synchronized(this)` / Mutex.withLock. Safe to call from any
     // thread, including coroutines launched on Dispatchers.Default (ConcurrencyTest).
     fun updateState(shouldPersist: Boolean = true, transform: (GameState) -> Unit) {
+        val startTime = System.currentTimeMillis()
         stateLock.withReentrantLock {
             val mutable = _gameState.value.deepCopy()
             transform(mutable)
@@ -75,6 +76,10 @@ class GameRepository @Inject constructor(
             if (shouldPersist) {
                 persistCurrentState()
             }
+        }
+        val duration = System.currentTimeMillis() - startTime
+        if (duration > 50) {
+            android.util.Log.w("GameRepository", "PERF: updateState took ${duration}ms (DeepCopy overhead?)")
         }
     }
 
