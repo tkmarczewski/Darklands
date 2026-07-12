@@ -2,6 +2,7 @@ package com.grimreich.grimreich.v1
 
 import kotlin.random.Random
 
+@Deprecated("Legacy loot system. Use LootSystem in systems package instead.")
 class LootMapper(private val itemsById: Map<String, Item>) {
     fun mapEntryToItem(entry: LootEntry): Item? = itemsById[entry.itemId]
     fun rollReward(table: RewardTable, rng: Random = Random.Default): List<Pair<Item, Int>> {

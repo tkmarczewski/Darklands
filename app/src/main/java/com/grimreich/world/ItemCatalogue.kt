@@ -63,7 +63,7 @@ class ItemCatalogue @Inject constructor() {
         reg(id = "pot_heal", name = "Mikstura Zdrowia", type = "potion", value = 25, weight = 0.5, effects = mapOf("heal" to 20))
         reg(id = "pot_mana", name = "Mikstura Many", type = "potion", value = 25, weight = 0.5, effects = mapOf("mana" to 15))
         reg(id = "pot_sanity", name = "Kojący Wywar", type = "potion", value = 40, weight = 0.3, effects = mapOf("sanity" to 15))
-        reg(id = "pot_str", name = "Eliksir Si力を", type = "potion", value = 50, weight = 0.5, effects = mapOf("strength" to 2))
+        reg(id = "pot_str", name = "Eliksir Siły", type = "potion", value = 50, weight = 0.5, effects = mapOf("strength" to 2))
         reg(id = "pot_agi", name = "Eliksir Zręczności", type = "potion", value = 50, weight = 0.5, effects = mapOf("agility" to 2))
 
         // INGREDIENTS

@@ -158,6 +158,7 @@ class DialogueManager @Inject constructor(
 
     fun seedBasicDialogues() {
         nodes.clear()
+        // FAIL-FAST: Load immediately to detect broken assets at startup
         loadNodesFromAsset("grimreich/dialogues_pilot.json")
     }
 }

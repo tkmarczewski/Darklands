@@ -18,7 +18,7 @@ object GrimBuilders {
         dialogue: Map<String, Any>? = null
     ) = NPC(id, name, role, factionId, personality, stats.toMap(), inventory.toList(), dialogue)
 
-    fun basicNPCLifePath(name: String) = NPCLifePath(name, "mist", "blood", "reflection", 1, 1, listOf("birth"), "npc", "ending")
+    fun basicNPCLifePath(name: String) = NPCLifePath(name, "mist", "blood", "reflection", 1f, 1f, listOf("birth"), "npc", "ending")
     fun emptyWorldChronicle(name: String) = WorldChronicle(name, "mist", "blood", "reflection", "fullness", "chaos", "region", "npc", "ending")
     fun defaultNonlinearTime(regionName: String) = NonlinearTime(regionName, 1, 1, 1, 1, 1, emptyList(), "region", "npc", "monster", "ending")
     fun boss(id: String = randomId("boss"), name: String = "Ancient Horror", level: Int = 10, lootTable: RewardTable = rewardTable()) = Boss(id, name, level, lootTable)
@@ -48,13 +48,13 @@ object GrimBuilders {
 
     fun defaultRegionConsciousness(name: String) = RegionConsciousness(name, "mist", "blood", "reflection", "neutral", emptyList(), emptyList(), "none", "none")
     fun defaultFullnessArchitecture(name: String) = FullnessArchitecture(name, "mist", "blood", "reflection", "none", "none", "none", "none")
-    fun defaultFullnessAvatar(name: String) = FullnessAvatar(name, "mist", "blood", "reflection", 1, 1, emptyList(), "none", "none", "none")
+    fun defaultFullnessAvatar(name: String) = FullnessAvatar(name, "mist", "blood", "reflection", 1f, 1f, emptyList(), "none", "none", "none")
     fun defaultAbsoluteMutation(name: String) = AbsoluteMutation(name, 1, 1, 1, 1, emptyList(), "none", "none", "none", "none")
     fun defaultAlternateHistory(name: String) = AlternateHistory(name, "mist", "blood", "reflection", "none", "none", "none", "none", "none")
     fun defaultOtherSideExpedition(name: String, log: String? = null, sym: String? = null, zero: String? = null, enemies: List<String>? = null, rewards: List<String>? = null, impact: String? = null, ending: String? = null) = OtherSideExpedition(name, log ?: "log", sym ?: "sym", zero ?: "zero", enemies ?: emptyList(), rewards ?: emptyList(), impact ?: "none", ending ?: "none")
     fun defaultPhenomenonReligion(name: String, phenom: String? = null, dogma: String? = null, rituals: List<String>? = null, prophets: List<String>? = null, artifacts: List<String>? = null, impact: String? = null, npc: String? = null, ending: String? = null) = PhenomenonReligion(name, phenom ?: "phenom", dogma ?: "dogma", rituals ?: emptyList(), prophets ?: emptyList(), artifacts ?: emptyList(), impact ?: "none", npc ?: "none", ending ?: "none")
     fun defaultFullnessArtifact(name: String) = FullnessArtifact(name, "mist", "blood", "reflection", "none", "none", "none", "none", "none")
-    fun defaultTriLayerRelationship(name: String) = TriLayerRelationship(name, "mist", "blood", "reflection", 1, 1, "none", "none", "none")
+    fun defaultTriLayerRelationship(name: String) = TriLayerRelationship(name, "mist", "blood", "reflection", 1f, 1f, "none", "none", "none")
     fun defaultWorldCollapse(stage: String? = null, loss: Int? = null, layer: Int? = null, region: Int? = null, npc: Int? = null, monster: Int? = null, history: Int? = null, ending: String? = null) = WorldCollapse(stage ?: "stage", loss ?: 1, layer ?: 1, region ?: 1, npc ?: 1, monster ?: 1, history ?: 1, ending ?: "none")
     
     val northCoastConsciousness get() = defaultRegionConsciousness("Wybrzeże Północne")

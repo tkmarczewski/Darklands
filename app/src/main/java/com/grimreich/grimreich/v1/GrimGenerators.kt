@@ -6,7 +6,7 @@ data class GrimQuest(val id:String,val title:String,val description:String,val r
 data class GrimWorldEvent(val id:String,val regionName:String,val title:String,val description:String,val impactOnReputation:Int,val impactOnCollapse:Int)
 
 class NpcGenerator(private val random: Random = Random.Default) { 
-    fun generateNpc(regionName:String, phenomenon:String, power:Int): NPCLifePath = NPCLifePath("${regionName.take(4)}-${random.nextInt(100,999)}","los_$phenomenon","ciało_$phenomenon","dusza_$phenomenon",power.coerceAtMost(10),(power+1).coerceAtMost(10), listOf("narodziny","pęknięcie","rozdarcie"), "impact_$regionName", "ending_$phenomenon") 
+    fun generateNpc(regionName:String, phenomenon:String, power:Int): NPCLifePath = NPCLifePath("${regionName.take(4)}-${random.nextInt(100,999)}","los_$phenomenon","ciało_$phenomenon","dusza_$phenomenon",power.coerceAtMost(10).toFloat(),(power+1).coerceAtMost(10).toFloat(), listOf("narodziny","pęknięcie","rozdarcie"), "impact_$regionName", "ending_$phenomenon")
     @JvmName("aelion_member") fun aelion() = generateNpc("Wybrzeże Północne", "Mgła", 5)
 }
 class QuestGenerator(private val random: Random = Random.Default) { 
