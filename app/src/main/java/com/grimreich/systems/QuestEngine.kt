@@ -102,7 +102,7 @@ class QuestEngine @Inject constructor(
         state.gold += def.rewardGold
         experienceSystem.addPartyXpDirect(state, def.recommendedLevel * 50)
         
-        state.logEntries.add("ZADANIE UKOŃCZONE: ${def.title}. Nagroda: ${def.rewardGold} zł.")
+        state.logEntries.add("ZADANIE UKOŃCZONE: ${def.title}. Otrzymano nagrodę: ${def.rewardGold} zł oraz doświadczenie.")
     }
 
     fun failQuestDirect(state: GameState, questId: String) {

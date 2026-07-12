@@ -129,7 +129,12 @@ fun CombatScreen(
                             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF333333)),
                             shape = MaterialTheme.shapes.extraSmall
                         ) {
-                            Text(skill.name.uppercase(), fontSize = 10.sp, fontWeight = FontWeight.Bold)
+                            val costLabel = buildString {
+                                if (skill.staminaCost > 0) append("${skill.staminaCost}S ")
+                                if (skill.favorCost > 0) append("${skill.favorCost}F ")
+                                if (skill.echoCost > 0) append("${(skill.echoCost * 100).toInt()}%E")
+                            }
+                            Text("${skill.name.uppercase()} ($costLabel)", fontSize = 9.sp, fontWeight = FontWeight.Bold)
                         }
                     }
                 }
