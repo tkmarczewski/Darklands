@@ -143,12 +143,12 @@ fun HeroDto.toDomain(): Hero = Hero(
 
 fun CareerEntryDto.toDomain(): CareerEntry = CareerEntry(
     career = Career.valueOf(careerName),
-    yearsServed = yearsServed
+    yearsServed = yearsServed.toFloat()
 )
 
 fun CareerEntry.toDto(): CareerEntryDto = CareerEntryDto(
     careerName = career.name,
-    yearsServed = yearsServed,
+    yearsServed = yearsServed.toInt(),
     levelReached = 1, // Default
     dateReached = 0L // Default
 )

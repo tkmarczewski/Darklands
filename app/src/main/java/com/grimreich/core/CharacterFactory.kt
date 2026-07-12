@@ -7,21 +7,43 @@ import java.util.UUID
 @Singleton
 class CharacterFactory @Inject constructor(
     private val careerChain: CareerChain,
-    private val agingSystem: AgingSystem
+    private val agingSystem: AgingSystem,
+    private val echoSystem: EchoSystem
 ) {
 
-    fun createHero(name: String, age: Int, career: Career): Hero {
+    fun createHero(name: String, age: Int, career: Career, trainingCycles: Int = 0, echoId: String? = null): Hero {
         val hero = Hero(
             id = "hero_${UUID.randomUUID()}",
             name = name,
-            age = age - 1, // age will be incremented by agingSystem
+            age = age,
             currentCareer = career
         )
         careerChain.applyCareer(career, hero)
         
-        // FIX: Aging must be applied manually here as hero is not yet in GameRepository.
-        // We use a dummy GameState just for logging/state tracking if needed.
-        agingSystem.applyAgingToHero(hero, GameState())
+        // --- LIFE PATH CYCLES (Darklands style) ---
+        repeat(trainingCycles) {
+            // Each cycle adds 5 years of service and increases stats/skills
+            val entry = hero.careerHistory.find { it.career == career }
+            if (entry != null) {
+                val updated = entry.copy(yearsServed = entry.yearsServed + 5f)
+                val index = hero.careerHistory.indexOf(entry)
+                hero.careerHistory[index] = updated
+            }
+            
+            // Skill bonus for training
+            hero.skills.entries.forEach { (skill, value) ->
+                hero.skills[skill] = value + 10
+            }
+            
+            hero.age += 5
+            agingSystem.applyAgingToHero(hero, GameState())
+        }
+        
+        // --- ECHO INHERITANCE ---
+        echoId?.let { id ->
+            echoSystem.linkToEcho(hero, id)
+        }
+
         hero.normalize()
         return hero
     }

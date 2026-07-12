@@ -23,6 +23,17 @@ class VerdictIncidentsSystem @Inject constructor(
         if (state.quest.worldFlags.contains("verdict_campaign_ready") || 
             state.quest.completedQuestIds.contains("q_verdict_1")) return
 
+        // 1. CHOOSE PATH: Suspect or Investigator (once per session)
+        if (!state.quest.worldFlags.any { it.startsWith("verdict_path_") }) {
+            // Chance to be a suspect increases with companion shadows
+            val suspectChance = 0.3f + (state.companionShadows.size * 0.15f)
+            val path = if (kotlin.random.Random.nextFloat() < suspectChance) "SUSPECT" else "INVESTIGATOR"
+            state.quest.worldFlags.add("verdict_path_$path")
+            android.util.Log.d("Verdict", "Path chosen: $path (Suspect chance was $suspectChance)")
+        }
+
+        val isSuspect = state.quest.worldFlags.contains("verdict_path_SUSPECT")
+
         val current = state.quest.progress["meta_verdict_incidents"]?.variables?.get("count") ?: 0
         val next = current + 1
 
@@ -32,14 +43,33 @@ class VerdictIncidentsSystem @Inject constructor(
             variables = mapOf("count" to next)
         )
 
+        // Store city in history for Ravenn's accusation evidence
+        val visitHistory = state.quest.progress["meta_verdict_history"]?.variables?.toMutableMap() ?: mutableMapOf()
+        visitHistory[cityId] = (visitHistory[cityId] ?: 0) + 1
+        state.quest.progress["meta_verdict_history"] = QuestProgress("meta_verdict_history", QuestStatus.ACTIVE, variables = visitHistory.toMap())
+
         // Incydenty pojawiają się wędrownie w dowolnym mieście
         when (next) {
-            1 -> state.logEntries.add("W cieniu bramy ${getCityName(cityId)} dostrzegasz ciało bez ran. Obok wyryto: WYROK WYKONANY.")
-            3 -> state.logEntries.add("Mieszkańcy ${getCityName(cityId)} szepczą o 'beztwarzowych sędziach'. Na murze widnieje runa: WYMAZANA.")
-            5 -> state.logEntries.add("W ruinach na obrzeżach miasta znaleziono listę z Twoim imieniem. Nagłówek głosi: WINNI.")
+            1 -> {
+                val msg = if (isSuspect) "W cieniu bramy ${getCityName(cityId)} dostrzegasz ciało. Masz wrażenie, że ktoś patrzy na Twoje ręce."
+                else "W cieniu bramy ${getCityName(cityId)} dostrzegasz ciało bez ran. Obok wyryto: WYROK WYKONANY."
+                state.logEntries.add(msg)
+            }
+            3 -> {
+                val msg = if (isSuspect) "Mieszkańcy ${getCityName(cityId)} milkną na Twój widok. Strażnik zanotował czas Twojego przyjazdu."
+                else "Mieszkańcy ${getCityName(cityId)} szepczą o 'beztwarzowych sędziach'. Na murze widnieje runa: WYMAZANA."
+                state.logEntries.add(msg)
+            }
+            5 -> {
+                val msg = if (isSuspect) "W ruinach na obrzeżach miasta znaleziono listę 'Pęknięć'. Twoje imię jest na szczycie."
+                else "W ruinach na obrzeżach miasta znaleziono listę z Twoim imieniem. Nagłówek głosi: WINNI."
+                state.logEntries.add(msg)
+            }
             7 -> {
                 state.quest.worldFlags.add("verdict_campaign_ready")
-                state.logEntries.add("Czujesz na sobie wzrok Ravenna. Musisz udać się do Opactwa Ciszy, aby zmierzyć się z Werdyktem.")
+                val msg = if (isSuspect) "Ravenn Beztwarzowy wydał nakaz Twojego doprowadzenia. Czeka w Opactwie Ciszy."
+                else "Czujesz na sobie wzrok Ravenna. Musisz udać się do Opactwa Ciszy, aby zmierzyć się z Werdyktem."
+                state.logEntries.add(msg)
             }
         }
     }

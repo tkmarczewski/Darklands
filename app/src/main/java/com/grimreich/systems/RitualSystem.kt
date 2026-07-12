@@ -32,12 +32,26 @@ class RitualSystem @Inject constructor(
         var success = false
         gameRepository.updateState { state ->
             val hero = state.party.find { it.id == heroId }
-            if (hero != null && hero.isDead && state.gold >= 100) {
-                state.gold -= 100
+            if (hero != null && hero.isDead && state.gold >= 300) {
+                state.gold -= 300
                 hero.isDead = false
                 hero.hp = hero.maxHp / 2
                 hero.corruption += REVIVAL_CORRUPTION_GAIN
                 hero.sanity -= REVIVAL_SANITY_LOSS
+                
+                // ONTOLOGICAL SCAR: Permanent stat reduction (Planescape style)
+                val stats = listOf("strength", "agility", "perception", "intelligence", "endurance", "charisma", "piety")
+                val targetStat = stats.random()
+                applyScar(hero, targetStat)
+                
+                // COMPANION SHADOW: Always awake the shadow upon revival
+                if (state.companionShadows.none { it.id == hero.id }) {
+                    state.companionShadows.add(hero.deepCopy().apply { 
+                        name = "CIEŃ_${name.uppercase()}"
+                        isDead = true 
+                    })
+                }
+
                 hero.normalize()
                 
                 // MORALITY SYSTEM: Resurrecting is a sin against natural order
@@ -47,11 +61,23 @@ class RitualSystem @Inject constructor(
                 // STABILITY FIX: Use system for consistent range validation
                 worldStabilitySystem.changeStabilityDirect(state, -REVIVAL_STABILITY_DRAIN, "Wskrzeszenie")
 
-                state.logEntries.add("Wskrzeszono ${hero.name}. Rzeczywistość drży...")
+                state.logEntries.add("Wskrzeszono ${hero.name}. Dusza wróciła pęknięta, a jej Cień nawiedza świat...")
                 success = true
             }
         }
         return success
+    }
+
+    private fun applyScar(hero: Hero, stat: String) {
+        when (stat) {
+            "strength" -> hero.strength = (hero.strength - 1).coerceAtLeast(1)
+            "agility" -> hero.agility = (hero.agility - 1).coerceAtLeast(1)
+            "perception" -> hero.perception = (hero.perception - 1).coerceAtLeast(1)
+            "intelligence" -> hero.intelligence = (hero.intelligence - 1).coerceAtLeast(1)
+            "endurance" -> hero.endurance = (hero.endurance - 1).coerceAtLeast(1)
+            "charisma" -> hero.charisma = (hero.charisma - 1).coerceAtLeast(1)
+            "piety" -> hero.piety = (hero.piety - 1).coerceAtLeast(1)
+        }
     }
 
     /**

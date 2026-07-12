@@ -295,15 +295,80 @@
     "choices": [
       {
         "text": "Tak, Ravenn. Prowadź.",
-        "targetNodeId": "end",
-        "triggerEvent": "ACTIVATE_QUEST",
-        "triggerValue": "q_verdict_1"
+        "targetNodeId": "ravenn_check_path"
       },
       {
         "text": "To nie moja sprawa.",
         "targetNodeId": "end"
       }
     ]
+  },
+  {
+    "id": "ravenn_check_path",
+    "npcId": "ravenn",
+    "text": "Najpierw muszę wiedzieć, z kim rozmawiam...",
+    "choices": [
+        {
+            "text": "[ANALIZUJ DOWODY]",
+            "targetNodeId": "ravenn_investigator",
+            "triggerEvent": "CHECK_WORLD_FLAG",
+            "triggerValue": "verdict_path_INVESTIGATOR"
+        },
+        {
+            "text": "[OCZEKUJ WYROKU]",
+            "targetNodeId": "ravenn_accused",
+            "triggerEvent": "CHECK_WORLD_FLAG",
+            "triggerValue": "verdict_path_SUSPECT"
+        }
+    ]
+  },
+  {
+    "id": "ravenn_investigator",
+    "npcId": "ravenn",
+    "text": "Twoja trasa podróży jest godna podziwu. Śledziłeś te usterki, zamiast przed nimi uciekać. Pomóż mi wejść do gabinetu, musimy zabezpieczyć dowody.",
+    "choices": [
+        {
+            "text": "Zrobię to. (AKTYWUJ: Gabinet bez śladów)",
+            "targetNodeId": "end",
+            "triggerEvent": "ACTIVATE_QUEST",
+            "triggerValue": "q_verdict_1"
+        }
+    ]
+  },
+  {
+    "id": "ravenn_accused",
+    "npcId": "ravenn",
+    "text": "Bilety Twojej sesji są w komplecie. Wybrzeże, Port, Twierdza... Twoja trasa pokrywa się z każdym morderstwem. Nie szukasz mordercy, Ty nim jesteś, bo tylko Ty przeżywasz każdą usterkę. Co masz na swoją obronę?",
+    "choices": [
+      {
+        "text": "To Szyfr mnie ściga, nie ja go tworzę! (Wymaga: Intelekt 16+)",
+        "targetNodeId": "ravenn_defended",
+        "requiredAttributes": { "intelligence": 16 }
+      },
+      {
+          "text": "To kłamstwa! Nie masz dowodów! (Wymaga: Charyzma 15+)",
+          "targetNodeId": "ravenn_defended",
+          "requiredAttributes": { "charisma": 15 }
+      },
+      {
+        "text": "Nie wyjdę stąd żywy, prawda? (WALKA)",
+        "targetNodeId": "end",
+        "isCombatTrigger": true
+      }
+    ]
+  },
+  {
+      "id": "ravenn_defended",
+      "npcId": "ravenn",
+      "text": "Twoje słowa mają pewną... ontologiczną wagę. No dobrze. Jeśli chcesz dowieść niewinności, wejdź do tego gabinetu i znajdź prawdziwego sprawcę.",
+      "choices": [
+          {
+              "text": "Zrobię to. (AKTYWUJ: Gabinet bez śladów)",
+              "targetNodeId": "end",
+              "triggerEvent": "ACTIVATE_QUEST",
+              "triggerValue": "q_verdict_1"
+          }
+      ]
   },
   {
     "id": "aelion_start",

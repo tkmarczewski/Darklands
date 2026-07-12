@@ -63,7 +63,11 @@ data class Hero(
     val abilities: MutableList<Ability> = mutableListOf(),
     val skills: MutableMap<String, Int> = mutableMapOf(),
     val activeMutations: MutableList<Mutation> = mutableListOf(),
-    val passiveAbilities: MutableSet<String> = mutableSetOf()
+    val passiveAbilities: MutableSet<String> = mutableSetOf(),
+    
+    // CAREER MASTERY (Darklands / Iteration 6)
+    var isMaster: Boolean = false,
+    var masteryTrait: String? = null
 ) {
 
     /**
@@ -75,6 +79,9 @@ data class Hero(
         val oldMaxHp = maxHp
         maxHp = effectiveEndurance() * GameConstants.HP_PER_ENDURANCE + GameConstants.HP_BASE_BONUS
         
+        // Mastery check: 10 years in any career
+        checkMastery()
+
         // If max HP increased (e.g. via stat upgrade), grant the same amount of current HP
         if (maxHp > oldMaxHp && !isDead) {
             hp += (maxHp - oldMaxHp)
@@ -88,8 +95,34 @@ data class Hero(
         endurance = endurance.coerceAtLeast(0)
     }
 
-    fun effectiveStrength(): Int = strength + (if (currentCareer == Career.MERCENARY || currentCareer == Career.KNIGHT) 2 else 0)
-    fun effectiveAgility(): Int = agility + (if (currentCareer == Career.THIEF || currentCareer == Career.ROGUE) 3 else 0)
+    private fun checkMastery() {
+        if (isMaster) return
+        val hasLongService = careerHistory.any { it.yearsServed >= 10 }
+        if (hasLongService) {
+            isMaster = true
+            applyMasteryPerk()
+        }
+    }
+
+    private fun applyMasteryPerk() {
+        masteryTrait = when (currentCareer) {
+            Career.KNIGHT -> "MISTRZ MIECZA (+5 Atak)"
+            Career.MERCENARY -> "WETERAN WOJENNY (+5 Obrona)"
+            Career.SCHOLAR -> "SZYFRANT (Większa odporność na Glitche)"
+            Career.THIEF, Career.ROGUE -> "CIEŃ (Zwiększony unik)"
+            Career.ALCHEMIST -> "MISTRZ TRANSMUTACJI (Silniejsze mikstury)"
+            Career.PRIEST, Career.INQUISITOR -> "ŚWIĘTY GNIEW (Silniejsze modlitwy)"
+            else -> "MISTRZ RZEMIOSŁA"
+        }
+    }
+
+    fun effectiveStrength(): Int = strength + 
+        (if (currentCareer == Career.MERCENARY || currentCareer == Career.KNIGHT) 2 else 0) +
+        (if (isMaster && currentCareer == Career.KNIGHT) 5 else 0)
+
+    fun effectiveAgility(): Int = agility + 
+        (if (currentCareer == Career.THIEF || currentCareer == Career.ROGUE) 3 else 0) +
+        (if (isMaster && (currentCareer == Career.THIEF || currentCareer == Career.ROGUE)) 5 else 0)
     fun effectiveIntelligence(): Int = intelligence + (if (currentCareer == Career.SCHOLAR || currentCareer == Career.ALCHEMIST) 4 else 0)
     fun effectiveEndurance(): Int = endurance + (if (currentCareer == Career.MERCENARY || currentCareer == Career.GUARD) 2 else 0)
 

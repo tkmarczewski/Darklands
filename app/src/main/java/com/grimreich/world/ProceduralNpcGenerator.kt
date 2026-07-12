@@ -37,7 +37,7 @@ class ProceduralNpcGenerator @Inject constructor(
         // --- ADD ECHO SPAWN ---
         if (random.nextFloat() < 0.4f) {
             val shadow = state.companionShadows.randomOrNull(random)
-            if (shadow != null) {
+            if (shadow != null && state.world.echoIntensity > 0.3f) {
                 npcList.add(NPC(
                     id = "echo_${shadow.id}",
                     name = "ECHO_${shadow.name.uppercase().replace(" ", "_")}",
@@ -46,7 +46,7 @@ class ProceduralNpcGenerator @Inject constructor(
                     stability = 0.05f,
                     isInfested = true
                 ))
-            } else {
+            } else if (state.world.echoIntensity > 0.5f) {
                 echoSystem.getRandomEcho()?.let { echo ->
                     npcList.add(NPC(
                         id = "echo_${echo.id}",

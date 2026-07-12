@@ -54,7 +54,7 @@ enum class Career(
 
 data class CareerEntry(
     val career: Career,
-    val yearsServed: Int
+    val yearsServed: Float
 )
 
 @Singleton
@@ -83,7 +83,7 @@ class CareerChain @Inject constructor() {
         
         // Ensure career exists in history, starting with 0 years if new
         if (hero.careerHistory.none { it.career == career }) {
-            hero.careerHistory.add(CareerEntry(career = career, yearsServed = 0))
+            hero.careerHistory.add(CareerEntry(career = career, yearsServed = 0f))
         }
         return hero
     }

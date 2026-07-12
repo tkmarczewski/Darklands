@@ -93,6 +93,27 @@ class EchoSystem @Inject constructor(
     }
 
     /**
+     * Links a new hero to an eternal echo for inheritance.
+     */
+    fun linkToEcho(hero: Hero, echoId: String) {
+        val echo = eternalHeroes.find { it.id == echoId } ?: return
+        
+        // Inheritance logic (Iteration 6)
+        val bonusXp = (echo.xp * 0.1f).toInt().coerceAtLeast(100)
+        hero.xp += bonusXp
+        hero.corruption += 15
+        
+        // Inherit a random high skill
+        val bestSkill = echo.skills.maxByOrNull { it.value }
+        if (bestSkill != null) {
+            val inheritedValue = (bestSkill.value * 0.5f).toInt().coerceAtLeast(20)
+            hero.skills[bestSkill.key] = inheritedValue
+        }
+        
+        android.util.Log.d("EchoSystem", "Hero ${hero.name} linked to Echo ${echo.name}. Bonus XP: $bonusXp")
+    }
+
+    /**
      * Świadome wywołanie pęknięcia rzeczywistości.
      * Obniża stabilność, ale generuje rzadki surowiec.
      */

@@ -53,35 +53,40 @@ class TravelSystem @Inject constructor(
         if (current == destCityId) return
         
         val terrain = worldMap.terrainBetween(current, destCityId)
-        val fatigueCost = when (terrain?.name) {
-            "ROAD" -> 10
-            "FOREST" -> 20
-            "MOUNTAIN" -> 35
-            else -> 15
+        val daysSpent = when (terrain?.name) {
+            "ROAD" -> 7
+            "FOREST" -> 14
+            "MOUNTAIN" -> 21
+            else -> 10
         }
 
         gameRepository.updateState { s ->
             s.grimCurrentRegion = destCityId
             s.world.locationId = destCityId
-            s.world.fatigue = (s.world.fatigue + fatigueCost).coerceAtMost(100)
+            s.world.day += daysSpent
             
-            // Time progression
-            if (s.world.timeOfDay == "morning") {
-                s.world.timeOfDay = "evening"
-            } else {
-                s.world.timeOfDay = "morning"
-                worldStabilitySystem.advanceDayDirect(s, "Koniec dnia w podróży.")
-                s.world.season = currentSeason(s.world.day)
+            // Advance career years (1 year = 365 days)
+            val yearsPassed = daysSpent.toFloat() / 365f
+            s.party.forEach { hero ->
+                val entry = hero.careerHistory.find { it.career == hero.currentCareer }
+                if (entry != null) {
+                    val updated = entry.copy(yearsServed = entry.yearsServed + yearsPassed)
+                    val index = hero.careerHistory.indexOf(entry)
+                    hero.careerHistory[index] = updated
+                }
             }
+
+            s.world.fatigue = (s.world.fatigue + daysSpent * 2).coerceAtMost(100)
             
-            // Travel also contributes to collapse based on fatigue
-            collapseEngine.processCollapseEventDirect(s, CollapseEvent.TravelCompleted(fatigueCost))
+            // Travel also contributes to collapse
+            collapseEngine.processCollapseEventDirect(s, CollapseEvent.TravelCompleted(daysSpent * 2))
             
             if (!s.world.discoveredLocations.contains(destCityId)) {
                 s.world.discoveredLocations.add(destCityId)
             }
             
-            s.logEntries.add("Podróż do ${cityCatalogue.get(destCityId)?.name ?: destCityId} zakończona.")
+            s.logEntries.add("Podróż do ${cityCatalogue.get(destCityId)?.name ?: destCityId} trwała $daysSpent dni.")
+            s.normalizeState()
         }
     }
 
