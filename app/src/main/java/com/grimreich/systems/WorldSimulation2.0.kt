@@ -1,6 +1,7 @@
 package com.grimreich.systems
 
 import com.grimreich.core.GameRepository
+import com.grimreich.core.GameState
 import com.grimreich.systems.CollapseEngine
 import com.grimreich.systems.CollapseEvent
 import javax.inject.Inject
@@ -13,7 +14,11 @@ class WorldSimulation2_0 @Inject constructor(
 ) {
     fun simulate() {
         gameRepository.updateState { s -> 
-            worldStabilitySystem.advanceDayDirect(s, "Symulacja świata postępuje.")
+            simulateDirect(s)
         }
+    }
+
+    fun simulateDirect(state: GameState) {
+        worldStabilitySystem.advanceDayDirect(state, "Symulacja świata postępuje.")
     }
 }

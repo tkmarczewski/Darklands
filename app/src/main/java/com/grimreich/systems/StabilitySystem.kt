@@ -14,23 +14,27 @@ class StabilitySystem @Inject constructor(
 ) {
     fun updateStability(delta: Int) {
         gameRepository.updateState { state ->
-            val current = state.world.globalStability
-            val next = (current + delta).coerceIn(0, 100)
-            state.world.globalStability = next
-            
-            if (delta < 0) state.logEntries.add("Stabilność rzeczywistości słabnie...")
-            
-            // Apply Seasonal Modifiers to heroes based on stability
-            applyAtmosphericEffects(state)
-            
-            // CULMINATION: Zero Stability Logic
-            if (next == 0 && current > 0) {
-                triggerCollapse(state)
-            }
+            updateStabilityDirect(state, delta)
         }
     }
 
-    private fun applyAtmosphericEffects(state: GameState) {
+    fun updateStabilityDirect(state: GameState, delta: Int) {
+        val current = state.world.globalStability
+        val next = (current + delta).coerceIn(0, 100)
+        state.world.globalStability = next
+        
+        if (delta < 0) state.logEntries.add("Stabilność rzeczywistości słabnie...")
+        
+        // Apply Seasonal Modifiers to heroes based on stability
+        applyAtmosphericEffectsDirect(state)
+        
+        // CULMINATION: Zero Stability Logic
+        if (next == 0 && current > 0) {
+            triggerCollapseDirect(state)
+        }
+    }
+
+    private fun applyAtmosphericEffectsDirect(state: GameState) {
         val world = state.world
         val stability = world.globalStability
 
@@ -55,20 +59,21 @@ class StabilitySystem @Inject constructor(
                 }
                 else -> {}
             }
+            // FIX: Normalize after stat changes to update HP etc.
+            hero.normalize()
         }
     }
 
-    private fun triggerCollapse(state: GameState) {
+    private fun triggerCollapseDirect(state: GameState) {
         state.logEntries.add("!!! PARADYGMAT ULEGŁ CAŁKOWITEMU ROZPADOWI !!!")
         state.world.echoIntensity = 1.0f
         state.world.collapseProgress = 1.0f
         
-        // At 0 stability, the world is a graveyard of instances
+        // BUG FIX: One-time heavy penalty instead of infinite drain to prevent soft-lock
         state.party.forEach { hero ->
-            hero.sanity = (hero.sanity - 30).coerceAtLeast(0)
-            if (hero.sanity == 0) {
-                hero.hp = (hero.hp - 10).coerceAtLeast(0)
-            }
+            hero.sanity = (hero.sanity - 50).coerceAtLeast(0)
+            hero.hp = (hero.hp - 20).coerceAtLeast(1) // Leave at least 1 HP to avoid instant wipe
+            hero.normalize()
         }
 
         state.world.weather = WeatherType.STORM // Permanent storm in collapse
