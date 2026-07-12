@@ -251,6 +251,16 @@ class GameRootViewModel @Inject constructor(
         gameRepository.persistCurrentState()
     }
 
+    fun forceSync() {
+        viewModelScope.launch {
+            gameRepository.sync()
+        }
+    }
+
+    fun manualSave(slotId: Int, label: String = "") {
+        gameRepository.manualSave(slotId, label)
+    }
+
     fun startDevCombat() {
         val enemy = Bestiary.get(EnemyType.BANDIT)
         combatSystem.startCombat(enemy)

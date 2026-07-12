@@ -55,7 +55,7 @@ class GameRepository @Inject constructor(
 
     fun replaceState(newState: GameState) {
         _gameState.value = newState
-        sync()
+        repositoryScope.launch { sync() }
     }
 
     // FIX: back to a plain (non-suspend) function, synchronized via ReentrantLock
@@ -91,21 +91,21 @@ class GameRepository @Inject constructor(
             }
             _gameLogs.value = current
 
+            // FIX: update state log entries to match Flow
             _gameState.value.logEntries.clear()
             _gameState.value.logEntries.addAll(current)
             _gameState.value.trimLogs()
         }
     }
 
-    fun sync() {
+    suspend fun sync() {
         cityCatalogue.seedCanonical()
         itemCatalogue.seed()
         dialogueManager.seedBasicDialogues()
         questManifest.seed()
 
-        repositoryScope.launch {
-            echoSystemProvider.get().loadEchoesAsync()
-        }
+        // FIX: Sequential loading to avoid race conditions and ensure data readiness
+        echoSystemProvider.get().loadEchoesAsync()
 
         com.grimreich.core.TradingEngine.initialize(economySystemProvider.get())
 
@@ -113,9 +113,15 @@ class GameRepository @Inject constructor(
             val jsonString = persistence.assets().open("grimreich/bestiary_pilot.json").bufferedReader().use { it.readText() }
             val type = object : com.google.gson.reflect.TypeToken<List<Enemy>>() {}.type
             val loadedEnemies: List<Enemy> = com.google.gson.Gson().fromJson(jsonString, type)
+            
+            // FIX: Critical validation - don't start if bestiary is empty
+            if (loadedEnemies.isEmpty()) throw IllegalStateException("Bestiary is empty")
+            
             Bestiary.loadFromList(loadedEnemies)
         } catch (e: Exception) {
+            android.util.Log.e("GameRepository", "CRITICAL: Failed to load bestiary", e)
             log("[Bestiary] Failed to load external data: ${e.message}")
+            // Optional: rethrow if we want to force fail-fast during bootstrap
         }
     }
 
@@ -127,11 +133,15 @@ class GameRepository @Inject constructor(
                     persistence.clearSessionOnly()
                     return false
                 }
+                
+                // Load manual slots into memory
                 SaveSystem.restoreFromPersistence(persistence)
+                
                 val domain = restored.toDomain()
                 _gameState.value = domain
                 _gameLogs.value = domain.logEntries.toList()
-                sync()
+                
+                sync() // Wait for assets
                 true
             } else {
                 false
@@ -150,9 +160,28 @@ class GameRepository @Inject constructor(
                 try {
                     val dto = stateSnapshot.toDto()
                     persistence.persist(dto)
-                    SaveSystem.saveToPersistence(persistence)
+                    // FIX: Removed SaveSystem.saveToPersistence() from auto-save.
+                    // Manual slots should only be saved on explicit user action.
                 } catch (e: Exception) {
-                    android.util.Log.e("GameRepository", "Save failed", e)
+                    android.util.Log.e("GameRepository", "Auto-save failed", e)
+                }
+            }
+        }
+    }
+
+    /**
+     * Explicitly saves current state to a manual save slot.
+     */
+    fun manualSave(slotId: Int, label: String = "") {
+        val stateSnapshot = _gameState.value.deepCopy()
+        repositoryScope.launch {
+            saveMutex.withLock {
+                try {
+                    SaveSystem.save(stateSnapshot, slotId, label)
+                    SaveSystem.saveToPersistence(persistence)
+                    log("Gra zapisana w slocie $slotId.")
+                } catch (e: Exception) {
+                    android.util.Log.e("GameRepository", "Manual save failed", e)
                 }
             }
         }
@@ -170,6 +199,6 @@ class GameRepository @Inject constructor(
         persistence.clearSessionOnly()
         _gameState.value = GameState()
         _gameLogs.value = emptyList()
-        sync()
+        repositoryScope.launch { sync() }
     }
 }

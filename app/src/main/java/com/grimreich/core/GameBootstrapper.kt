@@ -19,17 +19,16 @@ import javax.inject.Singleton
 @Singleton
 class GameBootstrapper @Inject constructor(
     private val gameRepository: GameRepository,
-    private val questEngine: QuestEngine,
-    private val questManifest: QuestManifest,
-    private val dialogueManager: DialogueManager,
     private val atmosphericLogSystem: AtmosphericLogSystem,
     private val cityCatalogue: CityCatalogue,
-    private val itemCatalogue: ItemCatalogue,
     private val contentValidator: ContentValidator,
     private val worldMap: WorldMap,
     private val heroPool: HeroPool
 ) {
     suspend fun bootstrapFreshWorld(seed: Int = 1) = withContext(Dispatchers.IO) {
+        // FIX: Ensure all catalogs are synced before state manipulation
+        gameRepository.sync()
+
         val oldState = gameRepository.currentState()
         val existingPlayerName = oldState.playerName
         val existingHeroName = oldState.heroName
@@ -38,23 +37,18 @@ class GameBootstrapper @Inject constructor(
             unlockedLegacyBuffs = oldState.persistentMeta.unlockedLegacyBuffs.toMutableSet()
         )
 
-        // Clear all session volatile caches
-        cityCatalogue.clear()
-        cityCatalogue.seedCanonical()
-        itemCatalogue.seed()
-        questEngine.clearRegistry()
-        dialogueManager.seedBasicDialogues()
+        // Clear session volatile caches (synced already above, but we can re-clear if needed)
+        // worldMap is unique to bootstrapper
         worldMap.clear()
         worldMap.seedStage1(seed)
 
-        // FIX-QUESTS: Reset state BEFORE seeding quests so the registry is
-        // populated into a clean slate, not later overwritten by replaceState().
+        // FIX-QUESTS: Reset state BEFORE seeding quests
         gameRepository.replaceState(GameState())
+        
+        // Re-sync after state reset to ensure questEngine is populated in the new state context
+        gameRepository.sync()
 
-        // Seed quests AFTER state reset so they are always available.
-        questManifest.seed()
-
-        // Run content validation after everything is seeded
+        // Run content validation
         val validationErrors = contentValidator.validateAll()
         val criticalCount = validationErrors.count { it.severity == ErrorSeverity.CRITICAL }
         if (criticalCount > 0) {

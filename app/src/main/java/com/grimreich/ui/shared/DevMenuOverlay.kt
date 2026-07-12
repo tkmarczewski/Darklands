@@ -120,7 +120,7 @@ fun DevMenuOverlay(
                             }
                         }
                         DevBtn("FORCE_SYNC") {
-                            root.gameRepository.sync()
+                            root.forceSync()
                         }
                         DevBtn("GIVE HERO") {
                             root.gameRepository.updateState { state ->
@@ -132,7 +132,7 @@ fun DevMenuOverlay(
                             }
                         }
                         DevBtn("TEST FLOW") {
-                            root.gameRepository.sync()
+                            root.forceSync()
                             root.gameRepository.updateState { state ->
                                 if (state.party.isEmpty()) {
                                     val hero = root.characterFactory.createHero("DevHero", 20, com.grimreich.core.Career.MERCENARY)

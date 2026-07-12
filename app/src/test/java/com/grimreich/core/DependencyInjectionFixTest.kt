@@ -53,6 +53,8 @@ class DependencyInjectionFixTest {
         
         // Explicitly trigger sync to see if it loops now
         // It shouldn't, because questEngine uses repo!! which is now set
-        repo.sync()
+        kotlinx.coroutines.runBlocking {
+            repo.sync()
+        }
     }
 }
