@@ -17,12 +17,12 @@ import com.grimreich.systems.RitualSystem
 @Composable
 fun RitualScreen(
     hero: Hero,
-    globalStability: Int,
+    gold: Int,
     ritualSystem: RitualSystem,
     onRevived: () -> Unit,
     onSacrificed: () -> Unit
 ) {
-    val canRevive = ritualSystem.canPerformResurrection(hero, globalStability)
+    val canRevive = ritualSystem.canPerformResurrection(hero, gold)
 
     Column(
         modifier = Modifier
@@ -42,7 +42,7 @@ fun RitualScreen(
         Spacer(modifier = Modifier.height(16.dp))
 
         Text(
-            text = "${hero.name} przekroczył granicę. Jego dusza dryfuje w Pęknięciu. Czy odważysz się przyciągnąć ją z powroce?",
+            text = "${hero.name} przekroczył granicę. Jego dusza dryfuje w Pęknięciu. Czy odważysz się przyciągnąć ją z powrotem?",
             color = Color.LightGray,
             textAlign = TextAlign.Center,
             fontSize = 16.sp
@@ -60,6 +60,7 @@ fun RitualScreen(
                 Text("- Stabilność Świata: -15 (Era Pęknięcia się zbliża)", color = Color.White, fontSize = 14.sp)
                 Text("- Korupcja Bohatera: +20", color = Color.White, fontSize = 14.sp)
                 Text("- Sanity Bohatera: -15", color = Color.White, fontSize = 14.sp)
+                Text("- Koszt: 100 złota", color = Color.White, fontSize = 14.sp)
             }
         }
 
@@ -77,7 +78,7 @@ fun RitualScreen(
                 containerColor = if (canRevive) Color(0xFF400000) else Color.DarkGray
             )
         ) {
-            Text("PERFORM RITUAL OF ECHOES", fontWeight = FontWeight.Bold)
+            Text("WYKONAJ RYTUAŁ ECHA", fontWeight = FontWeight.Bold)
         }
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -95,8 +96,9 @@ fun RitualScreen(
         }
         
         if (!canRevive) {
+            val reason = if (gold < 100) "Masz zbyt mało złota (wymagane 100)." else "Nie można przeprowadzić rytuału."
             Text(
-                "Stabilność świata jest zbyt niska, by przeprowadzić rytuał.",
+                reason,
                 color = Color.Red,
                 fontSize = 12.sp,
                 modifier = Modifier.padding(top = 8.dp)

@@ -107,6 +107,10 @@ class EchoSystem @Inject constructor(
         worldStabilitySystem.changeStability(-20, "Rytuał Wymuszenia Echa")
         
         gameRepository.updateState { s ->
+            // MORALITY SYSTEM: Forcing reality leak is a sin
+            s.prayer.sins += 1
+            s.prayer.normalize()
+
             itemCatalogue.createInstance("ing_echo_dust")?.let { dust ->
                 s.inventory.add(dust)
                 result = "Rzeczywistość pęka... Otrzymano ${dust.name}."

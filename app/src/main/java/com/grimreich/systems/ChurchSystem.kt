@@ -13,6 +13,8 @@ class ChurchSystem @Inject constructor(
         gameRepository.updateState { state ->
             val hero = state.party.find { it.id == heroId } ?: return@updateState
             state.prayer.faith += 5
+            state.prayer.virtue += 1 // MORALITY SYSTEM
+            state.prayer.normalize()
             hero.sanity = (hero.sanity + 10).coerceAtMost(100)
             msg = "${hero.name} oddaje się modlitwie. Spokój spływa na jego duszę (+10 Sanity)."
             state.logEntries.add(msg)
@@ -26,6 +28,8 @@ class ChurchSystem @Inject constructor(
             if (state.gold >= goldAmount) {
                 state.gold -= goldAmount
                 state.prayer.faith += goldAmount / 2
+                state.prayer.virtue += 2 // MORALITY SYSTEM
+                state.prayer.normalize()
                 msg = "Złożono ofiarę w wysokości $goldAmount zł. Bogowie patrzą łaskawiej (+${goldAmount/2} Faith)."
                 state.logEntries.add(msg)
             } else {
@@ -66,6 +70,10 @@ class ChurchSystem @Inject constructor(
             state.gold -= actualGold
             state.inventory.remove(corpseItem)
 
+            // MORALITY SYSTEM: Resurrecting is a sin
+            state.prayer.sins += if (negotiated) 3 else 1
+            state.prayer.normalize()
+
             // Wskrzeszenie
             hero.isDead = false
             hero.hp = 1
@@ -95,6 +103,8 @@ class ChurchSystem @Inject constructor(
             val item = state.inventory.find { it.instanceId == itemId } ?: return@updateState
             state.inventory.remove(item)
             state.world.globalStability += 5
+            state.prayer.virtue += 5 // MORALITY SYSTEM
+            state.prayer.normalize()
             msg = "Oczyszczono relikwię: ${item.name}. Stabilność świata wzrosła."
             state.logEntries.add(msg)
         }

@@ -247,11 +247,11 @@ fun GameNavHost(
         composable(GameRoute.Ritual.route) {
             val ritualVm: com.grimreich.ui.ritual.RitualViewModel = hiltViewModel()
             val hero by ritualVm.deadHero.collectAsState()
-            val stability by ritualVm.globalStability.collectAsState()
+            val gold by ritualVm.gold.collectAsState()
             hero?.let {
                 RitualScreen(
                     hero = it,
-                    globalStability = stability,
+                    gold = gold,
                     ritualSystem = ritualVm.ritualSystem,
                     onRevived = { root.setMode(GameScreenMode.HUB) },
                     onSacrificed = { root.setMode(GameScreenMode.HUB) }

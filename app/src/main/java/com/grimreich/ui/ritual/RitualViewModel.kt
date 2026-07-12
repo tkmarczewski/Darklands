@@ -22,6 +22,10 @@ class RitualViewModel @Inject constructor(
         .map { it.world.globalStability }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), 100)
 
+    val gold: StateFlow<Int> = gameRepository.gameState
+        .map { it.gold }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), 0)
+
     init {
         gameRepository.gameState
             .onEach { state ->

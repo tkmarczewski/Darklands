@@ -25,20 +25,24 @@ class RitualSystem @Inject constructor(
     }
 
     fun canPerformResurrection(hero: Hero, gold: Int): Boolean {
-        return hero.isDead && gold >= 50
+        return hero.isDead && gold >= 100
     }
 
     fun performResurrection(heroId: String): Boolean {
         var success = false
         gameRepository.updateState { state ->
             val hero = state.party.find { it.id == heroId }
-            if (hero != null && hero.isDead && state.gold >= 50) {
-                state.gold -= 50
+            if (hero != null && hero.isDead && state.gold >= 100) {
+                state.gold -= 100
                 hero.isDead = false
                 hero.hp = hero.maxHp / 2
                 hero.corruption += REVIVAL_CORRUPTION_GAIN
                 hero.sanity -= REVIVAL_SANITY_LOSS
                 hero.normalize()
+                
+                // MORALITY SYSTEM: Resurrecting is a sin against natural order
+                state.prayer.sins += 1
+                state.prayer.normalize()
                 
                 // STABILITY FIX: Use system for consistent range validation
                 worldStabilitySystem.changeStabilityDirect(state, -REVIVAL_STABILITY_DRAIN, "Wskrzeszenie")
@@ -62,6 +66,10 @@ class RitualSystem @Inject constructor(
                 // Record in EchoSystem
                 echoSystem.recordHero(hero, context)
                 
+                // MORALITY SYSTEM: Accepting death grants virtue
+                state.prayer.virtue += 3
+                state.prayer.normalize()
+
                 // Remove from party
                 state.party.removeAt(heroIndex)
                 
