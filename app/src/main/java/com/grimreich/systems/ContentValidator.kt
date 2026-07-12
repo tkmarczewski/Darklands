@@ -14,6 +14,8 @@ sealed interface ContentError {
     data class DialogueError(override val message: String, override val severity: ErrorSeverity = ErrorSeverity.CRITICAL) : ContentError
     data class ItemError(override val message: String, override val severity: ErrorSeverity = ErrorSeverity.WARNING) : ContentError
     data class CityError(override val message: String, override val severity: ErrorSeverity = ErrorSeverity.CRITICAL) : ContentError
+    data class BestiaryError(override val message: String, override val severity: ErrorSeverity = ErrorSeverity.CRITICAL) : ContentError
+    data class MutationError(override val message: String, override val severity: ErrorSeverity = ErrorSeverity.CRITICAL) : ContentError
 }
 
 enum class ErrorSeverity {
@@ -38,6 +40,8 @@ class ContentValidator @Inject constructor(
         validateDialogues()
         validateCities()
         validateItems()
+        validateBestiary()
+        validateMutations()
 
         if (questEngine.getAllDefinitions().isEmpty()) {
             _errors.add(ContentError.QuestError("Quest registry is EMPTY. Manifest seeding might have failed.", ErrorSeverity.CRITICAL))
@@ -78,6 +82,17 @@ class ContentValidator @Inject constructor(
                 
                 if (step.type == StepType.DIALOGUE && (!dialogueManager.hasNode(step.targetId))) {
                     _errors.add(ContentError.DialogueError("Quest '${quest.id}' step $index (DIALOGUE) refers to non-existent nodeId: '${step.targetId}'", ErrorSeverity.WARNING))
+                }
+
+                if (step.type == StepType.COMBAT) {
+                    try {
+                        val enemyType = com.grimreich.core.EnemyType.valueOf(step.targetId)
+                        if (com.grimreich.core.Bestiary.get(enemyType).name.contains("Błąd Rzeczywistości")) {
+                            _errors.add(ContentError.QuestError("Quest '${quest.id}' step $index (COMBAT) refers to enemy '$enemyType' which uses fallback bestiary entry.", ErrorSeverity.WARNING))
+                        }
+                    } catch (e: Exception) {
+                        _errors.add(ContentError.QuestError("Quest '${quest.id}' step $index (COMBAT) refers to non-existent enemy type: '${step.targetId}'"))
+                    }
                 }
             }
             
@@ -126,6 +141,31 @@ class ContentValidator @Inject constructor(
             }
             if (item.weight < 0) {
                 _errors.add(ContentError.ItemError("Item '${item.templateId}' has negative weight: ${item.weight}"))
+            }
+        }
+    }
+
+    private fun validateBestiary() {
+        com.grimreich.core.EnemyType.entries.forEach { type ->
+            val enemy = com.grimreich.core.Bestiary.get(type)
+            enemy.lootTable.itemChances.keys.forEach { itemId ->
+                if (itemCatalogue.findByTemplateId(itemId) == null) {
+                    _errors.add(ContentError.BestiaryError("Enemy '$type' loot table refers to non-existent itemId: '$itemId'"))
+                }
+            }
+        }
+    }
+
+    private fun validateMutations() {
+        com.grimreich.core.mutations.MutationRegistry.allMutations.forEach { mutation ->
+            mutation.attributeModifiers.keys.forEach { attr ->
+                val validAttrs = listOf("strength", "agility", "perception", "intelligence", "endurance", "charisma", "piety")
+                if (!validAttrs.contains(attr.lowercase())) {
+                    _errors.add(ContentError.MutationError("Mutation '${mutation.id}' refers to invalid attribute: '$attr'"))
+                }
+            }
+            if (mutation.stabilityImpact > 0) {
+                _errors.add(ContentError.MutationError("Mutation '${mutation.id}' has positive stability impact (+${mutation.stabilityImpact}). Mutations should destabilize the world.", ErrorSeverity.WARNING))
             }
         }
     }
