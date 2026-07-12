@@ -80,6 +80,17 @@ class ProceduralNpcGenerator @Inject constructor(
             ))
         }
 
+        if (cityId == "opactwo_ciszy") {
+            npcList.add(NPC(
+                id = "ravenn",
+                name = if (isGrim20) "OBSERWATOR_RAV" else "Ravenn Beztwarzowy",
+                role = "RAVENN",
+                isRegionalHero = true,
+                startNodeId = "ravenn_start",
+                stability = (worldStability / 100f).coerceIn(0.1f, 1.0f)
+            ))
+        }
+
         // 2. CANONICAL ROLES with procedurally generated epithets
         val baseRoles = listOf("Merchant", "Guard", "Mystic", "Beggar")
         val activeRoles = when(mood) {

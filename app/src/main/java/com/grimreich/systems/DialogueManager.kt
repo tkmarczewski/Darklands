@@ -127,6 +127,11 @@ class DialogueManager @Inject constructor(
             "OPEN_MARKET" -> {
                 state.logEntries.add("Otwierasz okno handlu...")
             }
+            "INCREMENT_STABILITY" -> {
+                val amount = value?.toIntOrNull() ?: 5
+                state.world.globalStability = (state.world.globalStability + amount).coerceAtMost(100)
+                state.logEntries.add("Poczucie celu wzmacnia paradygmat świata.")
+            }
         }
     }
 
@@ -136,6 +141,7 @@ class DialogueManager @Inject constructor(
             "MERCHANT" -> "port_merchant"
             "AELION" -> "port_aelion"
             "MIRA" -> "port_mira"
+            "RAVENN" -> "port_inquisitor"
             "ECHO" -> "port_wraith"
             else -> "port_peasant"
         }

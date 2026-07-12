@@ -75,6 +75,22 @@
     ]
   },
   {
+    "id": "q_blood_1",
+    "title": "Czerwona Rosa",
+    "description": "Zbierz próbki skażonej krwi z pobojowiska w lesie.",
+    "rewardGold": 100,
+    "cityId": "twierdza_zelazna",
+    "originNpcId": "ritualist",
+    "category": "MIXED",
+    "recommendedLevel": 2,
+    "chainId": "chain_blood",
+    "chainOrder": 1,
+    "steps": [
+      { "description": "Przeszukaj las pod Twierdzą.", "type": "EXPEDITION", "targetId": "twierdza_zelazna" },
+      { "description": "Wróć do Rytualisty.", "type": "DIALOGUE", "targetId": "quest_report_back_generic" }
+    ]
+  },
+  {
     "id": "q_blood_5_hard",
     "title": "Wspomnienie, Którego Nie Było: Rytuał Krwi",
     "description": "Rytualista żąda ofiary z Twojego poczytania. Wymagana wysoka pobożność (PIETY) lub siła woli (WILLPOWER).",
@@ -85,6 +101,7 @@
     "recommendedLevel": 6,
     "chainId": "chain_blood",
     "chainOrder": 5,
+    "prerequisiteQuestId": "q_blood_1",
     "steps": [
       { "description": "Przetrwaj próbę rytualną (Test WILL).", "type": "META", "targetId": "blood_ritual_will_test" },
       { "description": "Skonfrontuj się z cieniem.", "type": "COMBAT", "targetId": "PAST_SHADE_ELITE" }

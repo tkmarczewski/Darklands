@@ -289,6 +289,23 @@
     ]
   },
   {
+    "id": "ravenn_start",
+    "npcId": "ravenn",
+    "text": "Zbliż się, wędrowcze. Widzę, że ślady beztwarzowych wyroków nie są ci obce. Boreas krwawi, a Szyfr zaciera ślady. Czy jesteś gotów poznać prawdę o gabinecie bez śladów?",
+    "choices": [
+      {
+        "text": "Tak, Ravenn. Prowadź.",
+        "targetNodeId": "end",
+        "triggerEvent": "ACTIVATE_QUEST",
+        "triggerValue": "q_verdict_1"
+      },
+      {
+        "text": "To nie moja sprawa.",
+        "targetNodeId": "end"
+      }
+    ]
+  },
+  {
     "id": "aelion_start",
     "npcId": "aelion",
     "text": "Kotwico... Twoja obecność tutaj jest jak pęknięcie na tafli jeziora. Czy wiesz, że ten świat jest tylko snem Sędziów?",
@@ -330,7 +347,9 @@
     "choices": [
       {
         "text": "Będę pamiętać.",
-        "targetNodeId": "end"
+        "targetNodeId": "end",
+        "triggerEvent": "INCREMENT_META",
+        "triggerValue": "1"
       }
     ]
   },

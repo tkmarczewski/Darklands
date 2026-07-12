@@ -56,6 +56,11 @@ class QuestEngine @Inject constructor(
         if (actualState.world.day < def.minWorldDay) return QuestStatus.LOCKED
         if (actualState.metaAwarenessLevel < def.requiredMetaAwareness) return QuestStatus.LOCKED
 
+        // NEW: Check for required world flags (e.g. for Verdict chain)
+        if (questId == "q_verdict_1" && !actualState.quest.worldFlags.contains("verdict_campaign_ready")) {
+            return QuestStatus.LOCKED
+        }
+
         if (def.prerequisiteQuestId != null) {
             val preStatus = getStatus(def.prerequisiteQuestId, actualState, visited)
             if (preStatus != QuestStatus.COMPLETED) return QuestStatus.LOCKED
