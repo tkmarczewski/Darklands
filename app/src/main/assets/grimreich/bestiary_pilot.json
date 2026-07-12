@@ -158,9 +158,71 @@
       "goldMin": 0,
       "goldMax": 0,
       "itemChances": {
-        "ing_echo_dust": 1.0
+        "ing_echo_dust": 1.0,
+        "relic_echo_shard": 0.05
       }
     },
     "xpReward": 100
+  },
+  {
+    "type": "RAUBRITTER_BOSS",
+    "name": "Baron von Schatten",
+    "stats": {
+      "maxHp": 150,
+      "attack": 35,
+      "defense": 25,
+      "speed": 16,
+      "morale": 30
+    },
+    "ai": "TACTICAL",
+    "lootTable": {
+      "goldMin": 200,
+      "goldMax": 500,
+      "itemChances": {
+        "relic_broken_rosary": 0.02
+      }
+    },
+    "xpReward": 250
+  },
+  {
+    "type": "CULTIST_PRIEST",
+    "name": "Kapłan Pęknięcia",
+    "stats": {
+      "maxHp": 120,
+      "attack": 25,
+      "defense": 15,
+      "speed": 14,
+      "morale": 40
+    },
+    "ai": "BERSERK",
+    "lootTable": {
+      "goldMin": 100,
+      "goldMax": 300,
+      "itemChances": {
+        "relic_whispering_box": 0.02
+      }
+    },
+    "xpReward": 200
+  },
+  {
+    "type": "DEMON_MAJOR",
+    "name": "Ghul Pierwotny",
+    "stats": {
+      "maxHp": 200,
+      "attack": 40,
+      "defense": 20,
+      "speed": 20,
+      "morale": 50
+    },
+    "ai": "AGGRESSIVE",
+    "lootTable": {
+      "goldMin": 0,
+      "goldMax": 0,
+      "itemChances": {
+        "relic_echo_shard": 0.01,
+        "ing_echo_dust": 0.2
+      }
+    },
+    "xpReward": 400
   }
 ]

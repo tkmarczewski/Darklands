@@ -65,9 +65,29 @@ class AtmosphericLogSystem @Inject constructor() {
         "Niech na świecie zapanuje pokój... choćby na tę jedną chwilę."
     )
 
-    fun getRandomMessage(seed: Long, playerName: String, heroName: String): String {
+    private val glitchMessages = listOf(
+        "Czujesz to? To rzeczywistość traci spójność.",
+        "Twoje imię to tylko etykieta na zużytym procesie, {HERO}.",
+        "Słońce dzisiaj mrugało. To nie była chmura.",
+        "Pustka to nie brak wszystkiego. To obecność niczego.",
+        "Słyszysz? To muzyka sfer gra na pękniętych strunach.",
+        "Nie patrz w dół. Tam nie ma już ziemi.",
+        "Twoja sesja jest tylko marginesem w wielkiej Kronice Pęknięcia.",
+        "{PLAYER}, czy czujesz jak chłód paradygmatu przenika przez ekran Twojej duszy?",
+        "Świat jest błędem, który próbuje się naprawić kosztem Twojej duszy.",
+        "Spójrz w otchłań, a ona zacznie debugować Twoje sny."
+    )
+
+    fun getRandomMessage(seed: Long, playerName: String, heroName: String, stability: Int = 100): String {
         val rng = Random(seed)
-        val raw = templateMessages.random(rng)
+        
+        // REACTION: Favor glitch messages if stability is low
+        val raw = if (stability < 30 && rng.nextFloat() < 0.6f) {
+            glitchMessages.random(rng)
+        } else {
+            templateMessages.random(rng)
+        }
+
         return raw
             .replace("{PLAYER}", playerName)
             .replace("{HERO}", heroName)

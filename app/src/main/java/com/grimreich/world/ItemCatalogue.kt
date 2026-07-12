@@ -84,5 +84,31 @@ class ItemCatalogue @Inject constructor() {
             weight = 50.0, 
             lore = "Ciało, które niegdyś miało duszę. Ciężkie i emanujące chłodem."
         )
+
+        // RELICS (New in Iteration 3 Faza 4)
+        reg(
+            id = "relic_broken_rosary",
+            name = "Pęknięty Różaniec",
+            type = "relic",
+            value = 150,
+            weight = 0.5,
+            lore = "Paciorki ze spalonego drewna. Wciąż czuć w nich echo tysięcy szeptanych modlitw."
+        )
+        reg(
+            id = "relic_whispering_box",
+            name = "Szkatułka Szeptów",
+            type = "relic",
+            value = 300,
+            weight = 2.0,
+            lore = "Zdobiona kością szkatułka, z której wydobywają się stłumione głosy w zapomnianym języku."
+        )
+        reg(
+            id = "relic_echo_shard",
+            name = "Odłamek Echa",
+            type = "relic",
+            value = 500,
+            weight = 0.1,
+            lore = "Kawałek rzeczywistości, który odmówił istnienia. Pulsuje nienaturalnym światłem."
+        )
     }
 }

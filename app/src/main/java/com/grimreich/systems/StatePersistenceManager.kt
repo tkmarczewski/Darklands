@@ -44,21 +44,22 @@ class StatePersistenceManager @Inject constructor(
     private val slotsFile: File get() = File(context.filesDir, slotsFileName)
 
     suspend fun persist(session: SessionStateDto) = withContext(Dispatchers.IO) {
-        // FIX (Security): Add integrity checksum to auto-save session
+        // PERFORMANCE OPTIMIZATION: Encode once, generate checksum from string
         val sessionWithoutChecksum = session.copy(checksum = null)
         val dataJson = json.encodeToString(SessionStateDto.serializer(), sessionWithoutChecksum)
         val checksum = SaveIntegrity.generateChecksum(dataJson)
-        val sessionWithChecksum = session.copy(checksum = checksum)
-        val finalJsonString = json.encodeToString(SessionStateDto.serializer(), sessionWithChecksum)
+        
+        // FORMAT: CHECKSUM<NEWLINE>JSON
+        val finalContent = "$checksum\n$dataJson"
 
         mutex.withLock {
             try {
                 Log.d(TAG, "Persisting session to: ${sessionFile.absolutePath}")
                 
                 FileOutputStream(sessionFile).use { fos ->
-                    fos.write(finalJsonString.toByteArray())
+                    fos.write(finalContent.toByteArray())
                     fos.flush()
-                    fos.fd.sync()
+                    fos.fd.sync() // Ensure physical disk write
                 }
                 Log.d(TAG, "Session persisted successfully. Size: ${sessionFile.length()} bytes")
             } catch (e: Exception) {
@@ -72,26 +73,32 @@ class StatePersistenceManager @Inject constructor(
             Log.d(TAG, "Session file does not exist: ${sessionFile.absolutePath}")
             return@withContext null
         }
-        val session = mutex.withLock {
+        val (checksum, dataJson) = mutex.withLock {
             try {
                 val content = sessionFile.readText()
-                Log.d(TAG, "Restoring session. Content size: ${content.length}")
-                json.decodeFromString(SessionStateDto.serializer(), content)
+                val lines = content.split("\n", limit = 2)
+                if (lines.size < 2) return@withLock null to null
+                lines[0] to lines[1]
             } catch (e: Exception) {
-                Log.e(TAG, "Blad wczytywania sesji z pliku: $sessionFileName", e)
-                null
+                Log.e(TAG, "Blad wczytywania pliku sesji", e)
+                null to null
             }
-        } ?: return@withContext null
+        }
+        
+        if (checksum == null || dataJson == null) return@withContext null
             
-        // FIX (Security): Verify integrity checksum
-        val sessionWithoutChecksum = session.copy(checksum = null)
-        val dataJson = json.encodeToString(SessionStateDto.serializer(), sessionWithoutChecksum)
-        if (!SaveIntegrity.verify(dataJson, session.checksum ?: "")) {
+        // SECURITY: Verify integrity checksum
+        if (!SaveIntegrity.verify(dataJson, checksum)) {
             Log.e(TAG, "Naruszona integralnosc sesji (Checksum mismatch)!")
             return@withContext null
         }
         
-        return@withContext session
+        return@withContext try {
+            json.decodeFromString(SessionStateDto.serializer(), dataJson).copy(checksum = checksum)
+        } catch (e: Exception) {
+            Log.e(TAG, "Blad deserializacji sesji", e)
+            null
+        }
     }
 
     fun exists(): Boolean = sessionFile.exists()
@@ -134,7 +141,7 @@ class StatePersistenceManager @Inject constructor(
                 FileOutputStream(slotsFile).use { fos ->
                     fos.write(data.toByteArray())
                     fos.flush()
-                    fos.fd.sync()
+                    fos.fd.sync() // Ensure physical disk write
                 }
                 Log.d(TAG, "Slots persisted successfully.")
             } catch (e: Exception) {

@@ -85,7 +85,12 @@ class GameBootstrapper @Inject constructor(
             // Inicjalizacja sesji - cytat
             val playerName = state.playerName ?: "Nieznajomy"
             val heroName = state.heroName ?: "Wędrowiec"
-            state.logEntries.add(atmosphericLogSystem.getRandomMessage(System.currentTimeMillis(), playerName, heroName))
+            state.logEntries.add(atmosphericLogSystem.getRandomMessage(
+                System.currentTimeMillis(), 
+                playerName, 
+                heroName,
+                state.world.globalStability
+            ))
 
             // Initial pool of recruits
             state.hireableHeroes.addAll(heroPool.generatePool(GameConstants.MAX_RECRUITS_POOL_SIZE))
