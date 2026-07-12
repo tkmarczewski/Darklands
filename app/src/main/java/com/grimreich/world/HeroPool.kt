@@ -174,8 +174,6 @@ class HeroPool @Inject constructor(
             endurance = end,
             charisma = cha,
             piety = pie,
-            hp = maxHp,
-            maxHp = maxHp,
             currentCareer = career,
             portraitRes = portrait,
             skills = skills,
@@ -186,7 +184,7 @@ class HeroPool @Inject constructor(
                 "shield" to null,
                 "accessory" to null
             )
-        )
+        ).apply { normalize() }
     }
 
     // ── Skills map (reused from old HeroPool) ────────────────────────────────

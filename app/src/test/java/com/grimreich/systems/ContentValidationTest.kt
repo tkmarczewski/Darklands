@@ -6,26 +6,24 @@ import com.grimreich.core.GameRepository
 import com.grimreich.core.GameState
 import com.grimreich.core.WorldMap
 import com.grimreich.core.WorldState
-import com.grimreich.grimreich.v1.DialogueNode
 import com.grimreich.world.CityCatalogue
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
-import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.*
+import org.mockito.kotlin.any
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 import java.io.ByteArrayInputStream
 import java.io.IOException
 
 class ContentValidationTest {
 
     private fun createMockContext(): Context {
-        val context = mock(Context::class.java)
-        val assets = mock(AssetManager::class.java)
-        `when`(context.assets).thenReturn(assets)
-
-        // AUDIT FIX: stub unknown paths to throw, known path returns data
-        `when`(assets.open(any(String::class.java))).thenThrow(IOException("File not found"))
+        val context = mock<Context>()
+        val assets = mock<AssetManager>()
+        whenever(context.assets).thenReturn(assets)
 
         val dummyJson = """
         [
@@ -58,27 +56,33 @@ class ContentValidationTest {
             "npcId": "innkeeper",
             "text": "Czego potrzebujesz?",
             "choices": [
-              { "text": "Pokój", "nextId": "innkeeper_room" },
-              { "text": "Odejdź", "nextId": null }
+              { "text": "Pokój", "targetNodeId": "innkeeper_room" },
+              { "text": "Odejdź", "targetNodeId": "none" }
             ]
           }
         ]
         """.trimIndent()
 
-        `when`(assets.open("grimreich/dialogues_pilot.json"))
-            .thenReturn(ByteArrayInputStream(dummyJson.toByteArray()))
+        // Solidne mockowanie: domyślnie rzuca wyjątek dla wszystkiego, oprócz pliku testowego
+        whenever(assets.open(any())).thenAnswer { invocation -> 
+            if (invocation.arguments[0] == "grimreich/dialogues_pilot.json") {
+                ByteArrayInputStream(dummyJson.toByteArray())
+            } else {
+                throw IOException("File not found")
+            }
+        }
         return context
     }
 
     @Test
     fun dialogueNodes_shouldHaveValidNpcIds() {
-        val mockRepository = mock(GameRepository::class.java)
-        `when`(mockRepository.currentState()).thenReturn(GameState())
+        val mockRepository = mock<GameRepository>()
+        whenever(mockRepository.currentState()).thenReturn(GameState())
 
         val manager = DialogueManager(
             context = createMockContext(),
-            gameRepositoryProvider = dagger.Lazy { mockRepository },
-            questEngine = dagger.Lazy { mock(QuestEngine::class.java) }
+            gameRepositoryProvider = { mockRepository },
+            questEngine = { mock<QuestEngine>() }
         )
         manager.seedBasicDialogues()
 
@@ -93,16 +97,15 @@ class ContentValidationTest {
         assertTrue(manager.hasNode("mira_start"))
     }
 
-    // AUDIT FIX: coverage for branching choices (previously missing)
     @Test
     fun dialogueNode_shouldHaveChoicesWhenDefined() {
-        val mockRepository = mock(GameRepository::class.java)
-        `when`(mockRepository.currentState()).thenReturn(GameState())
+        val mockRepository = mock<GameRepository>()
+        whenever(mockRepository.currentState()).thenReturn(GameState())
 
         val manager = DialogueManager(
             context = createMockContext(),
-            gameRepositoryProvider = dagger.Lazy { mockRepository },
-            questEngine = dagger.Lazy { mock(QuestEngine::class.java) }
+            gameRepositoryProvider = { mockRepository },
+            questEngine = { mock<QuestEngine>() }
         )
         manager.seedBasicDialogues()
 
@@ -110,7 +113,7 @@ class ContentValidationTest {
         assertTrue("Innkeeper node should exist", innkeeperNode != null)
         assertEquals("innkeeper", innkeeperNode?.npcId)
         assertEquals("Node should have 2 choices", 2, innkeeperNode?.choices?.size)
-        assertEquals("innkeeper_room", innkeeperNode?.choices?.first()?.nextId)
+        assertEquals("innkeeper_room", innkeeperNode?.choices?.first()?.targetNodeId)
     }
 
     @Test
@@ -123,13 +126,12 @@ class ContentValidationTest {
         assertTrue("World map city reference issues: $issues", issues.isEmpty())
     }
 
-    // AUDIT FIX: determinism tested directly with explicit seed, not via cached node
     @Test
     fun glitchText_shouldBeDeterministicForSameSeed() {
         val manager = DialogueManager(
-            context = mock(Context::class.java),
-            gameRepositoryProvider = dagger.Lazy { mock(GameRepository::class.java) },
-            questEngine = dagger.Lazy { mock(QuestEngine::class.java) }
+            context = mock<Context>(),
+            gameRepositoryProvider = dagger.Lazy { mock<GameRepository>() },
+            questEngine = dagger.Lazy { mock<QuestEngine>() }
         )
         val seed = 42L
         val input = "Stój! Mgła gęstnieje."
@@ -138,17 +140,16 @@ class ContentValidationTest {
         assertEquals("glitchText must be deterministic for same seed", result1, result2)
     }
 
-    // AUDIT FIX: verify glitch actually mutates text at low stability (was missing)
     @Test
     fun glitchText_shouldMutateTextWhenStabilityIsLow() {
-        val mockRepository = mock(GameRepository::class.java)
+        val mockRepository = mock<GameRepository>()
         val lowStabilityState = GameState(world = WorldState(globalStability = 5))
-        `when`(mockRepository.currentState()).thenReturn(lowStabilityState)
+        whenever(mockRepository.currentState()).thenReturn(lowStabilityState)
 
         val manager = DialogueManager(
-            context = mock(Context::class.java),
+            context = mock<Context>(),
             gameRepositoryProvider = dagger.Lazy { mockRepository },
-            questEngine = dagger.Lazy { mock(QuestEngine::class.java) }
+            questEngine = dagger.Lazy { mock<QuestEngine>() }
         )
         val original = "Stój! Mgła gęstnieje."
         val glitched = manager.glitchText(original, seed = 1337L)
@@ -159,8 +160,8 @@ class ContentValidationTest {
     fun getNode_shouldReturnNullForNonExistentId() {
         val manager = DialogueManager(
             context = createMockContext(),
-            gameRepositoryProvider = dagger.Lazy { mock(GameRepository::class.java) },
-            questEngine = dagger.Lazy { mock(QuestEngine::class.java) }
+            gameRepositoryProvider = dagger.Lazy { mock<GameRepository>() },
+            questEngine = dagger.Lazy { mock<QuestEngine>() }
         )
         manager.seedBasicDialogues()
         assertEquals(null, manager.getNode("non_existent"))
@@ -169,9 +170,9 @@ class ContentValidationTest {
     @Test
     fun glitchText_shouldHandleEmptyString() {
         val manager = DialogueManager(
-            context = mock(Context::class.java),
-            gameRepositoryProvider = dagger.Lazy { mock(GameRepository::class.java) },
-            questEngine = dagger.Lazy { mock(QuestEngine::class.java) }
+            context = mock<Context>(),
+            gameRepositoryProvider = dagger.Lazy { mock<GameRepository>() },
+            questEngine = dagger.Lazy { mock<QuestEngine>() }
         )
         assertEquals("", manager.glitchText("", 123L))
     }
@@ -179,9 +180,9 @@ class ContentValidationTest {
     @Test
     fun getPortrait_shouldReturnDefaultForUnknownRole() {
         val manager = DialogueManager(
-            context = mock(Context::class.java),
-            gameRepositoryProvider = dagger.Lazy { mock(GameRepository::class.java) },
-            questEngine = dagger.Lazy { mock(QuestEngine::class.java) }
+            context = mock<Context>(),
+            gameRepositoryProvider = dagger.Lazy { mock<GameRepository>() },
+            questEngine = dagger.Lazy { mock<QuestEngine>() }
         )
         assertEquals("port_peasant", manager.getPortrait("UNKNOWN"))
     }

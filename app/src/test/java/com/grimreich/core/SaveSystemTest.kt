@@ -51,7 +51,7 @@ class SaveSystemTest {
     @Test
     fun stateHash_shouldChangeWhenQuestIdsChange() = runBlocking {
         val state1 = GameState()
-        val state2 = GameState().apply { activeQuestIds.add("q_plague") }
+        val state2 = GameState().apply { quest.activeQuestIds.add("q_plague") }
 
         val hash1 = SaveSystem.computeStateHash(state1)
         val hash2 = SaveSystem.computeStateHash(state2)
@@ -67,7 +67,7 @@ class SaveSystemTest {
     @Test
     fun stateHash_shouldChangeWhenReputationChanges() = runBlocking {
         val state1 = GameState()
-        val state2 = GameState().apply { reputation = 50 }
+        val state2 = GameState().apply { reputation.globalFactions["test"] = 50 }
 
         val hash1 = SaveSystem.computeStateHash(state1)
         val hash2 = SaveSystem.computeStateHash(state2)

@@ -81,7 +81,6 @@ fun GameNavHost(
             GameScreenMode.CHAR_DETAIL       -> GameRoute.CharDetail.route
             GameScreenMode.TEMPLE            -> GameRoute.Temple.route   // fallback to city
             GameScreenMode.EVENTS            -> GameRoute.Events.route   // fallback to hub
-            else                             -> GameRoute.MainMenu.route
         }
         navController.navigate(route) {
             launchSingleTop = true

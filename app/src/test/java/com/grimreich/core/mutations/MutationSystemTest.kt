@@ -9,10 +9,10 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.mockito.Mock
-import org.mockito.Mockito.`when`
 import org.mockito.Mockito.verifyNoInteractions
 import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.any
+import org.mockito.kotlin.whenever
 
 // AUDIT FIX: deterministic RNG providers for MutationSystem
 class AlwaysTriggerMutationRng : MutationRandomProvider {
@@ -46,8 +46,8 @@ class MutationSystemTest {
         val hero = Hero(id = heroId, name = "Test Hero", age = 25, strength = 10)
         val state = GameState(world = WorldState(globalStability = 0)).apply { party.add(hero) }
 
-        `when`(gameRepository.currentState()).thenReturn(state)
-        `when`(gameRepository.updateState(any(), any())).thenAnswer { invocation ->
+        whenever(gameRepository.currentState()).thenReturn(state)
+        whenever(gameRepository.updateState(any<Boolean>(), any())).thenAnswer { invocation ->
             @Suppress("UNCHECKED_CAST")
             val transform = invocation.arguments[1] as (GameState) -> Unit
             transform(state)
@@ -68,8 +68,8 @@ class MutationSystemTest {
         val hero = Hero(id = heroId, name = "Test Hero", age = 25, strength = 10)
         val state = GameState(world = WorldState(globalStability = 0)).apply { party.add(hero) }
 
-        `when`(gameRepository.currentState()).thenReturn(state)
-        `when`(gameRepository.updateState(any(), any())).thenAnswer { invocation ->
+        whenever(gameRepository.currentState()).thenReturn(state)
+        whenever(gameRepository.updateState(any<Boolean>(), any())).thenAnswer { invocation ->
             @Suppress("UNCHECKED_CAST")
             val transform = invocation.arguments[1] as (GameState) -> Unit
             transform(state)
@@ -89,8 +89,8 @@ class MutationSystemTest {
         val hero = Hero(id = heroId, name = "Test Hero", age = 25, strength = 10)
         val state = GameState(world = WorldState(globalStability = 100)).apply { party.add(hero) }
 
-        `when`(gameRepository.currentState()).thenReturn(state)
-        `when`(gameRepository.updateState(any(), any())).thenAnswer { invocation ->
+        whenever(gameRepository.currentState()).thenReturn(state)
+        whenever(gameRepository.updateState(any<Boolean>(), any())).thenAnswer { invocation ->
             @Suppress("UNCHECKED_CAST")
             val transform = invocation.arguments[1] as (GameState) -> Unit
             transform(state)

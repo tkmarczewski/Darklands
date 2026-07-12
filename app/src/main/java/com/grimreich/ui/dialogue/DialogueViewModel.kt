@@ -140,7 +140,7 @@ class DialogueViewModel @Inject constructor(
             val enemyType = try { 
                 // FIX: If it's a combat trigger but triggerEvent is ADVANCE_QUEST (common for mixed choices),
                 // use a default enemy type if none provided in triggerValue.
-                val typeStr = (if (choice.triggerEvent == "START_COMBAT") choice.triggerValue else choice.triggerValue) ?: "BANDIT"
+                val typeStr = choice.triggerValue ?: "BANDIT"
                 com.grimreich.core.EnemyType.valueOf(typeStr.trim().uppercase())
             } catch (e: Exception) { 
                 com.grimreich.core.EnemyType.BANDIT 

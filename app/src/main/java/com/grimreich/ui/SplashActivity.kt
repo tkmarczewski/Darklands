@@ -26,12 +26,14 @@ class SplashActivity : LocalizedActivity() {
 
         cityCatalogue.seedCanonical()
 
-        lifecycleScope.launchWhenStarted {
-            if (!navigated) {
-                navigated = true
-                delay(2000)
-                startActivity(Intent(this@SplashActivity, MainActivity::class.java))
-                finish()
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                if (!navigated) {
+                    navigated = true
+                    delay(2000)
+                    startActivity(Intent(this@SplashActivity, MainActivity::class.java))
+                    finish()
+                }
             }
         }
     }

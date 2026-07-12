@@ -6,6 +6,7 @@ import com.grimreich.core.WorldState
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
+import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import com.grimreich.contracts.CollapseRandomProvider
@@ -32,7 +33,7 @@ class CollapseEngineTest {
     fun processCollapseEvent_shouldAdvanceProgress() {
         val initialProgress = state.world.collapseProgress
         
-        whenever(gameRepository.updateState(org.mockito.kotlin.any(), org.mockito.kotlin.any())).thenAnswer { invocation ->
+        whenever(gameRepository.updateState(any<Boolean>(), any())).thenAnswer { invocation ->
             val transform = invocation.getArgument<(GameState) -> Unit>(1)
             transform(state)
             null
@@ -49,7 +50,7 @@ class CollapseEngineTest {
         state.world.collapseProgress = 0.59f
         state.world.collapseScenarioId = "BLOOD_RUIN"
         
-        whenever(gameRepository.updateState(org.mockito.kotlin.any(), org.mockito.kotlin.any())).thenAnswer { invocation ->
+        whenever(gameRepository.updateState(any<Boolean>(), any())).thenAnswer { invocation ->
             val transform = invocation.getArgument<(GameState) -> Unit>(1)
             transform(state)
             null

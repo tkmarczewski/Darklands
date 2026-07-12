@@ -14,6 +14,9 @@ class QuestEngine @Inject constructor(
     private val registry = mutableMapOf<String, QuestDefinition>()
 
     fun register(definition: QuestDefinition) {
+        if (registry.containsKey(definition.id)) {
+            android.util.Log.w("QuestEngine", "Duplicate quest ID registered: ${definition.id}. Overwriting.")
+        }
         registry[definition.id] = definition
     }
 
@@ -96,7 +99,6 @@ class QuestEngine @Inject constructor(
         state.quest.activeQuestIds.remove(questId)
         state.quest.completedQuestIds.add(questId)
         state.quest.progress[questId] = p.copy(status = QuestStatus.COMPLETED)
-        state.gold += def.rewardGold
         state.gold += def.rewardGold
         experienceSystem.addPartyXpDirect(state, def.recommendedLevel * 50)
         

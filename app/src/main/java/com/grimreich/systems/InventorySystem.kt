@@ -133,6 +133,7 @@ class InventorySystem @Inject constructor(
         hero.equipment["armor"]?.let { instId -> gear.bodyArmor = state.inventory.find { it.instanceId == instId } }
         hero.equipment["helmet"]?.let { instId -> gear.helmet = state.inventory.find { it.instanceId == instId } }
         hero.equipment["shield"]?.let { instId -> gear.shield = state.inventory.find { it.instanceId == instId } }
+        hero.equipment["accessory"]?.let { instId -> gear.accessory = state.inventory.find { it.instanceId == instId } }
         return gear
     }
 }

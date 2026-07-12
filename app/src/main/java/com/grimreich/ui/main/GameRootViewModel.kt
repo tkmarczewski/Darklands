@@ -213,6 +213,7 @@ class GameRootViewModel @Inject constructor(
                 }
                 if (applied) {
                     hero.attributePoints--
+                    hero.normalize()
                     state.logEntries.add("${hero.name} rozwija swoją naturę: $stat +1.")
                 }
             }
@@ -238,6 +239,7 @@ class GameRootViewModel @Inject constructor(
                     }
                 }
                 hero.attributePoints = 0
+                hero.normalize()
                 state.logEntries.add("${hero.name} poddaje się przeznaczeniu (losowy rozwój).")
             }
         }

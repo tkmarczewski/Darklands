@@ -7,13 +7,13 @@ import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
-import org.mockito.ArgumentMatchers.anyString
 import org.mockito.Mock
-import org.mockito.Mockito.`when`
 import org.mockito.Mockito.atLeastOnce
 import org.mockito.Mockito.verify
 import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.any
+import org.mockito.kotlin.whenever
+
 
 class OntologicalEngineTest {
 
@@ -32,10 +32,11 @@ class OntologicalEngineTest {
     fun `processRealityShift updates global stability`() {
         val initialState = GameState(world = WorldState(globalStability = 50))
         
-        `when`(gameRepository.updateState(any(), any())).thenAnswer { invocation ->
+        whenever(gameRepository.updateState(org.mockito.kotlin.any<Boolean>(), any())).thenAnswer { invocation ->
             @Suppress("UNCHECKED_CAST")
             val transform = invocation.arguments[1] as (GameState) -> Unit
             transform(initialState)
+            null
         }
 
         engine.processRealityShift()
@@ -48,10 +49,11 @@ class OntologicalEngineTest {
     fun `processRealityShift drains stability during expedition`() {
         val initialState = GameState(world = WorldState(globalStability = 100), isExpeditionActive = true)
         
-        `when`(gameRepository.updateState(any(), any())).thenAnswer { invocation ->
+        whenever(gameRepository.updateState(org.mockito.kotlin.any<Boolean>(), any())).thenAnswer { invocation ->
             @Suppress("UNCHECKED_CAST")
             val transform = invocation.arguments[1] as (GameState) -> Unit
             transform(initialState)
+            null
         }
 
         engine.processRealityShift()
@@ -65,23 +67,24 @@ class OntologicalEngineTest {
     fun `processRealityShift logs warning when stability is low`() {
         val lowStabilityState = GameState(world = WorldState(globalStability = 29))
         
-        `when`(gameRepository.updateState(any(), any())).thenAnswer { invocation ->
+        whenever(gameRepository.updateState(org.mockito.kotlin.any<Boolean>(), any())).thenAnswer { invocation ->
             @Suppress("UNCHECKED_CAST")
             val transform = invocation.arguments[1] as (GameState) -> Unit
             transform(lowStabilityState)
+            null
         }
 
         engine.processRealityShift()
 
         if (lowStabilityState.world.globalStability < 30) {
-            verify(gameRepository, atLeastOnce()).log(anyString())
+            verify(gameRepository, atLeastOnce()).log(any())
         }
     }
 
     @Test
     fun `isGlitchActive returns true when stability is very low`() {
         val criticalState = GameState(world = WorldState(globalStability = 0))
-        `when`(gameRepository.currentState()).thenReturn(criticalState)
+        whenever(gameRepository.currentState()).thenReturn(criticalState)
 
         val result = engine.isGlitchActive()
         assertNotNull(result)

@@ -36,6 +36,7 @@ class RitualSystem @Inject constructor(
                 hero.hp = hero.maxHp / 2
                 hero.corruption += REVIVAL_CORRUPTION_GAIN
                 hero.sanity -= REVIVAL_SANITY_LOSS
+                hero.normalize()
                 
                 state.world.globalStability -= REVIVAL_STABILITY_DRAIN
                 state.logEntries.add("Wskrzeszono ${hero.name}. Rzeczywistość drży...")
@@ -70,8 +71,9 @@ class RitualSystem @Inject constructor(
                 }
                 
                 // Ensure activeHeroId is valid
-                if (state.activeHeroId == heroId) {
-                    state.activeHeroId = state.party.firstOrNull()?.id
+                val currentActive = state.party.find { it.id == state.activeHeroId }
+                if (currentActive == null || currentActive.isDead) {
+                    state.activeHeroId = state.party.firstOrNull { !it.isDead }?.id
                 }
                 
                 state.world.globalStability += 5 // Peace brings some stability

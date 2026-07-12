@@ -21,10 +21,11 @@ class ConcurrencyTest {
     private fun buildRepo(): GameRepository {
         val mockPersistence = mock(StatePersistenceManager::class.java)
         return GameRepository(
-            questEngineProvider = { mock(com.grimreich.systems.QuestEngine::class.java) },
-            dialogueManagerProvider = { mock(com.grimreich.systems.DialogueManager::class.java) },
-            questManifestProvider = { mock(com.grimreich.systems.QuestManifest::class.java) },
-            economySystemProvider = { mock(EconomyCalculator::class.java) },
+            questEngineProvider = dagger.Lazy { mock(com.grimreich.systems.QuestEngine::class.java) },
+            dialogueManagerProvider = dagger.Lazy { mock(com.grimreich.systems.DialogueManager::class.java) },
+            questManifestProvider = dagger.Lazy { mock(com.grimreich.systems.QuestManifest::class.java) },
+            economySystemProvider = dagger.Lazy { mock(EconomyCalculator::class.java) },
+            echoSystemProvider = dagger.Lazy { mock(EchoSystem::class.java) },
             persistence = mockPersistence,
             cityCatalogue = CityCatalogue(),
             itemCatalogue = ItemCatalogue()

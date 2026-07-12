@@ -6,7 +6,7 @@ import com.grimreich.grimreich.v1.Item
 import com.grimreich.grimreich.v1.GrimWorldEngineFactory
 
 fun GameState.toDto(): SessionStateDto = SessionStateDto(
-    version = 1,
+    version = SAVE_VERSION,
     playerName = playerName,
     heroName = heroName,
     characterNameLocked = characterNameLocked,
@@ -172,6 +172,7 @@ fun Ability.toDto(): AbilityDto = AbilityDto(
 fun Mutation.toDto(): MutationDto = MutationDto(
     id = id,
     name = name,
+    description = description,
     tier = tier.name,
     category = category.name,
     attributeModifiers = attributeModifiers,
@@ -181,7 +182,7 @@ fun Mutation.toDto(): MutationDto = MutationDto(
 fun MutationDto.toDomain(): Mutation = Mutation(
     id = id,
     name = name,
-    description = "",
+    description = description,
     category = com.grimreich.core.mutations.MutationCategory.valueOf(category),
     tier = com.grimreich.core.mutations.MutationTier.valueOf(tier),
     attributeModifiers = attributeModifiers,

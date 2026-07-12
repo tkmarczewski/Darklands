@@ -176,7 +176,7 @@ class CombatRoundTest {
 
         assertTrue(
             "Dodged counter should not damage attacker",
-            result.counterAttackDamage == 0 || attacker.hp == attacker.maxHp
+            result.defenderDamage == 0 || attacker.hp == attacker.maxHp
         )
     }
 }

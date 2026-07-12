@@ -92,8 +92,18 @@ class ContentValidator @Inject constructor(
         val nodes = dialogueManager.getAllNodes()
         nodes.forEach { (nodeId, node) ->
             node.choices.forEach { choice ->
+                // Target Node Validation
                 if (choice.targetNodeId != "end" && !dialogueManager.hasNode(choice.targetNodeId)) {
                     _errors.add(ContentError.DialogueError("Dialogue node '$nodeId' choice leads to non-existent nodeId: '${choice.targetNodeId}'"))
+                }
+
+                // Quest Trigger Validation
+                when (choice.triggerEvent) {
+                    "ACTIVATE_QUEST", "COMPLETE_QUEST", "FAIL_QUEST", "ADVANCE_QUEST" -> {
+                        if (choice.triggerValue != null && choice.triggerValue != "ACTIVE" && questEngine.getDefinition(choice.triggerValue) == null) {
+                            _errors.add(ContentError.QuestError("Dialogue node '$nodeId' trigger '${choice.triggerEvent}' refers to non-existent questId: '${choice.triggerValue}'", ErrorSeverity.WARNING))
+                        }
+                    }
                 }
             }
         }

@@ -68,24 +68,13 @@ data class GameState(
 
         party.forEach { it.normalize() }
 
-        activeHeroId = party
-            .firstOrNull { !it.isDead }
-            ?.id
-            ?.takeIf { candidate -> party.any { it.id == candidate } }
+        val currentActive = party.find { it.id == activeHeroId }
+        if (currentActive == null || currentActive.isDead) {
+            activeHeroId = party.firstOrNull { !it.isDead }?.id
+        }
 
         trimLogs()
     }
-
-    // FIX: deepCopy now performs true deep copy of Hero.activeMutations, Hero.abilities,
-    // Hero.careerHistory, Hero.passiveAbilities and Hero.skills to prevent shared mutable
-    // references between the original and the copy (required by DeepCopyTest).
-    private fun Hero.deepCopy(): Hero = this.copy(
-        careerHistory = this.careerHistory.toMutableList(),
-        abilities = this.abilities.toMutableList(),
-        skills = this.skills.toMutableMap(),
-        activeMutations = this.activeMutations.map { it.copy() }.toMutableList(),
-        passiveAbilities = this.passiveAbilities.toMutableSet()
-    )
 
     fun deepCopy(): GameState = this.copy(
         party = this.party.map { it.deepCopy() }.toMutableList(),

@@ -14,11 +14,15 @@ class CharacterFactory @Inject constructor(
         val hero = Hero(
             id = "hero_${UUID.randomUUID()}",
             name = name,
-            age = age,
+            age = age - 1, // age will be incremented by agingSystem
             currentCareer = career
         )
         careerChain.applyCareer(career, hero)
-        agingSystem.applyAging(hero.id)
+        
+        // FIX: Aging must be applied manually here as hero is not yet in GameRepository.
+        // We use a dummy GameState just for logging/state tracking if needed.
+        agingSystem.applyAgingToHero(hero, GameState())
+        hero.normalize()
         return hero
     }
 
@@ -26,7 +30,7 @@ class CharacterFactory @Inject constructor(
         val hero = Hero(
             id = "hero_${UUID.randomUUID()}",
             name = name,
-            age = 22,
+            age = 21,
             currentCareer = Career.KNIGHT,
             strength = 14,
             agility = 10,
@@ -34,11 +38,10 @@ class CharacterFactory @Inject constructor(
             intelligence = 9,
             endurance = 12,
             charisma = 11,
-            piety = 10,
-            hp = 30,
-            maxHp = 30
+            piety = 10
         )
-        agingSystem.applyAging(hero.id)
+        agingSystem.applyAgingToHero(hero, GameState())
+        hero.normalize()
         return hero
     }
 
@@ -46,7 +49,7 @@ class CharacterFactory @Inject constructor(
         val hero = Hero(
             id = "hero_${UUID.randomUUID()}",
             name = name,
-            age = 30,
+            age = 29,
             currentCareer = Career.SCHOLAR,
             strength = 8,
             agility = 9,
@@ -54,11 +57,10 @@ class CharacterFactory @Inject constructor(
             intelligence = 15,
             endurance = 8,
             charisma = 10,
-            piety = 12,
-            hp = 20,
-            maxHp = 20
+            piety = 12
         )
-        agingSystem.applyAging(hero.id)
+        agingSystem.applyAgingToHero(hero, GameState())
+        hero.normalize()
         return hero
     }
 
@@ -66,7 +68,7 @@ class CharacterFactory @Inject constructor(
         val hero = Hero(
             id = "hero_${UUID.randomUUID()}",
             name = name,
-            age = 28,
+            age = 27,
             currentCareer = Career.MERCENARY,
             strength = 13,
             agility = 12,
@@ -74,11 +76,10 @@ class CharacterFactory @Inject constructor(
             intelligence = 8,
             endurance = 11,
             charisma = 9,
-            piety = 8,
-            hp = 28,
-            maxHp = 28
+            piety = 8
         )
-        agingSystem.applyAging(hero.id)
+        agingSystem.applyAgingToHero(hero, GameState())
+        hero.normalize()
         return hero
     }
 
@@ -86,7 +87,7 @@ class CharacterFactory @Inject constructor(
         val hero = Hero(
             id = "hero_${UUID.randomUUID()}",
             name = name,
-            age = 25,
+            age = 24,
             currentCareer = Career.MONK,
             strength = 10,
             agility = 10,
@@ -94,11 +95,10 @@ class CharacterFactory @Inject constructor(
             intelligence = 11,
             endurance = 10,
             charisma = 9,
-            piety = 15,
-            hp = 22,
-            maxHp = 22
+            piety = 15
         )
-        agingSystem.applyAging(hero.id)
+        agingSystem.applyAgingToHero(hero, GameState())
+        hero.normalize()
         return hero
     }
 

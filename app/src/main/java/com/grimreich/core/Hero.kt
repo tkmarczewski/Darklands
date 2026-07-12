@@ -113,4 +113,13 @@ data class Hero(
         }
         return armor
     }
+
+    fun deepCopy(): Hero = this.copy(
+        careerHistory = this.careerHistory.toMutableList(),
+        abilities = this.abilities.toMutableList(),
+        skills = this.skills.toMutableMap(),
+        activeMutations = this.activeMutations.map { it.copy() }.toMutableList(),
+        passiveAbilities = this.passiveAbilities.toMutableSet(),
+        equipment = this.equipment.toMutableMap()
+    )
 }

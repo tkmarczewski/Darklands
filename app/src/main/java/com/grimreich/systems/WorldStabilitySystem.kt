@@ -78,8 +78,12 @@ class WorldStabilitySystem @Inject constructor(
         state.normalizeState()
         val after = state.world.collapseProgress
         
-        if (before != after) {
-            state.logEntries.add("Upadek: ${"%.1f".format(after * 100)}%. Powód: $reason")
+        // BUG FIX: Prevent log spam by only logging significant changes (>= 1% or crossing threshold)
+        val beforePct = (before * 100).toInt()
+        val afterPct = (after * 100).toInt()
+        
+        if (beforePct != afterPct) {
+            state.logEntries.add("Upadek: $afterPct%. Powód: $reason")
         }
     }
 }

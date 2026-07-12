@@ -38,10 +38,11 @@ class DependencyInjectionFixTest {
 
         // This is the call that used to fail with StackOverflowError
         repo = GameRepository(
-            questEngineProvider = { questEngine },
-            dialogueManagerProvider = { dialogueManager },
-            questManifestProvider = { questManifest },
-            economySystemProvider = { mock(com.grimreich.core.EconomyCalculator::class.java) },
+            questEngineProvider = dagger.Lazy { questEngine },
+            dialogueManagerProvider = dagger.Lazy { dialogueManager },
+            questManifestProvider = dagger.Lazy { questManifest },
+            economySystemProvider = dagger.Lazy { mock(com.grimreich.core.EconomyCalculator::class.java) },
+            echoSystemProvider = dagger.Lazy { mock(com.grimreich.core.EchoSystem::class.java) },
             persistence = mockPersistence,
             cityCatalogue = cityCatalogue,
             itemCatalogue = itemCatalogue

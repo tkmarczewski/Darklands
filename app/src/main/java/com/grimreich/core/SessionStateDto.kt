@@ -69,7 +69,6 @@ data class SessionStateDto(
     var isExpeditionActive: Boolean,
     var lastSaveTimestamp: Long,
     
-    var grimEchoIntensity: Float = 0f,
     var grimMutationPhase: Int = 0,
     val grantedRewardFlags: List<String> = emptyList(),
     val companionShadows: List<HeroDto> = emptyList(),
@@ -140,6 +139,7 @@ data class AbilityDto(
 data class MutationDto(
     val id: String,
     val name: String,
+    val description: String,
     val tier: String,
     val category: String = "PHYSICAL",
     val attributeModifiers: Map<String, Int>,

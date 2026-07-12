@@ -46,7 +46,7 @@ fun ChronicleScreen(
         Column(modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp)) {
             Text(stringResource(R.string.chronicle_decode_prefix) + "${(progress * 100).toInt()}" + stringResource(R.string.chronicle_decode_suffix), color = Color.Gray, fontSize = 10.sp)
             LinearProgressIndicator(
-                progress = progress,
+                progress = { progress },
                 modifier = Modifier.fillMaxWidth().height(4.dp),
                 color = if (progress >= 1.0f) Color.Yellow else Color(0xFFC0A060),
                 trackColor = Color(0xFF111111)

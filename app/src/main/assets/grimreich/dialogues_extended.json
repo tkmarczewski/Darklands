@@ -2,24 +2,24 @@
   {
     "id": "cracked_chronicle_int_test",
     "npcId": "none",
-    "text": "Kronika drży w Twoich dłoniach. Atrament wydaje się pulsować, układając się w kształty, które nie powinny istnieć. Pomiędzy wierszami dostrzegasz pęknięcia w samej strukturze zapisu – coś próbuje wyciec z tej historii.",
+    "text": "Kronika drży v Twoich dłoniach. Atrament wydaje się pulsować, układając się v kształty, które nie powinny istnieć. Pomiędzy wierszami dostrzegasz pęknięcia v samej strukturze zapisu – coś próbuje wyciec z tej historii.",
     "choices": [
       {
-        "text": "[INT 16+] Odczytaj prawdziwy szyfr ukryty w pęknięciach.",
+        "text": "Odczytaj prawdziwy szyfr ukryty v pęknięciach.",
         "targetNodeId": "mira_report_back",
         "triggerEvent": "ADVANCE_QUEST",
         "triggerValue": "q_scribes_1",
         "requiredAttributes": { "intelligence": 16 }
       },
       {
-        "text": "[PER 14+] Skup się na pulsowaniu atramentu – to kod.",
+        "text": "Skup się na pulsowaniu atramentu – to kod.",
         "targetNodeId": "mira_report_back",
         "triggerEvent": "ADVANCE_QUEST",
         "triggerValue": "q_scribes_1",
         "requiredAttributes": { "perception": 14 }
       },
       {
-        "text": "To tylko błąd w druku. Ignoruj to (Zwykłe czytanie).",
+        "text": "To tylko błąd v druku. Ignoruj to (Zwykłe czytanie).",
         "targetNodeId": "end"
       }
     ]
@@ -27,15 +27,15 @@
   {
     "id": "verdict_office_per_test",
     "npcId": "ravenn",
-    "text": "Gabinet jest sterylny, niemal przerażająco czysty. Ale pod kątem, w którym pada światło lampy gazowej, kurz na ścianach układa się w nienaturalne wzory. To nie kurz. To wyryte w eterze runy, które wymazują pamięć o tym, kto tu przebywał.",
+    "text": "Gabinet jest sterylny, niemal przerażająco czysty. Ale pod kątem, v którym pada światło lampy gazowej, kurz na ścianach układa się v nienaturalne wzory. To nie kurz. To wyryte v eterze runy, które wymazują pamięć o tym, kto tu przebywał.",
     "choices": [
       {
-        "text": "[PER 18+] Dostrzeż geometryczny mechanizm runiczny. To pułapka na percepcję.",
+        "text": "Dostrzeż geometryczny mechanizm runiczny. To pułapka na percepcję.",
         "targetNodeId": "verdict_runes",
         "requiredAttributes": { "perception": 18 }
       },
       {
-        "text": "[INT 15+] Zanalizuj wzory – to sekwencja wymazująca.",
+        "text": "Zanalizuj wzory – to sekwencja wymazująca.",
         "targetNodeId": "verdict_runes",
         "requiredAttributes": { "intelligence": 15 }
       },
@@ -51,14 +51,14 @@
     "text": "Rytualista wyciąga ku Tobie dłonie czarne od zaschniętej krwi. 'Oddaj mi swoje wspomnienie o matce. Złamię twoją wolę, by zobaczyć prawdę o twojej krwi. Jeśli się oprzesz, twoja krew poświadczy o twoim zakłamaniu.'",
     "choices": [
       {
-        "text": "[WILL 16+] Skup się na swoim wnętrzu i odeprzyj wizję rytuału.",
+        "text": "Skup się na swoim wnętrzu i odeprzyj wizję rytuału.",
         "targetNodeId": "blood_ritual_success",
         "triggerEvent": "ADVANCE_QUEST",
         "triggerValue": "q_blood_5_hard",
         "requiredAttributes": { "willpower": 16 }
       },
       {
-        "text": "[PIETY 18+] Zmów krótką modlitwę o ochronę duszy.",
+        "text": "Zmów krótką modlitwę o ochronę duszy.",
         "targetNodeId": "blood_ritual_success",
         "triggerEvent": "ADVANCE_QUEST",
         "triggerValue": "q_blood_5_hard",
@@ -84,17 +84,17 @@
   {
     "id": "margin_note_complex",
     "npcId": "archivist",
-    "text": "Dopisek na stronie Kroniki: 'Podmiot wykazuje anomalie w percepcji. Czytanie kodu źródłowego zakończone sukcesem. Czy on widzi nas, czy tylko my widzimy go?' Słowa zaczynają się obracać na stronie.",
+    "text": "Dopisek na stronie Kroniki: 'Podmiot wykazuje anomalie v percepcji. Czytanie kodu źródłowego zakończone sukcesem. Czy on widzi nas, czy tylko my widzimy go?' Słowa zaczynają się obracać na stronie.",
     "choices": [
       {
-        "text": "[PER 20+] Zrozum, że to komentarz bezpośrednio do Ciebie.",
+        "text": "Zrozum, że to komentarz bezpośrednio do Ciebie.",
         "targetNodeId": "meta_truth_reveal",
         "triggerEvent": "INCREMENT_META",
         "triggerValue": "2",
         "requiredAttributes": { "perception": 20 }
       },
       {
-        "text": "[INT 18+] Próbuj rozszyfrować autorów tej notatki.",
+        "text": "Próbuj rozszyfrować autorów tej notatki.",
         "targetNodeId": "meta_truth_reveal",
         "triggerEvent": "INCREMENT_META",
         "triggerValue": "1",

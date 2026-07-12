@@ -33,7 +33,10 @@ class MutationSystem @Inject constructor(
         private const val STAT_CAP = 99
     }
 
-    suspend fun checkForNewMutation(heroId: String, regionId: String, currentStability: Int) {
+    // FIX: reverted from suspend back to a plain function. The only production
+    // call-site (MutationEngine.processMutations) calls this synchronously
+    // inside gameRepository.updateState { }, which is itself synchronous again.
+    fun checkForNewMutation(heroId: String, regionId: String, currentStability: Int) {
         gameRepository.updateState { state ->
             checkForNewMutationDirect(state, heroId, regionId, currentStability)
         }

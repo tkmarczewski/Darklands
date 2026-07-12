@@ -50,7 +50,7 @@ class EncounterSystem @Inject constructor(
             "Twoje zmysły podpowiadają, że pod luźnym kamieniem coś się znajduje.",
             EncounterType.RESOURCE,
             listOf(
-                EncounterChoice("[Perception 12] Przeszukaj skrytkę", "Znalazłeś stare monety!",
+                EncounterChoice("Przeszukaj skrytkę", "Znalazłeś stare monety!",
                     "perception", 12, effect = { state ->
                         state.gold += 50
                         "Znalazłeś 50 złota!"
@@ -63,7 +63,7 @@ class EncounterSystem @Inject constructor(
             "Na środku drogi stoi dziwna, pulsująca maszyna echa.",
             EncounterType.INTERACTIVE,
             listOf(
-                EncounterChoice("[Intelligence 14] Rozszyfruj działanie",
+                EncounterChoice("Rozszyfruj działanie",
                     "Ustabilizowałeś fragment rzeczywistości!", "intelligence", 14,
                     effect = { state ->
                         state.world.globalStability += 10
@@ -80,7 +80,7 @@ class EncounterSystem @Inject constructor(
             EncounterType.INTERACTIVE,
             listOf(
                 EncounterChoice(
-                    "[Intelligence 14] Pomóż mu skatalogować otoczenie",
+                    "Pomóż mu skatalogować otoczenie",
                     "Pamięć jest kotwicą.", "intelligence", 14,
                     effect = { s ->
                         chronicleSystem.get().unlock("lore_fracture_origin")
@@ -88,7 +88,7 @@ class EncounterSystem @Inject constructor(
                         "Twoja pomoc uspokaja Archiwistę. Wręcza Ci zapisany zwój."
                     }),
                 EncounterChoice(
-                    "Zabierz księgę siłą [Strength 15]",
+                    "Zabierz księgę siłą",
                     "Księga rozpada się w proch.", "strength", 15,
                     effect = { s ->
                         s.gold += 100
@@ -104,13 +104,13 @@ class EncounterSystem @Inject constructor(
             "'Piksele spadają jak śnieg.'",
             EncounterType.INTERACTIVE,
             listOf(
-                EncounterChoice("[Charisma 13] Uspokój dziecko",
+                EncounterChoice("Uspokój dziecko",
                     "Rzeczywistość odzyskuje ostrość.", "charisma", 13,
                     effect = { s ->
                         s.party.forEach { h -> h.hp = (h.hp + 10).coerceAtMost(h.maxHp) }
                         "Dziewczynka uśmiecha się. Odzyskaliście spokój ducha."
                     }),
-                EncounterChoice("[Perception 15] Zbadaj niebo",
+                EncounterChoice("Zbadaj niebo",
                     "Widzisz błękitny kod.", "perception", 15,
                     effect = { s ->
                         chronicleSystem.get().unlock("lore_scribes")

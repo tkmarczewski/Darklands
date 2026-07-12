@@ -16,7 +16,6 @@ class CombatSystem @Inject constructor(
     private val lootSystem: LootSystem
 ) {
     private var onCombatEnd: (() -> Unit)? = null
-    private var currentEnemy: Enemy? = null
     private var pendingCombatEndCallback: (() -> Unit)? = null
 
     private fun heroToCombatant(state: GameState, hero: Hero): CombatantState {
@@ -39,7 +38,6 @@ class CombatSystem @Inject constructor(
     }
 
     fun startCombat(enemy: Enemy, onEnd: (() -> Unit)? = null) {
-        currentEnemy = enemy
         onCombatEnd = onEnd
         
         gameRepository.updateState { state ->
@@ -51,6 +49,8 @@ class CombatSystem @Inject constructor(
             state.combat.enemyMaxHp = enemy.stats.maxHp
             state.combat.enemyAttack = enemy.stats.attack
             state.combat.enemyDefense = enemy.stats.defense
+            state.combat.enemyAgility = enemy.stats.speed
+            state.combat.enemyStrength = 10
             state.combat.enemyStamina = 10
             state.combat.activeHeroId = state.party.firstOrNull { !it.isDead }?.id
             state.combat.log.clear()
@@ -133,16 +133,6 @@ class CombatSystem @Inject constructor(
         var result = ""
         pendingCombatEndCallback = null
 
-        if (currentEnemy == null && gameRepository.currentState().combat.active) {
-            val savedTypeStr = gameRepository.currentState().combat.enemyType
-            val type = try { 
-                if (savedTypeStr != null) EnemyType.valueOf(savedTypeStr) else EnemyType.BANDIT 
-            } catch (e: Exception) { 
-                EnemyType.BANDIT 
-            }
-            currentEnemy = Bestiary.get(type)
-        }
-
         gameRepository.updateState { state ->
             val c = state.combat
             if (!c.active || c.initiativeOrder.isEmpty()) return@updateState
@@ -150,8 +140,6 @@ class CombatSystem @Inject constructor(
             // 1. Ensure it's a player turn
             var currentSlot = c.initiativeOrder[c.currentTurnIndex]
             if (!currentSlot.isPlayer) {
-                // Should not happen if UI is locked during enemy turns, 
-                // but we handle it by resolving enemy turns until it IS a player turn.
                 resolveEnemyTurnsInternal(state)
                 currentSlot = c.initiativeOrder[c.currentTurnIndex]
                 if (!currentSlot.isPlayer) return@updateState
@@ -165,8 +153,7 @@ class CombatSystem @Inject constructor(
             }
             
             val heroCombatant = heroToCombatant(state, actingHero)
-            val enemy = currentEnemy ?: return@updateState
-            val enemyCombatant = getEnemyCombatant(c, enemy)
+            val enemyCombatant = getEnemyCombatant(c)
 
             if (c.currentTurnIndex == 0) c.round++
             result = "Runda ${c.round}"
@@ -207,10 +194,9 @@ class CombatSystem @Inject constructor(
 
     private fun resolveEnemyTurnsInternal(state: GameState) {
         val c = state.combat
-        val enemy = currentEnemy ?: return
         
         while (c.active && !c.initiativeOrder[c.currentTurnIndex].isPlayer) {
-            val enemyCombatant = getEnemyCombatant(c, enemy)
+            val enemyCombatant = getEnemyCombatant(c)
             val aliveHeroes = state.party.filter { !it.isDead }
             if (aliveHeroes.isEmpty()) {
                 c.active = false
@@ -221,7 +207,7 @@ class CombatSystem @Inject constructor(
             val targetHero = aliveHeroes.random()
             val targetCombatant = heroToCombatant(state, targetHero)
             
-            c.log.add("Tura przeciwnika: ${enemy.name} atakuje ${targetHero.name}!")
+            c.log.add("Tura przeciwnika: ${c.enemyName} atakuje ${targetHero.name}!")
             val enemyRound = combatRound.resolveRound(enemyCombatant, targetCombatant)
             c.log.addAll(enemyRound.log)
             
@@ -240,17 +226,17 @@ class CombatSystem @Inject constructor(
         }
     }
 
-    private fun getEnemyCombatant(c: CombatState, enemy: Enemy) = CombatantState(
-        name = enemy.name,
+    private fun getEnemyCombatant(c: CombatState) = CombatantState(
+        name = c.enemyName,
         hp = c.enemyHp,
         maxHp = c.enemyMaxHp,
         endurance = c.enemyStamina,
         morale = 80,
-        armor = enemy.stats.defense / 2,
-        attackBase = enemy.stats.attack,
-        strength = 10,
-        agility = 10,
-        intelligence = 10,
+        armor = c.enemyDefense,
+        attackBase = c.enemyAttack,
+        strength = c.enemyStrength,
+        agility = c.enemyAgility,
+        intelligence = c.enemyIntelligence,
         activeEffects = c.enemyEffects.toMutableList()
     )
 
@@ -265,7 +251,7 @@ class CombatSystem @Inject constructor(
         )?.let { state.inventory.add(it) }
         
         if (state.companionShadows.none { it.id == hero.id }) {
-            state.companionShadows.add(hero.copy())
+            state.companionShadows.add(hero.deepCopy())
         }
         state.combat.initiativeOrder.removeAll { it.id == hero.id }
     }
@@ -273,11 +259,17 @@ class CombatSystem @Inject constructor(
     private fun handleCombatWin(state: GameState, c: CombatState) {
         c.active = false
         c.log.add("${c.enemyName} pokonany!")
-        currentEnemy?.let { enemyDef ->
+        
+        val typeStr = c.enemyType
+        val type = try { 
+            if (typeStr != null) EnemyType.valueOf(typeStr) else null 
+        } catch (e: Exception) { null }
+        
+        val enemyDef = type?.let { Bestiary.get(it) }
+        if (enemyDef != null) {
             experienceSystem.addPartyXpDirect(state, enemyDef.xpReward).forEach { c.log.add(it) }
             lootSystem.awardLootFromTableDirect(state, enemyDef.lootTable).forEach { c.log.add(it) }
         }
-        currentEnemy = null
 
         val action = state.pendingAction
         if (action is com.grimreich.core.PendingWorldAction.QuestCombatWin) {

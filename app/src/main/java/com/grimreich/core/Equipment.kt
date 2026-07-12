@@ -14,19 +14,23 @@ data class EquippedItems(
     var weapon: Item? = null,
     var shield: Item? = null,
     var helmet: Item? = null,
-    var bodyArmor: Item? = null
+    var bodyArmor: Item? = null,
+    var accessory: Item? = null
 ) {
     fun totalDefense(): Int =
         (shield?.effects?.get("defense") ?: 0) + 
         (helmet?.effects?.get("defense") ?: 0) + 
-        (bodyArmor?.effects?.get("defense") ?: 0)
+        (bodyArmor?.effects?.get("defense") ?: 0) +
+        (accessory?.effects?.get("defense") ?: 0)
 
     fun totalAttack(): Int =
-        weapon?.effects?.get("attack") ?: 1
+        (weapon?.effects?.get("attack") ?: 1) +
+        (accessory?.effects?.get("attack") ?: 0)
 
     fun totalWeight(): Float =
         ((weapon?.weight ?: 0.0) + (shield?.weight ?: 0.0) +
-        (helmet?.weight ?: 0.0) + (bodyArmor?.weight ?: 0.0)).toFloat()
+        (helmet?.weight ?: 0.0) + (bodyArmor?.weight ?: 0.0) +
+        (accessory?.weight ?: 0.0)).toFloat()
 
     fun canEquip(item: Item, hero: Hero): Boolean {
         val reqStr = item.effects["minStrength"] ?: 0

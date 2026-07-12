@@ -1,6 +1,7 @@
 package com.grimreich.systems
 
 import com.grimreich.core.GameRepository
+import com.grimreich.grimreich.v1.Item
 import com.grimreich.world.ItemCatalogue
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -38,19 +39,19 @@ class AlchemySystem @Inject constructor(
                 return@updateState
             }
             
+            val itemsToRemove = mutableListOf<Item>()
             for ((ingId, qty) in recipe.ingredients) {
-                val count = state.inventory.count { it.templateId == ingId }
-                if (count < qty) {
-                    result = "Brak składnika: $ingId ($count/$qty)."
+                val found = state.inventory.filter { it.templateId == ingId }
+                if (found.size < qty) {
+                    result = "Brak składnika: $ingId (${found.size}/$qty)."
                     return@updateState
                 }
+                itemsToRemove.addAll(found.take(qty))
             }
 
-            recipe.ingredients.forEach { (ingId, qty) ->
-                repeat(qty) {
-                    state.inventory.find { it.templateId == ingId }?.let { state.inventory.remove(it) }
-                }
-            }
+            // Atomic removal after all checks pass
+            itemsToRemove.forEach { state.inventory.remove(it) }
+
             itemCatalogue.createInstance(recipe.resultItemId)?.let { state.inventory.add(it) }
             result = "Sukces! Uwarzono ${resultItem.name}."
             state.logEntries.add("Alchemia: $result")

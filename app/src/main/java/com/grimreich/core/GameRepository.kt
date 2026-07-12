@@ -14,6 +14,8 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import java.util.concurrent.locks.ReentrantLock
+import kotlin.concurrent.withLock as withReentrantLock
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -31,11 +33,13 @@ class GameRepository @Inject constructor(
     private val repositoryScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
     private val saveMutex = Mutex()
 
-    // FIX: stateMutex replaces synchronized(this) for coroutine-safe state mutation.
-    // synchronized() blocks the thread and is incompatible with suspend functions and
-    // Dispatchers.Default. Mutex.withLock() suspends instead of blocking, enabling
-    // safe concurrent access from multiple coroutines (required by ConcurrencyTest).
-    private val stateMutex = Mutex()
+    // FIX: reverted from suspend/Mutex back to a synchronous ReentrantLock.
+    // updateState() is called synchronously from ~44 production call-sites
+    // (NpcAI, AgingSystem, TravelSystem, TavernViewModel, etc.). Making it
+    // suspend would break all of them. ReentrantLock still gives thread-safety
+    // under concurrent coroutine access (Dispatchers.Default), because callers
+    // simply block briefly on the lock instead of the function suspending.
+    private val stateLock = ReentrantLock()
 
     private val questEngine get() = questEngineProvider.get()
     private val dialogueManager get() = dialogueManagerProvider.get()
@@ -54,13 +58,11 @@ class GameRepository @Inject constructor(
         sync()
     }
 
-    // FIX: updateState is now a suspend function using Mutex.withLock() instead of
-    // synchronized(this). This prevents thread starvation under concurrent coroutine
-    // access and passes ConcurrencyTest (100 parallel coroutines updating gold).
-    // Non-suspend callers from legacy code should wrap in runBlocking { } or
-    // launch a coroutine — see GameLoopController for the standard pattern.
-    suspend fun updateState(shouldPersist: Boolean = true, transform: (GameState) -> Unit) {
-        stateMutex.withLock {
+    // FIX: back to a plain (non-suspend) function, synchronized via ReentrantLock
+    // instead of `synchronized(this)` / Mutex.withLock. Safe to call from any
+    // thread, including coroutines launched on Dispatchers.Default (ConcurrencyTest).
+    fun updateState(shouldPersist: Boolean = true, transform: (GameState) -> Unit) {
+        stateLock.withReentrantLock {
             val mutable = _gameState.value.deepCopy()
             transform(mutable)
             mutable.normalizeState()
@@ -77,26 +79,22 @@ class GameRepository @Inject constructor(
     }
 
     // Overload for callers that pass a String tag (e.g. ConcurrencyTest, GameLoopController).
-    suspend fun updateState(tag: String, transform: (GameState) -> Unit) =
+    fun updateState(tag: String, transform: (GameState) -> Unit) =
         updateState(shouldPersist = true, transform = transform)
 
-    // Synchronous bridge for legacy call-sites that cannot be converted to suspend yet.
-    // Runs on the caller's thread using runBlocking — do NOT call from a coroutine context.
-    fun updateStateBlocking(shouldPersist: Boolean = true, transform: (GameState) -> Unit) {
-        kotlinx.coroutines.runBlocking { updateState(shouldPersist, transform) }
-    }
-
     fun log(message: String) {
-        val current = _gameLogs.value.toMutableList()
-        current.add(message)
-        if (current.size > GameConstants.MAX_LOG_ENTRIES) {
-            current.removeAt(0)
-        }
-        _gameLogs.value = current
+        stateLock.withReentrantLock {
+            val current = _gameLogs.value.toMutableList()
+            current.add(message)
+            if (current.size > GameConstants.MAX_LOG_ENTRIES) {
+                current.removeAt(0)
+            }
+            _gameLogs.value = current
 
-        _gameState.value.logEntries.clear()
-        _gameState.value.logEntries.addAll(current)
-        _gameState.value.trimLogs()
+            _gameState.value.logEntries.clear()
+            _gameState.value.logEntries.addAll(current)
+            _gameState.value.trimLogs()
+        }
     }
 
     fun sync() {

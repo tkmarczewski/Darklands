@@ -5,17 +5,17 @@
     "text": "Stój! Mgła gęstnieje, a prawo musi być przestrzegane. Czego szukasz w cieniu murów?",
     "choices": [
       {
-        "text": "[ZADANIE] Melduję wykonanie wyroku (Wyrok Inkwizycji).",
+        "text": "Melduję wykonanie wyroku (Wyrok Inkwizycji).",
         "targetNodeId": "guard_verdict_done",
         "triggerEvent": "QUEST_OBJECTIVE_MET",
         "triggerValue": "q_verdict_1"
       },
       {
-        "text": "[ZADANIE] Czy coś niepokojącego działo się ostatnio?",
+        "text": "Czy coś niepokojącego działo się ostatnio?",
         "targetNodeId": "guard_quest_check"
       },
       {
-        "text": "[CHARYZMA] Wyglądasz na zmęczonego. Odpocznij chwilę.",
+        "text": "Wyglądasz na zmęczonego. Odpocznij chwilę.",
         "targetNodeId": "guard_relaxed",
         "requiredAttributes": { "charisma": 12 }
       },
@@ -44,12 +44,12 @@
     "text": "Nie zbliżaj się! Widziałem jak niebo mrugało... Widziałem liczby pod chmurami! Jesteśmy błędem!",
     "choices": [
       {
-        "text": "[SIŁA] Milcz i wracaj do posterunku albo zginiesz!",
+        "text": "Milcz i wracaj do posterunku albo zginiesz!",
         "targetNodeId": "deserter_obey",
         "requiredAttributes": { "strength": 14 }
       },
       {
-        "text": "[INTELIGENCJA] Powiedz mi o tym Szyfrze. Co dokładnie widziałeś?",
+        "text": "Powiedz mi o tym Szyfrze. Co dokładnie widziałeś?",
         "targetNodeId": "deserter_truth",
         "requiredAttributes": { "intelligence": 15 }
       },
@@ -111,7 +111,7 @@
     "text": "Witaj, wędrowcze! Mam towary z całego Boreas, o ile masz złoto. Albo może szukasz pracy? Mgła utrudnia zbiory.",
     "choices": [
       {
-        "text": "[ZADANIE] Przynoszę zioła z mgły (Żniwa Mgły).",
+        "text": "Przynoszę zioła z mgły (Żniwa Mgły).",
         "targetNodeId": "merchant_report_back",
         "triggerEvent": "QUEST_OBJECTIVE_MET",
         "triggerValue": "q_coast_harvest"
@@ -122,7 +122,7 @@
         "triggerEvent": "OPEN_MARKET"
       },
       {
-        "text": "[ZADANIE] O jakich zbiorach mówisz?",
+        "text": "O jakich zbiorach mówisz?",
         "targetNodeId": "merchant_quest_check"
       },
       {
@@ -210,7 +210,7 @@
     "text": "Stój! Twierdza Żelazna nie przyjmuje uchodźców. Tylko ci z uprawnieniami lub sprawami do Dowódcy mogą przejść przez bramę.",
     "choices": [
       {
-        "text": "[ZADANIE] Mam list od kupca z Wybrzeża.",
+        "text": "Mam list od kupca z Wybrzeża.",
         "targetNodeId": "fortress_commander_letter",
         "requiredQuestId": "q_fortress_letter"
       },
@@ -252,10 +252,10 @@
   {
     "id": "mira_start",
     "npcId": "mira",
-    "text": "Słowa w Kronice same się zmieniają... Jakby rzeczywistość próbowała wymazać własną historię. Czy pomożesz mi ją ocalić?",
+    "text": "Słowa v Kronice same się zmieniają... Jakby rzeczywistość próbowała wymazać własną historię. Czy pomożesz mi ją ocalić?",
     "choices": [
       {
-        "text": "[ZADANIE] Zbadam te pęknięcia.",
+        "text": "Zbadam te pęknięcia.",
         "targetNodeId": "end",
         "triggerEvent": "ACTIVATE_QUEST",
         "triggerValue": "q_scribes_1"
@@ -281,7 +281,7 @@
     "text": "Kotwico... Twoja obecność tutaj jest jak pęknięcie na tafli jeziora. Czy wiesz, że ten świat jest tylko snem Sędziów?",
     "choices": [
       {
-        "text": "[INTELIGENCJA] Jeśli to sen, kto nas śni?",
+        "text": "Jeśli to sen, kto nas śni?",
         "targetNodeId": "aelion_meta",
         "requiredAttributes": { "intelligence": 16 }
       },
@@ -305,7 +305,7 @@
         "targetNodeId": "aelion_meta_end"
       },
       {
-        "text": "Nie wierzę w to.",
+        "text": "Nie wierzę v to.",
         "targetNodeId": "end"
       }
     ]
@@ -313,7 +313,7 @@
   {
     "id": "aelion_meta_end",
     "npcId": "aelion",
-    "text": "Strach jest tylko reakcją na prawdę. Szukaj Kotwicy, ona utrzyma ten sen w ryzach... jeszcze przez chwilę.",
+    "text": "Strach jest tylko reakcją na prawdę. Szukaj Kotwicy, ona utrzyma ten sen v ryzach... jeszcze przez chwilę.",
     "choices": [
       {
         "text": "Będę pamiętać.",
@@ -404,7 +404,7 @@
   {
     "id": "companion_shadow_start",
     "npcId": "echo",
-    "text": "...pamiętasz mnie? Tam w mroku... było tak zimno. Czy ta kolejna próba ma w ogóle sens?",
+    "text": "...pamiętasz mnie? Tam v mroku... było tak zimno. Czy ta kolejna próba ma v ogóle sens?",
     "choices": [
       {
         "text": "Przepraszam, że zawiodłem.",
@@ -415,7 +415,7 @@
         "targetNodeId": "companion_shadow_util"
       },
       {
-        "text": "Odejdź w niebyt!",
+        "text": "Odejdź v niebyt!",
         "targetNodeId": "end"
       }
     ]
@@ -423,7 +423,7 @@
   {
     "id": "companion_shadow_sad",
     "npcId": "echo",
-    "text": "Wybaczenie... to tylko kolejna linijka w Kronice. Nie czuję gniewu, tylko pustkę.",
+    "text": "Wybaczenie... to tylko kolejna linijka v Kronice. Nie czuję gniewu, tylko pustkę.",
     "choices": [
       { "text": "Żegnaj.", "targetNodeId": "end" }
     ]
