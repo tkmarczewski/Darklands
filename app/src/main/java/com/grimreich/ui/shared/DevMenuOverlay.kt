@@ -125,13 +125,9 @@ fun DevMenuOverlay(
                         DevBtn("GIVE HERO") {
                             root.gameRepository.updateState { state ->
                                 if (state.party.isEmpty()) {
-                                    val hero = com.grimreich.core.Hero(
-                                        id = "dev_hero",
-                                        name = "DevHero",
-                                        currentCareer = com.grimreich.core.Career.MERCENARY
-                                    )
+                                    val hero = root.characterFactory.createHero("DevHero", 20, com.grimreich.core.Career.MERCENARY)
                                     state.party.add(hero)
-                                    state.activeHeroId = "dev_hero"
+                                    state.activeHeroId = hero.id
                                 }
                             }
                         }
@@ -139,13 +135,9 @@ fun DevMenuOverlay(
                             root.gameRepository.sync()
                             root.gameRepository.updateState { state ->
                                 if (state.party.isEmpty()) {
-                                    val hero = com.grimreich.core.Hero(
-                                        id = "dev_hero",
-                                        name = "DevHero",
-                                        currentCareer = com.grimreich.core.Career.MERCENARY
-                                    )
+                                    val hero = root.characterFactory.createHero("DevHero", 20, com.grimreich.core.Career.MERCENARY)
                                     state.party.add(hero)
-                                    state.activeHeroId = "dev_hero"
+                                    state.activeHeroId = hero.id
                                 }
                                 state.grimCurrentRegion = "wybrzeze_polnocne"
                                 state.gold += 1000
@@ -203,14 +195,7 @@ fun DevMenuOverlay(
                         }
                         DevBtn("+100 XP") {
                             root.gameRepository.updateState { state ->
-                                state.party.forEach { hero ->
-                                    hero.xp += 100
-                                    while (hero.xp >= hero.level * 100) {
-                                        hero.xp -= hero.level * 100
-                                        hero.level++
-                                        hero.attributePoints += 2
-                                    }
-                                }
+                                root.experienceSystem.addPartyXpDirect(state, 100)
                             }
                         }
                         DevBtn("ADD_RALWING") {

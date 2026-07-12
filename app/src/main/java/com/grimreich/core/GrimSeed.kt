@@ -2,6 +2,7 @@ package com.grimreich.core
 
 import com.grimreich.grimreich.v1.*
 
+@Deprecated("Seeding logic moved to GameRepository.sync(). Scheduled for deletion.")
 object GrimSeed {
     fun initialize() {
         val regions = GrimRegionCatalogue.regions

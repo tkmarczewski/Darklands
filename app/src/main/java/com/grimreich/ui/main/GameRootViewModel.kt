@@ -24,7 +24,9 @@ class GameRootViewModel @Inject constructor(
     private val combatSystem: CombatSystem,
     private val audioEngine: AudioEngine,
     private val contentValidator: ContentValidator,
-    private val endingSystem: EndingSystem
+    private val endingSystem: EndingSystem,
+    val experienceSystem: com.grimreich.systems.ExperienceSystem,
+    val characterFactory: CharacterFactory
 ) : ViewModel() {
 
     private val _mode = MutableStateFlow(GameScreenMode.MAIN_MENU)

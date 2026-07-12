@@ -13,6 +13,7 @@ data class BossState(
     var statusEffects: MutableList<String> = mutableListOf()
 )
 
+@Deprecated("Replaced by CombatSystem with advanced encounter logic. Scheduled for deletion.")
 @Singleton
 class BossBattleSystem @Inject constructor(
     private val partyRepository: PartyRepository,

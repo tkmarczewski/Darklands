@@ -1,6 +1,6 @@
 package com.grimreich.core
 
-import com.grimreich.grimreich.v1.*
+import com.grimreich.grimreich.v1.Item
 import com.grimreich.systems.DialogueManager
 import com.grimreich.systems.QuestEngine
 import com.grimreich.systems.QuestManifest
