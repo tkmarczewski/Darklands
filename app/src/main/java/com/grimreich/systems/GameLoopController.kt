@@ -14,7 +14,7 @@ class GameLoopController @Inject constructor(
     private val questManifest: QuestManifest,
     private val travelSystem: TravelSystem,
     private val cityCatalogue: CityCatalogue,
-    private val cityVisitCampaignSystem: CityVisitCampaignSystem,
+    private val verdictIncidentsSystem: VerdictIncidentsSystem,
     private val metaObservationSystem: MetaObservationSystem
 ) {
     companion object {
@@ -46,7 +46,7 @@ class GameLoopController @Inject constructor(
     }
 
     fun cityScreen(playerState: PlayerState): CityScreenState {
-        cityVisitCampaignSystem.onCityEntered(playerState.currentCityId)
+        verdictIncidentsSystem.onCityEntered(playerState.currentCityId)
         return CityScreenState(
             cityId = playerState.currentCityId,
             gold = playerState.gold,

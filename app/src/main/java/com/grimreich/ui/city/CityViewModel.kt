@@ -46,7 +46,8 @@ class CityViewModel @Inject constructor(
     private val cityCatalogue: CityCatalogue,
     private val npcGenerator: ProceduralNpcGenerator,
     private val socialEventSystem: SocialEventSystem,
-    private val atmosphericDescriptionSystem: AtmosphericDescriptionSystem
+    private val atmosphericDescriptionSystem: AtmosphericDescriptionSystem,
+    private val verdictIncidentsSystem: com.grimreich.systems.VerdictIncidentsSystem
 ) : ViewModel() {
 
     private val _isQuestMenuOpen = MutableStateFlow(false)
@@ -58,6 +59,11 @@ class CityViewModel @Inject constructor(
         val cityId = state.grimCurrentRegion
         val cityData = cityCatalogue.get(cityId)
         
+        // --- TRIGGER VERDICT INCIDENTS ---
+        // DESIGN CHOICE: Triggering here ensures that every meaningful "city entry" 
+        // through UI navigation is recorded.
+        verdictIncidentsSystem.onCityEntered(cityId)
+
         val localAvailable = questEngine.getAvailableQuestsForCity(cityId, state)
         val allAvailable = questEngine.getVisibleQuestBoard(state)
         val generatedNpcs = npcGenerator.generateForCity(cityId, state)
