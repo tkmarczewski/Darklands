@@ -60,6 +60,33 @@ class CollapseEngine @Inject constructor(
             }
             CollapseScenario.BLOOD_RUIN -> {
                 state.party.forEach { h -> h.hp = (h.hp - (threshold * 10).toInt()).coerceAtLeast(0) }
+                state.logEntries.add("Krew wrze w żyłach wędrowców...")
+            }
+            CollapseScenario.REFLECTION_RECKONING -> {
+                state.party.forEach { h -> 
+                    h.morale = (h.morale - (threshold * 20).toInt()).coerceAtLeast(0)
+                }
+                state.logEntries.add("Cienie przeszłości oskarżają Twoją duszę.")
+            }
+            CollapseScenario.FULLNESS_ASCENSION -> {
+                // Double edged sword: Buff stats but massive echo increase
+                state.party.forEach { h -> 
+                    h.strength += 1
+                    h.intelligence += 1
+                    h.normalize()
+                }
+                worldStabilitySystem.changeEchoDirect(state, 0.25f, "Wzniesienie Pełni")
+                state.logEntries.add("Czujesz boską potęgę, ale świat staje się nierealny.")
+            }
+            CollapseScenario.CHAOS_DOMINION -> {
+                val effects = com.grimreich.core.StatusEffectType.entries
+                state.party.forEach { h -> 
+                    // Non-existent in combatant state directly, but we can log or apply corruption
+                    h.corruption += 5
+                    h.sanity -= 10
+                    h.normalize()
+                }
+                state.logEntries.add("Chaos przejmuje władzę nad ciałem i umysłem.")
             }
             else -> {}
         }

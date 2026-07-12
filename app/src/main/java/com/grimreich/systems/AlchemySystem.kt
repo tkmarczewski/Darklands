@@ -16,7 +16,8 @@ data class Recipe(
 @Singleton
 class AlchemySystem @Inject constructor(
     private val gameRepository: GameRepository,
-    private val itemCatalogue: ItemCatalogue
+    private val itemCatalogue: ItemCatalogue,
+    private val experienceSystem: ExperienceSystem
 ) {
     val recipes = listOf(
         Recipe("rec_healing", "pot_heal", mapOf("ing_herb" to 2), 10),
@@ -53,6 +54,10 @@ class AlchemySystem @Inject constructor(
             itemsToRemove.forEach { state.inventory.remove(it) }
 
             itemCatalogue.createInstance(recipe.resultItemId)?.let { state.inventory.add(it) }
+            
+            // PROGRESSION FIX: Grant XP for successful crafting
+            experienceSystem.addPartyXpDirect(state, 10)
+
             result = "Sukces! Uwarzono ${resultItem.name}."
             state.logEntries.add("Alchemia: $result")
         }

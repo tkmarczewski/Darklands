@@ -5,6 +5,7 @@ import com.grimreich.core.GameRepository
 import com.grimreich.core.Hero
 import com.grimreich.core.EchoSystem
 import com.grimreich.world.HeroPool
+import com.grimreich.systems.WorldStabilitySystem
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -14,6 +15,7 @@ class RitualSystem @Inject constructor(
     private val gameRepository: GameRepository,
     private val echoSystem: EchoSystem,
     private val heroPool: HeroPool,
+    private val worldStabilitySystem: WorldStabilitySystem,
     @ApplicationContext private val context: Context
 ) {
     companion object {
@@ -38,7 +40,9 @@ class RitualSystem @Inject constructor(
                 hero.sanity -= REVIVAL_SANITY_LOSS
                 hero.normalize()
                 
-                state.world.globalStability -= REVIVAL_STABILITY_DRAIN
+                // STABILITY FIX: Use system for consistent range validation
+                worldStabilitySystem.changeStabilityDirect(state, -REVIVAL_STABILITY_DRAIN, "Wskrzeszenie")
+
                 state.logEntries.add("Wskrzeszono ${hero.name}. Rzeczywistość drży...")
                 success = true
             }

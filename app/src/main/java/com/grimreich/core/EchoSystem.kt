@@ -1,12 +1,14 @@
 package com.grimreich.core
 
 import android.content.Context
-import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.grimreich.systems.WorldStabilitySystem
 import com.grimreich.world.ItemCatalogue
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import java.io.File
+import java.io.FileOutputStream
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -22,9 +24,11 @@ class EchoSystem @Inject constructor(
     }
 
     private val ECHO_FILE = "eternal_echoes.json"
-    private val gson = Gson()
+    private val json = Json { 
+        ignoreUnknownKeys = true 
+        prettyPrint = true
+    }
     
-    // Defensive measure: Ensure transient if Hero ever gains non-serializable fields
     @Transient
     private val eternalHeroes = mutableListOf<Hero>()
 
@@ -36,11 +40,10 @@ class EchoSystem @Inject constructor(
         val file = File(context.filesDir, ECHO_FILE)
         if (file.exists()) {
             try {
-                val json = file.readText()
-                val type = object : TypeToken<MutableList<Hero>>() {}.type
-                val loaded: MutableList<Hero> = gson.fromJson(json, type)
+                val content = file.readText()
+                val dtos = json.decodeFromString<List<HeroDto>>(content)
                 eternalHeroes.clear()
-                eternalHeroes.addAll(loaded)
+                eternalHeroes.addAll(dtos.map { it.toDomain() })
             } catch (e: Exception) {
                 e.printStackTrace()
             }
@@ -64,7 +67,21 @@ class EchoSystem @Inject constructor(
     private fun save(context: Context) {
         try {
             val file = File(context.filesDir, ECHO_FILE)
-            file.writeText(gson.toJson(eternalHeroes))
+            val tempFile = File(context.filesDir, "$ECHO_FILE.tmp")
+            
+            val dtos = eternalHeroes.map { it.toDto() }
+            val content = json.encodeToString(dtos)
+            
+            // ATOMIC WRITE: Write to temp file then rename
+            FileOutputStream(tempFile).use { fos ->
+                fos.write(content.toByteArray())
+                fos.flush()
+            }
+            
+            if (tempFile.exists()) {
+                if (file.exists()) file.delete()
+                tempFile.renameTo(file)
+            }
         } catch (e: Exception) {
             // Guard against IO errors (Round 4 Audit)
             e.printStackTrace()
