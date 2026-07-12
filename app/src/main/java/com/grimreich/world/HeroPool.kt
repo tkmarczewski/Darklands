@@ -104,26 +104,6 @@ class HeroPool @Inject constructor(
                       "int" to StatRange(10,3), "end" to StatRange(10,3), "cha" to StatRange(10,3), "pie" to StatRange(10,3))
         }
 
-    // ── Zakres atrybutów per profesja (pełne) ──────────────────────────────
-    private fun fullStatRangesFor(career: Career): Map<String, StatRange> =
-        when (career) {
-            Career.KNIGHT ->
-                mapOf("str" to StatRange(13,4), "agi" to StatRange(10,3), "per" to StatRange(9,3),
-                      "int" to StatRange(8,3), "end" to StatRange(12,4), "cha" to StatRange(10,3), "pie" to StatRange(11,3))
-            Career.MERCENARY ->
-                mapOf("str" to StatRange(12,4), "agi" to StatRange(11,3), "per" to StatRange(10,3),
-                      "int" to StatRange(8,3), "end" to StatRange(12,3), "cha" to StatRange(9,3), "pie" to StatRange(8,3))
-            Career.THIEF ->
-                mapOf("str" to StatRange(8,3), "agi" to StatRange(14,4), "per" to StatRange(13,4),
-                      "int" to StatRange(10,3), "end" to StatRange(9,3), "cha" to StatRange(9,3), "pie" to StatRange(9,3))
-            Career.SCHOLAR ->
-                mapOf("str" to StatRange(8,3), "agi" to StatRange(10,3), "per" to StatRange(10,3),
-                      "int" to StatRange(10,3), "end" to StatRange(9,3), "cha" to StatRange(9,3), "pie" to StatRange(9,3))
-            else ->
-                mapOf("str" to StatRange(10,3), "agi" to StatRange(10,3), "per" to StatRange(10,3),
-                      "int" to StatRange(10,3), "end" to StatRange(10,3), "cha" to StatRange(10,3), "pie" to StatRange(10,3))
-        }
-
     // ── Główna metoda ────────────────────────────────────────────────────────
     /**
      * Generuje [count] losowych, unikalnych bohaterów.
@@ -153,7 +133,6 @@ class HeroPool @Inject constructor(
         val cha = roll("cha")
         val pie = roll("pie")
 
-        val maxHp = end * 2 + 18 + random.nextInt(8)
         val weapon = weaponByCareer[career]?.random()
         val armor = armorByCareer[career]?.random()
 
@@ -184,31 +163,25 @@ class HeroPool @Inject constructor(
                 "shield" to null,
                 "accessory" to null
             )
-        ).apply { normalize() }
+        ).apply { 
+            // Ensures correct HP calculation based on Endurance
+            normalize() 
+        }
     }
 
-    // ── Skills map (reused from old HeroPool) ────────────────────────────────
+    // ── Skills map ──────────────────────────────────────────────────────────
     private val skillsByCareer = mapOf(
-        Career.KNIGHT to mapOf("Slash" to 12, "Shield Bash" to 15, "Shield" to 35, "Intimidate" to 25),
-        Career.MERCENARY to
-                mapOf("str" to 10, "agi" to 9, "per" to 8, "int" to 7, "end" to 11, "cha" to 8, "pie" to 7),
-            Career.THIEF to
-                mapOf("agi" to 12, "per" to 11, "stealth" to 12, "lockpick" to 10, "dagger" to 10),
-            Career.ROGUE to
-                mapOf("agi" to 11, "per" to 10, "stealth" to 11, "dagger" to 10, "lockpick" to 9),
-            Career.SCHOLAR to
-                mapOf("int" to 12, "read" to 12, "ALCH" to 10, "herb_lore" to 9, "lore" to 8),
-            Career.MONK to
-                mapOf("pie" to 13, "heal" to 12, "read" to 10, "mace" to 9, "prayer" to 8),
-            Career.GUARD to
-                mapOf("str" to 10, "end" to 10, "spear" to 10, "shield" to 9, "intimidate" to 8),
-            Career.PHYSICIAN to
-                mapOf("int" to 11, "heal" to 11, "herb_lore" to 10, "read" to 8, "dagger" to 7),
-            Career.CRAFTSMAN to
-                mapOf("str" to 10, "craft" to 10, "appraise" to 9, "axe" to 8),
-            Career.ALCHEMIST to
-                mapOf("int" to 12, "ALCH" to 11, "read" to 9, "herb_lore" to 8)
-        )
+        Career.KNIGHT to mapOf("Cięcie" to 12, "Taran" to 15, "Tarczownik" to 35, "Zastraszanie" to 25),
+        Career.MERCENARY to mapOf("Miecze" to 10, "Topory" to 9, "Obrona" to 15, "Wojenne rzemiosło" to 12),
+        Career.THIEF to mapOf("Skradanie" to 12, "Otwieranie zamków" to 15, "Zwinne dłonie" to 10),
+        Career.ROGUE to mapOf("Sztylety" to 15, "Skradanie" to 10, "Uliczny spryt" to 12),
+        Career.SCHOLAR to mapOf("Czytanie i Pisanie" to 15, "Starożytne języki" to 12, "Historia" to 10),
+        Career.MONK to mapOf("Pobożność" to 18, "Leczenie" to 12, "Modlitwa" to 15),
+        Career.GUARD to mapOf("Drzewce" to 12, "Warta" to 15, "Prawo i Porządek" to 10),
+        Career.PHYSICIAN to mapOf("Anatomia" to 15, "Pierwsza pomoc" to 18, "Ziołolecznictwo" to 12),
+        Career.CRAFTSMAN to mapOf("Kowalstwo" to 15, "Naprawa" to 12, "Wycena" to 10),
+        Career.ALCHEMIST to mapOf("Alchemia" to 15, "Identyfikacja" to 12, "Chemia" to 10)
+    )
 
     // ── Koszt rekrutacji per profesja ────────────────────────────────────────
     fun hireCostFor(career: Career): Int =

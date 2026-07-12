@@ -80,9 +80,10 @@ class CareerChain @Inject constructor() {
         hero.agility        = (hero.agility     + career.agiBonus).coerceIn(0, STAT_CAP)
         hero.intelligence   = (hero.intelligence + career.intBonus).coerceIn(0, STAT_CAP)
         hero.virtue         = (hero.virtue      + career.virtueBonus).coerceIn(0, VIRTUE_CAP)
-        val entry = CareerEntry(career = career, yearsServed = 0)
+        
+        // Ensure career exists in history, starting with 0 years if new
         if (hero.careerHistory.none { it.career == career }) {
-            hero.careerHistory.add(entry)
+            hero.careerHistory.add(CareerEntry(career = career, yearsServed = 0))
         }
         return hero
     }

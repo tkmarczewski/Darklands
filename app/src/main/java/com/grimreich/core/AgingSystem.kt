@@ -17,6 +17,18 @@ class AgingSystem @Inject constructor(
     fun applyAgingToHero(hero: Hero, state: GameState) {
         hero.age += 1
         
+        // PROGRESSION FIX: Increment years served in current career
+        hero.currentCareer?.let { current ->
+            val entry = hero.careerHistory.find { it.career == current }
+            if (entry != null) {
+                // CareerEntry is a data class with val, we need to replace it or change to var.
+                // Checking CareerChain.kt... it's a data class with val.
+                val updatedEntry = entry.copy(yearsServed = entry.yearsServed + 1)
+                val index = hero.careerHistory.indexOf(entry)
+                hero.careerHistory[index] = updatedEntry
+            }
+        }
+
         when {
             hero.age > 80 -> {
                 hero.intelligence = (hero.intelligence - 1).coerceAtLeast(1)

@@ -3,6 +3,15 @@ package com.grimreich.core
 import com.grimreich.grimreich.v1.*
 import com.grimreich.core.mutations.Mutation
 
+/**
+ * Główny model bohatera w świecie Grimreich.
+ * 
+ * UWAGA DOTYCZĄCA STATYSTYK:
+ * - Atrybuty bazowe (np. [strength]) to wartości na stałe przypisane do postaci, 
+ *   zwiększane przez awanse i bonusy stałe z profesji ([Career.strBonus]).
+ * - Metody "effective" (np. [effectiveStrength]) obliczają ostateczną wartość bojową,
+ *   uwzględniając dynamiczne bonusy z aktualnie pełnionej profesji oraz ekwipunku.
+ */
 data class Hero(
     var id: String = "",
     var name: String = "",
