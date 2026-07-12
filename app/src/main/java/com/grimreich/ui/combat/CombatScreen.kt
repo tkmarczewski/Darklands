@@ -47,6 +47,17 @@ fun CombatScreen(
             .background(if (state.worldStability < 10 && Random.nextFloat() < 0.05f) Color(0xFF200000) else Color.Black)
             .padding(16.dp)
     ) {
+        // ONTOLOGICAL LEVEL DISPLAY
+        if (state.ontologicalLevel != com.grimreich.grimreich.v1.OntologicalLevel.MATERIAL) {
+            Text(
+                text = "PARADYGMAT: ${state.ontologicalLevel.displayName.uppercase()}",
+                color = Color(0xFFADFF2F),
+                fontSize = 9.sp,
+                fontWeight = FontWeight.ExtraBold,
+                modifier = Modifier.padding(bottom = 4.dp)
+            )
+        }
+
         // ENEMY
         val enemyName = if (state.worldStability < 30 && Random.nextFloat() < 0.1f) "UNKNOWN_ENTITY" else state.combat.enemyName
         CombatantRow(enemyName, state.combat.enemyHp, state.combat.enemyMaxHp, isEnemy = true, stability = state.worldStability, jitter = jitterX)

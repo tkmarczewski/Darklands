@@ -82,6 +82,19 @@
     "choices": [
       {
         "text": "Pozwól mu odejść (ZYSKAJ WIEDZĘ).",
+        "targetNodeId": "deserter_revelation",
+        "triggerEvent": "UNLOCK_LORE",
+        "triggerValue": "lore_cipher_sun"
+      }
+    ]
+  },
+  {
+    "id": "deserter_revelation",
+    "npcId": "none",
+    "text": "Gdy dezerter znika w mgle, czujesz, jak ciężar jego słów zapisuje się w Twojej pamięci. To nie był obłęd, to była obserwacja.",
+    "choices": [
+      {
+        "text": "Wróć zameldować o zdarzeniu.",
         "targetNodeId": "end",
         "triggerEvent": "ADVANCE_QUEST",
         "triggerValue": "q_deserter"

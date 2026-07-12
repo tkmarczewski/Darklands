@@ -18,7 +18,8 @@ data class CombatUiState(
     val party: List<Hero> = emptyList(),
     val potions: List<Item> = emptyList(),
     val availableSkills: List<CombatSkill> = emptyList(),
-    val worldStability: Int = 100
+    val worldStability: Int = 100,
+    val ontologicalLevel: com.grimreich.grimreich.v1.OntologicalLevel = com.grimreich.grimreich.v1.OntologicalLevel.MATERIAL
 )
 
 @HiltViewModel
@@ -34,7 +35,8 @@ class CombatViewModel @Inject constructor(
                 party = state.party,
                 potions = state.inventory.filter { it.effects.containsKey("heal") },
                 availableSkills = SkillCatalogue.allSkills,
-                worldStability = state.world.globalStability
+                worldStability = state.world.globalStability,
+                ontologicalLevel = state.world.ontologicalLevel
             )
         }
         .distinctUntilChanged()

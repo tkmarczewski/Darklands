@@ -54,7 +54,7 @@
     "id": "q_fortress_letter",
     "title": "List do Twierdzy",
     "description": "Dostarcz pilną wiadomość od kupca z Wybrzeża do dowódcy Twierdzy Żelaznej.",
-    "rewardGold": 80,
+    "rewardGold": 180,
     "cityId": "twierdza_zelazna",
     "originNpcId": "guard",
     "category": "SOCIAL",

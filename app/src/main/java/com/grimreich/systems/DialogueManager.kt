@@ -117,6 +117,13 @@ class DialogueManager @Inject constructor(
                     }
                 }
             }
+            "UNLOCK_LORE" -> {
+                value?.let { loreId ->
+                    if (state.unlockedLoreIds.add(loreId)) {
+                        state.logEntries.add("Nowy wpis w Kronice: $loreId")
+                    }
+                }
+            }
             "OPEN_MARKET" -> {
                 state.logEntries.add("Otwierasz okno handlu...")
             }
