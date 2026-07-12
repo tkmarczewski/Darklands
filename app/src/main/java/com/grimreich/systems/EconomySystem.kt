@@ -25,8 +25,16 @@ class EconomySystem @Inject constructor(
         return if (finalPrice < 1 && basePrice > 0) 1 else finalPrice
     }
 
-    override fun calculateSellPrice(item: Item): Int {
-        val price = (item.value * GrimConstants.Economy.SELL_PRICE_MULTIPLIER).toInt()
-        return if (price < 1 && item.value > 0) 1 else price
+    override fun calculateSellPrice(cityId: String, item: Item): Int {
+        val city = cityCatalogue.get(cityId)
+        val regionalModifier = city?.priceModifier ?: 1.0f
+        
+        val rulingFaction = city?.rulingFaction ?: "MERCHANTS"
+        val rep = factionReputationSystem.getReputation(rulingFaction)
+        
+        val reputationModifier = FactionReputationSystem.sellModifier(rep)
+        val baseSellPrice = (item.value * regionalModifier * reputationModifier * FactionReputationSystem.BASE_SELL_MULTIPLIER).toInt()
+        
+        return if (baseSellPrice < 1 && item.value > 0) 1 else baseSellPrice
     }
 }

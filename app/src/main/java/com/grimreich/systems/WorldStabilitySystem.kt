@@ -86,4 +86,13 @@ class WorldStabilitySystem @Inject constructor(
             state.logEntries.add("Upadek: $afterPct%. Powód: $reason")
         }
     }
+
+    /**
+     * Centrally advances the world day and triggers related events.
+     */
+    fun advanceDayDirect(state: GameState, reason: String) {
+        state.world.day += 1
+        state.logEntries.add("Dzień ${state.world.day}: $reason")
+        advanceCollapseDirect(state, CollapseEvent.DayEnded)
+    }
 }

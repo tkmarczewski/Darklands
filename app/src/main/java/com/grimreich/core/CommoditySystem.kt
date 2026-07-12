@@ -4,7 +4,7 @@ import com.grimreich.grimreich.v1.Item
 
 interface EconomyCalculator {
     fun priceInCity(cityId: String, basePrice: Int): Int
-    fun calculateSellPrice(item: Item): Int
+    fun calculateSellPrice(cityId: String, item: Item): Int
 }
 
 enum class TradeGoodType {
@@ -101,12 +101,12 @@ object TradingEngine {
         return (unitPrice.toLong() * safeQty.toLong()).toInt()
     }
 
-    fun quoteSell(item: Item): Int =
-        getCalculator().calculateSellPrice(item)
+    fun quoteSell(cityId: String, item: Item): Int =
+        getCalculator().calculateSellPrice(cityId, item)
 
-    fun sellItem(state: GameState, itemId: String): String {
+    fun sellItem(state: GameState, cityId: String, itemId: String): String {
         val item = state.inventory.find { it.instanceId == itemId } ?: return "Brak przedmiotu."
-        val sellPrice = quoteSell(item)
+        val sellPrice = quoteSell(cityId, item)
         state.inventory.remove(item)
         state.gold += sellPrice
         return "Sprzedano ${item.name} za $sellPrice G."

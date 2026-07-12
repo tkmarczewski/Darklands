@@ -30,6 +30,8 @@ class FactionReputationSystem @Inject constructor(
     private val gameRepository: GameRepository
 ) {
     companion object {
+        const val BASE_SELL_MULTIPLIER = 0.5f
+
         fun reputationLabel(rep: Int): String = when {
             rep <= -50 -> "WROGA"
             rep <= -20 -> "ZŁA"

@@ -9,13 +9,11 @@ import javax.inject.Singleton
 @Singleton
 class WorldSimulation2_0 @Inject constructor(
     private val gameRepository: GameRepository,
-    private val collapseEngine: CollapseEngine
+    private val worldStabilitySystem: WorldStabilitySystem
 ) {
     fun simulate() {
         gameRepository.updateState { s -> 
-            s.world.day += 1 
-            s.logEntries.add("Dzień ${s.world.day}: Symulacja świata postępuje.")
-            collapseEngine.processCollapseEventDirect(s, CollapseEvent.DayEnded)
+            worldStabilitySystem.advanceDayDirect(s, "Symulacja świata postępuje.")
         }
     }
 }

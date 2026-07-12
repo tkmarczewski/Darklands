@@ -9,7 +9,7 @@ class TradingEngineTest {
 
     private val mockCalculator = object : EconomyCalculator {
         override fun priceInCity(cityId: String, basePrice: Int): Int = basePrice
-        override fun calculateSellPrice(item: Item): Int {
+        override fun calculateSellPrice(cityId: String, item: Item): Int {
             val price = (item.value * 0.6).toInt()
             return if (price < 1 && item.value > 0) 1 else price
         }
@@ -43,7 +43,7 @@ class TradingEngineTest {
     @Test
     fun sellQuote_shouldBeAtLeastOne() {
         val item = makeItem()
-        assertTrue("Sell quote should be at least 1", TradingEngine.quoteSell(item) >= 1)
+        assertTrue("Sell quote should be at least 1", TradingEngine.quoteSell("city", item) >= 1)
     }
 
     @Test
@@ -69,7 +69,7 @@ class TradingEngineTest {
             inventory.add(item)
         }
 
-        val result = TradingEngine.sellItem(state, item.instanceId)
+        val result = TradingEngine.sellItem(state, "city", item.instanceId)
 
         assertTrue(result.contains("Sprzedano"))
         // Base value 100 * multiplier 0.6 = 60

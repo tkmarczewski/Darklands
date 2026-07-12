@@ -31,11 +31,9 @@ class TradeSystem @Inject constructor(
                 return@updateState
             }
             state.gold -= price
-            val boughtItem = if (item.instanceId.isEmpty()) {
-                item.copy(instanceId = java.util.UUID.randomUUID().toString())
-            } else {
-                item.copy()
-            }
+            // FIX: Always generate a unique UUID for the purchased item instance
+            // to prevent duplicate IDs in inventory when buying multiples of the same item.
+            val boughtItem = item.copy(instanceId = java.util.UUID.randomUUID().toString())
             state.inventory.add(boughtItem)
             state.logEntries.add("Kupiono ${item.name} za $price zl.")
             result = "Kupiono ${item.name} za $price zl."
@@ -51,7 +49,7 @@ class TradeSystem @Inject constructor(
      * Naprawiono: transakcja sprzedazy jest kompletna - item usuniety, gold dodany.
      */
     fun sellItem(item: Item, cityId: String): String {
-        val sellPrice = economySystem.calculateSellPrice(item)
+        val sellPrice = economySystem.calculateSellPrice(cityId, item)
         var result = ""
         gameRepository.updateState { state ->
             val found = state.inventory.find { it.instanceId == item.instanceId }
