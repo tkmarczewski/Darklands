@@ -25,16 +25,28 @@ class AudioEngine @Inject constructor(
 
     private var musicPlayer: MediaPlayer? = null
     private var currentTrackResId: Int = 0
+    private var lastRequestedRoute: String = ""
     private var currentStability: Int = 100
     private val lock = Any()
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
 
     init {
-        // FIX (BUG-2): Observe stability changes in real-time via StateFlow
-        // instead of reading stale snapshots. Dynamic pitch updates while playing.
+        // FIX (BUG-2): Observe stability changes in real-time via StateFlow.
+        // Triggers automatic track switching when crossing critical thresholds.
         gameRepository.get().gameState
             .onEach { state ->
+                val oldStability = currentStability
                 currentStability = state.world.globalStability
+                
+                // REACTION: If stability drops below threshold, force switch to glitch track
+                if (oldStability >= 20 && currentStability < 20) {
+                    playMusic(R.raw.ost_glitch_ambient)
+                } 
+                // RECOVERY: If stability recovers, return to intended area music
+                else if (oldStability < 20 && currentStability >= 20) {
+                    recoverMusic()
+                }
+                
                 applyDynamicEffects()
             }
             .launchIn(scope)
@@ -44,24 +56,27 @@ class AudioEngine @Inject constructor(
         synchronized(lock) {
             val player = musicPlayer
             if (player != null && try { player.isPlaying } catch (e: Exception) { false }) {
-                if (currentStability < 15) {
+                // Pitch shifting effect for extreme instability
+                if (currentStability < 10) {
                     try {
-                        val pitch = 0.85f + (android.os.SystemClock.elapsedRealtime() % 300) / 1000f
+                        val pitch = 0.8f + (android.os.SystemClock.elapsedRealtime() % 400) / 1000f
                         player.setPlaybackParams(player.playbackParams.setPitch(pitch))
                     } catch (ignore: Exception) {
-                        // Reset pitch if stability recovered or error occurred
-                        try {
-                            player.setPlaybackParams(player.playbackParams.setPitch(1.0f))
-                        } catch (e: Exception) {}
+                        resetPitch(player)
                     }
                 } else {
-                    try {
-                        // Reset pitch if stability recovered
-                        player.setPlaybackParams(player.playbackParams.setPitch(1.0f))
-                    } catch (e: Exception) {}
+                    resetPitch(player)
                 }
             }
         }
+    }
+
+    private fun resetPitch(player: MediaPlayer) {
+        try {
+            if (player.playbackParams.pitch != 1.0f) {
+                player.setPlaybackParams(player.playbackParams.setPitch(1.0f))
+            }
+        } catch (e: Exception) {}
     }
 
     fun playMusic(resId: Int, loop: Boolean = true) {
@@ -70,7 +85,13 @@ class AudioEngine @Inject constructor(
 
             stopMusicInternal()
             try {
-                musicPlayer = MediaPlayer.create(context, resId)?.apply {
+                val newPlayer = MediaPlayer.create(context, resId)
+                if (newPlayer == null) {
+                    Log.e(TAG, "FATAL: Resource not found or MediaPlayer error for resId=$resId")
+                    return
+                }
+                
+                musicPlayer = newPlayer.apply {
                     isLooping = loop
                     start()
                 }
@@ -87,6 +108,7 @@ class AudioEngine @Inject constructor(
     fun stopMusic() {
         synchronized(lock) {
             stopMusicInternal()
+            lastRequestedRoute = ""
         }
     }
 
@@ -105,9 +127,27 @@ class AudioEngine @Inject constructor(
     }
 
     fun playForRoute(route: String) {
-        // FIX (BUG-2): Use the cached stability to avoid race conditions
-        val track = when {
-            currentStability < 20 -> R.raw.ost_glitch_ambient
+        lastRequestedRoute = route
+        
+        // If world is already glitchy, override the request but save the route for later recovery
+        if (currentStability < 20) {
+            playMusic(R.raw.ost_glitch_ambient)
+            return
+        }
+
+        val track = evaluateTrackForRoute(route)
+        playMusic(track)
+    }
+
+    private fun recoverMusic() {
+        if (lastRequestedRoute.isNotBlank()) {
+            val track = evaluateTrackForRoute(lastRequestedRoute)
+            playMusic(track)
+        }
+    }
+
+    private fun evaluateTrackForRoute(route: String): Int {
+        return when {
             route.contains("main_menu") -> R.raw.ost_main_menu
             route.contains("city") -> {
                 val state = gameRepository.get().currentState()
@@ -129,7 +169,6 @@ class AudioEngine @Inject constructor(
             route.contains("death") || route.contains("ritual") -> R.raw.ost_death
             else -> R.raw.ost_main_theme
         }
-        playMusic(track)
     }
 
     fun getCurrentStability(): Int = currentStability
