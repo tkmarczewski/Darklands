@@ -3,7 +3,9 @@ package com.grimreich.core
 import com.grimreich.systems.SkillCatalogue
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
+import org.junit.Before
 import org.junit.Test
+import org.mockito.Mockito.mock
 
 class FixedRandomProvider(
     private val floats: MutableList<Float> = mutableListOf(),
@@ -24,6 +26,15 @@ class FixedRandomProvider(
 }
 
 class CombatRoundTest {
+
+    private lateinit var mockRepo: GameRepository
+    private val morale = MoraleSystem()
+
+    @Before
+    fun setup() {
+        mockRepo = mock(GameRepository::class.java)
+        org.mockito.kotlin.whenever(mockRepo.currentState()).thenReturn(GameState())
+    }
 
     private fun makeCombatant(
         name: String,
@@ -53,9 +64,8 @@ class CombatRoundTest {
 
     @Test
     fun skillDamage_shouldBeReported() {
-        val morale = MoraleSystem()
         val rng = FixedRandomProvider()
-        val combat = CombatRound(morale, rng)
+        val combat = CombatRound(mockRepo, morale, rng)
 
         val attacker = makeCombatant(name = "A", strength = 12)
         val defender = makeCombatant(name = "D", armor = 0)
@@ -69,9 +79,8 @@ class CombatRoundTest {
     // AUDIT FIX BUG-01: reported damage must equal actual HP loss (no double-counting)
     @Test
     fun skillDamage_shouldNotDoubleDamage() {
-        val morale = MoraleSystem()
         val rng = FixedRandomProvider()
-        val combat = CombatRound(morale, rng)
+        val combat = CombatRound(mockRepo, morale, rng)
 
         val hpBefore = 30
         val attacker = makeCombatant(name = "A", strength = 12)
@@ -90,15 +99,15 @@ class CombatRoundTest {
     // AUDIT FIX BUG-01: alchemist direct-HP skill — difference model
     @Test
     fun skillWithDirectHpModification_shouldCountDifferenceOnly() {
-        val morale = MoraleSystem()
         val rng = FixedRandomProvider()
-        val combat = CombatRound(morale, rng)
+        val combat = CombatRound(mockRepo, morale, rng)
 
         val hpBefore = 30
         val attacker = makeCombatant(name = "Alchemist", intelligence = 15)
         val defender = makeCombatant(name = "Target", hp = hpBefore, armor = 0)
 
-        val result = combat.resolveRound(attacker, defender, "acid_splash")
+        // Using mind_collapse as a direct-HP example from SkillCatalogue
+        val result = combat.resolveRound(attacker, defender, "mind_collapse")
         val actualHpLoss = hpBefore - defender.hp
 
         assertEquals(
@@ -110,9 +119,8 @@ class CombatRoundTest {
 
     @Test
     fun postCombatRecovery_shouldClampAndHeal() {
-        val morale = MoraleSystem()
         val rng = FixedRandomProvider(ints = mutableListOf(10))
-        val combat = CombatRound(morale, rng)
+        val combat = CombatRound(mockRepo, morale, rng)
 
         val unit = makeCombatant(name = "X", hp = 1, maxHp = 10, endurance = 1, morale = 10)
         unit.wounds.add(WoundType.LIGHT)
@@ -128,9 +136,8 @@ class CombatRoundTest {
     // AUDIT FIX: replaced fragile reflection with public-API approach
     @Test
     fun woundShouldNotDuplicate() {
-        val morale = MoraleSystem()
         val rng = FixedRandomProvider()
-        val combat = CombatRound(morale, rng)
+        val combat = CombatRound(mockRepo, morale, rng)
 
         val attacker = makeCombatant(name = "Crusher", strength = 99, attackBase = 99)
         val defender = makeCombatant(name = "Victim", hp = 1, maxHp = 10, endurance = 1)
@@ -148,9 +155,8 @@ class CombatRoundTest {
 
     @Test
     fun routedAttacker_shouldDealZeroDamage() {
-        val morale = MoraleSystem()
         val rng = FixedRandomProvider()
-        val combat = CombatRound(morale, rng)
+        val combat = CombatRound(mockRepo, morale, rng)
 
         val attacker = makeCombatant(name = "Routed", morale = 0)
         val defender = makeCombatant(name = "Target", hp = 100)
@@ -164,10 +170,9 @@ class CombatRoundTest {
     // NEW: counterattack Dodge mechanism
     @Test
     fun counterAttack_shouldRespectDodgeChance() {
-        val morale = MoraleSystem()
         // Second float is for dodge check — 0.01f forces dodge (below any threshold)
         val rng = FixedRandomProvider(floats = mutableListOf(0.5f, 0.01f))
-        val combat = CombatRound(morale, rng)
+        val combat = CombatRound(mockRepo, morale, rng)
 
         val attacker = makeCombatant(name = "A", agility = 5)
         val defender = makeCombatant(name = "D", agility = 20)

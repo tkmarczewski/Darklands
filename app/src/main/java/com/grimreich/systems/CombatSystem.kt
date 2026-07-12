@@ -155,7 +155,13 @@ class CombatSystem @Inject constructor(
             val heroCombatant = heroToCombatant(state, actingHero)
             val enemyCombatant = getEnemyCombatant(c)
 
-            if (c.currentTurnIndex == 0) c.round++
+            if (c.currentTurnIndex == 0) {
+                c.round++
+                // DYNAMIC INITIATIVE: Recalculate every round to account for wounds/buffs
+                recalculateInitiative(state)
+                // Need to refresh currentSlot after re-sort
+                currentSlot = c.initiativeOrder[c.currentTurnIndex]
+            }
             result = "Runda ${c.round}"
 
             val playerRound = when {
@@ -194,36 +200,77 @@ class CombatSystem @Inject constructor(
 
     private fun resolveEnemyTurnsInternal(state: GameState) {
         val c = state.combat
-        
+        val enemyTypeStr = c.enemyType ?: "BANDIT"
+        val enemyDef = try { EnemyType.valueOf(enemyTypeStr) } catch (e: Exception) { EnemyType.BANDIT }
+        val enemyAi = Bestiary.get(enemyDef).ai
+
         while (c.active && !c.initiativeOrder[c.currentTurnIndex].isPlayer) {
-            val enemyCombatant = getEnemyCombatant(c)
             val aliveHeroes = state.party.filter { !it.isDead }
             if (aliveHeroes.isEmpty()) {
                 c.active = false
                 c.log.add("Wszyscy bohaterowie polegli!")
                 return
             }
-            
-            val targetHero = aliveHeroes.random()
+
+            // AI STRATEGY: Target Selection
+            val targetHero = when (enemyAi) {
+                EnemyAI.TACTICAL -> aliveHeroes.minBy { it.hp }
+                EnemyAI.BERSERK -> aliveHeroes.maxBy { it.morale }
+                EnemyAI.RANGED -> aliveHeroes.minBy { it.agility }
+                else -> aliveHeroes.random()
+            }
+
+            val enemyCombatant = getEnemyCombatant(c)
             val targetCombatant = heroToCombatant(state, targetHero)
-            
-            c.log.add("Tura przeciwnika: ${c.enemyName} atakuje ${targetHero.name}!")
-            val enemyRound = combatRound.resolveRound(enemyCombatant, targetCombatant)
-            c.log.addAll(enemyRound.log)
-            
+
+            // AI STRATEGY: Action Choice
+            if (enemyAi == EnemyAI.DEFENSIVE && (0..99).random() < 30) {
+                enemyCombatant.armor += 10
+                c.log.add("Tura przeciwnika: ${c.enemyName} przyjmuje postawę obronną!")
+                val enemyRound = combatRound.resolveRound(enemyCombatant, targetCombatant, "system_defend")
+                c.log.addAll(enemyRound.log)
+            } else {
+                c.log.add("Tura przeciwnika: ${c.enemyName} atakuje ${targetHero.name}!")
+                val enemyRound = combatRound.resolveRound(enemyCombatant, targetCombatant)
+                c.log.addAll(enemyRound.log)
+            }
+
             targetHero.hp = targetCombatant.hp
             c.enemyStamina = enemyCombatant.endurance
-            
+
             if (targetHero.hp <= 0) handleHeroDeath(state, targetHero)
-            
+
             if (state.party.all { it.isDead }) {
                 c.active = false
                 c.log.add("Cała drużyna poległa!")
                 return
             }
-            
+
             advanceTurn(state)
         }
+    }
+
+    private fun recalculateInitiative(state: GameState) {
+        val c = state.combat
+        val slots = mutableListOf<InitiativeSlot>()
+        
+        state.party.filter { !it.isDead }.forEach { hero ->
+            // Base init is agility, but affected by health and morale
+            val healthMod = if (hero.hp < hero.maxHp / 4) -5 else 0
+            val initVal = (hero.agility * 2 + healthMod + (0..5).random()).coerceAtLeast(1)
+            slots.add(InitiativeSlot(hero.id, true, initVal))
+        }
+        
+        // Enemy init
+        val typeStr = c.enemyType ?: "BANDIT"
+        val type = try { EnemyType.valueOf(typeStr) } catch (e: Exception) { EnemyType.BANDIT }
+        val enemy = Bestiary.get(type)
+        val enemyInit = enemy.stats.speed * 2 + (0..5).random()
+        slots.add(InitiativeSlot("ENEMY", false, enemyInit))
+
+        c.initiativeOrder.clear()
+        c.initiativeOrder.addAll(slots.sortedByDescending { it.initiativeValue })
+        c.currentTurnIndex = 0 // Reset turn index at start of round
     }
 
     private fun getEnemyCombatant(c: CombatState) = CombatantState(

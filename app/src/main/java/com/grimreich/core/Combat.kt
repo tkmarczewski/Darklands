@@ -137,6 +137,7 @@ class DefaultCombatRandomProvider @Inject constructor() : CombatRandomProvider {
 
 @Singleton
 class CombatRound @Inject constructor(
+    private val gameRepository: GameRepository,
     private val moraleSystem: MoraleSystem,
     private val randomProvider: CombatRandomProvider
 ) {
@@ -147,6 +148,12 @@ class CombatRound @Inject constructor(
         skillId: String? = null
     ): RoundResult {
         val log = mutableListOf<String>()
+        val worldState = gameRepository.currentState().world
+        val ontologicalLevel = worldState.ontologicalLevel.level
+        
+        // ONTOLOGICAL IMPACT: Higher levels make reality sharper and more lethal
+        val dmgMultiplier = 1.0f + (ontologicalLevel - 1) * 0.05f
+        val dodgeReduction = (ontologicalLevel - 1) * 0.02f
 
         applyStatusTick(attacker, log)
         applyStatusTick(defender, log)
@@ -172,6 +179,14 @@ class CombatRound @Inject constructor(
                 
                 // BUG FIX: Skill results already applied to defender.hp inside skill.effect lambda.
                 // Manual subtraction removed to prevent double damage.
+                // Apply ontological multiplier to skill damage too
+                val baseDmg = (hpBefore - defender.hp)
+                if (baseDmg > 0 && dmgMultiplier > 1.0f) {
+                    val extraDmg = (baseDmg * (dmgMultiplier - 1.0f)).toInt()
+                    defender.hp = (defender.hp - extraDmg).coerceAtLeast(0)
+                    log.add("Emanacja poziomu ${worldState.ontologicalLevel.displayName} wzmacnia cios! (+$extraDmg)")
+                }
+                
                 dmgToDefender = hpBefore - defender.hp
 
                 if (result.statusApplied && dmgToDefender == 0) {
@@ -182,11 +197,11 @@ class CombatRound @Inject constructor(
                 dmgToDefender = 0
             }
         } else {
-            dmgToDefender = resolveAttack(attacker, defender, log)
+            dmgToDefender = resolveAttack(attacker, defender, log, dmgMultiplier, dodgeReduction)
         }
 
         val dmgToAttacker = if (!isDefeated(defender)) {
-            resolveCounterAttack(attacker, defender, log)
+            resolveCounterAttack(attacker, defender, log, dmgMultiplier)
         } else {
             0
         }
@@ -217,7 +232,9 @@ class CombatRound @Inject constructor(
     private fun resolveAttack(
         attacker: CombatantState,
         defender: CombatantState,
-        log: MutableList<String>
+        log: MutableList<String>,
+        dmgMultiplier: Float = 1.0f,
+        dodgeReduction: Float = 0f
     ): Int {
         if (attacker.maxHp <= 0 || defender.maxHp <= 0) return 0
 
@@ -225,7 +242,8 @@ class CombatRound @Inject constructor(
         val baseDodge = (GrimConstants.Combat.BASE_DODGE_CHANCE +
             ((defender.agility - 10) * GrimConstants.Combat.AGILITY_DODGE_MODIFIER))
         val perceptionBonus = (attacker.perception - 10) * 0.01f
-        val finalDodgeChance = (baseDodge - perceptionBonus).coerceIn(0.05f, 0.8f)
+        // ONTOLOGICAL FIX: Higher levels reduce dodge chance
+        val finalDodgeChance = (baseDodge - perceptionBonus - dodgeReduction).coerceIn(0.05f, 0.8f)
         
         val dodged = randomProvider.nextFloat() < finalDodgeChance
         if (dodged) {
@@ -256,8 +274,9 @@ class CombatRound @Inject constructor(
         val isCrit   = randomProvider.nextFloat() < critChance
         val critMod  = if (isCrit) GrimConstants.Combat.CRITICAL_HIT_MULTIPLIER else 1.0f
 
+        // ONTOLOGICAL FIX: Apply damage multiplier
         val attackRoll = (rawAtk * attackerStatus.attackModifier() *
-            (0.7f + randomProvider.nextFloat() * 0.6f) * critMod).toInt()
+            (0.7f + randomProvider.nextFloat() * 0.6f) * critMod * dmgMultiplier).toInt()
         val defendRoll = (defArmor * defenderStatus.defenseModifier() *
             (0.5f + randomProvider.nextFloat() * 0.5f)).toInt()
         val dmg = maxOf(1, attackRoll - defendRoll)
@@ -283,7 +302,8 @@ class CombatRound @Inject constructor(
     private fun resolveCounterAttack(
         attacker: CombatantState,
         defender: CombatantState,
-        log: MutableList<String>
+        log: MutableList<String>,
+        dmgMultiplier: Float = 1.0f
     ): Int {
         val attackerStatus = moraleSystem.computeStatus(attacker.morale)
         val defenderStatus = moraleSystem.computeStatus(defender.morale)
@@ -291,8 +311,9 @@ class CombatRound @Inject constructor(
         // FIX (M-01): Routed defenders don't counter
         if (defenderStatus == MoraleStatus.ROUTED) return 0
 
+        // ONTOLOGICAL FIX: Apply damage multiplier
         val counterAtk  = (defender.attackBase * defenderStatus.attackModifier() *
-            (0.6f + randomProvider.nextFloat() * 0.8f)).toInt()
+            (0.6f + randomProvider.nextFloat() * 0.8f) * dmgMultiplier).toInt()
         val attackerDef = (attacker.armor * attackerStatus.defenseModifier() *
             (0.5f + randomProvider.nextFloat() * 0.5f)).toInt()
         val dmg = maxOf(0, counterAtk - attackerDef)
