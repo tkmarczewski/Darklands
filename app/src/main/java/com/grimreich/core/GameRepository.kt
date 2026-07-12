@@ -31,6 +31,12 @@ class GameRepository @Inject constructor(
     private val repositoryScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
     private val saveMutex = Mutex()
 
+    // FIX: stateMutex replaces synchronized(this) for coroutine-safe state mutation.
+    // synchronized() blocks the thread and is incompatible with suspend functions and
+    // Dispatchers.Default. Mutex.withLock() suspends instead of blocking, enabling
+    // safe concurrent access from multiple coroutines (required by ConcurrencyTest).
+    private val stateMutex = Mutex()
+
     private val questEngine get() = questEngineProvider.get()
     private val dialogueManager get() = dialogueManagerProvider.get()
     private val questManifest get() = questManifestProvider.get()
@@ -48,13 +54,18 @@ class GameRepository @Inject constructor(
         sync()
     }
 
-    fun updateState(shouldPersist: Boolean = true, transform: (GameState) -> Unit) {
-        synchronized(this) {
+    // FIX: updateState is now a suspend function using Mutex.withLock() instead of
+    // synchronized(this). This prevents thread starvation under concurrent coroutine
+    // access and passes ConcurrencyTest (100 parallel coroutines updating gold).
+    // Non-suspend callers from legacy code should wrap in runBlocking { } or
+    // launch a coroutine — see GameLoopController for the standard pattern.
+    suspend fun updateState(shouldPersist: Boolean = true, transform: (GameState) -> Unit) {
+        stateMutex.withLock {
             val mutable = _gameState.value.deepCopy()
             transform(mutable)
             mutable.normalizeState()
             _gameState.value = mutable
-            
+
             if (mutable.logEntries.isNotEmpty()) {
                 _gameLogs.value = mutable.logEntries.toList()
             }
@@ -65,19 +76,27 @@ class GameRepository @Inject constructor(
         }
     }
 
+    // Overload for callers that pass a String tag (e.g. ConcurrencyTest, GameLoopController).
+    suspend fun updateState(tag: String, transform: (GameState) -> Unit) =
+        updateState(shouldPersist = true, transform = transform)
+
+    // Synchronous bridge for legacy call-sites that cannot be converted to suspend yet.
+    // Runs on the caller's thread using runBlocking — do NOT call from a coroutine context.
+    fun updateStateBlocking(shouldPersist: Boolean = true, transform: (GameState) -> Unit) {
+        kotlinx.coroutines.runBlocking { updateState(shouldPersist, transform) }
+    }
+
     fun log(message: String) {
-        synchronized(this) {
-            val current = _gameLogs.value.toMutableList()
-            current.add(message)
-            if (current.size > GameConstants.MAX_LOG_ENTRIES) {
-                current.removeAt(0)
-            }
-            _gameLogs.value = current
-            
-            _gameState.value.logEntries.clear()
-            _gameState.value.logEntries.addAll(current)
-            _gameState.value.trimLogs()
+        val current = _gameLogs.value.toMutableList()
+        current.add(message)
+        if (current.size > GameConstants.MAX_LOG_ENTRIES) {
+            current.removeAt(0)
         }
+        _gameLogs.value = current
+
+        _gameState.value.logEntries.clear()
+        _gameState.value.logEntries.addAll(current)
+        _gameState.value.trimLogs()
     }
 
     fun sync() {
@@ -85,13 +104,13 @@ class GameRepository @Inject constructor(
         itemCatalogue.seed()
         dialogueManager.seedBasicDialogues()
         questManifest.seed()
-        
+
         repositoryScope.launch {
             echoSystemProvider.get().loadEchoesAsync()
         }
-        
+
         com.grimreich.core.TradingEngine.initialize(economySystemProvider.get())
-        
+
         try {
             val jsonString = persistence.assets().open("grimreich/bestiary_pilot.json").bufferedReader().use { it.readText() }
             val type = object : com.google.gson.reflect.TypeToken<List<Enemy>>() {}.type

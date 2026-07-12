@@ -45,7 +45,7 @@ data class GameState(
     val grantedRewardFlags: MutableSet<String> = mutableSetOf(),
     val companionShadows: MutableList<Hero> = mutableListOf()
 ) {
-    var grimCurrentRegion: String 
+    var grimCurrentRegion: String
         get() = world.locationId
         set(value) { world.locationId = value }
 
@@ -76,9 +76,20 @@ data class GameState(
         trimLogs()
     }
 
+    // FIX: deepCopy now performs true deep copy of Hero.activeMutations, Hero.abilities,
+    // Hero.careerHistory, Hero.passiveAbilities and Hero.skills to prevent shared mutable
+    // references between the original and the copy (required by DeepCopyTest).
+    private fun Hero.deepCopy(): Hero = this.copy(
+        careerHistory = this.careerHistory.toMutableList(),
+        abilities = this.abilities.toMutableList(),
+        skills = this.skills.toMutableMap(),
+        activeMutations = this.activeMutations.map { it.copy() }.toMutableList(),
+        passiveAbilities = this.passiveAbilities.toMutableSet()
+    )
+
     fun deepCopy(): GameState = this.copy(
-        party = this.party.map { it.copy() }.toMutableList(),
-        hireableHeroes = this.hireableHeroes.map { it.copy() }.toMutableList(),
+        party = this.party.map { it.deepCopy() }.toMutableList(),
+        hireableHeroes = this.hireableHeroes.map { it.deepCopy() }.toMutableList(),
         inventory = this.inventory.map { it.copy() }.toMutableList(),
         logEntries = this.logEntries.toMutableList(),
         quest = this.quest.copy(
@@ -107,6 +118,6 @@ data class GameState(
             unlockedLegacyBuffs = this.persistentMeta.unlockedLegacyBuffs.toMutableSet()
         ),
         grantedRewardFlags = this.grantedRewardFlags.toMutableSet(),
-        companionShadows = this.companionShadows.map { it.copy() }.toMutableList()
+        companionShadows = this.companionShadows.map { it.deepCopy() }.toMutableList()
     )
 }

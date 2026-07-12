@@ -15,12 +15,12 @@ object SaveSystem {
     private val slots = java.util.concurrent.ConcurrentHashMap<Int, SaveSnapshot>()
     private var autoSaveSnapshot: SaveSnapshot? = null
     private var lastAutoSaveHash: Int = 0
-    private val gson = com.google.gson.Gson()
+    private val gson = Gson()
 
     suspend fun save(gameState: GameState, slotId: Int = 0, label: String = ""): SaveSnapshot {
         val stateCopy = gameState.deepCopy()
         val stateJson = gson.toJson(stateCopy)
-        
+
         // BUG-02: Ensure cancellation safety
         val checksum = try {
             SaveIntegrity.generateChecksum(stateJson)
@@ -81,10 +81,10 @@ object SaveSystem {
     suspend fun autoSave(gameState: GameState): Boolean {
         val hash = computeStateHash(gameState)
         if (hash == lastAutoSaveHash) return false
-        
+
         val stateCopy = gameState.deepCopy()
         val stateJson = gson.toJson(stateCopy)
-        
+
         // BUG-02: Ensure cancellation safety
         val checksum = try {
             SaveIntegrity.generateChecksum(stateJson)
@@ -108,14 +108,18 @@ object SaveSystem {
     fun loadAutoSave(): SaveSnapshot? = autoSaveSnapshot?.let { it.copy(state = it.state.deepCopy()) }
     fun hasAutoSave(): Boolean = autoSaveSnapshot != null
 
-    private fun computeStateHash(state: GameState): Int {
+    // FIX: computeStateHash now hashes the actual *content* of activeQuestIds (not just size)
+    // and includes reputation.globalFactions content + metaAwarenessLevel + party size.
+    // This ensures autosave detects changes to quest list and reputation (SaveSystemTest).
+    fun computeStateHash(state: GameState): Int {
         return java.util.Objects.hash(
             state.gold,
             state.world.day,
             state.party.size,
-            state.quest.activeQuestIds.size,
+            state.quest.activeQuestIds.hashCode(),         // content hash, not just .size
             state.inventory.size,
-            state.reputation.globalFactions.size,
+            state.reputation.globalFactions.hashCode(),    // content hash for reputation
+            state.reputation.globalFactions.values.sum(),  // extra sensitivity on reputation values
             state.metaAwarenessLevel
         )
     }
@@ -143,10 +147,10 @@ object SaveSystem {
             version      = snapshot.version,
             isCompatible = compatible,
             message = when {
-                !compatible -> "Niezgodna wersja zapisu (${snapshot.version} vs $SAVE_VERSION)"
+                !compatible    -> "Niezgodna wersja zapisu (${snapshot.version} vs $SAVE_VERSION)"
                 !checksumValid -> "Naruszona integralność zapisu (Checksum mismatch)"
-                !isValid    -> "Uszkodzony zapis — nieprawidłowy stan gry"
-                else        -> "Zapis poprawny (wersja ${snapshot.version})"
+                !isValid       -> "Uszkodzony zapis — nieprawidłowy stan gry"
+                else           -> "Zapis poprawny (wersja ${snapshot.version})"
             }
         )
     }
