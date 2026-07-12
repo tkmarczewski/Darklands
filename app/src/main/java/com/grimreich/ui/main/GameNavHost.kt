@@ -181,7 +181,16 @@ fun GameNavHost(
         composable(GameRoute.Dialogue.route) {
             DialogueScreen(
                 viewModel = hiltViewModel<DialogueViewModel>(),
-                onExit = { root.setMode(GameScreenMode.CITY) },
+                onExit = { 
+                    val state = root.gameRepository.currentState()
+                    if (state.isExpeditionActive) {
+                        root.setMode(GameScreenMode.EXPEDITION)
+                    } else if (state.world.locationId.isNotBlank()) {
+                        root.setMode(GameScreenMode.CITY)
+                    } else {
+                        root.setMode(GameScreenMode.HUB)
+                    }
+                },
                 onMarket = { root.setMode(GameScreenMode.MARKET) },
                 onCombat = { root.setMode(GameScreenMode.COMBAT) },
                 onRitual = { root.setMode(GameScreenMode.RITUAL) }

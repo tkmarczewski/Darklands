@@ -70,7 +70,8 @@ class DialogueViewModel @Inject constructor(
                         if (helper != null) {
                             ChoiceInfo(choice, isVisible = true, isEnabled = true, activeHeroName = helper.name)
                         } else {
-                            // Ukrywamy opcję jeśli nikt nie spełnia wymagań (brak frustracji gracza)
+                            // DESIGN CHOICE: Hidden by user request to ensure each playthrough 
+                            // with different stats/heroes reveals different content.
                             ChoiceInfo(choice, isVisible = false, isEnabled = false)
                         }
                     }

@@ -43,7 +43,7 @@ fun QuestJournalScreen(
             if (state.activeQuests.isEmpty()) {
                 item { Text(stringResource(R.string.quest_journal_empty_active), color = Color.Gray, fontSize = 12.sp) }
             } else {
-                items(state.activeQuests) { (quest, objective) ->
+                items(state.activeQuests, key = { it.first.id }) { (quest, objective) ->
                     QuestEntryCard(quest, isCompleted = false, objective = objective)
                 }
             }
@@ -53,7 +53,7 @@ fun QuestJournalScreen(
             if (state.completedQuests.isEmpty()) {
                 item { Text(stringResource(R.string.quest_journal_empty_completed), color = Color.Gray, fontSize = 12.sp) }
             } else {
-                items(state.completedQuests) { quest ->
+                items(state.completedQuests, key = { it.id }) { quest ->
                     QuestEntryCard(quest, isCompleted = true)
                 }
             }

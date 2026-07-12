@@ -6,11 +6,13 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -57,11 +59,13 @@ fun CombatScreen(
             modifier = Modifier.weight(1f).fillMaxWidth(),
             border = androidx.compose.foundation.BorderStroke(1.dp, if (state.worldStability < 20) Color.Red else Color.DarkGray)
         ) {
+            val reversedLogs = remember(state.combat.log) { state.combat.log.asReversed() }
             LazyColumn(
                 modifier = Modifier.padding(12.dp),
                 reverseLayout = true
             ) {
-                items(state.combat.log.asReversed()) { msg ->
+                // Using index as key for reversed logs to ensure smooth scrolling
+                itemsIndexed(reversedLogs, key = { index, _ -> index }) { _, msg ->
                     val displayedMsg = if (state.worldStability < 15) {
                         msg.map { if (Random.nextFloat() < 0.03f) '#' else it }.joinToString("")
                     } else msg
@@ -157,8 +161,9 @@ fun CombatScreen(
 
 @Composable
 fun CombatantRow(name: String, hp: Int, maxHp: Int, isEnemy: Boolean, stability: Int = 100, jitter: Float = 0f) {
-    val offset = if (stability < 15) jitter.dp else 0.dp
-    Column(modifier = Modifier.offset(x = offset)) {
+    Column(modifier = Modifier.graphicsLayer { 
+        translationX = if (stability < 15) jitter * density else 0f 
+    }) {
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
             Text(name.uppercase(), color = if (isEnemy) Color.Red else Color(0xFFE0C080), fontWeight = FontWeight.Bold, fontSize = 13.sp)
             Text("$hp / $maxHp HP", color = if (stability < 10 && hp < 10) Color.Red else Color.White, fontSize = 11.sp)
