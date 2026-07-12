@@ -91,7 +91,7 @@ class CollapseEngine @Inject constructor(
             else -> {}
         }
         
-        if (threshold >= 1.0f) {
+        if (threshold >= 0.999f) {
             state.logEntries.add("KONIEC: Rzeczywistość przestała istnieć.")
         }
     }

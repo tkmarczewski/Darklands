@@ -444,7 +444,8 @@ class CombatRound @Inject constructor(
     private fun computeWound(state: CombatantState): WoundType {
         val hpPercent = if (state.maxHp > 0) state.hp.toFloat() / state.maxHp else 0f
         return when {
-            hpPercent <= 0f                                                          -> WoundType.CRITICAL
+            // FIX (PRECISION): Use small epsilon for zero checks
+            hpPercent <= 0.001f                                                      -> WoundType.CRITICAL
             hpPercent <= GrimConstants.Combat.WOUND_THRESHOLD_SERIOUS && state.endurance < 5  -> WoundType.SERIOUS
             hpPercent <= GrimConstants.Combat.WOUND_THRESHOLD_LIGHT   && state.endurance < 10 -> WoundType.LIGHT
             else                                                                     -> WoundType.NONE

@@ -83,7 +83,10 @@ class AudioEngine @Inject constructor(
         synchronized(lock) {
             if (currentTrackResId == resId) return
 
+            // BUG-05 (R4): Rapid switching could leak MediaPlayer if creation fails
+            // Ensure full cleanup before attempting new creation
             stopMusicInternal()
+            
             try {
                 val newPlayer = MediaPlayer.create(context, resId)
                 if (newPlayer == null) {
@@ -99,8 +102,7 @@ class AudioEngine @Inject constructor(
                 applyDynamicEffects()
             } catch (e: Exception) {
                 Log.e(TAG, "Blad odtwarzania utworu resId=$resId", e)
-                musicPlayer = null
-                currentTrackResId = 0
+                stopMusicInternal() // Clean up any partial state
             }
         }
     }

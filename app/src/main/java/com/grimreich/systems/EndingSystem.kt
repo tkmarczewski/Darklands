@@ -25,8 +25,9 @@ class EndingSystem @Inject constructor(
 
     fun checkEndingConditions(state: GameState): GameEnding {
         return when {
-            state.world.collapseProgress >= 1.0f -> GameEnding.TOTAL_COLLAPSE
-            state.world.echoIntensity >= 1.0f -> GameEnding.ECHO_DOMINION
+            // FIX (PRECISION): Use epsilon for float comparisons
+            state.world.collapseProgress >= 0.999f -> GameEnding.TOTAL_COLLAPSE
+            state.world.echoIntensity >= 0.999f -> GameEnding.ECHO_DOMINION
             state.party.all { it.isDead } -> GameEnding.ABANDONED
             state.world.globalStability >= 90 && state.prayer.faith >= 80 -> GameEnding.FAITH_ASCENSION
             state.world.globalStability >= 95 -> GameEnding.RESTORATION
