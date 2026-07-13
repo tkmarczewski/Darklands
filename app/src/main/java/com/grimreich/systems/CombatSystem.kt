@@ -255,9 +255,13 @@ class CombatSystem @Inject constructor(
         val slots = mutableListOf<InitiativeSlot>()
         
         state.party.filter { !it.isDead }.forEach { hero ->
-            // Base init is agility, but affected by health and morale
-            val healthMod = if (hero.hp < hero.maxHp / 4) -5 else 0
-            val initVal = (hero.agility * 2 + healthMod + combatRound.randomProvider.nextInt(0, 6)).coerceAtLeast(1)
+            // --- INITIATIVE V2: Agility-Based ---
+            // Base value is effective Agility (with equipment/mutations)
+            val baseAgility = hero.effectiveAgility()
+            val healthPenalty = if (hero.hp < hero.maxHp / 3) -3 else 0
+            val moraleBonus = if (hero.morale > 70) 2 else 0
+            
+            val initVal = (baseAgility + healthPenalty + moraleBonus + combatRound.randomProvider.nextInt(0, 10)).coerceAtLeast(1)
             slots.add(InitiativeSlot(hero.id, true, initVal))
         }
         
@@ -265,12 +269,15 @@ class CombatSystem @Inject constructor(
         val typeStr = c.enemyType ?: "BANDIT"
         val type = try { EnemyType.valueOf(typeStr) } catch (e: Exception) { EnemyType.BANDIT }
         val enemy = Bestiary.get(type)
-        val enemyInit = enemy.stats.speed * 2 + combatRound.randomProvider.nextInt(0, 6)
+        // Enemy speed is their agility equivalent
+        val enemyInit = enemy.stats.speed + combatRound.randomProvider.nextInt(0, 10)
         slots.add(InitiativeSlot("ENEMY", false, enemyInit))
 
         c.initiativeOrder.clear()
         c.initiativeOrder.addAll(slots.sortedByDescending { it.initiativeValue })
-        c.currentTurnIndex = 0 // Reset turn index at start of round
+        c.currentTurnIndex = 0
+        
+        state.logEntries.add("TRIBUNAL_LOG_014: Ustalono sekwencję działań (Inicjatywa).")
     }
 
     private fun getEnemyCombatant(c: CombatState) = CombatantState(

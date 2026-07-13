@@ -10,9 +10,12 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 
+import com.grimreich.core.Hero
+
 data class TavernUiState(
     val gold: Int = 0,
-    val log: String = ""
+    val log: String = "",
+    val party: List<Hero> = emptyList() // DODANO dla dolnego paska V9
 )
 
 @HiltViewModel
@@ -59,6 +62,12 @@ class TavernViewModel @Inject constructor(
     }
 
     fun refresh() {
-        _uiState.update { it.copy(gold = gameRepository.currentState().gold) }
+        val state = gameRepository.currentState()
+        _uiState.update { 
+            it.copy(
+                gold = state.gold,
+                party = state.party.toList()
+            ) 
+        }
     }
 }

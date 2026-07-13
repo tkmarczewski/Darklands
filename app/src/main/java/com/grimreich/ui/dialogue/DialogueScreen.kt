@@ -1,6 +1,5 @@
 package com.grimreich.ui.dialogue
 
-import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -20,8 +19,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.grimreich.R
-import com.grimreich.grimreich.v1.DialogueNode
-import com.grimreich.grimreich.v1.DialogueChoice
+import com.grimreich.ui.shared.*
+import com.grimreich.ui.effects.glitchEffect
 import kotlin.random.Random
 
 @Composable
@@ -34,124 +33,112 @@ fun DialogueScreen(
 ) {
     val state by viewModel.uiState.collectAsState()
     val context = LocalContext.current
-    
-    // GLITCH ANIMATION
-    val infiniteTransition = rememberInfiniteTransition(label = "glitch")
-    val jitterX by if (state.worldStability < 15) {
-        infiniteTransition.animateFloat(
-            initialValue = -2f,
-            targetValue = 2f,
-            animationSpec = infiniteRepeatable(
-                animation = tween(50, easing = LinearEasing),
-                repeatMode = RepeatMode.Reverse
-            ),
-            label = "jitter"
-        )
-    } else {
-        remember { mutableStateOf(0f) }
-    }
 
-    Box(modifier = Modifier.fillMaxSize().background(Color.Black)) {
-        // BACKGROUND
-        val bgResId = context.resources.getIdentifier(state.backgroundDrawable, "drawable", context.packageName)
-        if (bgResId != 0) {
-            Image(
-                painter = painterResource(id = bgResId),
-                contentDescription = null,
-                modifier = Modifier.fillMaxSize(),
-                contentScale = ContentScale.Crop,
-                alpha = if (state.worldStability < 30) 0.15f else 0.3f
-            )
-        }
+    Box(modifier = Modifier.fillMaxSize().background(Color.Black).padding(4.dp)) {
+        Column(modifier = Modifier.fillMaxSize()) {
+            
+            // --- GÓRNY PASEK: NPC I STATUS ---
+            Row(
+                modifier = Modifier.fillMaxWidth().height(30.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(text = "INTERAKCJA: ${state.npcName.uppercase()}", color = Color(0xFFC0A060), fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                Text(text = "ROLA: ${state.npcRole.uppercase()}", color = Color.Gray, fontSize = 11.sp)
+            }
 
-        Column(modifier = Modifier.fillMaxSize().padding(24.dp)) {
-            // NPC PORTRAIT & NAME
-            Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.Bottom) {
-                Surface(
-                    modifier = Modifier.size(120.dp),
-                    color = Color(0xFF101010),
-                    border = androidx.compose.foundation.BorderStroke(2.dp, if (state.worldStability < 20) Color.Red else Color(0xFFC0A060))
-                ) {
-                    val portResId = context.resources.getIdentifier(state.npcPortrait, "drawable", context.packageName)
-                    if (portResId != 0) {
-                        Image(
-                            painter = painterResource(id = portResId),
-                            contentDescription = null,
-                            modifier = Modifier.fillMaxSize(),
-                            alpha = if (state.worldStability < 50 && Random.nextFloat() < 0.1f) 0.5f else 1.0f
+            Spacer(modifier = Modifier.height(4.dp))
+
+            // --- KOKPIT DIALOGOWY (3 KAFLE V9) ---
+            Row(modifier = Modifier.weight(1f).fillMaxWidth()) {
+                
+                // 1. LEWY KAFEL: LOGI I KRONIKA SPOTKANIA
+                GothicObsidianCard(modifier = Modifier.weight(0.7f).fillMaxHeight()) {
+                    Text(text = "KRONIKA SPOTKANIA", color = Color(0xFFC0A060), fontSize = 10.sp, fontWeight = FontWeight.Bold)
+                    Divider(color = Color(0x33C0A060), thickness = 1.dp, modifier = Modifier.padding(vertical = 4.dp))
+                    
+                    Text(
+                        text = "> Każde słowo zostaje zapisane. Trybunał obserwuje Twoje wybory.",
+                        color = Color.DarkGray,
+                        fontSize = 10.sp,
+                        lineHeight = 14.sp
+                    )
+                }
+
+                Spacer(modifier = Modifier.width(4.dp))
+
+                // 2. ŚRODKOWY KAFEL: WIDOK NPC I TEKST
+                GothicObsidianCard(modifier = Modifier.weight(1.3f).fillMaxHeight(), headerColor = Color(0xFF4A0000)) {
+                    Column(modifier = Modifier.fillMaxSize()) {
+                        // PORTRET NPC
+                        Box(modifier = Modifier.fillMaxWidth().weight(0.6f)) {
+                            val portResId = context.resources.getIdentifier(state.npcPortrait, "drawable", context.packageName)
+                            if (portResId != 0) {
+                                Image(
+                                    painter = painterResource(id = portResId),
+                                    contentDescription = null,
+                                    modifier = Modifier.fillMaxSize().glitchEffect(state.worldStability < 40, 0.1f),
+                                    contentScale = ContentScale.Fit
+                                )
+                            }
+                        }
+                        
+                        Divider(color = Color(0x33C0A060), thickness = 1.dp, modifier = Modifier.padding(vertical = 8.dp))
+                        
+                        // TEKST DIALOGU
+                        val rawText = state.currentNode?.text ?: "Cisza..."
+                        Text(
+                            text = rawText,
+                            color = if (state.worldStability < 15) Color.Red else Color.White,
+                            fontSize = 14.sp,
+                            lineHeight = 20.sp,
+                            modifier = Modifier.weight(0.4f).padding(horizontal = 4.dp)
                         )
                     }
                 }
-                
-                Spacer(modifier = Modifier.width(16.dp))
-                
-                Column {
-                    Text(
-                        text = when {
-                            state.npcName.isBlank() -> "???"
-                            state.worldStability < 35 && Random.nextFloat() < 0.2f -> 
-                                state.npcName.uppercase().take(5) + "_ERR"
-                            else -> state.npcName.uppercase()
-                        },
-                        color = if (state.worldStability < 20) Color.Red else Color(0xFFC0A060),
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 20.sp,
-                        modifier = if (state.worldStability < 15) Modifier.offset(x = jitterX.dp) else Modifier
-                    )
-                    Text(text = state.npcRole.uppercase(), color = Color.Gray, fontSize = 12.sp)
-                }
-            }
 
-            Spacer(modifier = Modifier.height(24.dp))
+                Spacer(modifier = Modifier.width(4.dp))
 
-            // DIALOGUE TEXT
-            Surface(
-                modifier = Modifier.weight(1f).fillMaxWidth(),
-                color = Color(0xCC000000),
-                border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFF222222))
-            ) {
-                Column(modifier = Modifier.padding(16.dp)) {
-                    val rawText = state.currentNode?.text ?: "Stoisz w milczeniu. Echo przeszłości powoli zanika..."
-                    val displayedText = if (state.worldStability < 25) {
-                        rawText.map { if (Random.nextFloat() < 0.05f) '?' else it }.joinToString("")
-                    } else rawText
-
-                    Text(
-                        text = displayedText,
-                        color = if (state.worldStability < 10) Color.Red else Color.White,
-                        fontSize = 16.sp,
-                        lineHeight = 24.sp
-                    )
-                    
-                    Spacer(modifier = Modifier.height(16.dp))
-
-                    if (state.availableChoices.isEmpty() || state.currentNode == null) {
-                        Button(
-                            onClick = onExit,
-                            modifier = Modifier.fillMaxWidth(),
-                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF400000))
-                        ) {
-                            Text("ZAKOŃCZ ROZMOWĘ")
-                        }
-                    }
-                    
-                    // CHOICES with scrolling
-                    LazyColumn(
-                        modifier = Modifier.weight(1f).fillMaxWidth(),
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        items(state.availableChoices) { info ->
-                            DialogueChoiceBtn(
-                                text = info.choice.text,
-                                isEnabled = info.isEnabled,
-                                stability = state.worldStability,
-                                isCombat = info.choice.isCombatTrigger,
-                                helperHero = info.activeHeroName
-                            ) {
-                                viewModel.choose(info.choice, onExit, onCombat, onMarket, onRitual)
+                // 3. PRAWY KAFEL: WYBORY
+                Column(modifier = Modifier.weight(0.7f).fillMaxHeight()) {
+                    GothicObsidianCard(modifier = Modifier.weight(1f), headerColor = Color(0xFF1B5E20)) {
+                        Text(text = "WYBORY", color = Color(0xFFC0A060), fontSize = 10.sp, fontWeight = FontWeight.Bold)
+                        Divider(color = Color(0x33C0A060), thickness = 1.dp, modifier = Modifier.padding(vertical = 4.dp))
+                        
+                        if (state.availableChoices.isEmpty() || state.currentNode == null) {
+                            NavTabV9("ZAKOŃCZ ROZMOWĘ", onClick = onExit, color = Color(0xFF400000))
+                        } else {
+                            LazyColumn(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                                items(state.availableChoices) { info ->
+                                    val choiceColor = when {
+                                        info.choice.isCombatTrigger -> Color(0xFF4A0000)
+                                        !info.isEnabled -> Color(0xFF0A0A0A)
+                                        else -> Color(0xFF1A1A1A)
+                                    }
+                                    NavTabV9(
+                                        text = info.choice.text,
+                                        onClick = { viewModel.choose(info.choice, onExit, onCombat, onMarket, onRitual) },
+                                        color = choiceColor,
+                                        enabled = info.isEnabled
+                                    )
+                                }
                             }
                         }
                     }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(4.dp))
+
+            // --- DOLNY PASEK: DRUŻYNA (V9) ---
+            GothicObsidianCard(modifier = Modifier.fillMaxWidth().height(80.dp)) {
+                Row(
+                    modifier = Modifier.fillMaxSize(),
+                    horizontalArrangement = Arrangement.SpaceAround,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    // Pasek drużyny dla kontekstu podczas dialogów
+                    Text("DRUŻYNA ŚWIADKÓW", color = Color.DarkGray, fontSize = 9.sp, fontWeight = FontWeight.Bold)
                 }
             }
         }
@@ -159,34 +146,14 @@ fun DialogueScreen(
 }
 
 @Composable
-private fun DialogueChoiceBtn(
-    text: String, 
-    isEnabled: Boolean = true, 
-    stability: Int = 100, 
-    isCombat: Boolean = false,
-    helperHero: String? = null,
-    onClick: () -> Unit
-) {
+fun NavTabV9(text: String, onClick: () -> Unit, color: Color = Color(0xFF1A1A1A), enabled: Boolean = true, modifier: Modifier = Modifier) {
     Surface(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 4.dp)
-            .clickable(enabled = isEnabled) { onClick() },
-        color = if (isEnabled) Color(0xFF151515) else Color(0xFF0A0A0A),
-        border = androidx.compose.foundation.BorderStroke(1.dp, if (isEnabled) Color(0xFF333333) else Color(0xFF111111))
+        modifier = modifier.fillMaxWidth().heightIn(min = 36.dp).clickable(enabled = enabled) { onClick() },
+        color = if (enabled) color else Color.Black,
+        border = androidx.compose.foundation.BorderStroke(1.dp, if (enabled) Color(0xFFC0A060) else Color(0xFF111111))
     ) {
-        val label = when {
-            stability < 40 && !isEnabled -> "[USZKODZONE]"
-            helperHero != null -> "(${helperHero.uppercase()}) $text"
-            isCombat -> "[WALKA] $text"
-            else -> "> $text"
+        Box(contentAlignment = Alignment.Center, modifier = Modifier.padding(8.dp)) {
+            Text(text = text.uppercase(), color = if (enabled) Color.White else Color.DarkGray, fontSize = 10.sp, fontWeight = FontWeight.Bold)
         }
-        
-        Text(
-            text = label,
-            color = if (isEnabled) Color(0xFFE0C080) else Color.DarkGray,
-            modifier = Modifier.padding(12.dp),
-            fontSize = 14.sp
-        )
     }
 }

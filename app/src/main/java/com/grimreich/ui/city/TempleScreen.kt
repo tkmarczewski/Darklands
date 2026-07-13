@@ -1,20 +1,23 @@
 package com.grimreich.ui.city
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.grimreich.R
 import com.grimreich.core.Hero
+import com.grimreich.ui.shared.*
 
 @Composable
 fun TempleScreen(
@@ -23,72 +26,122 @@ fun TempleScreen(
 ) {
     val state by viewModel.uiState.collectAsState()
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color.Black)
-            .padding(16.dp)
-    ) {
-        Text("KAPLICA CZYSTEGO ŚWIATŁA", color = Color(0xFFE0C080), fontSize = 20.sp, fontWeight = FontWeight.Bold)
-        Text("WIARA: ${state.faith} | ZŁOTO: ${state.gold} G", color = Color.Gray, fontSize = 12.sp)
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        if (state.logs.isNotBlank()) {
-            Surface(
-                color = Color(0xFF1A1A1A),
-                modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp),
-                border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFFC0A060))
+    Box(modifier = Modifier.fillMaxSize().background(Color.Black).padding(4.dp)) {
+        Column(modifier = Modifier.fillMaxSize()) {
+            
+            // --- GÓRNY PASEK: STATUS WIARY ---
+            Row(
+                modifier = Modifier.fillMaxWidth().height(30.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(state.logs, color = Color.White, modifier = Modifier.padding(12.dp), fontSize = 13.sp)
+                Text(text = "KAPLICA CZYSTEGO ŚWIATŁA", color = Color(0xFFC0A060), fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(text = "WIARA: ${state.faith}", color = Color(0xFFADFF2F), fontSize = 11.sp, fontWeight = FontWeight.Bold)
+                    Spacer(modifier = Modifier.width(16.dp))
+                    Image(painter = painterResource(id = R.drawable.ic_currency_gold), contentDescription = null, modifier = Modifier.size(16.dp))
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(text = "${state.gold} gp", color = Color.Yellow, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                }
             }
-        }
 
-        if (state.isNegotiating) {
-            Surface(
-                color = Color(0xFF201000),
-                modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp),
-                border = androidx.compose.foundation.BorderStroke(1.dp, Color.Red)
-            ) {
-                Column(modifier = Modifier.padding(12.dp)) {
-                    Text("TARGOWANIE: Cena spadnie do 150 G, ale konsekwencje dla paradygmatu będą znacznie cięższe. Czy na pewno?", color = Color.Yellow, fontSize = 12.sp)
-                    Button(onClick = { viewModel.toggleNegotiation() }, colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent)) {
-                        Text("ANULUJ", color = Color.Gray)
+            Spacer(modifier = Modifier.height(4.dp))
+
+            // --- KOKPIT ŚWIĄTYNI (3 KAFLE V9) ---
+            Row(modifier = Modifier.weight(1f).fillMaxWidth()) {
+                
+                // 1. LEWY KAFEL: LOGI I OBJAWIENIA
+                GothicObsidianCard(modifier = Modifier.weight(0.8f).fillMaxHeight()) {
+                    Text(text = "DZIENNIK DUSZY", color = Color(0xFFC0A060), fontSize = 10.sp, fontWeight = FontWeight.Bold)
+                    Divider(color = Color(0x33C0A060), thickness = 1.dp, modifier = Modifier.padding(vertical = 4.dp))
+                    
+                    LazyColumn(modifier = Modifier.fillMaxSize()) {
+                        item {
+                            Text(
+                                text = if (state.logs.isEmpty()) "> Cisza kaplicy koi zmęczone umysły." else "> ${state.logs}",
+                                color = Color.LightGray,
+                                fontSize = 11.sp,
+                                lineHeight = 16.sp
+                            )
+                        }
+                        if (state.isNegotiating) {
+                            item {
+                                Spacer(modifier = Modifier.height(12.dp))
+                                Text(
+                                    text = "OSTRZEŻENIE: Targowanie się z siłami wyższymi narusza stabilność rzeczywistości.",
+                                    color = Color.Yellow,
+                                    fontSize = 10.sp,
+                                    fontWeight = FontWeight.Bold
+                                )
+                            }
+                        }
+                    }
+                }
+
+                Spacer(modifier = Modifier.width(4.dp))
+
+                // 2. ŚRODKOWY KAFEL: DRUŻYNA (POSŁUGA)
+                GothicObsidianCard(modifier = Modifier.weight(1.2f).fillMaxHeight(), headerColor = Color(0xFF1A237E)) {
+                    Text(text = "STAN DUCHOWY", color = Color(0xFFC0A060), fontSize = 10.sp, fontWeight = FontWeight.Bold)
+                    Divider(color = Color(0x33C0A060), thickness = 1.dp, modifier = Modifier.padding(vertical = 4.dp))
+                    
+                    LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        items(state.party) { hero ->
+                            HeroTempleCardV9(
+                                hero = hero, 
+                                onPray = { viewModel.pray(hero.id) }, 
+                                onResurrect = { viewModel.resurrect(hero.id) },
+                                canNegotiate = !state.isNegotiating,
+                                onToggleNegotiation = { viewModel.toggleNegotiation() }
+                            )
+                        }
+                    }
+                }
+
+                Spacer(modifier = Modifier.width(4.dp))
+
+                // 3. PRAWY KAFEL: RYTUAŁY
+                Column(modifier = Modifier.weight(0.7f).fillMaxHeight()) {
+                    GothicObsidianCard(modifier = Modifier.weight(1f), headerColor = Color(0xFF4A148C)) {
+                        Text(text = "RYTUAŁY", color = Color(0xFFC0A060), fontSize = 10.sp, fontWeight = FontWeight.Bold)
+                        Divider(color = Color(0x33C0A060), thickness = 1.dp, modifier = Modifier.padding(vertical = 4.dp))
+                        
+                        Column(verticalArrangement = Arrangement.spacedBy(4.dp), modifier = Modifier.padding(top = 4.dp)) {
+                            NavTabV9("ZŁÓŻ OFIARĘ (100 G)", onClick = { viewModel.makeOffering(100) }, color = Color(0xFF2E1A1A))
+                            if (state.isNegotiating) {
+                                NavTabV9("ANULUJ TARG", onClick = { viewModel.toggleNegotiation() }, color = Color(0xFF400000))
+                            }
+                        }
+                    }
+                    Spacer(modifier = Modifier.height(4.dp))
+                    GothicObsidianCard(modifier = Modifier.weight(0.5f), headerColor = Color(0xFF400000)) {
+                        Text(text = "POWRÓT", color = Color(0xFFC0A060), fontSize = 10.sp, fontWeight = FontWeight.Bold)
+                        Spacer(modifier = Modifier.height(8.dp))
+                        NavTabV9("WYJDŹ Z KAPLICY", onClick = onBack, color = Color(0xFF400000))
                     }
                 }
             }
-        }
 
-        LazyColumn(modifier = Modifier.weight(1f)) {
-            items(state.party) { hero ->
-                HeroTempleCard(
-                    hero = hero, 
-                    onPray = { viewModel.pray(hero.id) }, 
-                    onResurrect = { viewModel.resurrect(hero.id) },
-                    canNegotiate = !state.isNegotiating,
-                    onToggleNegotiation = { viewModel.toggleNegotiation() }
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-            }
-        }
+            Spacer(modifier = Modifier.height(4.dp))
 
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            Button(onClick = { viewModel.makeOffering(100) }, modifier = Modifier.weight(1f)) { Text("OFIARA 100G") }
-            Button(
-                onClick = onBack, 
-                modifier = Modifier.weight(1f),
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF400000))
-            ) { 
-                Text("WYJDŹ") 
+            // --- DOLNY PASEK: DRUŻYNA (V9) ---
+            GothicObsidianCard(modifier = Modifier.fillMaxWidth().height(80.dp)) {
+                Row(
+                    modifier = Modifier.fillMaxSize(),
+                    horizontalArrangement = Arrangement.SpaceAround,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    state.party.forEach { hero ->
+                        HeroPortraitV9(hero = hero, onClick = { /* No action here */ })
+                    }
+                }
             }
         }
     }
 }
 
 @Composable
-fun HeroTempleCard(
+fun HeroTempleCardV9(
     hero: Hero, 
     onPray: () -> Unit, 
     onResurrect: () -> Unit,
@@ -96,38 +149,29 @@ fun HeroTempleCard(
     onToggleNegotiation: () -> Unit
 ) {
     Surface(
-        color = Color(0xFF111111),
-        border = androidx.compose.foundation.BorderStroke(1.dp, if (hero.isDead) Color.Red else Color.DarkGray),
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier.fillMaxWidth(),
+        color = Color(0xFF0F0F0F),
+        border = androidx.compose.foundation.BorderStroke(1.dp, if (hero.isDead) Color.Red else Color(0xFF333333))
     ) {
-        Row(modifier = Modifier.padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
+        Row(modifier = Modifier.padding(8.dp), verticalAlignment = Alignment.CenterVertically) {
             Column(modifier = Modifier.weight(1f)) {
-                Text(hero.name.uppercase(), color = if (hero.isDead) Color.Red else Color.White, fontWeight = FontWeight.Bold)
-                Text(if (hero.isDead) "POLEGŁY (Wymaga ciała)" else "SANITY: ${hero.sanity}/100", color = Color.Gray, fontSize = 11.sp)
+                Text(text = hero.name.uppercase(), color = if (hero.isDead) Color.Red else Color.White, fontWeight = FontWeight.Bold, fontSize = 11.sp)
+                Text(text = if (hero.isDead) "POLEGŁY" else "POCZYTALNOŚĆ: ${hero.sanity}%", color = Color.Gray, fontSize = 9.sp)
             }
             if (hero.isDead) {
                 Column(horizontalAlignment = Alignment.End) {
-                    Button(
-                        onClick = onResurrect,
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF600000)),
-                        shape = MaterialTheme.shapes.extraSmall
-                    ) {
-                        Text("WSKRZESZ", fontSize = 10.sp)
-                    }
+                    NavTabV9("WSKRZESZ", onClick = onResurrect, modifier = Modifier.width(80.dp), color = Color(0xFF600000))
                     if (canNegotiate) {
-                        TextButton(onClick = onToggleNegotiation) {
-                            Text("TARGUJ SIĘ", color = Color.DarkGray, fontSize = 9.sp)
-                        }
+                        Text(
+                            text = "TARGUJ SIĘ", 
+                            color = Color.DarkGray, 
+                            fontSize = 8.sp, 
+                            modifier = Modifier.clickable { onToggleNegotiation() }.padding(top = 2.dp)
+                        )
                     }
                 }
             } else {
-                Button(
-                    onClick = onPray,
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF222222)),
-                    shape = MaterialTheme.shapes.extraSmall
-                ) {
-                    Text("MÓDL SIĘ", fontSize = 10.sp)
-                }
+                NavTabV9("MÓDL SIĘ", onClick = onPray, modifier = Modifier.width(80.dp), color = Color(0xFF1A1A1A))
             }
         }
     }
