@@ -107,6 +107,7 @@ class GameRepository @Inject constructor(
         cityCatalogue.seedCanonical()
         itemCatalogue.seed()
         dialogueManager.seedBasicDialogues()
+        questEngine.clearRegistry()
         questManifest.seed()
 
         // FIX: Sequential loading to avoid race conditions and ensure data readiness

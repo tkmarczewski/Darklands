@@ -22,28 +22,44 @@ sealed interface CharacterHubUiEvent {
 
 enum class CharacterHubTab { OVERVIEW, EQUIPMENT, PARTY }
 
+sealed interface CharacterHubUiEffect {
+    data class ShowMessage(val message: String) : CharacterHubUiEffect
+}
+
 data class CharacterHubUiState(
     val selectedHeroId: String? = null,
     val selectedTab: CharacterHubTab = CharacterHubTab.OVERVIEW,
-    val heroes: List<Hero> = emptyList(),
-    val inventory: List<Item> = emptyList(),
+    val heroes: List<HeroUi> = emptyList(),
+    val inventory: List<InventoryItemUi> = emptyList(),
     val isLoading: Boolean = false
 ) {
-    val selectedHero: Hero? get() = heroes.find { it.id == selectedHeroId }
+    val selectedHero: HeroUi? get() = heroes.find { it.id == selectedHeroId }
 }
 
 @HiltViewModel
 class CharacterHubViewModel @Inject constructor(
     private val gameRepository: GameRepository,
-    private val inventorySystem: InventorySystem
+    private val inventorySystem: InventorySystem,
+    private val mapper: CharacterHubUiMapper
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(CharacterHubUiState(isLoading = true))
     val uiState: StateFlow<CharacterHubUiState> = _uiState.asStateFlow()
 
+    private val _uiEffect = MutableSharedFlow<CharacterHubUiEffect>()
+    val uiEffect = _uiEffect.asSharedFlow()
+
     init {
         gameRepository.gameState
-            .onEach { updateUiState(it) }
+            .onEach { state ->
+                val mapped = mapper.map(state)
+                _uiState.update { 
+                    mapped.copy(
+                        selectedHeroId = it.selectedHeroId ?: mapped.selectedHeroId ?: mapped.heroes.firstOrNull()?.id,
+                        selectedTab = it.selectedTab
+                    )
+                }
+            }
             .launchIn(viewModelScope)
     }
 
@@ -61,25 +77,16 @@ class CharacterHubViewModel @Inject constructor(
         }
     }
 
-    private fun updateUiState(state: GameState) {
-        _uiState.update { 
-            it.copy(
-                heroes = state.party,
-                inventory = state.inventory,
-                selectedHeroId = it.selectedHeroId ?: state.activeHeroId ?: state.party.firstOrNull()?.id,
-                isLoading = false
-            )
-        }
-    }
-
     private fun equipItem(instanceId: String) {
         val heroId = _uiState.value.selectedHeroId ?: return
-        inventorySystem.equip(heroId, instanceId)
+        val result = inventorySystem.equip(heroId, instanceId)
+        viewModelScope.launch { _uiEffect.emit(CharacterHubUiEffect.ShowMessage(result)) }
     }
 
     private fun unequipItem(slot: String) {
         val heroId = _uiState.value.selectedHeroId ?: return
-        inventorySystem.unequip(heroId, slot)
+        val result = inventorySystem.unequip(heroId, slot)
+        viewModelScope.launch { _uiEffect.emit(CharacterHubUiEffect.ShowMessage(result)) }
     }
 
     private fun reorderParty(from: Int, to: Int) {

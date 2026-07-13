@@ -26,7 +26,7 @@ class WorldSimulationCoordinator @Inject constructor(
             // Actually, let's keep executeTick as the orchestrator.
             // We need to pass 'state' to sub-systems.
             
-            val currentCity = state.grimCurrentRegion
+            val currentCity = state.world.locationId
             
             // 2. Region AI
             regionAi.tickRegionDirect(state, currentCity)

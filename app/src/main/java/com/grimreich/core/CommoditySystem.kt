@@ -63,7 +63,7 @@ object TradingEngine {
         calculator ?: error("TradingEngine must be initialized with an EconomyCalculator before use.")
 
     fun buyGood(state: GameState, cityId: String, type: TradeGoodType, qty: Int = 1): String {
-        if (cityId != state.grimCurrentRegion) {
+        if (cityId != state.world.locationId) {
             return "Nie znajdujesz się w tej lokacji."
         }
 

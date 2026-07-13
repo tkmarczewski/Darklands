@@ -27,12 +27,21 @@ class WorldStabilitySystem @Inject constructor(
 
     fun changeStabilityDirect(state: GameState, delta: Int, reason: String) {
         val before = state.world.globalStability
+        
+        // Project Anchor: In the "Iron Fortress" (Krew), every action costs 1 HP
+        if (state.world.locationId == "twierdza_zelazna" && delta != 0) {
+            state.party.forEach { hero ->
+                hero.hp = (hero.hp - 1).coerceAtLeast(1) // Anchor tax: cannot kill, but weakens
+            }
+            state.logEntries.add("Krew: Kotwica porusza się, a Naczynia krwawią.")
+        }
+
         state.world.globalStability += delta
         state.normalizeState()
         val after = state.world.globalStability
         
         if (before != after) {
-            state.logEntries.add("Stabilność: $after (${if (delta > 0) "+" else ""}$delta). Powód: $reason")
+            state.logEntries.add("TRIBUNAL_LOG: Stabilność: $after. Powód: $reason")
         }
     }
 

@@ -27,6 +27,7 @@ data class QuestProgress(
 data class QuestState(
     val activeQuestIds: MutableSet<String> = mutableSetOf(),
     val completedQuestIds: MutableSet<String> = mutableSetOf(),
+    val failedQuestIds: MutableSet<String> = mutableSetOf(),
     val progress: MutableMap<String, QuestProgress> = mutableMapOf(),
     val worldFlags: MutableSet<String> = mutableSetOf()
 )

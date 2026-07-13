@@ -85,6 +85,12 @@ class QuestEngine @Inject constructor(
         if (p.status != QuestStatus.ACTIVE) return
         val def = registry[questId] ?: return
         
+        if (def.steps.isEmpty()) {
+            state.quest.progress[questId] = p.copy(status = QuestStatus.OBJECTIVE_MET)
+            state.logEntries.add("CEL OSIĄGNIĘTY: ${def.title}")
+            return
+        }
+
         if (p.currentStepIndex < def.steps.size - 1) {
             state.quest.progress[questId] = p.copy(currentStepIndex = p.currentStepIndex + 1)
         } else {
@@ -112,6 +118,7 @@ class QuestEngine @Inject constructor(
 
     fun failQuestDirect(state: GameState, questId: String) {
         state.quest.activeQuestIds.remove(questId)
+        state.quest.failedQuestIds.add(questId)
         state.quest.progress[questId]?.let {
             state.quest.progress[questId] = it.copy(status = QuestStatus.FAILED)
         }
@@ -136,14 +143,16 @@ class QuestEngine @Inject constructor(
 
     fun getActiveQuestsForCity(cityId: String): List<QuestDefinition> {
         val state = gameRepository.currentState()
+        // FIX: Active quests are global for expedition, but we can prioritize/filter if needed.
+        // For now, returning all active quests to ensure they show up in expedition screen.
         return state.quest.activeQuestIds
             .mapNotNull { registry[it] }
-            .filter { it.cityId == cityId || it.steps.getOrNull(state.quest.progress[it.id]?.currentStepIndex ?: -1)?.targetId == cityId }
     }
 
     fun getVisibleQuestBoard(state: GameState): Map<String, List<QuestDefinition>> {
+        val sharedVisited = mutableSetOf<String>()
         return registry.values
-            .filter { !it.isHidden && getStatus(it.id, state) == QuestStatus.AVAILABLE }
+            .filter { !it.isHidden && getStatus(it.id, state, sharedVisited) == QuestStatus.AVAILABLE }
             .groupBy { it.cityId }
             .mapValues { (cityId, quests) ->
                 val seed = cityId.hashCode().toLong() + (state.world.day / 3)

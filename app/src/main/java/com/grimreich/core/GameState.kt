@@ -45,10 +45,6 @@ data class GameState(
     val grantedRewardFlags: MutableSet<String> = mutableSetOf(),
     val companionShadows: MutableList<Hero> = mutableListOf()
 ) {
-    var grimCurrentRegion: String
-        get() = world.locationId
-        set(value) { world.locationId = value }
-
     fun trimLogs() {
         if (logEntries.size > 100) {
             val trimmed = logEntries.takeLast(100)
@@ -65,6 +61,11 @@ data class GameState(
         world.globalStability = world.globalStability.coerceIn(0, 100)
         world.echoIntensity = world.echoIntensity.coerceIn(0f, 1f)
         world.collapseProgress = world.collapseProgress.coerceIn(0f, 1f)
+
+        // Project Anchor: Ensure anchorIdentity is synced with playerName
+        if (persistentMeta.anchorIdentity == null && playerName != null) {
+            persistentMeta.anchorIdentity = playerName
+        }
 
         party.forEach { it.normalize() }
 

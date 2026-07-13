@@ -9,9 +9,9 @@ class GrimMapActions @Inject constructor(
     private val gameRepository: GameRepository
 ) {
     fun openRegion(root: GameRootViewModel, regionId: String) {
-        val state = gameRepository.currentState()
-        state.grimCurrentRegion = regionId
-        gameRepository.persistCurrentState()
+        gameRepository.updateState { state ->
+            state.world.locationId = regionId
+        }
         root.setMode(GameScreenMode.CITY)
     }
 

@@ -59,10 +59,10 @@ class CombatSystem @Inject constructor(
             // Build Initiative Order
             val slots = mutableListOf<InitiativeSlot>()
             state.party.filter { !it.isDead }.forEach { hero ->
-                val initVal = hero.agility * 2 + (0..3).random()
+                val initVal = hero.agility * 2 + combatRound.randomProvider.nextInt(0, 4)
                 slots.add(InitiativeSlot(hero.id, true, initVal))
             }
-            val enemyInit = enemy.stats.speed * 2 + (0..3).random()
+            val enemyInit = enemy.stats.speed * 2 + combatRound.randomProvider.nextInt(0, 4)
             slots.add(InitiativeSlot("ENEMY", false, enemyInit))
             
             state.combat.initiativeOrder.clear()
@@ -257,7 +257,7 @@ class CombatSystem @Inject constructor(
         state.party.filter { !it.isDead }.forEach { hero ->
             // Base init is agility, but affected by health and morale
             val healthMod = if (hero.hp < hero.maxHp / 4) -5 else 0
-            val initVal = (hero.agility * 2 + healthMod + (0..5).random()).coerceAtLeast(1)
+            val initVal = (hero.agility * 2 + healthMod + combatRound.randomProvider.nextInt(0, 6)).coerceAtLeast(1)
             slots.add(InitiativeSlot(hero.id, true, initVal))
         }
         
@@ -265,7 +265,7 @@ class CombatSystem @Inject constructor(
         val typeStr = c.enemyType ?: "BANDIT"
         val type = try { EnemyType.valueOf(typeStr) } catch (e: Exception) { EnemyType.BANDIT }
         val enemy = Bestiary.get(type)
-        val enemyInit = enemy.stats.speed * 2 + (0..5).random()
+        val enemyInit = enemy.stats.speed * 2 + combatRound.randomProvider.nextInt(0, 6)
         slots.add(InitiativeSlot("ENEMY", false, enemyInit))
 
         c.initiativeOrder.clear()

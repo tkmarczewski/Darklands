@@ -153,7 +153,7 @@ class AudioEngine @Inject constructor(
             route.contains("main_menu") -> R.raw.ost_main_menu
             route.contains("city") -> {
                 val state = gameRepository.get().currentState()
-                val currentCity = state.grimCurrentRegion.lowercase()
+                val currentCity = state.world.locationId.lowercase()
                 when {
                     currentCity.contains("zakon") || currentCity.contains("fortress") -> R.raw.ost_faction_order
                     currentCity.contains("serce") || currentCity.contains("heart") -> R.raw.ost_magic_location

@@ -22,6 +22,12 @@ class CollapseEngine @Inject constructor(
     }
 
     fun processCollapseEventDirect(state: GameState, event: CollapseEvent) {
+        // Project Anchor: The Breath - End of Simulation
+        if (state.world.ontologicalLevel == com.grimreich.grimreich.v1.OntologicalLevel.ABSOLUTE && state.world.globalStability >= 100) {
+            state.logEntries.add("TRIBUNAL_LOG: Nie ma już błędów. Możesz przestać być Kotwicą. Świat oddycha sam.")
+            return // Simulation frozen in perfection
+        }
+
         val progressBefore = state.world.collapseProgress
         
         worldStabilitySystem.advanceCollapseDirect(state, event)

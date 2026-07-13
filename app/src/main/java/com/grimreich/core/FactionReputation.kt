@@ -55,12 +55,18 @@ class FactionReputationSystem @Inject constructor(
     fun changeReputation(factionId: String, delta: Int): String {
         var result = ""
         gameRepository.updateState { state ->
+            val faction = FactionCatalogue.findById(factionId) ?: run {
+                result = "Nieznana frakcja: $factionId"
+                return@updateState
+            }
             val current = state.reputation.globalFactions[factionId] ?: 0
             val next = (current + delta).coerceIn(-100, 100)
             state.reputation.globalFactions[factionId] = next
             
             val label = reputationLabel(next)
-            result = "Twoja reputacja u ${FactionCatalogue.findById(factionId)?.name} zmieniła się na: $label ($delta)"
+            val appliedDelta = next - current
+            result = "Twoja reputacja u ${faction.name} zmieniła się na: $label ($appliedDelta)"
+            state.logEntries.add("TRIBUNAL_LOG_014: Reputacja ${faction.name}: $next ($appliedDelta).")
         }
         return result
     }

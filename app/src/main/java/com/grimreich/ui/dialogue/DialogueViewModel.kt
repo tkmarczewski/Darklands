@@ -70,7 +70,7 @@ class DialogueViewModel @Inject constructor(
                 }
             }?.filter { it.isVisible } ?: emptyList()
 
-            val currentCity = cityCatalogue.get(state.grimCurrentRegion)
+            val currentCity = cityCatalogue.get(state.world.locationId)
 
             DialogueUiState(
                 currentNode = node?.let { dialogueManager.applyWorldEffects(it, state.world.globalStability) },

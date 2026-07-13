@@ -48,7 +48,7 @@ class TravelSystem @Inject constructor(
 
     fun travelTo(destCityId: String) {
         val state = gameRepository.currentState()
-        val current = state.grimCurrentRegion
+        val current = state.world.locationId
         
         if (current == destCityId) return
         
@@ -61,7 +61,6 @@ class TravelSystem @Inject constructor(
         }
 
         gameRepository.updateState { s ->
-            s.grimCurrentRegion = destCityId
             s.world.locationId = destCityId
             s.world.day += daysSpent
             

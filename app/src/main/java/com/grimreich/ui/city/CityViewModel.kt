@@ -56,7 +56,7 @@ class CityViewModel @Inject constructor(
         gameRepository.gameState,
         _isQuestMenuOpen
     ) { state, questMenuOpen ->
-        val cityId = state.grimCurrentRegion
+        val cityId = state.world.locationId
         val cityData = cityCatalogue.get(cityId)
         
         // --- TRIGGER VERDICT INCIDENTS ---
@@ -121,8 +121,15 @@ class CityViewModel @Inject constructor(
 
     private fun startDialogue(name: String, role: String, node: String) {
         val state = gameRepository.currentState()
-        val cityId = state.grimCurrentRegion
+        val cityId = state.world.locationId
         
+        // Project Anchor: Glitch Address - NPC sees the Player name when stability is low
+        val addressedName = if (state.world.globalStability < 30) {
+            state.playerName?.uppercase() ?: name
+        } else {
+            name
+        }
+
         val questToComplete = state.quest.progress.values.find {
             val def = questEngine.getDefinition(it.questId)
             it.status == QuestStatus.OBJECTIVE_MET && 
@@ -141,21 +148,21 @@ class CityViewModel @Inject constructor(
         gameRepository.updateState { s ->
             if (questToComplete != null) {
                 s.pendingAction = com.grimreich.core.PendingWorldAction.Dialogue(
-                    npcName = name,
+                    npcName = addressedName,
                     npcRole = role,
                     nodeId = targetNode,
                     relatedQuestId = questToComplete.questId
                 )
             } else {
                 s.pendingAction = com.grimreich.core.PendingWorldAction.Dialogue(
-                    npcName = name,
+                    npcName = addressedName,
                     npcRole = role,
                     nodeId = targetNode
                 )
             }
         }
         
-        emitEffect(CityUiEffect.NavigateToDialogue(name, role, targetNode))
+        emitEffect(CityUiEffect.NavigateToDialogue(addressedName, role, targetNode))
     }
 
     private fun selectQuestAndOpenDialogue(quest: QuestDefinition) {

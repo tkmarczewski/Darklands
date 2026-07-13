@@ -44,26 +44,21 @@ class StatePersistenceManager @Inject constructor(
     private val slotsFile: File get() = File(context.filesDir, slotsFileName)
 
     suspend fun persist(session: SessionStateDto) = withContext(Dispatchers.IO) {
-        // PERFORMANCE OPTIMIZATION: Encode once, generate checksum from string
-        val sessionWithoutChecksum = session.copy(checksum = null)
-        val dataJson = json.encodeToString(SessionStateDto.serializer(), sessionWithoutChecksum)
+        // Project Anchor: Ensure data is consistent before write
+        val dataJson = json.encodeToString(SessionStateDto.serializer(), session)
         val checksum = SaveIntegrity.generateChecksum(dataJson)
-        
-        // FORMAT: CHECKSUM<NEWLINE>JSON
         val finalContent = "$checksum\n$dataJson"
 
         mutex.withLock {
             try {
                 Log.d(TAG, "Persisting session to: ${sessionFile.absolutePath}")
-                
                 FileOutputStream(sessionFile).use { fos ->
                     fos.write(finalContent.toByteArray())
                     fos.flush()
-                    fos.fd.sync() // Ensure physical disk write
+                    fos.fd.sync()
                 }
-                Log.d(TAG, "Session persisted successfully. Size: ${sessionFile.length()} bytes")
             } catch (e: Exception) {
-                Log.e(TAG, "Blad zapisu sesji do pliku: $sessionFileName", e)
+                Log.e(TAG, "Blad zapisu sesji", e)
             }
         }
     }

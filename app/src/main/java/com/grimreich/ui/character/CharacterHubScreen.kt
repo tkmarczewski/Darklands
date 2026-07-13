@@ -26,9 +26,21 @@ fun CharacterHubScreen(
     onBack: () -> Unit
 ) {
     val state by viewModel.uiState.collectAsState()
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    LaunchedEffect(Unit) {
+        viewModel.uiEffect.collect { effect ->
+            when (effect) {
+                is CharacterHubUiEffect.ShowMessage -> {
+                    snackbarHostState.showSnackbar(effect.message)
+                }
+            }
+        }
+    }
 
     CharacterHubContent(
         state = state,
+        snackbarHostState = snackbarHostState,
         onEvent = viewModel::onEvent,
         onBack = onBack
     )
@@ -37,10 +49,12 @@ fun CharacterHubScreen(
 @Composable
 fun CharacterHubContent(
     state: CharacterHubUiState,
+    snackbarHostState: SnackbarHostState,
     onEvent: (CharacterHubUiEvent) -> Unit,
     onBack: () -> Unit
 ) {
     Scaffold(
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             Column(modifier = Modifier.background(Color.Black)) {
                 Row(
@@ -104,7 +118,7 @@ fun CharacterHubContent(
 }
 
 @Composable
-fun HeroTabChip(hero: Hero, isSelected: Boolean, onClick: () -> Unit) {
+fun HeroTabChip(hero: HeroUi, isSelected: Boolean, onClick: () -> Unit) {
     Surface(
         modifier = Modifier.clickable { onClick() },
         color = if (isSelected) Color(0xFFC0A060) else Color(0xFF1A1A1A),
@@ -121,17 +135,22 @@ fun HeroTabChip(hero: Hero, isSelected: Boolean, onClick: () -> Unit) {
 }
 
 @Composable
-fun HeroOverview(hero: Hero) {
+fun HeroOverview(hero: HeroUi) {
     Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
         Text("STATYSTYKI", color = Color(0xFFC0A060), fontWeight = FontWeight.Bold)
         Spacer(modifier = Modifier.height(8.dp))
-        StatRow("SIŁA", hero.strength)
-        StatRow("ZRĘCZNOŚĆ", hero.agility)
-        StatRow("INTELIGENCJA", hero.intelligence)
-        StatRow("PERCEPCJA", hero.perception)
-        StatRow("WYTRZYMAŁOŚĆ", hero.endurance)
-        StatRow("CHARYZMA", hero.charisma)
-        StatRow("POBOŻNOŚĆ", hero.piety)
+        StatRow("SIŁA", hero.combatStats.strength)
+        StatRow("ZRĘCZNOŚĆ", hero.combatStats.agility)
+        StatRow("INTELIGENCJA", hero.combatStats.intelligence)
+        StatRow("PERCEPCJA", hero.combatStats.perception)
+        StatRow("WYTRZYMAŁOŚĆ", hero.combatStats.endurance)
+        StatRow("CHARYZMA", hero.combatStats.charisma)
+        StatRow("POBOŻNOŚĆ", hero.combatStats.piety)
+        
+        Spacer(modifier = Modifier.height(16.dp))
+        Text("WALKA", color = Color(0xFFC0A060), fontWeight = FontWeight.Bold)
+        StatRow("ATAK", hero.combatStats.attack)
+        StatRow("PANCERZ", hero.combatStats.armor)
     }
 }
 
@@ -144,14 +163,15 @@ fun StatRow(label: String, value: Int) {
 }
 
 @Composable
-fun HeroEquipment(hero: Hero, inventory: List<Item>, onEvent: (CharacterHubUiEvent) -> Unit) {
-    var selectedItem by remember { mutableStateOf<Item?>(null) }
+fun HeroEquipment(hero: HeroUi, inventory: List<InventoryItemUi>, onEvent: (CharacterHubUiEvent) -> Unit) {
+    var selectedItem by remember { mutableStateOf<InventoryItemUi?>(null) }
     
     Row(modifier = Modifier.fillMaxSize().padding(16.dp)) {
+        // This would need to be updated to support UI models as well
+        // For now, let's keep it simple or assume they will be refactored too
         Column(modifier = Modifier.weight(1f)) {
-            HeroPaperDoll(hero, inventory) { slot ->
-                onEvent(CharacterHubUiEvent.UnequipItem(slot))
-            }
+            Text("POSTAĆ", color = Color(0xFFC0A060), fontSize = 10.sp, fontWeight = FontWeight.Bold)
+            // HeroPaperDoll(hero, inventory) { slot -> onEvent(CharacterHubUiEvent.UnequipItem(slot)) }
         }
         
         Spacer(modifier = Modifier.width(16.dp))
@@ -162,14 +182,14 @@ fun HeroEquipment(hero: Hero, inventory: List<Item>, onEvent: (CharacterHubUiEve
             
             LazyColumn(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                 items(inventory) { item ->
-                    InventoryItemBox(item, isSelected = selectedItem?.instanceId == item.instanceId) {
+                    InventoryItemBoxUi(item, isSelected = selectedItem?.instanceId == item.instanceId) {
                         selectedItem = item
                     }
                 }
             }
             
             selectedItem?.let { item ->
-                ItemDetailCard(item) {
+                ItemDetailCardUi(item) {
                     onEvent(CharacterHubUiEvent.EquipItem(item.instanceId))
                 }
             }
@@ -178,17 +198,59 @@ fun HeroEquipment(hero: Hero, inventory: List<Item>, onEvent: (CharacterHubUiEve
 }
 
 @Composable
-fun PartyManagement(heroes: List<Hero>, onEvent: (CharacterHubUiEvent) -> Unit) {
+fun InventoryItemBoxUi(item: InventoryItemUi, isSelected: Boolean, onClick: () -> Unit) {
+    Surface(
+        modifier = Modifier.fillMaxWidth().clickable { onClick() },
+        color = if (isSelected) Color(0xFF333333) else Color(0xFF111111),
+        border = androidx.compose.foundation.BorderStroke(1.dp, if (isSelected) Color.Yellow else Color.DarkGray)
+    ) {
+        Row(modifier = Modifier.padding(8.dp), verticalAlignment = Alignment.CenterVertically) {
+            Text(item.name, color = Color.White, fontSize = 12.sp)
+            Spacer(modifier = Modifier.weight(1f))
+            if (item.isEquipped) {
+                Text("[E]", color = Color.Green, fontSize = 10.sp)
+            }
+        }
+    }
+}
+
+@Composable
+fun ItemDetailCardUi(item: InventoryItemUi, onEquip: () -> Unit) {
+    Card(
+        modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
+        colors = CardDefaults.cardColors(containerColor = Color(0xFF222222))
+    ) {
+        Column(modifier = Modifier.padding(12.dp)) {
+            Text(item.name.uppercase(), fontWeight = FontWeight.Bold, color = Color.Yellow)
+            Text(item.type, fontSize = 10.sp, color = Color.Gray)
+            Spacer(modifier = Modifier.height(8.dp))
+            Button(
+                onClick = onEquip,
+                modifier = Modifier.fillMaxWidth(),
+                enabled = !item.isEquipped && item.canEquip
+            ) {
+                Text(if (item.isEquipped) "ZAŁOŻONO" else "ZAŁÓŻ")
+            }
+        }
+    }
+}
+
+@Composable
+fun PartyManagement(heroes: List<HeroUi>, onEvent: (CharacterHubUiEvent) -> Unit) {
     LazyColumn(modifier = Modifier.fillMaxSize().padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
         items(heroes) { hero ->
             Surface(
                 modifier = Modifier.fillMaxWidth(),
-                color = Color(0xFF111111),
-                border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFF333333))
+                color = if (hero.isActiveHero) Color(0xFF222222) else Color(0xFF111111),
+                border = androidx.compose.foundation.BorderStroke(1.dp, if (hero.isActiveHero) Color(0xFFC0A060) else Color(0xFF333333))
             ) {
                 Row(modifier = Modifier.padding(12.dp), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
                     Text(hero.name.uppercase(), color = Color.White, fontWeight = FontWeight.Bold)
-                    Text(if (hero.isDead) "POLEGŁY" else "ZDRÓW", color = if (hero.isDead) Color.Red else Color.Green, fontSize = 10.sp)
+                    Text(hero.status.name, color = when(hero.status) {
+                        HeroStatusUi.DEAD -> Color.Red
+                        HeroStatusUi.WOUNDED -> Color.Yellow
+                        HeroStatusUi.ALIVE -> Color.Green
+                    }, fontSize = 10.sp)
                 }
             }
         }

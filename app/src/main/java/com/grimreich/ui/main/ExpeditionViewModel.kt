@@ -86,7 +86,7 @@ class ExpeditionViewModel @Inject constructor(
     }
 
     private fun updateUiState(state: GameState) {
-        val cityId = state.grimCurrentRegion
+        val cityId = state.world.locationId
         val city = cityCatalogue.get(cityId)
         val quests = questEngine.getActiveQuestsForCity(cityId)
         val activeEncounter = encounterSystem.activeEncounter

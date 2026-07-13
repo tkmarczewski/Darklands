@@ -187,7 +187,7 @@ class DefaultCombatRandomProvider @Inject constructor() : CombatRandomProvider {
 class CombatRound @Inject constructor(
     private val gameRepository: GameRepository,
     private val moraleSystem: MoraleSystem,
-    private val randomProvider: CombatRandomProvider
+    val randomProvider: CombatRandomProvider
 ) {
 
     fun resolveRound(

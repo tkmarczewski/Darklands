@@ -218,12 +218,14 @@ fun ItemDto.toDomain(): Item = Item(
 fun QuestState.toDto(): QuestStateDto = QuestStateDto(
     activeQuestIds = activeQuestIds.toList(),
     completedQuestIds = completedQuestIds.toList(),
+    failedQuestIds = failedQuestIds.toList(),
     progress = progress.mapValues { it.value.toDto() }
 )
 
 fun QuestStateDto.toDomain(): QuestState = QuestState().also {
     it.activeQuestIds.addAll(activeQuestIds)
     it.completedQuestIds.addAll(completedQuestIds)
+    it.failedQuestIds.addAll(failedQuestIds)
     it.progress.putAll(progress.mapValues { entry -> entry.value.toDomain() })
 }
 
@@ -383,12 +385,14 @@ fun StatusEffectDto.toDomain(): StatusEffect = StatusEffect(
 )
 
 fun PersistentMeta.toDto(): PersistentMetaDto = PersistentMetaDto(
+    anchorIdentity = anchorIdentity,
     totalSessionsFinished = totalSessionsFinished,
     unlockedLegacyBuffs = unlockedLegacyBuffs.toList(),
     maxMetaAwarenessReached = maxMetaAwarenessReached
 )
 
 fun PersistentMetaDto.toDomain(): PersistentMeta = PersistentMeta(
+    anchorIdentity = anchorIdentity,
     totalSessionsFinished = totalSessionsFinished,
     maxMetaAwarenessReached = maxMetaAwarenessReached
 ).also {

@@ -139,7 +139,7 @@ fun DevMenuOverlay(
                                     state.party.add(hero)
                                     state.activeHeroId = hero.id
                                 }
-                                state.grimCurrentRegion = "wybrzeze_polnocne"
+                                state.world.locationId = "wybrzeze_polnocne"
                                 state.gold += 1000
                             }
                             root.setMode(GameScreenMode.HUB)
@@ -147,28 +147,28 @@ fun DevMenuOverlay(
                         }
                         DevBtn("DUMP STATE") {
                             val state = root.gameRepository.currentState()
-                            android.util.Log.e("DUMP", "CITY: ${state.grimCurrentRegion}")
+                            android.util.Log.e("DUMP", "CITY: ${state.world.locationId}")
                             android.util.Log.e("DUMP", "PARTY SIZE: ${state.party.size}")
                             state.party.forEach { android.util.Log.e("DUMP", "  - ${it.name} (${it.id})") }
                             android.util.Log.e("DUMP", "ACTIVE QUESTS: ${state.quest.activeQuestIds}")
                         }
                         DevBtn("TP: NORTH") {
                             root.gameRepository.updateState { state ->
-                                state.grimCurrentRegion = "wybrzeze_polnocne"
+                                state.world.locationId = "wybrzeze_polnocne"
                             }
                             root.setMode(GameScreenMode.CITY)
                             visible = false
                         }
                         DevBtn("TP: TWIERDZA") {
                             root.gameRepository.updateState { state ->
-                                state.grimCurrentRegion = "twierdza_zakonu"
+                                state.world.locationId = "twierdza_zakonu"
                             }
                             root.setMode(GameScreenMode.CITY)
                             visible = false
                         }
                         DevBtn("TP: SERCE") {
                             root.gameRepository.updateState { state ->
-                                state.grimCurrentRegion = "serce_krainy"
+                                state.world.locationId = "serce_krainy"
                             }
                             root.setMode(GameScreenMode.CITY)
                             visible = false

@@ -27,7 +27,7 @@ class MutationEngine @Inject constructor(
                 mutationSystem.checkForNewMutationDirect(
                     state = state,
                     heroId = hero.id,
-                    regionId = state.grimCurrentRegion,
+                    regionId = state.world.locationId,
                     currentStability = state.world.globalStability
                 )
             }

@@ -11,7 +11,6 @@ class GameLoopController @Inject constructor(
     private val gameRepository: GameRepository,
     private val gameBootstrapper: GameBootstrapper,
     private val questEngine: QuestEngine,
-    private val questManifest: QuestManifest,
     private val travelSystem: TravelSystem,
     private val cityCatalogue: CityCatalogue,
     private val verdictIncidentsSystem: VerdictIncidentsSystem,
@@ -33,7 +32,6 @@ class GameLoopController @Inject constructor(
             Log.i(TAG, "Rozpoczynam bootstrap swiata GrimReich (seed=$seed)")
             gameRepository.clearSessionAndReset()
             gameBootstrapper.bootstrapFreshWorld(seed)
-            questManifest.seed()
 
             val startingCityId = cityCatalogue.startingCityId
             return PlayerState(currentCityId = startingCityId)
@@ -66,9 +64,9 @@ class GameLoopController @Inject constructor(
         val quest = questEngine.getDefinition(questId) ?: error("Nieznane zadanie: $questId")
         val progress = state.quest.progress[questId]
 
-        val destinationCity = if (progress != null && progress.status == QuestStatus.ACTIVE) {
+        val destinationCity = if (progress != null && (progress.status == QuestStatus.ACTIVE || progress.status == QuestStatus.OBJECTIVE_MET)) {
             val step = quest.steps.getOrNull(progress.currentStepIndex)
-            if (step != null && step.type == StepType.EXPEDITION) {
+            if (step != null && (step.type == StepType.EXPEDITION || step.type == StepType.DIALOGUE)) {
                 step.targetId
             } else {
                 quest.cityId

@@ -4,6 +4,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class PersistentMetaDto(
+    var anchorIdentity: String? = null,
     var totalSessionsFinished: Int,
     val unlockedLegacyBuffs: List<String>,
     var maxMetaAwarenessReached: Int
@@ -21,6 +22,7 @@ data class QuestProgressDto(
 data class QuestStateDto(
     val activeQuestIds: List<String>,
     val completedQuestIds: List<String>,
+    val failedQuestIds: List<String> = emptyList(),
     val progress: Map<String, QuestProgressDto>
 )
 

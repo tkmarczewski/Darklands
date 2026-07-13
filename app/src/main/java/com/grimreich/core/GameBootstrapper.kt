@@ -76,9 +76,6 @@ class GameBootstrapper @Inject constructor(
             state.world.day = 1
             state.world.timeOfDay = "morning"
             state.world.locationId = cityCatalogue.startingCityId
-            // FIX-QUESTS: grimCurrentRegion must match startingCityId so that
-            // getAllRelevantQuestsForCity() finds quests for the starting city.
-            state.grimCurrentRegion = cityCatalogue.startingCityId
             
             state.gold = GameConstants.INITIAL_GOLD
 

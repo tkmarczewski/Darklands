@@ -53,7 +53,7 @@ class HubViewModel @Inject constructor(
         combine(gameRepository.gameState, gameRepository.gameLogs) { state, logs ->
             state to logs
         }.onEach { (state, logs) ->
-            val currentCityId = state.grimCurrentRegion
+            val currentCityId = state.world.locationId
             val city = cityCatalogue.get(currentCityId)
             
             val stability = state.world.globalStability
@@ -71,7 +71,7 @@ class HubViewModel @Inject constructor(
                 else -> com.grimreich.R.string.stability_high
             }
 
-            val dailySeed = state.world.day.toLong() + state.grimCurrentRegion.hashCode()
+            val dailySeed = state.world.day.toLong() + state.world.locationId.hashCode()
             val playerName = state.playerName ?: "Wędrowiec"
             val heroName = state.party.firstOrNull { !it.isDead }?.name ?: state.heroName ?: "Kotwica"
             

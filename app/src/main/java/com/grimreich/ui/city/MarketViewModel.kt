@@ -43,7 +43,7 @@ class MarketViewModel @Inject constructor(
 
     fun refresh() {
         val state = gameRepository.currentState()
-        val cityId = state.grimCurrentRegion
+        val cityId = state.world.locationId
         val city = cityCatalogue.get(cityId)
         
         val stock = city?.marketStock ?: emptyList()
