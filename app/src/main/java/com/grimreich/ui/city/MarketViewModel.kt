@@ -10,6 +10,8 @@ import kotlinx.coroutines.flow.*
 import javax.inject.Inject
 import java.text.Normalizer
 
+import com.grimreich.core.Hero
+
 data class MarketItem(
     val id: String,
     val name: String,
@@ -22,6 +24,7 @@ data class MarketUiState(
     val playerGold: Int = 0,
     val itemsForSale: List<MarketItem> = emptyList(),
     val itemsToSell: List<MarketItem> = emptyList(),
+    val party: List<Hero> = emptyList(), // DODANO dla dolnego paska V9
     val errorMessage: String? = null
 )
 
@@ -62,7 +65,8 @@ class MarketViewModel @Inject constructor(
                 cityName = city?.name ?: "Nieznane Miasto",
                 playerGold = state.gold,
                 itemsForSale = forSale,
-                itemsToSell = toSell
+                itemsToSell = toSell,
+                party = state.party.toList()
             )
         }
     }

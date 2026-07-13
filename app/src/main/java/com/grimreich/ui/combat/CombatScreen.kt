@@ -1,6 +1,8 @@
 package com.grimreich.ui.combat
 
 import androidx.compose.animation.core.*
+import androidx.compose.foundation.border
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -13,13 +15,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.grimreich.R
-import com.grimreich.core.GameConstants
+import com.grimreich.ui.shared.*
+import com.grimreich.ui.effects.glitchEffect
 import kotlin.random.Random
 
 @Composable
@@ -28,179 +33,147 @@ fun CombatScreen(
     onExit: () -> Unit
 ) {
     val state by viewModel.uiState.collectAsState()
+    val context = LocalContext.current
 
-    // GLITCH ANIMATION
-    val infiniteTransition = rememberInfiniteTransition(label = "glitch")
-    val jitterX by infiniteTransition.animateFloat(
-        initialValue = -1f,
-        targetValue = 1f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(40, easing = LinearEasing),
-            repeatMode = RepeatMode.Reverse
-        ),
-        label = "jitter"
-    )
-
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(if (state.worldStability < 10 && Random.nextFloat() < 0.05f) Color(0xFF200000) else Color.Black)
-            .padding(16.dp)
-    ) {
-        // ONTOLOGICAL LEVEL DISPLAY
-        if (state.ontologicalLevel != com.grimreich.grimreich.v1.OntologicalLevel.MATERIAL) {
-            Text(
-                text = "PARADYGMAT: ${state.ontologicalLevel.displayName.uppercase()}",
-                color = Color(0xFFADFF2F),
-                fontSize = 9.sp,
-                fontWeight = FontWeight.ExtraBold,
-                modifier = Modifier.padding(bottom = 4.dp)
-            )
-        }
-
-        // ENEMY
-        val enemyName = if (state.worldStability < 30 && Random.nextFloat() < 0.1f) "UNKNOWN_ENTITY" else state.combat.enemyName
-        CombatantRow(enemyName, state.combat.enemyHp, state.combat.enemyMaxHp, isEnemy = true, stability = state.worldStability, jitter = jitterX)
-        
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // LOG
-        Surface(
-            color = Color(0xFF111111),
-            modifier = Modifier.weight(1f).fillMaxWidth(),
-            border = androidx.compose.foundation.BorderStroke(1.dp, if (state.worldStability < 20) Color.Red else Color.DarkGray)
-        ) {
-            val reversedLogs = remember(state.combat.log) { state.combat.log.asReversed() }
-            LazyColumn(
-                modifier = Modifier.padding(12.dp),
-                reverseLayout = true
+    Box(modifier = Modifier.fillMaxSize().background(Color.Black).padding(4.dp)) {
+        Column(modifier = Modifier.fillMaxSize()) {
+            
+            // --- GÓRNY PASEK: STATUS PARADYGMATU ---
+            Row(
+                modifier = Modifier.fillMaxWidth().height(30.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                // Using index as key for reversed logs to ensure smooth scrolling
-                itemsIndexed(reversedLogs, key = { index, _ -> index }) { _, msg ->
-                    val displayedMsg = if (state.worldStability < 15) {
-                        msg.map { if (Random.nextFloat() < 0.03f) '#' else it }.joinToString("")
-                    } else msg
-                    Text(displayedMsg, color = if (state.worldStability < 10) Color.Red else Color.LightGray, fontSize = 11.sp, lineHeight = 14.sp)
-                }
+                Text(
+                    text = "PROTOKÓŁ WALKI: ${state.ontologicalLevel.displayName.uppercase()}", 
+                    color = Color(0xFFC0A060), 
+                    fontSize = 11.sp, 
+                    fontWeight = FontWeight.Bold
+                )
+                Text(
+                    text = "STABILNOŚĆ: ${state.worldStability}%", 
+                    color = if(state.worldStability < 20) Color.Red else Color.Green, 
+                    fontSize = 11.sp
+                )
             }
-        }
 
-        Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(4.dp))
 
-        // HEROES (Party List / Selector)
-        Row(
-            modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            state.party.forEach { hero ->
-                val isTarget = state.combat.currentTargetHeroId == hero.id
-                val isActive = state.combat.activeHeroId == hero.id
+            // --- KOKPIT TAKTYCZNY (3 KAFLE V9) ---
+            Row(modifier = Modifier.weight(1f).fillMaxWidth()) {
                 
-                Surface(
-                    modifier = Modifier
-                        .weight(1f)
-                        .clickable(enabled = !hero.isDead) { viewModel.selectHero(hero.id) },
-                    color = if (isActive) Color(0xFF333300) else Color(0xFF111111),
-                    border = androidx.compose.foundation.BorderStroke(
-                        if (isTarget) 2.dp else 1.dp,
-                        if (isTarget) Color.Red else if (isActive) Color.Yellow else Color.DarkGray
-                    ),
-                    shape = MaterialTheme.shapes.extraSmall
-                ) {
-                    Column(modifier = Modifier.padding(4.dp)) {
-                        Text(
-                            hero.name.uppercase(), 
-                            color = if (hero.isDead) Color.Gray else Color.White, 
-                            fontSize = 10.sp, 
-                            fontWeight = FontWeight.Bold,
-                            maxLines = 1
-                        )
-                        LinearProgressIndicator(
-                            progress = { if (hero.maxHp > 0) hero.hp.toFloat() / hero.maxHp else 0f },
-                            modifier = Modifier.fillMaxWidth().height(2.dp),
-                            color = if (hero.hp < 10) Color.Red else Color(0xFFADFF2F),
-                            trackColor = Color.Black
-                        )
+                // 1. LEWY KAFEL: LOGI BITWNE (TRIBUNAL LOG)
+                GothicObsidianCard(modifier = Modifier.weight(0.7f).fillMaxHeight()) {
+                    Text(text = "TRIBUNAL_LOG_014", color = Color(0xFFC0A060), fontSize = 10.sp, fontWeight = FontWeight.Bold)
+                    Divider(color = Color(0x33C0A060), thickness = 1.dp, modifier = Modifier.padding(vertical = 4.dp))
+                    
+                    val reversedLogs = remember(state.combat.log) { state.combat.log.asReversed() }
+                    LazyColumn(modifier = Modifier.fillMaxSize(), reverseLayout = true) {
+                        itemsIndexed(reversedLogs) { _, msg ->
+                            Text(
+                                text = "> $msg", 
+                                color = if (state.worldStability < 15) Color.Red else Color.LightGray, 
+                                fontSize = 10.sp, 
+                                lineHeight = 13.sp,
+                                modifier = Modifier.padding(bottom = 2.dp)
+                            )
+                        }
                     }
                 }
-            }
-        }
 
-        Spacer(modifier = Modifier.height(12.dp))
+                Spacer(modifier = Modifier.width(4.dp))
 
-        // ACTIONS
-        if (state.combat.active) {
-            // Skill List
-            if (state.availableSkills.isNotEmpty()) {
-                LazyColumn(modifier = Modifier.heightIn(max = 120.dp)) {
-                    items(state.availableSkills) { skill ->
-                        Button(
-                            onClick = { viewModel.useSkill(skill.id) },
-                            modifier = Modifier.fillMaxWidth().height(36.dp).padding(vertical = 2.dp),
-                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF333333)),
-                            shape = MaterialTheme.shapes.extraSmall
+                // 2. ŚRODKOWY KAFEL: ARENA (WIZJA WROGA)
+                GothicObsidianCard(modifier = Modifier.weight(1.3f).fillMaxHeight(), headerColor = Color(0xFF800000)) {
+                    Box(modifier = Modifier.fillMaxSize()) {
+                        // WIZUALIZACJA WROGA
+                        Column(
+                            modifier = Modifier.fillMaxSize(),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.Center
                         ) {
-                            val costLabel = buildString {
-                                if (skill.staminaCost > 0) append("${skill.staminaCost}S ")
-                                if (skill.favorCost > 0) append("${skill.favorCost}F ")
-                                if (skill.echoCost > 0) append("${(skill.echoCost * 100).toInt()}%E")
+                            Text(
+                                text = state.combat.enemyName.uppercase(),
+                                color = Color.Red,
+                                fontWeight = FontWeight.ExtraBold,
+                                fontSize = 18.sp
+                            )
+                            Spacer(modifier = Modifier.height(8.dp))
+                            // HP BAR WROGA
+                            Box(modifier = Modifier.width(200.dp).height(8.dp).background(Color(0xFF222222))) {
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxHeight()
+                                        .fillMaxWidth(if (state.combat.enemyMaxHp > 0) state.combat.enemyHp.toFloat() / state.combat.enemyMaxHp else 0f)
+                                        .background(Color.Red)
+                                )
                             }
-                            Text("${skill.name.uppercase()} ($costLabel)", fontSize = 9.sp, fontWeight = FontWeight.Bold)
+                            Text(
+                                text = "${state.combat.enemyHp} / ${state.combat.enemyMaxHp} HP",
+                                color = Color.White,
+                                fontSize = 10.sp,
+                                modifier = Modifier.padding(top = 4.dp)
+                            )
+                        }
+                        
+                        // EFEKTY GLITCH
+                        if (state.worldStability < 30) {
+                            Box(modifier = Modifier.fillMaxSize().glitchEffect(true, 0.2f))
+                        }
+                    }
+                }
+
+                Spacer(modifier = Modifier.width(4.dp))
+
+                // 3. PRAWY KAFEL: MENU AKCJI
+                Column(modifier = Modifier.weight(0.7f).fillMaxHeight()) {
+                    GothicObsidianCard(modifier = Modifier.weight(1.2f), headerColor = Color(0xFF4527A0)) {
+                        Text(text = "UMIEJĘTNOŚCI", color = Color(0xFFC0A060), fontSize = 10.sp, fontWeight = FontWeight.Bold)
+                        Divider(color = Color(0x33C0A060), thickness = 1.dp, modifier = Modifier.padding(vertical = 4.dp))
+                        
+                        LazyColumn(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                            items(state.availableSkills) { skill ->
+                                NavTabV9(
+                                    text = skill.name, 
+                                    onClick = { viewModel.useSkill(skill.id) },
+                                    color = Color(0xFF1A1A1A)
+                                )
+                            }
+                        }
+                    }
+                    Spacer(modifier = Modifier.height(4.dp))
+                    GothicObsidianCard(modifier = Modifier.weight(0.8f), headerColor = Color(0xFF1B5E20)) {
+                        Text(text = "AKCJE", color = Color(0xFFC0A060), fontSize = 10.sp, fontWeight = FontWeight.Bold)
+                        Column(verticalArrangement = Arrangement.spacedBy(4.dp), modifier = Modifier.padding(top = 4.dp)) {
+                            if (state.combat.active) {
+                                NavTabV9("ATAK", onClick = { viewModel.attack() }, color = Color(0xFF4A0000))
+                                NavTabV9("OBRONA", onClick = { viewModel.defend() }, color = Color(0xFF333333))
+                                NavTabV9("REVISION", onClick = { viewModel.useEchoSkill("REVISION") }, color = Color(0xFF0D47A1))
+                            } else {
+                                NavTabV9("ZAKOŃCZ", onClick = { viewModel.exitCombat(onExit) }, color = Color(0xFF400000))
+                            }
                         }
                     }
                 }
             }
 
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(4.dp))
 
-            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                CombatButton(stringResource(R.string.combat_btn_attack), Color(0xFF800000), modifier = Modifier.weight(1f)) { viewModel.attack() }
-                CombatButton(stringResource(R.string.combat_btn_defend), Color(0xFF444444), modifier = Modifier.weight(1f)) { viewModel.defend() }
-            }
-            Spacer(modifier = Modifier.height(8.dp))
-            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                val revLabel = if (state.worldStability < 40) stringResource(R.string.combat_btn_revision) + "_v2" else stringResource(R.string.combat_btn_revision)
-                CombatButton(revLabel, Color(0xFF004488), modifier = Modifier.weight(1f)) { viewModel.useEchoSkill("REVISION") }
-                CombatButton(stringResource(R.string.combat_btn_overwrite), Color(0xFF440088), modifier = Modifier.weight(1f)) { viewModel.useEchoSkill("OVERWRITE") }
-            }
-        } else {
-            Button(
-                onClick = { viewModel.exitCombat(onExit) },
-                modifier = Modifier.fillMaxWidth().height(50.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = if (state.worldStability < 10) Color.Red else Color(0xFF2A2A2A))
-            ) {
-                Text(if (state.worldStability < 5) stringResource(R.string.combat_btn_glitch_exit) else stringResource(R.string.combat_btn_exit), color = Color.White, fontWeight = FontWeight.Bold)
+            // --- DOLNY PASEK: DRUŻYNA (V9) ---
+            GothicObsidianCard(modifier = Modifier.fillMaxWidth().height(80.dp)) {
+                Row(
+                    modifier = Modifier.fillMaxSize(),
+                    horizontalArrangement = Arrangement.SpaceAround,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    state.party.forEach { hero ->
+                        val isActive = state.combat.activeHeroId == hero.id
+                        Box(modifier = Modifier.border(if (isActive) 1.dp else 0.dp, Color.Yellow)) {
+                            HeroPortraitV9(hero = hero, onClick = { viewModel.selectHero(hero.id) })
+                        }
+                    }
+                }
             }
         }
-    }
-}
-
-@Composable
-fun CombatantRow(name: String, hp: Int, maxHp: Int, isEnemy: Boolean, stability: Int = 100, jitter: Float = 0f) {
-    Column(modifier = Modifier.graphicsLayer { 
-        translationX = if (stability < 15) jitter * density else 0f 
-    }) {
-        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-            Text(name.uppercase(), color = if (isEnemy) Color.Red else Color(0xFFE0C080), fontWeight = FontWeight.Bold, fontSize = 13.sp)
-            Text("$hp / $maxHp HP", color = if (stability < 10 && hp < 10) Color.Red else Color.White, fontSize = 11.sp)
-        }
-        LinearProgressIndicator(
-            progress = { if (maxHp > 0) hp.toFloat() / maxHp else 0f },
-            modifier = Modifier.fillMaxWidth().height(4.dp),
-            color = if (isEnemy) Color.Red else Color(0xFFADFF2F),
-            trackColor = Color(0xFF222222)
-        )
-    }
-}
-
-@Composable
-fun CombatButton(text: String, color: Color, modifier: Modifier = Modifier, onClick: () -> Unit) {
-    Button(
-        onClick = onClick,
-        modifier = modifier.height(40.dp),
-        colors = ButtonDefaults.buttonColors(containerColor = color),
-        shape = MaterialTheme.shapes.extraSmall
-    ) {
-        Text(text, fontSize = 11.sp, fontWeight = FontWeight.Bold)
     }
 }
