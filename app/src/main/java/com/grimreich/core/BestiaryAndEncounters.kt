@@ -47,7 +47,11 @@ data class Enemy(
     val stats: EnemyStats,
     val ai: EnemyAI,
     val lootTable: LootTable,
-    val xpReward: Int
+    val xpReward: Int,
+
+    // --- ONTOLOGICAL AUDIT: Hierarchia Bytu ---
+    val ontologicalMass: Int = 5,
+    val ranga: String = "Odrzut" // Odrzut, Naczynie, Dziecko Pęknięcia, etc.
 )
 
 data class LootTable(

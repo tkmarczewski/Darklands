@@ -114,6 +114,10 @@ class GameRootViewModel @Inject constructor(
 
             gameRepository.updateState { state ->
                 state.playerName = _pendingPlayerName ?: "Wędrowiec"
+                
+                // --- ONTOLOGICAL AUDIT: Anchor Sync ---
+                state.persistentMeta.anchorIdentity = state.playerName
+
                 val isRalwing = state.playerName?.trim()?.equals("ralwing", ignoreCase = true) == true || 
                                 name.trim().equals("ralwing", ignoreCase = true)
                 

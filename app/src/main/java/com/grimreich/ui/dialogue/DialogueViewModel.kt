@@ -72,9 +72,17 @@ class DialogueViewModel @Inject constructor(
 
             val currentCity = cityCatalogue.get(state.world.locationId)
 
+            // --- ONTOLOGICAL AUDIT: Glitch Address ---
+            // If stability is low, NPCs might reveal the Player's real name (The Anchor)
+            val finalNpcName = if (state.world.globalStability < 25 && kotlin.random.Random.nextFloat() < 0.3f) {
+                state.playerName ?: npcName
+            } else {
+                npcName
+            }
+
             DialogueUiState(
                 currentNode = node?.let { dialogueManager.applyWorldEffects(it, state.world.globalStability) },
-                npcName = npcName,
+                npcName = finalNpcName,
                 npcRole = npcRole,
                 npcPortrait = dialogueManager.getPortrait(npcRole),
                 backgroundDrawable = currentCity?.backgroundDrawable ?: "bg_city_default",

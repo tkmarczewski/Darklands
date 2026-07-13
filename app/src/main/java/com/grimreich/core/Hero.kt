@@ -67,8 +67,19 @@ data class Hero(
     
     // CAREER MASTERY (Darklands / Iteration 6)
     var isMaster: Boolean = false,
-    var masteryTrait: String? = null
+    var masteryTrait: String? = null,
+
+    // --- ONTOLOGICAL AUDIT: Hierarchia Bytu ---
+    var subjectType: SubjectType = SubjectType.VESSEL,
+    var ontologicalMass: Int = 10 
 ) {
+
+    enum class SubjectType {
+        VESSEL,     // Standardowy mieszkaniec L1
+        AWAKE,      // Przebudzony (Prorok)
+        TRAVELER,   // Inkarnacja Kotwicy
+        ANCHOR      // Sama Kotwica (Gracz)
+    }
 
     /**
      * Normalizes mutable fields to valid ranges.
