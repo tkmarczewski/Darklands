@@ -137,12 +137,21 @@ class CombatSystem @Inject constructor(
             val c = state.combat
             if (!c.active || c.initiativeOrder.isEmpty()) return@updateState
             
-            // 1. Ensure it's a player turn
+            // --- FIX BUG: Round counter must trigger at index 0 regardless of who acts ---
+            if (c.currentTurnIndex == 0) {
+                c.round++
+                // DYNAMIC INITIATIVE: Recalculate every round to account for wounds/buffs
+                recalculateInitiative(state)
+            }
+            result = "Runda ${c.round}"
+
+            // 1. Ensure it's a player turn (if not, resolve enemy turns until it is)
             var currentSlot = c.initiativeOrder[c.currentTurnIndex]
             if (!currentSlot.isPlayer) {
                 resolveEnemyTurnsInternal(state)
+                // If combat ended during enemy turns, return
+                if (!c.active) return@updateState
                 currentSlot = c.initiativeOrder[c.currentTurnIndex]
-                if (!currentSlot.isPlayer) return@updateState
             }
             
             // 2. Resolve Player Action
@@ -154,15 +163,6 @@ class CombatSystem @Inject constructor(
             
             val heroCombatant = heroToCombatant(state, actingHero)
             val enemyCombatant = getEnemyCombatant(c)
-
-            if (c.currentTurnIndex == 0) {
-                c.round++
-                // DYNAMIC INITIATIVE: Recalculate every round to account for wounds/buffs
-                recalculateInitiative(state)
-                // Need to refresh currentSlot after re-sort
-                currentSlot = c.initiativeOrder[c.currentTurnIndex]
-            }
-            result = "Runda ${c.round}"
 
             val playerRound = when {
                 action.startsWith("SKILL:") -> {
@@ -194,7 +194,12 @@ class CombatSystem @Inject constructor(
             resolveEnemyTurnsInternal(state)
         }
 
-        pendingCombatEndCallback?.invoke()
+        // --- FIX BUG: Ensure callbacks are actually called ---
+        val s = gameRepository.currentState()
+        if (!s.combat.active) {
+            onCombatEnd?.invoke()
+        }
+
         return result
     }
 

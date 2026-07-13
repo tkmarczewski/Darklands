@@ -122,5 +122,21 @@
     "steps": [
       { "description": "Zrozum adnotację (Wymaga wysokiej PER/INT).", "type": "META", "targetId": "margin_note_complex" }
     ]
+  },
+  {
+    "id": "q_meta_7",
+    "title": "Ostatni Wpis: Margines Sesji",
+    "description": "Zrozumienie, że nie jesteś bohaterem, lecz tym, który go prowadzi. Ostatnie zabezpieczenie przed wymazaniem.",
+    "rewardGold": 0,
+    "cityId": "serce_krainy",
+    "originNpcId": "archivist",
+    "category": "META",
+    "recommendedLevel": 10,
+    "chainId": "chain_meta",
+    "chainOrder": 7,
+    "prerequisiteQuestId": "q_meta_1",
+    "steps": [
+      { "description": "Stań na krawędzi Szyfru.", "type": "META", "targetId": "meta_truth_reveal" }
+    ]
   }
 ]

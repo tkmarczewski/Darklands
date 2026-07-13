@@ -65,7 +65,10 @@ class CollapseEngine @Inject constructor(
                 worldStabilitySystem.changeEchoDirect(state, 0.15f, "Próg Upadku")
             }
             CollapseScenario.BLOOD_RUIN -> {
-                state.party.forEach { h -> h.hp = (h.hp - (threshold * 10).toInt()).coerceAtLeast(0) }
+                state.party.forEach { h -> 
+                    h.hp = (h.hp - (threshold * 10).toInt()).coerceAtLeast(0) 
+                    h.normalize()
+                }
                 state.logEntries.add("Krew wrze w żyłach wędrowców...")
             }
             CollapseScenario.REFLECTION_RECKONING -> {

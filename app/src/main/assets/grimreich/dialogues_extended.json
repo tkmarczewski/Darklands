@@ -131,7 +131,9 @@
     "choices": [
       {
         "text": "To ja wybieram kierunek.",
-        "targetNodeId": "end"
+        "targetNodeId": "end",
+        "triggerEvent": "COMPLETE_QUEST",
+        "triggerValue": "q_meta_7"
       }
     ]
   }

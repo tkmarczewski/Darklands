@@ -20,7 +20,9 @@ enum class EnemyType {
     // Zwierzęta
     WOLF, WOLF_PACK_LEADER, WILD_BOAR,
     // Specjalne
-    WITCH, DRAGON
+    WITCH, DRAGON,
+    // Ontologiczne
+    PAST_SHADE_ELITE
 }
 
 enum class EnemyAI {
