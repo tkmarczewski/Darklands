@@ -1,4 +1,4 @@
-# Lore Manifesto: GrimReich
+jescze# Lore Manifesto: GrimReich
 
 Ten dokument opisuje fundamenty ontologiczne świata GrimReich, niezbędne dla każdego Mistrza Gry i Dewelopera rozbudowującego system.
 
