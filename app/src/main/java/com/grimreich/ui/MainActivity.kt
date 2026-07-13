@@ -7,6 +7,7 @@ import android.view.WindowInsetsController
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
+import androidx.compose.runtime.collectAsState
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
@@ -32,8 +33,16 @@ class MainActivity : LocalizedActivity() {
 
         setContent {
             GrimTheme {
-                BackHandler { /* Disable system back button to enforce ontological stability */ }
                 val rootViewModel: GameRootViewModel = hiltViewModel()
+                val mode = rootViewModel.mode.collectAsState().value
+                
+                // --- SYSTEM BACK BLOCKER ---
+                // Only allow back button if we are in Main Menu (to exit app)
+                // Otherwise, the back button is disabled to enforce ontological stability.
+                BackHandler(enabled = mode != com.grimreich.ui.main.GameScreenMode.MAIN_MENU) {
+                    android.util.Log.d("TRIBUNAL", "Back action blocked. World stability must be maintained.")
+                }
+
                 DevMenuOverlay(root = rootViewModel) {
                     GameNavHost(root = rootViewModel)
                 }

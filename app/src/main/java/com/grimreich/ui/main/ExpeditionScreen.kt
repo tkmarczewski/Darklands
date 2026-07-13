@@ -13,10 +13,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.grimreich.core.GameConstants
 import com.grimreich.systems.QuestDefinition
 import com.grimreich.systems.Encounter
 import com.grimreich.systems.EncounterChoice
+import com.grimreich.ui.shared.*
 
 @Composable
 fun ExpeditionScreen(
@@ -47,76 +47,98 @@ fun ExpeditionContent(
     state: ExpeditionUiState,
     onEvent: (ExpeditionUiEvent) -> Unit
 ) {
-    Box(modifier = Modifier.fillMaxSize().background(Color.Black)) {
-        Column(
-            modifier = Modifier.fillMaxSize().padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Text("EKSPLORACJA: ${state.regionName.uppercase()}", color = Color(0xFFC0A060), fontSize = 22.sp, fontWeight = FontWeight.Bold)
+    Box(modifier = Modifier.fillMaxSize().background(Color.Black).padding(4.dp)) {
+        Column(modifier = Modifier.fillMaxSize()) {
             
-            Spacer(modifier = Modifier.height(24.dp))
+            // --- GÓRNY PASEK STATUSU ---
+            Row(
+                modifier = Modifier.fillMaxWidth().height(30.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(text = "EKSPLORACJA TERENU", color = Color(0xFFC0A060), fontSize = 12.sp)
+                Text(text = state.regionName.uppercase(), color = Color.White, fontWeight = FontWeight.Bold, fontSize = 14.sp)
+                Text(text = "AGRESJA: WYSOKA", color = Color.Red, fontSize = 12.sp)
+            }
 
-            when (val content = state.content) {
-                ExpeditionContentState.Loading -> {
-                    CircularProgressIndicator(color = Color.Yellow)
-                }
-                is ExpeditionContentState.EncounterActive -> {
-                    EncounterView(content.encounter, onChoice = { onEvent(ExpeditionUiEvent.OnEncounterChoiceClick(it)) })
-                }
-                is ExpeditionContentState.EncounterLog -> {
-                    EncounterLogView(content.message, onDismiss = { onEvent(ExpeditionUiEvent.OnDismissEncounter) })
-                }
-                is ExpeditionContentState.QuestList -> {
-                    if (content.quests.isEmpty()) {
-                        Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.Center) {
-                            Text("Brak aktywnych celów w tym regionie.", color = Color.DarkGray)
-                        }
+            Spacer(modifier = Modifier.height(4.dp))
+
+            // --- KOKPIT EKSPEDYCYJNY (3 KAFLE V9) ---
+            Row(modifier = Modifier.weight(1f).fillMaxWidth()) {
+                
+                // 1. LEWY KAFEL: LOGI I ZAPISY TRYBUNAŁU
+                GothicObsidianCard(modifier = Modifier.weight(0.7f).fillMaxHeight()) {
+                    Text(text = "ZAPISY TERENOWE", color = Color(0xFFC0A060), fontSize = 10.sp, fontWeight = FontWeight.Bold)
+                    Divider(color = Color(0x33C0A060), thickness = 1.dp, modifier = Modifier.padding(vertical = 4.dp))
+                    
+                    if (state.content is ExpeditionContentState.EncounterLog) {
+                        Text(
+                            text = (state.content as ExpeditionContentState.EncounterLog).message,
+                            color = Color.LightGray,
+                            fontSize = 11.sp
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        NavTabV9("ZROZUMIAŁEM", onClick = { onEvent(ExpeditionUiEvent.OnDismissEncounter) })
                     } else {
-                        LazyColumn(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                            items(content.quests) { quest ->
-                                QuestActionCard(quest) {
-                                    onEvent(ExpeditionUiEvent.OnQuestClick(quest.id))
-                                }
+                        Text(text = "> Sensory rejestrują anomalie w strukturze mgły...", color = Color.Gray, fontSize = 10.sp)
+                    }
+                }
+
+                Spacer(modifier = Modifier.width(4.dp))
+
+                // 2. ŚRODKOWY KAFEL: GŁÓWNA AKCJA / ENCOUNTER
+                GothicObsidianCard(modifier = Modifier.weight(1.3f).fillMaxHeight(), headerColor = Color(0xFFE65100)) {
+                    when (val content = state.content) {
+                        ExpeditionContentState.Loading -> {
+                            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                                CircularProgressIndicator(color = Color(0xFFC0A060))
+                            }
+                        }
+                        is ExpeditionContentState.EncounterActive -> {
+                            EncounterViewV9(content.encounter, onChoice = { onEvent(ExpeditionUiEvent.OnEncounterChoiceClick(it)) })
+                        }
+                        else -> {
+                            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                                Text("OCZEKIWANIE NA KONTAKT", color = Color.DarkGray, fontSize = 12.sp, fontWeight = FontWeight.Bold)
                             }
                         }
                     }
                 }
+
+                Spacer(modifier = Modifier.width(4.dp))
+
+                // 3. PRAWY KAFEL: CELE I NAWIGACJA
+                Column(modifier = Modifier.weight(0.7f).fillMaxHeight()) {
+                    GothicObsidianCard(modifier = Modifier.weight(1f), headerColor = Color(0xFF1B5E20)) {
+                        Text(text = "CELE AKTYWNE", color = Color(0xFFC0A060), fontSize = 10.sp, fontWeight = FontWeight.Bold)
+                        Divider(color = Color(0x33C0A060), thickness = 1.dp, modifier = Modifier.padding(vertical = 4.dp))
+                        
+                        val quests = (state.content as? ExpeditionContentState.QuestList)?.quests ?: emptyList()
+                        if (quests.isEmpty()) {
+                            Text("Brak celów.", color = Color.DarkGray, fontSize = 11.sp)
+                        } else {
+                            LazyColumn(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                                items(quests) { quest ->
+                                    QuestActionCardV9(quest) { onEvent(ExpeditionUiEvent.OnQuestClick(quest.id)) }
+                                }
+                            }
+                        }
+                    }
+                    Spacer(modifier = Modifier.height(4.dp))
+                    GothicObsidianCard(modifier = Modifier.weight(0.5f), headerColor = Color(0xFF400000)) {
+                        Text(text = "POWRÓT", color = Color(0xFFC0A060), fontSize = 10.sp, fontWeight = FontWeight.Bold)
+                        Spacer(modifier = Modifier.height(8.dp))
+                        NavTabV9("ODWRÓT DO HUBU", onClick = { onEvent(ExpeditionUiEvent.OnBackClick) }, color = Color(0xFF400000))
+                    }
+                }
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(4.dp))
 
-            Button(
-                onClick = { onEvent(ExpeditionUiEvent.OnBackClick) },
-                enabled = state.canLeave,
-                modifier = Modifier.fillMaxWidth().height(50.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF400000))
-            ) {
-                Text("POWRÓT")
-            }
-        }
-    }
-}
-
-@Composable
-fun EncounterView(encounter: Encounter, onChoice: (EncounterChoice) -> Unit) {
-    Surface(
-        modifier = Modifier.fillMaxWidth().padding(8.dp),
-        color = Color(0xFF151515),
-        border = androidx.compose.foundation.BorderStroke(1.dp, Color.Yellow)
-    ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            Text(encounter.title.uppercase(), color = Color.Yellow, fontWeight = FontWeight.Bold, fontSize = 18.sp)
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(encounter.description, color = Color.White, fontSize = 14.sp)
-            Spacer(modifier = Modifier.height(16.dp))
-            
-            encounter.choices.forEach { choice ->
-                Button(
-                    onClick = { onChoice(choice) },
-                    modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF222222))
-                ) {
-                    Text(choice.label, color = Color.White)
+            // --- DOLNY PASEK: INFORMACYJNY ---
+            GothicObsidianCard(modifier = Modifier.fillMaxWidth().height(40.dp)) {
+                Row(modifier = Modifier.fillMaxSize(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center) {
+                    Text("STATUS KOTWICY: STABILNY | ZAPIS LOGÓW AKTYWNY", color = Color.DarkGray, fontSize = 9.sp)
                 }
             }
         }
@@ -124,34 +146,32 @@ fun EncounterView(encounter: Encounter, onChoice: (EncounterChoice) -> Unit) {
 }
 
 @Composable
-fun EncounterLogView(log: String, onDismiss: () -> Unit) {
-    Surface(
-        modifier = Modifier.fillMaxWidth().padding(8.dp),
-        color = Color(0xFF0A0A0A),
-        border = androidx.compose.foundation.BorderStroke(1.dp, Color.Gray)
-    ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            Text(log, color = Color.LightGray, fontSize = 15.sp)
-            Spacer(modifier = Modifier.height(16.dp))
-            Button(onClick = onDismiss, modifier = Modifier.align(Alignment.End)) {
-                Text("ZROZUMIAŁEM")
+fun EncounterViewV9(encounter: Encounter, onChoice: (EncounterChoice) -> Unit) {
+    Column(modifier = Modifier.fillMaxSize()) {
+        Text(text = encounter.title.uppercase(), color = Color.White, fontWeight = FontWeight.ExtraBold, fontSize = 16.sp)
+        Spacer(modifier = Modifier.height(8.dp))
+        Text(text = encounter.description, color = Color.LightGray, fontSize = 13.sp, lineHeight = 18.sp)
+        
+        Spacer(modifier = Modifier.weight(1f))
+        
+        Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+            encounter.choices.forEach { choice ->
+                NavTabV9(text = choice.label, onClick = { onChoice(choice) }, color = Color(0xFF151515))
             }
         }
     }
 }
 
 @Composable
-fun QuestActionCard(quest: QuestDefinition, onClick: () -> Unit) {
-    Card(
+fun QuestActionCardV9(quest: QuestDefinition, onClick: () -> Unit) {
+    Surface(
         modifier = Modifier.fillMaxWidth().clickable { onClick() },
-        colors = CardDefaults.cardColors(containerColor = Color(0xFF111111)),
-        border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFFADFF2F))
+        color = Color(0xFF0A0A0A),
+        border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFF333333))
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            Text(quest.title, color = Color.White, fontWeight = FontWeight.Bold)
-            Text(quest.description, color = Color.Gray, fontSize = 12.sp)
-            Spacer(modifier = Modifier.height(8.dp))
-            Text("WYRUSZ >", color = Color.Yellow, fontSize = 12.sp, fontWeight = FontWeight.Bold, modifier = Modifier.align(Alignment.End))
+        Column(modifier = Modifier.padding(8.dp)) {
+            Text(text = quest.title.uppercase(), color = Color.White, fontWeight = FontWeight.Bold, fontSize = 11.sp)
+            Text(text = "POZIOM: ${quest.recommendedLevel}", color = Color.Gray, fontSize = 9.sp)
         }
     }
 }
