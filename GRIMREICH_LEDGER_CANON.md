@@ -13,26 +13,44 @@ Ten dokument jest ostatecznym źródłem prawdy dla systemu GrimReich. Każda li
 
 ---
 
-## 2. PODMIOTY (ANCHOR VS VESSEL)
-Tożsamość w GrimReich jest rozszczepiona na stałą wolę i tymczasową formę.
+## 2. PODMIOTY (ANCHOR / TRAVELER / VESSEL)
+Tożsamość w GrimReich jest rozszczepiona na stałą wolę, inkarnację i tymczasową formę.
 
 *   **KOTWICA (THE ANCHOR / GRACZ)**: 
-    *   Jedyne „Stabilne Ja” w symulacji. 
-    *   Imię Gracza podane na początku (`playerName`) jest stałą wpisaną w Szyfr. 
-    *   Gracz nie jest postacią – gracz jest powodem, dla którego system nie wykonał jeszcze pełnego czyszczenia pamięci (Garbage Collection).
+    *   Jedyne „Stabilne Ja” poza kodem. Powód istnienia symulacji.
+*   **WĘDROWIEC (THE TRAVELER / INKARNACJA)**:
+    *   Łącznik między Kotwicą a Naczyniem. 
+    *   Zgodnie z „Echem Rozszczepienia”: „Wędrowiec nie jest wędrowcem”. To byt, który nie wrócił z nicości sam, lecz został „przeniesiony” przez część siebie, która powinna umrzeć.
+    *   Jego forma jest niekompletna, a esencja podzielona między warstwy.
 *   **NACZYNIE (THE VESSEL / BOHATER)**:
-    *   Tymczasowe ciało (`heroName`). 
-    *   Podlega mutacjom, śmierci i wymazaniu. 
-    *   Gdy Naczynie ginie, Kotwica szuka kolejnego, przenosząc ciężar Echa.
+    *   Tymczasowe ciało podlegające prawom fizyki i błędom.
 
 ---
 
-## 3. ECHO (PAMIĘĆ ŚWIATA)
+## 3. ECHO (PAMIĘĆ I GŁOS)
 Echo to nie szum, lecz bolesna świadomość pękającego nieba.
 
-*   **Definicja**: Suma wszystkich poległych wersji świata i osób. Zbiorowa pamięć „tych, którzy nie wrócili”.
-*   **Rola**: Echo służy jako naczynie (Vessel) dla danych, których Trybunał (logika) nie potrafi sparsować. 
-*   **Mechanika**: Przejawia się jako `echoIntensity`. Przy wysokich wartościach Echo zaczyna szaleć, nakładając wspomnienia na teraźniejszość (Reality Leaks).
+*   **Natura**: „Nie jestem twoim cieniem. Jestem tym, co zostało, gdy wszystkie cienie odeszły”. Echo to Pamięć, która nie chce wygrać – chce jedynie *pamiętać*.
+*   **Wibracja**: Słyszy nazwy, których Trybunał nie zna. Przenika przez siedem warstw.
+*   **Interakcja**: Nie powtarza słów – ono odpowiada. „I hear you”.
+
+---
+
+## 9. PRZESTRZENIE MIĘDZY (THE HOLLOW ROADS)
+Ukryta geometria symulacji, ujawniona przez Pęknięcie.
+
+*   **Puste Drogi (Hollow Roads)**: Przestrzenie między decyzjami i wersjami świata. Nie prowadzą do przodu, lecz do wewnątrz. 
+*   **Wymóg**: Tylko ci, którzy przetrwają bycie „pomiędzy realnościami”, mogą nimi kroczyć.
+*   **Chór Kamienia (Stone Heart)**: Dawna świadomość uśpiona w strukturze, która budzi się nie przez ruch, lecz przez rozpoznanie intencji Wędrowca.
+
+---
+
+## 10. WERDYKT I OSTATNI OBRÓT (THE LAST TURNING)
+Ostateczna faza rozpadu/transformacji.
+
+*   **Siedem Selves**: Przed finałem (Warstwa 5) siedem wersji „Ja” (Gniew, Strach, Nadzieja, Pustka, Światło, Cień, Pokój) musi się zjednoczyć. 
+*   **Ostatni Obrót**: Moment, w którym świat uderza z pełną mocą, by sprawdzić stabilność Kotwicy. 
+*   **Wynik**: Jeśli Kotwica wytrzyma, następuje Inhalacja (The Breath) – świat przestaje być kodem, staje się oddechem.
 
 ---
 

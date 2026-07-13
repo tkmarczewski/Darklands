@@ -1,116 +1,707 @@
 [
   {
-    "id": "q_coast_harvest",
-    "title": "Żniwa Mgły: Esencja Poranka",
-    "description": "Kupiec z Wybrzeża potrzebuje rzadkich ziół, które rosną tylko w gęstej mgle. Przynieś mu je, zanim zwiędną.",
-    "rewardGold": 150,
+    "id": "q_blood_icon",
+    "title": "Szept Krwawej Ikony",
+    "description": "Wioska Raskhold czci posąg, który zaczyna… odpowiadać. Zbadaj źródło głosu w wiosce.",
+    "rewardGold": 100,
     "cityId": "wybrzeze_polnocne",
-    "originNpcId": "merchant",
-    "category": "SOCIAL",
-    "recommendedLevel": 1,
-    "steps": [
-      { "description": "Zbierz zioła z wybrzeża.", "type": "DIALOGUE", "targetId": "harvest_herbs_coast" },
-      { "description": "Oddaj zioła kupcowi.", "type": "DIALOGUE", "targetId": "merchant_report_back" }
-    ]
-  },
-  {
-    "id": "q_deserter",
-    "title": "Cień Dezertera: Sumienie Boreas",
-    "description": "Strażnik wspomniał o dezerterze w Porcie. Znajdź go i zdecyduj o jego losie. Czy to zdrada, czy objawienie?",
-    "rewardGold": 200,
-    "cityId": "port_mglisty",
-    "originNpcId": "guard",
+    "originNpcId": "peasant",
     "category": "INTRIGUE",
     "recommendedLevel": 2,
     "steps": [
-      { "description": "Odnajdź dezertera w Porcie.", "type": "DIALOGUE", "targetId": "deserter_start" },
-      { "description": "Wróć do strażnika z Wybrzeża.", "type": "DIALOGUE", "targetId": "guard_deserter_done" }
+      { "description": "Przeszukaj wioskę Raskhold.", "type": "EXPEDITION", "targetId": "wybrzeze_polnocne" },
+      { "description": "Zbadaj posąg (Combat).", "type": "COMBAT", "targetId": "POSSESSED_STATUE" }
     ]
   },
   {
-    "id": "q_fortress_letter",
-    "title": "List do Dowódcy: Żelazny Głos",
-    "description": "Dostarcz pilną wiadomość od kupców z Wybrzeża do Dowódcy Ferrum w Twierdzy Żelaznej.",
-    "rewardGold": 180,
-    "cityId": "wybrzeze_polnocne",
-    "originNpcId": "merchant",
-    "category": "SOCIAL",
+    "id": "q_lost_apostle",
+    "title": "Zaginiony Apostoł",
+    "description": "Jeden z kapłanów Absolutu uciekł z zakazanym manuskryptem. Odnajdź kapłana i manuskrypt.",
+    "rewardGold": 120,
+    "cityId": "opactwo_ciszy",
+    "originNpcId": "priest",
+    "category": "INTRIGUE",
+    "recommendedLevel": 3,
+    "steps": [
+      { "description": "Trop kapłana w okolicach opactwa.", "type": "EXPEDITION", "targetId": "opactwo_ciszy" },
+      { "description": "Odzyskaj manuskrypt (Combat).", "type": "COMBAT", "targetId": "FALLEN_PRIEST" }
+    ]
+  },
+  {
+    "id": "q_three_masks",
+    "title": "Trzy Maski Zdrajcy",
+    "description": "Ktoś podszywa się pod bohatera w Varenshold. Oczyść swoje imię i powstrzymaj oszusta.",
+    "rewardGold": 150,
+    "cityId": "serce_krainy",
+    "originNpcId": "guard",
+    "category": "INTRIGUE",
+    "recommendedLevel": 4,
+    "steps": [
+      { "description": "Zidentyfikuj oszusta.", "type": "DIALOGUE", "targetId": "masked_impostor_reveal" },
+      { "description": "Pokonaj oszusta (Combat).", "type": "COMBAT", "targetId": "MASKED_IMPOSTOR" }
+    ]
+  },
+  {
+    "id": "q_altar_silence",
+    "title": "Krew na Ołtarzu Ciszy",
+    "description": "Klasztor milczenia ukrywa ofiary w podziemiach. Zbadaj podziemia klasztoru.",
+    "rewardGold": 130,
+    "cityId": "opactwo_ciszy",
+    "originNpcId": "monk",
+    "category": "INTRIGUE",
+    "recommendedLevel": 3,
+    "steps": [
+      { "description": "Wejdź do podziemi.", "type": "INVESTIGATION", "targetId": "Silent Cellar" },
+      { "description": "Zwalcz strażnika (Combat).", "type": "COMBAT", "targetId": "SILENT_GUARDIAN" }
+    ]
+  },
+  {
+    "id": "q_raven_oath",
+    "title": "Złamana Przysięga Kruka",
+    "description": "Bractwo zabójców żąda spłaty dawnego długu. Rozwiąż sprawę długu z bractwem.",
+    "rewardGold": 140,
+    "cityId": "port_mglisty",
+    "originNpcId": "assassin",
+    "category": "INTRIGUE",
+    "recommendedLevel": 5,
+    "steps": [
+      { "description": "Spotkaj się z posłańcem bractwa.", "type": "DIALOGUE", "targetId": "raven_messenger" },
+      { "description": "Odeprzyj atak (Combat).", "type": "COMBAT", "targetId": "RAVEN_ASSASSIN" }
+    ]
+  },
+  {
+    "id": "q_ritualist_seal",
+    "title": "Ostatnia Pieczęć Rytualisty",
+    "description": "Rytualista twierdzi, że bohater jest „ostatnim elementem”. Przetrwaj rytuał lub go powstrzymaj.",
+    "rewardGold": 160,
+    "cityId": "twierdza_zelazna",
+    "originNpcId": "ritualist",
+    "category": "INTRIGUE",
+    "recommendedLevel": 6,
+    "steps": [
+      { "description": "Przystąp do próby.", "type": "DIALOGUE", "targetId": "ritual_seal_start" },
+      { "description": "Pokonaj Arcy-Rytualistę (Combat).", "type": "COMBAT", "targetId": "ARCH_RITUALIST" }
+    ]
+  },
+  {
+    "id": "q_house_shadows",
+    "title": "Cienie w Domu Burgrabiego",
+    "description": "Burgrabia nie śpi od tygodni, bo „ktoś chodzi po suficie”. Spędź noc w domu burgrabiego.",
+    "rewardGold": 110,
+    "cityId": "serce_krainy",
+    "originNpcId": "noble",
+    "category": "INTRIGUE",
     "recommendedLevel": 2,
     "steps": [
-      { "description": "Podróżuj do Twierdzy Żelaznej.", "type": "EXPEDITION", "targetId": "twierdza_zelazna" },
-      { "description": "Przekaż list Dowódcy.", "type": "DIALOGUE", "targetId": "fortress_commander_letter" }
+      { "description": "Zasadź się na intruza.", "type": "INVESTIGATION", "targetId": "Burgrabia Bedroom" },
+      { "description": "Wyeliminuj pełzacza (Combat).", "type": "COMBAT", "targetId": "CEILING_CRAWLER" }
     ]
   },
   {
-    "id": "q_scribes_1",
-    "title": "Cienie Archiwistów I: Szyfr Pęknięcia",
-    "description": "Mira potrzebuje kogoś, kto odczyta zapisy v Pękniętej Kronice. Wymaga wysokiej inteligencji, by dostrzec anomalie.",
+    "id": "q_golden_ruins_betrayal",
+    "title": "Zdrada w Złotych Ruinach",
+    "description": "Ekspedycja archeologiczna zaczyna znikać po kolei. Znajdź ocalałych w ruinach.",
+    "rewardGold": 150,
+    "cityId": "serce_krainy",
+    "originNpcId": "scholar",
+    "category": "INTRIGUE",
+    "recommendedLevel": 4,
+    "steps": [
+      { "description": "Zbadaj złote ruiny.", "type": "EXPEDITION", "targetId": "serce_krainy" },
+      { "description": "Pokonaj strażnika (Combat).", "type": "COMBAT", "targetId": "GHOSTLY_SENTINEL" }
+    ]
+  },
+  {
+    "id": "q_not_your_voice",
+    "title": "Głos, Który Nie Jest Twój",
+    "description": "Bohater słyszy własny głos, który daje mu rozkazy. Odkryj źródło mentalnej manipulacji.",
+    "rewardGold": 170,
+    "cityId": "serce_krainy",
+    "originNpcId": "none",
+    "category": "INTRIGUE",
+    "recommendedLevel": 7,
+    "steps": [
+      { "description": "Podążaj za szeptem.", "type": "META", "targetId": "voice_inside_head" },
+      { "description": "Zniszcz odbicie (Combat).", "type": "COMBAT", "targetId": "MIND_REFLECTION" }
+    ]
+  },
+  {
+    "id": "q_book_writes_itself",
+    "title": "Księga, Która Pisze Się Sama",
+    "description": "Księga zapisuje przyszłe zbrodnie, zanim się wydarzą. Zapobiegnij zbrodni opisanej w księdze.",
+    "rewardGold": 180,
+    "cityId": "opactwo_ciszy",
+    "originNpcId": "archivist",
+    "category": "INTRIGUE",
+    "recommendedLevel": 5,
+    "steps": [
+      { "description": "Przechwyć księgę.", "type": "DIALOGUE", "targetId": "forbidden_book_dialogue" },
+      { "description": "Pokonaj atramentową zmorę (Combat).", "type": "COMBAT", "targetId": "INK_NIGHTMARE" }
+    ]
+  },
+  {
+    "id": "q_remembering_mists",
+    "title": "Mgły, Które Pamiętają",
+    "description": "Mgła pokazuje sceny z przeszłości, ale nie wszystkie są prawdziwe. Przejdź przez mgłę.",
+    "rewardGold": 120,
+    "cityId": "wybrzeze_polnocne",
+    "originNpcId": "none",
+    "category": "ANOMALY",
+    "recommendedLevel": 3,
+    "steps": [
+      { "description": "Skup się na paradygmacie.", "type": "INVESTIGATION", "targetId": "Misty Path" }
+    ]
+  },
+  {
+    "id": "q_doorless_tower",
+    "title": "Wieża Bez Drzwi",
+    "description": "Wejście pojawia się tylko wtedy, gdy ktoś umrze w pobliżu. Odkryj tajemnicę wieży.",
+    "rewardGold": 200,
+    "cityId": "serce_krainy",
+    "originNpcId": "none",
+    "category": "ANOMALY",
+    "recommendedLevel": 5,
+    "steps": [
+      { "description": "Czekaj na manifestację wieży.", "type": "EXPEDITION", "targetId": "serce_krainy" },
+      { "description": "Pokonaj ektoplazmika (Combat).", "type": "COMBAT", "targetId": "ECTOPLASMIC" }
+    ]
+  },
+  {
+    "id": "q_breathing_forest",
+    "title": "Las, Który Oddycha",
+    "description": "Drzewa zmieniają położenie, zamykając bohatera w labiryncie. Znajdź drogę wyjścia z lasu.",
+    "rewardGold": 150,
+    "cityId": "serce_krainy",
+    "originNpcId": "none",
+    "category": "ANOMALY",
+    "recommendedLevel": 4,
+    "steps": [
+      { "description": "Zsynchronizuj oddech z lasem.", "type": "INVESTIGATION", "targetId": "Living Forest" }
+    ]
+  },
+  {
+    "id": "q_stone_haven_dusk",
+    "title": "Kamienna Przystań o Zmierzchu",
+    "description": "O zmierzchu pojawiają się statki, których nie ma za dnia. Wejdź na pokład widmowego okrętu.",
+    "rewardGold": 130,
+    "cityId": "port_mglisty",
+    "originNpcId": "none",
+    "category": "ANOMALY",
+    "recommendedLevel": 3,
+    "steps": [
+      { "description": "Poczekaj do zmierzchu w porcie.", "type": "EXPEDITION", "targetId": "port_mglisty" },
+      { "description": "Zbadaj widmowy pokład.", "type": "DIALOGUE", "targetId": "ghost_ship_start" }
+    ]
+  },
+  {
+    "id": "q_backwards_clock",
+    "title": "Zegar, Który Odmierza Wstecz",
+    "description": "Czas w wiosce płynie odwrotnie. Powstrzymaj regresję czasu.",
+    "rewardGold": 140,
+    "cityId": "wybrzeze_polnocne",
+    "originNpcId": "none",
+    "category": "ANOMALY",
+    "recommendedLevel": 4,
+    "steps": [
+      { "description": "Znajdź mechanizm zegarowy.", "type": "INVESTIGATION", "targetId": "Broken Clockwork" }
+    ]
+  },
+  {
+    "id": "q_black_maw_wakes",
+    "title": "Czarna Paszcza Budzi Się",
+    "description": "Ruiny zaczynają „oddychać”, jakby coś rosło pod ziemią. Zbadaj serce ruin.",
+    "rewardGold": 180,
+    "cityId": "twierdza_zelazna",
+    "originNpcId": "none",
+    "category": "ANOMALY",
+    "recommendedLevel": 6,
+    "steps": [
+      { "description": "Zejdź do paszczy.", "type": "EXPEDITION", "targetId": "twierdza_zelazna" },
+      { "description": "Wycisz bicie serca ruin.", "type": "DIALOGUE", "targetId": "ruin_heart_silence" }
+    ]
+  },
+  {
+    "id": "q_bridge_over_nothing",
+    "title": "Most Nad Niczym",
+    "description": "Most prowadzi do miejsca, które nie istnieje na mapach. Przekrocz most do Innej Strony.",
+    "rewardGold": 160,
+    "cityId": "port_mglisty",
+    "originNpcId": "none",
+    "category": "ANOMALY",
+    "recommendedLevel": 5,
+    "steps": [
+      { "description": "Znajdź wejście na most.", "type": "EXPEDITION", "targetId": "port_mglisty" },
+      { "description": "Przetrwaj przejście.", "type": "META", "targetId": "void_bridge_crossing" }
+    ]
+  },
+  {
+    "id": "q_vanishing_temple",
+    "title": "Świątynia, Która Znika",
+    "description": "Świątynia pojawia się tylko podczas burzy. Odszukaj świątynię w oku cyklonu.",
+    "rewardGold": 190,
+    "cityId": "opactwo_ciszy",
+    "originNpcId": "none",
+    "category": "ANOMALY",
+    "recommendedLevel": 7,
+    "steps": [
+      { "description": "Wywołaj burzę echa.", "type": "META", "targetId": "storm_summoning" },
+      { "description": "Wejdź do świątyni.", "type": "DIALOGUE", "targetId": "phantom_temple_enter" }
+    ]
+  },
+  {
+    "id": "q_mirror_lake",
+    "title": "Jezioro Lustrzane",
+    "description": "Odbicia w wodzie pokazują alternatywne wersje bohatera. Pokonaj swoje alternatywne ja.",
+    "rewardGold": 170,
+    "cityId": "opactwo_ciszy",
+    "originNpcId": "none",
+    "category": "ANOMALY",
+    "recommendedLevel": 6,
+    "steps": [
+      { "description": "Spójrz w taflę jeziora.", "type": "INVESTIGATION", "targetId": "Mirror Lake" },
+      { "description": "Zabij sobowtóra (Combat).", "type": "COMBAT", "targetId": "DOPPELGANGER" }
+    ]
+  },
+  {
+    "id": "q_whispering_mine",
+    "title": "Kopalnia, Która Szepcze",
+    "description": "Górnicy słyszą głosy, które każą im kopać głębiej. Wycisz głosy w głębi kopalni.",
+    "rewardGold": 150,
+    "cityId": "twierdza_zelazna",
+    "originNpcId": "none",
+    "category": "ANOMALY",
+    "recommendedLevel": 5,
+    "steps": [
+      { "description": "Zejdź do najgłębszego szybu.", "type": "EXPEDITION", "targetId": "twierdza_zelazna" },
+      { "description": "Zidentyfikuj źródło szeptów.", "type": "DIALOGUE", "targetId": "mine_whisper_source" }
+    ]
+  },
+  {
+    "id": "q_shadowless_wolves",
+    "title": "Wilki Bez Cieni",
+    "description": "Wataha wilków nie rzuca cienia i nie zostawia śladów. Upoluj widmową watahę.",
+    "rewardGold": 110,
+    "cityId": "wybrzeze_polnocne",
+    "originNpcId": "hunter",
+    "category": "BEAST",
+    "recommendedLevel": 2,
+    "steps": [
+      { "description": "Zlokalizuj legowisko bez cienia.", "type": "EXPEDITION", "targetId": "wybrzeze_polnocne" },
+      { "description": "Zgładź watahę (Combat).", "type": "COMBAT", "targetId": "VOID_WOLF" }
+    ]
+  },
+  {
+    "id": "q_triple_hunter",
+    "title": "Trójwersyjny Łowca",
+    "description": "Potwór istnieje w trzech wersjach naraz. Zabij łowcę w trzech wymiarach.",
+    "rewardGold": 200,
+    "cityId": "serce_krainy",
+    "originNpcId": "none",
+    "category": "BEAST",
+    "recommendedLevel": 8,
+    "steps": [
+      { "description": "Znajdź punkt zborny wymiarów.", "type": "INVESTIGATION", "targetId": "Paradox Convergence" },
+      { "description": "Pokonaj łowcę (Combat).", "type": "COMBAT", "targetId": "PARADOX_HUNTER" }
+    ]
+  },
+  {
+    "id": "q_two_heart_ghoul",
+    "title": "Ghul z Dwoma Sercami",
+    "description": "Zabicie go raz nie wystarcza. Zniszcz oba serca ghula.",
+    "rewardGold": 130,
+    "cityId": "twierdza_zelazna",
+    "originNpcId": "guard",
+    "category": "BEAST",
+    "recommendedLevel": 4,
+    "steps": [
+      { "description": "Odnajdź zmutowanego ghula.", "type": "EXPEDITION", "targetId": "twierdza_zelazna" },
+      { "description": "Rozpruj ghula (Combat).", "type": "COMBAT", "targetId": "MUTANT_GHOUL" }
+    ]
+  },
+  {
+    "id": "q_swamp_witch",
+    "title": "Szeptucha z Bagien",
+    "description": "Wiedźma oferuje pomoc, ale żąda „czegoś żywego”. Złóż ofiarę lub pokonaj wiedźmę.",
+    "rewardGold": 150,
+    "cityId": "wybrzeze_polnocne",
+    "originNpcId": "none",
+    "category": "BEAST",
+    "recommendedLevel": 5,
+    "steps": [
+      { "description": "Odnajdź chatkę na bagnach.", "type": "EXPEDITION", "targetId": "wybrzeze_polnocne" },
+      { "description": "Konfrontacja z Szeptuchą.", "type": "DIALOGUE", "targetId": "witch_swamp_choice" }
+    ]
+  },
+  {
+    "id": "q_monastery_bloodsucker",
+    "title": "Krwiopijca z Klasztoru",
+    "description": "Mnisi ukrywają potwora, który był kiedyś jednym z nich. Rozwiąż problem krwiopijcy.",
+    "rewardGold": 140,
+    "cityId": "opactwo_ciszy",
+    "originNpcId": "monk",
+    "category": "BEAST",
+    "recommendedLevel": 5,
+    "steps": [
+      { "description": "Zidentyfikuj ukrytego mnicha.", "type": "DIALOGUE", "targetId": "vampire_monk_dialogue" },
+      { "description": "Wyeliminuj wampira (Combat).", "type": "COMBAT", "targetId": "VAMPIRE_MONK" }
+    ]
+  },
+  {
+    "id": "q_golden_colossus",
+    "title": "Złoty Kolos",
+    "description": "Gigantyczna statua zaczyna się poruszać. Powstrzymaj kolosa przed zniszczeniem miasta.",
     "rewardGold": 250,
     "cityId": "serce_krainy",
-    "originNpcId": "mira",
-    "category": "INVESTIGATION",
-    "recommendedLevel": 3,
-    "chainId": "chain_scribes",
-    "chainOrder": 1,
+    "originNpcId": "noble",
+    "category": "BEAST",
+    "recommendedLevel": 10,
     "steps": [
-      { "description": "Zbadaj Pękniętą Kronikę (Test INT).", "type": "INVESTIGATION", "targetId": "cracked_chronicle_int_test" },
-      { "description": "Skonfrontuj się z Mirą.", "type": "DIALOGUE", "targetId": "mira_report_back" }
+      { "description": "Stań naprzeciw giganta.", "type": "EXPEDITION", "targetId": "serce_krainy" },
+      { "description": "Zniszcz kolosa (Combat).", "type": "COMBAT", "targetId": "GOLDEN_COLOSSUS" }
+    ]
+  },
+  {
+    "id": "q_mist_child",
+    "title": "Dziecko Mgły",
+    "description": "Dziecko pojawia się w wioskach, a potem wszyscy chorują. Znajdź źródło zarazy mgły.",
+    "rewardGold": 160,
+    "cityId": "wybrzeze_polnocne",
+    "originNpcId": "peasant",
+    "category": "BEAST",
+    "recommendedLevel": 4,
+    "steps": [
+      { "description": "Trop dziecko we mgle.", "type": "INVESTIGATION", "targetId": "Misty Tracks" },
+      { "description": "Ulecz lub wyeliminuj manifestację.", "type": "DIALOGUE", "targetId": "mist_child_final" }
+    ]
+  },
+  {
+    "id": "q_winged_hulk",
+    "title": "Skrzydlaty Kadłub",
+    "description": "Latająca abominacja złożona z ciał kilku ofiar. Zestrzel abominację.",
+    "rewardGold": 180,
+    "cityId": "port_mglisty",
+    "originNpcId": "guard",
+    "category": "BEAST",
+    "recommendedLevel": 6,
+    "steps": [
+      { "description": "Znajdź punkt obserwacyjny.", "type": "EXPEDITION", "targetId": "port_mglisty" },
+      { "description": "Zestrzel kadłub (Combat).", "type": "COMBAT", "targetId": "WINGED_HULK" }
+    ]
+  },
+  {
+    "id": "q_talking_dog",
+    "title": "Pies, Który Mówi",
+    "description": "Pies twierdzi, że zna przyszłość bohatera. Podążaj za psem do prawdy.",
+    "rewardGold": 100,
+    "cityId": "serce_krainy",
+    "originNpcId": "none",
+    "category": "BEAST",
+    "recommendedLevel": 1,
+    "steps": [
+      { "description": "Biegnij za psem przez zaułki.", "type": "EXPEDITION", "targetId": "serce_krainy" },
+      { "description": "Wysłuchaj proroctwa.", "type": "DIALOGUE", "targetId": "talking_dog_revelation" }
+    ]
+  },
+  {
+    "id": "q_four_eyed_rider",
+    "title": "Czterooki Jeździec",
+    "description": "Jeździec zwiastuje katastrofy, ale można go przekupić. Zatrzymaj zwiastuna lub zapłać mu.",
+    "rewardGold": 140,
+    "cityId": "twierdza_zelazna",
+    "originNpcId": "none",
+    "category": "BEAST",
+    "recommendedLevel": 7,
+    "steps": [
+      { "description": "Przechwyć jeźdźca na trakcie.", "type": "EXPEDITION", "targetId": "twierdza_zelazna" },
+      { "description": "Zatrzymaj zwiastuna (Combat).", "type": "COMBAT", "targetId": "DARK_RIDER" }
+    ]
+  },
+  {
+    "id": "q_undying_mother",
+    "title": "Matka, Która Nie Umiera",
+    "description": "Kobieta żyje już 200 lat i błaga o śmierć. Znajdź sposób na przerwanie wiecznego życia.",
+    "rewardGold": 100,
+    "cityId": "wybrzeze_polnocne",
+    "originNpcId": "none",
+    "category": "DRAMA",
+    "recommendedLevel": 2,
+    "steps": [
+      { "description": "Znajdź artefakt wygaszający.", "type": "INVESTIGATION", "targetId": "Old Relic" },
+      { "description": "Dopełnij wyroku.", "type": "DIALOGUE", "targetId": "undying_mother_end" }
+    ]
+  },
+  {
+    "id": "q_two_soul_child",
+    "title": "Dziecko z Dwoma Duszami",
+    "description": "Dwie osobowości walczą o kontrolę. Ustabilizuj duszę dziecka.",
+    "rewardGold": 120,
+    "cityId": "serce_krainy",
+    "originNpcId": "none",
+    "category": "DRAMA",
+    "recommendedLevel": 3,
+    "steps": [
+      { "description": "Odpraw rytuał stabilizacji.", "type": "META", "targetId": "soul_sync_ritual" }
+    ]
+  },
+  {
+    "id": "q_lost_squad",
+    "title": "Zaginiony Oddział",
+    "description": "Oddział żołnierzy wraca po latach, ale… nie postarzał się. Odkryj tajemnicę wiecznej młodości oddziału.",
+    "rewardGold": 150,
+    "cityId": "twierdza_zelazna",
+    "originNpcId": "guard",
+    "category": "DRAMA",
+    "recommendedLevel": 5,
+    "steps": [
+      { "description": "Przesłuchaj weteranów.", "type": "DIALOGUE", "targetId": "lost_squad_interrogation" },
+      { "description": "Zbadaj źródło czasu.", "type": "EXPEDITION", "targetId": "twierdza_zelazna" }
+    ]
+  },
+  {
+    "id": "q_demon_merchant",
+    "title": "Kupiec, Który Widzi Demony",
+    "description": "Kupiec twierdzi, że każdy klient ma „demoniczny cień”. Zbadaj wizje kupca.",
+    "rewardGold": 130,
+    "cityId": "port_mglisty",
+    "originNpcId": "merchant",
+    "category": "DRAMA",
+    "recommendedLevel": 4,
+    "steps": [
+      { "description": "Spójrz przez soczewkę kupca.", "type": "INVESTIGATION", "targetId": "Demon Lens" },
+      { "description": "Odkryj prawdę o cieniach.", "type": "DIALOGUE", "targetId": "demon_shadow_truth" }
+    ]
+  },
+  {
+    "id": "q_returned_brother",
+    "title": "Brat, Który Powrócił",
+    "description": "Brat bohatera wraca z martwych, ale nie pamięta rodziny. Pomóż bratu odzyskać pamięć lub spokój.",
+    "rewardGold": 140,
+    "cityId": "wybrzeze_polnocne",
+    "originNpcId": "peasant",
+    "category": "DRAMA",
+    "recommendedLevel": 4,
+    "steps": [
+      { "description": "Zbierz pamiątki rodzinne.", "type": "EXPEDITION", "targetId": "wybrzeze_polnocne" },
+      { "description": "Zdecyduj o losie brata.", "type": "DIALOGUE", "targetId": "brother_fate_choice" }
+    ]
+  },
+  {
+    "id": "q_village_judgment",
+    "title": "Sąd Ostateczny Wioski",
+    "description": "Mieszkańcy chcą wykonać egzekucję na niewinnej osobie. Wydaj sprawiedliwy wyrok.",
+    "rewardGold": 110,
+    "cityId": "serce_krainy",
+    "originNpcId": "peasant",
+    "category": "DRAMA",
+    "recommendedLevel": 3,
+    "steps": [
+      { "description": "Wysłuchaj oskarżeń.", "type": "DIALOGUE", "targetId": "village_judge_start" },
+      { "description": "Ogłoś werdykt.", "type": "DIALOGUE", "targetId": "village_judge_final" }
+    ]
+  },
+  {
+    "id": "q_dream_thief",
+    "title": "Złodziej Snów",
+    "description": "Ktoś kradnie sny mieszkańców, doprowadzając ich do obłędu. Odzyskaj sny ze świata snów.",
+    "rewardGold": 160,
+    "cityId": "opactwo_ciszy",
+    "originNpcId": "monk",
+    "category": "DRAMA",
+    "recommendedLevel": 6,
+    "steps": [
+      { "description": "Zapadnij w letarg.", "type": "META", "targetId": "dream_world_enter" },
+      { "description": "Pokonaj złodzieja snów (Combat).", "type": "COMBAT", "targetId": "DREAM_WRAITH" }
+    ]
+  },
+  {
+    "id": "q_faceless_wanderer",
+    "title": "Wędrowiec Bez Twarzy",
+    "description": "Człowiek bez twarzy prosi o pomoc w odzyskaniu „swojego ja”. Odnajdź twarz wędrowca.",
+    "rewardGold": 130,
+    "cityId": "serce_krainy",
+    "originNpcId": "none",
+    "category": "DRAMA",
+    "recommendedLevel": 5,
+    "steps": [
+      { "description": "Znajdź lustrzane odłamki.", "type": "EXPEDITION", "targetId": "serce_krainy" },
+      { "description": "Zwróć tożsamość.", "type": "DIALOGUE", "targetId": "faceless_restore" }
+    ]
+  },
+  {
+    "id": "q_blood_dowry",
+    "title": "Dziewczyna z Krwawym Wianem",
+    "description": "Panna młoda uciekła sprzed ołtarza, bo her narzeczony „nie jest człowiekiem”. Zdemaskuj narzeczonego.",
+    "rewardGold": 140,
+    "cityId": "twierdza_zelazna",
+    "originNpcId": "none",
+    "category": "DRAMA",
+    "recommendedLevel": 5,
+    "steps": [
+      { "description": "Zbadaj przeszłość narzeczonego.", "type": "INVESTIGATION", "targetId": "Groom Records" },
+      { "description": "Ujawń prawdziwą formę.", "type": "COMBAT", "targetId": "HIDDEN_DEMON" }
+    ]
+  },
+  {
+    "id": "q_jester_laugh",
+    "title": "Ostatni Śmiech Błazna",
+    "description": "Błazen zna sekrety całego dworu i chce je sprzedać. Zdobądź sekrety błazna.",
+    "rewardGold": 120,
+    "cityId": "port_mglisty",
+    "originNpcId": "none",
+    "category": "DRAMA",
+    "recommendedLevel": 4,
+    "steps": [
+      { "description": "Rozbaw lub zastrasz błazna.", "type": "DIALOGUE", "targetId": "jester_interact" }
     ]
   },
   {
     "id": "q_verdict_1",
-    "title": "Gabinet bez śladów: Logika Wyroku",
-    "description": "Ravenn prosi o zbadanie miejsca zbrodni. Wymagana wysoka percepcja, by dostrzec runy ukryte v cieniu.",
-    "rewardGold": 300,
+    "title": "Gabinet bez śladów",
+    "description": "Zbadaj miejsce zbrodni wysokiego urzędnika.",
+    "rewardGold": 150,
     "cityId": "opactwo_ciszy",
     "originNpcId": "ravenn",
     "category": "INTRIGUE",
-    "recommendedLevel": 4,
     "chainId": "chain_verdict",
     "chainOrder": 1,
-    "minWorldDay": 7,
+    "recommendedLevel": 4,
     "steps": [
       { "description": "Przeszukaj gabinet (Test PER).", "type": "INVESTIGATION", "targetId": "verdict_office_per_test" },
       { "description": "Zanalizuj runy.", "type": "DIALOGUE", "targetId": "verdict_runes" }
     ]
   },
   {
-    "id": "q_blood_1",
-    "title": "Czerwona Rosa",
-    "description": "Zbierz próbki skażonej krwi z pobojowiska w lesie.",
-    "rewardGold": 100,
+    "id": "q_verdict_2",
+    "title": "Mieszkanie, które nie pamięta",
+    "description": "Archiwistka Imperium zniknęła. Jej dom jest pusty. Odszukaj ślady Liry Voss.",
+    "rewardGold": 150,
+    "cityId": "serce_krainy",
+    "originNpcId": "ravenn",
+    "category": "INTRIGUE",
+    "chainId": "chain_verdict",
+    "chainOrder": 2,
+    "prerequisiteQuestId": "q_verdict_1",
+    "recommendedLevel": 5,
+    "steps": [
+      { "description": "Przeszukaj puste mieszkanie.", "type": "INVESTIGATION", "targetId": "Empty Apartment" }
+    ]
+  },
+  {
+    "id": "q_verdict_3",
+    "title": "Fabryka, która zabiła sama siebie",
+    "description": "WINNI. Tak brzmi wyrok na ścianie fabryki. Zbadaj ruiny fabryki zbrojeniowej.",
+    "rewardGold": 200,
     "cityId": "twierdza_zelazna",
-    "originNpcId": "ritualist",
+    "originNpcId": "ravenn",
+    "category": "INTRIGUE",
+    "chainId": "chain_verdict",
+    "chainOrder": 3,
+    "prerequisiteQuestId": "q_verdict_2",
+    "recommendedLevel": 7,
+    "steps": [
+      { "description": "Zbadaj hale produkcyjne.", "type": "EXPEDITION", "targetId": "twierdza_zelazna" },
+      { "description": "Pokonaj strażnika fabryki (Combat).", "type": "COMBAT", "targetId": "STEEL_WRAITH" }
+    ]
+  },
+  {
+    "id": "q_verdict_4",
+    "title": "Sala, która pamięta wyroki",
+    "description": "Dawna sala sądowa Imperium kryje sekret Trybunału. Wejdź do sali wyroku i przetrwaj wizję.",
+    "rewardGold": 250,
+    "cityId": "serce_krainy",
+    "originNpcId": "ravenn",
+    "category": "INTRIGUE",
+    "chainId": "chain_verdict",
+    "chainOrder": 4,
+    "prerequisiteQuestId": "q_verdict_3",
+    "recommendedLevel": 9,
+    "steps": [
+      { "description": "Stań przed sędzią bez twarzy.", "type": "DIALOGUE", "targetId": "tribunal_hall_start" }
+    ]
+  },
+  {
+    "id": "q_verdict_5",
+    "title": "Proces, którego nikt nie prowadzi",
+    "description": "Stoisz w kręgu oskarżonych. Trybunał patrzy. Dokonaj ostatecznego wyboru.",
+    "rewardGold": 500,
+    "cityId": "serce_krainy",
+    "originNpcId": "ravenn",
+    "category": "INTRIGUE",
+    "chainId": "chain_verdict",
+    "chainOrder": 5,
+    "prerequisiteQuestId": "q_verdict_4",
+    "recommendedLevel": 10,
+    "steps": [
+      { "description": "Wybierz swój wyrok.", "type": "DIALOGUE", "targetId": "verdict_final_choice" }
+    ]
+  },
+  {
+    "id": "q_blood_1",
+    "title": "Krzyk z Piwnicy",
+    "description": "Wioska prosi o pomoc - z pustego domu słychać krzyki. Zbadaj piwnicę starego domu.",
+    "rewardGold": 100,
+    "cityId": "wybrzeze_polnocne",
+    "originNpcId": "peasant",
     "category": "MIXED",
-    "recommendedLevel": 2,
     "chainId": "chain_blood",
     "chainOrder": 1,
+    "recommendedLevel": 2,
     "steps": [
-      { "description": "Przeszukaj las pod Twierdzą.", "type": "EXPEDITION", "targetId": "twierdza_zelazna" },
-      { "description": "Wróć do Rytualisty.", "type": "DIALOGUE", "targetId": "quest_report_back_generic" }
+      { "description": "Pokonaj krwawą marę (Combat).", "type": "COMBAT", "targetId": "BLOOD_WRAITH" }
+    ]
+  },
+  {
+    "id": "q_blood_2",
+    "title": "Dziewczyna, Która Widziała Twoją Twarz",
+    "description": "Jedyna świadek twierdzi, że widziała Cię w piwnicy. Porozmawiaj z nią.",
+    "rewardGold": 110,
+    "cityId": "wybrzeze_polnocne",
+    "originNpcId": "none",
+    "category": "MIXED",
+    "chainId": "chain_blood",
+    "chainOrder": 2,
+    "prerequisiteQuestId": "q_blood_1",
+    "recommendedLevel": 3,
+    "steps": [
+      { "description": "Skonfrontuj się ze świadkiem.", "type": "DIALOGUE", "targetId": "witness_girl_dialogue" }
     ]
   },
   {
     "id": "q_blood_5_hard",
-    "title": "Wspomnienie, Którego Nie Było: Rytuał Krwi",
-    "description": "Rytualista żąda ofiary z Twojego poczytania. Wymagana wysoka pobożność (PIETY) lub siła woli (WILLPOWER).",
-    "rewardGold": 450,
+    "title": "Wspomnienie, Którego Nie Było",
+    "description": "Zaczynasz widzieć siebie w rytuale sprzed dekad. Rozszyfruj wizje swojej przeszłości.",
+    "rewardGold": 140,
     "cityId": "twierdza_zelazna",
     "originNpcId": "ritualist",
     "category": "META",
-    "recommendedLevel": 6,
     "chainId": "chain_blood",
     "chainOrder": 5,
-    "prerequisiteQuestId": "q_blood_1",
+    "recommendedLevel": 6,
+    "prerequisiteQuestId": "q_blood_2",
     "steps": [
-      { "description": "Przetrwaj próbę rytualną (Test WILL).", "type": "META", "targetId": "blood_ritual_will_test" },
-      { "description": "Skonfrontuj się z cieniem.", "type": "COMBAT", "targetId": "PAST_SHADE_ELITE" }
+      { "description": "Pokonaj cień przeszłości (Combat).", "type": "COMBAT", "targetId": "PAST_SHADE_ELITE" }
+    ]
+  },
+  {
+    "id": "q_blood_8",
+    "title": "Ołtarz, Który Pamięta",
+    "description": "Finał w podziemiach. Ołtarz czeka na uczestnika. Dokonaj ostatecznego wyboru.",
+    "rewardGold": 300,
+    "cityId": "serce_krainy",
+    "originNpcId": "ritualist",
+    "category": "META",
+    "chainId": "chain_blood",
+    "chainOrder": 8,
+    "recommendedLevel": 12,
+    "prerequisiteQuestId": "q_blood_5_hard",
+    "steps": [
+      { "description": "Zniszcz klątwę (Combat).", "type": "COMBAT", "targetId": "BLOOD_CURSE" }
     ]
   },
   {
     "id": "q_meta_1",
     "title": "Margines na stronie: Objawienie",
-    "description": "Margines Kroniki zawiera tekst, który staje się zrozumiały tylko dla umysłów otwartych na meta-percepcję.",
+    "description": "Margines Kroniki zawiera tekst zrozumiały tylko dla umysłów otwartych na meta-percepcję.",
     "rewardGold": 0,
     "cityId": "serce_krainy",
     "originNpcId": "archivist",
@@ -126,7 +717,7 @@
   {
     "id": "q_meta_7",
     "title": "Ostatni Wpis: Margines Sesji",
-    "description": "Zrozumienie, że nie jesteś bohaterem, lecz tym, który go prowadzi. Ostatnie zabezpieczenie przed wymazaniem.",
+    "description": "Zrozumienie, że nie jesteś bohaterem, lecz tym, który go prowadzi.",
     "rewardGold": 0,
     "cityId": "serce_krainy",
     "originNpcId": "archivist",
