@@ -70,7 +70,7 @@
   {
     "id": "q_scribes_1",
     "title": "Cienie Archiwistów I",
-    "description": "Mira twierdzi, że ktoś podmienia wpisy v Kronice Świata.",
+    "description": "Mira twierdzi, że ktoś podmienia wpisy w Kronice Świata.",
     "rewardGold": 150,
     "cityId": "serce_krainy",
     "originNpcId": "mira",

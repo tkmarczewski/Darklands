@@ -113,7 +113,7 @@
 
     <!-- Recruitment Screen -->
     <string name="recruit_title">WERBUNEK</string>
-    <string name="recruit_subtitle">Dostępni najemnicy v tej karczmie</string>
+    <string name="recruit_subtitle">Dostępni najemnicy w tej karczmie</string>
     <string name="recruit_empty">Wszyscy najemnicy zostali wynajęci.</string>
     <string name="recruit_btn_locked">ZABLOKOWANE</string>
     <string name="recruit_stats_format">SIŁ:%1$d ZRC:%2$d INT:%3$d WYT:%4$d</string>
@@ -127,7 +127,7 @@
     <string name="quest_journal_empty_completed">Brak ukończonych zadań.</string>
     <!-- Player Identity Screen -->
     <string name="identity_title">JAK CIĘ ZWĄ, WĘDROWCZE?</string>
-    <string name="identity_desc">To imię należy do Ciebie, nie do bohatera. Będzie ono zapisane v Kronikach Świata.</string>
+    <string name="identity_desc">To imię należy do Ciebie, nie do bohatera. Będzie ono zapisane w Kronikach Świata.</string>
     <string name="identity_hint">TWOJE IMIĘ</string>
 
     <!-- City Screen -->

@@ -2,10 +2,10 @@
   {
     "id": "cracked_chronicle_int_test",
     "npcId": "none",
-    "text": "Kronika drży v Twoich dłoniach. Atrament wydaje się pulsować, układając się v kształty, które nie powinny istnieć. Pomiędzy wierszami dostrzegasz pęknięcia v samej strukturze zapisu – coś próbuje wyciec z tej historii.",
+    "text": "Kronika drży w Twoich dłoniach. Atrament wydaje się pulsować, układając się w kształty, które nie powinny istnieć. Pomiędzy wierszami dostrzegasz pęknięcia w samej strukturze zapisu – coś próbuje wyciec z tej historii.",
     "choices": [
       {
-        "text": "Odczytaj prawdziwy szyfr ukryty v pęknięciach.",
+        "text": "Odczytaj prawdziwy szyfr ukryty w pęknięciach.",
         "targetNodeId": "mira_report_back",
         "triggerEvent": "ADVANCE_QUEST",
         "triggerValue": "q_scribes_1",
@@ -19,7 +19,7 @@
         "requiredAttributes": { "perception": 14 }
       },
       {
-        "text": "To tylko błąd v druku. Ignoruj to (Zwykłe czytanie).",
+        "text": "To tylko błąd w druku. Ignoruj to (Zwykłe czytanie).",
         "targetNodeId": "end"
       }
     ]
@@ -45,7 +45,7 @@
   {
     "id": "verdict_office_per_test",
     "npcId": "ravenn",
-    "text": "Gabinet jest sterylny, niemal przerażająco czysty. Ale pod kątem, v którym pada światło lampy gazowej, kurz na ścianach układa się v nienaturalne wzory. To nie kurz. To wyryte v eterze runy, które wymazują pamięć o tym, kto tu przebywał.",
+    "text": "Gabinet jest sterylny, niemal przerażająco czysty. Ale pod kątem, w którym pada światło lampy gazowej, kurz na ścianach układa się w nienaturalne wzory. To nie kurz. To wyryte w eterze runy, które wymazują pamięć o tym, kto tu przebywał.",
     "choices": [
       {
         "text": "Dostrzeż geometryczny mechanizm runiczny. To pułapka na percepcję.",
@@ -102,7 +102,7 @@
   {
     "id": "margin_note_complex",
     "npcId": "archivist",
-    "text": "Dopisek na stronie Kroniki: 'Podmiot wykazuje anomalie v percepcji. Czytanie kodu źródłowego zakończone sukcesem. Czy on widzi nas, czy tylko my widzimy go?' Słowa zaczynają się obracać na stronie.",
+    "text": "Dopisek na stronie Kroniki: 'Podmiot wykazuje anomalie w percepcji. Czytanie kodu źródłowego zakończone sukcesem. Czy on widzi nas, czy tylko my widzimy go?' Słowa zaczynają się obracać na stronie.",
     "choices": [
       {
         "text": "Zrozum, że to komentarz bezpośrednio do Ciebie.",

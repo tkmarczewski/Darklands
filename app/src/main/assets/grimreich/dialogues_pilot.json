@@ -265,7 +265,7 @@
   {
     "id": "mira_start",
     "npcId": "mira",
-    "text": "Słowa v Kronice same się zmieniają... Jakby rzeczywistość próbowała wymazać własną historię. Czy pomożesz mi ją ocalić?",
+    "text": "Słowa w Kronice same się zmieniają... Jakby rzeczywistość próbowała wymazać własną historię. Czy pomożesz mi ją ocalić?",
     "choices": [
       {
         "text": "Zbadam te pęknięcia.",
@@ -393,14 +393,14 @@
   {
     "id": "aelion_meta",
     "npcId": "aelion",
-    "text": "Śnią nas Skrybowie Absolutni. Każdy twój krok, każda walka, to tylko linia v ich Kronice. Czy czujesz, jak stabilność świata drży, gdy o tym mówię?",
+    "text": "Śnią nas Skrybowie Absolutni. Każdy twój krok, każda walka, to tylko linia w ich Kronice. Czy czujesz, jak stabilność świata drży, gdy o tym mówię?",
     "choices": [
       {
         "text": "To przerażające.",
         "targetNodeId": "aelion_meta_end"
       },
       {
-        "text": "Nie wierzę v to.",
+        "text": "Nie wierzę w to.",
         "targetNodeId": "end"
       }
     ]
@@ -408,7 +408,7 @@
   {
     "id": "aelion_meta_end",
     "npcId": "aelion",
-    "text": "Strach jest tylko reakcją na prawdę. Szukaj Kotwicy, ona utrzyma ten sen v ryzach... jeszcze przez chwilę.",
+    "text": "Strach jest tylko reakcją na prawdę. Szukaj Kotwicy, ona utrzyma ten sen w ryzach... jeszcze przez chwilę.",
     "choices": [
       {
         "text": "Będę pamiętać.",
@@ -421,7 +421,7 @@
   {
     "id": "aelion_quest",
     "npcId": "aelion",
-    "text": "Relikwie są fragmentami poprzednich snów. Jeśli chcesz pomóc v stabilizacji, musisz odnaleźć Kotwicę Północy. Strażnik przy bramie wie więcej o pęknięciach v okolicy.",
+    "text": "Relikwie są fragmentami poprzednich snów. Jeśli chcesz pomóc w stabilizacji, musisz odnaleźć Kotwicę Północy. Strażnik przy bramie wie więcej o pęknięciach w okolicy.",
     "choices": [
       {
         "text": "Pójdę do Strażnika.",
@@ -432,7 +432,7 @@
   {
     "id": "mystic_start",
     "npcId": "mystic",
-    "text": "Czuję echo v twoich słowach. Czy szukasz prawdy o tym świecie, czy tylko ukojenia v modlitwie?",
+    "text": "Czuję echo w twoich słowach. Czy szukasz prawdy o tym świecie, czy tylko ukojenia w modlitwie?",
     "choices": [
       {
         "text": "Chcę wiedzieć więcej.",
@@ -501,7 +501,7 @@
   {
     "id": "companion_shadow_start",
     "npcId": "echo",
-    "text": "...pamiętasz mnie? Tam v mroku... było tak zimno. Czy ta kolejna próba ma v ogóle sens?",
+    "text": "...pamiętasz mnie? Tam w mroku... było tak zimno. Czy ta kolejna próba ma w ogóle sens?",
     "choices": [
       {
         "text": "Przepraszam, że zawiodłem.",
@@ -512,7 +512,7 @@
         "targetNodeId": "companion_shadow_util"
       },
       {
-        "text": "Odejdź v niebyt!",
+        "text": "Odejdź w niebyt!",
         "targetNodeId": "end"
       }
     ]
@@ -520,7 +520,7 @@
   {
     "id": "companion_shadow_sad",
     "npcId": "echo",
-    "text": "Wybaczenie... to tylko kolejna linijka v Kronice. Nie czuję gniewu, tylko pustkę.",
+    "text": "Wybaczenie... to tylko kolejna linijka w Kronice. Nie czuję gniewu, tylko pustkę.",
     "choices": [
       { "text": "Żegnaj.", "targetNodeId": "end" }
     ]

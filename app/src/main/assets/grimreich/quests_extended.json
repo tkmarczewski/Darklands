@@ -530,7 +530,7 @@
   {
     "id": "q_blood_dowry",
     "title": "Dziewczyna z Krwawym Wianem",
-    "description": "Panna młoda uciekła sprzed ołtarza, bo her narzeczony „nie jest człowiekiem”. Zdemaskuj narzeczonego.",
+    "description": "Panna młoda uciekła sprzed ołtarza, bo jej narzeczony „nie jest człowiekiem”. Zdemaskuj narzeczonego.",
     "rewardGold": 140,
     "cityId": "twierdza_zelazna",
     "originNpcId": "none",
