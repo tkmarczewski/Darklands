@@ -10,9 +10,11 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.grimreich.R
 import com.grimreich.systems.QuestDefinition
 import com.grimreich.systems.Encounter
 import com.grimreich.systems.EncounterChoice
@@ -56,9 +58,9 @@ fun ExpeditionContent(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(text = "EKSPLORACJA TERENU", color = Color(0xFFC0A060), fontSize = 12.sp)
+                Text(text = stringResource(R.string.expedition_title), color = Color(0xFFC0A060), fontSize = 12.sp)
                 Text(text = state.regionName.uppercase(), color = Color.White, fontWeight = FontWeight.Bold, fontSize = 14.sp)
-                Text(text = "AGRESJA: WYSOKA", color = Color.Red, fontSize = 12.sp)
+                Text(text = stringResource(R.string.expedition_aggression_high), color = Color.Red, fontSize = 12.sp)
             }
 
             Spacer(modifier = Modifier.height(4.dp))
@@ -68,7 +70,7 @@ fun ExpeditionContent(
                 
                 // 1. LEWY KAFEL: LOGI I ZAPISY TRYBUNAŁU
                 GothicObsidianCard(modifier = Modifier.weight(0.7f).fillMaxHeight()) {
-                    Text(text = "ZAPISY TERENOWE", color = Color(0xFFC0A060), fontSize = 10.sp, fontWeight = FontWeight.Bold)
+                    Text(text = stringResource(R.string.expedition_logs_label), color = Color(0xFFC0A060), fontSize = 10.sp, fontWeight = FontWeight.Bold)
                     Divider(color = Color(0x33C0A060), thickness = 1.dp, modifier = Modifier.padding(vertical = 4.dp))
                     
                     if (state.content is ExpeditionContentState.EncounterLog) {
@@ -78,7 +80,7 @@ fun ExpeditionContent(
                             fontSize = 11.sp
                         )
                         Spacer(modifier = Modifier.height(8.dp))
-                        NavTabV9("ZROZUMIAŁEM", onClick = { onEvent(ExpeditionUiEvent.OnDismissEncounter) })
+                        NavTabV9(stringResource(R.string.expedition_btn_understand), onClick = { onEvent(ExpeditionUiEvent.OnDismissEncounter) })
                     } else {
                         Text(text = "> Sensory rejestrują anomalie w strukturze mgły...", color = Color.Gray, fontSize = 10.sp)
                     }
@@ -99,7 +101,7 @@ fun ExpeditionContent(
                         }
                         else -> {
                             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                                Text("OCZEKIWANIE NA KONTAKT", color = Color.DarkGray, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                                Text(stringResource(R.string.expedition_waiting_contact), color = Color.DarkGray, fontSize = 12.sp, fontWeight = FontWeight.Bold)
                             }
                         }
                     }
@@ -110,12 +112,12 @@ fun ExpeditionContent(
                 // 3. PRAWY KAFEL: CELE I NAWIGACJA
                 Column(modifier = Modifier.weight(0.7f).fillMaxHeight()) {
                     GothicObsidianCard(modifier = Modifier.weight(1f), headerColor = Color(0xFF1B5E20)) {
-                        Text(text = "CELE AKTYWNE", color = Color(0xFFC0A060), fontSize = 10.sp, fontWeight = FontWeight.Bold)
+                        Text(text = stringResource(R.string.expedition_active_objectives), color = Color(0xFFC0A060), fontSize = 10.sp, fontWeight = FontWeight.Bold)
                         Divider(color = Color(0x33C0A060), thickness = 1.dp, modifier = Modifier.padding(vertical = 4.dp))
                         
                         val quests = (state.content as? ExpeditionContentState.QuestList)?.quests ?: emptyList()
                         if (quests.isEmpty()) {
-                            Text("Brak celów.", color = Color.DarkGray, fontSize = 11.sp)
+                            Text(stringResource(R.string.expedition_no_objectives), color = Color.DarkGray, fontSize = 11.sp)
                         } else {
                             LazyColumn(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                                 items(quests) { quest ->
@@ -126,9 +128,9 @@ fun ExpeditionContent(
                     }
                     Spacer(modifier = Modifier.height(4.dp))
                     GothicObsidianCard(modifier = Modifier.weight(0.5f), headerColor = Color(0xFF400000)) {
-                        Text(text = "POWRÓT", color = Color(0xFFC0A060), fontSize = 10.sp, fontWeight = FontWeight.Bold)
+                        Text(text = stringResource(R.string.expedition_return_label), color = Color(0xFFC0A060), fontSize = 10.sp, fontWeight = FontWeight.Bold)
                         Spacer(modifier = Modifier.height(8.dp))
-                        NavTabV9("ODWRÓT DO HUBU", onClick = { onEvent(ExpeditionUiEvent.OnBackClick) }, color = Color(0xFF400000))
+                        NavTabV9(stringResource(R.string.expedition_btn_retreat), onClick = { onEvent(ExpeditionUiEvent.OnBackClick) }, color = Color(0xFF400000))
                     }
                 }
             }
@@ -138,7 +140,7 @@ fun ExpeditionContent(
             // --- DOLNY PASEK: INFORMACYJNY ---
             GothicObsidianCard(modifier = Modifier.fillMaxWidth().height(40.dp)) {
                 Row(modifier = Modifier.fillMaxSize(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center) {
-                    Text("STATUS KOTWICY: STABILNY | ZAPIS LOGÓW AKTYWNY", color = Color.DarkGray, fontSize = 9.sp)
+                    Text(stringResource(R.string.expedition_anchor_status), color = Color.DarkGray, fontSize = 9.sp)
                 }
             }
         }
@@ -180,7 +182,7 @@ fun QuestActionCardV9(quest: QuestDefinition, onClick: () -> Unit) {
                     modifier = Modifier.padding(start = 4.dp)
                 )
             }
-            Text(text = "POZIOM: ${quest.recommendedLevel}", color = Color.Gray, fontSize = 9.sp)
+            Text(text = "${stringResource(R.string.expedition_quest_level)}: ${quest.recommendedLevel}", color = Color.Gray, fontSize = 9.sp)
         }
     }
 }

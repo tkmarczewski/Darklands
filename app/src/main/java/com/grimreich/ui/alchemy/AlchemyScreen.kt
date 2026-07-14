@@ -12,9 +12,11 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.grimreich.R
 import com.grimreich.systems.Recipe
 import com.grimreich.core.Hero
 
@@ -33,7 +35,7 @@ fun AlchemyScreen(
     ) {
         // HEADER
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-            Text("KOCIOŁ ALCHEMICZNY", color = Color(0xFFADFF2F), fontSize = 24.sp, fontWeight = FontWeight.Bold)
+            Text(stringResource(R.string.alchemy_title), color = Color(0xFFADFF2F), fontSize = 24.sp, fontWeight = FontWeight.Bold)
         }
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -41,7 +43,7 @@ fun AlchemyScreen(
         Row(modifier = Modifier.weight(1f)) {
             // LEFT: Recipe List & EXIT
             Column(modifier = Modifier.weight(1f)) {
-                Text("RECEPTURY", color = Color.Gray, fontSize = 10.sp, fontWeight = FontWeight.Bold)
+                Text(stringResource(R.string.alchemy_recipes_label), color = Color.Gray, fontSize = 10.sp, fontWeight = FontWeight.Bold)
                 Spacer(modifier = Modifier.height(8.dp))
                 LazyColumn(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     items(state.recipes) { recipe ->
@@ -59,7 +61,7 @@ fun AlchemyScreen(
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF400000)),
                     shape = androidx.compose.material3.MaterialTheme.shapes.extraSmall
                 ) {
-                    Text("POWRÓT", color = Color.White, fontWeight = FontWeight.Bold)
+                    Text(stringResource(R.string.btn_back), color = Color.White, fontWeight = FontWeight.Bold)
                 }
             }
 
@@ -67,7 +69,7 @@ fun AlchemyScreen(
 
             // RIGHT: Crafting Bench
             Column(modifier = Modifier.weight(1.2f)) {
-                Text("STÓŁ WARSZTATOWY", color = Color.Gray, fontSize = 10.sp, fontWeight = FontWeight.Bold)
+                Text(stringResource(R.string.alchemy_bench_label), color = Color.Gray, fontSize = 10.sp, fontWeight = FontWeight.Bold)
                 Spacer(modifier = Modifier.height(8.dp))
                 
                 Surface(
@@ -80,7 +82,7 @@ fun AlchemyScreen(
                         Column(modifier = Modifier.padding(16.dp)) {
                             Text(recipe.id.replace("rec_", "").uppercase(), color = Color.White, fontWeight = FontWeight.Bold)
                             Spacer(modifier = Modifier.height(16.dp))
-                            Text("SKŁADNIKI:", color = Color.Gray, fontSize = 12.sp)
+                            Text(stringResource(R.string.alchemy_ingredients_label), color = Color.Gray, fontSize = 12.sp)
                             recipe.ingredients.forEach { (ingId, qty) ->
                                 val hasCount = state.inventory.count { it.templateId == ingId }
                                 Text(
@@ -93,7 +95,7 @@ fun AlchemyScreen(
                             Spacer(modifier = Modifier.weight(1f))
                             
                             // Hero Selection
-                            Text("KTO WARZY?", color = Color.Gray, fontSize = 10.sp)
+                            Text(stringResource(R.string.alchemy_who_brews), color = Color.Gray, fontSize = 10.sp)
                             LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                                 items(state.party) { hero ->
                                     HeroChip(hero, isSelected = state.selectedHero?.id == hero.id) {
@@ -109,7 +111,7 @@ fun AlchemyScreen(
                                 modifier = Modifier.fillMaxWidth().height(48.dp),
                                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2A4000))
                             ) {
-                                Text("WARZ MIKSTURĘ", fontWeight = FontWeight.Bold)
+                                Text(stringResource(R.string.alchemy_btn_brew), fontWeight = FontWeight.Bold)
                             }
                             
                             state.statusMessage?.let { 
@@ -118,7 +120,7 @@ fun AlchemyScreen(
                         }
                     } else {
                         Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
-                            Text("Wybierz recepturę z listy.", color = Color.DarkGray)
+                            Text(stringResource(R.string.alchemy_select_recipe_hint), color = Color.DarkGray)
                         }
                     }
                 }

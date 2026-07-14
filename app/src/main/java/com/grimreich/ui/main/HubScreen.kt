@@ -20,6 +20,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -58,9 +59,9 @@ fun HubScreen(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(text = "DZIEŃ ${state.day} | ${state.timeOfDay.uppercase()}", color = Color(0xFFC0A060), fontSize = 12.sp)
+                Text(text = "${stringResource(R.string.hub_day_label)} ${state.day} | ${state.timeOfDay.uppercase()}", color = Color(0xFFC0A060), fontSize = 12.sp)
                 Text(text = state.locationName.uppercase(), color = Color.White, fontWeight = FontWeight.Bold, fontSize = 14.sp)
-                Text(text = "STABILNOŚĆ: ${state.worldStability}%", color = if(state.worldStability < 40) Color.Red else Color.Green, fontSize = 12.sp)
+                Text(text = "${stringResource(R.string.hub_stability_label)}: ${state.worldStability}%", color = if(state.worldStability < 40) Color.Red else Color.Green, fontSize = 12.sp)
             }
 
             Spacer(modifier = Modifier.height(4.dp))
@@ -70,7 +71,7 @@ fun HubScreen(
                 
                 // 1. LEWY KAFEL: LOGI (KRONIKA)
                 GothicObsidianCard(modifier = Modifier.weight(0.7f).fillMaxHeight()) {
-                    Text(text = "KRONIKA", color = Color(0xFFC0A060), fontSize = 10.sp, fontWeight = FontWeight.Bold)
+                    Text(text = stringResource(R.string.hub_chronicle_label), color = Color(0xFFC0A060), fontSize = 10.sp, fontWeight = FontWeight.Bold)
                     Divider(color = Color(0x33C0A060), thickness = 1.dp, modifier = Modifier.padding(vertical = 4.dp))
                     LazyColumn(modifier = Modifier.fillMaxSize()) {
                         items(state.latestLogs) { log ->
@@ -104,11 +105,11 @@ fun HubScreen(
                     }
                     Spacer(modifier = Modifier.height(4.dp))
                     GothicObsidianCard(modifier = Modifier.weight(1f), headerColor = Color(0xFF1B5E20)) {
-                        Text(text = "AKCJE", color = Color(0xFFC0A060), fontSize = 10.sp, fontWeight = FontWeight.Bold)
+                        Text(text = stringResource(R.string.hub_actions_label), color = Color(0xFFC0A060), fontSize = 10.sp, fontWeight = FontWeight.Bold)
                         Column(verticalArrangement = Arrangement.spacedBy(4.dp), modifier = Modifier.padding(top = 8.dp)) {
-                            NavTabV9("DO MIASTA", onClick = onCity)
-                            NavTabV9("MAPA ŚWIATA", onClick = onMap)
-                            NavTabV9("EKSPEDYCJA", onClick = onExpedition)
+                            NavTabV9(stringResource(R.string.hub_btn_to_city), onClick = onCity)
+                            NavTabV9(stringResource(R.string.hub_btn_to_map), onClick = onMap)
+                            NavTabV9(stringResource(R.string.hub_btn_to_expedition), onClick = onExpedition)
                         }
                     }
                 }

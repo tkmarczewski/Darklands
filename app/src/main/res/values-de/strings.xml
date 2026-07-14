@@ -152,6 +152,46 @@
     <string name="combat_btn_defend">VERTEIDIGEN</string>
     <string name="combat_btn_revision">REVISION</string>
     <string name="combat_btn_overwrite">ÜBERSCHREIBEN</string>
-    <string name="combat_btn_exit">KAMPF BEENDEN</string>
-    <string name="combat_btn_glitch_exit">LOOP_VERLASSEN</string>
+    <string name="hub_day_label">TAG</string>
+    <string name="hub_stability_label">STABILITÄT</string>
+    <string name="hub_chronicle_label">CHRONIK</string>
+    <string name="hub_actions_label">AKTIONEN</string>
+    <string name="hub_btn_to_city">ZUR STADT</string>
+    <string name="hub_btn_to_map">WELTKARTE</string>
+    <string name="hub_btn_to_expedition">EXPEDITION</string>
+
+    <!-- Expedition Screen -->
+    <string name="expedition_title">GELÄNDEEKXPLORATION</string>
+    <string name="expedition_aggression_high">AGGRESSION: HOCH</string>
+    <string name="expedition_logs_label">FELDAUFZEICHNUNGEN</string>
+    <string name="expedition_btn_understand">VERSTANDEN</string>
+    <string name="expedition_waiting_contact">WARTEN AUF KONTAKT</string>
+    <string name="expedition_active_objectives">AKTIVE ZIELE</string>
+    <string name="expedition_no_objectives">Keine Ziele.</string>
+    <string name="expedition_return_label">RÜCKKEHR</string>
+    <string name="expedition_btn_retreat">RÜCKZUG ZUM CAMP</string>
+    <string name="expedition_anchor_status">ANKER-STATUS: STABIL | LOG-AUFZEICHNUNG AKTIV</string>
+    <string name="expedition_quest_level">STUFE</string>
+
+    <!-- City Screen V9 -->
+    <string name="city_manifest_label">STADTMANIFEST</string>
+    <string name="city_npcs_label">ANWESENDE NPCs:</string>
+    <string name="city_locations_label">ORTE</string>
+    <string name="city_btn_market">MARKT</string>
+    <string name="city_btn_tavern">SCHENKE</string>
+    <string name="city_btn_temple">TEMPEL</string>
+    <string name="city_btn_alchemy">ALCHEMIST</string>
+    <string name="city_btn_recruit">REKRUTIERUNG</string>
+    <string name="city_btn_quest_board">WARNETAFEL</string>
+    <string name="city_btn_exit_city">STADT VERLASSEN</string>
+    <string name="city_party_management_hint">GRUPPENVERWALTUNG IM CAMP ODER ÜBER CHARAKTERKARTEN VERFÜGBAR</string>
+
+    <!-- Alchemy Screen -->
+    <string name="alchemy_title">ALCHEMIEKESSEL</string>
+    <string name="alchemy_recipes_label">REZEPTE</string>
+    <string name="alchemy_bench_label">WERKBANK</string>
+    <string name="alchemy_ingredients_label">ZUTATEN:</string>
+    <string name="alchemy_who_brews">WER BRAUT?</string>
+    <string name="alchemy_btn_brew">TRANK BRAUEN</string>
+    <string name="alchemy_select_recipe_hint">Wählen Sie ein Rezept aus der Liste.</string>
 </resources>

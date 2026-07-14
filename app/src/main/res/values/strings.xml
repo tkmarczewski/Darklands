@@ -154,6 +154,46 @@
     <string name="combat_btn_defend">OBRONA</string>
     <string name="combat_btn_revision">REWIZJA</string>
     <string name="combat_btn_overwrite">NADPISANIE</string>
-    <string name="combat_btn_exit">ZAKOŃCZ WALKĘ</string>
-    <string name="combat_btn_glitch_exit">WYJDŹ_Z_PĘTLI</string>
+    <string name="hub_day_label">DZIEŃ</string>
+    <string name="hub_stability_label">STABILNOŚĆ</string>
+    <string name="hub_chronicle_label">KRONIKA</string>
+    <string name="hub_actions_label">AKCJE</string>
+    <string name="hub_btn_to_city">DO MIASTA</string>
+    <string name="hub_btn_to_map">MAPA ŚWIATA</string>
+    <string name="hub_btn_to_expedition">EKSPEDYCJA</string>
+
+    <!-- Expedition Screen -->
+    <string name="expedition_title">EKSPLORACJA TERENU</string>
+    <string name="expedition_aggression_high">AGRESJA: WYSOKA</string>
+    <string name="expedition_logs_label">ZAPISY TERENOWE</string>
+    <string name="expedition_btn_understand">ZROZUMIAŁEM</string>
+    <string name="expedition_waiting_contact">OCZEKIWANIE NA KONTAKT</string>
+    <string name="expedition_active_objectives">CELE AKTYWNE</string>
+    <string name="expedition_no_objectives">Brak celów.</string>
+    <string name="expedition_return_label">POWRÓT</string>
+    <string name="expedition_btn_retreat">ODWRÓT DO OBOZOWISKA</string>
+    <string name="expedition_anchor_status">STATUS KOTWICY: STABILNY | ZAPIS LOGÓW AKTYWNY</string>
+    <string name="expedition_quest_level">POZIOM</string>
+
+    <!-- City Screen V9 -->
+    <string name="city_manifest_label">MANIFEST MIASTA</string>
+    <string name="city_npcs_label">OBECNI NPC:</string>
+    <string name="city_locations_label">LOKACJE</string>
+    <string name="city_btn_market">RYNEK</string>
+    <string name="city_btn_tavern">TAVERNA</string>
+    <string name="city_btn_temple">ŚWIĄTYNIA</string>
+    <string name="city_btn_alchemy">ALCHEMIK</string>
+    <string name="city_btn_recruit">REKRUTACJA</string>
+    <string name="city_btn_quest_board">TABLICA OGŁOSZEŃ</string>
+    <string name="city_btn_exit_city">WYJDŹ Z MIASTA</string>
+    <string name="city_party_management_hint">ZARZĄDZANIE DRUŻYNĄ DOSTĘPNE W OBOZOWISKU LUB KARTACH POSTACI</string>
+
+    <!-- Alchemy Screen -->
+    <string name="alchemy_title">KOCIOŁ ALCHEMICZNY</string>
+    <string name="alchemy_recipes_label">RECEPTURY</string>
+    <string name="alchemy_bench_label">STÓŁ WARSZTATOWY</string>
+    <string name="alchemy_ingredients_label">SKŁADNIKI:</string>
+    <string name="alchemy_who_brews">KTO WARZY?</string>
+    <string name="alchemy_btn_brew">WARZ MIKSTURĘ</string>
+    <string name="alchemy_select_recipe_hint">Wybierz recepturę z listy.</string>
 </resources>

@@ -14,6 +14,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -84,7 +85,7 @@ fun CityContent(
                 
                 // 1. LEWY KAFEL: STATUS MIASTA I LOGI
                 GothicObsidianCard(modifier = Modifier.weight(0.7f).fillMaxHeight()) {
-                    Text(text = "MANIFEST MIASTA", color = Color(0xFFC0A060), fontSize = 10.sp, fontWeight = FontWeight.Bold)
+                    Text(text = stringResource(R.string.city_manifest_label), color = Color(0xFFC0A060), fontSize = 10.sp, fontWeight = FontWeight.Bold)
                     Divider(color = Color(0x33C0A060), thickness = 1.dp, modifier = Modifier.padding(vertical = 4.dp))
                     LazyColumn(modifier = Modifier.fillMaxSize()) {
                         item {
@@ -118,7 +119,7 @@ fun CityContent(
                                 .background(androidx.compose.ui.graphics.Brush.verticalGradient(listOf(Color.Transparent, Color(0xCC000000))))
                                 .padding(8.dp)
                         ) {
-                            Text("OBECNI NPC:", color = Color(0xFFC0A060), fontSize = 9.sp, fontWeight = FontWeight.Bold)
+                            Text(stringResource(R.string.city_npcs_label), color = Color(0xFFC0A060), fontSize = 9.sp, fontWeight = FontWeight.Bold)
                             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                                 state.npcs.forEach { npc ->
                                     Surface(
@@ -139,21 +140,21 @@ fun CityContent(
                 // 3. PRAWY KAFEL: LOKACJE I ZADANIA
                 Column(modifier = Modifier.weight(0.7f).fillMaxHeight()) {
                     GothicObsidianCard(modifier = Modifier.weight(1.2f), headerColor = Color(0xFF1B5E20)) {
-                        Text(text = "LOKACJE", color = Color(0xFFC0A060), fontSize = 10.sp, fontWeight = FontWeight.Bold)
+                        Text(text = stringResource(R.string.city_locations_label), color = Color(0xFFC0A060), fontSize = 10.sp, fontWeight = FontWeight.Bold)
                         Column(verticalArrangement = Arrangement.spacedBy(4.dp), modifier = Modifier.padding(top = 4.dp)) {
-                            NavTabV9("RYNEK", onClick = { onEvent(CityUiEvent.OnMarketClick) })
-                            NavTabV9("TAVERNA", onClick = { onEvent(CityUiEvent.OnTavernClick) })
-                            NavTabV9("ŚWIĄTYNIA", onClick = { onEvent(CityUiEvent.OnTempleClick) })
-                            NavTabV9("ALCHEMIK", onClick = { onEvent(CityUiEvent.OnAlchemyClick) })
-                            NavTabV9("REKRUTACJA", onClick = { onEvent(CityUiEvent.OnRecruitClick) })
+                            NavTabV9(stringResource(R.string.city_btn_market), onClick = { onEvent(CityUiEvent.OnMarketClick) })
+                            NavTabV9(stringResource(R.string.city_btn_tavern), onClick = { onEvent(CityUiEvent.OnTavernClick) })
+                            NavTabV9(stringResource(R.string.city_btn_temple), onClick = { onEvent(CityUiEvent.OnTempleClick) })
+                            NavTabV9(stringResource(R.string.city_btn_alchemy), onClick = { onEvent(CityUiEvent.OnAlchemyClick) })
+                            NavTabV9(stringResource(R.string.city_btn_recruit), onClick = { onEvent(CityUiEvent.OnRecruitClick) })
                         }
                     }
                     Spacer(modifier = Modifier.height(4.dp))
                     GothicObsidianCard(modifier = Modifier.weight(0.8f), headerColor = Color(0xFF0D47A1)) {
-                        Text(text = "ZADANIA", color = Color(0xFFC0A060), fontSize = 10.sp, fontWeight = FontWeight.Bold)
-                        NavTabV9("TABLICA OGŁOSZEŃ", onClick = { onEvent(CityUiEvent.ToggleQuestMenu(true)) }, modifier = Modifier.padding(top = 4.dp), color = Color(0xFF1A237E))
+                        Text(text = stringResource(R.string.menu_quests), color = Color(0xFFC0A060), fontSize = 10.sp, fontWeight = FontWeight.Bold)
+                        NavTabV9(stringResource(R.string.city_btn_quest_board), onClick = { onEvent(CityUiEvent.ToggleQuestMenu(true)) }, modifier = Modifier.padding(top = 4.dp), color = Color(0xFF1A237E))
                         Spacer(modifier = Modifier.height(4.dp))
-                        NavTabV9("WYJDŹ Z MIASTA", onClick = { onEvent(CityUiEvent.OnExitClick) }, color = Color(0xFF400000))
+                        NavTabV9(stringResource(R.string.city_btn_exit_city), onClick = { onEvent(CityUiEvent.OnExitClick) }, color = Color(0xFF400000))
                     }
                 }
             }
@@ -165,7 +166,7 @@ fun CityContent(
             // Dla MVP użyjemy GothicObsidianCard z informacją o wyjściu, ale docelowo tu powinien być pasek party.
             GothicObsidianCard(modifier = Modifier.fillMaxWidth().height(60.dp)) {
                 Row(modifier = Modifier.fillMaxSize(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center) {
-                    Text("ZARZĄDZANIE DRUŻYNĄ DOSTĘPNE W HUBIE LUB KARTACH POSTACI", color = Color.DarkGray, fontSize = 10.sp)
+                    Text(stringResource(R.string.city_party_management_hint), color = Color.DarkGray, fontSize = 10.sp)
                 }
             }
         }

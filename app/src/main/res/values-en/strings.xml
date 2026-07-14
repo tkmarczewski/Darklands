@@ -154,6 +154,46 @@
     <string name="combat_btn_defend">DEFEND</string>
     <string name="combat_btn_revision">REVISION</string>
     <string name="combat_btn_overwrite">OVERWRITE</string>
-    <string name="combat_btn_exit">END COMBAT</string>
-    <string name="combat_btn_glitch_exit">EXIT_LOOP</string>
+    <string name="hub_day_label">DAY</string>
+    <string name="hub_stability_label">STABILITY</string>
+    <string name="hub_chronicle_label">CHRONICLE</string>
+    <string name="hub_actions_label">ACTIONS</string>
+    <string name="hub_btn_to_city">TO CITY</string>
+    <string name="hub_btn_to_map">WORLD MAP</string>
+    <string name="hub_btn_to_expedition">EXPEDITION</string>
+
+    <!-- Expedition Screen -->
+    <string name="expedition_title">FIELD EXPLORATION</string>
+    <string name="expedition_aggression_high">AGGRESSION: HIGH</string>
+    <string name="expedition_logs_label">FIELD RECORDS</string>
+    <string name="expedition_btn_understand">I UNDERSTAND</string>
+    <string name="expedition_waiting_contact">WAITING FOR CONTACT</string>
+    <string name="expedition_active_objectives">ACTIVE OBJECTIVES</string>
+    <string name="expedition_no_objectives">No objectives.</string>
+    <string name="expedition_return_label">RETURN</string>
+    <string name="expedition_btn_retreat">RETREAT TO CAMP</string>
+    <string name="expedition_anchor_status">ANCHOR STATUS: STABLE | LOG RECORDING ACTIVE</string>
+    <string name="expedition_quest_level">LEVEL</string>
+
+    <!-- City Screen V9 -->
+    <string name="city_manifest_label">CITY MANIFEST</string>
+    <string name="city_npcs_label">PRESENT NPCs:</string>
+    <string name="city_locations_label">LOCATIONS</string>
+    <string name="city_btn_market">MARKET</string>
+    <string name="city_btn_tavern">TAVERN</string>
+    <string name="city_btn_temple">TEMPLE</string>
+    <string name="city_btn_alchemy">ALCHEMIST</string>
+    <string name="city_btn_recruit">RECRUITMENT</string>
+    <string name="city_btn_quest_board">NOTICE BOARD</string>
+    <string name="city_btn_exit_city">EXIT CITY</string>
+    <string name="city_party_management_hint">PARTY MANAGEMENT AVAILABLE IN CAMP OR CHARACTER CARDS</string>
+
+    <!-- Alchemy Screen -->
+    <string name="alchemy_title">ALCHEMY CAULDRON</string>
+    <string name="alchemy_recipes_label">RECIPES</string>
+    <string name="alchemy_bench_label">WORKBENCH</string>
+    <string name="alchemy_ingredients_label">INGREDIENTS:</string>
+    <string name="alchemy_who_brews">WHO BREWS?</string>
+    <string name="alchemy_btn_brew">BREW POTION</string>
+    <string name="alchemy_select_recipe_hint">Select a recipe from the list.</string>
 </resources>
