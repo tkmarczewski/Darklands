@@ -326,6 +326,13 @@ class CombatSystem @Inject constructor(
         
         val enemyDef = type?.let { Bestiary.get(it) }
         if (enemyDef != null) {
+            // --- QUANTUM SCAN: Ontological Mass Impact ---
+            // If the enemy had significant mass, it increases meta awareness
+            if (enemyDef.ontologicalMass >= 50) {
+                state.metaAwarenessLevel += 1
+                c.log.add("TRIBUNAL_LOG_014: Masa ontologiczna celu zintegrowana. Meta-percepcja wzrasta.")
+            }
+
             experienceSystem.addPartyXpDirect(state, enemyDef.xpReward).forEach { c.log.add(it) }
             lootSystem.awardLootFromTableDirect(state, enemyDef.lootTable).forEach { c.log.add(it) }
         }

@@ -392,7 +392,8 @@ fun PersistentMeta.toDto(): PersistentMetaDto = PersistentMetaDto(
     anchorIdentity = anchorIdentity,
     totalSessionsFinished = totalSessionsFinished,
     unlockedLegacyBuffs = unlockedLegacyBuffs.toList(),
-    maxMetaAwarenessReached = maxMetaAwarenessReached
+    maxMetaAwarenessReached = maxMetaAwarenessReached,
+    unitedSelves = unitedSelves.map { it.name }
 )
 
 fun PersistentMetaDto.toDomain(): PersistentMeta = PersistentMeta(
@@ -401,6 +402,7 @@ fun PersistentMetaDto.toDomain(): PersistentMeta = PersistentMeta(
     maxMetaAwarenessReached = maxMetaAwarenessReached
 ).also {
     it.unlockedLegacyBuffs.addAll(unlockedLegacyBuffs)
+    it.unitedSelves.addAll(unitedSelves.map { s -> PersistentMeta.SelfAspect.valueOf(s) })
 }
 
 fun SaveSnapshot.toDto(): SaveSnapshotDto = SaveSnapshotDto(

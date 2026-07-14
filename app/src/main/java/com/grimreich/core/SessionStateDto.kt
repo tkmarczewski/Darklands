@@ -7,7 +7,8 @@ data class PersistentMetaDto(
     var anchorIdentity: String? = null,
     var totalSessionsFinished: Int,
     val unlockedLegacyBuffs: List<String>,
-    var maxMetaAwarenessReached: Int
+    var maxMetaAwarenessReached: Int,
+    val unitedSelves: List<String> = emptyList()
 )
 
 @Serializable

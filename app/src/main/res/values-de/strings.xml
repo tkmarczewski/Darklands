@@ -42,7 +42,7 @@
 
     <!-- Main Menu hardcoded strings -->
     <string name="main_title">GRIMREICH</string>
-    <string name="main_subtitle">Versuchen Sie nicht, das Bild anzupassen. Wir kontrollieren die Übertragung.</string>
+    <string name="main_subtitle">Do Not Attempt to Adjust The Picture. We Are Controlling Transmission.</string>
     <string name="btn_new_game">NEUES ABENTEUER</string>
     <string name="btn_no_session">FORTSETZUNG (KEINE SITZUNG)</string>
     <string name="btn_exit">BEENDEN</string>

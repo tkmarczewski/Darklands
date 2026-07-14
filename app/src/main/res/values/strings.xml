@@ -50,9 +50,9 @@
 
     <!-- Chronicle Screen -->
     <string name="chronicle_title">KRONIKA ECHO</string>
-    <string name="chronicle_decode_prefix">DECODING REALITY: </string>
+    <string name="chronicle_decode_prefix">DEKODOWANIE RZECZYWISTOŚCI: </string>
     <string name="chronicle_decode_suffix">%</string>
-    <string name="chronicle_select_hint">Select an entry to delve into the knowledge of the Breach.</string>
+    <string name="chronicle_select_hint">Wybierz wpis, aby zgłębić wiedzę o Pęknięciu.</string>
 
     <!-- Character Creator Screen -->
     <string name="creator_header">KREACJA BOHATERA</string>
