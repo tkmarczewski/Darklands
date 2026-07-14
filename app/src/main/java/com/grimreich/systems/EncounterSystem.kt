@@ -1,5 +1,6 @@
 package com.grimreich.systems
 
+import com.grimreich.core.GameConstants
 import com.grimreich.core.GameState
 import com.grimreich.core.GameRepository
 import com.grimreich.core.Bestiary
@@ -131,8 +132,8 @@ class EncounterSystem @Inject constructor(
     // FIX: Usunięto kotlin.random.Random — parametr to CombatRandomProvider
     fun rollEncounter(random: CombatRandomProvider, state: GameState): Encounter? {
         // --- FACTION RAIDS ---
-        val hostileFactions = state.reputation.globalFactions.filter { it.value <= -50 }.keys
-        if (hostileFactions.isNotEmpty() && random.nextFloat() < 0.2f) {
+        val hostileFactions = state.reputation.globalFactions.filter { it.value <= GameConstants.HOSTILE_REPUTATION_THRESHOLD }.keys
+        if (hostileFactions.isNotEmpty() && random.nextFloat() < GameConstants.FACTION_RAID_CHANCE) {
             val factionId = hostileFactions.toList()[random.nextInt(hostileFactions.size)]
             val enemyType = when (factionId.uppercase()) {
                 "CHURCH", "INKWIZYCJA" -> EnemyType.CITY_GUARD
@@ -155,7 +156,7 @@ class EncounterSystem @Inject constructor(
             )
         }
 
-        if (random.nextFloat() > 0.3f) return null
+        if (random.nextFloat() > GameConstants.ENCOUNTER_CHANCE) return null
         if (encounters.isEmpty()) return null
         return encounters[random.nextInt(encounters.size)]
     }

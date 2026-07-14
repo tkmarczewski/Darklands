@@ -1,5 +1,6 @@
 package com.grimreich.systems
 
+import com.grimreich.core.GameConstants
 import com.grimreich.core.GrimConstants
 import com.grimreich.core.FactionReputationSystem
 import com.grimreich.grimreich.v1.Item
@@ -22,7 +23,7 @@ class EconomySystem @Inject constructor(
 
         val reputationModifier = FactionReputationSystem.buyModifier(rep)
         val finalPrice = (basePrice * regionalModifier * reputationModifier).toInt()
-        return if (finalPrice < 1 && basePrice > 0) 1 else finalPrice
+        return if (finalPrice < GameConstants.MIN_BUY_PRICE && basePrice > 0) GameConstants.MIN_BUY_PRICE else finalPrice
     }
 
     override fun calculateSellPrice(cityId: String, item: Item): Int {
@@ -35,6 +36,6 @@ class EconomySystem @Inject constructor(
         val reputationModifier = FactionReputationSystem.sellModifier(rep)
         val baseSellPrice = (item.value * regionalModifier * reputationModifier * FactionReputationSystem.BASE_SELL_MULTIPLIER).toInt()
         
-        return if (baseSellPrice < 1 && item.value > 0) 1 else baseSellPrice
+        return if (baseSellPrice < GameConstants.MIN_SELL_PRICE && item.value > 0) GameConstants.MIN_SELL_PRICE else baseSellPrice
     }
 }

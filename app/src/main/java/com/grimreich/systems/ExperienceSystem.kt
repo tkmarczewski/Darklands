@@ -1,5 +1,6 @@
 package com.grimreich.systems
 
+import com.grimreich.core.GameConstants
 import com.grimreich.core.GameState
 import com.grimreich.core.Hero
 import com.grimreich.core.GameRepository
@@ -65,18 +66,18 @@ class ExperienceSystem @Inject constructor(
         if (hero.level < 1) hero.level = 1
         
         // Scaling XP requirement: level * 100
-        while (hero.xp >= hero.level * 100) {
-            hero.xp -= hero.level * 100
+        while (hero.xp >= hero.level * GameConstants.XP_PER_LEVEL_BASE) {
+            hero.xp -= hero.level * GameConstants.XP_PER_LEVEL_BASE
             hero.level++
             
             // FIX: Grant attribute points on level up (2 per level)
-            hero.attributePoints += 2
+            hero.attributePoints += GameConstants.ATTR_POINTS_PER_LEVEL
             
-            state?.logEntries?.add("BOHATER AWANSOWAŁ! ${hero.name} jest teraz na poziomie ${hero.level}. Otrzymano 2 punkty cech.")
+            state?.logEntries?.add("BOHATER AWANSOWAŁ! ${hero.name} jest teraz na poziomie ${hero.level}. Otrzymano ${GameConstants.ATTR_POINTS_PER_LEVEL} punkty cech.")
             
             levelsGained++
             // Safety break
-            if (levelsGained > 50) break
+            if (levelsGained > GameConstants.MAX_QUEST_ADVANCE_SAFETY) break
         }
         return levelsGained
     }

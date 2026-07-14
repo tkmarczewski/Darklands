@@ -33,7 +33,7 @@ class FactionReputationSystem @Inject constructor(
         const val BASE_SELL_MULTIPLIER = 0.5f
 
         fun reputationLabel(rep: Int): String = when {
-            rep <= -50 -> "WROGA"
+            rep <= GameConstants.HOSTILE_REPUTATION_THRESHOLD -> "WROGA"
             rep <= -20 -> "ZŁA"
             rep <= 20 -> "NEUTRALNA"
             rep <= 50 -> "DOBRA"
@@ -41,11 +41,11 @@ class FactionReputationSystem @Inject constructor(
         }
 
         fun buyModifier(rep: Int): Float {
-            return (1.0f - (rep * 0.02f)).coerceIn(0.7f, 1.3f)
+            return (GameConstants.BASE_REPUTATION_BUY_MODIFIER - (rep * GameConstants.REPUTATION_MODIFIER_STEP)).coerceIn(0.7f, 1.3f)
         }
 
         fun sellModifier(rep: Int): Float {
-            return (1.0f + (rep * 0.02f)).coerceIn(0.7f, 1.3f)
+            return (GameConstants.BASE_REPUTATION_BUY_MODIFIER + (rep * GameConstants.REPUTATION_MODIFIER_STEP)).coerceIn(0.7f, 1.3f)
         }
     }
 

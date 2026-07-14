@@ -3,6 +3,7 @@ package com.grimreich.systems
 import android.content.Context
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import com.grimreich.core.GameConstants
 import com.grimreich.core.GameRepository
 import com.grimreich.core.GameState
 import com.grimreich.grimreich.v1.DialogueChoice
@@ -128,7 +129,7 @@ class DialogueManager @Inject constructor(
                 state.logEntries.add("Otwierasz okno handlu...")
             }
             "INCREMENT_STABILITY" -> {
-                val amount = value?.toIntOrNull() ?: 5
+                val amount = value?.toIntOrNull() ?: GameConstants.DEFAULT_STABILITY_INC
                 state.world.globalStability = (state.world.globalStability + amount).coerceAtMost(100)
                 state.logEntries.add("Poczucie celu wzmacnia paradygmat świata.")
             }
@@ -148,7 +149,7 @@ class DialogueManager @Inject constructor(
     }
 
     fun applyWorldEffects(node: DialogueNode, stability: Int): DialogueNode {
-        if (stability > 40) return node
+        if (stability > GameConstants.STABILITY_GLITCH_THRESHOLD) return node
         val seed = node.id.hashCode().toLong()
         return node.copy(text = glitchText(node.text, seed))
     }
@@ -159,7 +160,7 @@ class DialogueManager @Inject constructor(
         input.forEach { c ->
             if (c == ' ') {
                 sb.append(' ')
-            } else if (rand.nextFloat() < 0.15f) {
+            } else if (rand.nextFloat() < GameConstants.GLITCH_CHANCE_LOW_STABILITY) {
                 val glitches = listOf('#', '@', '$', '%', '&', '0', '1', 'X')
                 sb.append(glitches.random(rand))
             } else {

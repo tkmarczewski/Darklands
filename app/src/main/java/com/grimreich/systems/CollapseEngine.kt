@@ -1,6 +1,7 @@
 package com.grimreich.systems
 
 import com.grimreich.contracts.CollapseRandomProvider
+import com.grimreich.core.GameConstants
 import com.grimreich.core.GameRepository
 import com.grimreich.core.GameState
 import com.grimreich.grimreich.v1.CollapseScenario
@@ -100,7 +101,7 @@ class CollapseEngine @Inject constructor(
             else -> {}
         }
         
-        if (threshold >= 0.999f) {
+        if (threshold >= GameConstants.COLLAPSE_TOTAL_THRESHOLD) {
             state.logEntries.add("KONIEC: Rzeczywistość przestała istnieć.")
         }
     }
@@ -108,8 +109,8 @@ class CollapseEngine @Inject constructor(
     private fun decideScenario(faith: Int, stability: Int): CollapseScenario {
         val availableScenarios = CollapseScenario.entries.filter { it != CollapseScenario.ZERO_END }.toList()
         return when {
-            faith > 70 -> CollapseScenario.FULLNESS_ASCENSION
-            stability < 30 -> CollapseScenario.CHAOS_DOMINION
+            faith > GameConstants.STABILITY_THRESHOLD_HIGH -> CollapseScenario.FULLNESS_ASCENSION
+            stability < GameConstants.STABILITY_THRESHOLD_LOW -> CollapseScenario.CHAOS_DOMINION
             else -> collapseRandomProvider.chooseScenario(availableScenarios)
         }
     }

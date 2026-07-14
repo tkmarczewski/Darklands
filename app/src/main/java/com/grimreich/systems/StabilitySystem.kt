@@ -1,5 +1,6 @@
 package com.grimreich.systems
 
+import com.grimreich.core.GameConstants
 import com.grimreich.core.GameRepository
 import com.grimreich.core.GameState
 import com.grimreich.core.Season
@@ -39,7 +40,7 @@ class StabilitySystem @Inject constructor(
         val stability = world.globalStability
 
         // Project Cipher: Weather Glitches
-        if (stability < 25 && Random.nextFloat() < 0.2f) {
+        if (stability < GameConstants.STABILITY_ATMOSPHERE_GLITCH && Random.nextFloat() < 0.2f) {
             world.weather = WeatherType.entries.random() // Erratic weather
             state.logEntries.add("!!! BŁĄD ATMOSFERY: Pogoda traci spójność !!!")
         }

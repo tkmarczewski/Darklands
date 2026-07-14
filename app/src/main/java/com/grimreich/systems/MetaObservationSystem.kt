@@ -1,5 +1,6 @@
 package com.grimreich.systems
 
+import com.grimreich.core.GameConstants
 import com.grimreich.core.GameRepository
 import com.grimreich.core.GameState
 import com.grimreich.core.PersistentMeta
@@ -50,7 +51,7 @@ class MetaObservationSystem @Inject constructor(
                 state.metaAwarenessLevel += 1
                 state.logEntries.add("Archiwista bez twarzy zna twoje imię, lecz nie zna bohatera.")
             }
-            completed >= 30 && !state.quest.worldFlags.contains("meta_chain_unlock") -> {
+            completed >= GameConstants.META_QUEST_THRESHOLD && !state.quest.worldFlags.contains("meta_chain_unlock") -> {
                 state.quest.worldFlags.add("meta_chain_unlock")
                 if (questEngine.getStatus("q_meta_1", state) == QuestStatus.AVAILABLE) {
                     questEngine.activateQuestDirect(state, "q_meta_1")

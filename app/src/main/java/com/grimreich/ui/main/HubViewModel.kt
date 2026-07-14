@@ -4,6 +4,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.grimreich.R
+import com.grimreich.core.GameConstants
 import com.grimreich.core.GameRepository
 import com.grimreich.core.Hero
 import com.grimreich.systems.EndingSystem
@@ -58,16 +59,16 @@ class HubViewModel @Inject constructor(
             
             val stability = state.world.globalStability
             val tint = when {
-                stability < 15 -> Color(0x66FF0000)
-                stability < 35 -> Color(0x33AA0000)
-                stability < 60 -> Color(0x22000000)
+                stability < 15 -> Color(GameConstants.ANOMALY_TINT_ALPHA shl 24 or 0xFF0000)
+                stability < GameConstants.STABILITY_THRESHOLD_LOW + 5 -> Color(0x33AA0000)
+                stability < GameConstants.STABILITY_THRESHOLD_HIGH - 10 -> Color(0x22000000)
                 else -> Color.Transparent
             }
 
             val messageRes = when {
-                stability < 20 -> com.grimreich.R.string.stability_critical
-                stability < 40 -> com.grimreich.R.string.stability_low
-                stability < 70 -> com.grimreich.R.string.stability_medium
+                stability < GameConstants.STABILITY_THRESHOLD_CRITICAL -> com.grimreich.R.string.stability_critical
+                stability < GameConstants.STABILITY_THRESHOLD_LOW + 10 -> com.grimreich.R.string.stability_low
+                stability < GameConstants.STABILITY_THRESHOLD_HIGH -> com.grimreich.R.string.stability_medium
                 else -> com.grimreich.R.string.stability_high
             }
 
@@ -94,7 +95,7 @@ class HubViewModel @Inject constructor(
                     hubBackground = city?.backgroundDrawable ?: "bg_generic_city",
                     hubTintColor = tint,
                     atmosphericMessageRes = messageRes,
-                    latestLogs = listOf(quote) + logs.takeLast(19).reversed(),
+                    latestLogs = listOf(quote) + logs.takeLast(GameConstants.LATEST_LOGS_DISPLAY_COUNT).reversed(),
                     hasPendingLevelUp = state.party.any { h -> h.attributePoints > 0 }
                 )
             }

@@ -4,6 +4,7 @@ import android.content.Context
 import android.media.MediaPlayer
 import android.util.Log
 import com.grimreich.R
+import com.grimreich.core.GameConstants
 import com.grimreich.core.GameRepository
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
@@ -39,11 +40,11 @@ class AudioEngine @Inject constructor(
                 currentStability = state.world.globalStability
                 
                 // REACTION: If stability drops below threshold, force switch to glitch track
-                if (oldStability >= 20 && currentStability < 20) {
+                if (oldStability >= GameConstants.STABILITY_MIN_FOR_RECOVERY && currentStability < GameConstants.STABILITY_THRESHOLD_CRITICAL) {
                     playMusic(R.raw.ost_glitch_ambient)
                 } 
                 // RECOVERY: If stability recovers, return to intended area music
-                else if (oldStability < 20 && currentStability >= 20) {
+                else if (oldStability < GameConstants.STABILITY_MIN_FOR_RECOVERY && currentStability >= GameConstants.STABILITY_MIN_FOR_RECOVERY) {
                     recoverMusic()
                 }
                 
@@ -132,7 +133,7 @@ class AudioEngine @Inject constructor(
         lastRequestedRoute = route
         
         // If world is already glitchy, override the request but save the route for later recovery
-        if (currentStability < 20) {
+        if (currentStability < GameConstants.STABILITY_THRESHOLD_CRITICAL) {
             playMusic(R.raw.ost_glitch_ambient)
             return
         }

@@ -1,5 +1,6 @@
 package com.grimreich.systems
 
+import com.grimreich.core.GameConstants
 import com.grimreich.core.GameRepository
 import com.grimreich.core.GameState
 import javax.inject.Inject
@@ -76,10 +77,10 @@ class WorldStabilitySystem @Inject constructor(
 
     fun advanceCollapseDirect(state: GameState, event: CollapseEvent) {
         val (delta, reason) = when (event) {
-            CollapseEvent.DayEnded -> 0.05f to "Koniec dnia"
-            is CollapseEvent.TravelCompleted -> (event.fatigueDelta / 1000f) to "Wyczerpująca podróż"
-            is CollapseEvent.QuestFailed -> 0.03f to "Porażka w zadaniu: ${event.questId}"
-            CollapseEvent.RealityRitualUsed -> 0.10f to "Rytuał naruszenia rzeczywistości"
+            CollapseEvent.DayEnded -> GameConstants.COLLAPSE_DELTA_DAY to "Koniec dnia"
+            is CollapseEvent.TravelCompleted -> (event.fatigueDelta / GameConstants.COLLAPSE_DELTA_TRAVEL_DIVISOR) to "Wyczerpująca podróż"
+            is CollapseEvent.QuestFailed -> GameConstants.COLLAPSE_DELTA_QUEST_FAIL to "Porażka w zadaniu: ${event.questId}"
+            CollapseEvent.RealityRitualUsed -> GameConstants.COLLAPSE_DELTA_RITUAL to "Rytuał naruszenia rzeczywistości"
         }
 
         val before = state.world.collapseProgress
