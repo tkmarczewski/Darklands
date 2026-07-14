@@ -104,7 +104,9 @@ fun Hero.toDto(): HeroDto = HeroDto(
     equipment = equipment,
     careerHistory = careerHistory.map { it.toDto() },
     abilities = abilities.map { it.toDto() },
-    passiveAbilities = passiveAbilities.toList()
+    passiveAbilities = passiveAbilities.toList(),
+    subjectType = subjectType.name,
+    ontologicalMass = ontologicalMass
 )
 
 fun HeroDto.toDomain(): Hero = Hero(
@@ -131,7 +133,9 @@ fun HeroDto.toDomain(): Hero = Hero(
     maxHp = maxHp,
     isDead = isDead,
     currentCareer = currentCareer?.let { Career.valueOf(it) },
-    trait = trait?.let { Trait.valueOf(it) }
+    trait = trait?.let { Trait.valueOf(it) },
+    subjectType = Hero.SubjectType.valueOf(subjectType),
+    ontologicalMass = ontologicalMass
 ).also {
     it.activeMutations.addAll(activeMutations.map { dto -> dto.toDomain() })
     it.skills.putAll(skills)

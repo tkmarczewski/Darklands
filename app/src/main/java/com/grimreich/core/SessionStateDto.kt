@@ -117,7 +117,9 @@ data class HeroDto(
     val equipment: Map<String, String?>,
     val careerHistory: List<CareerEntryDto>,
     val abilities: List<AbilityDto>,
-    val passiveAbilities: List<String> = emptyList()
+    val passiveAbilities: List<String> = emptyList(),
+    val subjectType: String = "VESSEL",
+    val ontologicalMass: Int = 10
 )
 
 @Serializable

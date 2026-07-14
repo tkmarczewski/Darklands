@@ -16,6 +16,7 @@ class QuestManifest @Inject constructor(
 
     fun seed() {
         engine.clearRegistry()
+        loadQuestsFromAsset("grimreich/quests_pilot.json")
         loadQuestsFromAsset("grimreich/quests_extended.json")
     }
 

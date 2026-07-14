@@ -173,5 +173,6 @@ class DialogueManager @Inject constructor(
         nodes.clear()
         // FAIL-FAST: Load immediately to detect broken assets at startup
         loadNodesFromAsset("grimreich/dialogues_pilot.json")
+        loadNodesFromAsset("grimreich/dialogues_extended.json")
     }
 }
