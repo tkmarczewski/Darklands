@@ -170,8 +170,31 @@ fun QuestActionCardV9(quest: QuestDefinition, onClick: () -> Unit) {
         border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFF333333))
     ) {
         Column(modifier = Modifier.padding(8.dp)) {
-            Text(text = quest.title.uppercase(), color = Color.White, fontWeight = FontWeight.Bold, fontSize = 11.sp)
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(text = quest.title.uppercase(), color = Color.White, fontWeight = FontWeight.Bold, fontSize = 11.sp, modifier = Modifier.weight(1f))
+                Text(
+                    text = quest.category.name,
+                    color = getCategoryColor(quest.category),
+                    fontSize = 8.sp,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(start = 4.dp)
+                )
+            }
             Text(text = "POZIOM: ${quest.recommendedLevel}", color = Color.Gray, fontSize = 9.sp)
         }
+    }
+}
+
+private fun getCategoryColor(category: com.grimreich.systems.QuestCategory): Color {
+    return when (category) {
+        com.grimreich.systems.QuestCategory.COMBAT -> Color(0xFFD32F2F)
+        com.grimreich.systems.QuestCategory.SOCIAL -> Color(0xFF1976D2)
+        com.grimreich.systems.QuestCategory.INVESTIGATION -> Color(0xFF7B1FA2)
+        com.grimreich.systems.QuestCategory.MIXED -> Color(0xFF689F38)
+        com.grimreich.systems.QuestCategory.META -> Color(0xFFFFD700)
+        com.grimreich.systems.QuestCategory.ANOMALY -> Color(0xFF00ACC1)
+        com.grimreich.systems.QuestCategory.DRAMA -> Color(0xFFF57C00)
+        com.grimreich.systems.QuestCategory.BEAST -> Color(0xFF4E342E)
+        com.grimreich.systems.QuestCategory.INTRIGUE -> Color(0xFF455A64)
     }
 }

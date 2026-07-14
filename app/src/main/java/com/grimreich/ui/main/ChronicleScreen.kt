@@ -81,18 +81,16 @@ fun ChronicleScreen(
                 color = Color(0xFF101010),
                 border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFF222222))
             ) {
-                if (selectedEntry != null) {
+                selectedEntry?.let { entry ->
                     LazyColumn(modifier = Modifier.padding(16.dp)) {
                         item {
-                            Text(selectedEntry!!.title, color = Color(0xFFC0A060), fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                            Text(entry.title, color = Color(0xFFC0A060), fontSize = 18.sp, fontWeight = FontWeight.Bold)
                             Spacer(modifier = Modifier.height(12.dp))
-                            Text(selectedEntry!!.fullText, color = Color.LightGray, fontSize = 14.sp, lineHeight = 20.sp)
+                            Text(entry.fullText, color = Color.LightGray, fontSize = 14.sp, lineHeight = 20.sp)
                         }
                     }
-                } else {
-                    Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
-                        Text(stringResource(R.string.chronicle_select_hint), color = Color.DarkGray, fontSize = 12.sp)
-                    }
+                } ?: Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
+                    Text(stringResource(R.string.chronicle_select_hint), color = Color.DarkGray, fontSize = 12.sp)
                 }
             }
         }

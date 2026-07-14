@@ -111,9 +111,10 @@ class QuestEngine @Inject constructor(
         state.quest.completedQuestIds.add(questId)
         state.quest.progress[questId] = p.copy(status = QuestStatus.COMPLETED)
         state.gold += def.rewardGold
-        experienceSystem.addPartyXpDirect(state, def.recommendedLevel * 50)
+        val xpMessages = experienceSystem.addPartyXpDirect(state, def.recommendedLevel * 50)
         
-        state.logEntries.add("ZADANIE UKOŃCZONE: ${def.title}. Otrzymano nagrodę: ${def.rewardGold} zł oraz doświadczenie.")
+        state.logEntries.add("ZADANIE UKOŃCZONE: ${def.title}. Otrzymano nagrodę: ${def.rewardGold} zł.")
+        state.logEntries.addAll(xpMessages)
     }
 
     fun failQuestDirect(state: GameState, questId: String) {
@@ -173,9 +174,6 @@ class QuestEngine @Inject constructor(
             .sortedWith(compareBy<QuestDefinition> { it.chainId ?: "zzz" }.thenBy { it.chainOrder }.thenBy { it.recommendedLevel })
     }
 }
-
-enum class StepType { COMBAT, DIALOGUE, INVESTIGATION, SOCIAL, META, EXPEDITION }
-enum class QuestCategory { COMBAT, SOCIAL, INVESTIGATION, MIXED, META, ANOMALY, DRAMA, BEAST, INTRIGUE }
 
 data class QuestStep(
     val description: String,

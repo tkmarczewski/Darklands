@@ -75,12 +75,13 @@ fun AlchemyScreen(
                     modifier = Modifier.fillMaxSize(),
                     border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFF222222))
                 ) {
-                    if (state.selectedRecipe != null) {
+                    val recipe = state.selectedRecipe
+                    if (recipe != null) {
                         Column(modifier = Modifier.padding(16.dp)) {
-                            Text(state.selectedRecipe!!.id.replace("rec_", "").uppercase(), color = Color.White, fontWeight = FontWeight.Bold)
+                            Text(recipe.id.replace("rec_", "").uppercase(), color = Color.White, fontWeight = FontWeight.Bold)
                             Spacer(modifier = Modifier.height(16.dp))
                             Text("SKŁADNIKI:", color = Color.Gray, fontSize = 12.sp)
-                            state.selectedRecipe!!.ingredients.forEach { (ingId, qty) ->
+                            recipe.ingredients.forEach { (ingId, qty) ->
                                 val hasCount = state.inventory.count { it.templateId == ingId }
                                 Text(
                                     "- $ingId: $hasCount / $qty", 

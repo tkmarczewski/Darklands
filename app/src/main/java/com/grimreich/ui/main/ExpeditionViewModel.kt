@@ -160,8 +160,28 @@ class ExpeditionViewModel @Inject constructor(
                     state.logEntries.add(msg)
                     _uiState.update { it.copy(content = ExpeditionContentState.EncounterLog(msg)) }
                 }
-                else -> {
+                StepType.SOCIAL -> {
                     questEngine.advanceStepDirect(state, questId)
+                    val msg = "Interakcja społeczna w ${step.targetId} zakończona sukcesem."
+                    state.logEntries.add(msg)
+                    _uiState.update { it.copy(content = ExpeditionContentState.EncounterLog(msg)) }
+                }
+                StepType.META -> {
+                    questEngine.advanceStepDirect(state, questId)
+                    val msg = "Zrozumiano ontologiczny aspekt: ${step.targetId}. Ledger zaktualizowany."
+                    state.logEntries.add(msg)
+                    _uiState.update { it.copy(content = ExpeditionContentState.EncounterLog(msg)) }
+                }
+                StepType.EXPEDITION -> {
+                    val currentCityId = state.world.locationId
+                    if (currentCityId == step.targetId) {
+                        questEngine.advanceStepDirect(state, questId)
+                        state.logEntries.add("Dotarto do celu ekspedycji: ${step.targetId}.")
+                    } else {
+                        val msg = "Musisz udać się do: ${step.targetId}, aby kontynuować to zadanie."
+                        state.logEntries.add(msg)
+                        _uiState.update { it.copy(content = ExpeditionContentState.EncounterLog(msg)) }
+                    }
                 }
             }
         }

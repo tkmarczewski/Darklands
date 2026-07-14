@@ -6,10 +6,10 @@
     "rewardGold": 100,
     "cityId": "wybrzeze_polnocne",
     "originNpcId": "peasant",
-    "category": "INTRIGUE",
+    "category": "SOCIAL",
     "recommendedLevel": 2,
     "steps": [
-      { "description": "Przeszukaj wioskę Raskhold.", "type": "EXPEDITION", "targetId": "wybrzeze_polnocne" },
+      { "description": "Przeszukaj wioskę Raskhold.", "type": "SOCIAL", "targetId": "wybrzeze_polnocne" },
       { "description": "Zbadaj posąg (Combat).", "type": "COMBAT", "targetId": "POSSESSED_STATUE" }
     ]
   },
@@ -20,10 +20,10 @@
     "rewardGold": 120,
     "cityId": "opactwo_ciszy",
     "originNpcId": "priest",
-    "category": "INTRIGUE",
+    "category": "INVESTIGATION",
     "recommendedLevel": 3,
     "steps": [
-      { "description": "Trop kapłana w okolicach opactwa.", "type": "EXPEDITION", "targetId": "opactwo_ciszy" },
+      { "description": "Trop kapłana w okolicach opactwa.", "type": "INVESTIGATION", "targetId": "opactwo_ciszy" },
       { "description": "Odzyskaj manuskrypt (Combat).", "type": "COMBAT", "targetId": "FALLEN_PRIEST" }
     ]
   },
@@ -34,7 +34,7 @@
     "rewardGold": 150,
     "cityId": "serce_krainy",
     "originNpcId": "guard",
-    "category": "INTRIGUE",
+    "category": "COMBAT",
     "recommendedLevel": 4,
     "steps": [
       { "description": "Zidentyfikuj oszusta.", "type": "DIALOGUE", "targetId": "masked_impostor_reveal" },
@@ -283,7 +283,7 @@
     "rewardGold": 110,
     "cityId": "wybrzeze_polnocne",
     "originNpcId": "hunter",
-    "category": "BEAST",
+    "category": "COMBAT",
     "recommendedLevel": 2,
     "steps": [
       { "description": "Zlokalizuj legowisko bez cienia.", "type": "EXPEDITION", "targetId": "wybrzeze_polnocne" },
@@ -548,10 +548,10 @@
     "rewardGold": 120,
     "cityId": "port_mglisty",
     "originNpcId": "none",
-    "category": "DRAMA",
+    "category": "SOCIAL",
     "recommendedLevel": 4,
     "steps": [
-      { "description": "Rozbaw lub zastrasz błazna.", "type": "DIALOGUE", "targetId": "jester_interact" }
+      { "description": "Rozbaw lub zastrasz błazna.", "type": "SOCIAL", "targetId": "jester_interact" }
     ]
   },
   {
@@ -728,6 +728,33 @@
     "prerequisiteQuestId": "q_meta_1",
     "steps": [
       { "description": "Stań na krawędzi Szyfru.", "type": "META", "targetId": "meta_truth_reveal" }
+    ]
+  },
+  {
+    "id": "q_void_whisper",
+    "title": "Szept Pustki: Rezonans",
+    "description": "Pustka zaczyna śpiewać w Twoim ojczystym języku. Zrozum przekaz.",
+    "rewardGold": 0,
+    "cityId": "port_mglisty",
+    "originNpcId": "none",
+    "category": "ANOMALY",
+    "recommendedLevel": 8,
+    "steps": [
+      { "description": "Wsłuchaj się w szum statyczny.", "type": "META", "targetId": "void_white_noise" }
+    ]
+  },
+  {
+    "id": "q_lost_scribe",
+    "title": "Zaginiony Skryba: Ostatni Protokół",
+    "description": "Jeden ze Skrybów Absolutu pozostawił niedokończony zapis. Dopełnij go.",
+    "rewardGold": 300,
+    "cityId": "opactwo_ciszy",
+    "originNpcId": "priest",
+    "category": "INTRIGUE",
+    "recommendedLevel": 9,
+    "steps": [
+      { "description": "Odszukaj pióro skryby.", "type": "INVESTIGATION", "targetId": "Scribe Pen" },
+      { "description": "Podpisz Ledger.", "type": "DIALOGUE", "targetId": "ledger_signing" }
     ]
   }
 ]
