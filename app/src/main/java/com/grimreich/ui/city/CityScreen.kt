@@ -31,6 +31,10 @@ fun CityScreen(
     onTemple: () -> Unit,
     onRecruit: () -> Unit,
     onDialogue: (String, String, String) -> Unit,
+    onMap: () -> Unit = {},
+    onInventory: () -> Unit = {},
+    onChronicle: () -> Unit = {},
+    onQuests: () -> Unit = {},
     onExit: () -> Unit
 ) {
     val state by viewModel.uiState.collectAsState()
@@ -54,6 +58,16 @@ fun CityScreen(
         onEvent = viewModel::onEvent,
         onCharacter = { /* Można tu dodać podgląd postaci */ }
     )
+
+    // --- EXPANDING QUILL MENU (V9 INTEGRATION) ---
+    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.BottomEnd) {
+        ExpandingQuillMenu(
+            onMap = onMap,
+            onInventory = onInventory,
+            onChronicle = onChronicle,
+            onQuests = onQuests
+        )
+    }
 }
 
 @Composable

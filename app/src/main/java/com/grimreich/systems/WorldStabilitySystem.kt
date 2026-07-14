@@ -29,13 +29,7 @@ class WorldStabilitySystem @Inject constructor(
     fun changeStabilityDirect(state: GameState, delta: Int, reason: String) {
         val before = state.world.globalStability
         
-        // Project Anchor: In the "Iron Fortress" (Krew), every action costs 1 HP
-        if (state.world.locationId == "twierdza_zelazna" && delta != 0) {
-            state.party.forEach { hero ->
-                hero.hp = (hero.hp - 1).coerceAtLeast(1) // Anchor tax: cannot kill, but weakens
-            }
-            state.logEntries.add("Krew: Kotwica porusza się, a Naczynia krwawią.")
-        }
+        applyAnchorTax(state)
 
         state.world.globalStability += delta
         state.normalizeState()
@@ -45,6 +39,22 @@ class WorldStabilitySystem @Inject constructor(
             state.logEntries.add("TRIBUNAL_LOG: Stabilność: $after. Powód: $reason")
         }
     }
+
+    /**
+     * Project Anchor: In the "Iron Fortress" (Krew), every meaningful action costs 1 HP.
+     * This represents the physiological price of existence in the Anchor's core.
+     */
+    private fun applyAnchorTax(state: GameState) {
+        if (state.world.locationId == "twierdza_zelazna") {
+            state.party.forEach { hero ->
+                if (!hero.isDead) {
+                    hero.hp = (hero.hp - 1).coerceAtLeast(1)
+                }
+            }
+            state.logEntries.add("Krew: Kotwica porusza się, a Naczynia krwawią.")
+        }
+    }
+
 
     /**
      * Zmienia intensywność echa (0.0 - 1.0).

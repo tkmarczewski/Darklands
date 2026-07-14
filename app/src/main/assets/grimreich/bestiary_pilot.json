@@ -88,7 +88,6 @@
     "xpReward": 400
   },
   {
-    "_comment": "TO BE CHECKED: New enemies added for V2.0 stabilization",
     "type": "POSSESSED_STATUE",
     "name": "Opętany Posąg",
     "stats": { "maxHp": 60, "attack": 22, "defense": 30, "speed": 8, "morale": 100 },

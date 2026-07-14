@@ -140,9 +140,12 @@ fun GameNavHost(
                 onTemple = { root.setMode(GameScreenMode.TEMPLE) },
                 onRecruit = { root.setMode(GameScreenMode.RECRUIT) },
                 onDialogue = { name, role, node -> 
-                    // root.setDialogueParams(...) if needed
                     root.setMode(GameScreenMode.DIALOGUE) 
                 },
+                onMap = { root.setMode(GameScreenMode.WORLD_MAP) },
+                onInventory = { root.setMode(GameScreenMode.INVENTORY) },
+                onChronicle = { root.setMode(GameScreenMode.CHRONICLE) },
+                onQuests = { root.setMode(GameScreenMode.QUESTS) },
                 onExit = { root.setMode(GameScreenMode.HUB) }
             )
         }
@@ -167,7 +170,11 @@ fun GameNavHost(
                 viewModel = hiltViewModel(),
                 onBack = { root.setMode(GameScreenMode.HUB) },
                 onCombat = { root.setMode(GameScreenMode.COMBAT) },
-                onDialogue = { root.setMode(GameScreenMode.DIALOGUE) }
+                onDialogue = { root.setMode(GameScreenMode.DIALOGUE) },
+                onMap = { root.setMode(GameScreenMode.WORLD_MAP) },
+                onInventory = { root.setMode(GameScreenMode.INVENTORY) },
+                onChronicle = { root.setMode(GameScreenMode.CHRONICLE) },
+                onQuests = { root.setMode(GameScreenMode.QUESTS) }
             )
         }
 

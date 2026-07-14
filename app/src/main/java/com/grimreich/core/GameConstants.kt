@@ -47,7 +47,7 @@ object GameConstants {
     const val HOSTILE_REPUTATION_THRESHOLD = -50
     const val ANOMALY_TINT_ALPHA = 0x66
     const val DEFAULT_STABILITY_INC = 5
-    const val SKILL_STABILITY_LOSS_HEAVY = 10 // TO BE CHECKED
+    const val SKILL_STABILITY_LOSS_HEAVY = 10
 
     // Collapse Deltas
     const val COLLAPSE_DELTA_DAY = 0.05f

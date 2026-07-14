@@ -42,6 +42,10 @@ class AtmosphericLogSystem @Inject constructor() {
         "Nie patrz w dół. Tam nie ma już ziemi.",
         "Twoja sesja jest tylko marginesem w wielkiej Kronice Pęknięcia.",
         "STABILITY FAILING. SUBJECT UNDEFINED.",
+        "There is nothing wrong with your television set. Do not attempt to adjust the picture.",
+        "We are controlling transmission. We will control the horizontal. We will control the vertical.",
+        "We can change the focus to a soft blur or sharpen it to crystal clarity.",
+        "For the next hour, sit quietly and we will control all that you see and hear.",
         "TRIBUNAL_LOG_ERR: IDENTITY UNRESOLVED. SYSTEM INSUFFICIENT."
     )
 

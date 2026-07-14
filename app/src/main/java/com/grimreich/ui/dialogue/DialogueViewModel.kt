@@ -145,6 +145,14 @@ class DialogueViewModel @Inject constructor(
         // Handle triggers (quest advances, item giving, etc)
         dialogueManager.handleTrigger(state, choice.triggerEvent, choice.triggerValue)
 
+        // Project Anchor: Dialogue choice is a meaningful action. Apply Blood Tax if in Iron Fortress.
+        if (state.world.locationId == "twierdza_zelazna") {
+            gameRepository.updateState { s ->
+                s.party.forEach { if (!it.isDead) it.hp = (it.hp - 1).coerceAtLeast(1) }
+                s.logEntries.add("Krew: Decyzja kosztuje. Kotwica pije z Naczyń.")
+            }
+        }
+
         // SPECIAL TRANSITIONS
         if (choice.triggerEvent == "START_COMBAT" || choice.isCombatTrigger) {
             val enemyType = try { 

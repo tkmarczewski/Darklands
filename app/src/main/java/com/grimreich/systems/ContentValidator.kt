@@ -1,7 +1,7 @@
 package com.grimreich.systems
 
 import android.util.Log
-import com.grimreich.core.StepType // TO BE CHECKED
+import com.grimreich.core.StepType
 import com.grimreich.world.CityCatalogue
 import com.grimreich.world.ItemCatalogue
 import javax.inject.Inject

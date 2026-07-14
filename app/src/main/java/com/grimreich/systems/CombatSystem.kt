@@ -89,7 +89,7 @@ class CombatSystem @Inject constructor(
             
             // Apply stability impact for mind_collapse
             if (skill.id == "mind_collapse") {
-                state.world.globalStability = (state.world.globalStability - GameConstants.SKILL_STABILITY_LOSS_HEAVY).coerceAtLeast(0) // TO BE CHECKED
+                state.world.globalStability = (state.world.globalStability - GameConstants.SKILL_STABILITY_LOSS_HEAVY).coerceAtLeast(0)
                 state.logEntries.add("Użycie Zapaści Umysłu naruszyło strukturę regionu.")
             }
         }

@@ -46,8 +46,8 @@ data class GameState(
     val companionShadows: MutableList<Hero> = mutableListOf()
 ) {
     fun trimLogs() {
-        if (logEntries.size > GameConstants.MAX_LOG_ENTRIES) { // TO BE CHECKED
-            val trimmed = logEntries.takeLast(GameConstants.MAX_LOG_ENTRIES) // TO BE CHECKED
+        if (logEntries.size > GameConstants.MAX_LOG_ENTRIES) {
+            val trimmed = logEntries.takeLast(GameConstants.MAX_LOG_ENTRIES)
             logEntries.clear()
             logEntries.addAll(trimmed)
         }
