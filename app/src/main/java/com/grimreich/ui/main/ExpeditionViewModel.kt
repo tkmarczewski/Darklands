@@ -5,9 +5,9 @@ import androidx.lifecycle.viewModelScope
 import com.grimreich.core.GameRepository
 import com.grimreich.core.GameState
 import com.grimreich.core.CombatRandomProvider
+import com.grimreich.core.StepType // TO BE CHECKED
 import com.grimreich.systems.QuestEngine
 import com.grimreich.systems.QuestDefinition
-import com.grimreich.systems.StepType
 import com.grimreich.world.CityCatalogue
 import com.grimreich.systems.EncounterSystem
 import com.grimreich.systems.Encounter

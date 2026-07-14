@@ -15,6 +15,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.grimreich.R
+import com.grimreich.core.QuestCategory // TO BE CHECKED
 import com.grimreich.systems.QuestDefinition
 import com.grimreich.systems.Encounter
 import com.grimreich.systems.EncounterChoice
@@ -73,9 +74,10 @@ fun ExpeditionContent(
                     Text(text = stringResource(R.string.expedition_logs_label), color = Color(0xFFC0A060), fontSize = 10.sp, fontWeight = FontWeight.Bold)
                     Divider(color = Color(0x33C0A060), thickness = 1.dp, modifier = Modifier.padding(vertical = 4.dp))
                     
-                    if (state.content is ExpeditionContentState.EncounterLog) {
+                    val content = state.content
+                    if (content is ExpeditionContentState.EncounterLog) {
                         Text(
-                            text = (state.content as ExpeditionContentState.EncounterLog).message,
+                            text = content.message,
                             color = Color.LightGray,
                             fontSize = 11.sp
                         )
@@ -187,16 +189,16 @@ fun QuestActionCardV9(quest: QuestDefinition, onClick: () -> Unit) {
     }
 }
 
-private fun getCategoryColor(category: com.grimreich.systems.QuestCategory): Color {
+private fun getCategoryColor(category: com.grimreich.core.QuestCategory): Color { // TO BE CHECKED
     return when (category) {
-        com.grimreich.systems.QuestCategory.COMBAT -> Color(0xFFD32F2F)
-        com.grimreich.systems.QuestCategory.SOCIAL -> Color(0xFF1976D2)
-        com.grimreich.systems.QuestCategory.INVESTIGATION -> Color(0xFF7B1FA2)
-        com.grimreich.systems.QuestCategory.MIXED -> Color(0xFF689F38)
-        com.grimreich.systems.QuestCategory.META -> Color(0xFFFFD700)
-        com.grimreich.systems.QuestCategory.ANOMALY -> Color(0xFF00ACC1)
-        com.grimreich.systems.QuestCategory.DRAMA -> Color(0xFFF57C00)
-        com.grimreich.systems.QuestCategory.BEAST -> Color(0xFF4E342E)
-        com.grimreich.systems.QuestCategory.INTRIGUE -> Color(0xFF455A64)
+        com.grimreich.core.QuestCategory.COMBAT -> Color(0xFFD32F2F)
+        com.grimreich.core.QuestCategory.SOCIAL -> Color(0xFF1976D2)
+        com.grimreich.core.QuestCategory.INVESTIGATION -> Color(0xFF7B1FA2)
+        com.grimreich.core.QuestCategory.MIXED -> Color(0xFF689F38)
+        com.grimreich.core.QuestCategory.META -> Color(0xFFFFD700)
+        com.grimreich.core.QuestCategory.ANOMALY -> Color(0xFF00ACC1)
+        com.grimreich.core.QuestCategory.DRAMA -> Color(0xFFF57C00)
+        com.grimreich.core.QuestCategory.BEAST -> Color(0xFF4E342E)
+        com.grimreich.core.QuestCategory.INTRIGUE -> Color(0xFF455A64)
     }
 }

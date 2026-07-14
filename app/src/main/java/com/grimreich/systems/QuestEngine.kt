@@ -30,39 +30,49 @@ class QuestEngine @Inject constructor(
 
     fun getStatus(questId: String, state: GameState? = null, visited: MutableSet<String> = mutableSetOf()): QuestStatus {
         val actualState = state ?: gameRepository.currentState()
+        var status = QuestStatus.LOCKED
 
         if (questId.startsWith("resurrect_")) {
             val hId = questId.removePrefix("resurrect_")
             val hero = actualState.party.find { it.id == hId }
-            if (hero == null || !hero.isDead) return QuestStatus.LOCKED
-            
-            val corpseId = "corpse_${hero.id}"
-            val hasCorpse = actualState.inventory.any { it.instanceId == corpseId }
-            return if (hasCorpse) QuestStatus.AVAILABLE else QuestStatus.LOCKED
+            if (hero != null && hero.isDead) {
+                val corpseId = "corpse_${hero.id}"
+                val hasCorpse = actualState.inventory.any { it.instanceId == corpseId }
+                status = if (hasCorpse) QuestStatus.AVAILABLE else QuestStatus.LOCKED
+            }
+        } else {
+            val def = registry[questId]
+            if (def != null && visited.add(questId)) {
+                status = evaluateDefinitionStatus(def, actualState, visited)
+            }
         }
 
-        val def = registry[questId] ?: return QuestStatus.LOCKED
-        if (!visited.add(questId)) return QuestStatus.LOCKED
+        return status
+    }
 
-        if (actualState.quest.completedQuestIds.contains(questId)) {
+    private fun evaluateDefinitionStatus(def: QuestDefinition, state: GameState, visited: MutableSet<String>): QuestStatus {
+        if (state.quest.completedQuestIds.contains(def.id)) {
             return if (def.repeatable) QuestStatus.AVAILABLE else QuestStatus.COMPLETED
         }
         
-        if (actualState.quest.activeQuestIds.contains(questId)) {
-            val progress = actualState.quest.progress[questId]
-            return progress?.status ?: QuestStatus.ACTIVE
+        if (state.quest.activeQuestIds.contains(def.id)) {
+            return state.quest.progress[def.id]?.status ?: QuestStatus.ACTIVE
         }
 
-        if (actualState.world.day < def.minWorldDay) return QuestStatus.LOCKED
-        if (actualState.metaAwarenessLevel < def.requiredMetaAwareness) return QuestStatus.LOCKED
+        // Logic Requirements
+        val dayOk = state.world.day >= def.minWorldDay
+        val metaOk = state.metaAwarenessLevel >= def.requiredMetaAwareness
+        
+        if (!dayOk || !metaOk) return QuestStatus.LOCKED
 
-        // NEW: Check for required world flags (e.g. for Verdict chain)
-        if (questId == "q_verdict_1" && !actualState.quest.worldFlags.contains("verdict_campaign_ready")) {
+        // Special Flags
+        if (def.id == "q_verdict_1" && !state.quest.worldFlags.contains("verdict_campaign_ready")) {
             return QuestStatus.LOCKED
         }
 
+        // Prerequisites
         if (def.prerequisiteQuestId != null) {
-            val preStatus = getStatus(def.prerequisiteQuestId, actualState, visited)
+            val preStatus = getStatus(def.prerequisiteQuestId, state, visited)
             if (preStatus != QuestStatus.COMPLETED) return QuestStatus.LOCKED
         }
 

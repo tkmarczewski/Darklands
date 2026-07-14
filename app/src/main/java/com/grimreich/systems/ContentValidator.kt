@@ -1,6 +1,7 @@
 package com.grimreich.systems
 
 import android.util.Log
+import com.grimreich.core.StepType // TO BE CHECKED
 import com.grimreich.world.CityCatalogue
 import com.grimreich.world.ItemCatalogue
 import javax.inject.Inject
@@ -76,7 +77,8 @@ class ContentValidator @Inject constructor(
 
             // Validate Steps
             quest.steps.forEachIndexed { index, step ->
-                if (step.type == StepType.EXPEDITION && cityCatalogue.get(step.targetId) == null) {
+                if (step.type == 
+                    StepType.EXPEDITION && cityCatalogue.get(step.targetId) == null) {
                     _errors.add(ContentError.QuestError("Quest '${quest.id}' step $index (EXPEDITION) refers to non-existent targetId (City): '${step.targetId}'"))
                 }
                 

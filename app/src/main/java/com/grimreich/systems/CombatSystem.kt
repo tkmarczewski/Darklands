@@ -89,7 +89,7 @@ class CombatSystem @Inject constructor(
             
             // Apply stability impact for mind_collapse
             if (skill.id == "mind_collapse") {
-                state.world.globalStability = (state.world.globalStability - 10).coerceAtLeast(0)
+                state.world.globalStability = (state.world.globalStability - GameConstants.SKILL_STABILITY_LOSS_HEAVY).coerceAtLeast(0) // TO BE CHECKED
                 state.logEntries.add("Użycie Zapaści Umysłu naruszyło strukturę regionu.")
             }
         }
@@ -136,72 +136,78 @@ class CombatSystem @Inject constructor(
 
         gameRepository.updateState { state ->
             val c = state.combat
-            if (!c.active || c.initiativeOrder.isEmpty()) return@updateState
-            
-            // --- FIX BUG: Round counter must trigger at index 0 regardless of who acts ---
-            if (c.currentTurnIndex == 0) {
-                c.round++
-                // DYNAMIC INITIATIVE: Recalculate every round to account for wounds/buffs
-                recalculateInitiative(state)
-            }
-            result = "Runda ${c.round}"
-
-            // 1. Ensure it's a player turn (if not, resolve enemy turns until it is)
-            var currentSlot = c.initiativeOrder[c.currentTurnIndex]
-            if (!currentSlot.isPlayer) {
-                resolveEnemyTurnsInternal(state)
-                // If combat ended during enemy turns, return
-                if (!c.active) return@updateState
-                currentSlot = c.initiativeOrder[c.currentTurnIndex]
-            }
-            
-            // 2. Resolve Player Action
-            val actingHero = state.party.find { it.id == currentSlot.id } ?: return@updateState
-            if (actingHero.isDead) {
-                advanceTurn(state)
-                return@updateState
-            }
-            
-            val heroCombatant = heroToCombatant(state, actingHero)
-            val enemyCombatant = getEnemyCombatant(c)
-
-            val playerRound = when {
-                action.startsWith("SKILL:") -> {
-                    val skillId = action.substringAfter("SKILL:")
-                    combatRound.resolveRound(heroCombatant, enemyCombatant, skillId)
+            if (c.active && c.initiativeOrder.isNotEmpty()) {
+                // 1. Advance Round and Recalculate if at start
+                if (c.currentTurnIndex == 0) {
+                    c.round++
+                    recalculateInitiative(state)
                 }
-                action == "DEFEND" -> {
-                    heroCombatant.armor += 5
-                    combatRound.resolveRound(heroCombatant, enemyCombatant, "system_defend")
+                result = "Runda ${c.round}"
+
+                // 2. Ensure Player Turn
+                var currentSlot = c.initiativeOrder.getOrNull(c.currentTurnIndex)
+                if (currentSlot != null && !currentSlot.isPlayer) {
+                    resolveEnemyTurnsInternal(state)
+                    if (c.active) {
+                        currentSlot = c.initiativeOrder.getOrNull(c.currentTurnIndex)
+                    }
                 }
-                else -> combatRound.resolveRound(heroCombatant, enemyCombatant)
+
+                // 3. Process Action if slot is valid and is Player
+                if (c.active && currentSlot != null && currentSlot.isPlayer) {
+                    val actingHero = state.party.find { it.id == currentSlot.id }
+                    if (actingHero != null) {
+                        if (actingHero.isDead) {
+                            advanceTurn(state)
+                        } else {
+                            processHeroAction(state, actingHero, action)
+                            
+                            // Check Combat End Condition
+                            if (c.enemyHp <= 0) {
+                                handleCombatWin(state, c)
+                            } else {
+                                advanceTurn(state)
+                                resolveEnemyTurnsInternal(state)
+                            }
+                        }
+                    }
+                }
             }
-
-            c.log.addAll(playerRound.log)
-            actingHero.hp = heroCombatant.hp
-            c.enemyHp = enemyCombatant.hp
-            c.enemyStamina = enemyCombatant.endurance
-
-            if (actingHero.hp <= 0) handleHeroDeath(state, actingHero)
-
-            // 3. Check for Combat End (Player Won)
-            if (c.enemyHp <= 0) {
-                handleCombatWin(state, c)
-                return@updateState
-            }
-
-            // 4. Advance and resolve ENEMY turns automatically
-            advanceTurn(state)
-            resolveEnemyTurnsInternal(state)
         }
 
-        // --- FIX BUG: Ensure callbacks are actually called ---
-        val s = gameRepository.currentState()
-        if (!s.combat.active) {
+        // Invoke callbacks outside the updateState block
+        if (!gameRepository.currentState().combat.active) {
             onCombatEnd?.invoke()
         }
 
         return result
+    }
+
+    private fun processHeroAction(state: GameState, hero: Hero, action: String) {
+        val c = state.combat
+        val heroCombatant = heroToCombatant(state, hero)
+        val enemyCombatant = getEnemyCombatant(c)
+
+        val playerRound = when {
+            action.startsWith("SKILL:") -> {
+                val skillId = action.substringAfter("SKILL:")
+                combatRound.resolveRound(heroCombatant, enemyCombatant, skillId)
+            }
+            action == "DEFEND" -> {
+                heroCombatant.armor += 5
+                combatRound.resolveRound(heroCombatant, enemyCombatant, "system_defend")
+            }
+            else -> combatRound.resolveRound(heroCombatant, enemyCombatant)
+        }
+
+        c.log.addAll(playerRound.log)
+        hero.hp = heroCombatant.hp
+        c.enemyHp = enemyCombatant.hp
+        c.enemyStamina = enemyCombatant.endurance
+
+        if (hero.hp <= 0) {
+            handleHeroDeath(state, hero)
+        }
     }
 
     private fun resolveEnemyTurnsInternal(state: GameState) {

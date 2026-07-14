@@ -97,6 +97,12 @@ class AudioEngine @Inject constructor(
                 
                 musicPlayer = newPlayer.apply {
                     isLooping = loop
+                    setOnErrorListener { mp, _, _ -> // TO BE CHECKED
+                        Log.e(TAG, "MediaPlayer error, releasing resources")
+                        mp.release()
+                        if (musicPlayer == mp) musicPlayer = null
+                        true
+                    }
                     start()
                 }
                 currentTrackResId = resId
@@ -118,7 +124,7 @@ class AudioEngine @Inject constructor(
     private fun stopMusicInternal() {
         try {
             musicPlayer?.let {
-                if (it.isPlaying) it.stop()
+                if (try { it.isPlaying } catch (e: Exception) { false }) it.stop() // TO BE CHECKED
                 it.release()
             }
         } catch (e: Exception) {

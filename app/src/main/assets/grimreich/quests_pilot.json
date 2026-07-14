@@ -1,6 +1,7 @@
 [
   {
     "id": "q_verdict_1",
+    "_comment": "TO BE CHECKED: Restored and confirmed as the pilot trigger for the Verdict chain",
     "title": "Wyrok Inkwizycji",
     "description": "Inkwizycja podejrzewa, że stabilność regionu jest sabotowana. Musisz wyeliminować kultystę Echa.",
     "rewardGold": 100,

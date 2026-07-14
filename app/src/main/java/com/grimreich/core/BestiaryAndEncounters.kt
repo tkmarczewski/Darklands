@@ -22,7 +22,31 @@ enum class EnemyType {
     // Specjalne
     WITCH, DRAGON,
     // Ontologiczne
-    PAST_SHADE_ELITE
+    PAST_SHADE_ELITE,
+    
+    // Brakujące typy z questów (Stabilizacja V2.0) - TO BE CHECKED
+    POSSESSED_STATUE,
+    FALLEN_PRIEST,
+    MASKED_IMPOSTOR,
+    SILENT_GUARDIAN,
+    RAVEN_ASSASSIN,
+    ARCH_RITUALIST,
+    CEILING_CRAWLER,
+    GHOSTLY_SENTINEL,
+    MIND_REFLECTION,
+    INK_NIGHTMARE,
+    ECTOPLASMIC,
+    VOID_WOLF,
+    PARADOX_HUNTER,
+    MUTANT_GHOUL,
+    VAMPIRE_MONK,
+    GOLDEN_COLOSSUS,
+    DARK_RIDER,
+    DREAM_WRAITH,
+    HIDDEN_DEMON,
+    BLOOD_CURSE,
+    BLOOD_WRAITH,
+    DOPPELGANGER // TO BE CHECKED
 }
 
 enum class EnemyAI {
