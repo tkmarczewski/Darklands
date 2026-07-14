@@ -50,6 +50,7 @@ class CombatSystem @Inject constructor(
             state.combat.enemyAttack = enemy.stats.attack
             state.combat.enemyDefense = enemy.stats.defense
             state.combat.enemyAgility = enemy.stats.speed
+            state.combat.enemyIntelligence = 10 // Baseline for procedural enemies
             state.combat.enemyStrength = 10
             state.combat.enemyStamina = 10
             state.combat.activeHeroId = state.party.firstOrNull { !it.isDead }?.id

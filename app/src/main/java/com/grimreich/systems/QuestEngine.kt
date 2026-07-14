@@ -144,10 +144,9 @@ class QuestEngine @Inject constructor(
 
     fun getActiveQuestsForCity(cityId: String): List<QuestDefinition> {
         val state = gameRepository.currentState()
-        // FIX: Active quests are global for expedition, but we can prioritize/filter if needed.
-        // For now, returning all active quests to ensure they show up in expedition screen.
         return state.quest.activeQuestIds
             .mapNotNull { registry[it] }
+            .filter { it.cityId == cityId }
     }
 
     fun getVisibleQuestBoard(state: GameState): Map<String, List<QuestDefinition>> {

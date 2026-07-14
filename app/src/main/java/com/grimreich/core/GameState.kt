@@ -100,12 +100,14 @@ data class GameState(
         combat = this.combat.copy(
             enemyEffects = this.combat.enemyEffects.toMutableList(),
             heroEffects = this.combat.heroEffects.toMutableList(),
-            log = this.combat.log.toMutableList()
+            log = this.combat.log.toMutableList(),
+            initiativeOrder = this.combat.initiativeOrder.toMutableList()
         ),
         knownNpcs = this.knownNpcs.mapValues { it.value.map { n -> n.deepCopy() } }.toMutableMap(),
         unlockedLoreIds = this.unlockedLoreIds.toMutableSet(),
         persistentMeta = this.persistentMeta.copy(
-            unlockedLegacyBuffs = this.persistentMeta.unlockedLegacyBuffs.toMutableSet()
+            unlockedLegacyBuffs = this.persistentMeta.unlockedLegacyBuffs.toMutableSet(),
+            unitedSelves = this.persistentMeta.unitedSelves.toMutableSet()
         ),
         grantedRewardFlags = this.grantedRewardFlags.toMutableSet(),
         companionShadows = this.companionShadows.map { it.deepCopy() }.toMutableList()

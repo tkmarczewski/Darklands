@@ -135,5 +135,15 @@ fun HubScreen(
                 }
             }
         }
+
+        // --- QUICK ACTIONS: Expanding Quill Menu ---
+        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.BottomEnd) {
+            ExpandingQuillMenu(
+                onMap = onMap,
+                onInventory = onInventory,
+                onChronicle = onWorldLog,
+                onQuests = onQuests
+            )
+        }
     }
 }

@@ -155,8 +155,9 @@ class AudioEngine @Inject constructor(
                 val state = gameRepository.get().currentState()
                 val currentCity = state.world.locationId.lowercase()
                 when {
-                    currentCity.contains("zakon") || currentCity.contains("fortress") -> R.raw.ost_faction_order
-                    currentCity.contains("serce") || currentCity.contains("heart") -> R.raw.ost_magic_location
+                    currentCity.contains("zakon") || currentCity.contains("fortress") || currentCity.contains("twierdza") || currentCity.contains("opactwo") -> R.raw.ost_faction_order
+                    currentCity.contains("serce") || currentCity.contains("heart") || currentCity.contains("core") -> R.raw.ost_magic_location
+                    currentCity.contains("port") -> R.raw.ost_city
                     else -> R.raw.ost_city
                 }
             }
@@ -164,7 +165,15 @@ class AudioEngine @Inject constructor(
                 val state = gameRepository.get().currentState()
                 if (state.combat.enemyMaxHp > 100) R.raw.ost_combat_boss else R.raw.ost_combat_normal
             }
-            route.contains("expedition") || route.contains("events") -> R.raw.ost_exploration
+            route.contains("expedition") || route.contains("events") -> {
+                val state = gameRepository.get().currentState()
+                val currentCity = state.world.locationId.lowercase()
+                when {
+                    currentCity.contains("wybrzeze") || currentCity.contains("coast") -> R.raw.ost_night_eerie
+                    currentCity.contains("opactwo") -> R.raw.ost_dungeon
+                    else -> R.raw.ost_exploration
+                }
+            }
             route.contains("tavern") -> R.raw.ost_tavern
             route.contains("market") -> R.raw.ost_market
             route.contains("ending") -> R.raw.ost_epilogue
