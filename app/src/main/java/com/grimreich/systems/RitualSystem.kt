@@ -7,7 +7,7 @@ import javax.inject.Singleton
 @Singleton
 class RitualSystem @Inject constructor(
     private val gameRepository: GameRepository,
-    private val combatSystem: CombatSystem
+    private val combatSystem: CombatSystem,
 ) {
     /**
      * Główna metoda wykonania rytuału.
@@ -36,12 +36,12 @@ class RitualSystem @Inject constructor(
                 state.logEntries.add("RYTUAŁ: Jesteś na krawędzi istnienia.")
             }
 
-            // 3. Sprawdź Szyfr (Cipher Validation)
             if (recipe.requiredCipher == playerCipher) {
                 // Sukces: Usuń składniki i dodaj przedmiot
                 recipe.requiredIngredients.forEach { id ->
-                    val item = state.inventory.find { it.templateId == id }
-                    if (item != null) state.inventory.remove(item)
+                    state.inventory.find { it.templateId == id }?.let { item ->
+                        state.inventory.remove(item)
+                    }
                 }
                 
                 val newItem = gameRepository.itemCatalogue.createInstance(recipe.targetItemId)

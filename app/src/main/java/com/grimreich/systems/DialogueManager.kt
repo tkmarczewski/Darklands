@@ -16,9 +16,9 @@ import kotlin.random.Random
 
 @Singleton
 class DialogueManager @Inject constructor(
-    @ApplicationContext private val context: Context,
+    @param:ApplicationContext private val context: Context,
     private val gameRepositoryProvider: Lazy<GameRepository>,
-    private val questEngine: Lazy<QuestEngine>
+    private val questEngine: Lazy<QuestEngine>,
 ) {
     private val nodes = mutableMapOf<String, DialogueNode>()
     private val gson = Gson()
@@ -82,7 +82,7 @@ class DialogueManager @Inject constructor(
             }
             "COMPLETE_QUEST" -> {
                 val action = state.pendingAction
-                val targetId = if (value == "ACTIVE" && action is com.grimreich.core.PendingWorldAction.Dialogue) {
+                val targetId = if ((value == "ACTIVE") && (action is com.grimreich.core.PendingWorldAction.Dialogue)) {
                     action.relatedQuestId
                 } else {
                     value
@@ -164,7 +164,7 @@ class DialogueManager @Inject constructor(
         
         // Efekt ogólny: NPC reagują na głębokie rany duszy
         if (hero.traumaMarks.any { it.severity >= 2 }) {
-            modifiedText = "[NPC COFA SIĘ Z PRZERAŻENIEM] " + modifiedText
+            modifiedText = "[NPC COFA SIĘ Z PRZERAŻENIEM] $modifiedText"
         }
         
         // Trauma "Wizja Echa": Tekst staje się bardziej ontologiczny

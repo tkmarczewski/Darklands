@@ -7,13 +7,11 @@ import javax.inject.Singleton
 @Singleton
 class CombatSystem @Inject constructor(
     private val gameRepository: GameRepository,
-    private val partyRepository: PartyRepository,
-    private val inventorySystem: InventorySystem,
     private val moraleSystem: MoraleSystem,
     private val combatRound: CombatRound,
     private val questEngine: QuestEngine,
     private val experienceSystem: ExperienceSystem,
-    private val lootSystem: LootSystem
+    private val lootSystem: LootSystem,
 ) {
     private var onCombatEnd: (() -> Unit)? = null
     private var pendingCombatEndCallback: (() -> Unit)? = null
@@ -60,10 +58,10 @@ class CombatSystem @Inject constructor(
             // Build Initiative Order
             val slots = mutableListOf<InitiativeSlot>()
             state.party.filter { !it.isDead }.forEach { hero ->
-                val initVal = hero.agility * 2 + combatRound.randomProvider.nextInt(0, 4)
-                slots.add(InitiativeSlot(hero.id, true, initVal))
+                val initVal = (hero.agility * 2) + combatRound.randomProvider.nextInt(0, 4)
+                slots.add(InitiativeSlot(hero.id, isPlayer = true, initiativeValue = initVal))
             }
-            val enemyInit = enemy.stats.speed * 2 + combatRound.randomProvider.nextInt(0, 4)
+            val enemyInit = (enemy.stats.speed * 2) + combatRound.randomProvider.nextInt(0, 4)
             slots.add(InitiativeSlot("ENEMY", false, enemyInit))
             
             state.combat.initiativeOrder.clear()
@@ -155,8 +153,7 @@ class CombatSystem @Inject constructor(
 
                 // 3. Process Action if slot is valid and is Player
                 if (c.active && currentSlot != null && currentSlot.isPlayer) {
-                    val actingHero = state.party.find { it.id == currentSlot.id }
-                    if (actingHero != null) {
+                    state.party.find { it.id == currentSlot.id }?.let { actingHero ->
                         if (actingHero.isDead) {
                             advanceTurn(state)
                         } else {
