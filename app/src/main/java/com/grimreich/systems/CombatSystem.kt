@@ -340,6 +340,9 @@ class CombatSystem @Inject constructor(
                 c.log.add("TRIBUNAL_LOG_014: Masa ontologiczna celu zintegrowana. Meta-percepcja wzrasta.")
             }
 
+            // --- SYSTEM TRAUMY (Funkcjonalność A) ---
+            checkForTrauma(state, enemyDef)
+
             experienceSystem.addPartyXpDirect(state, enemyDef.xpReward).forEach { c.log.add(it) }
             lootSystem.awardLootFromTableDirect(state, enemyDef.lootTable).forEach { c.log.add(it) }
         }
@@ -348,6 +351,29 @@ class CombatSystem @Inject constructor(
         if (action is com.grimreich.core.PendingWorldAction.QuestCombatWin) {
             questEngine.advanceStepDirect(state, action.questId)
             state.pendingAction = com.grimreich.core.PendingWorldAction.None
+        }
+    }
+
+    private fun checkForTrauma(state: GameState, enemy: Enemy) {
+        state.party.filter { !it.isDead }.forEach { hero ->
+            // Szansa na traumę wzrasta wraz z siłą przeciwnika i niską stabilnością
+            val chance = when {
+                enemy.type == EnemyType.PAST_SHADE_ELITE -> 0.25f
+                enemy.ontologicalMass >= 30 -> 0.15f
+                hero.ontologicalStability < 50f -> 0.10f
+                else -> 0.02f
+            }
+
+            if (kotlin.random.Random.nextFloat() < chance) {
+                val trauma = TraumaCatalog.getRandomTrauma()
+                if (hero.traumaMarks.none { it.id == trauma.id }) {
+                    hero.traumaMarks.add(trauma)
+                    hero.ontologicalStability -= 10f
+                    state.combat.log.add("TRAUMA: ${hero.name} zyskał: ${trauma.name}!")
+                    state.logEntries.add("ONTOLOGIA: ${hero.name} doznał pęknięcia psychicznego: ${trauma.name}.")
+                    hero.normalize()
+                }
+            }
         }
     }
 

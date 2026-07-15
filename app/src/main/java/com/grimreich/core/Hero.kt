@@ -71,7 +71,11 @@ data class Hero(
 
     // --- ONTOLOGICAL AUDIT: Hierarchia Bytu ---
     var subjectType: SubjectType = SubjectType.VESSEL,
-    var ontologicalMass: Int = 10 
+    var ontologicalMass: Int = 10,
+
+    // --- SYSTEM TRAUMY (Funkcjonalność A) ---
+    val traumaMarks: MutableList<Trauma> = mutableListOf(),
+    var ontologicalStability: Float = 100f // 0 - 100
 ) {
 
     enum class SubjectType {
@@ -111,6 +115,7 @@ data class Hero(
         morale = morale.coerceIn(0, 100)
         divineFavor = divineFavor.coerceIn(0, 150)
         endurance = endurance.coerceAtLeast(0)
+        ontologicalStability = ontologicalStability.coerceIn(0f, 100f)
     }
 
     private fun checkMastery() {
@@ -134,15 +139,49 @@ data class Hero(
         }
     }
 
-    fun effectiveStrength(): Int = strength + 
-        (if (currentCareer == Career.MERCENARY || currentCareer == Career.KNIGHT) 2 else 0) +
-        (if (isMaster && currentCareer == Career.KNIGHT) 5 else 0)
+    fun effectiveStrength(): Int {
+        var bonus = (if (currentCareer == Career.MERCENARY || currentCareer == Career.KNIGHT) 2 else 0) +
+                    (if (isMaster && currentCareer == Career.KNIGHT) 5 else 0)
+        traumaMarks.forEach { bonus += it.statModifiers["strength"] ?: 0 }
+        return strength + bonus
+    }
 
-    fun effectiveAgility(): Int = agility + 
-        (if (currentCareer == Career.THIEF || currentCareer == Career.ROGUE) 3 else 0) +
-        (if (isMaster && (currentCareer == Career.THIEF || currentCareer == Career.ROGUE)) 5 else 0)
-    fun effectiveIntelligence(): Int = intelligence + (if (currentCareer == Career.SCHOLAR || currentCareer == Career.ALCHEMIST) 4 else 0)
-    fun effectiveEndurance(): Int = endurance + (if (currentCareer == Career.MERCENARY || currentCareer == Career.GUARD) 2 else 0)
+    fun effectiveAgility(): Int {
+        var bonus = (if (currentCareer == Career.THIEF || currentCareer == Career.ROGUE) 3 else 0) +
+                    (if (isMaster && (currentCareer == Career.THIEF || currentCareer == Career.ROGUE)) 5 else 0)
+        traumaMarks.forEach { bonus += it.statModifiers["agility"] ?: 0 }
+        return agility + bonus
+    }
+
+    fun effectiveIntelligence(): Int {
+        var bonus = (if (currentCareer == Career.SCHOLAR || currentCareer == Career.ALCHEMIST) 4 else 0)
+        traumaMarks.forEach { bonus += it.statModifiers["intelligence"] ?: 0 }
+        return intelligence + bonus
+    }
+
+    fun effectiveEndurance(): Int {
+        var bonus = (if (currentCareer == Career.MERCENARY || currentCareer == Career.GUARD) 2 else 0)
+        traumaMarks.forEach { bonus += it.statModifiers["endurance"] ?: 0 }
+        return endurance + bonus
+    }
+
+    fun effectivePerception(): Int {
+        var bonus = (if (currentCareer == Career.ROGUE || currentCareer == Career.SCHOLAR) 2 else 0)
+        traumaMarks.forEach { bonus += it.statModifiers["perception"] ?: 0 }
+        return perception + bonus
+    }
+
+    fun effectivePiety(): Int {
+        var bonus = (if (currentCareer == Career.PRIEST || currentCareer == Career.INQUISITOR) 3 else 0)
+        traumaMarks.forEach { bonus += it.statModifiers["piety"] ?: 0 }
+        return piety + bonus
+    }
+
+    fun effectiveCharisma(): Int {
+        var bonus = (if (currentCareer == Career.KNIGHT || currentCareer == Career.MERCENARY) 2 else 0)
+        traumaMarks.forEach { bonus += it.statModifiers["charisma"] ?: 0 }
+        return charisma + bonus
+    }
 
     fun getEquipmentBonus(statName: String, allItems: List<Item>): Int {
         var bonus = 0
@@ -154,11 +193,15 @@ data class Hero(
     }
 
     fun effectiveAttack(allItems: List<Item>): Int {
-        return effectiveStrength() + getEquipmentBonus("attack", allItems)
+        var bonus = getEquipmentBonus("attack", allItems)
+        traumaMarks.forEach { bonus += it.statModifiers["attack"] ?: 0 }
+        return effectiveStrength() + bonus
     }
 
     fun effectiveDefense(allItems: List<Item>): Int {
-        return effectiveAgility() + getEquipmentBonus("defense", allItems)
+        var bonus = getEquipmentBonus("defense", allItems)
+        traumaMarks.forEach { bonus += it.statModifiers["defense"] ?: 0 }
+        return effectiveAgility() + bonus
     }
 
     fun effectiveArmor(allItems: List<Item>): Int {
@@ -180,6 +223,7 @@ data class Hero(
         skills = this.skills.toMutableMap(),
         activeMutations = this.activeMutations.map { it.copy() }.toMutableList(),
         passiveAbilities = this.passiveAbilities.toMutableSet(),
-        equipment = this.equipment.toMutableMap()
+        equipment = this.equipment.toMutableMap(),
+        traumaMarks = this.traumaMarks.map { it.copy() }.toMutableList()
     )
 }

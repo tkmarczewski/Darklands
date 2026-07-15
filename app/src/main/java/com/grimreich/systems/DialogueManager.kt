@@ -154,6 +154,32 @@ class DialogueManager @Inject constructor(
         return node.copy(text = glitchText(node.text, seed))
     }
 
+    /**
+     * SYSTEM TRAUMY (Funkcjonalność A): Wpływ traum na postrzeganie dialogu.
+     */
+    fun applyTraumaEffects(node: DialogueNode, hero: com.grimreich.core.Hero): DialogueNode {
+        if (hero.traumaMarks.isEmpty()) return node
+        
+        var modifiedText = node.text
+        
+        // Efekt ogólny: NPC reagują na głębokie rany duszy
+        if (hero.traumaMarks.any { it.severity >= 2 }) {
+            modifiedText = "[NPC COFA SIĘ Z PRZERAŻENIEM] " + modifiedText
+        }
+        
+        // Trauma "Wizja Echa": Tekst staje się bardziej ontologiczny
+        if (hero.traumaMarks.any { it.id == "t_echo_vision" }) {
+            modifiedText = modifiedText.replace(" ", " . ")
+        }
+
+        // Trauma "Pusty Głos": Trudności w komunikacji
+        if (hero.traumaMarks.any { it.id == "t_hollow_voice" }) {
+            modifiedText = modifiedText.uppercase()
+        }
+
+        return node.copy(text = modifiedText)
+    }
+
     fun glitchText(input: String, seed: Long): String {
         val rand = Random(seed)
         val sb = StringBuilder()

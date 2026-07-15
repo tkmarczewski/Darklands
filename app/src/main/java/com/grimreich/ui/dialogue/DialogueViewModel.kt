@@ -80,8 +80,18 @@ class DialogueViewModel @Inject constructor(
                 npcName
             }
 
+            val activeHero = state.party.find { it.id == state.activeHeroId }
+            val processedNode = node?.let { 
+                var n = it
+                n = dialogueManager.applyWorldEffects(n, state.world.globalStability)
+                if (activeHero != null) {
+                    n = dialogueManager.applyTraumaEffects(n, activeHero)
+                }
+                n
+            }
+
             DialogueUiState(
-                currentNode = node?.let { dialogueManager.applyWorldEffects(it, state.world.globalStability) },
+                currentNode = processedNode,
                 npcName = finalNpcName,
                 npcRole = npcRole,
                 npcPortrait = dialogueManager.getPortrait(npcRole),

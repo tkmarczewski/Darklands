@@ -27,13 +27,13 @@ class CharacterHubUiMapper @Inject constructor(
         }
 
         val combatStats = HeroCombatStatsUi(
-            strength = hero.strength,
-            agility = hero.agility,
-            intelligence = hero.intelligence,
-            perception = hero.perception,
-            endurance = hero.endurance,
-            charisma = hero.charisma,
-            piety = hero.piety,
+            strength = hero.effectiveStrength(),
+            agility = hero.effectiveAgility(),
+            intelligence = hero.effectiveIntelligence(),
+            perception = hero.effectivePerception(),
+            endurance = hero.effectiveEndurance(),
+            charisma = hero.effectiveCharisma(),
+            piety = hero.effectivePiety(),
             attack = hero.effectiveAttack(state.inventory),
             armor = hero.effectiveArmor(state.inventory)
         )
