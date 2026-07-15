@@ -15,6 +15,8 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.res.stringResource
 import com.grimreich.R
 import com.grimreich.systems.QuestDefinition
+import com.grimreich.ui.shared.BadgeV9
+import com.grimreich.ui.shared.getQuestCategoryColor
 
 @Composable
 fun QuestJournalScreen(
@@ -43,8 +45,13 @@ fun QuestJournalScreen(
             if (state.activeQuests.isEmpty()) {
                 item { Text(stringResource(R.string.quest_journal_empty_active), color = Color.Gray, fontSize = 12.sp) }
             } else {
-                items(state.activeQuests, key = { it.first.id }) { (quest, objective) ->
-                    QuestEntryCard(quest, isCompleted = false, objective = objective)
+                items(state.activeQuests, key = { it.definition.id }) { item ->
+                    QuestEntryCard(
+                        quest = item.definition, 
+                        isCompleted = false, 
+                        objective = item.objective,
+                        isReady = item.isReadyToTurnIn
+                    )
                 }
             }
 
@@ -68,21 +75,55 @@ fun SectionHeader(title: String) {
 }
 
 @Composable
-fun QuestEntryCard(quest: QuestDefinition, isCompleted: Boolean, objective: String? = null) {
+fun QuestEntryCard(
+    quest: QuestDefinition, 
+    isCompleted: Boolean, 
+    objective: String? = null,
+    isReady: Boolean = false
+) {
+    val borderColor = when {
+        isCompleted -> Color.DarkGray
+        isReady -> Color(0xFFC0A060) // Gold for ready to turn in
+        else -> Color(0xFFADFF2F) // Green for active
+    }
+
     Surface(
         color = Color(0xFF151515),
-        border = androidx.compose.foundation.BorderStroke(1.dp, if (isCompleted) Color.Gray else Color(0xFFADFF2F)),
+        border = androidx.compose.foundation.BorderStroke(1.dp, borderColor),
         shape = MaterialTheme.shapes.extraSmall
     ) {
         Column(modifier = Modifier.padding(12.dp).fillMaxWidth()) {
-            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                Text(quest.title, color = if (isCompleted) Color.Gray else Color.White, fontWeight = FontWeight.Bold)
-                Text(quest.cityId.uppercase(), color = Color.DarkGray, fontSize = 9.sp, fontWeight = FontWeight.Bold)
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    if (isReady) {
+                        Text("۞ ", color = Color(0xFFC0A060), fontWeight = FontWeight.Bold)
+                    }
+                    Text(quest.title, color = if (isCompleted) Color.Gray else Color.White, fontWeight = FontWeight.Bold)
+                }
+                BadgeV9(text = quest.category.name, color = getQuestCategoryColor(quest.category))
             }
-            Text(quest.description, color = Color.DarkGray, fontSize = 11.sp)
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(quest.description, color = Color.Gray, fontSize = 11.sp, lineHeight = 15.sp)
+            
             if (!isCompleted && objective != null) {
+                Spacer(modifier = Modifier.height(12.dp))
+                HorizontalDivider(color = Color(0x11FFFFFF), thickness = 0.5.dp)
                 Spacer(modifier = Modifier.height(8.dp))
-                Text("CEL: $objective", color = Color(0xFFADFF2F), fontSize = 11.sp, fontWeight = FontWeight.SemiBold)
+                Text(
+                    text = if (isReady) "۞ STATUS: GOTOWE DO ODDANIA" else "CEL: $objective", 
+                    color = if (isReady) Color(0xFFC0A060) else Color(0xFFADFF2F), 
+                    fontSize = 11.sp, 
+                    fontWeight = FontWeight.ExtraBold
+                )
+                if (isReady) {
+                    Text(
+                        text = "Lokalizacja: ${quest.cityId.uppercase()} -> ${quest.originNpcId.uppercase()}",
+                        color = Color.DarkGray,
+                        fontSize = 9.sp,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(top = 4.dp)
+                    )
+                }
             }
         }
     }

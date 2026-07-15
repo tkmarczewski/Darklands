@@ -105,7 +105,8 @@ class QuestEngine @Inject constructor(
             state.quest.progress[questId] = p.copy(currentStepIndex = p.currentStepIndex + 1)
         } else {
             state.quest.progress[questId] = p.copy(status = QuestStatus.OBJECTIVE_MET)
-            state.logEntries.add("CEL OSIĄGNIĘTY: ${def.title}")
+            state.logEntries.add("۞ CEL OSIĄGNIĘTY: ${def.title}")
+            state.logEntries.add("> Wróć do zleceniodawcy: ${def.originNpcId.uppercase()}")
         }
     }
 

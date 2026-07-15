@@ -10,14 +10,9 @@
     "recommendedLevel": 1,
     "steps": [
       {
-        "description": "Wytrop 'Apostoła Błędu' ukrywającego się w dymiących zgliszczach na obrzeżach Wybrzeża.",
+        "description": "Wytrop 'Apostoła Błędu' ukrywającego się w dymiących zgliszczach na obrzeżach Wybrzeża i wymierz mu wyrok.",
         "type": "COMBAT",
         "targetId": "CULTIST"
-      },
-      {
-        "description": "Odzyskaj 'Szyfr Odstępcy' i wróć do Strażnika przy bramie, aby potwierdzić wykonanie wyroku.",
-        "type": "DIALOGUE",
-        "targetId": "guard_start"
       }
     ]
   },
@@ -32,14 +27,9 @@
     "recommendedLevel": 2,
     "steps": [
       {
-        "description": "Odnajdź dezertera w zaułkach Portu Mglistego, gdzie echo przeszłości miesza się z dymem kadzideł.",
+        "description": "Odnajdź dezertera w zaułkach Portu Mglistego i rozstrzygnij jego los.",
         "type": "DIALOGUE",
         "targetId": "deserter_start"
-      },
-      {
-        "description": "Rozstrzygnij los dezertera i przynieś raport Strażnikowi na Wybrzeżu. Każde kłamstwo zostanie zapisane w Ledgerze.",
-        "type": "DIALOGUE",
-        "targetId": "guard_start"
       }
     ]
   },
@@ -57,11 +47,6 @@
         "description": "Przeszukaj strefy zerowej widoczności na Wybrzeżu i zbierz trzy pęki pulsujących błękitem ziół echa.",
         "type": "INVESTIGATION",
         "targetId": "Gęsta Mgła"
-      },
-      {
-        "description": "Dostarcz surowiec do Kupca, zanim zioła wyparują, zmieniając się w czysty szum.",
-        "type": "DIALOGUE",
-        "targetId": "merchant_start"
       }
     ]
   },
@@ -96,11 +81,6 @@
         "description": "Zanalizuj anomalie w tekście Pękniętej Kroniki. Uważaj, czytanie kodu źródłowego może wywołać traumę ontologiczną.",
         "type": "INVESTIGATION",
         "targetId": "Pęknięta Kronika"
-      },
-      {
-        "description": "Wróć do Miry z dowodami na ingerencję z Drugiej Strony. Nie daj się zwieść szeptom.",
-        "type": "DIALOGUE",
-        "targetId": "mira_start"
       }
     ]
   }
