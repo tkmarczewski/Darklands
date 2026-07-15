@@ -51,10 +51,8 @@ class QuestEngine @Inject constructor(
     }
 
     private fun evaluateDefinitionStatus(def: QuestDefinition, state: GameState, visited: MutableSet<String>): QuestStatus {
-        // --- PRIORITY 1: ALREADY COMPLETED OR FAILED ---
+        // --- PRIORITY 1: FINAL STATES ---
         if (state.quest.completedQuestIds.contains(def.id)) {
-            // Repeatable quests should stay in COMPLETED state but be eligible for special re-activation logic
-            // For now, if it's in completedQuestIds, it's NOT available anymore.
             return QuestStatus.COMPLETED
         }
         
@@ -63,6 +61,7 @@ class QuestEngine @Inject constructor(
         }
 
         // --- PRIORITY 2: CURRENTLY ACTIVE ---
+        // Rygorystyczne sprawdzenie: jeśli jest w activeQuestIds, to NIE MOŻE być AVAILABLE
         if (state.quest.activeQuestIds.contains(def.id)) {
             val progress = state.quest.progress[def.id]
             return progress?.status ?: QuestStatus.ACTIVE
@@ -91,10 +90,15 @@ class QuestEngine @Inject constructor(
     fun activateQuest(questId: String) = activateQuestDirect(gameRepository.currentState(), questId)
 
     fun activateQuestDirect(state: GameState, questId: String) {
-        if (getStatus(questId, state) != QuestStatus.AVAILABLE) return
+        val currentStatus = getStatus(questId, state)
+        if (currentStatus != QuestStatus.AVAILABLE) {
+            android.util.Log.d("QuestEngine", "Blokada aktywacji: Quest $questId ma status $currentStatus")
+            return
+        }
         
         state.quest.activeQuestIds.add(questId)
         state.quest.progress[questId] = QuestProgress(questId = questId, status = QuestStatus.ACTIVE)
+        state.logEntries.add("۞ NOWE ZADANIE: ${getDefinition(questId)?.title ?: questId}")
     }
 
     fun advanceStep(questId: String) = advanceStepDirect(gameRepository.currentState(), questId)
