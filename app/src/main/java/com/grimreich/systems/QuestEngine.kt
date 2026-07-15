@@ -51,12 +51,21 @@ class QuestEngine @Inject constructor(
     }
 
     private fun evaluateDefinitionStatus(def: QuestDefinition, state: GameState, visited: MutableSet<String>): QuestStatus {
+        // --- PRIORITY 1: ALREADY COMPLETED OR FAILED ---
         if (state.quest.completedQuestIds.contains(def.id)) {
-            return if (def.repeatable) QuestStatus.AVAILABLE else QuestStatus.COMPLETED
+            // Repeatable quests should stay in COMPLETED state but be eligible for special re-activation logic
+            // For now, if it's in completedQuestIds, it's NOT available anymore.
+            return QuestStatus.COMPLETED
         }
         
+        if (state.quest.failedQuestIds.contains(def.id)) {
+            return QuestStatus.FAILED
+        }
+
+        // --- PRIORITY 2: CURRENTLY ACTIVE ---
         if (state.quest.activeQuestIds.contains(def.id)) {
-            return state.quest.progress[def.id]?.status ?: QuestStatus.ACTIVE
+            val progress = state.quest.progress[def.id]
+            return progress?.status ?: QuestStatus.ACTIVE
         }
 
         // Logic Requirements
@@ -180,12 +189,11 @@ class QuestEngine @Inject constructor(
     }
     
     fun getAvailableQuestsForCity(cityId: String, state: GameState): List<QuestDefinition> {
+        val sharedVisited = mutableSetOf<String>()
         val allAvailable = registry.values.filter {
-            it.cityId == cityId && !it.isHidden && getStatus(it.id, state) == QuestStatus.AVAILABLE
+            it.cityId == cityId && !it.isHidden && getStatus(it.id, state, sharedVisited) == QuestStatus.AVAILABLE
         }
         
-        // Story quests (Inquisition, Ravenn) must be visible on the board to be started.
-        // Story quests are those starting with "q_verdict".
         return shuffleQuests(allAvailable, cityId, state.world.day)
             .sortedWith(compareBy<QuestDefinition> { it.chainId ?: "zzz" }.thenBy { it.chainOrder }.thenBy { it.recommendedLevel })
     }
