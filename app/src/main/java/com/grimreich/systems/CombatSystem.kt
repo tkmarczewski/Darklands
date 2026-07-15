@@ -353,6 +353,19 @@ class CombatSystem @Inject constructor(
             questEngine.advanceStepDirect(state, action.questId)
             state.pendingAction = com.grimreich.core.PendingWorldAction.None
         }
+
+        // TO BE CHECKED: Auto-advance ALL active quests if they have a COMBAT step matching the enemy
+        val currentEnemyType = state.combat.enemyType
+        state.quest.activeQuestIds.toList().forEach { qId ->
+            val def = questEngine.getDefinition(qId)
+            val progress = state.quest.progress[qId]
+            if (def != null && progress != null) {
+                val currentStep = def.steps.getOrNull(progress.currentStepIndex)
+                if (currentStep?.type == StepType.COMBAT && (currentStep.targetId == "ANY" || currentStep.targetId == currentEnemyType)) {
+                    questEngine.advanceStepDirect(state, qId)
+                }
+            }
+        }
     }
 
     private fun checkForTrauma(state: GameState, enemy: Enemy) {

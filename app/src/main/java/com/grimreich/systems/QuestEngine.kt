@@ -113,13 +113,22 @@ class QuestEngine @Inject constructor(
 
     fun completeQuestDirect(state: GameState, questId: String) {
         if (state.quest.completedQuestIds.contains(questId)) return
-        val p = state.quest.progress[questId] ?: return
+        
+        // TO BE CHECKED: relatedQuestId from pendingAction should have priority
+        val action = state.pendingAction
+        val actualQuestId = if (questId == "ACTIVE" && action is com.grimreich.core.PendingWorldAction.Dialogue && action.relatedQuestId != null) {
+            action.relatedQuestId!!
+        } else {
+            questId
+        }
+
+        val p = state.quest.progress[actualQuestId] ?: return
         if (p.status != QuestStatus.OBJECTIVE_MET) return
         
-        val def = registry[questId] ?: return
-        state.quest.activeQuestIds.remove(questId)
-        state.quest.completedQuestIds.add(questId)
-        state.quest.progress[questId] = p.copy(status = QuestStatus.COMPLETED)
+        val def = registry[actualQuestId] ?: return
+        state.quest.activeQuestIds.remove(actualQuestId)
+        state.quest.completedQuestIds.add(actualQuestId)
+        state.quest.progress[actualQuestId] = p.copy(status = QuestStatus.COMPLETED)
         state.gold += def.rewardGold
         val xpMessages = experienceSystem.addPartyXpDirect(state, def.recommendedLevel * 50)
         
@@ -174,13 +183,9 @@ class QuestEngine @Inject constructor(
             it.cityId == cityId && !it.isHidden && getStatus(it.id, state) == QuestStatus.AVAILABLE
         }
         
-        // --- QUEST BOARD FIX ---
-        // Story quests should be visible if status is AVAILABLE - TO BE CHECKED
-        val boardQuests = allAvailable.filter { 
-            it.cityId == cityId
-        }
-        
-        return shuffleQuests(boardQuests, cityId, state.world.day)
+        // TO BE CHECKED: Story quests (Inquisition, Ravenn) must be visible on the board to be started.
+        // Story quests are those starting with "q_verdict".
+        return shuffleQuests(allAvailable, cityId, state.world.day)
             .sortedWith(compareBy<QuestDefinition> { it.chainId ?: "zzz" }.thenBy { it.chainOrder }.thenBy { it.recommendedLevel })
     }
 
