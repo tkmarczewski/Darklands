@@ -60,12 +60,29 @@ class CityViewModel @Inject constructor(
         val cityData = cityCatalogue.get(cityId)
         
         // --- TRIGGER VERDICT INCIDENTS ---
-        // DESIGN CHOICE: Triggering here ensures that every meaningful "city entry" 
-        // through UI navigation is recorded.
         verdictIncidentsSystem.onCityEntered(cityId)
 
+        // --- RAVENN AMBUSH CHECK ---
+        if (state.quest.worldFlags.contains("verdict_ravenn_interaction_pending")) {
+            val isSuspect = state.quest.worldFlags.contains("verdict_path_SUSPECT")
+            val npcName = "Ravenn Beztwarzowy"
+            val npcRole = "Ravenn"
+            val node = if (isSuspect) "ravenn_ambush_suspect" else "ravenn_ambush_investigator"
+            
+            // This will trigger an automatic navigation to dialogue when CityScreen starts
+            // and remove the pending flag.
+            gameRepository.updateState { s ->
+                s.quest.worldFlags.remove("verdict_ravenn_interaction_pending")
+                s.pendingAction = com.grimreich.core.PendingWorldAction.Dialogue(npcName, npcRole, node)
+            }
+            emitEffect(CityUiEffect.NavigateToDialogue(npcName, npcRole, node))
+        }
+
         val localAvailable = questEngine.getAvailableQuestsForCity(cityId, state)
-        val allAvailable = questEngine.getVisibleQuestBoard(state)
+        // --- QUEST BOARD FIX ---
+        // Only show quests for the current city in the board, and exclude story triggers.
+        val filteredBoard = mapOf(cityId to localAvailable.filter { !it.id.startsWith("q_verdict") })
+        
         val generatedNpcs = npcGenerator.generateForCity(cityId, state)
 
         val stability = state.world.globalStability
@@ -78,7 +95,7 @@ class CityViewModel @Inject constructor(
             backgroundDrawable = cityData?.backgroundDrawable ?: "bg_region_north_coast",
             npcs = generatedNpcs,
             activeLocalQuests = localAvailable,
-            allAvailableQuests = allAvailable,
+            allAvailableQuests = filteredBoard,
             isQuestMenuOpen = questMenuOpen,
             isGlitchActive = finalGlitchIntensity > 0.5f,
             glitchIntensity = finalGlitchIntensity,

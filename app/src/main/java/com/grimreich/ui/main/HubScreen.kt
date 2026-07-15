@@ -109,7 +109,13 @@ fun HubScreen(
                         Column(verticalArrangement = Arrangement.spacedBy(4.dp), modifier = Modifier.padding(top = 8.dp)) {
                             NavTabV9(stringResource(R.string.hub_btn_to_city), onClick = onCity)
                             NavTabV9(stringResource(R.string.hub_btn_to_map), onClick = onMap)
-                            NavTabV9(stringResource(R.string.hub_btn_to_expedition), onClick = onExpedition)
+                            
+                            // --- EXPEDITION VISIBILITY FIX ---
+                            // Only allow expeditions if there are active quests that require them
+                            // or if it's the start of the game (tutorial context).
+                            if (state.expeditionQuestsCount > 0 || state.day < 2) {
+                                NavTabV9(stringResource(R.string.hub_btn_to_expedition), onClick = onExpedition, color = Color(0xFF3E2723))
+                            }
                         }
                     }
                 }

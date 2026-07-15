@@ -67,9 +67,10 @@ class VerdictIncidentsSystem @Inject constructor(
             }
             7 -> {
                 state.quest.worldFlags.add("verdict_campaign_ready")
-                val msg = if (isSuspect) "Ravenn Beztwarzowy wydał nakaz Twojego doprowadzenia. Czeka w Opactwie Ciszy."
-                else "Czujesz na sobie wzrok Ravenna. Musisz udać się do Opactwa Ciszy, aby zmierzyć się z Werdyktem."
-                state.logEntries.add(msg)
+                // --- RAVENN AMBUSH FIX ---
+                // Do not add the log entry here. Instead, set a flag that triggers an interaction 
+                // in DialogueManager when the player is in a city.
+                state.quest.worldFlags.add("verdict_ravenn_interaction_pending")
             }
         }
     }

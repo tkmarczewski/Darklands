@@ -304,6 +304,36 @@
     ]
   },
   {
+    "id": "ravenn_ambush_suspect",
+    "npcId": "ravenn",
+    "text": "Stój, Kotwico. Twoja trasa podróży jest... podejrzanie zsynchronizowana z serią wyroków wykonanych bez użycia ostrza. Jesteś albo największym pechowcem w Boreas, albo tym, kogo szukam. Ravenn Beztwarzowy chce z Tobą rozmawiać w Opactwie Ciszy.",
+    "choices": [
+      {
+        "text": "Pójdę tam. (ZADANIE: Gabinet bez śladów)",
+        "targetNodeId": "end",
+        "triggerEvent": "ACTIVATE_QUEST",
+        "triggerValue": "q_verdict_1"
+      },
+      {
+        "text": "Nie mam z tym nic wspólnego.",
+        "targetNodeId": "end"
+      }
+    ]
+  },
+  {
+    "id": "ravenn_ambush_investigator",
+    "npcId": "ravenn",
+    "text": "Twoje kroki odbijają się echem w Szyfrze, wędrowcze. Widziałeś ciała, których nikt nie powinien widzieć. Jeśli chcesz zatrzymać ten proces, przyjdź do Opactwa Ciszy. Ja, Ravenn, będę na Ciebie czekał.",
+    "choices": [
+      {
+        "text": "Zrozumiałem. (ZADANIE: Gabinet bez śladów)",
+        "targetNodeId": "end",
+        "triggerEvent": "ACTIVATE_QUEST",
+        "triggerValue": "q_verdict_1"
+      }
+    ]
+  },
+  {
     "id": "ravenn_check_path",
     "npcId": "ravenn",
     "text": "Najpierw muszę wiedzieć, z kim rozmawiam...",
@@ -488,7 +518,7 @@
   {
     "id": "quest_report_back_generic",
     "npcId": "npc",
-    "text": "A więc udało ci się? Doskonale. Twoje wysiłki nie pójdą na marne, wędrowcze.",
+    "text": "A więc udało ci się? Doskonale. Twoje wysiłki nie pojdą na marne, wędrowcze.",
     "choices": [
       {
         "text": "Dziękuję za nagrodę (ZAKOŃCZ).",

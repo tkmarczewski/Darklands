@@ -174,7 +174,12 @@ class QuestEngine @Inject constructor(
             it.cityId == cityId && !it.isHidden && getStatus(it.id, state) == QuestStatus.AVAILABLE
         }
         
-        return shuffleQuests(allAvailable, cityId, state.world.day)
+        // --- QUEST BOARD FIX ---
+        // Exclude story quests (like q_verdict_1) from the generic city board.
+        // Story quests are triggered by specific events/NPCs.
+        val boardQuests = allAvailable.filter { !it.id.startsWith("q_verdict") }
+        
+        return shuffleQuests(boardQuests, cityId, state.world.day)
             .sortedWith(compareBy<QuestDefinition> { it.chainId ?: "zzz" }.thenBy { it.chainOrder }.thenBy { it.recommendedLevel })
     }
 
