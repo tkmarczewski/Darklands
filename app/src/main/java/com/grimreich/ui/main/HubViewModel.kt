@@ -96,8 +96,7 @@ class HubViewModel @Inject constructor(
                     hubTintColor = tint,
                     atmosphericMessageRes = messageRes,
                     latestLogs = listOf(quote) + logs.takeLast(GameConstants.LATEST_LOGS_DISPLAY_COUNT).reversed(),
-                    hasPendingLevelUp = state.party.any { h -> h.attributePoints > 0 },
-                    expeditionQuestsCount = 1 // FORCING VISIBILITY FOR DEBUG - SHOULD BE state.quest.activeQuestIds.size in future
+                    hasPendingLevelUp = state.party.any { h -> h.attributePoints > 0 }
                 )
             }
         }.launchIn(viewModelScope)
