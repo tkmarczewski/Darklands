@@ -114,7 +114,7 @@ class QuestEngine @Inject constructor(
     fun completeQuestDirect(state: GameState, questId: String) {
         if (state.quest.completedQuestIds.contains(questId)) return
         
-        // TO BE CHECKED: relatedQuestId from pendingAction should have priority
+        // relatedQuestId from pendingAction should have priority
         val action = state.pendingAction
         val actualQuestId = if (questId == "ACTIVE" && action is com.grimreich.core.PendingWorldAction.Dialogue && action.relatedQuestId != null) {
             action.relatedQuestId!!
@@ -183,7 +183,7 @@ class QuestEngine @Inject constructor(
             it.cityId == cityId && !it.isHidden && getStatus(it.id, state) == QuestStatus.AVAILABLE
         }
         
-        // TO BE CHECKED: Story quests (Inquisition, Ravenn) must be visible on the board to be started.
+        // Story quests (Inquisition, Ravenn) must be visible on the board to be started.
         // Story quests are those starting with "q_verdict".
         return shuffleQuests(allAvailable, cityId, state.world.day)
             .sortedWith(compareBy<QuestDefinition> { it.chainId ?: "zzz" }.thenBy { it.chainOrder }.thenBy { it.recommendedLevel })

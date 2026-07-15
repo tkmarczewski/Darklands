@@ -8,7 +8,6 @@
         "text": "Melduję wykonanie wyroku (Wyrok Inkwizycji).",
         "targetNodeId": "guard_verdict_done",
         "triggerEvent": "ADVANCE_QUEST",
-        "_comment": "TO BE CHECKED: Unified trigger to ADVANCE_QUEST",
         "triggerValue": "q_verdict_1"
       },
       {
@@ -128,7 +127,6 @@
         "text": "Przynoszę zioła z mgły (Żniwa Mgły).",
         "targetNodeId": "merchant_report_back",
         "triggerEvent": "ADVANCE_QUEST",
-        "_comment": "TO BE CHECKED: Unified trigger to ADVANCE_QUEST",
         "triggerValue": "q_coast_harvest"
       },
       {

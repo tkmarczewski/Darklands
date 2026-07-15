@@ -72,7 +72,7 @@ class DialogueManager @Inject constructor(
                     engine.activateQuestDirect(state, it) 
                 }
             }
-            "ADVANCE_QUEST", "QUEST_OBJECTIVE_MET" -> { // TO BE CHECKED: Consistency fix
+            "ADVANCE_QUEST", "QUEST_OBJECTIVE_MET" -> {
                 value?.let { 
                     engine.advanceStepDirect(state, it) 
                 }

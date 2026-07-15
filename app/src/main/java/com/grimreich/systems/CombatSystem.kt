@@ -349,12 +349,12 @@ class CombatSystem @Inject constructor(
 
         val action = state.pendingAction
         if (action is com.grimreich.core.PendingWorldAction.QuestCombatWin) {
-            android.util.Log.d("CombatSystem", "[QUEST] Advancing quest ${action.questId} after win - TO BE CHECKED")
+            android.util.Log.d("CombatSystem", "[QUEST] Advancing quest ${action.questId} after win")
             questEngine.advanceStepDirect(state, action.questId)
             state.pendingAction = com.grimreich.core.PendingWorldAction.None
         }
 
-        // TO BE CHECKED: Auto-advance ALL active quests if they have a COMBAT step matching the enemy
+        // Auto-advance ALL active quests if they have a COMBAT step matching the enemy
         val currentEnemyType = state.combat.enemyType
         state.quest.activeQuestIds.toList().forEach { qId ->
             val def = questEngine.getDefinition(qId)
