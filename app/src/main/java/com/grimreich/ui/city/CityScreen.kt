@@ -6,6 +6,8 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -155,7 +157,10 @@ fun CityContent(
                 Column(modifier = Modifier.weight(0.7f).fillMaxHeight()) {
                     GothicObsidianCard(modifier = Modifier.weight(1.2f), headerColor = Color(0xFF1B5E20)) {
                         Text(text = stringResource(R.string.city_locations_label), color = Color(0xFFC0A060), fontSize = 10.sp, fontWeight = FontWeight.Bold)
-                        Column(verticalArrangement = Arrangement.spacedBy(4.dp), modifier = Modifier.padding(top = 4.dp)) {
+                        Column(
+                            verticalArrangement = Arrangement.spacedBy(4.dp), 
+                            modifier = Modifier.padding(top = 4.dp).verticalScroll(rememberScrollState())
+                        ) {
                             NavTabV9(stringResource(R.string.city_btn_market), onClick = { onEvent(CityUiEvent.OnMarketClick) })
                             NavTabV9(stringResource(R.string.city_btn_tavern), onClick = { onEvent(CityUiEvent.OnTavernClick) })
                             NavTabV9(stringResource(R.string.city_btn_temple), onClick = { onEvent(CityUiEvent.OnTempleClick) })

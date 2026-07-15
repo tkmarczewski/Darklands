@@ -138,8 +138,8 @@ class DialogueManager @Inject constructor(
 
     fun getPortrait(role: String): String {
         return when (role.uppercase()) {
-            "GUARD" -> "port_guard"
-            "MERCHANT" -> "port_merchant"
+            "GUARD", "STRAZNIK" -> "port_guard"
+            "MERCHANT", "KUPIEC" -> "port_merchant"
             "AELION" -> "port_aelion"
             "MIRA" -> "port_mira"
             "RAVENN" -> "port_inquisitor"

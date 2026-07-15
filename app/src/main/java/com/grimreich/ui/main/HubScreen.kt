@@ -111,7 +111,6 @@ fun HubScreen(
                             modifier = Modifier.padding(top = 8.dp).verticalScroll(rememberScrollState())
                         ) {
                             NavTabV9(stringResource(R.string.hub_btn_to_city), onClick = onCity)
-                            NavTabV9(stringResource(R.string.hub_btn_to_map), onClick = onMap)
                             
                             // --- EXPEDITION VISIBILITY FIX ---
                             // Only allow expeditions if there are active quests that require them
