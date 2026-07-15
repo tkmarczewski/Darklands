@@ -19,6 +19,9 @@ class ChronicleSystem @Inject constructor(
         register(ChronicleEntry("lore_fracture_origin", "Początek Pęknięcia", "W roku 1242 Mgła po raz pierwszy przestała być tylko zjawiskiem pogodowym.", "HISTORIA", false))
         register(ChronicleEntry("lore_scribes", "Archiwiści Absolutu", "Mówią, że świat jest zapisywany w czasie rzeczywistym przez istoty spoza paradygmatu.", "ONTOLOGIA", false))
         register(ChronicleEntry("lore_black_anchor", "Czarna Kotwica", "Ostatnie zabezpieczenie przed całkowitym wymazaniem GrimReich.", "TAJEMNICA", false))
+        
+        // --- ADD MISSING ENTRIES FROM DIALOGUES ---
+        register(ChronicleEntry("lore_cipher_sun", "Szyfr Słońca", "Dezerter widział to wyraźnie. Pod tarczą słońca kryje się ciąg zer i jedynek. Rzeczywistość ma swoją warstwę bazową.", "ONTOLOGIA", false))
     }
 
     fun register(entry: ChronicleEntry) {

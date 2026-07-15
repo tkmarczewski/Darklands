@@ -120,8 +120,8 @@ class ProceduralNpcGenerator @Inject constructor(
                 npcList.add(NPC(
                     id = "npc_${role.lowercase()}_$cityId",
                     name = npcName,
-                    role = role,
-                    startNodeId = "${role.lowercase()}_start",
+                    role = if (cityId == "twierdza_zelazna" && role == "Guard") "FORTRESS_GUARD" else role,
+                    startNodeId = if (cityId == "twierdza_zelazna" && role == "Guard") "fortress_guard_start" else "${role.lowercase()}_start",
                     stability = (worldStability / 100f).coerceIn(0.05f, 1.0f),
                     isInfested = isInfested
                 ))

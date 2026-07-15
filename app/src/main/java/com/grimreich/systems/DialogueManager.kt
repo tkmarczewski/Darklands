@@ -144,6 +144,7 @@ class DialogueManager @Inject constructor(
             "MIRA" -> "port_mira"
             "RAVENN" -> "port_inquisitor"
             "ECHO" -> "port_wraith"
+            "FORTRESS_GUARD" -> "port_guard"
             else -> "port_peasant"
         }
     }
