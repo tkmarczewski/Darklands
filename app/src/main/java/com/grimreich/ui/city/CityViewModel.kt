@@ -46,8 +46,7 @@ class CityViewModel @Inject constructor(
     private val cityCatalogue: CityCatalogue,
     private val npcGenerator: ProceduralNpcGenerator,
     private val socialEventSystem: SocialEventSystem,
-    private val atmosphericDescriptionSystem: AtmosphericDescriptionSystem,
-    private val verdictIncidentsSystem: com.grimreich.systems.VerdictIncidentsSystem
+    private val atmosphericDescriptionSystem: AtmosphericDescriptionSystem
 ) : ViewModel() {
 
     private val _isQuestMenuOpen = MutableStateFlow(false)
@@ -80,7 +79,7 @@ class CityViewModel @Inject constructor(
 
         val localAvailable = questEngine.getAvailableQuestsForCity(cityId, state)
         // --- QUEST BOARD FIX ---
-        // Showing all available quests for the city, including story triggers - TO BE CHECKED
+        // Showing all available quests for the city, including story triggers
         val filteredBoard = mapOf(cityId to localAvailable)
         
         val generatedNpcs = npcGenerator.generateForCity(cityId, state)
@@ -111,11 +110,7 @@ class CityViewModel @Inject constructor(
     val uiEffect = _uiEffect.asSharedFlow()
 
     init {
-        // Trigger city entrance logic ONCE when ViewModel is created (on actual screen entry)
-        val cityId = gameRepository.currentState().world.locationId
-        if (cityId.isNotBlank()) {
-            verdictIncidentsSystem.onCityEntered(cityId)
-        }
+        // init body is now empty as city entrance is handled by GameRootViewModel
     }
 
     fun onEvent(event: CityUiEvent) {

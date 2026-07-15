@@ -7,8 +7,18 @@
       {
         "text": "Melduję wykonanie wyroku (Wyrok Inkwizycji).",
         "targetNodeId": "guard_verdict_done",
-        "triggerEvent": "ADVANCE_QUEST",
-        "triggerValue": "q_verdict_1"
+        "requiredQuestId": "q_inquisition_verdict",
+        "requiredQuestStatus": "OBJECTIVE_MET",
+        "triggerEvent": "COMPLETE_QUEST",
+        "triggerValue": "q_inquisition_verdict"
+      },
+      {
+        "text": "Melduję o dezerterze (ZADANIE: Dezerter).",
+        "targetNodeId": "guard_deserter_done",
+        "requiredQuestId": "q_deserter",
+        "requiredQuestStatus": "OBJECTIVE_MET",
+        "triggerEvent": "COMPLETE_QUEST",
+        "triggerValue": "q_deserter"
       },
       {
         "text": "Czy coś niepokojącego działo się ostatnio?",
@@ -110,7 +120,7 @@
         "text": "Tak, pomogę (PRZYJMIJ: Wyrok Inkwizycji).",
         "targetNodeId": "end",
         "triggerEvent": "ACTIVATE_QUEST",
-        "triggerValue": "q_verdict_1"
+        "triggerValue": "q_inquisition_verdict"
       },
       {
         "text": "Może innym razem.",
@@ -126,6 +136,8 @@
       {
         "text": "Przynoszę zioła z mgły (Żniwa Mgły).",
         "targetNodeId": "merchant_report_back",
+        "requiredQuestId": "q_coast_harvest",
+        "requiredQuestStatus": "OBJECTIVE_MET",
         "triggerEvent": "ADVANCE_QUEST",
         "triggerValue": "q_coast_harvest"
       },
@@ -170,7 +182,7 @@
         "text": "Zrozumiałem (ODBIERZ NAGRODĘ).",
         "targetNodeId": "end",
         "triggerEvent": "COMPLETE_QUEST",
-        "triggerValue": "q_verdict_1"
+        "triggerValue": "q_inquisition_verdict"
       }
     ]
   },
@@ -225,12 +237,16 @@
       {
         "text": "Mam list od kupca z Wybrzeża.",
         "targetNodeId": "fortress_commander_letter",
-        "requiredQuestId": "q_fortress_letter"
+        "requiredQuestId": "q_fortress_letter",
+        "requiredQuestStatus": "ACTIVE",
+        "triggerEvent": "ADVANCE_QUEST",
+        "triggerValue": "q_fortress_letter"
       },
       {
         "text": "Mam sprawę do Dowódcy (Wymaga: Dowód na sabotaż).",
         "targetNodeId": "fortress_commander_letter",
-        "requiredQuestId": "q_verdict_1"
+        "requiredQuestId": "q_inquisition_verdict",
+        "requiredQuestStatus": "COMPLETED"
       },
       {
         "text": "Chcę wejść do środka.",
@@ -265,7 +281,7 @@
   {
     "id": "mira_start",
     "npcId": "mira",
-    "text": "Słowa w Kronice same się zmieniają... Jakby rzeczywistość próbowała wymazać własną historię. Czy pomożesz mi ją ocalić?",
+    "text": "Słowa są fragmentami prawdy... Jakby rzeczywistość próbowała wymazać własną historię. Czy pomożesz mi ją ocalić?",
     "choices": [
       {
         "text": "Zbadam te pęknięcia.",
@@ -518,7 +534,7 @@
   {
     "id": "quest_report_back_generic",
     "npcId": "npc",
-    "text": "A więc udało ci się? Doskonale. Twoje wysiłki nie pojdą na marne, wędrowcze.",
+    "text": "A więc udało ci się? Doskonale. Twoje wysiłki nie pójdą na marne, wędrowcze.",
     "choices": [
       {
         "text": "Dziękuję za nagrodę (ZAKOŃCZ).",

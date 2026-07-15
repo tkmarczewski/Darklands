@@ -165,16 +165,29 @@ fun ExpeditionContent(
 
 @Composable
 fun EncounterViewV9(encounter: Encounter, onChoice: (EncounterChoice) -> Unit) {
-    Column(modifier = Modifier.fillMaxSize()) {
-        Text(text = encounter.title.uppercase(), color = Color.White, fontWeight = FontWeight.ExtraBold, fontSize = 16.sp)
+    Column(modifier = Modifier.fillMaxSize().padding(8.dp)) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text(text = "ANOMALIA WYKRYTA", color = Color.Red, fontSize = 8.sp, fontWeight = FontWeight.Bold)
+            Spacer(modifier = Modifier.width(8.dp))
+            HorizontalDivider(modifier = Modifier.weight(1f), color = Color(0x33FF0000))
+        }
         Spacer(modifier = Modifier.height(8.dp))
+        Text(text = encounter.title.uppercase(), color = Color.White, fontWeight = FontWeight.ExtraBold, fontSize = 18.sp)
+        Spacer(modifier = Modifier.height(4.dp))
+        HorizontalDivider(color = Color(0x66C0A060), thickness = 1.dp)
+        Spacer(modifier = Modifier.height(12.dp))
         Text(text = encounter.description, color = Color.LightGray, fontSize = 13.sp, lineHeight = 18.sp)
         
         Spacer(modifier = Modifier.weight(1f))
         
-        Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+        Text(text = "INTERAKCJA WYMAGANA:", color = Color.Gray, fontSize = 9.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(bottom = 8.dp))
+        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
             encounter.choices.forEach { choice ->
-                NavTabV9(text = choice.label, onClick = { onChoice(choice) }, color = Color(0xFF151515))
+                NavTabV9(
+                    text = choice.label, 
+                    onClick = { onChoice(choice) }, 
+                    color = if (choice.combatEnemyType != null) Color(0xFF400000) else Color(0xFF151515)
+                )
             }
         }
     }
@@ -192,7 +205,7 @@ fun QuestActionCardV9(quest: QuestDefinition, onClick: () -> Unit) {
                 Text(text = quest.title.uppercase(), color = Color.White, fontWeight = FontWeight.Bold, fontSize = 11.sp, modifier = Modifier.weight(1f))
                 Text(
                     text = quest.category.name,
-                    color = getCategoryColor(quest.category),
+                    color = getQuestCategoryColor(quest.category),
                     fontSize = 8.sp,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.padding(start = 4.dp)
@@ -200,19 +213,5 @@ fun QuestActionCardV9(quest: QuestDefinition, onClick: () -> Unit) {
             }
             Text(text = "${stringResource(R.string.expedition_quest_level)}: ${quest.recommendedLevel}", color = Color.Gray, fontSize = 9.sp)
         }
-    }
-}
-
-private fun getCategoryColor(category: com.grimreich.core.QuestCategory): Color {
-    return when (category) {
-        com.grimreich.core.QuestCategory.COMBAT -> Color(0xFFD32F2F)
-        com.grimreich.core.QuestCategory.SOCIAL -> Color(0xFF1976D2)
-        com.grimreich.core.QuestCategory.INVESTIGATION -> Color(0xFF7B1FA2)
-        com.grimreich.core.QuestCategory.MIXED -> Color(0xFF689F38)
-        com.grimreich.core.QuestCategory.META -> Color(0xFFFFD700)
-        com.grimreich.core.QuestCategory.ANOMALY -> Color(0xFF00ACC1)
-        com.grimreich.core.QuestCategory.DRAMA -> Color(0xFFF57C00)
-        com.grimreich.core.QuestCategory.BEAST -> Color(0xFF4E342E)
-        com.grimreich.core.QuestCategory.INTRIGUE -> Color(0xFF455A64)
     }
 }

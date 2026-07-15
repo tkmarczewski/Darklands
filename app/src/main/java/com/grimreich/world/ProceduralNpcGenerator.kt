@@ -92,15 +92,20 @@ class ProceduralNpcGenerator @Inject constructor(
         }
 
         // 2. CANONICAL ROLES with procedurally generated epithets
-        val baseRoles = listOf("Merchant", "Guard", "Mystic", "Beggar")
+        val baseRoles = listOf("Merchant", "Guard", "Mystic", "Beggar", "Peasant")
+        val advancedRoles = listOf("Noble", "Scholar", "Priest", "Monk", "Hunter", "Assassin", "Ritualist")
+        
         val activeRoles = when(mood) {
-            "PROSPEROUS" -> baseRoles + "Noble"
-            "DESPERATE" -> baseRoles + "Cultist"
-            else -> baseRoles
+            "PROSPEROUS" -> baseRoles + listOf("Noble", "Scholar", "Priest")
+            "DESPERATE" -> baseRoles + listOf("Cultist", "Assassin", "Ritualist")
+            else -> baseRoles + advancedRoles.filter { random.nextFloat() < 0.3f }
         }
 
         activeRoles.forEach { role ->
-            val guaranteed = cityId == "wybrzeze_polnocne" && (role == "Guard" || role == "Merchant")
+            val guaranteed = (cityId == "wybrzeze_polnocne" && (role == "Guard" || role == "Merchant")) ||
+                             (cityId == "opactwo_ciszy" && (role == "Priest" || role == "Monk")) ||
+                             (cityId == "twierdza_zelazna" && role == "Ritualist")
+
             if (guaranteed || random.nextBoolean()) {
                 val epithet = when(mood) {
                     "PROSPEROUS" -> listOf("Zamożny", "Dumny", "Uczciwy").random(random)

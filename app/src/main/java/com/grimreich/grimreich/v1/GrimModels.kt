@@ -97,6 +97,7 @@ data class DialogueChoice(
     val requiredAttributes: Map<String, Int> = emptyMap(),
     val requiredSkills: Map<String, Int> = emptyMap(),
     val requiredQuestId: String? = null,
+    val requiredQuestStatus: String? = null, // New field for status-based visibility
     val triggerEvent: String? = null,
     val triggerValue: String? = null,
     val isCombatTrigger: Boolean = false,

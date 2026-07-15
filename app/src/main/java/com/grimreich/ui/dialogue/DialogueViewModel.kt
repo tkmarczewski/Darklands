@@ -125,8 +125,15 @@ class DialogueViewModel @Inject constructor(
             if (heroVal < value) return false
         }
 
-        // Reszta warunków (questy, złoto) jest globalna dla drużyny
-        if (choice.requiredQuestId != null && !state.quest.activeQuestIds.contains(choice.requiredQuestId)) return false
+        if (choice.requiredQuestId != null) {
+            val status = questEngine.getStatus(choice.requiredQuestId, state)
+            if (choice.requiredQuestStatus != null) {
+                if (status.name != choice.requiredQuestStatus.uppercase()) return false
+            } else {
+                // Default behavior: if requiredQuestId is present, quest must be at least AVAILABLE
+                if (status == com.grimreich.core.QuestStatus.LOCKED) return false
+            }
+        }
 
         if (choice.triggerEvent == "QUEST_ACTIVE" && !state.quest.activeQuestIds.contains(choice.triggerValue)) return false
         if (choice.triggerEvent == "QUEST_OBJECTIVE_MET" && !questEngine.isObjectiveMet(choice.triggerValue ?: "", state)) return false

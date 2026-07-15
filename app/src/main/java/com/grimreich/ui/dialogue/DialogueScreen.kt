@@ -130,15 +130,23 @@ fun DialogueScreen(
 
             Spacer(modifier = Modifier.height(4.dp))
 
-            // --- DOLNY PASEK: DRUŻYNA (V9) ---
-            GothicObsidianCard(modifier = Modifier.fillMaxWidth().height(80.dp)) {
+            // --- DOLNY PASEK: DRUŻYNA (IMMERSION) ---
+            GothicObsidianCard(modifier = Modifier.fillMaxWidth().height(90.dp)) {
                 Row(
                     modifier = Modifier.fillMaxSize(),
-                    horizontalArrangement = Arrangement.SpaceAround,
+                    horizontalArrangement = Arrangement.Center,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    // Pasek drużyny dla kontekstu podczas dialogów
-                    Text("DRUŻYNA ŚWIADKÓW", color = Color.DarkGray, fontSize = 9.sp, fontWeight = FontWeight.Bold)
+                    state.availableChoices.find { it.activeHeroName != null }?.let { info ->
+                        Text(
+                            text = "POŚREDNIK: ${info.activeHeroName?.uppercase()}", 
+                            color = Color(0xFFC0A060), 
+                            fontSize = 10.sp, 
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier.padding(end = 16.dp)
+                        )
+                    }
+                    Text(text = "DRUŻYNA ŚWIADKÓW", color = Color.DarkGray, fontSize = 9.sp, fontWeight = FontWeight.Bold)
                 }
             }
         }

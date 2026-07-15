@@ -7,6 +7,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CutCornerShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -201,20 +203,44 @@ fun CityContent(
 fun QuestBoardModal(state: CityUiState, onEvent: (CityUiEvent) -> Unit) {
     AlertDialog(
         onDismissRequest = { onEvent(CityUiEvent.ToggleQuestMenu(false)) },
-        title = { Text("TABLICA OGŁOSZEŃ", color = Color(0xFFC0A060), fontSize = 18.sp, fontWeight = FontWeight.Bold) },
+        title = { 
+            Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth()) {
+                Text("۞ TABLICA WYROKÓW I ZLECEŃ ۞", color = Color(0xFFC0A060), fontSize = 18.sp, fontWeight = FontWeight.ExtraBold)
+                HorizontalDivider(color = Color(0xFFC0A060), thickness = 1.dp, modifier = Modifier.padding(top = 4.dp))
+            }
+        },
         text = {
-            LazyColumn(modifier = Modifier.heightIn(max = 400.dp)) {
+            LazyColumn(modifier = Modifier.heightIn(max = 500.dp)) {
                 state.allAvailableQuests.forEach { (city, quests) ->
-                    item { Text(city.uppercase(), color = Color.Gray, fontSize = 10.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(top = 8.dp)) }
+                    item { 
+                        Text(
+                            text = "LOKALIZACJA: ${city.uppercase()}", 
+                            color = Color(0xFF4A0000), 
+                            fontSize = 10.sp, 
+                            fontWeight = FontWeight.Bold, 
+                            modifier = Modifier.padding(top = 12.dp, bottom = 4.dp)
+                        ) 
+                    }
                     items(quests) { quest ->
                         Surface(
-                            modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp).clickable { onEvent(CityUiEvent.OnQuestClick(quest)) },
+                            modifier = Modifier.fillMaxWidth().padding(vertical = 6.dp).clickable { onEvent(CityUiEvent.OnQuestClick(quest)) },
                             color = Color(0xFF0F0F0F),
-                            border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFF333333))
+                            border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFF333333)),
+                            shape = androidx.compose.foundation.shape.CutCornerShape(4.dp)
                         ) {
-                            Column(modifier = Modifier.padding(12.dp)) {
-                                Text(text = quest.title.uppercase(), color = Color.White, fontWeight = FontWeight.Bold, fontSize = 13.sp)
-                                Text(text = quest.description, color = Color.Gray, fontSize = 11.sp)
+                            Column(modifier = Modifier.padding(14.dp)) {
+                                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()) {
+                                    Text(text = quest.title.uppercase(), color = Color.White, fontWeight = FontWeight.Bold, fontSize = 14.sp, modifier = Modifier.weight(1f))
+                                    BadgeV9(text = quest.category.name, color = getQuestCategoryColor(quest.category))
+                                }
+                                Spacer(modifier = Modifier.height(6.dp))
+                                Text(text = quest.description, color = Color.LightGray, fontSize = 11.sp, lineHeight = 16.sp)
+                                HorizontalDivider(color = Color(0x22FFFFFF), thickness = 0.5.dp, modifier = Modifier.padding(vertical = 8.dp))
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Text(text = "POZIOM: ${quest.recommendedLevel}", color = Color.Gray, fontSize = 9.sp, fontWeight = FontWeight.Bold)
+                                    Spacer(modifier = Modifier.width(12.dp))
+                                    Text(text = "NAGRODA: ${quest.rewardGold} gp", color = Color(0xFFC0A060), fontSize = 9.sp, fontWeight = FontWeight.Bold)
+                                }
                             }
                         }
                     }
@@ -224,7 +250,7 @@ fun QuestBoardModal(state: CityUiState, onEvent: (CityUiEvent) -> Unit) {
         confirmButton = {},
         dismissButton = {
             TextButton(onClick = { onEvent(CityUiEvent.ToggleQuestMenu(false)) }) {
-                Text("ZAMKNIJ", color = Color.Gray)
+                Text("POWRÓT DO MIASTA", color = Color.Gray, fontWeight = FontWeight.Bold)
             }
         },
         containerColor = Color(0xFF050505)

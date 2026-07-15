@@ -138,14 +138,21 @@ class DialogueManager @Inject constructor(
 
     fun getPortrait(role: String): String {
         return when (role.uppercase()) {
-            "GUARD", "STRAZNIK" -> "port_guard"
-            "MERCHANT", "KUPIEC" -> "port_merchant"
-            "AELION" -> "port_aelion"
-            "MIRA" -> "port_mira"
-            "RAVENN" -> "port_inquisitor"
+            "GUARD", "STRAZNIK", "FORTRESS_GUARD" -> "port_knight"
+            "MERCHANT", "KUPIEC" -> "port_alchemist"
+            "AELION" -> "port_priest"
+            "MIRA" -> "port_mage"
+            "RAVENN" -> "port_wraith"
             "ECHO" -> "port_wraith"
-            "FORTRESS_GUARD" -> "port_guard"
-            else -> "port_peasant"
+            "PEASANT" -> "port_barbarian"
+            "PRIEST" -> "port_priest"
+            "MONK" -> "port_priest"
+            "ASSASSIN" -> "port_rogue"
+            "RITUALIST" -> "port_alchemist"
+            "NOBLE" -> "port_knight"
+            "SCHOLAR" -> "port_scholar"
+            "HUNTER" -> "port_ranger"
+            else -> "port_barbarian"
         }
     }
 

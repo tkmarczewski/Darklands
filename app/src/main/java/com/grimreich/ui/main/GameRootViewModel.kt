@@ -25,6 +25,7 @@ class GameRootViewModel @Inject constructor(
     private val audioEngine: AudioEngine,
     private val contentValidator: ContentValidator,
     private val endingSystem: EndingSystem,
+    private val verdictIncidentsSystem: com.grimreich.systems.VerdictIncidentsSystem,
     val experienceSystem: com.grimreich.systems.ExperienceSystem,
     val characterFactory: CharacterFactory
 ) : ViewModel() {
@@ -80,10 +81,21 @@ class GameRootViewModel @Inject constructor(
     }
 
     fun setMode(mode: GameScreenMode) {
+        val previousMode = _mode.value
         if (mode == GameScreenMode.MAIN_MENU) {
             gameRepository.persistCurrentState()
         }
+        
         _mode.value = mode
+
+        // --- CITY ENTRY LOGIC: VERDICT INCIDENTS ---
+        // Only trigger if entering CITY from MAP or EXPEDITION (actual travel/arrival)
+        if (mode == GameScreenMode.CITY && (previousMode == GameScreenMode.WORLD_MAP || previousMode == GameScreenMode.EXPEDITION)) {
+            val cityId = gameRepository.currentState().world.locationId
+            if (cityId.isNotBlank()) {
+                verdictIncidentsSystem.onCityEntered(cityId)
+            }
+        }
         val route = when (mode) {
             GameScreenMode.MAIN_MENU        -> "main_menu"
             GameScreenMode.PLAYER_IDENTITY,
