@@ -15,7 +15,7 @@ import javax.inject.Inject
 import kotlin.random.Random
 
 enum class CreatorStage {
-    CAREER, ATTRIBUTES, SKILLS
+    CAREER, ATTRIBUTES, SKILLS, LIFEPATH
 }
 
 data class CharacterCreatorUiState(
@@ -27,7 +27,9 @@ data class CharacterCreatorUiState(
         "Str" to 10, "Agi" to 10, "Per" to 10, "Int" to 10, "End" to 10, "Cha" to 10, "Pie" to 10
     ),
     val specializedSkills: Set<HeroSkill> = emptySet(),
-    val availableSkills: List<HeroSkill> = emptyList()
+    val availableSkills: List<HeroSkill> = emptyList(),
+    val trainingCycles: Int = 0,
+    val currentAge: Int = 20
 )
 
 @HiltViewModel
@@ -68,7 +70,20 @@ class CharacterCreatorViewModel @Inject constructor(
                 pointsRemaining = 20,
                 specializedSkills = emptySet(),
                 specializationPointsRemaining = 3,
-                availableSkills = availableSkillsForCareer(career)
+                availableSkills = availableSkillsForCareer(career),
+                currentAge = career.minAge,
+                trainingCycles = 0
+            )
+        }
+    }
+
+    fun addTrainingCycle() {
+        if (_uiState.value.currentAge >= 60) return // Limit wieku dla balansu
+        
+        _uiState.update { 
+            it.copy(
+                trainingCycles = it.trainingCycles + 1,
+                currentAge = it.currentAge + 5
             )
         }
     }
@@ -78,7 +93,8 @@ class CharacterCreatorViewModel @Inject constructor(
             when (it.stage) {
                 CreatorStage.CAREER -> it.copy(stage = CreatorStage.ATTRIBUTES)
                 CreatorStage.ATTRIBUTES -> it.copy(stage = CreatorStage.SKILLS)
-                CreatorStage.SKILLS -> it // Finalized
+                CreatorStage.SKILLS -> it.copy(stage = CreatorStage.LIFEPATH)
+                CreatorStage.LIFEPATH -> it // Finalized
             }
         }
     }
@@ -89,6 +105,7 @@ class CharacterCreatorViewModel @Inject constructor(
                 CreatorStage.CAREER -> it
                 CreatorStage.ATTRIBUTES -> it.copy(stage = CreatorStage.CAREER)
                 CreatorStage.SKILLS -> it.copy(stage = CreatorStage.ATTRIBUTES)
+                CreatorStage.LIFEPATH -> it.copy(stage = CreatorStage.SKILLS)
             }
         }
     }

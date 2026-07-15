@@ -121,7 +121,7 @@ class GameRootViewModel @Inject constructor(
         setMode(GameScreenMode.CHARACTER_CREATOR)
     }
 
-    fun finalizeCharacterCreation(name: String, career: Career, attrs: Map<String, Int>, skills: List<HeroSkill>) {
+    fun finalizeCharacterCreation(name: String, career: Career, attrs: Map<String, Int>, skills: List<HeroSkill>, trainingCycles: Int = 0) {
         viewModelScope.launch {
             gameBootstrapper.bootstrapFreshWorld()
 
@@ -161,22 +161,19 @@ class GameRootViewModel @Inject constructor(
                         this.skills.put("Religia", 50)
                     }
                 } else {
-                    Hero(
-                        id = "hero_main",
-                        name = name,
-                        age = 20,
-                        currentCareer = career,
-                        strength = attrs["Str"] ?: 10,
-                        agility = attrs["Agi"] ?: 10,
-                        perception = attrs["Per"] ?: 10,
-                        intelligence = attrs["Int"] ?: 10,
-                        endurance = attrs["End"] ?: 10,
-                        charisma = attrs["Cha"] ?: 10,
-                        piety = attrs["Pie"] ?: 10,
-                        hp = 40,
-                        maxHp = 40
-                    ).apply {
-                        skills.forEach { this.skills.put(it.displayName, 40) }
+                    val baseAge = career.minAge
+                    characterFactory.createHero(name, baseAge, career, trainingCycles).copy(id = "hero_main").apply {
+                        // Override attributes with user's distribution if not ralwing
+                        this.strength = attrs["Str"] ?: this.strength
+                        this.agility = attrs["Agi"] ?: this.agility
+                        this.perception = attrs["Per"] ?: this.perception
+                        this.intelligence = attrs["Int"] ?: this.intelligence
+                        this.endurance = attrs["End"] ?: this.endurance
+                        this.charisma = attrs["Cha"] ?: this.charisma
+                        this.piety = attrs["Pie"] ?: this.piety
+                        
+                        // Add specialized skills with high value
+                        skills.forEach { this.skills.put(it.displayName, 45) }
                     }
                 }
 

@@ -108,8 +108,8 @@ fun GameNavHost(
         composable(GameRoute.CharacterCreator.route) {
             val isRalwing = root.pendingPlayerName?.trim()?.equals("ralwing", ignoreCase = true) == true
             CharacterCreatorScreen(
-                onStartGame = { name, career, attrs, skills ->
-                    root.finalizeCharacterCreation(name, career, attrs, skills)
+                onStartGame = { name, career, attrs, skills, cycles ->
+                    root.finalizeCharacterCreation(name, career, attrs, skills, cycles)
                 },
                 onBack = { root.setMode(GameScreenMode.PLAYER_IDENTITY) },
                 initialHeroName = if (isRalwing) "Felix Anderson" else "",

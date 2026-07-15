@@ -13,6 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -22,7 +23,7 @@ import com.grimreich.core.HeroSkill
 
 @Composable
 fun CharacterCreatorScreen(
-    onStartGame: (String, Career, Map<String, Int>, List<HeroSkill>) -> Unit,
+    onStartGame: (String, Career, Map<String, Int>, List<HeroSkill>, Int) -> Unit,
     onBack: () -> Unit,
     initialHeroName: String = "",
     viewModel: CharacterCreatorViewModel = hiltViewModel()
@@ -37,7 +38,6 @@ fun CharacterCreatorScreen(
             .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // Reduced header size
         Text(
             text = stringResource(R.string.creator_header),
             color = Color(0xFFC0A060),
@@ -47,7 +47,6 @@ fun CharacterCreatorScreen(
 
         Spacer(modifier = Modifier.height(4.dp))
 
-        // Progress
         Row(
             modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp),
             horizontalArrangement = Arrangement.SpaceEvenly
@@ -55,6 +54,7 @@ fun CharacterCreatorScreen(
             ProgressItem(stringResource(R.string.creator_stage_career), active = state.stage == CreatorStage.CAREER)
             ProgressItem(stringResource(R.string.creator_stage_attributes), active = state.stage == CreatorStage.ATTRIBUTES)
             ProgressItem(stringResource(R.string.creator_stage_skills), active = state.stage == CreatorStage.SKILLS)
+            ProgressItem("ŚCIEŻKA", active = state.stage == CreatorStage.LIFEPATH)
         }
 
         Spacer(modifier = Modifier.height(12.dp))
@@ -102,12 +102,18 @@ fun CharacterCreatorScreen(
                         onRandomize = { viewModel.randomizeSkills() }
                     )
                 }
+                CreatorStage.LIFEPATH -> {
+                    LifePathStage(
+                        age = state.currentAge,
+                        cycles = state.trainingCycles,
+                        onAddCycle = { viewModel.addTrainingCycle() }
+                    )
+                }
             }
         }
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Bottom Navigation
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             Button(
                 onClick = {
@@ -122,8 +128,8 @@ fun CharacterCreatorScreen(
             }
             Button(
                 onClick = {
-                    if (state.stage == CreatorStage.SKILLS) {
-                        onStartGame(heroName, state.selectedCareer, state.attributes, state.specializedSkills.toList())
+                    if (state.stage == CreatorStage.LIFEPATH) {
+                        onStartGame(heroName, state.selectedCareer, state.attributes, state.specializedSkills.toList(), state.trainingCycles)
                     } else {
                         viewModel.nextStage()
                     }
@@ -131,14 +137,14 @@ fun CharacterCreatorScreen(
                 modifier = Modifier.weight(1f),
                 enabled = (state.stage != CreatorStage.CAREER || heroName.isNotBlank()),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = if (state.stage == CreatorStage.SKILLS) Color(0xFF4A6000) else Color(0xFFC0A060),
+                    containerColor = if (state.stage == CreatorStage.LIFEPATH) Color(0xFF4A6000) else Color(0xFFC0A060),
                     disabledContainerColor = Color.DarkGray
                 ),
                 shape = MaterialTheme.shapes.extraSmall
             ) {
                 Text(
-                    text = if (state.stage == CreatorStage.SKILLS) stringResource(R.string.btn_finish) else stringResource(R.string.btn_next),
-                    color = if (state.stage == CreatorStage.SKILLS) Color.White else Color.Black,
+                    text = if (state.stage == CreatorStage.LIFEPATH) stringResource(R.string.btn_finish) else stringResource(R.string.btn_next),
+                    color = if (state.stage == CreatorStage.LIFEPATH) Color.White else Color.Black,
                     fontWeight = FontWeight.Bold
                 )
             }
@@ -324,6 +330,50 @@ fun SkillsStage(
                     )
                 }
             }
+        }
+    }
+}
+
+@Composable
+fun LifePathStage(
+    age: Int,
+    cycles: Int,
+    onAddCycle: () -> Unit
+) {
+    Column(
+        modifier = Modifier.fillMaxSize().padding(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Text("ZAKORZENIENIE W CZASIE", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 18.sp)
+        Spacer(modifier = Modifier.height(8.dp))
+        Text(
+            text = "Możesz poświęcić lata na dodatkowy trening. Każdy cykl (5 lat) zwiększy Twoje umiejętności, ale przybliży Cię do progu śmiertelności.",
+            color = Color.Gray,
+            textAlign = TextAlign.Center,
+            fontSize = 12.sp
+        )
+        
+        Spacer(modifier = Modifier.height(32.dp))
+        
+        Text("WIEK KOTWICY: $age lat", color = Color(0xFFC0A060), fontSize = 24.sp, fontWeight = FontWeight.Bold)
+        Text("CYKLE TRENINGOWE: $cycles", color = Color.White, fontSize = 14.sp)
+
+        Spacer(modifier = Modifier.height(32.dp))
+
+        Button(
+            onClick = onAddCycle,
+            enabled = age < 60,
+            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF400000)),
+            modifier = Modifier.fillMaxWidth().height(60.dp),
+            shape = MaterialTheme.shapes.extraSmall,
+            border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFFC0A060))
+        ) {
+            Text("TRENUJ ( +5 LAT )", color = Color.White, fontWeight = FontWeight.Bold)
+        }
+        
+        if (age >= 60) {
+            Text("Osiągnięto limit wytrzymałości biologicznej.", color = Color.Red, fontSize = 10.sp, modifier = Modifier.padding(top = 8.dp))
         }
     }
 }

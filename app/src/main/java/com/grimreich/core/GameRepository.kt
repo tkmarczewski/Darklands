@@ -41,6 +41,7 @@ class GameRepository @Inject constructor(
         repositoryScope.launch { sync() }
     }
     private val saveMutex = Mutex()
+    private val syncMutex = Mutex()
 
     // FIX: reverted from suspend/Mutex back to a synchronous ReentrantLock.
     private val stateLock = ReentrantLock()
@@ -95,7 +96,7 @@ class GameRepository @Inject constructor(
         }
     }
 
-    suspend fun sync() {
+    suspend fun sync() = syncMutex.withLock {
         cityCatalogue.seedCanonical()
         itemCatalogue.seed()
         dialogueManager.seedBasicDialogues()
