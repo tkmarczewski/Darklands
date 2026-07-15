@@ -80,8 +80,8 @@ class CityViewModel @Inject constructor(
 
         val localAvailable = questEngine.getAvailableQuestsForCity(cityId, state)
         // --- QUEST BOARD FIX ---
-        // Only show quests for the current city in the board, and exclude story triggers.
-        val filteredBoard = mapOf(cityId to localAvailable.filter { !it.id.startsWith("q_verdict") })
+        // Showing all available quests for the city, including story triggers - TO BE CHECKED
+        val filteredBoard = mapOf(cityId to localAvailable)
         
         val generatedNpcs = npcGenerator.generateForCity(cityId, state)
 

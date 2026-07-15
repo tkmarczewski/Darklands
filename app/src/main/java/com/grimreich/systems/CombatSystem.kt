@@ -349,6 +349,7 @@ class CombatSystem @Inject constructor(
 
         val action = state.pendingAction
         if (action is com.grimreich.core.PendingWorldAction.QuestCombatWin) {
+            android.util.Log.d("CombatSystem", "[QUEST] Advancing quest ${action.questId} after win - TO BE CHECKED")
             questEngine.advanceStepDirect(state, action.questId)
             state.pendingAction = com.grimreich.core.PendingWorldAction.None
         }

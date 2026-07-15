@@ -72,7 +72,7 @@ class DialogueManager @Inject constructor(
                     engine.activateQuestDirect(state, it) 
                 }
             }
-            "ADVANCE_QUEST" -> {
+            "ADVANCE_QUEST", "QUEST_OBJECTIVE_MET" -> { // TO BE CHECKED: Added alias for compatibility
                 value?.let { 
                     engine.advanceStepDirect(state, it) 
                 }

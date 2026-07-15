@@ -175,9 +175,9 @@ class QuestEngine @Inject constructor(
         }
         
         // --- QUEST BOARD FIX ---
-        // Exclude story quests and ensure strict cityId matching to prevent leaking.
+        // Story quests should be visible if status is AVAILABLE - TO BE CHECKED
         val boardQuests = allAvailable.filter { 
-            it.cityId == cityId && !it.id.startsWith("q_verdict") 
+            it.cityId == cityId
         }
         
         return shuffleQuests(boardQuests, cityId, state.world.day)
