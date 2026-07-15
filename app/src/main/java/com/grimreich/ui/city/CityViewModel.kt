@@ -59,8 +59,8 @@ class CityViewModel @Inject constructor(
         val cityId = state.world.locationId
         val cityData = cityCatalogue.get(cityId)
         
-        // --- TRIGGER VERDICT INCIDENTS ---
-        verdictIncidentsSystem.onCityEntered(cityId)
+        // --- TRIGGER VERDICT INCIDENTS REMOVED FROM FLOW ---
+        // Moved to init to avoid multiple triggers on state updates (recruitment, etc)
 
         // --- RAVENN AMBUSH CHECK ---
         if (state.quest.worldFlags.contains("verdict_ravenn_interaction_pending")) {
@@ -111,7 +111,11 @@ class CityViewModel @Inject constructor(
     val uiEffect = _uiEffect.asSharedFlow()
 
     init {
-        // init body is now empty as state is handled via stateIn
+        // Trigger city entrance logic ONCE when ViewModel is created (on actual screen entry)
+        val cityId = gameRepository.currentState().world.locationId
+        if (cityId.isNotBlank()) {
+            verdictIncidentsSystem.onCityEntered(cityId)
+        }
     }
 
     fun onEvent(event: CityUiEvent) {

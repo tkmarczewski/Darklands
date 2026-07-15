@@ -53,7 +53,7 @@ class CityCatalogue @Inject constructor() {
             loreDescription = "Miejsce, gdzie Mgła po raz pierwszy dotknęła paradygmatu.",
             primaryArtifact = "Kotwica Północy",
             prophet = "Aelion",
-            marketStock = listOf("pot_heal", "ing_herb")
+            marketStock = listOf("sword_short", "dagger_basic", "armor_leather_light", "pot_heal", "ing_herb")
         ))
 
         register(CityData(
@@ -66,7 +66,7 @@ class CityCatalogue @Inject constructor() {
             backgroundDrawable = "bg_fortress",
             loreDescription = "Potężna forteca wykuta w skale, bastion przeciwko echa.",
             primaryArtifact = "Serce Ferrum",
-            marketStock = listOf("pot_str", "ing_bone")
+            marketStock = listOf("sword_long", "mace_basic", "armor_chainmail", "pot_str", "ing_bone")
         ))
 
         register(CityData(

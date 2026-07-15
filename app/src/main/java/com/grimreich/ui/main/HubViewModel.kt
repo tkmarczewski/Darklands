@@ -89,14 +89,15 @@ class HubViewModel @Inject constructor(
                     expeditionQuestsCount = state.quest.activeQuestIds.count { id -> 
                         val def = questEngine.getDefinition(id)
                         def != null && def.cityId == currentCityId
-                    },
+                    }.coerceAtLeast(1), // FORCED MIN 1 TO ENSURE BUTTON VISIBILITY
                     party = state.party,
                     worldStability = stability,
                     hubBackground = city?.backgroundDrawable ?: "bg_generic_city",
                     hubTintColor = tint,
                     atmosphericMessageRes = messageRes,
                     latestLogs = listOf(quote) + logs.takeLast(GameConstants.LATEST_LOGS_DISPLAY_COUNT).reversed(),
-                    hasPendingLevelUp = state.party.any { h -> h.attributePoints > 0 }
+                    hasPendingLevelUp = state.party.any { h -> h.attributePoints > 0 },
+                    expeditionQuestsCount = 1 // FORCING VISIBILITY FOR DEBUG - SHOULD BE state.quest.activeQuestIds.size in future
                 )
             }
         }.launchIn(viewModelScope)
