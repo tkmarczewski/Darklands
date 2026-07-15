@@ -14,6 +14,7 @@ import androidx.core.view.WindowInsetsControllerCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.grimreich.ui.main.GameNavHost
 import com.grimreich.ui.main.GameRootViewModel
+import com.grimreich.ui.main.components.ExitConfirmationDialog
 import com.grimreich.ui.shared.DevMenuOverlay
 import com.grimreich.core.GameBootstrapper
 import com.grimreich.core.LanguageManager
@@ -36,11 +37,21 @@ class MainActivity : LocalizedActivity() {
                 val rootViewModel: GameRootViewModel = hiltViewModel()
                 val mode = rootViewModel.mode.collectAsState().value
                 
-                // --- SYSTEM BACK BLOCKER ---
-                // Only allow back button if we are in Main Menu (to exit app)
-                // Otherwise, the back button is disabled to enforce ontological stability.
+                val showExitDialog = rootViewModel.showExitConfirmation.collectAsState().value
+
+                if (showExitDialog) {
+                    ExitConfirmationDialog(
+                        onConfirm = { rootViewModel.confirmExitToMainMenu() },
+                        onDismiss = { rootViewModel.setExitConfirmationVisible(false) }
+                    )
+                }
+
+                // --- SYSTEM BACK HANDLER ---
+                // If we are in Main Menu, let the system handle it (exit app).
+                // Otherwise, show confirmation dialog.
                 BackHandler(enabled = mode != com.grimreich.ui.main.GameScreenMode.MAIN_MENU) {
-                    android.util.Log.d("TRIBUNAL", "Back action blocked. World stability must be maintained.")
+                    android.util.Log.d("TRIBUNAL", "Back action: requesting exit confirmation.")
+                    rootViewModel.setExitConfirmationVisible(true)
                 }
 
                 DevMenuOverlay(root = rootViewModel) {

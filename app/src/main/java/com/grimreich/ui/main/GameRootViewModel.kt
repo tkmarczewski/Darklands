@@ -38,6 +38,18 @@ class GameRootViewModel @Inject constructor(
     private val _contentErrors = MutableStateFlow<List<ContentError>>(emptyList())
     val contentErrors: StateFlow<List<ContentError>> = _contentErrors.asStateFlow()
 
+    private val _showExitConfirmation = MutableStateFlow(false)
+    val showExitConfirmation: StateFlow<Boolean> = _showExitConfirmation.asStateFlow()
+
+    fun setExitConfirmationVisible(visible: Boolean) {
+        _showExitConfirmation.value = visible
+    }
+
+    fun confirmExitToMainMenu() {
+        _showExitConfirmation.value = false
+        setMode(GameScreenMode.MAIN_MENU)
+    }
+
     fun runContentValidation() {
         _contentErrors.value = contentValidator.validateAll()
     }
