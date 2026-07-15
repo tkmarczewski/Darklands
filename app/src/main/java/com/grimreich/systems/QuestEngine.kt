@@ -52,28 +52,19 @@ class QuestEngine @Inject constructor(
 
     private fun evaluateDefinitionStatus(def: QuestDefinition, state: GameState, visited: MutableSet<String>): QuestStatus {
         // --- PRIORITY 1: FINAL STATES ---
-        if (state.quest.completedQuestIds.contains(def.id)) {
-            return QuestStatus.COMPLETED
-        }
-        
-        if (state.quest.failedQuestIds.contains(def.id)) {
-            return QuestStatus.FAILED
-        }
+        if (state.quest.completedQuestIds.contains(def.id)) return QuestStatus.COMPLETED
+        if (state.quest.failedQuestIds.contains(def.id)) return QuestStatus.FAILED
 
         // --- PRIORITY 2: CURRENTLY ACTIVE ---
-        // Rygorystyczne sprawdzenie: jeśli jest w activeQuestIds, to NIE MOŻE być AVAILABLE
         if (state.quest.activeQuestIds.contains(def.id)) {
-            val progress = state.quest.progress[def.id]
-            return progress?.status ?: QuestStatus.ACTIVE
+            return state.quest.progress[def.id]?.status ?: QuestStatus.ACTIVE
         }
 
-        // Logic Requirements
-        val dayOk = state.world.day >= def.minWorldDay
-        val metaOk = state.metaAwarenessLevel >= def.requiredMetaAwareness
-        
-        if (!dayOk || !metaOk) return QuestStatus.LOCKED
+        // --- PRIORITY 3: LOGIC REQUIREMENTS ---
+        if (state.world.day < def.minWorldDay) return QuestStatus.LOCKED
+        if (state.metaAwarenessLevel < def.requiredMetaAwareness) return QuestStatus.LOCKED
 
-        // Special Flags
+        // Special Flags (Campaign Start)
         if (def.id == "q_verdict_1" && !state.quest.worldFlags.contains("verdict_campaign_ready")) {
             return QuestStatus.LOCKED
         }
@@ -87,12 +78,10 @@ class QuestEngine @Inject constructor(
         return QuestStatus.AVAILABLE
     }
 
-    fun activateQuest(questId: String) = activateQuestDirect(gameRepository.currentState(), questId)
-
     fun activateQuestDirect(state: GameState, questId: String) {
         val currentStatus = getStatus(questId, state)
         if (currentStatus != QuestStatus.AVAILABLE) {
-            android.util.Log.d("QuestEngine", "Blokada aktywacji: Quest $questId ma status $currentStatus")
+            android.util.Log.d("QuestEngine", "Activation blocked: $questId is $currentStatus")
             return
         }
         
@@ -101,21 +90,14 @@ class QuestEngine @Inject constructor(
         state.logEntries.add("۞ NOWE ZADANIE: ${getDefinition(questId)?.title ?: questId}")
     }
 
-    fun advanceStep(questId: String) = advanceStepDirect(gameRepository.currentState(), questId)
-
     fun advanceStepDirect(state: GameState, questId: String) {
         val p = state.quest.progress[questId] ?: return
         if (p.status != QuestStatus.ACTIVE) return
         val def = registry[questId] ?: return
         
-        if (def.steps.isEmpty()) {
-            state.quest.progress[questId] = p.copy(status = QuestStatus.OBJECTIVE_MET)
-            state.logEntries.add("CEL OSIĄGNIĘTY: ${def.title}")
-            return
-        }
-
         if (p.currentStepIndex < def.steps.size - 1) {
             state.quest.progress[questId] = p.copy(currentStepIndex = p.currentStepIndex + 1)
+            android.util.Log.d("QuestEngine", "Advanced $questId to step ${p.currentStepIndex + 1}")
         } else {
             state.quest.progress[questId] = p.copy(status = QuestStatus.OBJECTIVE_MET)
             state.logEntries.add("۞ CEL OSIĄGNIĘTY: ${def.title}")
@@ -123,39 +105,39 @@ class QuestEngine @Inject constructor(
         }
     }
 
-    fun completeQuest(questId: String) = completeQuestDirect(gameRepository.currentState(), questId)
-
     fun completeQuestDirect(state: GameState, questId: String) {
-        if (state.quest.completedQuestIds.contains(questId)) return
-        
-        // relatedQuestId from pendingAction should have priority
-        val action = state.pendingAction
-        val actualQuestId = if (questId == "ACTIVE" && action is com.grimreich.core.PendingWorldAction.Dialogue && action.relatedQuestId != null) {
-            action.relatedQuestId!!
-        } else {
-            questId
+        // Resolve "ACTIVE" alias from dialogue context
+        val actualQuestId = if (questId == "ACTIVE") {
+            (state.pendingAction as? com.grimreich.core.PendingWorldAction.Dialogue)?.relatedQuestId ?: questId
+        } else questId
+
+        if (state.quest.completedQuestIds.contains(actualQuestId)) {
+            state.quest.activeQuestIds.remove(actualQuestId)
+            return
         }
 
         val p = state.quest.progress[actualQuestId] ?: return
-        if (p.status != QuestStatus.OBJECTIVE_MET) return
+        // Allow completion if objective met or directly requested (for simple single-step quests)
+        if (p.status != QuestStatus.OBJECTIVE_MET && p.status != QuestStatus.ACTIVE) return
         
         val def = registry[actualQuestId] ?: return
+        
+        // --- ATOMIC TRANSITION ---
         state.quest.activeQuestIds.remove(actualQuestId)
         state.quest.completedQuestIds.add(actualQuestId)
         state.quest.progress[actualQuestId] = p.copy(status = QuestStatus.COMPLETED)
-        state.gold += def.rewardGold
-        val xpMessages = experienceSystem.addPartyXpDirect(state, def.recommendedLevel * 50)
         
-        state.logEntries.add("ZADANIE UKOŃCZONE: ${def.title}. Otrzymano nagrodę: ${def.rewardGold} zł.")
-        state.logEntries.addAll(xpMessages)
+        state.gold += def.rewardGold
+        experienceSystem.addPartyXpDirect(state, def.recommendedLevel * 50).forEach { state.logEntries.add(it) }
+        
+        state.logEntries.add("۞ ZADANIE UKOŃCZONE: ${def.title}")
+        android.util.Log.i("QuestEngine", "Quest $actualQuestId COMPLETED and removed from active list.")
     }
 
     fun failQuestDirect(state: GameState, questId: String) {
         state.quest.activeQuestIds.remove(questId)
         state.quest.failedQuestIds.add(questId)
-        state.quest.progress[questId]?.let {
-            state.quest.progress[questId] = it.copy(status = QuestStatus.FAILED)
-        }
+        state.quest.progress[questId] = state.quest.progress[questId]?.copy(status = QuestStatus.FAILED) ?: QuestProgress(questId, QuestStatus.FAILED)
     }
 
     fun getCurrentObjective(questId: String, state: GameState? = null): String {
@@ -166,7 +148,7 @@ class QuestEngine @Inject constructor(
         return if (p.status == QuestStatus.OBJECTIVE_MET) {
             "Wróć do: ${def.originNpcId.uppercase()}"
         } else {
-            def.steps.getOrNull(p.currentStepIndex)?.description ?: "???"
+            def.steps.getOrNull(p.currentStepIndex)?.description ?: def.description
         }
     }
 
