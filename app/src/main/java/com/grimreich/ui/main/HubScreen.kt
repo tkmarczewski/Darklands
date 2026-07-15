@@ -72,7 +72,7 @@ fun HubScreen(
                 // 1. LEWY KAFEL: LOGI (KRONIKA)
                 GothicObsidianCard(modifier = Modifier.weight(0.7f).fillMaxHeight()) {
                     Text(text = stringResource(R.string.hub_chronicle_label), color = Color(0xFFC0A060), fontSize = 10.sp, fontWeight = FontWeight.Bold)
-                    Divider(color = Color(0x33C0A060), thickness = 1.dp, modifier = Modifier.padding(vertical = 4.dp))
+                    HorizontalDivider(color = Color(0x33C0A060), thickness = 1.dp, modifier = Modifier.padding(vertical = 4.dp))
                     LazyColumn(modifier = Modifier.fillMaxSize()) {
                         items(state.latestLogs) { log ->
                             Text(text = "> $log", color = Color.LightGray, fontSize = 11.sp, modifier = Modifier.padding(bottom = 4.dp))
@@ -100,13 +100,16 @@ fun HubScreen(
 
                 // 3. PRAWY KAFEL: NAWIGACJA (MAPA + AKCJE)
                 Column(modifier = Modifier.weight(0.7f).fillMaxHeight()) {
-                    GothicObsidianCard(modifier = Modifier.weight(1f)) {
+                    GothicObsidianCard(modifier = Modifier.weight(0.6f)) {
                         ParchmentMinimap(locationName = state.locationName)
                     }
                     Spacer(modifier = Modifier.height(4.dp))
-                    GothicObsidianCard(modifier = Modifier.weight(1f), headerColor = Color(0xFF1B5E20)) {
+                    GothicObsidianCard(modifier = Modifier.weight(1.4f), headerColor = Color(0xFF1B5E20)) {
                         Text(text = stringResource(R.string.hub_actions_label), color = Color(0xFFC0A060), fontSize = 10.sp, fontWeight = FontWeight.Bold)
-                        Column(verticalArrangement = Arrangement.spacedBy(4.dp), modifier = Modifier.padding(top = 8.dp)) {
+                        Column(
+                            verticalArrangement = Arrangement.spacedBy(4.dp), 
+                            modifier = Modifier.padding(top = 8.dp).verticalScroll(rememberScrollState())
+                        ) {
                             NavTabV9(stringResource(R.string.hub_btn_to_city), onClick = onCity)
                             NavTabV9(stringResource(R.string.hub_btn_to_map), onClick = onMap)
                             

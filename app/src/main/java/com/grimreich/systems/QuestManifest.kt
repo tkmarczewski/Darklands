@@ -9,7 +9,7 @@ import javax.inject.Singleton
 
 @Singleton
 class QuestManifest @Inject constructor(
-    @ApplicationContext private val context: Context,
+    @param:ApplicationContext private val context: Context,
     private val engine: QuestEngine
 ) {
     private val gson = Gson()

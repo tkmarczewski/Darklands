@@ -100,7 +100,7 @@ fun CityContent(
                 // 1. LEWY KAFEL: STATUS MIASTA I LOGI
                 GothicObsidianCard(modifier = Modifier.weight(0.7f).fillMaxHeight()) {
                     Text(text = stringResource(R.string.city_manifest_label), color = Color(0xFFC0A060), fontSize = 10.sp, fontWeight = FontWeight.Bold)
-                    Divider(color = Color(0x33C0A060), thickness = 1.dp, modifier = Modifier.padding(vertical = 4.dp))
+                    HorizontalDivider(color = Color(0x33C0A060), thickness = 1.dp, modifier = Modifier.padding(vertical = 4.dp))
                     LazyColumn(modifier = Modifier.fillMaxSize()) {
                         item {
                             Text(text = state.cityStatus, color = Color.LightGray, fontSize = 11.sp)

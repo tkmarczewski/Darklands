@@ -53,7 +53,7 @@ fun TempleScreen(
                 // 1. LEWY KAFEL: LOGI I OBJAWIENIA
                 GothicObsidianCard(modifier = Modifier.weight(0.8f).fillMaxHeight()) {
                     Text(text = "DZIENNIK DUSZY", color = Color(0xFFC0A060), fontSize = 10.sp, fontWeight = FontWeight.Bold)
-                    Divider(color = Color(0x33C0A060), thickness = 1.dp, modifier = Modifier.padding(vertical = 4.dp))
+                    HorizontalDivider(color = Color(0x33C0A060), thickness = 1.dp, modifier = Modifier.padding(vertical = 4.dp))
                     
                     LazyColumn(modifier = Modifier.fillMaxSize()) {
                         item {
@@ -83,7 +83,7 @@ fun TempleScreen(
                 // 2. ŚRODKOWY KAFEL: DRUŻYNA (POSŁUGA)
                 GothicObsidianCard(modifier = Modifier.weight(1.2f).fillMaxHeight(), headerColor = Color(0xFF1A237E)) {
                     Text(text = "STAN DUCHOWY", color = Color(0xFFC0A060), fontSize = 10.sp, fontWeight = FontWeight.Bold)
-                    Divider(color = Color(0x33C0A060), thickness = 1.dp, modifier = Modifier.padding(vertical = 4.dp))
+                    HorizontalDivider(color = Color(0x33C0A060), thickness = 1.dp, modifier = Modifier.padding(vertical = 4.dp))
                     
                     LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                         items(state.party) { hero ->
@@ -104,7 +104,7 @@ fun TempleScreen(
                 Column(modifier = Modifier.weight(0.7f).fillMaxHeight()) {
                     GothicObsidianCard(modifier = Modifier.weight(1f), headerColor = Color(0xFF4A148C)) {
                         Text(text = "RYTUAŁY", color = Color(0xFFC0A060), fontSize = 10.sp, fontWeight = FontWeight.Bold)
-                        Divider(color = Color(0x33C0A060), thickness = 1.dp, modifier = Modifier.padding(vertical = 4.dp))
+                        HorizontalDivider(color = Color(0x33C0A060), thickness = 1.dp, modifier = Modifier.padding(vertical = 4.dp))
                         
                         Column(verticalArrangement = Arrangement.spacedBy(4.dp), modifier = Modifier.padding(top = 4.dp)) {
                             NavTabV9("ZŁÓŻ OFIARĘ (100 G)", onClick = { viewModel.makeOffering(100) }, color = Color(0xFF2E1A1A))

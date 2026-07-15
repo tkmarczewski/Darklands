@@ -51,7 +51,7 @@ fun MarketScreen(
                 // 1. LEWY KAFEL: TWOJE ZAPASY (EKWIPUNEK)
                 GothicObsidianCard(modifier = Modifier.weight(0.8f).fillMaxHeight(), headerColor = Color(0xFF1B5E20)) {
                     Text(text = "TWOJE ZAPASY", color = Color(0xFFC0A060), fontSize = 10.sp, fontWeight = FontWeight.Bold)
-                    Divider(color = Color(0x33C0A060), thickness = 1.dp, modifier = Modifier.padding(vertical = 4.dp))
+                    HorizontalDivider(color = Color(0x33C0A060), thickness = 1.dp, modifier = Modifier.padding(vertical = 4.dp))
                     
                     if (state.itemsToSell.isEmpty()) {
                         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -76,7 +76,7 @@ fun MarketScreen(
                 // 2. ŚRODKOWY KAFEL: OFERTA HANDLARZA
                 GothicObsidianCard(modifier = Modifier.weight(1.2f).fillMaxHeight(), headerColor = Color(0xFF4A0000)) {
                     Text(text = "LOKALNE TOWARY", color = Color(0xFFC0A060), fontSize = 10.sp, fontWeight = FontWeight.Bold)
-                    Divider(color = Color(0x33C0A060), thickness = 1.dp, modifier = Modifier.padding(vertical = 4.dp))
+                    HorizontalDivider(color = Color(0x33C0A060), thickness = 1.dp, modifier = Modifier.padding(vertical = 4.dp))
                     
                     LazyColumn(verticalArrangement = Arrangement.spacedBy(6.dp)) {
                         items(state.itemsForSale) { item ->
@@ -97,7 +97,7 @@ fun MarketScreen(
                 Column(modifier = Modifier.weight(0.7f).fillMaxHeight()) {
                     GothicObsidianCard(modifier = Modifier.weight(1f), headerColor = Color(0xFF0D47A1)) {
                         Text(text = "INFORMACJE", color = Color(0xFFC0A060), fontSize = 10.sp, fontWeight = FontWeight.Bold)
-                        Divider(color = Color(0x33C0A060), thickness = 1.dp, modifier = Modifier.padding(vertical = 4.dp))
+                        HorizontalDivider(color = Color(0x33C0A060), thickness = 1.dp, modifier = Modifier.padding(vertical = 4.dp))
                         
                         state.errorMessage?.let {
                             Text(text = "OSTRZEŻENIE: $it", color = Color.Red, fontSize = 11.sp, fontWeight = FontWeight.Bold)

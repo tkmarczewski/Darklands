@@ -86,7 +86,7 @@ fun ExpeditionContent(
                 // 1. LEWY KAFEL: LOGI I ZAPISY TRYBUNAŁU
                 GothicObsidianCard(modifier = Modifier.weight(0.7f).fillMaxHeight()) {
                     Text(text = stringResource(R.string.expedition_logs_label), color = Color(0xFFC0A060), fontSize = 10.sp, fontWeight = FontWeight.Bold)
-                    Divider(color = Color(0x33C0A060), thickness = 1.dp, modifier = Modifier.padding(vertical = 4.dp))
+                    HorizontalDivider(color = Color(0x33C0A060), thickness = 1.dp, modifier = Modifier.padding(vertical = 4.dp))
                     
                     val content = state.content
                     if (content is ExpeditionContentState.EncounterLog) {
@@ -129,7 +129,7 @@ fun ExpeditionContent(
                 Column(modifier = Modifier.weight(0.7f).fillMaxHeight()) {
                     GothicObsidianCard(modifier = Modifier.weight(1f), headerColor = Color(0xFF1B5E20)) {
                         Text(text = stringResource(R.string.expedition_active_objectives), color = Color(0xFFC0A060), fontSize = 10.sp, fontWeight = FontWeight.Bold)
-                        Divider(color = Color(0x33C0A060), thickness = 1.dp, modifier = Modifier.padding(vertical = 4.dp))
+                        HorizontalDivider(color = Color(0x33C0A060), thickness = 1.dp, modifier = Modifier.padding(vertical = 4.dp))
                         
                         val quests = (state.content as? ExpeditionContentState.QuestList)?.quests ?: emptyList()
                         if (quests.isEmpty()) {

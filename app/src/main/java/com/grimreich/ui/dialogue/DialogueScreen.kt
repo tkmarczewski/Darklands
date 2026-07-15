@@ -55,7 +55,7 @@ fun DialogueScreen(
                 // 1. LEWY KAFEL: LOGI I KRONIKA SPOTKANIA
                 GothicObsidianCard(modifier = Modifier.weight(0.7f).fillMaxHeight()) {
                     Text(text = "KRONIKA SPOTKANIA", color = Color(0xFFC0A060), fontSize = 10.sp, fontWeight = FontWeight.Bold)
-                    Divider(color = Color(0x33C0A060), thickness = 1.dp, modifier = Modifier.padding(vertical = 4.dp))
+                    HorizontalDivider(color = Color(0x33C0A060), thickness = 1.dp, modifier = Modifier.padding(vertical = 4.dp))
                     
                     Text(
                         text = "> Każde słowo zostaje zapisane. Trybunał obserwuje Twoje wybory.",
@@ -83,7 +83,7 @@ fun DialogueScreen(
                             }
                         }
                         
-                        Divider(color = Color(0x33C0A060), thickness = 1.dp, modifier = Modifier.padding(vertical = 8.dp))
+                        HorizontalDivider(color = Color(0x33C0A060), thickness = 1.dp, modifier = Modifier.padding(vertical = 8.dp))
                         
                         // TEKST DIALOGU
                         val rawText = state.currentNode?.text ?: "Cisza..."
@@ -103,7 +103,7 @@ fun DialogueScreen(
                 Column(modifier = Modifier.weight(0.7f).fillMaxHeight()) {
                     GothicObsidianCard(modifier = Modifier.weight(1f), headerColor = Color(0xFF1B5E20)) {
                         Text(text = "WYBORY", color = Color(0xFFC0A060), fontSize = 10.sp, fontWeight = FontWeight.Bold)
-                        Divider(color = Color(0x33C0A060), thickness = 1.dp, modifier = Modifier.padding(vertical = 4.dp))
+                        HorizontalDivider(color = Color(0x33C0A060), thickness = 1.dp, modifier = Modifier.padding(vertical = 4.dp))
                         
                         if (state.availableChoices.isEmpty() || state.currentNode == null) {
                             NavTabV9("ZAKOŃCZ ROZMOWĘ", onClick = onExit, color = Color(0xFF400000))

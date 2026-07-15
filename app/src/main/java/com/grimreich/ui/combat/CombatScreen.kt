@@ -65,7 +65,7 @@ fun CombatScreen(
                 // 1. LEWY KAFEL: LOGI BITWNE (TRIBUNAL LOG)
                 GothicObsidianCard(modifier = Modifier.weight(0.7f).fillMaxHeight()) {
                     Text(text = "TRIBUNAL_LOG_014", color = Color(0xFFC0A060), fontSize = 10.sp, fontWeight = FontWeight.Bold)
-                    Divider(color = Color(0x33C0A060), thickness = 1.dp, modifier = Modifier.padding(vertical = 4.dp))
+                    HorizontalDivider(color = Color(0x33C0A060), thickness = 1.dp, modifier = Modifier.padding(vertical = 4.dp))
                     
                     val reversedLogs = remember(state.combat.log) { state.combat.log.asReversed() }
                     LazyColumn(modifier = Modifier.fillMaxSize(), reverseLayout = true) {
@@ -129,7 +129,7 @@ fun CombatScreen(
                 Column(modifier = Modifier.weight(0.7f).fillMaxHeight()) {
                     GothicObsidianCard(modifier = Modifier.weight(1.2f), headerColor = Color(0xFF4527A0)) {
                         Text(text = "UMIEJĘTNOŚCI", color = Color(0xFFC0A060), fontSize = 10.sp, fontWeight = FontWeight.Bold)
-                        Divider(color = Color(0x33C0A060), thickness = 1.dp, modifier = Modifier.padding(vertical = 4.dp))
+                        HorizontalDivider(color = Color(0x33C0A060), thickness = 1.dp, modifier = Modifier.padding(vertical = 4.dp))
                         
                         LazyColumn(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                             items(state.availableSkills) { skill ->
