@@ -24,7 +24,7 @@ fun ExitConfirmationDialog(
         },
         text = {
             Text(
-                text = "Czy na pewno chcesz przerwać obecną sesję i wrócić do menu głównego? Niezapisane postępy mogą zostać utracone w Pęknięciu.",
+                text = "Czy chcesz przerwać obecną sesję i wrócić do menu głównego? Twój stan zostanie automatycznie zapisany w Kronice.",
                 color = Color.White
             )
         },

@@ -47,6 +47,7 @@ class GameRootViewModel @Inject constructor(
 
     fun confirmExitToMainMenu() {
         _showExitConfirmation.value = false
+        saveGame() // Wymuszenie zapisu przed wyjściem
         setMode(GameScreenMode.MAIN_MENU)
     }
 
