@@ -62,4 +62,39 @@ class RitualSystem @Inject constructor(
         }
         return success
     }
+
+    // --- OLD RITUAL METHODS (Refactoring Compatibility) ---
+
+    fun canPerformResurrection(hero: Hero, gold: Int): Boolean {
+        return hero.isDead && gold >= 100
+    }
+
+    fun performResurrection(heroId: String): Boolean {
+        var success = false
+        gameRepository.updateState { state ->
+            val hero = state.party.find { it.id == heroId }
+            if (hero != null && state.gold >= 100) {
+                state.gold -= 100
+                hero.isDead = false
+                hero.hp = 1
+                hero.sanity -= 15
+                hero.corruption += 20
+                state.world.globalStability -= 15
+                state.logEntries.add("RYTUAŁ: ${hero.name} powrócił z Pęknięcia, ale nie jest już taki sam.")
+                hero.normalize()
+                success = true
+            }
+        }
+        return success
+    }
+
+    fun sacrificeHero(heroId: String) {
+        gameRepository.updateState { state ->
+            val hero = state.party.find { it.id == heroId }
+            if (hero != null) {
+                state.party.remove(hero)
+                state.logEntries.add("RYTUAŁ: Ciało ${hero.name} zostało złożone w ofierze. Pustka jest zadowolona.")
+            }
+        }
+    }
 }
