@@ -8,17 +8,13 @@
         "text": "Melduję wykonanie wyroku (Wyrok Inkwizycji).",
         "targetNodeId": "guard_verdict_done",
         "requiredQuestId": "q_inquisition_verdict",
-        "requiredQuestStatus": "OBJECTIVE_MET",
-        "triggerEvent": "COMPLETE_QUEST",
-        "triggerValue": "q_inquisition_verdict"
+        "requiredQuestStatus": "OBJECTIVE_MET"
       },
       {
         "text": "Melduję o dezerterze (ZADANIE: Dezerter).",
         "targetNodeId": "guard_deserter_done",
         "requiredQuestId": "q_deserter",
-        "requiredQuestStatus": "OBJECTIVE_MET",
-        "triggerEvent": "COMPLETE_QUEST",
-        "triggerValue": "q_deserter"
+        "requiredQuestStatus": "OBJECTIVE_MET"
       },
       {
         "text": "Czy coś niepokojącego działo się ostatnio?",
@@ -66,9 +62,7 @@
       {
         "text": "Jesteś niebezpieczny. Muszę cię uciszyć (WALKA).",
         "targetNodeId": "end",
-        "isCombatTrigger": true,
-        "triggerEvent": "ADVANCE_QUEST",
-        "triggerValue": "q_deserter"
+        "isCombatTrigger": true
       }
     ]
   },
@@ -137,9 +131,7 @@
         "text": "Przynoszę zioła z mgły (Żniwa Mgły).",
         "targetNodeId": "merchant_report_back",
         "requiredQuestId": "q_coast_harvest",
-        "requiredQuestStatus": "OBJECTIVE_MET",
-        "triggerEvent": "ADVANCE_QUEST",
-        "triggerValue": "q_coast_harvest"
+        "requiredQuestStatus": "OBJECTIVE_MET"
       },
       {
         "text": "Pokaż mi swoje towary.",
@@ -283,6 +275,12 @@
     "npcId": "mira",
     "text": "Słowa są fragmentami prawdy... Jakby rzeczywistość próbowała wymazać własną historię. Czy pomożesz mi ją ocalić?",
     "choices": [
+      {
+        "text": "Zamelduję o anomalii (Cienie Archiwistów).",
+        "targetNodeId": "mira_report_back",
+        "requiredQuestId": "q_scribes_1",
+        "requiredQuestStatus": "OBJECTIVE_MET"
+      },
       {
         "text": "Zbadam te pęknięcia.",
         "targetNodeId": "end",
@@ -534,7 +532,7 @@
   {
     "id": "quest_report_back_generic",
     "npcId": "npc",
-    "text": "A więc udało ci się? Doskonale. Twoje wysiłki nie pójdą na marne, wędrowcze.",
+    "text": "A więc udało ci się? Doskonale. Twoje wysiłki nie pojdą na marne, wędrowcze.",
     "choices": [
       {
         "text": "Dziękuję za nagrodę (ZAKOŃCZ).",
