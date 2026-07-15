@@ -136,5 +136,257 @@
         "triggerValue": "q_meta_7"
       }
     ]
+  },
+  {
+    "id": "masked_impostor_reveal",
+    "npcId": "guard",
+    "text": "To niemożliwe... Wyglądasz dokładnie jak on. Ale on przed chwilą wszedł do Karczmy!",
+    "choices": [
+      { "text": "To oszustwo. Prowadź mnie do niego.", "targetNodeId": "end", "triggerEvent": "ADVANCE_QUEST", "triggerValue": "q_three_masks" }
+    ]
+  },
+  {
+    "id": "raven_messenger",
+    "npcId": "assassin",
+    "text": "Bractwo nie zapomina. Twoja krew należy do nas, Kotwico.",
+    "choices": [
+      { "text": "Próbujcie ją odebrać.", "targetNodeId": "end", "isCombatTrigger": true, "triggerEvent": "ADVANCE_QUEST", "triggerValue": "q_raven_oath" }
+    ]
+  },
+  {
+    "id": "ritual_seal_start",
+    "npcId": "ritualist",
+    "text": "Ostatnia pieczęć wymaga Twojego podpisu na eterze. Czy jesteś gotów stać się częścią Maszyny?",
+    "choices": [
+      { "text": "Nigdy.", "targetNodeId": "end", "isCombatTrigger": true, "triggerEvent": "ADVANCE_QUEST", "triggerValue": "q_ritualist_seal" }
+    ]
+  },
+  {
+    "id": "voice_inside_head",
+    "npcId": "none",
+    "text": "(Twój własny głos szepcze w Twoim umyśle): 'Wszystko, co widzisz, jest tylko odbiciem. Ty jesteś oryginałem, ale oni chcą Twojej symetrii.'",
+    "choices": [
+      { "text": "Odejdź z moich myśli.", "targetNodeId": "end", "triggerEvent": "ADVANCE_QUEST", "triggerValue": "q_not_your_voice" }
+    ]
+  },
+  {
+    "id": "forbidden_book_dialogue",
+    "npcId": "archivist",
+    "text": "Księga zaczęła zapisywać Twoją śmierć. Patrz, atrament wciąż jest mokry...",
+    "choices": [
+      { "text": "Zniszczę to przeznaczenie.", "targetNodeId": "end", "triggerEvent": "ADVANCE_QUEST", "triggerValue": "q_book_writes_itself" }
+    ]
+  },
+  {
+    "id": "ghost_ship_start",
+    "npcId": "none",
+    "text": "Statki nie mają załogi, a ich żagle są utkane z mgły. Słyszysz jednak dzwon bijący pod pokładem.",
+    "choices": [
+      { "text": "Zbadaj ładownię.", "targetNodeId": "end", "triggerEvent": "ADVANCE_QUEST", "triggerValue": "q_stone_haven_dusk" }
+    ]
+  },
+  {
+    "id": "ruin_heart_silence",
+    "npcId": "none",
+    "text": "W centrum ruin bije wielkie, kamienne serce. Z każdym uderzeniem świat traci nasycenie kolorów.",
+    "choices": [
+      { "text": "Ustabilizuj tętno ruin.", "targetNodeId": "end", "triggerEvent": "ADVANCE_QUEST", "triggerValue": "q_black_maw_wakes" }
+    ]
+  },
+  {
+    "id": "void_bridge_crossing",
+    "npcId": "none",
+    "text": "Most pod Twoimi stopami wydaje się być tylko sugestią. Pod nim nie ma nawet ciemności – jest tylko Nicość.",
+    "choices": [
+      { "text": "Idź naprzód, nie patrząc w dół.", "targetNodeId": "end", "triggerEvent": "ADVANCE_QUEST", "triggerValue": "q_bridge_over_nothing" }
+    ]
+  },
+  {
+    "id": "storm_summoning",
+    "npcId": "none",
+    "text": "Wznosisz ręce, a niebo odpowiada rykiem statycznego szumu. Burza echa nadchodzi.",
+    "choices": [
+      { "text": "Czekaj na manifestację Świątyni.", "targetNodeId": "end", "triggerEvent": "ADVANCE_QUEST", "triggerValue": "q_vanishing_temple" }
+    ]
+  },
+  {
+    "id": "phantom_temple_enter",
+    "npcId": "none",
+    "text": "Świątynia lśni w świetle błyskawic. Drzwi są otwarte, ale w środku czas wydaje się stać w miejscu.",
+    "choices": [
+      { "text": "Wejdź do środka.", "targetNodeId": "end", "triggerEvent": "ADVANCE_QUEST", "triggerValue": "q_vanishing_temple" }
+    ]
+  },
+  {
+    "id": "mine_whisper_source",
+    "npcId": "none",
+    "text": "Szepty dobiegają ze szczeliny w skale. To nie ludzie – to same ściany kopalni pamiętają głosy tych, którzy tu zginęli.",
+    "choices": [
+      { "text": "Zamurować to miejsce (Cisza).", "targetNodeId": "end", "triggerEvent": "ADVANCE_QUEST", "triggerValue": "q_whispering_mine" }
+    ]
+  },
+  {
+    "id": "witch_swamp_choice",
+    "npcId": "none",
+    "text": "Szeptucha uśmiecha się, pokazując zęby z czarnego szkła. 'Daj mi swoje najpiękniejsze wspomnienie, a mgła się rozstąpi.'",
+    "choices": [
+      { "text": "Oddaj wspomnienie (Płacisz cenę).", "targetNodeId": "end", "triggerEvent": "ADVANCE_QUEST", "triggerValue": "q_swamp_witch" },
+      { "text": "Walcz z wiedźmą.", "targetNodeId": "end", "isCombatTrigger": true, "triggerEvent": "ADVANCE_QUEST", "triggerValue": "q_swamp_witch" }
+    ]
+  },
+  {
+    "id": "vampire_monk_dialogue",
+    "npcId": "monk",
+    "text": "Brat Tomasz nie pije wina... on pije tylko czerwony atrament z Kroniki. A potem Kronika staje się pusta.",
+    "choices": [
+      { "text": "Znajdź brata Tomasza.", "targetNodeId": "end", "triggerEvent": "ADVANCE_QUEST", "triggerValue": "q_monastery_bloodsucker" }
+    ]
+  },
+  {
+    "id": "mist_child_final",
+    "npcId": "peasant",
+    "text": "Dziecko stoi w centrum mgły i płacze czystym światłem. Tam, gdzie spadają jego łzy, rzeczywistość pęka.",
+    "choices": [
+      { "text": "Pociesz dziecko (Stabilizacja).", "targetNodeId": "end", "triggerEvent": "ADVANCE_QUEST", "triggerValue": "q_mist_child" },
+      { "text": "Wygasz manifestację (Zniszczenie).", "targetNodeId": "end", "triggerEvent": "ADVANCE_QUEST", "triggerValue": "q_mist_child" }
+    ]
+  },
+  {
+    "id": "talking_dog_revelation",
+    "npcId": "none",
+    "text": "Pies siada i mówi ludzkim głosem: 'Jesteś tylko pionkiem w grze, której zasady zmieniają się w trakcie rzutu kością.'",
+    "choices": [
+      { "text": "Wiem o tym.", "targetNodeId": "end", "triggerEvent": "ADVANCE_QUEST", "triggerValue": "q_talking_dog" }
+    ]
+  },
+  {
+    "id": "undying_mother_end",
+    "npcId": "none",
+    "text": "Gdy artefakt dotyka jej czoła, czas w końcu dogania jej ciało. 'Dziękuję...', szepcze, rozsypując się w pył.",
+    "choices": [
+      { "text": "Odpocznij w pokoju.", "targetNodeId": "end", "triggerEvent": "COMPLETE_QUEST", "triggerValue": "q_undying_mother" }
+    ]
+  },
+  {
+    "id": "soul_sync_ritual",
+    "npcId": "none",
+    "text": "Dwie dusze w jednym ciele zaczynają wibrować z tą samą częstotliwością. Harmonia powraca.",
+    "choices": [
+      { "text": "Zakończ rytuał.", "targetNodeId": "end", "triggerEvent": "COMPLETE_QUEST", "triggerValue": "q_two_soul_child" }
+    ]
+  },
+  {
+    "id": "lost_squad_interrogation",
+    "npcId": "guard",
+    "text": "Twierdzą, że wyszli z obozu wczoraj. Ale ich mundury są z czasów Pierwszej Krwi.",
+    "choices": [
+      { "text": "Znajdź lukę w ich zeznaniach.", "targetNodeId": "end", "triggerEvent": "ADVANCE_QUEST", "triggerValue": "q_lost_squad" }
+    ]
+  },
+  {
+    "id": "demon_shadow_truth",
+    "npcId": "merchant",
+    "text": "Widzisz to? Ich cienie mają rogi i ogony. Oni nie są klientami – oni są strażnikami Twojego więzienia.",
+    "choices": [
+      { "text": "Teraz to widzę.", "targetNodeId": "end", "triggerEvent": "ADVANCE_QUEST", "triggerValue": "q_demon_merchant" }
+    ]
+  },
+  {
+    "id": "brother_fate_choice",
+    "npcId": "peasant",
+    "text": "On ma Twoje oczy, ale patrzy przez nie coś obcego. Czy to wciąż Twój brat?",
+    "choices": [
+      { "text": "Przyjmij go takim, jakim jest.", "targetNodeId": "end", "triggerEvent": "ADVANCE_QUEST", "triggerValue": "q_returned_brother" },
+      { "text": "Pozwól mu odejść z powrotem do mgły.", "targetNodeId": "end", "triggerEvent": "ADVANCE_QUEST", "triggerValue": "q_returned_brother" }
+    ]
+  },
+  {
+    "id": "village_judge_start",
+    "npcId": "peasant",
+    "text": "Wybieraj, Kotwico. Jeden musi zginąć, by reszta mogła żyć. Takie jest prawo stabilności.",
+    "choices": [
+      { "text": "Wysłuchaj obu stron.", "targetNodeId": "end", "triggerEvent": "ADVANCE_QUEST", "triggerValue": "q_village_judgment" }
+    ]
+  },
+  {
+    "id": "village_judge_final",
+    "npcId": "peasant",
+    "text": "Twój wyrok został zapisany w Kronice. Niech krew spłynie na fundamenty.",
+    "choices": [
+      { "text": "Wykonaj wyrok.", "targetNodeId": "end", "triggerEvent": "ADVANCE_QUEST", "triggerValue": "q_village_judgment" }
+    ]
+  },
+  {
+    "id": "dream_world_enter",
+    "npcId": "none",
+    "text": "Rzeczywistość rozpływa się w kolorach akwareli. Jesteś w Świecie Snów.",
+    "choices": [
+      { "text": "Odszukaj Złodzieja.", "targetNodeId": "end", "triggerEvent": "ADVANCE_QUEST", "triggerValue": "q_dream_thief" }
+    ]
+  },
+  {
+    "id": "faceless_restore",
+    "npcId": "none",
+    "text": "Gdy lustrzany odłamek dotyka pustki w miejscu twarzy, rysy wędrowca zaczynają się formować. 'W końcu... widzę siebie.'",
+    "choices": [
+      { "text": "Twoja podróż dobiegła końca.", "targetNodeId": "end", "triggerEvent": "COMPLETE_QUEST", "triggerValue": "q_faceless_wanderer" }
+    ]
+  },
+  {
+    "id": "jester_interact",
+    "npcId": "none",
+    "text": "Błazen tańczy na krawędzi murów obronnych. 'Chcesz znać sekret Dowódcy? To kosztuje więcej niż złoto – kosztuje zdrowy rozsądek.'",
+    "choices": [
+      { "text": "Powiedz mi wszystko.", "targetNodeId": "end", "triggerEvent": "COMPLETE_QUEST", "triggerValue": "q_jester_laugh" }
+    ]
+  },
+  {
+    "id": "verdict_runes",
+    "npcId": "none",
+    "text": "Runy układają się w słowo: 'REBOOT'. Ale nie restart świata, lecz restart Twojej roli w nim.",
+    "choices": [
+      { "text": "Zrozum kod.", "targetNodeId": "end", "triggerEvent": "ADVANCE_QUEST", "triggerValue": "q_verdict_1" }
+    ]
+  },
+  {
+    "id": "tribunal_hall_start",
+    "npcId": "none",
+    "text": "Sala jest pełna posągów sędziów. Wszystkie głowy obracają się w Twoją stronę w tej samej sekundzie.",
+    "choices": [
+      { "text": "Przyjmij wyrok.", "targetNodeId": "end", "triggerEvent": "ADVANCE_QUEST", "triggerValue": "q_verdict_4" }
+    ]
+  },
+  {
+    "id": "verdict_final_choice",
+    "npcId": "none",
+    "text": "Stoisz przed ostatecznym wyborem. Czy zostaniesz częścią Szyfru, czy zniszczysz Kronikę raz na zawsze?",
+    "choices": [
+      { "text": "Zniszcz Kronikę (Koniec wszystkiego).", "targetNodeId": "end", "triggerEvent": "COMPLETE_QUEST", "triggerValue": "q_verdict_5" },
+      { "text": "Stań się Sędzią (Wieczna stabilność).", "targetNodeId": "end", "triggerEvent": "COMPLETE_QUEST", "triggerValue": "q_verdict_5" }
+    ]
+  },
+  {
+    "id": "witness_girl_dialogue",
+    "npcId": "peasant",
+    "text": "Widziałam Twoje oczy we mgle... były pełne cyfr i błyskawic. To Ty byłeś tym potworem.",
+    "choices": [
+      { "text": "To nie byłem ja.", "targetNodeId": "end", "triggerEvent": "ADVANCE_QUEST", "triggerValue": "q_blood_2" }
+    ]
+  },
+  {
+    "id": "void_white_noise",
+    "npcId": "none",
+    "text": "Szum w uszach staje się zrozumiały. To nie jest dźwięk – to instrukcja obsługi Twojej własnej duszy.",
+    "choices": [
+      { "text": "Przyswój instrukcję.", "targetNodeId": "end", "triggerEvent": "ADVANCE_QUEST", "triggerValue": "q_void_whisper" }
+    ]
+  },
+  {
+    "id": "ledger_signing",
+    "npcId": "none",
+    "text": "Pióro skryby jest gorące. Gdy stawiasz swój znak na Ledgerze, czujesz, jak Twoje instanceId zostaje na zawsze wyryte w pamięci trwałej.",
+    "choices": [
+      { "text": "Zatwierdzam protokół.", "targetNodeId": "end", "triggerEvent": "ADVANCE_QUEST", "triggerValue": "q_lost_scribe" }
+    ]
   }
 ]

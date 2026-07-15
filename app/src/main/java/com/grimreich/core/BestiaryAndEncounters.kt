@@ -46,7 +46,9 @@ enum class EnemyType {
     HIDDEN_DEMON,
     BLOOD_CURSE,
     BLOOD_WRAITH,
-    DOPPELGANGER
+    DOPPELGANGER,
+    WINGED_HULK,
+    STEEL_WRAITH
 }
 
 enum class EnemyAI {

@@ -96,6 +96,22 @@
     "xpReward": 40
   },
   {
+    "type": "WINGED_HULK",
+    "name": "Skrzydlaty Kadłub",
+    "stats": { "maxHp": 120, "attack": 30, "defense": 15, "speed": 18, "morale": 40 },
+    "ai": "AGGRESSIVE",
+    "lootTable": { "goldMin": 0, "goldMax": 0, "itemChances": { "ing_bone": 0.5, "ing_echo_dust": 0.2 } },
+    "xpReward": 150
+  },
+  {
+    "type": "STEEL_WRAITH",
+    "name": "Stalowa Mara",
+    "stats": { "maxHp": 100, "attack": 28, "defense": 25, "speed": 12, "morale": 100 },
+    "ai": "DEFENSIVE",
+    "lootTable": { "goldMin": 20, "goldMax": 50, "itemChances": { "ing_stone": 0.5 } },
+    "xpReward": 120
+  },
+  {
     "type": "FALLEN_PRIEST",
     "name": "Upadły Kapłan",
     "stats": { "maxHp": 45, "attack": 20, "defense": 12, "speed": 12, "morale": 30 },
@@ -260,7 +276,7 @@
     "name": "Sobowtór",
     "stats": { "maxHp": 100, "attack": 25, "defense": 20, "speed": 15, "morale": 30 },
     "ai": "TACTICAL",
-    "lootTable": { "goldMin": 50, "goldMax": 100 },
+    "lootTable": { "goldMin": 50, "goldMax": 100, "itemChances": {} },
     "xpReward": 100
   }
 ]

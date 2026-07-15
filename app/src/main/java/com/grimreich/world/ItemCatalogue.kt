@@ -74,6 +74,8 @@ class ItemCatalogue @Inject constructor() {
         reg(id = "ing_bone", name = "Kość", type = "ingredient", value = 2, weight = 0.5)
         reg(id = "ing_feather", name = "Pióro", type = "ingredient", value = 3, weight = 0.05)
         reg(id = "ing_echo_dust", name = "Pył Echa", type = "ingredient", value = 15, weight = 0.1)
+        reg(id = "ing_stone", name = "Kamień", type = "ingredient", value = 1, weight = 1.0)
+        reg(id = "ing_gold_ore", name = "Ruda złota", type = "ingredient", value = 100, weight = 5.0)
 
         // QUEST ITEMS
         reg(
