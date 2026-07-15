@@ -41,6 +41,9 @@ class CharacterCreatorViewModel @Inject constructor(
     val uiState: StateFlow<CharacterCreatorUiState> = _uiState.asStateFlow()
 
     init {
+        // Initial setup for default career (PAGE)
+        selectCareer(Career.PAGE)
+
         // Check for Legacy Buffs
         val meta = gameRepository.currentState().persistentMeta
         if (meta.unlockedLegacyBuffs.contains("SCRIBES_EYE")) {
@@ -112,14 +115,21 @@ class CharacterCreatorViewModel @Inject constructor(
 
     private fun availableSkillsForCareer(career: Career): List<HeroSkill> {
         val allSkills = HeroSkill.entries
-        return when (career) {
+        val baseSkills = when (career) {
             Career.KNIGHT -> allSkills.filter { it.group == SkillGroup.WEAPON || it.group == SkillGroup.ARMOR }
-            Career.ALCHEMIST -> allSkills.filter { it.group == SkillGroup.ACADEMIC || it.displayName == "ALCH" }
+            Career.ALCHEMIST -> allSkills.filter { it.group == SkillGroup.ACADEMIC || it == HeroSkill.ALCH }
             Career.GUARD -> allSkills.filter { it.group == SkillGroup.WEAPON || it.group == SkillGroup.SURVIVAL }
             Career.SCHOLAR -> allSkills.filter { it.group == SkillGroup.ACADEMIC }
             Career.PRIEST, Career.MONK -> allSkills.filter { it.group == SkillGroup.SPIRITUAL || it.group == SkillGroup.ACADEMIC }
             Career.THIEF, Career.ROGUE -> allSkills.filter { it.group == SkillGroup.INTRIGUE || it.group == SkillGroup.SURVIVAL }
             else -> allSkills.filter { it.group == SkillGroup.SURVIVAL || it.group == SkillGroup.WEAPON }
+        }
+        
+        // Fallback: Jeśli filtr jest zbyt ostry, daj dostęp do podstawowych umiejętności przetrwania i walki
+        return if (baseSkills.size < 5) {
+            (baseSkills + allSkills.filter { it.group == SkillGroup.SURVIVAL || it.group == SkillGroup.WEAPON }).distinct()
+        } else {
+            baseSkills
         }
     }
 
