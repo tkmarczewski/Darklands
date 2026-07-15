@@ -23,7 +23,7 @@ class AlchemyCore @Inject constructor(
         hero.normalize()
         val alchSkill = hero.skills.getOrDefault("ALCH", 5)
         val result = when {
-            alchSkill >= GrimConstants.Character.SPECIALIZED_SKILL_BASE_VALUE -> "Uwarzono mistrzowski eliksir."
+            alchSkill >= GameConstants.Character.SPECIALIZED_SKILL_BASE_VALUE -> "Uwarzono mistrzowski eliksir."
             alchSkill >= 15 -> "Powstał solidny eliksir."
             alchSkill >= 8 -> "Powstała słaba, ale użyteczna mikstura."
             else -> {

@@ -21,7 +21,7 @@ class CombatSystem @Inject constructor(
             name = hero.name,
             hp = hero.hp,
             maxHp = hero.maxHp,
-            endurance = 10,
+            endurance = hero.effectiveEndurance(),
             morale = hero.morale,
             armor = hero.effectiveArmor(state.inventory),
             attackBase = hero.effectiveAttack(state.inventory),
@@ -226,14 +226,17 @@ class CombatSystem @Inject constructor(
                 EnemyAI.TACTICAL -> aliveHeroes.minBy { it.hp }
                 EnemyAI.BERSERK -> aliveHeroes.maxBy { it.morale }
                 EnemyAI.RANGED -> aliveHeroes.minBy { it.agility }
-                else -> aliveHeroes.random()
+                else -> {
+                    val index = combatRound.randomProvider.nextInt(aliveHeroes.size)
+                    aliveHeroes[index]
+                }
             }
 
             val enemyCombatant = getEnemyCombatant(c)
             val targetCombatant = heroToCombatant(state, targetHero)
 
             // AI STRATEGY: Action Choice
-            if (enemyAi == EnemyAI.DEFENSIVE && (0..99).random() < 30) {
+            if (enemyAi == EnemyAI.DEFENSIVE && combatRound.randomProvider.nextInt(100) < 30) {
                 enemyCombatant.armor += 10
                 c.log.add("Tura przeciwnika: ${c.enemyName} przyjmuje postawę obronną!")
                 val enemyRound = combatRound.resolveRound(enemyCombatant, targetCombatant, "system_defend")

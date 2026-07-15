@@ -1,6 +1,10 @@
 package com.grimreich.core
 
-import com.google.gson.Gson
+import kotlinx.serialization.builtins.MapSerializer
+import kotlinx.serialization.builtins.serializer
+import kotlinx.serialization.json.Json
+import javax.inject.Inject
+import javax.inject.Singleton
 
 const val SAVE_VERSION = 3
 
@@ -11,21 +15,24 @@ data class SaveSlot(
     val isEmpty: Boolean = snapshot == null
 )
 
-object SaveSystem {
+@Singleton
+class SaveSystem @Inject constructor() {
     private val slots = java.util.concurrent.ConcurrentHashMap<Int, SaveSnapshot>()
     private var autoSaveSnapshot: SaveSnapshot? = null
     private var lastAutoSaveHash: Int = 0
-    private val gson = Gson()
+    
+    private val json = Json {
+        ignoreUnknownKeys = true
+        encodeDefaults = true
+    }
 
     suspend fun save(gameState: GameState, slotId: Int = 0, label: String = ""): SaveSnapshot {
         val stateCopy = gameState.deepCopy()
-        val stateJson = gson.toJson(stateCopy)
+        val dto = stateCopy.toDto()
+        val stateJson = json.encodeToString(SessionStateDto.serializer(), dto)
 
-        // BUG-02: Ensure cancellation safety
         val checksum = try {
             SaveIntegrity.generateChecksum(stateJson)
-        } catch (e: kotlinx.coroutines.CancellationException) {
-            throw e
         } catch (e: Exception) {
             ""
         }
@@ -83,13 +90,11 @@ object SaveSystem {
         if (hash == lastAutoSaveHash) return false
 
         val stateCopy = gameState.deepCopy()
-        val stateJson = gson.toJson(stateCopy)
+        val dto = stateCopy.toDto()
+        val stateJson = json.encodeToString(SessionStateDto.serializer(), dto)
 
-        // BUG-02: Ensure cancellation safety
         val checksum = try {
             SaveIntegrity.generateChecksum(stateJson)
-        } catch (e: kotlinx.coroutines.CancellationException) {
-            throw e
         } catch (e: Exception) {
             ""
         }
@@ -108,18 +113,15 @@ object SaveSystem {
     fun loadAutoSave(): SaveSnapshot? = autoSaveSnapshot?.let { it.copy(state = it.state.deepCopy()) }
     fun hasAutoSave(): Boolean = autoSaveSnapshot != null
 
-    // FIX: computeStateHash now hashes the actual *content* of activeQuestIds (not just size)
-    // and includes reputation.globalFactions content + metaAwarenessLevel + party size.
-    // This ensures autosave detects changes to quest list and reputation (SaveSystemTest).
     fun computeStateHash(state: GameState): Int {
         return java.util.Objects.hash(
             state.gold,
             state.world.day,
             state.party.size,
-            state.quest.activeQuestIds.hashCode(),         // content hash, not just .size
+            state.quest.activeQuestIds.hashCode(),
             state.inventory.size,
-            state.reputation.globalFactions.hashCode(),    // content hash for reputation
-            state.reputation.globalFactions.values.sum(),  // extra sensitivity on reputation values
+            state.reputation.globalFactions.hashCode(),
+            state.reputation.globalFactions.values.sum(),
             state.metaAwarenessLevel
         )
     }
@@ -134,7 +136,8 @@ object SaveSystem {
 
     suspend fun validate(snapshot: SaveSnapshot): ValidationResult {
         val compatible = isCompatible(snapshot)
-        val stateJson = gson.toJson(snapshot.state)
+        val dto = snapshot.state.toDto()
+        val stateJson = json.encodeToString(SessionStateDto.serializer(), dto)
         val checksumValid = snapshot.checksum?.let { SaveIntegrity.verify(stateJson, it) } ?: false
 
         val isValid = snapshot.version >= 1 &&

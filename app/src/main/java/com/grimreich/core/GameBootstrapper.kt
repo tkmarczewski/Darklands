@@ -26,9 +26,6 @@ class GameBootstrapper @Inject constructor(
     private val heroPool: HeroPool
 ) {
     suspend fun bootstrapFreshWorld(seed: Int = 1) = withContext(Dispatchers.IO) {
-        // FIX: Ensure all catalogs are synced before state manipulation
-        gameRepository.sync()
-
         val oldState = gameRepository.currentState()
         val existingPlayerName = oldState.playerName
         val existingHeroName = oldState.heroName
@@ -42,11 +39,8 @@ class GameBootstrapper @Inject constructor(
         worldMap.clear()
         worldMap.seedStage1(seed)
 
-        // FIX-QUESTS: Reset state BEFORE seeding quests
+        // Reset state to default. sync() will be triggered by replaceState's internal logic.
         gameRepository.replaceState(GameState())
-        
-        // Re-sync after state reset to ensure questEngine is populated in the new state context
-        gameRepository.sync()
 
         // Run content validation
         val validationErrors = contentValidator.validateAll()

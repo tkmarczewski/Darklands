@@ -12,7 +12,8 @@ data class HeroUi(
     val combatStats: HeroCombatStatsUi,
     val attributePoints: Int,
     val activeEffects: List<HeroEffectUi>,
-    val isActiveHero: Boolean
+    val isActiveHero: Boolean,
+    val masteryTraitLabel: String? = null
 )
 
 data class HeroCombatStatsUi(

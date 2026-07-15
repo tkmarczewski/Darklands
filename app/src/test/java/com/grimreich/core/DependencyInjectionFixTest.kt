@@ -45,7 +45,8 @@ class DependencyInjectionFixTest {
             echoSystemProvider = dagger.Lazy { mock(com.grimreich.core.EchoSystem::class.java) },
             persistence = mockPersistence,
             cityCatalogue = cityCatalogue,
-            itemCatalogue = itemCatalogue
+            itemCatalogue = itemCatalogue,
+            saveSystem = SaveSystem()
         )
 
         // Verify we can access the state

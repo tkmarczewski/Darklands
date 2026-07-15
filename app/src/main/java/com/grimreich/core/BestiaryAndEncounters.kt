@@ -1,6 +1,7 @@
 package com.grimreich.core
 
 import com.grimreich.grimreich.v1.Item
+import kotlinx.serialization.Serializable
 
 /**
  * Bestiariusz i encountery z Grimreich: pełna lista wrogów ze statystykami,
@@ -8,6 +9,7 @@ import com.grimreich.grimreich.v1.Item
  */
 
 // ────────── ENEMY TYPES ──────────────────────────────────────────────────────
+@Serializable
 enum class EnemyType {
     // Ludzcy
     BANDIT, BANDIT_LEADER, CITY_GUARD,
@@ -51,6 +53,7 @@ enum class EnemyType {
     STEEL_WRAITH
 }
 
+@Serializable
 enum class EnemyAI {
     AGGRESSIVE,  // atakuje zawsze
     DEFENSIVE,   // broni się, nie ściga
@@ -59,6 +62,7 @@ enum class EnemyAI {
     RANGED       // preferuje dystans
 }
 
+@Serializable
 data class EnemyStats(
     val maxHp: Int,
     val attack: Int,
@@ -67,6 +71,7 @@ data class EnemyStats(
     val morale: Int
 )
 
+@Serializable
 data class Enemy(
     val type: EnemyType,
     val name: String,
@@ -80,6 +85,7 @@ data class Enemy(
     val ranga: String = "Odrzut" // Odrzut, Naczynie, Dziecko Pęknięcia, etc.
 )
 
+@Serializable
 data class LootTable(
     val goldMin: Int,
     val goldMax: Int,

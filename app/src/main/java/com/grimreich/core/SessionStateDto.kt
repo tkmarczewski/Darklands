@@ -120,7 +120,17 @@ data class HeroDto(
     val abilities: List<AbilityDto>,
     val passiveAbilities: List<String> = emptyList(),
     val subjectType: String = "VESSEL",
-    val ontologicalMass: Int = 10
+    val ontologicalMass: Int = 10,
+    val traumaMarks: List<TraumaDto> = emptyList()
+)
+
+@Serializable
+data class TraumaDto(
+    val id: String,
+    val name: String,
+    val description: String,
+    val statModifiers: Map<String, Int>,
+    val severity: Int
 )
 
 @Serializable

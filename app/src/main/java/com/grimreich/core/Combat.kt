@@ -30,10 +30,10 @@ enum class MoraleStatus {
 @Singleton
 class MoraleSystem @Inject constructor() {
     fun computeStatus(morale: Int): MoraleStatus = when {
-        morale >= GrimConstants.Combat.MORALE_HEROIC_THRESHOLD   -> MoraleStatus.HEROIC
-        morale >= GrimConstants.Combat.MORALE_STEADY_THRESHOLD   -> MoraleStatus.STEADY
-        morale >= GrimConstants.Combat.MORALE_SHAKEN_THRESHOLD   -> MoraleStatus.SHAKEN
-        morale >= GrimConstants.Combat.MORALE_PANICKED_THRESHOLD -> MoraleStatus.PANICKED
+        morale >= GameConstants.Combat.MORALE_HEROIC_THRESHOLD   -> MoraleStatus.HEROIC
+        morale >= GameConstants.Combat.MORALE_STEADY_THRESHOLD   -> MoraleStatus.STEADY
+        morale >= GameConstants.Combat.MORALE_SHAKEN_THRESHOLD   -> MoraleStatus.SHAKEN
+        morale >= GameConstants.Combat.MORALE_PANICKED_THRESHOLD -> MoraleStatus.PANICKED
         else                                                      -> MoraleStatus.ROUTED
     }
 
@@ -41,10 +41,10 @@ class MoraleSystem @Inject constructor() {
         (morale - (dmgTaken / 2)).coerceAtLeast(0)
 
     fun moraleAfterKill(morale: Int): Int =
-        (morale + GrimConstants.Combat.KILL_MORALE_BONUS).coerceAtMost(GrimConstants.Combat.MAX_MORALE)
+        (morale + GameConstants.Combat.KILL_MORALE_BONUS).coerceAtMost(GameConstants.Combat.MAX_MORALE)
 
     fun moraleAfterFlee(morale: Int): Int =
-        (morale - GrimConstants.Combat.FLEE_MORALE_PENALTY).coerceAtLeast(0)
+        (morale - GameConstants.Combat.FLEE_MORALE_PENALTY).coerceAtLeast(0)
 }
 
 // ==================== STATUS EFFECTS ====================
@@ -100,7 +100,7 @@ data class CombatantState(
     fun normalize() {
         hp = hp.coerceIn(0, maxHp)
         endurance = endurance.coerceAtLeast(0)
-        morale = morale.coerceIn(0, GrimConstants.Combat.MAX_MORALE)
+        morale = morale.coerceIn(0, GameConstants.Combat.MAX_MORALE)
     }
 
     /**
@@ -287,8 +287,8 @@ class CombatRound @Inject constructor(
         if (attacker.maxHp <= 0 || defender.maxHp <= 0) return 0
 
         // BALANCE FIX: Attacker's Perception now counters Defender's Agility-based dodge.
-        val baseDodge = (GrimConstants.Combat.BASE_DODGE_CHANCE +
-            ((defender.agility - 10) * GrimConstants.Combat.AGILITY_DODGE_MODIFIER))
+        val baseDodge = (GameConstants.Combat.BASE_DODGE_CHANCE +
+            ((defender.agility - 10) * GameConstants.Combat.AGILITY_DODGE_MODIFIER))
         val perceptionBonus = (attacker.perception - 10) * 0.01f
         // ONTOLOGICAL FIX: Higher levels reduce dodge chance
         val finalDodgeChance = (baseDodge - perceptionBonus - dodgeReduction).coerceIn(0.05f, 0.8f)
@@ -317,10 +317,10 @@ class CombatRound @Inject constructor(
 
         val defArmor = defender.armor
 
-        val critChance = (attacker.perception * GrimConstants.Combat.PERCEPTION_CRIT_MODIFIER)
+        val critChance = (attacker.perception * GameConstants.Combat.PERCEPTION_CRIT_MODIFIER)
             .coerceIn(0f, 0.8f) // FIX (M-02): Clamp crit chance
         val isCrit   = randomProvider.nextFloat() < critChance
-        val critMod  = if (isCrit) GrimConstants.Combat.CRITICAL_HIT_MULTIPLIER else 1.0f
+        val critMod  = if (isCrit) GameConstants.Combat.CRITICAL_HIT_MULTIPLIER else 1.0f
 
         // ONTOLOGICAL FIX: Apply damage multiplier
         val attackRoll = (rawAtk * attackerStatus.attackModifier() *
@@ -337,9 +337,9 @@ class CombatRound @Inject constructor(
 
         if (attacker.charisma >= 10) {
             // BALANCE FIX: Buffed charisma morale regen (removed divisor)
-            val regen = (attacker.charisma - 9) * GrimConstants.Combat.CHARISMA_MORALE_REGEN
+            val regen = (attacker.charisma - 9) * GameConstants.Combat.CHARISMA_MORALE_REGEN
             attacker.morale = (attacker.morale + regen)
-                .coerceAtMost(GrimConstants.Combat.MAX_MORALE)
+                .coerceAtMost(GameConstants.Combat.MAX_MORALE)
             if (regen > 0) log.add("${attacker.name} zagrzewa siebie do walki. (+${regen} Morale)")
         }
 
@@ -431,8 +431,8 @@ class CombatRound @Inject constructor(
         defender: CombatantState,
         log: MutableList<String>
     ) {
-        val statusChance = (GrimConstants.Combat.STATUS_CHANCE_BASE +
-            ((attacker.intelligence - 10) * GrimConstants.Combat.STATUS_CHANCE_INT_MOD))
+        val statusChance = (GameConstants.Combat.STATUS_CHANCE_BASE +
+            ((attacker.intelligence - 10) * GameConstants.Combat.STATUS_CHANCE_INT_MOD))
             .coerceIn(0.0f, 0.8f)
         if (randomProvider.nextFloat() < statusChance) {
             val effectType = StatusEffectType.entries[randomProvider.nextInt(StatusEffectType.entries.size)]
@@ -446,8 +446,8 @@ class CombatRound @Inject constructor(
         return when {
             // FIX (PRECISION): Use small epsilon for zero checks
             hpPercent <= 0.001f                                                      -> WoundType.CRITICAL
-            hpPercent <= GrimConstants.Combat.WOUND_THRESHOLD_SERIOUS && state.endurance < 5  -> WoundType.SERIOUS
-            hpPercent <= GrimConstants.Combat.WOUND_THRESHOLD_LIGHT   && state.endurance < 10 -> WoundType.LIGHT
+            hpPercent <= GameConstants.Combat.WOUND_THRESHOLD_SERIOUS && state.endurance < 5  -> WoundType.SERIOUS
+            hpPercent <= GameConstants.Combat.WOUND_THRESHOLD_LIGHT   && state.endurance < 10 -> WoundType.LIGHT
             else                                                                     -> WoundType.NONE
         }
     }
@@ -456,12 +456,12 @@ class CombatRound @Inject constructor(
         state.hp <= 0 || moraleSystem.computeStatus(state.morale) == MoraleStatus.ROUTED
 
     fun postCombatRecovery(hero: CombatantState): String {
-        val healHp = (hero.maxHp * GrimConstants.Combat.HP_RECOVERY_RATIO)
+        val healHp = (hero.maxHp * GameConstants.Combat.HP_RECOVERY_RATIO)
             .toInt().coerceAtLeast(1)
         hero.hp = (hero.hp + healHp).coerceAtMost(hero.maxHp)
         val enduranceHeal = randomProvider.nextInt(
-            GrimConstants.Combat.POST_COMBAT_HEAL_HP_MIN,
-            GrimConstants.Combat.POST_COMBAT_HEAL_HP_MAX + 1
+            GameConstants.Combat.POST_COMBAT_HEAL_HP_MIN,
+            GameConstants.Combat.POST_COMBAT_HEAL_HP_MAX + 1
         )
         hero.endurance = (hero.endurance + enduranceHeal).coerceAtMost(99)
         hero.morale    = moraleSystem.moraleAfterKill(hero.morale)

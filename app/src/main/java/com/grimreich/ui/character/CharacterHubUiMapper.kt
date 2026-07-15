@@ -50,7 +50,11 @@ class CharacterHubUiMapper @Inject constructor(
             combatStats = combatStats,
             attributePoints = hero.attributePoints,
             activeEffects = hero.activeMutations.map { HeroEffectUi(it.id, it.name, true) },
-            isActiveHero = isActive
+            isActiveHero = isActive,
+            masteryTraitLabel = hero.masteryTrait?.let { key ->
+                val resId = context.resources.getIdentifier(key, "string", context.packageName)
+                if (resId != 0) context.getString(resId) else key
+            }
         )
     }
 

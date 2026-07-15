@@ -1,7 +1,6 @@
 package com.grimreich.systems
 
 import com.grimreich.core.GameConstants
-import com.grimreich.core.GrimConstants
 import com.grimreich.core.FactionReputationSystem
 import com.grimreich.grimreich.v1.Item
 import com.grimreich.world.CityCatalogue

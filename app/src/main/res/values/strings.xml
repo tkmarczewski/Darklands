@@ -196,4 +196,13 @@
     <string name="alchemy_who_brews">KTO WARZY?</string>
     <string name="alchemy_btn_brew">WARZ MIKSTURĘ</string>
     <string name="alchemy_select_recipe_hint">Wybierz recepturę z listy.</string>
+
+    <!-- Mastery Traits -->
+    <string name="mastery_knight">MISTRZ MIECZA (+5 Atak)</string>
+    <string name="mastery_mercenary">WETERAN WOJENNY (+5 Obrona)</string>
+    <string name="mastery_scholar">SZYFRANT (Większa odporność na Glitche)</string>
+    <string name="mastery_thief">CIEŃ (Zwiększony unik)</string>
+    <string name="mastery_alchemist">MISTRZ TRANSMUTACJI (Silniejsze mikstury)</string>
+    <string name="mastery_priest">ŚWIĘTY GNIEW (Silniejsze modlitwy)</string>
+    <string name="mastery_generic">MISTRZ RZEMIOSŁA</string>
 </resources>

@@ -129,13 +129,13 @@ data class Hero(
 
     private fun applyMasteryPerk() {
         masteryTrait = when (currentCareer) {
-            Career.KNIGHT -> "MISTRZ MIECZA (+5 Atak)"
-            Career.MERCENARY -> "WETERAN WOJENNY (+5 Obrona)"
-            Career.SCHOLAR -> "SZYFRANT (Większa odporność na Glitche)"
-            Career.THIEF, Career.ROGUE -> "CIEŃ (Zwiększony unik)"
-            Career.ALCHEMIST -> "MISTRZ TRANSMUTACJI (Silniejsze mikstury)"
-            Career.PRIEST, Career.INQUISITOR -> "ŚWIĘTY GNIEW (Silniejsze modlitwy)"
-            else -> "MISTRZ RZEMIOSŁA"
+            Career.KNIGHT -> "mastery_knight"
+            Career.MERCENARY -> "mastery_mercenary"
+            Career.SCHOLAR -> "mastery_scholar"
+            Career.THIEF, Career.ROGUE -> "mastery_thief"
+            Career.ALCHEMIST -> "mastery_alchemist"
+            Career.PRIEST, Career.INQUISITOR -> "mastery_priest"
+            else -> "mastery_generic"
         }
     }
 

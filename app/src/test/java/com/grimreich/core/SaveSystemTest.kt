@@ -10,18 +10,19 @@ import org.junit.Test
 
 class SaveSystemTest {
 
-    // AUDIT FIX: isolate global singleton state — clear before each test
+    private lateinit var saveSystem: SaveSystem
+
     @Before
     fun setUp() = runBlocking {
-        SaveSystem.clearAll()
+        saveSystem = SaveSystem()
     }
 
     @Test
     fun saveAndLoad_shouldRoundTripSnapshot() = runBlocking {
         val state = GameState().apply { gold = 123 }
-        SaveSystem.save(state, slotId = 1, label = "test")
+        saveSystem.save(state, slotId = 1, label = "test")
 
-        val loaded = SaveSystem.load(1)
+        val loaded = saveSystem.load(1)
 
         assertNotNull("Loaded snapshot should not be null", loaded)
         assertEquals("Gold value must survive round trip", 123, loaded!!.state.gold)
@@ -30,31 +31,30 @@ class SaveSystemTest {
 
     @Test
     fun deleteSlot_shouldRemoveSnapshot() = runBlocking {
-        SaveSystem.save(GameState(), slotId = 2, label = "to-delete")
-        SaveSystem.deleteSlot(2)
-        assertNull("Deleted slot should be null", SaveSystem.load(2))
+        saveSystem.save(GameState(), slotId = 2, label = "to-delete")
+        saveSystem.deleteSlot(2)
+        assertNull("Deleted slot should be null", saveSystem.load(2))
     }
 
     @Test
     fun load_shouldReturnCopyNotLiveReference() = runBlocking {
         val state = GameState().apply { gold = 50 }
-        SaveSystem.save(state, slotId = 3, label = "copy-check")
+        saveSystem.save(state, slotId = 3, label = "copy-check")
 
-        val loaded = SaveSystem.load(3)!!
+        val loaded = saveSystem.load(3)!!
         loaded.state.gold = 999
 
-        val loadedAgain = SaveSystem.load(3)!!
+        val loadedAgain = saveSystem.load(3)!!
         assertEquals("Original save should remain unchanged (was gold=50)", 50, loadedAgain.state.gold)
     }
 
-    // NEW: hash must differ when activeQuestIds change (plan naprawy — autosave sensitivity)
     @Test
     fun stateHash_shouldChangeWhenQuestIdsChange() = runBlocking {
         val state1 = GameState()
         val state2 = GameState().apply { quest.activeQuestIds.add("q_plague") }
 
-        val hash1 = SaveSystem.computeStateHash(state1)
-        val hash2 = SaveSystem.computeStateHash(state2)
+        val hash1 = saveSystem.computeStateHash(state1)
+        val hash2 = saveSystem.computeStateHash(state2)
 
         assertNotEquals(
             "computeStateHash must differ when activeQuestIds differ",
@@ -63,14 +63,13 @@ class SaveSystemTest {
         )
     }
 
-    // NEW: hash must differ when reputation changes
     @Test
     fun stateHash_shouldChangeWhenReputationChanges() = runBlocking {
         val state1 = GameState()
         val state2 = GameState().apply { reputation.globalFactions["test"] = 50 }
 
-        val hash1 = SaveSystem.computeStateHash(state1)
-        val hash2 = SaveSystem.computeStateHash(state2)
+        val hash1 = saveSystem.computeStateHash(state1)
+        val hash2 = saveSystem.computeStateHash(state2)
 
         assertNotEquals(
             "computeStateHash must differ when reputation differs",

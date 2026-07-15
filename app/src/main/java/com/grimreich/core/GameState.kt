@@ -77,6 +77,10 @@ data class GameState(
         trimLogs()
     }
 
+    /**
+     * UWAGA: Przy dodawaniu nowych pól (szczególnie kolekcji) do GameState,
+     * MUSISZ zaktualizować metodę deepCopy() poniżej, aby zapewnić pełną izolację stanu.
+     */
     fun deepCopy(): GameState = this.copy(
         party = this.party.map { it.deepCopy() }.toMutableList(),
         hireableHeroes = this.hireableHeroes.map { it.deepCopy() }.toMutableList(),

@@ -196,4 +196,13 @@
     <string name="alchemy_who_brews">WHO BREWS?</string>
     <string name="alchemy_btn_brew">BREW POTION</string>
     <string name="alchemy_select_recipe_hint">Select a recipe from the list.</string>
+
+    <!-- Mastery Traits -->
+    <string name="mastery_knight">SWORD MASTER (+5 Attack)</string>
+    <string name="mastery_mercenary">WAR VETERAN (+5 Defense)</string>
+    <string name="mastery_scholar">CIPHER (Glitch Resistance)</string>
+    <string name="mastery_thief">SHADOW (Increased Dodge)</string>
+    <string name="mastery_alchemist">TRANSMUTATION MASTER (Stronger Potions)</string>
+    <string name="mastery_priest">HOLY WRATH (Stronger Prayers)</string>
+    <string name="mastery_generic">CRAFT MASTER</string>
 </resources>

@@ -51,11 +51,17 @@ class StatePersistenceManager @Inject constructor(
 
         mutex.withLock {
             try {
+                val tempFile = File(context.filesDir, "$sessionFileName.tmp")
                 Log.d(TAG, "Persisting session to: ${sessionFile.absolutePath}")
-                FileOutputStream(sessionFile).use { fos ->
+                FileOutputStream(tempFile).use { fos ->
                     fos.write(finalContent.toByteArray())
                     fos.flush()
                     fos.fd.sync()
+                }
+                if (tempFile.renameTo(sessionFile)) {
+                    Log.d(TAG, "Session persisted successfully via rename.")
+                } else {
+                    Log.e(TAG, "Failed to rename temp session file")
                 }
             } catch (e: Exception) {
                 Log.e(TAG, "Blad zapisu sesji", e)
@@ -132,13 +138,18 @@ class StatePersistenceManager @Inject constructor(
         
         mutex.withLock {
             try {
+                val tempFile = File(context.filesDir, "$slotsFileName.tmp")
                 Log.d(TAG, "Persisting slots to: ${slotsFile.absolutePath}")
-                FileOutputStream(slotsFile).use { fos ->
+                FileOutputStream(tempFile).use { fos ->
                     fos.write(data.toByteArray())
                     fos.flush()
                     fos.fd.sync() // Ensure physical disk write
                 }
-                Log.d(TAG, "Slots persisted successfully.")
+                if (tempFile.renameTo(slotsFile)) {
+                    Log.d(TAG, "Slots persisted successfully via rename.")
+                } else {
+                    Log.e(TAG, "Failed to rename temp slots file")
+                }
             } catch (e: Exception) {
                 Log.e(TAG, "Blad zapisu slotow", e)
             }
