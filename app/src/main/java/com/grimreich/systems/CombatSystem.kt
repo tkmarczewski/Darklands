@@ -355,17 +355,17 @@ class CombatSystem @Inject constructor(
         state.party.filter { !it.isDead }.forEach { hero ->
             // Szansa na traumę wzrasta wraz z siłą przeciwnika i niską stabilnością
             val chance = when {
-                enemy.type == EnemyType.PAST_SHADE_ELITE -> 0.25f
-                enemy.ontologicalMass >= 30 -> 0.15f
-                hero.ontologicalStability < 50f -> 0.10f
-                else -> 0.02f
+                enemy.type == EnemyType.PAST_SHADE_ELITE -> GameConstants.TRAUMA_CHANCE_ELITE
+                enemy.ontologicalMass >= 30 -> GameConstants.TRAUMA_CHANCE_MASSIVE
+                hero.ontologicalStability < 50f -> GameConstants.TRAUMA_CHANCE_UNSTABLE
+                else -> GameConstants.TRAUMA_CHANCE_BASE
             }
 
             if (kotlin.random.Random.nextFloat() < chance) {
                 val trauma = TraumaCatalog.getRandomTrauma()
                 if (hero.traumaMarks.none { it.id == trauma.id }) {
                     hero.traumaMarks.add(trauma)
-                    hero.ontologicalStability -= 10f
+                    hero.ontologicalStability -= GameConstants.TRAUMA_STABILITY_LOSS
                     state.combat.log.add("TRAUMA: ${hero.name} zyskał: ${trauma.name}!")
                     state.logEntries.add("ONTOLOGIA: ${hero.name} doznał pęknięcia psychicznego: ${trauma.name}.")
                     hero.normalize()

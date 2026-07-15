@@ -38,6 +38,11 @@ object GameConstants {
     const val MIN_LEVEL = 1
     const val COLLAPSE_TOTAL_THRESHOLD = 0.999f
     const val ONTOLOGICAL_MASS_ELITE_THRESHOLD = 50
+    const val TRAUMA_CHANCE_ELITE = 0.25f
+    const val TRAUMA_CHANCE_MASSIVE = 0.15f
+    const val TRAUMA_CHANCE_UNSTABLE = 0.10f
+    const val TRAUMA_CHANCE_BASE = 0.02f
+    const val TRAUMA_STABILITY_LOSS = 10f
 
     // Economy & Factions
     const val BASE_REPUTATION_BUY_MODIFIER = 1.0f
