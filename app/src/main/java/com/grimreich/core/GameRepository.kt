@@ -31,6 +31,10 @@ class GameRepository @Inject constructor(
     val itemCatalogue: ItemCatalogue,
 ) {
     private val repositoryScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+
+    init {
+        repositoryScope.launch { sync() }
+    }
     private val saveMutex = Mutex()
 
     // FIX: reverted from suspend/Mutex back to a synchronous ReentrantLock.
