@@ -107,7 +107,8 @@ fun Hero.toDto(): HeroDto = HeroDto(
     passiveAbilities = passiveAbilities.toList(),
     subjectType = subjectType.name,
     ontologicalMass = ontologicalMass,
-    traumaMarks = traumaMarks.map { it.toDto() }
+    traumaMarks = traumaMarks.map { it.toDto() },
+    ontologicalStability = ontologicalStability
 )
 
 fun Trauma.toDto(): TraumaDto = TraumaDto(id, name, description, statModifiers, severity)
@@ -139,7 +140,8 @@ fun HeroDto.toDomain(): Hero = Hero(
     currentCareer = currentCareer?.let { Career.valueOf(it) },
     trait = trait?.let { Trait.valueOf(it) },
     subjectType = Hero.SubjectType.valueOf(subjectType),
-    ontologicalMass = ontologicalMass
+    ontologicalMass = ontologicalMass,
+    ontologicalStability = ontologicalStability
 ).also {
     it.activeMutations.addAll(activeMutations.map { dto -> dto.toDomain() })
     it.skills.putAll(skills)

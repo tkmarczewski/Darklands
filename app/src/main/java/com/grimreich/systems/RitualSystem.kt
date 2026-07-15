@@ -28,13 +28,15 @@ class RitualSystem @Inject constructor(
             }
 
             // 2. Koszt Krwi (HP Sacrifice)
-            hero.hp -= recipe.sacrificeHp
-            state.logEntries.add("RYTUAŁ: Krew została przelana. (${recipe.sacrificeHp} HP)")
+            val hpCost = recipe.sacrificeHp.coerceAtLeast(0)
+            hero.hp -= hpCost
+            state.logEntries.add("RYTUAŁ: Krew została przelana. ($hpCost HP)")
             
             if (hero.hp <= 0) {
                 hero.hp = 1 // Minimalne życie, aby nie umrzeć w trakcie (chyba że tak chcemy)
                 state.logEntries.add("RYTUAŁ: Jesteś na krawędzi istnienia.")
             }
+            hero.normalize() // Normalize HP early to ensure consistency
 
             if (recipe.requiredCipher == playerCipher) {
                 // Sukces: Usuń składniki i dodaj przedmiot

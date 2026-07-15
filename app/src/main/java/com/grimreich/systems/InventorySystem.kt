@@ -86,6 +86,7 @@ class InventorySystem @Inject constructor(
             val equippedSlot = from.equipment.entries.firstOrNull { it.value == instanceId }?.key
             if (equippedSlot != null) {
                 from.equipment[equippedSlot] = null
+                to.equipment[equippedSlot] = instanceId
             }
             
             state.logEntries.add("Przekazano przedmiot od ${from.name} do ${to.name}.")

@@ -6,12 +6,14 @@ import java.util.UUID
 
 @Singleton
 class CharacterFactory @Inject constructor(
+    private val gameRepository: GameRepository,
     private val careerChain: CareerChain,
     private val agingSystem: AgingSystem,
     private val echoSystem: EchoSystem
 ) {
 
     fun createHero(name: String, age: Int, career: Career, trainingCycles: Int = 0, echoId: String? = null): Hero {
+        val state = gameRepository.currentState()
         val hero = Hero(
             id = "hero_${UUID.randomUUID()}",
             name = name,
@@ -36,7 +38,7 @@ class CharacterFactory @Inject constructor(
             }
             
             hero.age += 5
-            agingSystem.applyAgingToHero(hero, GameState())
+            agingSystem.applyAgingToHero(hero, state)
         }
         
         // --- ECHO INHERITANCE ---
@@ -62,7 +64,7 @@ class CharacterFactory @Inject constructor(
             charisma = 11,
             piety = 10
         )
-        agingSystem.applyAgingToHero(hero, GameState())
+        agingSystem.applyAgingToHero(hero, gameRepository.currentState())
         hero.normalize()
         return hero
     }
@@ -81,7 +83,7 @@ class CharacterFactory @Inject constructor(
             charisma = 10,
             piety = 12
         )
-        agingSystem.applyAgingToHero(hero, GameState())
+        agingSystem.applyAgingToHero(hero, gameRepository.currentState())
         hero.normalize()
         return hero
     }
@@ -100,7 +102,7 @@ class CharacterFactory @Inject constructor(
             charisma = 9,
             piety = 8
         )
-        agingSystem.applyAgingToHero(hero, GameState())
+        agingSystem.applyAgingToHero(hero, gameRepository.currentState())
         hero.normalize()
         return hero
     }
@@ -119,7 +121,7 @@ class CharacterFactory @Inject constructor(
             charisma = 9,
             piety = 15
         )
-        agingSystem.applyAgingToHero(hero, GameState())
+        agingSystem.applyAgingToHero(hero, gameRepository.currentState())
         hero.normalize()
         return hero
     }

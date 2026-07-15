@@ -36,6 +36,7 @@ object GameConstants {
     const val META_QUEST_THRESHOLD = 30
     const val MAX_QUEST_ADVANCE_SAFETY = 50
     const val MIN_LEVEL = 1
+    const val MAX_LEVEL = 10
     const val COLLAPSE_TOTAL_THRESHOLD = 0.999f
     const val ONTOLOGICAL_MASS_ELITE_THRESHOLD = 50
     const val TRAUMA_CHANCE_ELITE = 0.25f

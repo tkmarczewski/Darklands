@@ -85,7 +85,6 @@ class TravelSystem @Inject constructor(
             }
             
             s.logEntries.add("Podróż do ${cityCatalogue.get(destCityId)?.name ?: destCityId} trwała $daysSpent dni.")
-            s.normalizeState()
         }
     }
 

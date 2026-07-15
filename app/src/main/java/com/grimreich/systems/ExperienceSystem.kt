@@ -66,7 +66,7 @@ class ExperienceSystem @Inject constructor(
         if (hero.level < 1) hero.level = 1
         
         // Scaling XP requirement: level * 100
-        while (hero.xp >= hero.level * GameConstants.XP_PER_LEVEL_BASE) {
+        while (hero.level < GameConstants.MAX_LEVEL && hero.xp >= hero.level * GameConstants.XP_PER_LEVEL_BASE) {
             hero.xp -= hero.level * GameConstants.XP_PER_LEVEL_BASE
             hero.level++
             

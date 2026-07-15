@@ -165,9 +165,7 @@ class QuestEngine @Inject constructor(
             .filter { !it.isHidden && getStatus(it.id, state, sharedVisited) == QuestStatus.AVAILABLE }
             .groupBy { it.cityId }
             .mapValues { (cityId, quests) ->
-                val seed = cityId.hashCode().toLong() + (state.world.day / 3)
-                val cityRandom = kotlin.random.Random(seed)
-                quests.shuffled(cityRandom).take(3) // Max 3 quests per city
+                shuffleQuests(quests, cityId, state.world.day)
             }
     }
     
@@ -176,11 +174,14 @@ class QuestEngine @Inject constructor(
             it.cityId == cityId && !it.isHidden && getStatus(it.id, state) == QuestStatus.AVAILABLE
         }
         
-        val seed = cityId.hashCode().toLong() + (state.world.day / 3)
-        val cityRandom = kotlin.random.Random(seed)
-        
-        return allAvailable.shuffled(cityRandom).take(3)
+        return shuffleQuests(allAvailable, cityId, state.world.day)
             .sortedWith(compareBy<QuestDefinition> { it.chainId ?: "zzz" }.thenBy { it.chainOrder }.thenBy { it.recommendedLevel })
+    }
+
+    private fun shuffleQuests(quests: List<QuestDefinition>, cityId: String, day: Int): List<QuestDefinition> {
+        val seed = cityId.hashCode().toLong() + (day / 3)
+        val cityRandom = kotlin.random.Random(seed)
+        return quests.shuffled(cityRandom).take(3)
     }
 }
 

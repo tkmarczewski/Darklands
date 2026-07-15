@@ -14,7 +14,7 @@ import javax.inject.Singleton
 
 @Singleton
 class EchoSystem @Inject constructor(
-    @ApplicationContext private val context: Context,
+    @param:ApplicationContext private val context: Context,
     private val gameRepository: GameRepository,
     private val worldStabilitySystem: WorldStabilitySystem,
     private val itemCatalogue: ItemCatalogue

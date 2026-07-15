@@ -10,6 +10,11 @@ import java.security.MessageDigest
  */
 object SaveIntegrity {
     
+    /**
+     * UWAGA: SALT jest obecnie zakodowany na sztywno, co chroni przed przypadkowym
+     * uszkodzeniem pliku, ale nie przed celową manipulacją (security theater).
+     * W wersji produkcyjnej zaleca się użycie soli unikalnej dla urządzenia.
+     */
     private const val SALT = "GRIM_CIPHER_2026"
 
     /**

@@ -32,9 +32,25 @@ class WorldMap @Inject constructor() {
 
     fun seedStage1(seed: Int = 1) {
         if (connections.isNotEmpty()) return
+        
+        val random = kotlin.random.Random(seed.toLong())
+        
+        // Canonical connections
         link("wybrzeze_polnocne", "twierdza_zelazna", TerrainType.ROAD)
         link("twierdza_zelazna", "port_mglisty", TerrainType.ROAD)
         link("port_mglisty", "opactwo_ciszy", TerrainType.TRAIL)
+        
+        // Dynamic connections based on seed
+        if (random.nextFloat() < 0.5f) {
+            link("wybrzeze_polnocne", "port_mglisty", TerrainType.SWAMP)
+        }
+        if (random.nextFloat() < 0.3f) {
+            link("opactwo_ciszy", "twierdza_zelazna", TerrainType.MOUNTAIN)
+        }
+        
+        // Link all to heart
+        link("twierdza_zelazna", "serce_krainy", TerrainType.ROAD)
+        link("port_mglisty", "serce_krainy", TerrainType.RIVER)
     }
 
     fun clear() {

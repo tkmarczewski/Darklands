@@ -174,12 +174,10 @@ class DialogueViewModel @Inject constructor(
                 com.grimreich.core.EnemyType.BANDIT 
             }
             val enemy = com.grimreich.core.Bestiary.get(enemyType)
-            if (enemy != null) {
-                combatSystem.startCombat(enemy)
-                gameRepository.updateState { it.pendingAction = com.grimreich.core.PendingWorldAction.None }
-                onCombat()
-                return
-            }
+            combatSystem.startCombat(enemy)
+            gameRepository.updateState { it.pendingAction = com.grimreich.core.PendingWorldAction.None }
+            onCombat()
+            return
         }
 
         if (choice.triggerEvent == "OPEN_MARKET") {
