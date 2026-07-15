@@ -120,7 +120,9 @@ class DialogueViewModel @Inject constructor(
                 "AGI", "AGILITY", "ZRĘCZNOŚĆ" -> hero.agility
                 "CHA", "CHARISMA", "CHARYZMA" -> hero.charisma
                 "PIETY", "POBOŻNOŚĆ" -> hero.piety
-                else -> 100
+                "PERCEPTION", "PERCEPCJA", "PER" -> hero.perception
+                "ENDURANCE", "WYTRZYMAŁOŚĆ", "END" -> hero.endurance
+                else -> 0 // STRICT: Unknown attributes fail by default
             }
             if (heroVal < value) return false
         }

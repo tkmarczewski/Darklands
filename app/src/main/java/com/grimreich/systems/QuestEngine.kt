@@ -107,8 +107,9 @@ class QuestEngine @Inject constructor(
 
     fun completeQuestDirect(state: GameState, questId: String) {
         // Resolve "ACTIVE" alias from dialogue context
-        val actualQuestId = if (questId == "ACTIVE") {
-            (state.pendingAction as? com.grimreich.core.PendingWorldAction.Dialogue)?.relatedQuestId ?: questId
+        val action = state.pendingAction
+        val actualQuestId = if (questId == "ACTIVE" && action is com.grimreich.core.PendingWorldAction.Dialogue && action.relatedQuestId != null) {
+            action.relatedQuestId!!
         } else questId
 
         if (state.quest.completedQuestIds.contains(actualQuestId)) {
@@ -117,10 +118,26 @@ class QuestEngine @Inject constructor(
         }
 
         val p = state.quest.progress[actualQuestId] ?: return
+        
+        // --- IRONCLAD VALIDATION: Only allow turn-in at the correct location and NPC ---
+        val def = registry[actualQuestId] ?: return
+        val currentCityId = state.world.locationId
+        
+        // Match city and NPC role (originNpcId)
+        if (def.cityId != currentCityId) {
+            android.util.Log.e("QuestEngine", "Attempted to turn in quest $actualQuestId in wrong city: $currentCityId")
+            return
+        }
+        
+        if (action is com.grimreich.core.PendingWorldAction.Dialogue) {
+             if (action.npcRole.lowercase() != def.originNpcId.lowercase() && action.npcName.lowercase() != def.originNpcId.lowercase()) {
+                 android.util.Log.e("QuestEngine", "Attempted to turn in quest $actualQuestId to wrong NPC: ${action.npcRole}")
+                 return
+             }
+        }
+
         // Allow completion if objective met or directly requested (for simple single-step quests)
         if (p.status != QuestStatus.OBJECTIVE_MET && p.status != QuestStatus.ACTIVE) return
-        
-        val def = registry[actualQuestId] ?: return
         
         // --- ATOMIC TRANSITION ---
         state.quest.activeQuestIds.remove(actualQuestId)

@@ -155,10 +155,17 @@ class ExpeditionViewModel @Inject constructor(
                     shouldDialogue = true
                 }
                 StepType.INVESTIGATION -> {
-                    questEngine.advanceStepDirect(state, questId)
-                    val msg = "Zbadano cel: ${step.targetId}. Cel zadania został osiągnięty."
-                    state.logEntries.add(msg)
-                    _uiState.update { it.copy(content = ExpeditionContentState.EncounterLog(msg)) }
+                    val currentCityId = state.world.locationId
+                    if (currentCityId == def.cityId) {
+                        questEngine.advanceStepDirect(state, questId)
+                        val msg = "Zbadano cel: ${step.targetId}. Cel zadania został osiągnięty."
+                        state.logEntries.add(msg)
+                        _uiState.update { it.copy(content = ExpeditionContentState.EncounterLog(msg)) }
+                    } else {
+                        val msg = "Zbyt daleko od celu. Musisz wrócić do ${def.cityId}."
+                        state.logEntries.add(msg)
+                        _uiState.update { it.copy(content = ExpeditionContentState.EncounterLog(msg)) }
+                    }
                 }
                 StepType.SOCIAL -> {
                     questEngine.advanceStepDirect(state, questId)
