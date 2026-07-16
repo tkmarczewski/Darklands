@@ -35,10 +35,16 @@ class QuestEngine @Inject constructor(
         if (questId.startsWith("resurrect_")) {
             val hId = questId.removePrefix("resurrect_")
             val hero = actualState.party.find { it.id == hId }
+            
+            // --- FIX BUG: Proper status for resurrection ---
             if (hero != null && hero.isDead) {
                 val corpseId = "corpse_${hero.id}"
                 val hasCorpse = actualState.inventory.any { it.instanceId == corpseId }
+                // Only available if we HAVE the corpse
                 status = if (hasCorpse) QuestStatus.AVAILABLE else QuestStatus.LOCKED
+            } else {
+                // Not dead or not in party anymore? Definitely not available.
+                status = QuestStatus.LOCKED
             }
         } else {
             val def = registry[questId]
@@ -195,14 +201,21 @@ class QuestEngine @Inject constructor(
             it.cityId == cityId && !it.isHidden && getStatus(it.id, state, sharedVisited) == QuestStatus.AVAILABLE
         }
         
-        return shuffleQuests(allAvailable, cityId, state.world.day)
+        // --- BOARD FIX: Priority for Chain Quests ---
+        val priorityQuests = allAvailable.filter { it.chainId != null }
+        val randomQuests = allAvailable.filter { it.chainId == null }
+        
+        return shuffleQuests(priorityQuests + randomQuests, cityId, state.world.day)
             .sortedWith(compareBy<QuestDefinition> { it.chainId ?: "zzz" }.thenBy { it.chainOrder }.thenBy { it.recommendedLevel })
     }
 
     private fun shuffleQuests(quests: List<QuestDefinition>, cityId: String, day: Int): List<QuestDefinition> {
         val seed = cityId.hashCode().toLong() + (day / 3)
         val cityRandom = kotlin.random.Random(seed)
-        return quests.shuffled(cityRandom).take(3)
+        
+        // Priority for chain quests, then take up to 6
+        val sorted = quests.sortedByDescending { it.chainId != null }
+        return sorted.shuffled(cityRandom).take(6)
     }
 }
 

@@ -2,6 +2,8 @@ package com.grimreich.ui.ritual
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -23,15 +25,18 @@ fun RitualScreen(
     onSacrificed: () -> Unit
 ) {
     val canRevive = ritualSystem.canPerformResurrection(hero, gold)
+    val scrollState = rememberScrollState()
 
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(Color(0xFF0A0A0A))
-            .padding(24.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+            .padding(24.dp)
+            .verticalScroll(scrollState),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        Spacer(modifier = Modifier.height(32.dp))
+        
         Text(
             text = "RYTUAŁ ECHA",
             color = Color.Red,
@@ -61,10 +66,12 @@ fun RitualScreen(
                 Text("- Korupcja Bohatera: +20", color = Color.White, fontSize = 14.sp)
                 Text("- Sanity Bohatera: -15", color = Color.White, fontSize = 14.sp)
                 Text("- Koszt: 100 złota", color = Color.White, fontSize = 14.sp)
+                Spacer(modifier = Modifier.height(8.dp))
+                Text("TWOJE ZŁOTO: $gold", color = if (gold >= 100) Color.Yellow else Color.Red, fontWeight = FontWeight.Bold)
             }
         }
 
-        Spacer(modifier = Modifier.height(48.dp))
+        Spacer(modifier = Modifier.height(32.dp))
 
         Button(
             onClick = {
@@ -104,5 +111,7 @@ fun RitualScreen(
                 modifier = Modifier.padding(top = 8.dp)
             )
         }
+
+        Spacer(modifier = Modifier.height(32.dp))
     }
 }

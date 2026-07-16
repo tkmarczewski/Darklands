@@ -40,7 +40,9 @@
         "text": "Sprawdzę to (ZADANIE: Dezerter).",
         "targetNodeId": "end",
         "triggerEvent": "ACTIVATE_QUEST",
-        "triggerValue": "q_deserter"
+        "triggerValue": "q_deserter",
+        "requiredQuestId": "q_deserter",
+        "requiredQuestStatus": "AVAILABLE"
       }
     ]
   },
@@ -114,7 +116,9 @@
         "text": "Tak, pomogę (PRZYJMIJ: Wyrok Inkwizycji).",
         "targetNodeId": "end",
         "triggerEvent": "ACTIVATE_QUEST",
-        "triggerValue": "q_inquisition_verdict"
+        "triggerValue": "q_inquisition_verdict",
+        "requiredQuestId": "q_inquisition_verdict",
+        "requiredQuestStatus": "AVAILABLE"
       },
       {
         "text": "Może innym razem.",
@@ -157,7 +161,9 @@
         "text": "Zajmę się tym (PRZYJMIJ: Żniwa Mgły).",
         "targetNodeId": "end",
         "triggerEvent": "ACTIVATE_QUEST",
-        "triggerValue": "q_coast_harvest"
+        "triggerValue": "q_coast_harvest",
+        "requiredQuestId": "q_coast_harvest",
+        "requiredQuestStatus": "AVAILABLE"
       },
       {
         "text": "Nie mam na to czasu.",
@@ -213,7 +219,9 @@
         "text": "Dobrze, zajmę się tym (ZADANIE: List do Twierdzy).",
         "targetNodeId": "end",
         "triggerEvent": "ACTIVATE_QUEST",
-        "triggerValue": "q_fortress_letter"
+        "triggerValue": "q_fortress_letter",
+        "requiredQuestId": "q_fortress_letter",
+        "requiredQuestStatus": "AVAILABLE"
       },
       {
         "text": "Nie teraz.",
@@ -285,7 +293,9 @@
         "text": "Zbadam te pęknięcia.",
         "targetNodeId": "end",
         "triggerEvent": "ACTIVATE_QUEST",
-        "triggerValue": "q_scribes_1"
+        "triggerValue": "q_scribes_1",
+        "requiredQuestId": "q_scribes_1",
+        "requiredQuestStatus": "AVAILABLE"
       }
     ]
   },
@@ -326,7 +336,9 @@
         "text": "Pójdę tam. (ZADANIE: Gabinet bez śladów)",
         "targetNodeId": "end",
         "triggerEvent": "ACTIVATE_QUEST",
-        "triggerValue": "q_verdict_1"
+        "triggerValue": "q_verdict_1",
+        "requiredQuestId": "q_verdict_1",
+        "requiredQuestStatus": "AVAILABLE"
       },
       {
         "text": "Nie mam z tym nic wspólnego.",
@@ -343,7 +355,9 @@
         "text": "Zrozumiałem. (ZADANIE: Gabinet bez śladów)",
         "targetNodeId": "end",
         "triggerEvent": "ACTIVATE_QUEST",
-        "triggerValue": "q_verdict_1"
+        "triggerValue": "q_verdict_1",
+        "requiredQuestId": "q_verdict_1",
+        "requiredQuestStatus": "AVAILABLE"
       }
     ]
   },
@@ -375,7 +389,9 @@
             "text": "Zrobię to. (AKTYWUJ: Gabinet bez śladów)",
             "targetNodeId": "end",
             "triggerEvent": "ACTIVATE_QUEST",
-            "triggerValue": "q_verdict_1"
+            "triggerValue": "q_verdict_1",
+            "requiredQuestId": "q_verdict_1",
+            "requiredQuestStatus": "AVAILABLE"
         }
     ]
   },
@@ -410,7 +426,9 @@
               "text": "Zrobię to. (AKTYWUJ: Gabinet bez śladów)",
               "targetNodeId": "end",
               "triggerEvent": "ACTIVATE_QUEST",
-              "triggerValue": "q_verdict_1"
+              "triggerValue": "q_verdict_1",
+              "requiredQuestId": "q_verdict_1",
+              "requiredQuestStatus": "AVAILABLE"
           }
       ]
   },
