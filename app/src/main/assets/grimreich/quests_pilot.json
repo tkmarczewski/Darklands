@@ -1,88 +1,87 @@
 [
   {
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
+    "id": "q_inquisition_verdict",
     "title": "۞ Wyrok Inkwizycji ۞",
     "description": "Inkwizycja Boreas wykryła anomalie w strukturze regionu. Podejrzenie padło na heretycki odłam kultu Echa, który próbuje wyważyć bramy paradygmatu. Musisz odnaleźć ich przywódcę w ruinach Wybrzeża i wymierzyć ostateczną sprawiedliwość, zanim rzeczywistość zacznie krwawić statyką.",
     "rewardGold": 120,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
+    "cityId": "wybrzeze_polnocne",
+    "originNpcId": "guard",
     "category": "COMBAT",
     "recommendedLevel": 1,
     "steps": [
       {
         "description": "Wytrop 'Apostoła Błędu' ukrywającego się w dymiących zgliszczach na obrzeżach Wybrzeża i wymierz mu wyrok.",
         "type": "COMBAT",
-         param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" 
+        "targetId": "cultist"
       }
     ]
   },
   {
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
+    "id": "q_deserter",
     "title": "Cień Dezertera",
     "description": "Były strażnik, znany jako 'Widzący Liczby', twierdzi, że niebo nad Boreas mruga, odsłaniając surowe dane. Jego słowa sieją obłęd wśród mieszkańców. Znajdź go w mroku Portu i zdecyduj, czy jest ofiarą echa, czy jego narzędziem. Prawo Boreas nie znosi wątpliwości.",
     "rewardGold": 180,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
+    "cityId": "wybrzeze_polnocne",
+    "originNpcId": "guard",
     "category": "SOCIAL",
     "recommendedLevel": 2,
     "steps": [
       {
         "description": "Odnajdź dezertera w zaułkach Portu Mglistego i rozstrzygnij jego los.",
         "type": "DIALOGUE",
-         param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" 
+        "targetId": "deserter_start"
       }
     ]
   },
   {
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
+    "id": "q_coast_harvest",
     "title": "Żniwa Mgły",
     "description": "Kupcy z Wybrzeża płacą złotem za 'Kwiaty Pamięci' – rzadkie zioła, które żywią się echem dawnych snów. Archiwiści używają ich do stabilizacji atramentu w Kronikach. Wyjdź w gęstą, lodowatą mgłę i przynieś to, co świat próbuje zapomnieć.",
     "rewardGold": 60,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
+    "cityId": "wybrzeze_polnocne",
+    "originNpcId": "merchant",
     "category": "INVESTIGATION",
     "recommendedLevel": 1,
     "steps": [
       {
         "description": "Przeszukaj strefy zerowej widoczności na Wybrzeżu i zbierz trzy pęki pulsujących błękitem ziół echa.",
         "type": "INVESTIGATION",
-         param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" 
+        "targetId": "gesta_mgla"
       }
     ]
   },
   {
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
+    "id": "q_fortress_letter",
     "title": "List do Twierdzy",
     "description": "Pilny meldunek o pęknięciu w strukturze Wybrzeża musi dotrzeć do Dowódcy Ferrum w Twierdzy Żelaznej. Drogi są niebezpieczne, a Echo przybiera kształty poległych posłańców. Nie otwieraj pieczęci – jej blask może spalić Twoją tożsamość.",
     "rewardGold": 220,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
+    "cityId": "twierdza_zelazna",
+    "originNpcId": "guard",
     "category": "SOCIAL",
     "recommendedLevel": 2,
     "steps": [
       {
         "description": "Przedrzyj się przez Północne Trakty i oddaj zapieczętowany zwój Dowódcy w sercu skalnego bastionu.",
         "type": "DIALOGUE",
-         param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" 
+        "targetId": "fortress_commander_letter"
       }
     ]
   },
   {
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
+    "id": "q_scribes_1",
     "title": "Cienie Archiwistów I",
     "description": "Mira Wieloznaczna twierdzi, że Szyfr krwawi, a słowa w Kronice Świata same się nadpisują. Ktoś lub coś próbuje zmienić historię naszej sesji. Musisz zbadać 'Pękniętą Kronikę' w Sercu Krainy i odnaleźć ślady atramentu, który nie ma fizycznego źródła.",
     "rewardGold": 200,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
+    "cityId": "serce_krainy",
+    "originNpcId": "mira",
     "category": "INVESTIGATION",
     "recommendedLevel": 3,
     "steps": [
       {
         "description": "Zanalizuj anomalie w tekście Pękniętej Kroniki. Uważaj, czytanie kodu źródłowego może wywołać traumę ontologiczną.",
         "type": "INVESTIGATION",
-         param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" 
+        "targetId": "peknie_kronika"
       }
     ]
   }
 ]
-

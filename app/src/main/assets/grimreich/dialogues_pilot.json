@@ -1,20 +1,20 @@
 [
   {
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
+    "id": "guard_start",
+    "npcId": "guard",
     "text": "Stój! Mgła gęstnieje, a prawo musi być przestrzegane. Czego szukasz w cieniu murów?",
     "choices": [
       {
         "text": "Melduję wykonanie wyroku (Wyrok Inkwizycji).",
         "targetNodeId": "guard_verdict_done",
         "requiredQuestId": "q_inquisition_verdict",
-        "requiredQuestStatus": "OBJECTIVE_MET"
+        "requiredQuestStatus": "objective_met"
       },
       {
         "text": "Melduję o dezerterze (ZADANIE: Dezerter).",
         "targetNodeId": "guard_deserter_done",
         "requiredQuestId": "q_deserter",
-        "requiredQuestStatus": "OBJECTIVE_MET"
+        "requiredQuestStatus": "objective_met"
       },
       {
         "text": "Czy coś niepokojącego działo się ostatnio?",
@@ -32,8 +32,8 @@
     ]
   },
   {
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
+    "id": "guard_relaxed",
+    "npcId": "guard",
     "text": "Dziękuję... rzadko kto tutaj dostrzega w nas ludzi. Jeśli chcesz pomóc, idź do Portu. Tam błąka się dezerter.",
     "choices": [
       {
@@ -42,13 +42,13 @@
         "triggerEvent": "ACTIVATE_QUEST",
         "triggerValue": "q_deserter",
         "requiredQuestId": "q_deserter",
-        "requiredQuestStatus": "AVAILABLE"
+        "requiredQuestStatus": "available"
       }
     ]
   },
   {
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
+    "id": "deserter_start",
+    "npcId": "deserter",
     "text": "Nie zbliżaj się! Widziałem jak niebo mrugało... Widziałem liczby pod chmurami! Jesteśmy błędem!",
     "choices": [
       {
@@ -64,13 +64,14 @@
       {
         "text": "Jesteś niebezpieczny. Muszę cię uciszyć (WALKA).",
         "targetNodeId": "end",
-        "isCombatTrigger": true
+        "isCombatTrigger": true,
+        "triggerValue": "bandit"
       }
     ]
   },
   {
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
+    "id": "deserter_obey",
+    "npcId": "deserter",
     "text": "Dobrze, dobrze! Nie krzycz... Wrócę. Ale wy i tak nie rozumiecie...",
     "choices": [
       {
@@ -82,8 +83,8 @@
     ]
   },
   {
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
+    "id": "deserter_truth",
+    "npcId": "deserter",
     "text": "Widziałem Szyfr... #000000... Wyraz 'NULL' wyryty w słońcu. Odchodzę do Miejsca Pomiędzy.",
     "choices": [
       {
@@ -95,8 +96,8 @@
     ]
   },
   {
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
+    "id": "deserter_revelation",
+    "npcId": "none",
     "text": "Gdy dezerter znika w mgle, czujesz, jak ciężar jego słów zapisuje się w Twojej pamięci. To nie był obłęd, to była obserwacja.",
     "choices": [
       {
@@ -108,8 +109,8 @@
     ]
   },
   {
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
+    "id": "guard_quest_check",
+    "npcId": "guard",
     "text": "Mgła wypluwa potwory... Inkwizycja szuka ochotników do wyeliminowania pewnego kultysty. Jesteś zainteresowany?",
     "choices": [
       {
@@ -118,7 +119,7 @@
         "triggerEvent": "ACTIVATE_QUEST",
         "triggerValue": "q_inquisition_verdict",
         "requiredQuestId": "q_inquisition_verdict",
-        "requiredQuestStatus": "AVAILABLE"
+        "requiredQuestStatus": "available"
       },
       {
         "text": "Może innym razem.",
@@ -127,15 +128,15 @@
     ]
   },
   {
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
+    "id": "merchant_start",
+    "npcId": "merchant",
     "text": "Witaj, wędrowcze! Mam towary z całego Boreas, o ile masz złoto. Albo może szukasz pracy? Mgła utrudnia zbiory.",
     "choices": [
       {
         "text": "Przynoszę zioła z mgły (Żniwa Mgły).",
         "targetNodeId": "merchant_report_back",
         "requiredQuestId": "q_coast_harvest",
-        "requiredQuestStatus": "OBJECTIVE_MET"
+        "requiredQuestStatus": "objective_met"
       },
       {
         "text": "Pokaż mi swoje towary.",
@@ -153,8 +154,8 @@
     ]
   },
   {
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
+    "id": "merchant_quest_check",
+    "npcId": "merchant",
     "text": "Archiwiści potrzebują rzadkich ziół z mgły. Płacę dobrze, jeśli przyniesiesz mi ich wystarczająco dużo.",
     "choices": [
       {
@@ -163,7 +164,7 @@
         "triggerEvent": "ACTIVATE_QUEST",
         "triggerValue": "q_coast_harvest",
         "requiredQuestId": "q_coast_harvest",
-        "requiredQuestStatus": "AVAILABLE"
+        "requiredQuestStatus": "available"
       },
       {
         "text": "Nie mam na to czasu.",
@@ -172,8 +173,8 @@
     ]
   },
   {
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
+    "id": "guard_verdict_done",
+    "npcId": "guard",
     "text": "Kultysta nie żyje? Doskonale. Inkwizycja dziękuje za usunięcie tej skazy na paradygmacie. Przygotuj się, wkrótce możesz być potrzebny w Twierdzy.",
     "choices": [
       {
@@ -185,8 +186,8 @@
     ]
   },
   {
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
+    "id": "guard_deserter_done",
+    "npcId": "guard",
     "text": "Dezerter uciszony? Prawo Boreas znów jest silne. Widzę w tobie potencjał, którego nie wolno zmarnować na tym pustkowiu.",
     "choices": [
       {
@@ -198,9 +199,9 @@
     ]
   },
   {
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-    "text": "Masz te zioła? Widzę blask echa w twoich oczach... to dobra partia. Może zainteresuje cię Twierdza Żelazna? Mam tam list do dowódcy.",
+    "id": "merchant_report_back",
+    "npcId": "merchant",
+    "text": "Masz te zioła? Widzę blask echa w twoich oczach... to dobra partia. Może zainteresuje cię Twierdza Żelaznej? Mam tam list do dowódcy.",
     "choices": [
       {
         "text": "Proszę, oto zioła (ZAKOŃCZ).",
@@ -211,8 +212,8 @@
     ]
   },
   {
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
+    "id": "merchant_next_task",
+    "npcId": "merchant",
     "text": "Skoro jesteś taki sprawny... Dostarcz ten list do Twierdzy Żelaznej. Dowódca Ferrum zapłaci ci godziwie za trud podróży.",
     "choices": [
       {
@@ -221,7 +222,7 @@
         "triggerEvent": "ACTIVATE_QUEST",
         "triggerValue": "q_fortress_letter",
         "requiredQuestId": "q_fortress_letter",
-        "requiredQuestStatus": "AVAILABLE"
+        "requiredQuestStatus": "available"
       },
       {
         "text": "Nie teraz.",
@@ -230,33 +231,8 @@
     ]
   },
   {
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-    "text": "Stój! Twierdza Żelazna nie przyjmuje uchodźców. Tylko ci z uprawnieniami lub sprawami do Dowódcy mogą przejść przez bramę.",
-    "choices": [
-      {
-        "text": "Mam list od kupca z Wybrzeża.",
-        "targetNodeId": "fortress_commander_letter",
-        "requiredQuestId": "q_fortress_letter",
-        "requiredQuestStatus": "ACTIVE",
-        "triggerEvent": "ADVANCE_QUEST",
-        "triggerValue": "q_fortress_letter"
-      },
-      {
-        "text": "Mam sprawę do Dowódcy (Wymaga: Dowód na sabotaż).",
-        "targetNodeId": "fortress_commander_letter",
-        "requiredQuestId": "q_inquisition_verdict",
-        "requiredQuestStatus": "COMPLETED"
-      },
-      {
-        "text": "Chcę wejść do środka.",
-        "targetNodeId": "fortress_denied"
-      }
-    ]
-  },
-  {
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
+    "id": "fortress_commander_letter",
+    "npcId": "guard",
     "text": "List od starego Aldousa? No dobrze... Dowódca Ferrum czeka w bastionie. Możesz wejść.",
     "choices": [
       {
@@ -268,26 +244,15 @@
     ]
   },
   {
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-    "text": "Nie ma mowy. Wróć, gdy będziesz miał realny powód, by marnować nasz czas.",
-    "choices": [
-      {
-        "text": "Odejdź.",
-        "targetNodeId": "end"
-      }
-    ]
-  },
-  {
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
+    "id": "mira_start",
+    "npcId": "mira",
     "text": "Słowa są fragmentami prawdy... Jakby rzeczywistość próbowała wymazać własną historię. Czy pomożesz mi ją ocalić?",
     "choices": [
       {
         "text": "Zamelduję o anomalii (Cienie Archiwistów).",
         "targetNodeId": "mira_report_back",
         "requiredQuestId": "q_scribes_1",
-        "requiredQuestStatus": "OBJECTIVE_MET"
+        "requiredQuestStatus": "objective_met"
       },
       {
         "text": "Zbadam te pęknięcia.",
@@ -295,13 +260,13 @@
         "triggerEvent": "ACTIVATE_QUEST",
         "triggerValue": "q_scribes_1",
         "requiredQuestId": "q_scribes_1",
-        "requiredQuestStatus": "AVAILABLE"
+        "requiredQuestStatus": "available"
       }
     ]
   },
   {
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
+    "id": "mira_report_back",
+    "npcId": "mira",
     "text": "Kronika znów drży... Czy odnalazłeś to, co zostało podmienione? Każdy wpis ma znaczenie dla stabilności tego snu.",
     "choices": [
       {
@@ -313,8 +278,8 @@
     ]
   },
   {
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
+    "id": "ravenn_start",
+    "npcId": "ravenn",
     "text": "Zbliż się, wędrowcze. Widzę, że ślady beztwarzowych wyroków nie są ci obce. Boreas krwawi, a Szyfr zaciera ślady. Czy jesteś gotów poznać prawdę o gabinecie bez śladów?",
     "choices": [
       {
@@ -328,8 +293,8 @@
     ]
   },
   {
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
+    "id": "ravenn_ambush_suspect",
+    "npcId": "ravenn",
     "text": "Stój, Kotwico. Twoja trasa podróży jest... podejrzanie zsynchronizowana z serią wyroków wykonanych bez użycia ostrza. Jesteś albo największym pechowcem w Boreas, albo tym, kogo szukam. Ravenn Beztwarzowy chce z Tobą rozmawiać w Opactwie Ciszy.",
     "choices": [
       {
@@ -338,7 +303,7 @@
         "triggerEvent": "ACTIVATE_QUEST",
         "triggerValue": "q_verdict_1",
         "requiredQuestId": "q_verdict_1",
-        "requiredQuestStatus": "AVAILABLE"
+        "requiredQuestStatus": "available"
       },
       {
         "text": "Nie mam z tym nic wspólnego.",
@@ -347,8 +312,8 @@
     ]
   },
   {
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
+    "id": "ravenn_ambush_investigator",
+    "npcId": "ravenn",
     "text": "Twoje kroki odbijają się echem w Szyfrze, wędrowcze. Widziałeś ciała, których nikt nie powinien widzieć. Jeśli chcesz zatrzymać ten proces, przyjdź do Opactwa Ciszy. Ja, Ravenn, będę na Ciebie czekał.",
     "choices": [
       {
@@ -357,32 +322,32 @@
         "triggerEvent": "ACTIVATE_QUEST",
         "triggerValue": "q_verdict_1",
         "requiredQuestId": "q_verdict_1",
-        "requiredQuestStatus": "AVAILABLE"
+        "requiredQuestStatus": "available"
       }
     ]
   },
   {
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
+    "id": "ravenn_check_path",
+    "npcId": "ravenn",
     "text": "Najpierw muszę wiedzieć, z kim rozmawiam...",
     "choices": [
         {
             "text": "[ANALIZUJ DOWODY]",
             "targetNodeId": "ravenn_investigator",
             "triggerEvent": "CHECK_WORLD_FLAG",
-            "triggerValue": "verdict_path_INVESTIGATOR"
+            "triggerValue": "verdict_path_investigator"
         },
         {
             "text": "[OCZEKUJ WYROKU]",
             "targetNodeId": "ravenn_accused",
             "triggerEvent": "CHECK_WORLD_FLAG",
-            "triggerValue": "verdict_path_SUSPECT"
+            "triggerValue": "verdict_path_suspect"
         }
     ]
   },
   {
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
+    "id": "ravenn_investigator",
+    "npcId": "ravenn",
     "text": "Twoja trasa podróży jest godna podziwu. Śledziłeś te usterki, zamiast przed nimi uciekać. Pomóż mi wejść do gabinetu, musimy zabezpieczyć dowody.",
     "choices": [
         {
@@ -391,35 +356,36 @@
             "triggerEvent": "ACTIVATE_QUEST",
             "triggerValue": "q_verdict_1",
             "requiredQuestId": "q_verdict_1",
-            "requiredQuestStatus": "AVAILABLE"
+            "requiredQuestStatus": "available"
         }
     ]
   },
   {
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
+    "id": "ravenn_accused",
+    "npcId": "ravenn",
     "text": "Bilety Twojej sesji są w komplecie. Wybrzeże, Port, Twierdza... Twoja trasa pokrywa się z każdym morderstwem. Nie szukasz mordercy, Ty nim jesteś, bo tylko Ty przeżywasz każdą usterkę. Co masz na swoją obronę?",
     "choices": [
       {
-        "text": "To Szyfr mnie ściga, nie ja go tworzę! (Wymaga: Intelekt 16+)",
+        "text": "To Szyfr mnie ściga, nie ja go tworzę!",
         "targetNodeId": "ravenn_defended",
         "requiredAttributes": { "intelligence": 16 }
       },
       {
-          "text": "To kłamstwa! Nie masz dowodów! (Wymaga: Charyzma 15+)",
+          "text": "To kłamstwa! Nie masz dowodów!",
           "targetNodeId": "ravenn_defended",
           "requiredAttributes": { "charisma": 15 }
       },
       {
         "text": "Nie wyjdę stąd żywy, prawda? (WALKA)",
         "targetNodeId": "end",
-        "isCombatTrigger": true
+        "isCombatTrigger": true,
+        "triggerValue": "blood_wraith"
       }
     ]
   },
   {
-       param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-       param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
+      "id": "ravenn_defended",
+      "npcId": "ravenn",
       "text": "Twoje słowa mają pewną... ontologiczną wagę. No dobrze. Jeśli chcesz dowieść niewinności, wejdź do tego gabinetu i znajdź prawdziwego sprawcę.",
       "choices": [
           {
@@ -428,177 +394,21 @@
               "triggerEvent": "ACTIVATE_QUEST",
               "triggerValue": "q_verdict_1",
               "requiredQuestId": "q_verdict_1",
-              "requiredQuestStatus": "AVAILABLE"
+              "requiredQuestStatus": "available"
           }
       ]
   },
   {
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-    "text": "Kotwico... Twoja obecność tutaj jest jak pęknięcie na tafli jeziora. Czy wiesz, że ten świat jest tylko snem Sędziów?",
-    "choices": [
-      {
-        "text": "Jeśli to sen, kto nas śni?",
-        "targetNodeId": "aelion_meta",
-        "requiredAttributes": { "intelligence": 16 }
-      },
-      {
-        "text": "Szukam relikwii.",
-        "targetNodeId": "aelion_quest"
-      },
-      {
-        "text": "Muszę iść.",
-        "targetNodeId": "end"
-      }
-    ]
-  },
-  {
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-    "text": "Śnią nas Skrybowie Absolutni. Każdy twój krok, każda walka, to tylko linia w ich Kronice. Czy czujesz, jak stabilność świata drży, gdy o tym mówię?",
-    "choices": [
-      {
-        "text": "To przerażające.",
-        "targetNodeId": "aelion_meta_end"
-      },
-      {
-        "text": "Nie wierzę w to.",
-        "targetNodeId": "end"
-      }
-    ]
-  },
-  {
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-    "text": "Strach jest tylko reakcją na prawdę. Szukaj Kotwicy, ona utrzyma ten sen w ryzach... jeszcze przez chwilę.",
-    "choices": [
-      {
-        "text": "Będę pamiętać.",
-        "targetNodeId": "end",
-        "triggerEvent": "INCREMENT_META",
-        "triggerValue": "1"
-      }
-    ]
-  },
-  {
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-    "text": "Relikwie są fragmentami poprzednich snów. Jeśli chcesz pomóc w stabilizacji, musisz odnaleźć Kotwicę Północy. Strażnik przy bramie wie więcej o pęknięciach w okolicy.",
-    "choices": [
-      {
-        "text": "Pójdę do Strażnika.",
-        "targetNodeId": "end"
-      }
-    ]
-  },
-  {
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-    "text": "Czuję echo w twoich słowach. Czy szukasz prawdy o tym świecie, czy tylko ukojenia w modlitwie?",
-    "choices": [
-      {
-        "text": "Chcę wiedzieć więcej.",
-        "targetNodeId": "end"
-      },
-      {
-        "text": "Potrzebuję pomocy.",
-        "targetNodeId": "end"
-      }
-    ]
-  },
-  {
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-    "text": "Daj miedziaka... Albo powiedz mi, że to wszystko to tylko zły sen. Widzę kolory, których nie ma...",
-    "choices": [
-      {
-        "text": "Daj złoto (1 G).",
-        "targetNodeId": "end",
-        "triggerEvent": "GRANT_REPUTATION",
-        "triggerValue": "CITY:1"
-      },
-      {
-        "text": "Odejdź.",
-        "targetNodeId": "end"
-      }
-    ]
-  },
-  {
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-    "text": "Twoja aura uległa zmianie... Czy Szyfr przemówił do ciebie podczas rytuału?",
-    "choices": [
-      {
-        "text": "Zadanie wykonane. Świat stał się nieco jaśniejszy (ZAKOŃCZ).",
-        "targetNodeId": "end",
-        "triggerEvent": "COMPLETE_QUEST",
-        "triggerValue": "ACTIVE"
-      }
-    ]
-  },
-  {
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-    "text": "Melduję się u Dowódcy. Mam wiadomość z Wybrzeża.",
-    "choices": [
-      {
-        "text": "Przekaż list (ZAKOŃCZ).",
-        "targetNodeId": "fortress_commander_letter"
-      }
-    ]
-  },
-  {
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
+    "id": "quest_report_back_generic",
+    "npcId": "npc",
     "text": "A więc udało ci się? Doskonale. Twoje wysiłki nie pojdą na marne, wędrowcze.",
     "choices": [
       {
         "text": "Dziękuję za nagrodę (ZAKOŃCZ).",
         "targetNodeId": "end",
         "triggerEvent": "COMPLETE_QUEST",
-        "triggerValue": "ACTIVE"
-      }
-    ]
-  },
-  {
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-    "text": "...pamiętasz mnie? Tam w mroku... było tak zimno. Czy ta kolejna próba ma w ogóle sens?",
-    "choices": [
-      {
-        "text": "Przepraszam, że zawiodłem.",
-        "targetNodeId": "companion_shadow_sad"
-      },
-      {
-        "text": "Twoja ofiara pozwoli nam przetrwać.",
-        "targetNodeId": "companion_shadow_util"
-      },
-      {
-        "text": "Odejdź w niebyt!",
-        "targetNodeId": "end"
-      }
-    ]
-  },
-  {
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-    "text": "Wybaczenie... to tylko kolejna linijka w Kronice. Nie czuję gniewu, tylko pustkę.",
-    "choices": [
-      { "text": "Żegnaj.", "targetNodeId": "end" }
-    ]
-  },
-  {
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-    "text": "Więc niech tak będzie. Wykorzystaj moje Echo, zanim Szyfr całkowicie mnie wymaże.",
-    "choices": [
-      {
-        "text": "Przyjmij mądrość echa (+100 XP).",
-        "targetNodeId": "end",
-        "triggerEvent": "COMPLETE_QUEST",
-        "triggerValue": "ACTIVE"
+        "triggerValue": "active"
       }
     ]
   }
 ]
-

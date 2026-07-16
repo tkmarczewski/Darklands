@@ -1,7 +1,7 @@
 [
   {
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
+    "id": "cracked_chronicle_int_test",
+    "npcId": "none",
     "text": "Kronika drży w Twoich dłoniach. Atrament wydaje się pulsować, układając się w kształty, które nie powinny istnieć. Pomiędzy wierszami dostrzegasz pęknięcia w samej strukturze zapisu – coś próbuje wyciec z tej historii.",
     "choices": [
       {
@@ -25,8 +25,8 @@
     ]
   },
   {
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
+    "id": "harvest_herbs_coast",
+    "npcId": "none",
     "text": "Mgła na wybrzeżu jest gęsta i lodowata. Dostrzegasz błękitne kwiaty, które wydają się pulsować w rytm Twojego serca. To rzadkie zioła echa, których szuka kupiec.",
     "choices": [
       {
@@ -43,8 +43,8 @@
     ]
   },
   {
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
+    "id": "verdict_office_per_test",
+    "npcId": "ravenn",
     "text": "Gabinet jest sterylny, niemal przerażająco czysty. Ale pod kątem, w którym pada światło lampy gazowej, kurz na ścianach układa się w nienaturalne wzory. To nie kurz. To wyryte w eterze runy, które wymazują pamięć o tym, kto tu przebywał.",
     "choices": [
       {
@@ -64,8 +64,8 @@
     ]
   },
   {
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
+    "id": "blood_ritual_will_test",
+    "npcId": "ritualist",
     "text": "Rytualista wyciąga ku Tobie dłonie czarne od zaschniętej krwi. 'Oddaj mi swoje wspomnienie o matce. Złamię twoją wolę, by zobaczyć prawdę o twojej krwi. Jeśli się oprzesz, twoja krew poświadczy o twoim zakłamaniu.'",
     "choices": [
       {
@@ -89,8 +89,8 @@
     ]
   },
   {
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
+    "id": "blood_ritual_success",
+    "npcId": "ritualist",
     "text": "Twoja wola jest jak stal... lub twoja wiara jak tarcza. Rytualista cofa się, a jego wizja pęka jak lustro.",
     "choices": [
       {
@@ -100,8 +100,8 @@
     ]
   },
   {
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
+    "id": "margin_note_complex",
+    "npcId": "archivist",
     "text": "Dopisek na stronie Kroniki: 'Podmiot wykazuje anomalie w percepcji. Czytanie kodu źródłowego zakończone sukcesem. Czy on widzi nas, czy tylko my widzimy go?' Słowa zaczynają się obracać na stronie.",
     "choices": [
       {
@@ -125,8 +125,8 @@
     ]
   },
   {
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
+    "id": "meta_truth_reveal",
+    "npcId": "archivist",
     "text": "Świat wokół Ciebie na sekundę zamiera. Widzisz przez chwilę marginesy strony, na której zapisana jest cała Twoja podróż. Widzisz miejsce na komentarz Twojego gracza.",
     "choices": [
       {
@@ -138,96 +138,96 @@
     ]
   },
   {
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
+    "id": "masked_impostor_reveal",
+    "npcId": "guard",
     "text": "To niemożliwe... Wyglądasz dokładnie jak on. Ale on przed chwilą wszedł do Karczmy!",
     "choices": [
       { "text": "To oszustwo. Prowadź mnie do niego.", "targetNodeId": "end", "triggerEvent": "ADVANCE_QUEST", "triggerValue": "q_three_masks" }
     ]
   },
   {
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
+    "id": "raven_messenger",
+    "npcId": "assassin",
     "text": "Bractwo nie zapomina. Twoja krew należy do nas, Kotwico.",
     "choices": [
       { "text": "Próbujcie ją odebrać.", "targetNodeId": "end", "isCombatTrigger": true, "triggerEvent": "ADVANCE_QUEST", "triggerValue": "q_raven_oath" }
     ]
   },
   {
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
+    "id": "ritual_seal_start",
+    "npcId": "ritualist",
     "text": "Ostatnia pieczęć wymaga Twojego podpisu na eterze. Czy jesteś gotów stać się częścią Maszyny?",
     "choices": [
       { "text": "Nigdy.", "targetNodeId": "end", "isCombatTrigger": true, "triggerEvent": "ADVANCE_QUEST", "triggerValue": "q_ritualist_seal" }
     ]
   },
   {
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
+    "id": "voice_inside_head",
+    "npcId": "none",
     "text": "(Twój własny głos szepcze w Twoim umyśle): 'Wszystko, co widzisz, jest tylko odbiciem. Ty jesteś oryginałem, ale oni chcą Twojej symetrii.'",
     "choices": [
       { "text": "Odejdź z moich myśli.", "targetNodeId": "end", "triggerEvent": "ADVANCE_QUEST", "triggerValue": "q_not_your_voice" }
     ]
   },
   {
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
+    "id": "forbidden_book_dialogue",
+    "npcId": "archivist",
     "text": "Księga zaczęła zapisywać Twoją śmierć. Patrz, atrament wciąż jest mokry...",
     "choices": [
       { "text": "Zniszczę to przeznaczenie.", "targetNodeId": "end", "triggerEvent": "ADVANCE_QUEST", "triggerValue": "q_book_writes_itself" }
     ]
   },
   {
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
+    "id": "ghost_ship_start",
+    "npcId": "none",
     "text": "Statki nie mają załogi, a ich żagle są utkane z mgły. Słyszysz jednak dzwon bijący pod pokładem.",
     "choices": [
       { "text": "Zbadaj ładownię.", "targetNodeId": "end", "triggerEvent": "ADVANCE_QUEST", "triggerValue": "q_stone_haven_dusk" }
     ]
   },
   {
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
+    "id": "ruin_heart_silence",
+    "npcId": "none",
     "text": "W centrum ruin bije wielkie, kamienne serce. Z każdym uderzeniem świat traci nasycenie kolorów.",
     "choices": [
       { "text": "Ustabilizuj tętno ruin.", "targetNodeId": "end", "triggerEvent": "ADVANCE_QUEST", "triggerValue": "q_black_maw_wakes" }
     ]
   },
   {
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
+    "id": "void_bridge_crossing",
+    "npcId": "none",
     "text": "Most pod Twoimi stopami wydaje się być tylko sugestią. Pod nim nie ma nawet ciemności – jest tylko Nicość.",
     "choices": [
       { "text": "Idź naprzód, nie patrząc w dół.", "targetNodeId": "end", "triggerEvent": "ADVANCE_QUEST", "triggerValue": "q_bridge_over_nothing" }
     ]
   },
   {
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
+    "id": "storm_summoning",
+    "npcId": "none",
     "text": "Wznosisz ręce, a niebo odpowiada rykiem statycznego szumu. Burza echa nadchodzi.",
     "choices": [
       { "text": "Czekaj na manifestację Świątyni.", "targetNodeId": "end", "triggerEvent": "ADVANCE_QUEST", "triggerValue": "q_vanishing_temple" }
     ]
   },
   {
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
+    "id": "phantom_temple_enter",
+    "npcId": "none",
     "text": "Świątynia lśni w świetle błyskawic. Drzwi są otwarte, ale w środku czas wydaje się stać w miejscu.",
     "choices": [
       { "text": "Wejdź do środka.", "targetNodeId": "end", "triggerEvent": "ADVANCE_QUEST", "triggerValue": "q_vanishing_temple" }
     ]
   },
   {
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
+    "id": "mine_whisper_source",
+    "npcId": "none",
     "text": "Szepty dobiegają ze szczeliny w skale. To nie ludzie – to same ściany kopalni pamiętają głosy tych, którzy tu zginęli.",
     "choices": [
       { "text": "Zamurować to miejsce (Cisza).", "targetNodeId": "end", "triggerEvent": "ADVANCE_QUEST", "triggerValue": "q_whispering_mine" }
     ]
   },
   {
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
+    "id": "witch_swamp_choice",
+    "npcId": "none",
     "text": "Szeptucha uśmiecha się, pokazując zęby z czarnego szkła. 'Daj mi swoje najpiękniejsze wspomnienie, a mgła się rozstąpi.'",
     "choices": [
       { "text": "Oddaj wspomnienie (Płacisz cenę).", "targetNodeId": "end", "triggerEvent": "ADVANCE_QUEST", "triggerValue": "q_swamp_witch" },
@@ -235,16 +235,16 @@
     ]
   },
   {
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
+    "id": "vampire_monk_dialogue",
+    "npcId": "monk",
     "text": "Brat Tomasz nie pije wina... on pije tylko czerwony atrament z Kroniki. A potem Kronika staje się pusta.",
     "choices": [
       { "text": "Znajdź brata Tomasza.", "targetNodeId": "end", "triggerEvent": "ADVANCE_QUEST", "triggerValue": "q_monastery_bloodsucker" }
     ]
   },
   {
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
+    "id": "mist_child_final",
+    "npcId": "peasant",
     "text": "Dziecko stoi w centrum mgły i płacze czystym światłem. Tam, gdzie spadają jego łzy, rzeczywistość pęka.",
     "choices": [
       { "text": "Pociesz dziecko (Stabilizacja).", "targetNodeId": "end", "triggerEvent": "ADVANCE_QUEST", "triggerValue": "q_mist_child" },
@@ -252,48 +252,48 @@
     ]
   },
   {
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
+    "id": "talking_dog_revelation",
+    "npcId": "none",
     "text": "Pies siada i mówi ludzkim głosem: 'Jesteś tylko pionkiem w grze, której zasady zmieniają się w trakcie rzutu kością.'",
     "choices": [
       { "text": "Wiem o tym.", "targetNodeId": "end", "triggerEvent": "ADVANCE_QUEST", "triggerValue": "q_talking_dog" }
     ]
   },
   {
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
+    "id": "undying_mother_end",
+    "npcId": "none",
     "text": "Gdy artefakt dotyka jej czoła, czas w końcu dogania jej ciało. 'Dziękuję...', szepcze, rozsypując się w pył.",
     "choices": [
       { "text": "Odpocznij w pokoju.", "targetNodeId": "end", "triggerEvent": "COMPLETE_QUEST", "triggerValue": "q_undying_mother" }
     ]
   },
   {
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
+    "id": "soul_sync_ritual",
+    "npcId": "none",
     "text": "Dwie dusze w jednym ciele zaczynają wibrować z tą samą częstotliwością. Harmonia powraca.",
     "choices": [
       { "text": "Zakończ rytuał.", "targetNodeId": "end", "triggerEvent": "COMPLETE_QUEST", "triggerValue": "q_two_soul_child" }
     ]
   },
   {
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
+    "id": "lost_squad_interrogation",
+    "npcId": "guard",
     "text": "Twierdzą, że wyszli z obozu wczoraj. Ale ich mundury są z czasów Pierwszej Krwi.",
     "choices": [
       { "text": "Znajdź lukę w ich zeznaniach.", "targetNodeId": "end", "triggerEvent": "ADVANCE_QUEST", "triggerValue": "q_lost_squad" }
     ]
   },
   {
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
+    "id": "demon_shadow_truth",
+    "npcId": "merchant",
     "text": "Widzisz to? Ich cienie mają rogi i ogony. Oni nie są klientami – oni są strażnikami Twojego więzienia.",
     "choices": [
       { "text": "Teraz to widzę.", "targetNodeId": "end", "triggerEvent": "ADVANCE_QUEST", "triggerValue": "q_demon_merchant" }
     ]
   },
   {
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
+    "id": "brother_fate_choice",
+    "npcId": "peasant",
     "text": "On ma Twoje oczy, ale patrzy przez nie coś obcego. Czy to wciąż Twój brat?",
     "choices": [
       { "text": "Przyjmij go takim, jakim jest.", "targetNodeId": "end", "triggerEvent": "ADVANCE_QUEST", "triggerValue": "q_returned_brother" },
@@ -301,64 +301,64 @@
     ]
   },
   {
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
+    "id": "village_judge_start",
+    "npcId": "peasant",
     "text": "Wybieraj, Kotwico. Jeden musi zginąć, by reszta mogła żyć. Takie jest prawo stabilności.",
     "choices": [
       { "text": "Wysłuchaj obu stron.", "targetNodeId": "end", "triggerEvent": "ADVANCE_QUEST", "triggerValue": "q_village_judgment" }
     ]
   },
   {
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
+    "id": "village_judge_final",
+    "npcId": "peasant",
     "text": "Twój wyrok został zapisany w Kronice. Niech krew spłynie na fundamenty.",
     "choices": [
       { "text": "Wykonaj wyrok.", "targetNodeId": "end", "triggerEvent": "ADVANCE_QUEST", "triggerValue": "q_village_judgment" }
     ]
   },
   {
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
+    "id": "dream_world_enter",
+    "npcId": "none",
     "text": "Rzeczywistość rozpływa się w kolorach akwareli. Jesteś w Świecie Snów.",
     "choices": [
       { "text": "Odszukaj Złodzieja.", "targetNodeId": "end", "triggerEvent": "ADVANCE_QUEST", "triggerValue": "q_dream_thief" }
     ]
   },
   {
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
+    "id": "faceless_restore",
+    "npcId": "none",
     "text": "Gdy lustrzany odłamek dotyka pustki w miejscu twarzy, rysy wędrowca zaczynają się formować. 'W końcu... widzę siebie.'",
     "choices": [
       { "text": "Twoja podróż dobiegła końca.", "targetNodeId": "end", "triggerEvent": "COMPLETE_QUEST", "triggerValue": "q_faceless_wanderer" }
     ]
   },
   {
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
+    "id": "jester_interact",
+    "npcId": "none",
     "text": "Błazen tańczy na krawędzi murów obronnych. 'Chcesz znać sekret Dowódcy? To kosztuje więcej niż złoto – kosztuje zdrowy rozsądek.'",
     "choices": [
       { "text": "Powiedz mi wszystko.", "targetNodeId": "end", "triggerEvent": "COMPLETE_QUEST", "triggerValue": "q_jester_laugh" }
     ]
   },
   {
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
+    "id": "verdict_runes",
+    "npcId": "none",
     "text": "Runy układają się w słowo: 'REBOOT'. Ale nie restart świata, lecz restart Twojej roli w nim.",
     "choices": [
       { "text": "Zrozum kod.", "targetNodeId": "end", "triggerEvent": "ADVANCE_QUEST", "triggerValue": "q_verdict_1" }
     ]
   },
   {
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
+    "id": "tribunal_hall_start",
+    "npcId": "none",
     "text": "Sala jest pełna posągów sędziów. Wszystkie głowy obracają się w Twoją stronę w tej samej sekundzie.",
     "choices": [
       { "text": "Przyjmij wyrok.", "targetNodeId": "end", "triggerEvent": "ADVANCE_QUEST", "triggerValue": "q_verdict_4" }
     ]
   },
   {
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
+    "id": "verdict_final_choice",
+    "npcId": "none",
     "text": "Stoisz przed ostatecznym wyborem. Czy zostaniesz częścią Szyfru, czy zniszczysz Kronikę raz na zawsze?",
     "choices": [
       { "text": "Zniszcz Kronikę (Koniec wszystkiego).", "targetNodeId": "end", "triggerEvent": "COMPLETE_QUEST", "triggerValue": "q_verdict_5" },
@@ -366,28 +366,27 @@
     ]
   },
   {
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
+    "id": "witness_girl_dialogue",
+    "npcId": "peasant",
     "text": "Widziałam Twoje oczy we mgle... były pełne cyfr i błyskawic. To Ty byłeś tym potworem.",
     "choices": [
       { "text": "To nie byłem ja.", "targetNodeId": "end", "triggerEvent": "ADVANCE_QUEST", "triggerValue": "q_blood_2" }
     ]
   },
   {
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
+    "id": "void_white_noise",
+    "npcId": "none",
     "text": "Szum w uszach staje się zrozumiały. To nie jest dźwięk – to instrukcja obsługi Twojej własnej duszy.",
     "choices": [
       { "text": "Przyswój instrukcję.", "targetNodeId": "end", "triggerEvent": "ADVANCE_QUEST", "triggerValue": "q_void_whisper" }
     ]
   },
   {
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
+    "id": "ledger_signing",
+    "npcId": "none",
     "text": "Pióro skryby jest gorące. Gdy stawiasz swój znak na Ledgerze, czujesz, jak Twoje instanceId zostaje na zawsze wyryte w pamięci trwałej.",
     "choices": [
       { "text": "Zatwierdzam protokół.", "targetNodeId": "end", "triggerEvent": "ADVANCE_QUEST", "triggerValue": "q_lost_scribe" }
     ]
   }
 ]
-

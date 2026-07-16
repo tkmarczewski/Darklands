@@ -1,761 +1,760 @@
 [
   {
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
+    "id": "q_blood_icon",
     "title": "Szept Krwawej Ikony",
     "description": "Wioska Raskhold, niegdyś spokojna osada rybacka, teraz drży w rytm uderzeń serca potężnego posągu, który wyłonił się z piasku. Ikona krwawi czarnym atramentem i szepcze imiona mieszkańców, którzy znikają we mgle. Inkwizycja chce wiedzieć, czy to błąd w Szyfrze, czy przebudzenie zapomnianego bóstwa.",
     "rewardGold": 150,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-    "category": "SOCIAL",
+    "cityId": "wybrzeze_polnocne",
+    "originNpcId": "peasant",
+    "category": "social",
     "recommendedLevel": 2,
     "steps": [
-      { "description": "Wejdź między obłąkanych mieszkańców i odszukaj 'Głos Wioski', by dowiedzieć się, co widzieli w blasku ikony.", "type": "SOCIAL",  param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`""  },
-      { "description": "Stań przed ołtarzem błędu, pokonaj jego opętanego strażnika i zniszcz Ikonę, zanim wymaże Raskhold z Kroniki.", "type": "COMBAT",  param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`""  }
+      { "description": "Wejdź między obłąkanych mieszkańców i odszukaj 'Głos Wioski', by dowiedzieć się, co widzieli w blasku ikony.", "type": "social", "targetId": "wybrzeze_polnocne" },
+      { "description": "Stań przed ołtarzem błędu, pokonaj jego opętanego strażnika i zniszcz Ikonę, zanim wymaże Raskhold z Kroniki.", "type": "combat", "targetId": "possessed_statue" }
     ]
   },
   {
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
+    "id": "q_lost_apostle",
     "title": "۞ Zaginiony Apostoł ۞",
     "description": "Kapłan Absolutu, Brat Kael, uciekł z Opactwa Ciszy, niosąc ze sobą 'Księgę Zer'. Manuskrypt ten zawiera rzekomo instrukcję restartu bieżącej sesji rzeczywistości. Musisz go odnaleźć, zanim odprawi rytuał, który może cofnąć nas wszystkich do stanu nicości.",
     "rewardGold": 180,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-    "category": "INVESTIGATION",
+    "cityId": "opactwo_ciszy",
+    "originNpcId": "priest",
+    "category": "investigation",
     "recommendedLevel": 3,
     "steps": [
-      { "description": "Trop Kaela w mroźnych, martwych lasach wokół Opactwa. Szukaj śladów statycznego wyładowania na drzewach.", "type": "INVESTIGATION",  param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`""  },
-      { "description": "Skonfrontuj się z upadłym kapłanem w sercu zamieci i odzyskaj zakazany manuskrypt.", "type": "COMBAT",  param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`""  }
+      { "description": "Trop Kaela w mroźnych, martwych lasach wokół Opactwa. Szukaj śladów statycznego wyładowania na drzewach.", "type": "investigation", "targetId": "opactwo_ciszy" },
+      { "description": "Skonfrontuj się z upadłym kapłanem w sercu zamieci i odzyskaj zakazany manuskrypt.", "type": "combat", "targetId": "fallen_priest" }
     ]
   },
   {
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
+    "id": "q_three_masks",
     "title": "Trzy Maski Zdrajcy",
     "description": "W Sercu Krainy pojawiła się grupa oszustów, którzy noszą maski wykonane z ludzkiej skóry, idealnie imitujące Twoje twarze. Dokonują morderstw, pozostawiając Twoje identyfikatory w Ledgerach ofiar. Musisz odnaleźć tych 'Sobowtórów Szyfru' i dowieść, że to Ty jesteś oryginałem.",
     "rewardGold": 220,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-    "category": "COMBAT",
+    "cityId": "serce_krainy",
+    "originNpcId": "guard",
+    "category": "combat",
     "recommendedLevel": 4,
     "steps": [
-      { "description": "Zlokalizuj legowisko 'Złodziei Twarzy' w podziemnych kanałach Serca Krainy.", "type": "DIALOGUE",  param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`""  },
-      { "description": "Wyeliminuj grupę sobowtórów i spal ich maski, by przerwać fałszywe echo.", "type": "COMBAT",  param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`""  }
+      { "description": "Zlokalizuj legowisko 'Złodziei Twarzy' w podziemnych kanałach Serca Krainy.", "type": "dialogue", "targetId": "masked_impostor_reveal" },
+      { "description": "Wyeliminuj grupę sobowtórów i spal ich maski, by przerwać fałszywe echo.", "type": "combat", "targetId": "masked_impostor" }
     ]
   },
   {
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
+    "id": "q_altar_silence",
     "title": "Krew na Ołtarzu Ciszy",
     "description": "Pod fundamentami Opactwa odkryto komnatę, która nie istnieje na planach architektonicznych. To 'Strefa Buforowa', gdzie mnisi składają ofiary z własnych wspomnień, by zasilać barierę przeciwko Echu. Zbadaj te fundamenty i zdecyduj, czy ich cena za stabilność nie jest zbyt wysoka.",
     "rewardGold": 160,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-    "category": "INTRIGUE",
+    "cityId": "opactwo_ciszy",
+    "originNpcId": "monk",
+    "category": "intrigue",
     "recommendedLevel": 3,
     "steps": [
-      { "description": "Zejdź do milczących piwnic, gdzie czas płynie o połowę wolniej.", "type": "INVESTIGATION",  param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`""  },
-      { "description": "Wyeliminuj 'Strażnika Ciszy' – byt stworzony z uciętych języków heretyków.", "type": "COMBAT",  param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`""  }
+      { "description": "Zejdź do milczących piwnic, gdzie czas płynie o połowę wolniej.", "type": "investigation", "targetId": "silent_cellar" },
+      { "description": "Wyeliminuj 'Strażnika Ciszy' – byt stworzony z uciętych języków heretyków.", "type": "combat", "targetId": "silent_guardian" }
     ]
   },
   {
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
+    "id": "q_raven_oath",
     "title": "Złamana Przysięga Kruka",
     "description": "Bractwo Zabójców, wykonawcy 'Szybkiego Wymazania', żądają Twojej krwi. Twierdzą, że Twój gracz obiecał im Twoją śmierć w poprzedniej sesji gry. Emisariusz czeka w dokach, by odebrać dług, którego nie pamiętasz.",
     "rewardGold": 190,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-    "category": "INTRIGUE",
+    "cityId": "port_mglisty",
+    "originNpcId": "assassin",
+    "category": "intrigue",
     "recommendedLevel": 5,
     "steps": [
-      { "description": "Spotkaj się z posłańcem w Porcie Mglistym i wysłuchaj oskarżenia ze strony Bractwa.", "type": "DIALOGUE",  param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`""  },
-      { "description": "Odeprzyj atak elitarnego 'Kruczego Zabójcy', który nie spocznie, póki nie zsynchronizuje Twojej śmierci.", "type": "COMBAT",  param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`""  }
+      { "description": "Spotkaj się z posłańcem w Porcie Mglistym i wysłuchaj oskarżenia ze strony Bractwa.", "type": "dialogue", "targetId": "raven_messenger" },
+      { "description": "Odeprzyj atak elitarnego 'Kruczego Zabójcy', który nie spocznie, póki nie zsynchronizuje Twojej śmierci.", "type": "combat", "targetId": "raven_assassin" }
     ]
   },
   {
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
+    "id": "q_ritualist_seal",
     "title": "Ostatnia Pieczęć Rytualisty",
     "description": "Arcy-Rytualista w Twierdzy twierdzi, że Twój paradygmat jest niestabilny i zagraża całemu Ferrum. Proponuje 'Ceremonię Pieczętowania', która rzekomo naprawi Twoją duszę. W rzeczywistości chce zmienić Cię w bezwolne naczynie dla energii Kotwicy.",
     "rewardGold": 250,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-    "category": "INTRIGUE",
+    "cityId": "twierdza_zelazna",
+    "originNpcId": "ritualist",
+    "category": "intrigue",
     "recommendedLevel": 6,
     "steps": [
-      { "description": "Wejdź do rytualnego kręgu i przetrwaj próbę woli.", "type": "DIALOGUE",  param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`""  },
-      { "description": "Gdy rytuał zawiedzie, pokonaj Arcy-Rytualistę i jego cienie.", "type": "COMBAT",  param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`""  }
+      { "description": "Wejdź do rytualnego kręgu i przetrwaj próbę woli.", "type": "dialogue", "targetId": "ritual_seal_start" },
+      { "description": "Gdy rytuał zawiedzie, pokonaj Arcy-Rytualistę i jego cienie.", "type": "combat", "targetId": "arch_ritualist" }
     ]
   },
   {
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
+    "id": "q_house_shadows",
     "title": "Cienie w Domu Burgrabiego",
     "description": "Młody Burgrabia w Sercu Krainy jest przekonany, że pod jego łóżkiem otworzyło się pęknięcie. Słyszy drapanie pazurów o strukturę rzeczywistości. Każdy strażnik, który pilnował pokoju, zostawiał po sobie tylko pusty pancerz.",
     "rewardGold": 140,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-    "category": "INTRIGUE",
+    "cityId": "serce_krainy",
+    "originNpcId": "noble",
+    "category": "intrigue",
     "recommendedLevel": 2,
     "steps": [
-      { "description": "Spędź noc w sypialni szlachcica i poczekaj na manifestację intruza.", "type": "INVESTIGATION",  param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`""  },
-      { "description": "Wyeliminuj 'Pełzacza Sufitowego' – abominację żywiącą się poczuciem bezpieczeństwa.", "type": "COMBAT",  param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`""  }
+      { "description": "Spędź noc w sypialni szlachcica i poczekaj na manifestację intruza.", "type": "investigation", "targetId": "burgrabia_bedroom" },
+      { "description": "Wyeliminuj 'Pełzacza Sufitowego' – abominację żywiącą się poczuciem bezpieczeństwa.", "type": "combat", "targetId": "ceiling_crawler" }
     ]
   },
   {
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
+    "id": "q_golden_ruins_betrayal",
     "title": "Zdrada w Złotych Ruinach",
-    "description": "Uczony z Serca Krainy wysłał grupę po 'Złoty Kod' – artefakt zdolny do manipulacji cenami w całym Boreas. Kontakt został zerwany. Podejrzewa się, że jeden z archeologów postanowił zrebootować sesję tylko dla siebie.",
+    "description": "Uczony z Serca Krainy wysłał grupę po 'Złoty Kod' – artefakt zdolny do manipulacji cenami w całym Boreas. Kontakt został zerwany. Podejrzenie padło na jeden z archeologów postanowił zrebootować sesję tylko dla siebie.",
     "rewardGold": 210,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-    "category": "INTRIGUE",
+    "cityId": "serce_krainy",
+    "originNpcId": "scholar",
+    "category": "intrigue",
     "recommendedLevel": 4,
     "steps": [
-      { "description": "Przeszukaj wykopaliska i znajdź dowody na zdradę.", "type": "EXPEDITION",  param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`""  },
-      { "description": "Pokonaj 'Widmowego Strażnika', który został przywołany przez chciwość ekspedycji.", "type": "COMBAT",  param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`""  }
+      { "description": "Przeszukaj wykopaliska i znajdź dowody na zdradę.", "type": "expedition", "targetId": "serce_krainy" },
+      { "description": "Pokonaj 'Widmowego Strażnika', który został przywołany przez chciwość ekspedycji.", "type": "combat", "targetId": "ghostly_sentinel" }
     ]
   },
   {
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
+    "id": "q_not_your_voice",
     "title": "Głos, Który Nie Jest Twój",
     "description": "Słyszysz w głowie instrukcje. Głos podaje Ci koordynaty miejsc, których nie ma na mapie. Twierdzi, że jest 'Prawdziwym Tobą' z poprzedniego zapisu gry. Musisz odnaleźć to źródło interferencji.",
     "rewardGold": 0,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-    "category": "INTRIGUE",
+    "cityId": "serce_krainy",
+    "originNpcId": "none",
+    "category": "intrigue",
     "recommendedLevel": 7,
     "steps": [
-      { "description": "Podążaj za głosem do najgłębszych lochów Serca Krainy.", "type": "DIALOGUE",  param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`""  },
-      { "description": "Zniszcz 'Odbicie Umysłu' – cyfrową kopię Twojej świadomości.", "type": "COMBAT",  param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`""  }
+      { "description": "Podążaj za głosem do najgłębszych lochów Serca Krainy.", "type": "dialogue", "targetId": "voice_inside_head" },
+      { "description": "Zniszcz 'Odbicie Umysłu' – cyfrową kopię Twojej świadomości.", "type": "combat", "targetId": "mind_reflection" }
     ]
   },
   {
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
+    "id": "q_book_writes_itself",
     "title": "Księga, Która Pisze Się Sama",
     "description": "W bibliotece Opactwa odnaleziono 'Libre de Log' – księgę, która na bieżąco zapisuje tę rozmowę. Jej strony kończą się za kilka minut. Musisz sprawdzić, co autor zaplanował na wielki finał Twojej podróży.",
     "rewardGold": 250,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-    "category": "INTRIGUE",
+    "cityId": "opactwo_ciszy",
+    "originNpcId": "archivist",
+    "category": "intrigue",
     "recommendedLevel": 5,
     "steps": [
-      { "description": "Skonfrontuj się z bibliotekarzem-zdrajcą i przejmij manuskrypt.", "type": "DIALOGUE",  param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`""  },
-      { "description": "Pokonaj 'Atramentową Zmorę' uciekającą z opisanych na czarno stron.", "type": "COMBAT",  param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`""  }
+      { "description": "Skonfrontuj się z bibliotekarzem-zdrajcą i przejmij manuskrypt.", "type": "dialogue", "targetId": "forbidden_book_dialogue" },
+      { "description": "Pokonaj 'Atramentową Zmorę' uciekającą z opisanych na czarno stron.", "type": "combat", "targetId": "ink_nightmare" }
     ]
   },
   {
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
+    "id": "q_remembering_mists",
     "title": "Mgły, Które Pamiętają",
     "description": "Na Wybrzeżu Północnym Mgła zaczęła odtwarzać sceny z dzieciństwa bohaterów. Niektórzy weszli w nie i nigdy nie wrócili. Sprawdź, co wabi ludzi w głąb wspomnień.",
     "rewardGold": 160,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-    "category": "ANOMALY",
+    "cityId": "wybrzeze_polnocne",
+    "originNpcId": "none",
+    "category": "anomaly",
     "recommendedLevel": 3,
     "steps": [
-      { "description": "Przejdź przez ścieżkę wizji we mgle, nie dając się zwieść fałszywym wspomnieniom.", "type": "INVESTIGATION",  param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`""  }
+      { "description": "Przejdź przez ścieżkę wizji we mgle, nie dając się zwieść fałszywym wspomnieniom.", "type": "investigation", "targetId": "misty_path" }
     ]
   },
   {
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
+    "id": "q_doorless_tower",
     "title": "Wieża Bez Drzwi",
     "description": "W centrum Serca Krainy pojawiła się wieża wykonana z obsydianu i kości. Nie ma w niej drzwi ani okien, ale ze środka dobiega dźwięk tysięcy piszących piór. Archiwiści wierzą, że to tam przebywają Skrybowie Absolutu.",
     "rewardGold": 300,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-    "category": "ANOMALY",
+    "cityId": "serce_krainy",
+    "originNpcId": "none",
+    "category": "anomaly",
     "recommendedLevel": 5,
     "steps": [
-      { "description": "Czekaj na moment, w którym stabilność świata spadnie na tyle, by wejście stało się widzialne.", "type": "EXPEDITION",  param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`""  },
-      { "description": "Pokonaj 'Ektoplazmiczną Straż' i wejdź do pierwszego poziomu Wieży.", "type": "COMBAT",  param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`""  }
+      { "description": "Czekaj na moment, w którym stabilność świata spadnie na tyle, by wejście stało się widzialne.", "type": "expedition", "targetId": "serce_krainy" },
+      { "description": "Pokonaj 'Ektoplazmiczną Straż' i wejdź do pierwszego poziomu Wieży.", "type": "combat", "targetId": "ectoplasmic" }
     ]
   },
   {
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
+    "id": "q_breathing_forest",
     "title": "Las, Który Oddycha",
     "description": "W okolicach Serca Krainy drzewa zaczęły pulsować, a ziemia unosi się i opada w rytmie spokojnego snu. To 'Strefa Hibernacji' Szyfru. Każdy Twój krok zostaje uznany za intruza w systemie immunologicznym lasu.",
     "rewardGold": 180,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-    "category": "ANOMALY",
+    "cityId": "serce_krainy",
+    "originNpcId": "none",
+    "category": "anomaly",
     "recommendedLevel": 4,
     "steps": [
-      { "description": "Przetrwaj w lesie i odnajdź 'Węzeł Oddechowy', by go ustabilizować.", "type": "INVESTIGATION",  param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`""  }
+      { "description": "Przetrwaj w lesie i odnajdź 'Węzeł Oddechowy', by go ustabilizować.", "type": "investigation", "targetId": "living_forest" }
     ]
   },
   {
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
+    "id": "q_stone_haven_dusk",
     "title": "Kamienna Przystań o Zmierzchu",
     "description": "Gdy słońce chowa się za horyzontem Portu Mglistego, woda zamienia się w rtęć, a do brzegu dobijają statki, które zatonęły wieki temu. Ich załoga szuka 'Pasztetów Istnienia', by móc znów poczuć smak jedzenia.",
     "rewardGold": 150,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-    "category": "ANOMALY",
+    "cityId": "port_mglisty",
+    "originNpcId": "none",
+    "category": "anomaly",
     "recommendedLevel": 3,
     "steps": [
-      { "description": "Zasadź się w dokach o zmroku i przechwyć ładunek echa.", "type": "EXPEDITION",  param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`""  },
-      { "description": "Zbadaj ładownię widmowego statku i ucieknij, zanim odpłynie w nicość.", "type": "DIALOGUE",  param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`""  }
+      { "description": "Zasadź się w dokach o zmroku i przechwyć ładunek echa.", "type": "expedition", "targetId": "port_mglisty" },
+      { "description": "Zbadaj ładownię widmowego statku i ucieknij, zanim odpłynie w nicość.", "type": "dialogue", "targetId": "ghost_ship_start" }
     ]
   },
   {
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
+    "id": "q_backwards_clock",
     "title": "Zegar, Który Odmierza Wstecz",
     "description": "Wioska na Wybrzeżu została uwięziona w pętli czasu. Każdy dzień zaczyna się od kolacji, a kończy śniadaniem. Mieszkańcy młodnieją, aż znikają w łonach matek. Musisz odnaleźć 'Kotwicę Czasową' i przywrócić bieg historii.",
     "rewardGold": 170,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-    "category": "ANOMALY",
+    "cityId": "wybrzeze_polnocne",
+    "originNpcId": "none",
+    "category": "anomaly",
     "recommendedLevel": 4,
     "steps": [
-      { "description": "Odszukaj pęknięty mechanizm zegarowy w ruinach spalonej wieży.", "type": "INVESTIGATION",  param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`""  }
+      { "description": "Odszukaj pęknięty mechanizm zegarowy w ruinach spalonej wieży.", "type": "investigation", "targetId": "broken_clockwork" }
     ]
   },
   {
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
+    "id": "q_black_maw_wakes",
     "title": "Czarna Paszcza Budzi Się",
     "description": "Pod fundamentami Twierdzy Żelaznej bije serce czegoś wielkiego i głodnego. To 'Czarna Paszcza' – anomalia, która wsysa nie tylko materię, ale i kolory świata. Dowódca chce, abyś zszedł tam i 'wyłączył' to zjawisko.",
     "rewardGold": 250,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-    "category": "ANOMALY",
+    "cityId": "twierdza_zelazna",
+    "originNpcId": "none",
+    "category": "anomaly",
     "recommendedLevel": 6,
     "steps": [
-      { "description": "Zejdź do najgłębszych lochów bastionu Ferrum.", "type": "EXPEDITION",  param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`""  },
-      { "description": "Wycisz bicie serca ruin, które wzywa Nicość do naszego świata.", "type": "DIALOGUE",  param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`""  }
+      { "description": "Zejdź do najgłębszych lochów bastionu Ferrum.", "type": "expedition", "targetId": "twierdza_zelazna" },
+      { "description": "Wycisz bicie serca ruin, które wzywa Nicość do naszego świata.", "type": "dialogue", "targetId": "ruin_heart_silence" }
     ]
   },
   {
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
+    "id": "q_bridge_over_nothing",
     "title": "Most Nad Niczym",
     "description": "Most w Porcie prowadzi do 'Regionu NULL'. To miejsce, w którym parametry świata nie zostały jeszcze zdefiniowane. Każdy krok to ryzyko upadku w czystą abstrakcję.",
     "rewardGold": 220,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-    "category": "ANOMALY",
+    "cityId": "port_mglisty",
+    "originNpcId": "none",
+    "category": "anomaly",
     "recommendedLevel": 5,
     "steps": [
-      { "description": "Zlokalizuj wejście na niewidzialną strukturę nad zatoką.", "type": "EXPEDITION",  param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`""  },
-      { "description": "Przekrocz Most, stawiając kroki tylko tam, gdzie Szyfr na to pozwoli.", "type": "DIALOGUE",  param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`""  }
+      { "description": "Zlokalizuj wejście na niewidzialną strukturę nad zatoką.", "type": "expedition", "targetId": "port_mglisty" },
+      { "description": "Przekrocz Most, stawiając kroki tylko tam, gdzie Szyfr na to pozwoli.", "type": "dialogue", "targetId": "void_bridge_crossing" }
     ]
   },
   {
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
+    "id": "q_vanishing_temple",
     "title": "Świątynia, Która Znika",
     "description": "W Opactwie Ciszy, podczas najsilniejszych wyładowań echa, pojawia się budowla z kryształu. Mnisi wierzą, że to fragment Świata Idealnego, który próbuje nadpisać nasz nędzny Boreas. Musisz sprawdzić, co tamtejsi 'Anielscy Archiwiści' notują na nasz temat.",
     "rewardGold": 280,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-    "category": "ANOMALY",
+    "cityId": "opactwo_ciszy",
+    "originNpcId": "none",
+    "category": "anomaly",
     "recommendedLevel": 7,
     "steps": [
-      { "description": "Wywołaj burzę echa, spalając rzadkie kadzidła w ruinach starej kaplicy.", "type": "INVESTIGATION",  param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`""  },
-      { "description": "Wejdź do widmowej świątyni i skopiuj dane ze świetlistego ołtarza.", "type": "DIALOGUE",  param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`""  }
+      { "description": "Wywołaj burzę echa, spalając rzadkie kadzidła w ruinach starej kaplicy.", "type": "investigation", "targetId": "echo_storm" },
+      { "description": "Wejdź do widmowej świątyni i skopiuj dane ze świetlistego ołtarza.", "type": "dialogue", "targetId": "phantom_temple_enter" }
     ]
   },
   {
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
+    "id": "q_mirror_lake",
     "title": "Jezioro Lustrzane",
     "description": "Woda w jeziorze przy Opactwie stała się gęsta jak smoła i przestała odbijać światło słoneczne. Zamiast tego pokazuje twarze ludzi, których zabiliśmy w poprzednich wcieleniach. Twoje odbicie właśnie próbuje wyciągnąć dłoń z tafli i wciągnąć Cię pod wodę.",
     "rewardGold": 200,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-    "category": "ANOMALY",
+    "cityId": "opactwo_ciszy",
+    "originNpcId": "none",
+    "category": "anomaly",
     "recommendedLevel": 6,
     "steps": [
-      { "description": "Stań na brzegu czarnej tafli i spójrz prawdzie w oczy.", "type": "INVESTIGATION",  param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`""  },
-      { "description": "Pokonaj 'Doppelgangera' – byt, który jest sumą wszystkich Twoich grzechów.", "type": "COMBAT",  param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`""  }
+      { "description": "Stań na brzegu czarnej tafli i spójrz prawdzie w oczy.", "type": "investigation", "targetId": "mirror_lake" },
+      { "description": "Pokonaj 'Doppelgangera' – byt, który jest sumą wszystkich Twoich grzechów.", "type": "combat", "targetId": "doppelganger" }
     ]
   },
   {
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
+    "id": "q_whispering_mine",
     "title": "Kopalnia, Która Szepcze",
     "description": "Górnicy pod Twierdzą dokopali się do miejsca, w którym kamień śpiewa. Muzyka ta sprawia, że ludzie przestają potrzebować jedzenia i snu, stając się żywymi rzeźbami. Dowódca Ferrum chce uciszyć tę melodię, zanim całe miasto skamienieje w ekstazie.",
     "rewardGold": 190,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-    "category": "ANOMALY",
+    "cityId": "twierdza_zelazna",
+    "originNpcId": "none",
+    "category": "anomaly",
     "recommendedLevel": 5,
     "steps": [
-      { "description": "Zejdź do najgłębszego szybu, skąd dochodzi hipnotyczny dźwięk.", "type": "EXPEDITION",  param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`""  },
-      { "description": "Zidentyfikuj źródło szeptów – pękniętą żyłę czystego echa – i zamuruj ją na zawsze.", "type": "DIALOGUE",  param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`""  }
+      { "description": "Zejdź do najgłębszego szybu, skąd dochodzi hipnotyczny dźwięk.", "type": "expedition", "targetId": "twierdza_zelazna" },
+      { "description": "Zidentyfikuj źródło szeptów – pękniętą żyłę czystego echa – i zamuruj ją na zawsze.", "type": "dialogue", "targetId": "mine_whisper_source" }
     ]
   },
   {
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
+    "id": "q_shadowless_wolves",
     "title": "Wilki Bez Cieni",
     "description": "Wataha widmowych drapieżników na Wybrzeżu poluje nie na ciało, lecz na cienie wędrowców. Ten, kto straci cień, traci zdolność do bycia zapisanym w Kronice i przestaje istnieć w oczach innych. Upoluj te drapieżniki, zanim nas wymażą.",
     "rewardGold": 140,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-    "category": "COMBAT",
+    "cityId": "wybrzeze_polnocne",
+    "originNpcId": "hunter",
+    "category": "combat",
     "recommendedLevel": 2,
     "steps": [
-      { "description": "Wytrop legowisko bestii, śledząc pęknięcia w teksturach podłoża.", "type": "EXPEDITION",  param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`""  },
-      { "description": "Zgładź watahę 'Wilków Pustki' i odzyskaj skradzione cienie.", "type": "COMBAT",  param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`""  }
+      { "description": "Wytrop legowisko bestii, śledząc pęknięcia w teksturach podłoża.", "type": "expedition", "targetId": "wybrzeze_polnocne" },
+      { "description": "Zgładź watahę 'Wilków Pustki' i odzyskaj skradzione cienie.", "type": "combat", "targetId": "void_wolf" }
     ]
   },
   {
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
+    "id": "q_triple_hunter",
     "title": "Trójwersyjny Łowca",
     "description": "W Sercu Krainy grasuje bestia, która istnieje w trzech stanach skupienia naraz: jako ciało, jako echo i jako kod. Musisz zadać jej trzy ciosy w tej samej sekundzie, by trwale usunąć ją z paradygmatu.",
     "rewardGold": 250,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-    "category": "BEAST",
+    "cityId": "serce_krainy",
+    "originNpcId": "none",
+    "category": "beast",
     "recommendedLevel": 8,
     "steps": [
-      { "description": "Zlokalizuj punkt 'Paradoksalnej Konwergencji', gdzie wymiary się nakładają.", "type": "INVESTIGATION",  param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`""  },
-      { "description": "Pokonaj 'Trójwersyjnego Łowcę', uderzając w jego jądro w trzech wymiarach.", "type": "COMBAT",  param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`""  }
+      { "description": "Zlokalizuj punkt 'Paradoksalnej Konwergencji', gdzie wymiary się nakładają.", "type": "investigation", "targetId": "paradox_convergence" },
+      { "description": "Pokonaj 'Trójwersyjnego Łowcę', uderzając w jego jądro w trzech wymiarach.", "type": "combat", "targetId": "paradox_hunter" }
     ]
   },
   {
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
+    "id": "q_two_heart_ghoul",
     "title": "Ghul z Dwoma Sercami",
     "description": "Monstrum, które było niegdyś sędzią, teraz błąka się po lochach Twierdzy. Ma dwa serca: jedno pompujące krew, drugie – czysty atrament Szyfru. Dopóki oba biją, ghul jest nieśmiertelny.",
     "rewardGold": 170,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-    "category": "BEAST",
+    "cityId": "twierdza_zelazna",
+    "originNpcId": "guard",
+    "category": "beast",
     "recommendedLevel": 4,
     "steps": [
-      { "description": "Odszukaj 'Sędziego-Ghula' w trzewiach skalnego bastionu.", "type": "EXPEDITION",  param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`""  },
-      { "description": "Rozpruj klatkę piersiową bestii i wyrwij oba jej źródła życia.", "type": "COMBAT",  param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`""  }
+      { "description": "Odszukaj 'Sędziego-Ghula' w trzewiach skalnego bastionu.", "type": "expedition", "targetId": "twierdza_zelazna" },
+      { "description": "Rozpruj klatkę piersiową bestii i wyrwij oba jej źródła życia.", "type": "combat", "targetId": "mutant_ghoul" }
     ]
   },
   {
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
+    "id": "q_swamp_witch",
     "title": "Szeptucha z Bagien",
     "description": "Na bagnach wokół Wybrzeża żyje 'Matka Błędów' – wiedźma, która zszywa rany rzeczywistości ludzkimi ścięgnami. Oferuje pomoc w Twojej misji, ale żąda, byś oddał jej swoje najszczęśliwsze wspomnienie, by mogła nim nakarmić swoje dzieci-echa.",
     "rewardGold": 200,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-    "category": "BEAST",
+    "cityId": "wybrzeze_polnocne",
+    "originNpcId": "none",
+    "category": "beast",
     "recommendedLevel": 5,
     "steps": [
-      { "description": "Odnajdź chatkę na kurzych łapach, ukrytą tam, gdzie mgła staje się zielona.", "type": "EXPEDITION",  param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`""  },
-      { "description": "Dokonaj wyboru: oddaj wspomnienie (trauma) lub spal wiedźmę w jej własnym piecu.", "type": "DIALOGUE",  param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`""  }
+      { "description": "Odnajdź chatkę na kurzych łapach, ukrytą tam, gdzie mgła staje się zielona.", "type": "expedition", "targetId": "wybrzeze_polnocne" },
+      { "description": "Dokonaj wyboru: oddaj wspomnienie (trauma) lub spal wiedźmę w jej własnym piecu.", "type": "dialogue", "targetId": "witch_swamp_choice" }
     ]
   },
   {
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
+    "id": "q_monastery_bloodsucker",
     "title": "Krwiopijca z Klasztoru",
     "description": "Brat Tomasz z Opactwa przestał się modlić. Zamiast tego spędza noce w bibliotece, wycinając fragmenty z Kronik. Mnisi twierdzą, że pije on nie krew, lecz sens istnienia innych, zostawiając po sobie puste, bezmyślne skorupy.",
     "rewardGold": 180,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-    "category": "BEAST",
+    "cityId": "opactwo_ciszy",
+    "originNpcId": "monk",
+    "category": "beast",
     "recommendedLevel": 5,
     "steps": [
-      { "description": "Zidentyfikuj wampirycznego mnicha pośród braci pogrążonych w medytacji.", "type": "DIALOGUE",  param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`""  },
-      { "description": "Zakończ jego nieświęty głód w bibliotece zakazanych ksiąg.", "type": "COMBAT",  param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`""  }
+      { "description": "Zidentyfikuj wampirycznego mnicha pośród braci pogrążonych w medytacji.", "type": "dialogue", "targetId": "vampire_monk_dialogue" },
+      { "description": "Zakończ jego nieświęty głód w bibliotece zakazanych ksiąg.", "type": "combat", "targetId": "vampire_monk" }
     ]
   },
   {
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
+    "id": "q_golden_colossus",
     "title": "Złoty Kolos",
     "description": "W Sercu Krainy statua Pierwszego Sędziego ożyła, reagując na spadek stabilności świata. Jej złota powłoka pęka, odsłaniając wnętrze wypełnione czarnym szumem. Każdy jej krok powoduje lokalny reset ustawień regionu.",
     "rewardGold": 350,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-    "category": "BEAST",
+    "cityId": "serce_krainy",
+    "originNpcId": "noble",
+    "category": "beast",
     "recommendedLevel": 10,
     "steps": [
-      { "description": "Stań naprzeciw giganta, który uważa Cię za błąd do naprawienia.", "type": "EXPEDITION",  param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`""  },
-      { "description": "Zniszcz złoty pancerz kolosa i ucisz szum w jego wnętrzu.", "type": "COMBAT",  param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`""  }
+      { "description": "Stań naprzeciw giganta, który uważa Cię za błąd do naprawienia.", "type": "expedition", "targetId": "serce_krainy" },
+      { "description": "Zniszcz złoty pancerz kolosa i ucisz szum w jego wnętrzu.", "type": "combat", "targetId": "golden_colossus" }
     ]
   },
   {
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
+    "id": "q_mist_child",
     "title": "Dziecko Mgły",
     "description": "Dziecko, które pojawia się w wioskach na Wybrzeżu, nie ma oczu – w ich miejscu wirują miniaturowe galaktyki. Gdziekolwiek pójdzie, rośliny zmieniają się w kryształy, a zwierzęta zapominają, jak oddychać. To manifestacja czystej, dziecięcej ciekawości Szyfru.",
     "rewardGold": 200,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-    "category": "BEAST",
+    "cityId": "wybrzeze_polnocne",
+    "originNpcId": "peasant",
+    "category": "beast",
     "recommendedLevel": 4,
     "steps": [
-      { "description": "Podążaj za śladami światła we mgle.", "type": "INVESTIGATION",  param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`""  },
-      { "description": "Ulecz manifestację poprzez współczucie lub wymaż ją brutalnie ze świata.", "type": "DIALOGUE",  param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`""  }
+      { "description": "Podążaj za śladami światła we mgle.", "type": "investigation", "targetId": "misty_tracks" },
+      { "description": "Ulecz manifestację poprzez współczucie lub wymaż ją brutalnie ze świata.", "type": "dialogue", "targetId": "mist_child_final" }
     ]
   },
   {
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
+    "id": "q_winged_hulk",
     "title": "Skrzydlaty Kadłub",
     "description": "Latająca góra mięsa i metalu krąży nad Portem. To połączenie szczątków okrętów i marynarzy, ożywione przez potężne wyładowanie echa. Musisz ją strącić, zanim jej krzyk sparaliżuje całe wybrzeże.",
     "rewardGold": 230,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-    "category": "BEAST",
+    "cityId": "port_mglisty",
+    "originNpcId": "guard",
+    "category": "beast",
     "recommendedLevel": 6,
     "steps": [
-      { "description": "Wdrap się na Latarnię Echa, by zyskać przewagę wysokości.", "type": "EXPEDITION",  param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`""  },
-      { "description": "Strąć latającą abominację i dopilnuj, by nie wstała z fal.", "type": "COMBAT",  param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`""  }
+      { "description": "Wdrap się na Latarnię Echa, by zyskać przewagę wysokości.", "type": "expedition", "targetId": "port_mglisty" },
+      { "description": "Strąć latającą abominację i dopilnuj, by nie wstała z fal.", "type": "combat", "targetId": "winged_hulk" }
     ]
   },
   {
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
+    "id": "q_talking_dog",
     "title": "Pies, Który Mówi",
     "description": "W zaułkach Serca Krainy spotykasz psa, który zna Twoje imię sprzed ekranu. Twierdzi, że jest awatarem jednego z programistów Szyfru, uwięzionym w tym paradygmacie. Chce Ci przekazać instrukcje, jak przetrwać Wielki Finał.",
     "rewardGold": 150,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-    "category": "BEAST",
+    "cityId": "serce_krainy",
+    "originNpcId": "none",
+    "category": "beast",
     "recommendedLevel": 1,
     "steps": [
-      { "description": "Biegnij za psem przez labirynt ulic Serca Krainy.", "type": "EXPEDITION",  param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`""  },
-      { "description": "Wysłuchaj proroctwa o końcu tej rzeczywistości w cieniu Wieży.", "type": "DIALOGUE",  param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`""  }
+      { "description": "Biegnij za psem przez labirynt ulic Serca Krainy.", "type": "expedition", "targetId": "serce_krainy" },
+      { "description": "Wysłuchaj proroctwa o końcu tej rzeczywistości w cieniu Wieży.", "type": "dialogue", "targetId": "talking_dog_revelation" }
     ]
   },
   {
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
+    "id": "q_four_eyed_rider",
     "title": "Czterooki Jeździec",
     "description": "Rycerz o czterech świecących oczach patroluje trakty Ferrum. Każdy, kogo spotka, musi odpowiedzieć na zagadkę ontologiczną. Błędna odpowiedź skutkuje natychmiastowym wymazaniem z aktualnego zapisu gry.",
     "rewardGold": 180,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-    "category": "BEAST",
+    "cityId": "twierdza_zelazna",
+    "originNpcId": "none",
+    "category": "beast",
     "recommendedLevel": 7,
     "steps": [
-      { "description": "Przechwyć widmowego jeźdźca na trakcie pod Twierdzą.", "type": "EXPEDITION",  param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`""  },
-      { "description": "Pokonaj zwiastuna lub udowodnij mu swoje prawo do istnienia w walce.", "type": "COMBAT",  param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`""  }
+      { "description": "Przechwyć widmowego jeźdźca na trakcie pod Twierdzą.", "type": "expedition", "targetId": "twierdza_zelazna" },
+      { "description": "Pokonaj zwiastuna lub udowodnij mu swoje prawo do istnienia w walce.", "type": "combat", "targetId": "dark_rider" }
     ]
   },
   {
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
+    "id": "q_undying_mother",
     "title": "Matka, Która Nie Umiera",
     "description": "Kobieta na Wybrzeżu żyje od czasów Pierwszego Zapisu. Jej ciało jest przeźroczyste, a krew ma kolor światła. Błaga o 'Wygaszenie' – rytuał, który pozwoli jej w końcu przestać być częścią tego snu.",
     "rewardGold": 130,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-    "category": "DRAMA",
+    "cityId": "wybrzeze_polnocne",
+    "originNpcId": "none",
+    "category": "drama",
     "recommendedLevel": 2,
     "steps": [
-      { "description": "Znajdź 'Relikwię Zapomnienia' w ruinach starej latarni.", "type": "INVESTIGATION",  param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`""  },
-      { "description": "Dopełnij wyroku miłosierdzia i zapewnij kobiecie spokój nicości.", "type": "DIALOGUE",  param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`""  }
+      { "description": "Znajdź 'Relikwię Zapomnienia' w ruinach starej latarni.", "type": "investigation", "targetId": "old_relic" },
+      { "description": "Dopełnij wyroku miłosierdzia i zapewnij kobiecie spokój nicości.", "type": "dialogue", "targetId": "undying_mother_end" }
     ]
   },
   {
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
+    "id": "q_two_soul_child",
     "title": "Dziecko z Dwoma Duszami",
     "description": "W Sercu Krainy dziecko walczy o kontrolę nad swoim ciałem z echem dawno zmarłego mordercy. Ich tożsamości zlewają się w jedną, tworząc niebezpieczną anomalię społeczną. Musisz przeprowadzić 'Rytuał Synchronizacji'.",
     "rewardGold": 160,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-    "category": "DRAMA",
+    "cityId": "serce_krainy",
+    "originNpcId": "none",
+    "category": "drama",
     "recommendedLevel": 3,
     "steps": [
-      { "description": "Odpraw rytuał stabilizacji tożsamości, decydując która dusza ma przetrwać.", "type": "DIALOGUE",  param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`""  }
+      { "description": "Odpraw rytuał stabilizacji tożsamości, decydując która dusza ma przetrwać.", "type": "dialogue", "targetId": "soul_sync_ritual" }
     ]
   },
   {
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
+    "id": "q_lost_squad",
     "title": "Zaginiony Oddział",
     "description": "Oddział 'Srebrnych Kruków' wrócił do Twierdzy. Nie postarzeli się ani o dzień, mimo że ich dowódca zmarł ze starości 30 lat temu. Twierdzą, że walczyli w bitwie, która trwała wieczność. Zbadaj, z jakiej osi czasu pochodzą.",
     "rewardGold": 200,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-    "category": "DRAMA",
+    "cityId": "twierdza_zelazna",
+    "originNpcId": "guard",
+    "category": "drama",
     "recommendedLevel": 5,
     "steps": [
-      { "description": "Przeszukaj bastion i przesłuchaj ocalałych weteranów.", "type": "DIALOGUE",  param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`""  },
-      { "description": "Zbadaj źródło anomali czasowej na dawnym polu bitwy.", "type": "EXPEDITION",  param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`""  }
+      { "description": "Przeszukaj bastion i przesłuchaj ocalałych weteranów.", "type": "dialogue", "targetId": "lost_squad_interrogation" },
+      { "description": "Zbadaj źródło anomali czasowej na dawnym polu bitwy.", "type": "expedition", "targetId": "twierdza_zelazna" }
     ]
   },
   {
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
+    "id": "q_demon_merchant",
     "title": "Kupiec, Który Widzi Demony",
     "description": "Kupiec w Porcie twierdzi, że niektórzy klienci nie mają odbicia w lustrach, a ich cienie szepczą do siebie. Wierzy, że miasto zostało zainfekowane przez 'Pasożyty Ontologiczne'. Chce, abyś użył jego specjalnej soczewki, by oczyścić rynek.",
     "rewardGold": 170,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-    "category": "DRAMA",
+    "cityId": "port_mglisty",
+    "originNpcId": "merchant",
+    "category": "drama",
     "recommendedLevel": 4,
     "steps": [
-      { "description": "Spójrz na mieszkańców przez przeklętą soczewkę kupca.", "type": "INVESTIGATION",  param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`""  },
-      { "description": "Odkryj prawdę o ukrytych mieszkańcach Portu i zdecyduj o ich losie.", "type": "DIALOGUE",  param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`""  }
+      { "description": "Spójrz na mieszkańców przez przeklętą soczewkę kupca.", "type": "investigation", "targetId": "demon_lens" },
+      { "description": "Odkryj prawdę o ukrytych mieszkańcach Portu i zdecyduj o ich losie.", "type": "dialogue", "targetId": "demon_shadow_truth" }
     ]
   },
   {
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
+    "id": "q_returned_brother",
     "title": "Brat, Który Powrócił",
     "description": "Brat bohatera wrócił z mgły, ale twierdzi, że Wybrzeże jest tylko dekoracją w teatrze, a my jesteśmy aktorami, którzy zapomnieli swoich ról. Chce przekonać rodzinę do 'Wyjścia poza scenę'. Musisz go powstrzymać lub do niego dołączyć.",
     "rewardGold": 180,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-    "category": "DRAMA",
+    "cityId": "wybrzeze_polnocne",
+    "originNpcId": "peasant",
+    "category": "drama",
     "recommendedLevel": 4,
     "steps": [
-      { "description": "Zbierz pamiątki, które mogą przypomnieć bratu o jego prawdziwej przeszłości.", "type": "EXPEDITION",  param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`""  },
-      { "description": "Dokonaj ostatecznego wyboru losu brata w mrocznej rozmowie.", "type": "DIALOGUE",  param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`""  }
+      { "description": "Zbierz pamiątki, które mogą przypomnieć bratu o jego prawdziwej przeszłości.", "type": "expedition", "targetId": "wybrzeze_polnocne" },
+      { "description": "Dokonaj ostatecznego wyboru losu brata w mrocznej rozmowie.", "type": "dialogue", "targetId": "brother_fate_choice" }
     ]
   },
   {
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
+    "id": "q_village_judgment",
     "title": "Sąd Ostateczny Wioski",
     "description": "Mieszkańcy wioski pod Sercu Krainy uwięzili kobietę, która rzekomo potrafi przywoływać Echo samym spojrzeniem. Chcą ją spalić 'dla dobra stabilności'. Jako Kotwica, musisz przeprowadzić sprawiedliwy proces.",
     "rewardGold": 150,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-    "category": "DRAMA",
+    "cityId": "serce_krainy",
+    "originNpcId": "peasant",
+    "category": "drama",
     "recommendedLevel": 3,
     "steps": [
-      { "description": "Wysłuchaj zeznań oskarżycieli i obrony w centrum wioski.", "type": "DIALOGUE",  param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`""  },
-      { "description": "Wydaj wyrok, który na zawsze zmieni Twoją reputację u sędziów.", "type": "DIALOGUE",  param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`""  }
+      { "description": "Wysłuchaj zeznań oskarżycieli i obrony w centrum wioski.", "type": "dialogue", "targetId": "village_judge_start" },
+      { "description": "Wydaj wyrok, który na zawsze zmieni Twoją reputację u sędziów.", "type": "dialogue", "targetId": "village_judge_final" }
     ]
   },
   {
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
+    "id": "q_dream_thief",
     "title": "Złodziej Snów",
     "description": "W Opactwie mnisi budzą się z całkowitą amnezją. Ktoś 'odsysa' ich sny, by budować z nich nową, alternatywną rzeczywistość. Musisz wejść w stan wspólnego letargu, by odnaleźć złodzieja w świecie podświadomości.",
     "rewardGold": 210,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-    "category": "DRAMA",
+    "cityId": "opactwo_ciszy",
+    "originNpcId": "monk",
+    "category": "drama",
     "recommendedLevel": 6,
     "steps": [
-      { "description": "Zapadnij w kontrolowany sen w sercu Opactwa.", "type": "DIALOGUE",  param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`""  },
-      { "description": "Pokonaj 'Zmora Snów' i odzyskaj skradzione wizje mnichów.", "type": "COMBAT",  param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`""  }
+      { "description": "Zapadnij w kontrolowany sen w sercu Opactwa.", "type": "dialogue", "targetId": "dream_world_enter" },
+      { "description": "Pokonaj 'Zmora Snów' i odzyskaj skradzione wizje mnichów.", "type": "combat", "targetId": "dream_wraith" }
     ]
   },
   {
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
+    "id": "q_faceless_wanderer",
     "title": "Wędrowiec Bez Twarzy",
     "description": "Spotykasz istotę, która jest tylko szkicem człowieka. Twierdzi, że Archiwiści zapomnieli go 'dokończyć'. Prosi o pomoc w odnalezieniu fragmentów swojej tożsamości, rozrzuconych po Sercu Krainy jako odpady ontologiczne.",
     "rewardGold": 180,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-    "category": "DRAMA",
+    "cityId": "serce_krainy",
+    "originNpcId": "none",
+    "category": "drama",
     "recommendedLevel": 5,
     "steps": [
-      { "description": "Odszukaj 'Odłamki Tożsamości' w najbardziej niestabilnych punktach miasta.", "type": "EXPEDITION",  param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`""  },
-      { "description": "Zwróć twarz wędrowcowi i wysłuchaj prawdy o jego pochodzeniu.", "type": "DIALOGUE",  param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`""  }
+      { "description": "Odszukaj 'Odłamki Tożsamości' w najbardziej niestabilnych punktach miasta.", "type": "expedition", "targetId": "serce_krainy" },
+      { "description": "Zwróć twarz wędrowcowi i wysłuchaj prawdy o jego pochodzeniu.", "type": "dialogue", "targetId": "faceless_restore" }
     ]
   },
   {
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
+    "id": "q_blood_dowry",
     "title": "Dziewczyna z Krwawym Wianem",
     "description": "W Twierdzy panna młoda błaga o pomoc. Jej mąż po ślubie przestał rzucać cień i zaczął mówić w kodzie. Podejrzewa, że został podmieniony przez istotę z Drugiej Strony podczas przysięgi przed Kotwicą.",
     "rewardGold": 190,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-    "category": "DRAMA",
+    "cityId": "twierdza_zelazna",
+    "originNpcId": "none",
+    "category": "drama",
     "recommendedLevel": 5,
     "steps": [
-      { "description": "Przeszukaj archiwa małżeńskie i znajdź błąd w zapisie.", "type": "INVESTIGATION",  param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`""  },
-      { "description": "Skonfrontuj się z fałszywym panem młodym i ujawnij jego demoniczną formę.", "type": "COMBAT",  param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`""  }
+      { "description": "Przeszukaj archiwa małżeńskie i znajdź błąd w zapisie.", "type": "investigation", "targetId": "groom_records" },
+      { "description": "Skonfrontuj się z fałszywym panem młodym i ujawnij jego demoniczną formę.", "type": "combat", "targetId": "hidden_demon" }
     ]
   },
   {
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
+    "id": "q_jester_laugh",
     "title": "Ostatni Śmiech Błazna",
     "description": "Błazen w dokach Portu twierdzi, że widzi 'Wielki Kursor' na niebie. Śmieje się z każdego Twojego wyboru, twierdząc, że i tak nie masz wolnej woli. Jeśli go przekonasz do rozmowy, może wyjawić Ci sekrety, których nie ma w Kronikach.",
     "rewardGold": 160,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-    "category": "SOCIAL",
+    "cityId": "port_mglisty",
+    "originNpcId": "none",
+    "category": "social",
     "recommendedLevel": 4,
     "steps": [
-      { "description": "Wydobądź z błazna informację o 'Dacie Wygaśnięcia' bieżącej sesji rzeczywistości.", "type": "DIALOGUE",  param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`""  }
+      { "description": "Wydobądź z błazna informację o 'Dacie Wygaśnięcia' bieżącej sesji rzeczywistości.", "type": "dialogue", "targetId": "jester_interact" }
     ]
   },
   {
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
+    "id": "q_verdict_1",
     "title": "۞ Gabinet bez śladów ۞",
     "description": "Wysoki Sędzia Opactwa zginął w gabinecie zamkniętym od wewnątrz. W pomieszczeniu nie ma śladów walki, ale każda kartka in jego Ledgerze stała się czysta. Ravenn podejrzewa, że morderca użył 'Czystego Wymazania'. Musisz przeprowadzić audyt miejsca zbrodni.",
     "rewardGold": 200,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-    "category": "INTRIGUE",
+    "cityId": "opactwo_ciszy",
+    "originNpcId": "ravenn",
+    "category": "intrigue",
     "chainId": "chain_verdict",
     "chainOrder": 1,
     "recommendedLevel": 4,
     "steps": [
-      { "description": "Przeszukaj sterylny gabinet w poszukiwaniu ukrytych run ontologicznych.", "type": "DIALOGUE",  param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`""  },
-      { "description": "Zanalizuj kod wyryty w eterze podłogi gabinetu.", "type": "DIALOGUE",  param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`""  }
+      { "description": "Przeszukaj sterylny gabinet w poszukiwaniu ukrytych run ontologicznych.", "type": "dialogue", "targetId": "verdict_office_per_test" },
+      { "description": "Zanalizuj kod wyryty w eterze podłogi gabinetu.", "type": "dialogue", "targetId": "verdict_runes" }
     ]
   },
   {
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
+    "id": "q_verdict_2",
     "title": "Mieszkanie, które nie pamięta",
     "description": "Kolejna ofiara, Archiwistka Lira Voss, zniknęła wraz ze swoim domem w Sercu Krainy. Na miejscu jej kamienicy jest teraz tylko pusty plac o idealnie gładkiej powierzchni. Musisz odnaleźć ślad jej istnienia w pamięci podręcznej miasta.",
     "rewardGold": 200,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-    "category": "INTRIGUE",
+    "cityId": "serce_krainy",
+    "originNpcId": "ravenn",
+    "category": "intrigue",
     "chainId": "chain_verdict",
     "chainOrder": 2,
     "prerequisiteQuestId": "q_verdict_1",
     "recommendedLevel": 5,
     "steps": [
-      { "description": "Przeszukaj 'Strefę Zapomnienia' i odzyskaj dziennik Liry Voss.", "type": "INVESTIGATION",  param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`""  }
+      { "description": "Przeszukaj 'Strefę Zapomnienia' i odzyskaj dziennik Liry Voss.", "type": "investigation", "targetId": "empty_apartment" }
     ]
   },
   {
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
+    "id": "q_verdict_3",
     "title": "Fabryka, która zabiła sama siebie",
     "description": "W Twierdzy potężna fabryka zbrojeniowa nagle przestała produkować stal. Maszyny same się przeprogramowały i teraz wykuwają w metalu wyroki na konkretnych mieszkańców. Musisz powstrzymać ten mechaniczny Trybunał.",
     "rewardGold": 300,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-    "category": "INTRIGUE",
+    "cityId": "twierdza_zelazna",
+    "originNpcId": "ravenn",
+    "category": "intrigue",
     "chainId": "chain_verdict",
     "chainOrder": 3,
     "prerequisiteQuestId": "q_verdict_2",
     "recommendedLevel": 7,
     "steps": [
-      { "description": "Zbadaj serce maszyny w halach produkcyjnych Ferrum.", "type": "EXPEDITION",  param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`""  },
-      { "description": "Pokonaj 'Stalową Marę' – strażnika fabryki, który pilnuje porządku wyroków.", "type": "COMBAT",  param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`""  }
+      { "description": "Zbadaj serce maszyny w halach produkcyjnych Ferrum.", "type": "expedition", "targetId": "twierdza_zelazna" },
+      { "description": "Pokonaj 'Stalową Marę' – strażnika fabryki, który pilnuje porządku wyroków.", "type": "combat", "targetId": "steel_wraith" }
     ]
   },
   {
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
+    "id": "q_verdict_4",
     "title": "Sala, która pamięta wyroki",
     "description": "Wszystkie tropy prowadzą do Sali Tronowej w Sercu Krainy. To tam pierwszy raz usłyszano o Werdykcie. Sala jest teraz odcięta od reszty świata przez barierę z czystego szumu. Wejdź tam i zmierz się z przeszłością.",
     "rewardGold": 400,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-    "category": "INTRIGUE",
+    "cityId": "serce_krainy",
+    "originNpcId": "ravenn",
+    "category": "intrigue",
     "chainId": "chain_verdict",
     "chainOrder": 4,
     "prerequisiteQuestId": "q_verdict_3",
     "recommendedLevel": 9,
     "steps": [
-      { "description": "Stań przed bezimiennymi sędziami w Sali Wyroku i przetrwaj wizję końca sesji.", "type": "DIALOGUE",  param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`""  }
+      { "description": "Stań przed bezimiennymi sędziami w Sali Wyroku i przetrwaj wizję końca sesji.", "type": "dialogue", "targetId": "tribunal_hall_start" }
     ]
   },
   {
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
+    "id": "q_verdict_5",
     "title": "Proces, którego nikt nie prowadzi",
     "description": "To koniec Twojej drogi w kampanii Trybunału. Jesteś oskarżonym o bycie 'Błędem w Systemie'. Musisz zdecydować: czy zniszczysz Szyfr i uwolnisz Boreas, czy staniesz się częścią Maszyny Wyroków.",
     "rewardGold": 1000,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-    "category": "INTRIGUE",
+    "cityId": "serce_krainy",
+    "originNpcId": "ravenn",
+    "category": "intrigue",
     "chainId": "chain_verdict",
     "chainOrder": 5,
     "prerequisiteQuestId": "q_verdict_4",
     "recommendedLevel": 10,
     "steps": [
-      { "description": "Dokonaj ostatecznego wyboru w Szyfrze Świata.", "type": "DIALOGUE",  param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`""  }
+      { "description": "Dokonaj ostatecznego wyboru w Szyfrze Świata.", "type": "dialogue", "targetId": "verdict_final_choice" }
     ]
   },
   {
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
+    "id": "q_blood_1",
     "title": "Krzyk z Piwnicy",
     "description": "W wiosce rybackiej na Wybrzeżu, z piwnicy domu, który spłonął 20 lat temu, wciąż dobiegają krzyki. Archiwiści twierdzą, że dźwięk ten jest 'zablokowany w pętli' i destabilizuje region. Rozwiąż ten akustyczny błąd rzeczywistości.",
     "rewardGold": 120,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-    "category": "MIXED",
+    "cityId": "wybrzeze_polnocne",
+    "originNpcId": "peasant",
+    "category": "mixed",
     "chainId": "chain_blood",
     "chainOrder": 1,
     "recommendedLevel": 2,
     "steps": [
-      { "description": "Zejdź do dymiącej piwnicy i ucisz 'Krwawą Marę' – echo cierpienia ofiar pożaru.", "type": "COMBAT",  param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`""  }
+      { "description": "Zejdź do dymiącej piwnicy i ucisz 'Krwawą Marę' – echo cierpienia ofiar pożaru.", "type": "combat", "targetId": "blood_wraith" }
     ]
   },
   {
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
+    "id": "q_blood_2",
     "title": "Dziewczyna, Która Widziała Twoją Twarz",
     "description": "Jedyna ocalała z pożaru twierdzi, że widziała Cię tamtej nocy, jak stałeś niewzruszony w ogniu. To niemożliwe, bo miałeś wtedy 5 lat. Wyjaśnij ten paradoks chronologiczny, zanim zainteresuje się nim Inkwizycja.",
     "rewardGold": 150,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-    "category": "MIXED",
+    "cityId": "wybrzeze_polnocne",
+    "originNpcId": "none",
+    "category": "mixed",
     "chainId": "chain_blood",
     "chainOrder": 2,
     "prerequisiteQuestId": "q_blood_1",
     "recommendedLevel": 3,
     "steps": [
-      { "description": "Odszukaj dziewczynę i skonfrontuj swoją tożsamość z jej wizją.", "type": "DIALOGUE",  param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`""  }
+      { "description": "Odszukaj dziewczynę i skonfrontuj swoją tożsamość z jej wizją.", "type": "dialogue", "targetId": "witness_girl_dialogue" }
     ]
   },
   {
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
+    "id": "q_blood_5_hard",
     "title": "Wspomnienie, Którego Nie Było",
     "description": "W Twierdzy Twoje ciało zaczyna krwawić w miejscach, w których nigdy nie odniosłeś ran. To 'Rany Dziedziczne' – błędy w synchronizacji Twojej obecnej formy z poprzednimi wcieleniami. Musisz zamknąć te stare blizny w rytualnym kręgu.",
     "rewardGold": 250,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-    "category": "META",
+    "cityId": "twierdza_zelazna",
+    "originNpcId": "ritualist",
+    "category": "meta",
     "chainId": "chain_blood",
     "chainOrder": 3,
     "recommendedLevel": 6,
     "prerequisiteQuestId": "q_blood_2",
     "steps": [
-      { "description": "Pokonaj 'Cień Przeszłości' – byt będący sumą wszystkich Twoich niepowodzeń.", "type": "COMBAT",  param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`""  }
+      { "description": "Pokonaj 'Cień Przeszłości' – byt będący sumą wszystkich Twoich niepowodzeń.", "type": "combat", "targetId": "past_shade_elite" }
     ]
   },
   {
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
+    "id": "q_blood_8",
     "title": "Ołtarz, Który Pamięta",
     "description": "Finał ścieżki krwi. Ołtarz w Sercu Krainy żąda ostatecznego dowodu na to, że jesteś Prawdziwą Kotwicą, a nie tylko kolejną iteracją. Musisz przelać swoją krew na Ledger Rzeczywistości, by utrwalić swój paradygmat.",
     "rewardGold": 500,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-    "category": "META",
+    "cityId": "serce_krainy",
+    "originNpcId": "ritualist",
+    "category": "meta",
     "chainId": "chain_blood",
     "chainOrder": 4,
     "recommendedLevel": 12,
     "prerequisiteQuestId": "q_blood_5_hard",
     "steps": [
-      { "description": "Zniszcz 'Klątwę Pierwszej Krwi' i przejmij kontrolę nad własnym istnieniem.", "type": "COMBAT",  param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`""  }
+      { "description": "Zniszcz 'Klątwę Pierwszej Krwi' i przejmij kontrolę nad własnym istnieniem.", "type": "combat", "targetId": "blood_curse" }
     ]
   },
   {
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
+    "id": "q_meta_1",
     "title": "Margines na stronie: Objawienie",
     "description": "Odkryłeś dopisek na marginesie rzeczywistości, napisany pismem, które potrafisz odczytać tylko Ty. Sugeruje on, że cały Boreas jest częścią większego eksperymentu zwanego 'REPO2'. Zbadaj ten ślad meta-percepcji.",
     "rewardGold": 0,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-    "category": "META",
+    "cityId": "serce_krainy",
+    "originNpcId": "archivist",
+    "category": "meta",
     "recommendedLevel": 1,
     "chainId": "chain_meta",
     "chainOrder": 1,
     "requiredMetaAwareness": 1,
     "steps": [
-      { "description": "Zrozum adnotację Skryby na temat parametrów Twojej sesji.", "type": "DIALOGUE",  param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`""  }
+      { "description": "Zrozum adnotację Skryby na temat parametrów Twojej sesji.", "type": "dialogue", "targetId": "margin_note_complex" }
     ]
   },
   {
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
+    "id": "q_meta_7",
     "title": "Ostatni Wpis: Margines Sesji",
     "description": "To moment prawdy. Rozumiesz już, że nie jesteś bohaterem, lecz wykonawcą woli kogoś, kto siedzi przed ekranem. Twoja podróż dobiega końca tam, gdzie Szyfr spotyka się z Twoją Prawdziwą Wolą.",
     "rewardGold": 0,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-    "category": "META",
+    "cityId": "serce_krainy",
+    "originNpcId": "archivist",
+    "category": "meta",
     "recommendedLevel": 10,
     "chainId": "chain_meta",
     "chainOrder": 7,
     "prerequisiteQuestId": "q_meta_1",
     "steps": [
-      { "description": "Stań na krawędzi Szyfru i spróbuj nawiązać kontakt z Prawdziwym Graczem.", "type": "DIALOGUE",  param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`""  }
+      { "description": "Stań na krawędzi Szyfru i spróbuj nawiązać kontakt z Prawdziwym Graczem.", "type": "dialogue", "targetId": "meta_truth_reveal" }
     ]
   },
   {
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
+    "id": "q_void_whisper",
     "title": "Szept Pustki: Rezonans",
     "description": "W Porcie Pustka zaczęła emitować szum, który układa się w melodię Twojego domu. Słyszysz głosy bliskich, których nigdy nie miałeś w Boreas. Musisz zrozumieć ten rezonans, zanim Twoja tożsamość całkowicie się rozmyje.",
     "rewardGold": 100,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-    "category": "ANOMALY",
+    "cityId": "port_mglisty",
+    "originNpcId": "none",
+    "category": "anomaly",
     "recommendedLevel": 8,
     "steps": [
-      { "description": "Wsłuchaj się w szum statyczny i spróbuj odnaleźć w nim ukryte znaczenie.", "type": "DIALOGUE",  param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`""  }
+      { "description": "Wsłuchaj się w szum statyczny i spróbuj odnaleźć w nim ukryte znaczenie.", "type": "dialogue", "targetId": "void_white_noise" }
     ]
   },
   {
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
+    "id": "q_lost_scribe",
     "title": "Zaginiony Skryba: Ostatni Protokół",
-    "description": "W Opactwie odnaleziono legendarne 'Pióro Skryby', którym zapisano pierwszy dzień świata. Jeden z Archiwistów uważa, że tylko Ty możesz nim dopisać szczęśliwe zakończenie do naszej tragicznej historii.",
+    "description": "W bibliotece Opactwa odnaleziono legendarne 'Pióro Skryby', którym zapisano pierwszy dzień świata. Jeden z Archiwistów uważa, że tylko Ty możesz nim dopisać szczęśliwe zakończenie do naszej tragicznej historii.",
     "rewardGold": 500,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-     param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,
-    "category": "INTRIGUE",
+    "cityId": "opactwo_ciszy",
+    "originNpcId": "priest",
+    "category": "intrigue",
     "recommendedLevel": 9,
     "steps": [
-      { "description": "Odszukaj Pióro ukryte w podziemnych archiwach zakazanej wiedzy.", "type": "INVESTIGATION",  param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`""  },
-      { "description": "Złóż swój podpis na 'Ledgerze Rzeczywistości', pieczętując los Boreas.", "type": "DIALOGUE",  param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`""  }
+      { "description": "Odszukaj Pióro ukryte w podziemnych archiwach zakazanej wiedzy.", "type": "investigation", "targetId": "scribe_pen" },
+      { "description": "Złóż swój podpis na 'Ledgerze Rzeczywistości', pieczętując los Boreas.", "type": "dialogue", "targetId": "ledger_signing" }
     ]
   }
 ]
-
