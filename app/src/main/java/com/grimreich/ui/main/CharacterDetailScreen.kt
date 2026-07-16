@@ -8,9 +8,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.grimreich.R
 import com.grimreich.core.Hero
 
 @Composable
@@ -29,7 +31,7 @@ fun CharacterDetailScreen(hero: Hero, onBack: () -> Unit) {
             modifier = Modifier.align(Alignment.CenterHorizontally)
         )
         Text(
-            text = hero.currentCareer?.name ?: "Wędrowiec",
+            text = hero.currentCareer?.displayName ?: "Wędrowiec",
             color = Color.Gray,
             fontSize = 14.sp,
             modifier = Modifier.align(Alignment.CenterHorizontally)
@@ -39,21 +41,21 @@ fun CharacterDetailScreen(hero: Hero, onBack: () -> Unit) {
 
         LazyColumn(modifier = Modifier.weight(1f)) {
             item {
-                StatItem("ZDROWIE", "${hero.hp}/${hero.maxHp}", Color.Red)
-                StatItem("SIŁA", "${hero.strength}", Color.White)
-                StatItem("ZRĘCZNOŚĆ", "${hero.agility}", Color.White)
-                StatItem("INTELIGENCJA", "${hero.intelligence}", Color.White)
-                StatItem("POBOŻNOŚĆ", "${hero.piety}", Color.White)
+                StatItem(stringResource(R.string.inventory_hp_format, hero.hp, hero.maxHp), "", Color.Red)
+                StatItem(stringResource(R.string.stat_str), "${hero.strength}", Color.White)
+                StatItem(stringResource(R.string.stat_agi), "${hero.agility}", Color.White)
+                StatItem(stringResource(R.string.stat_int), "${hero.intelligence}", Color.White)
+                StatItem(stringResource(R.string.stat_pie), "${hero.piety}", Color.White)
             }
             
             item {
                 Spacer(modifier = Modifier.height(24.dp))
-                Text("SPECJALIZACJE", color = Color(0xFF800000), fontWeight = FontWeight.Bold, fontSize = 12.sp)
+                Text(stringResource(R.string.detail_specializations), color = Color(0xFF800000), fontWeight = FontWeight.Bold, fontSize = 12.sp)
                 HorizontalDivider(color = Color(0xFF333333), modifier = Modifier.padding(vertical = 8.dp))
             }
             
             if (hero.skills.isEmpty()) {
-                item { Text("Brak unikalnych biegłości.", color = Color.DarkGray, fontSize = 12.sp) }
+                item { Text(stringResource(R.string.detail_no_specializations), color = Color.DarkGray, fontSize = 12.sp) }
             } else {
                 hero.skills.forEach { (name, value) ->
                     item {
@@ -74,7 +76,7 @@ fun CharacterDetailScreen(hero: Hero, onBack: () -> Unit) {
             modifier = Modifier.fillMaxWidth().height(50.dp).padding(top = 16.dp),
             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF500000))
         ) {
-            Text("POWRÓT", color = Color.White, fontWeight = FontWeight.Bold)
+            Text(stringResource(R.string.btn_return), color = Color.White, fontWeight = FontWeight.Bold)
         }
     }
 }

@@ -9,10 +9,12 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.grimreich.R
 import com.grimreich.core.Hero
 import com.grimreich.systems.RitualSystem
 
@@ -38,7 +40,7 @@ fun RitualScreen(
         Spacer(modifier = Modifier.height(32.dp))
         
         Text(
-            text = "RYTUAŁ ECHA",
+            text = stringResource(R.string.ritual_title),
             color = Color.Red,
             fontSize = 32.sp,
             fontWeight = FontWeight.Bold
@@ -47,7 +49,7 @@ fun RitualScreen(
         Spacer(modifier = Modifier.height(16.dp))
 
         Text(
-            text = "${hero.name} przekroczył granicę. Jego dusza dryfuje w Pęknięciu. Czy odważysz się przyciągnąć ją z powrotem?",
+            text = stringResource(R.string.ritual_desc, hero.name),
             color = Color.LightGray,
             textAlign = TextAlign.Center,
             fontSize = 16.sp
@@ -61,13 +63,13 @@ fun RitualScreen(
             modifier = Modifier.fillMaxWidth()
         ) {
             Column(modifier = Modifier.padding(16.dp)) {
-                Text("KONSEKWENCJE WSKRZESZENIA:", color = Color.Red, fontWeight = FontWeight.Bold)
-                Text("- Stabilność Świata: -15 (Era Pęknięcia się zbliża)", color = Color.White, fontSize = 14.sp)
-                Text("- Korupcja Bohatera: +20", color = Color.White, fontSize = 14.sp)
-                Text("- Sanity Bohatera: -15", color = Color.White, fontSize = 14.sp)
-                Text("- Koszt: 100 złota", color = Color.White, fontSize = 14.sp)
+                Text(stringResource(R.string.ritual_consequences_title), color = Color.Red, fontWeight = FontWeight.Bold)
+                Text(stringResource(R.string.ritual_consequence_stability), color = Color.White, fontSize = 14.sp)
+                Text(stringResource(R.string.ritual_consequence_corruption), color = Color.White, fontSize = 14.sp)
+                Text(stringResource(R.string.ritual_consequence_sanity), color = Color.White, fontSize = 14.sp)
+                Text(stringResource(R.string.ritual_consequence_cost), color = Color.White, fontSize = 14.sp)
                 Spacer(modifier = Modifier.height(8.dp))
-                Text("TWOJE ZŁOTO: $gold", color = if (gold >= 100) Color.Yellow else Color.Red, fontWeight = FontWeight.Bold)
+                Text(stringResource(R.string.ritual_gold_status, gold), color = if (gold >= 100) Color.Yellow else Color.Red, fontWeight = FontWeight.Bold)
             }
         }
 
@@ -85,7 +87,7 @@ fun RitualScreen(
                 containerColor = if (canRevive) Color(0xFF400000) else Color.DarkGray
             )
         ) {
-            Text("WYKONAJ RYTUAŁ ECHA", fontWeight = FontWeight.Bold)
+            Text(stringResource(R.string.ritual_btn_perform), fontWeight = FontWeight.Bold)
         }
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -99,11 +101,11 @@ fun RitualScreen(
             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1A1A1A)),
             border = androidx.compose.foundation.BorderStroke(1.dp, Color.Gray)
         ) {
-            Text("POZWÓL MU ODEJŚĆ (PERMANENTNA ŚMIERĆ)", color = Color.White)
+            Text(stringResource(R.string.ritual_btn_sacrifice), color = Color.White)
         }
         
         if (!canRevive) {
-            val reason = if (gold < 100) "Masz zbyt mało złota (wymagane 100)." else "Nie można przeprowadzić rytuału."
+            val reason = if (gold < 100) stringResource(R.string.ritual_error_gold) else stringResource(R.string.ritual_error_generic)
             Text(
                 reason,
                 color = Color.Red,

@@ -93,7 +93,7 @@ fun CityContent(
             ) {
                 Text(text = state.rulingFactionName.uppercase(), color = Color(0xFFC0A060), fontSize = 12.sp)
                 Text(text = state.cityName.uppercase(), color = Color.White, fontWeight = FontWeight.Bold, fontSize = 14.sp)
-                Text(text = "REGION: PÓŁNOC", color = Color.Gray, fontSize = 12.sp)
+                Text(text = stringResource(R.string.city_label_region), color = Color.Gray, fontSize = 12.sp)
             }
 
             Spacer(modifier = Modifier.height(4.dp))
@@ -183,8 +183,6 @@ fun CityContent(
             Spacer(modifier = Modifier.height(4.dp))
 
             // --- DOLNY PASEK: DRUŻYNA (Ten sam co w Hubie) ---
-            // Uwaga: state.party nie ma w CityUiState bezpośrednio, CityViewModel musi go udostępniać
-            // Dla MVP użyjemy GothicObsidianCard z informacją o wyjściu, ale docelowo tu powinien być pasek party.
             GothicObsidianCard(modifier = Modifier.fillMaxWidth().height(60.dp)) {
                 Row(modifier = Modifier.fillMaxSize(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center) {
                     Text(stringResource(R.string.city_party_management_hint), color = Color.DarkGray, fontSize = 10.sp)
@@ -205,7 +203,7 @@ fun QuestBoardModal(state: CityUiState, onEvent: (CityUiEvent) -> Unit) {
         onDismissRequest = { onEvent(CityUiEvent.ToggleQuestMenu(false)) },
         title = { 
             Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth()) {
-                Text("۞ TABLICA WYROKÓW I ZLECEŃ ۞", color = Color(0xFFC0A060), fontSize = 18.sp, fontWeight = FontWeight.ExtraBold)
+                Text(stringResource(R.string.city_quest_board_title), color = Color(0xFFC0A060), fontSize = 18.sp, fontWeight = FontWeight.ExtraBold)
                 HorizontalDivider(color = Color(0xFFC0A060), thickness = 1.dp, modifier = Modifier.padding(top = 4.dp))
             }
         },
@@ -214,7 +212,7 @@ fun QuestBoardModal(state: CityUiState, onEvent: (CityUiEvent) -> Unit) {
                 state.allAvailableQuests.forEach { (city, quests) ->
                     item { 
                         Text(
-                            text = "LOKALIZACJA: ${city.uppercase()}", 
+                            text = stringResource(R.string.city_label_location, city.uppercase()), 
                             color = Color(0xFF4A0000), 
                             fontSize = 10.sp, 
                             fontWeight = FontWeight.Bold, 
@@ -237,9 +235,9 @@ fun QuestBoardModal(state: CityUiState, onEvent: (CityUiEvent) -> Unit) {
                                 Text(text = quest.description, color = Color.LightGray, fontSize = 11.sp, lineHeight = 16.sp)
                                 HorizontalDivider(color = Color(0x22FFFFFF), thickness = 0.5.dp, modifier = Modifier.padding(vertical = 8.dp))
                                 Row(verticalAlignment = Alignment.CenterVertically) {
-                                    Text(text = "POZIOM: ${quest.recommendedLevel}", color = Color.Gray, fontSize = 9.sp, fontWeight = FontWeight.Bold)
+                                    Text(text = "${stringResource(R.string.expedition_quest_level)}: ${quest.recommendedLevel}", color = Color.Gray, fontSize = 9.sp, fontWeight = FontWeight.Bold)
                                     Spacer(modifier = Modifier.width(12.dp))
-                                    Text(text = "NAGRODA: ${quest.rewardGold} gp", color = Color(0xFFC0A060), fontSize = 9.sp, fontWeight = FontWeight.Bold)
+                                    Text(text = stringResource(R.string.city_label_reward, quest.rewardGold), color = Color(0xFFC0A060), fontSize = 9.sp, fontWeight = FontWeight.Bold)
                                 }
                             }
                         }
@@ -250,7 +248,7 @@ fun QuestBoardModal(state: CityUiState, onEvent: (CityUiEvent) -> Unit) {
         confirmButton = {},
         dismissButton = {
             TextButton(onClick = { onEvent(CityUiEvent.ToggleQuestMenu(false)) }) {
-                Text("POWRÓT DO MIASTA", color = Color.Gray, fontWeight = FontWeight.Bold)
+                Text(stringResource(R.string.city_btn_back_city), color = Color.Gray, fontWeight = FontWeight.Bold)
             }
         },
         containerColor = Color(0xFF050505)

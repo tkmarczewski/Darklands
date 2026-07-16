@@ -54,7 +54,7 @@ fun CharacterCreatorScreen(
             ProgressItem(stringResource(R.string.creator_stage_career), active = state.stage == CreatorStage.CAREER)
             ProgressItem(stringResource(R.string.creator_stage_attributes), active = state.stage == CreatorStage.ATTRIBUTES)
             ProgressItem(stringResource(R.string.creator_stage_skills), active = state.stage == CreatorStage.SKILLS)
-            ProgressItem("ŚCIEŻKA", active = state.stage == CreatorStage.LIFEPATH)
+            ProgressItem(stringResource(R.string.creator_stage_lifepath), active = state.stage == CreatorStage.LIFEPATH)
         }
 
         Spacer(modifier = Modifier.height(12.dp))
@@ -172,7 +172,7 @@ fun ProfessionStage(
     onSelect: (Career) -> Unit,
     onRandomizeName: () -> Unit
 ) {
-    val startingCareers = Career.entries.filter { it.minAge <= 14 }
+    val startingCareers = Career.entries.filter { it.minAge <= 18 }
 
     Column(modifier = Modifier.fillMaxSize()) {
         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -345,10 +345,10 @@ fun LifePathStage(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        Text("ZAKORZENIENIE W CZASIE", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 18.sp)
+        Text(stringResource(R.string.creator_lifepath_title), color = Color.White, fontWeight = FontWeight.Bold, fontSize = 18.sp)
         Spacer(modifier = Modifier.height(8.dp))
         Text(
-            text = "Możesz poświęcić lata na dodatkowy trening. Każdy cykl (5 lat) zwiększy Twoje umiejętności, ale przybliży Cię do progu śmiertelności.",
+            text = stringResource(R.string.creator_lifepath_desc),
             color = Color.Gray,
             textAlign = TextAlign.Center,
             fontSize = 12.sp
@@ -356,8 +356,8 @@ fun LifePathStage(
         
         Spacer(modifier = Modifier.height(32.dp))
         
-        Text("WIEK KOTWICY: $age lat", color = Color(0xFFC0A060), fontSize = 24.sp, fontWeight = FontWeight.Bold)
-        Text("CYKLE TRENINGOWE: $cycles", color = Color.White, fontSize = 14.sp)
+        Text(stringResource(R.string.label_age_years, age), color = Color(0xFFC0A060), fontSize = 24.sp, fontWeight = FontWeight.Bold)
+        Text(stringResource(R.string.label_training_cycles, cycles), color = Color.White, fontSize = 14.sp)
 
         Spacer(modifier = Modifier.height(32.dp))
 
@@ -369,11 +369,11 @@ fun LifePathStage(
             shape = MaterialTheme.shapes.extraSmall,
             border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFFC0A060))
         ) {
-            Text("TRENUJ ( +5 LAT )", color = Color.White, fontWeight = FontWeight.Bold)
+            Text(stringResource(R.string.creator_btn_train), color = Color.White, fontWeight = FontWeight.Bold)
         }
         
         if (age >= 60) {
-            Text("Osiągnięto limit wytrzymałości biologicznej.", color = Color.Red, fontSize = 10.sp, modifier = Modifier.padding(top = 8.dp))
+            Text(stringResource(R.string.creator_error_age_limit), color = Color.Red, fontSize = 10.sp, modifier = Modifier.padding(top = 8.dp))
         }
     }
 }

@@ -9,10 +9,10 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.res.stringResource
 import com.grimreich.R
 import com.grimreich.systems.QuestDefinition
 import com.grimreich.ui.shared.BadgeV9
@@ -110,14 +110,14 @@ fun QuestEntryCard(
                 HorizontalDivider(color = Color(0x11FFFFFF), thickness = 0.5.dp)
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
-                    text = if (isReady) "۞ STATUS: GOTOWE DO ODDANIA" else "CEL: $objective", 
+                    text = if (isReady) stringResource(R.string.quest_status_ready) else stringResource(R.string.quest_label_objective, objective), 
                     color = if (isReady) Color(0xFFC0A060) else Color(0xFFADFF2F), 
                     fontSize = 11.sp, 
                     fontWeight = FontWeight.ExtraBold
                 )
                 if (isReady) {
                     Text(
-                        text = "Lokalizacja: ${quest.cityId.uppercase()} -> ${quest.originNpcId.uppercase()}",
+                        text = "${stringResource(R.string.city_label_location, quest.cityId.uppercase())} -> ${quest.originNpcId.uppercase()}",
                         color = Color.DarkGray,
                         fontSize = 9.sp,
                         fontWeight = FontWeight.Bold,

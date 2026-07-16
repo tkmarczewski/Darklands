@@ -10,6 +10,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -29,7 +30,7 @@ fun TavernScreen(viewModel: TavernViewModel, onHire: () -> Unit, onExit: () -> U
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(text = "LOKALNA TAVERNA", color = Color(0xFFC0A060), fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                Text(text = stringResource(R.string.tavern_label_local), color = Color(0xFFC0A060), fontSize = 12.sp, fontWeight = FontWeight.Bold)
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Image(painter = painterResource(id = R.drawable.ic_currency_gold), contentDescription = null, modifier = Modifier.size(16.dp))
                     Spacer(modifier = Modifier.width(4.dp))
@@ -44,13 +45,13 @@ fun TavernScreen(viewModel: TavernViewModel, onHire: () -> Unit, onExit: () -> U
                 
                 // 1. LEWY KAFEL: LOGI I PLOTKI
                 GothicObsidianCard(modifier = Modifier.weight(0.8f).fillMaxHeight()) {
-                    Text(text = "ECHO ROZMÓW", color = Color(0xFFC0A060), fontSize = 10.sp, fontWeight = FontWeight.Bold)
-                    Divider(color = Color(0x33C0A060), thickness = 1.dp, modifier = Modifier.padding(vertical = 4.dp))
+                    Text(text = stringResource(R.string.tavern_label_echo), color = Color(0xFFC0A060), fontSize = 10.sp, fontWeight = FontWeight.Bold)
+                    HorizontalDivider(color = Color(0x33C0A060), thickness = 1.dp, modifier = Modifier.padding(vertical = 4.dp))
                     
                     LazyColumn(modifier = Modifier.fillMaxSize()) {
                         item {
                             Text(
-                                text = if (state.log.isEmpty()) "> W powietrzu unosi się zapach dymu i starych opowieści." else "> ${state.log}",
+                                text = if (state.log.isEmpty()) "> ${stringResource(R.string.tavern_log_default)}" else "> ${state.log}",
                                 color = Color.LightGray,
                                 fontSize = 11.sp,
                                 lineHeight = 16.sp
@@ -65,9 +66,9 @@ fun TavernScreen(viewModel: TavernViewModel, onHire: () -> Unit, onExit: () -> U
                 GothicObsidianCard(modifier = Modifier.weight(1.2f).fillMaxHeight(), headerColor = Color(0xFF5D4037)) {
                     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            Text("TAVERNA", color = Color(0xFFC0A060), fontSize = 24.sp, fontWeight = FontWeight.ExtraBold)
+                            Text(stringResource(R.string.city_tavern), color = Color(0xFFC0A060), fontSize = 24.sp, fontWeight = FontWeight.ExtraBold)
                             Spacer(modifier = Modifier.height(16.dp))
-                            Text("ODPOCZYNEK I REKRUTACJA", color = Color.Gray, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                            Text(stringResource(R.string.tavern_btn_hire), color = Color.Gray, fontSize = 12.sp, fontWeight = FontWeight.Bold)
                         }
                     }
                 }
@@ -77,20 +78,20 @@ fun TavernScreen(viewModel: TavernViewModel, onHire: () -> Unit, onExit: () -> U
                 // 3. PRAWY KAFEL: AKCJE
                 Column(modifier = Modifier.weight(0.7f).fillMaxHeight()) {
                     GothicObsidianCard(modifier = Modifier.weight(1f), headerColor = Color(0xFF1B5E20)) {
-                        Text(text = "INTERAKCJE", color = Color(0xFFC0A060), fontSize = 10.sp, fontWeight = FontWeight.Bold)
-                        Divider(color = Color(0x33C0A060), thickness = 1.dp, modifier = Modifier.padding(vertical = 4.dp))
+                        Text(text = stringResource(R.string.tavern_label_interactions), color = Color(0xFFC0A060), fontSize = 10.sp, fontWeight = FontWeight.Bold)
+                        HorizontalDivider(color = Color(0x33C0A060), thickness = 1.dp, modifier = Modifier.padding(vertical = 4.dp))
                         
                         Column(verticalArrangement = Arrangement.spacedBy(4.dp), modifier = Modifier.padding(top = 4.dp)) {
-                            NavTabV9("WYNAJMIJ POKÓJ (50 G)", onClick = { viewModel.rest() }, color = Color(0xFF2E1A1A))
-                            NavTabV9("SŁUCHAJ PLOTEK", onClick = { viewModel.listenToGossip() })
-                            NavTabV9("REKRUTUJ NAJEMNIKÓW", onClick = onHire, color = Color(0xFF0D47A1))
+                            NavTabV9(stringResource(R.string.tavern_btn_rest), onClick = { viewModel.rest() }, color = Color(0xFF2E1A1A))
+                            NavTabV9(stringResource(R.string.tavern_btn_gossip), onClick = { viewModel.listenToGossip() })
+                            NavTabV9(stringResource(R.string.tavern_btn_hire_mercs), onClick = onHire, color = Color(0xFF0D47A1))
                         }
                     }
                     Spacer(modifier = Modifier.height(4.dp))
                     GothicObsidianCard(modifier = Modifier.weight(0.5f), headerColor = Color(0xFF400000)) {
-                        Text(text = "WYJŚCIE", color = Color(0xFFC0A060), fontSize = 10.sp, fontWeight = FontWeight.Bold)
+                        Text(text = stringResource(R.string.tavern_label_exit), color = Color(0xFFC0A060), fontSize = 10.sp, fontWeight = FontWeight.Bold)
                         Spacer(modifier = Modifier.height(8.dp))
-                        NavTabV9("WRÓĆ DO MIASTA", onClick = onExit, color = Color(0xFF400000))
+                        NavTabV9(stringResource(R.string.tavern_btn_return_city), onClick = onExit, color = Color(0xFF400000))
                     }
                 }
             }

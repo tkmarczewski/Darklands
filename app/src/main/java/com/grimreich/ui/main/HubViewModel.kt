@@ -18,7 +18,7 @@ data class HubUiState(
     val locationName: String = "",
     val locationNameRes: Int? = null,
     val day: Int = 1,
-    val timeOfDay: String = "",
+    val timeOfDayRes: Int = R.string.time_morning,
     val gold: Int = 0,
     val activeQuestsCount: Int = 0,
     val expeditionQuestsCount: Int = 0,
@@ -26,7 +26,7 @@ data class HubUiState(
     val worldStability: Int = 100,
     val hubBackground: String = "",
     val hubTintColor: Color = Color.Transparent,
-    val atmosphericMessageRes: Int = com.grimreich.R.string.stability_high,
+    val atmosphericMessageRes: Int = R.string.stability_high,
     val latestLogs: List<String> = emptyList(),
     val hasPendingLevelUp: Boolean = false
 )
@@ -66,10 +66,10 @@ class HubViewModel @Inject constructor(
             }
 
             val messageRes = when {
-                stability < GameConstants.STABILITY_THRESHOLD_CRITICAL -> com.grimreich.R.string.stability_critical
-                stability < GameConstants.STABILITY_THRESHOLD_LOW + 10 -> com.grimreich.R.string.stability_low
-                stability < GameConstants.STABILITY_THRESHOLD_HIGH -> com.grimreich.R.string.stability_medium
-                else -> com.grimreich.R.string.stability_high
+                stability < GameConstants.STABILITY_THRESHOLD_CRITICAL -> R.string.stability_critical
+                stability < GameConstants.STABILITY_THRESHOLD_LOW + 10 -> R.string.stability_low
+                stability < GameConstants.STABILITY_THRESHOLD_HIGH -> R.string.stability_medium
+                else -> R.string.stability_high
             }
 
             val dailySeed = state.world.day.toLong() + state.world.locationId.hashCode()
@@ -78,12 +78,23 @@ class HubViewModel @Inject constructor(
             
             val quote = atmosphericLogSystem.getRandomMessage(dailySeed, playerName, heroName)
 
+            val timeRes = when (state.world.timeOfDay.lowercase()) {
+                "morning" -> R.string.time_morning
+                "midday" -> R.string.time_midday
+                "afternoon" -> R.string.time_afternoon
+                "dusk" -> R.string.time_dusk
+                "evening" -> R.string.time_evening
+                "midnight" -> R.string.time_midnight
+                "deep_night" -> R.string.time_deep_night
+                else -> R.string.time_morning
+            }
+
             _uiState.update { 
                 it.copy(
                     locationName = city?.name ?: "",
-                    locationNameRes = if (city == null) com.grimreich.R.string.hub_location_unknown else null,
+                    locationNameRes = if (city == null) R.string.hub_location_unknown else null,
                     day = state.world.day,
-                    timeOfDay = state.world.timeOfDay,
+                    timeOfDayRes = timeRes,
                     gold = state.gold,
                     activeQuestsCount = state.quest.activeQuestIds.size,
                     expeditionQuestsCount = state.quest.activeQuestIds.count { id -> 

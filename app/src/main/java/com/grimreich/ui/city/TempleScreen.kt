@@ -12,6 +12,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -35,13 +36,13 @@ fun TempleScreen(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(text = "KAPLICA CZYSTEGO ŚWIATŁA", color = Color(0xFFC0A060), fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                Text(text = stringResource(R.string.temple_label_title), color = Color(0xFFC0A060), fontSize = 12.sp, fontWeight = FontWeight.Bold)
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(text = "WIARA: ${state.faith}", color = Color(0xFFADFF2F), fontSize = 11.sp, fontWeight = FontWeight.Bold)
+                    Text(text = stringResource(R.string.temple_label_faith, state.faith), color = Color(0xFFADFF2F), fontSize = 11.sp, fontWeight = FontWeight.Bold)
                     Spacer(modifier = Modifier.width(16.dp))
                     Image(painter = painterResource(id = R.drawable.ic_currency_gold), contentDescription = null, modifier = Modifier.size(16.dp))
                     Spacer(modifier = Modifier.width(4.dp))
-                    Text(text = "${state.gold} gp", color = Color.Yellow, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                    Text(text = stringResource(R.string.gold_format, state.gold), color = Color.Yellow, fontSize = 12.sp, fontWeight = FontWeight.Bold)
                 }
             }
 
@@ -52,13 +53,13 @@ fun TempleScreen(
                 
                 // 1. LEWY KAFEL: LOGI I OBJAWIENIA
                 GothicObsidianCard(modifier = Modifier.weight(0.8f).fillMaxHeight()) {
-                    Text(text = "DZIENNIK DUSZY", color = Color(0xFFC0A060), fontSize = 10.sp, fontWeight = FontWeight.Bold)
+                    Text(text = stringResource(R.string.temple_label_log), color = Color(0xFFC0A060), fontSize = 10.sp, fontWeight = FontWeight.Bold)
                     HorizontalDivider(color = Color(0x33C0A060), thickness = 1.dp, modifier = Modifier.padding(vertical = 4.dp))
                     
                     LazyColumn(modifier = Modifier.fillMaxSize()) {
                         item {
                             Text(
-                                text = if (state.logs.isEmpty()) "> Cisza kaplicy koi zmęczone umysły." else "> ${state.logs}",
+                                text = if (state.logs.isEmpty()) "> ${stringResource(R.string.temple_log_default)}" else "> ${state.logs}",
                                 color = Color.LightGray,
                                 fontSize = 11.sp,
                                 lineHeight = 16.sp
@@ -68,7 +69,7 @@ fun TempleScreen(
                             item {
                                 Spacer(modifier = Modifier.height(12.dp))
                                 Text(
-                                    text = "OSTRZEŻENIE: Targowanie się z siłami wyższymi narusza stabilność rzeczywistości.",
+                                    text = stringResource(R.string.temple_warning_negotiate),
                                     color = Color.Yellow,
                                     fontSize = 10.sp,
                                     fontWeight = FontWeight.Bold
@@ -82,7 +83,7 @@ fun TempleScreen(
 
                 // 2. ŚRODKOWY KAFEL: DRUŻYNA (POSŁUGA)
                 GothicObsidianCard(modifier = Modifier.weight(1.2f).fillMaxHeight(), headerColor = Color(0xFF1A237E)) {
-                    Text(text = "STAN DUCHOWY", color = Color(0xFFC0A060), fontSize = 10.sp, fontWeight = FontWeight.Bold)
+                    Text(text = stringResource(R.string.temple_label_status), color = Color(0xFFC0A060), fontSize = 10.sp, fontWeight = FontWeight.Bold)
                     HorizontalDivider(color = Color(0x33C0A060), thickness = 1.dp, modifier = Modifier.padding(vertical = 4.dp))
                     
                     LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -103,21 +104,21 @@ fun TempleScreen(
                 // 3. PRAWY KAFEL: RYTUAŁY
                 Column(modifier = Modifier.weight(0.7f).fillMaxHeight()) {
                     GothicObsidianCard(modifier = Modifier.weight(1f), headerColor = Color(0xFF4A148C)) {
-                        Text(text = "RYTUAŁY", color = Color(0xFFC0A060), fontSize = 10.sp, fontWeight = FontWeight.Bold)
+                        Text(text = stringResource(R.string.temple_label_rituals), color = Color(0xFFC0A060), fontSize = 10.sp, fontWeight = FontWeight.Bold)
                         HorizontalDivider(color = Color(0x33C0A060), thickness = 1.dp, modifier = Modifier.padding(vertical = 4.dp))
                         
                         Column(verticalArrangement = Arrangement.spacedBy(4.dp), modifier = Modifier.padding(top = 4.dp)) {
-                            NavTabV9("ZŁÓŻ OFIARĘ (100 G)", onClick = { viewModel.makeOffering(100) }, color = Color(0xFF2E1A1A))
+                            NavTabV9(stringResource(R.string.temple_btn_offering, 100), onClick = { viewModel.makeOffering(100) }, color = Color(0xFF2E1A1A))
                             if (state.isNegotiating) {
-                                NavTabV9("ANULUJ TARG", onClick = { viewModel.toggleNegotiation() }, color = Color(0xFF400000))
+                                NavTabV9(stringResource(R.string.temple_btn_cancel_deal), onClick = { viewModel.toggleNegotiation() }, color = Color(0xFF400000))
                             }
                         }
                     }
                     Spacer(modifier = Modifier.height(4.dp))
                     GothicObsidianCard(modifier = Modifier.weight(0.5f), headerColor = Color(0xFF400000)) {
-                        Text(text = "POWRÓT", color = Color(0xFFC0A060), fontSize = 10.sp, fontWeight = FontWeight.Bold)
+                        Text(text = stringResource(R.string.btn_return), color = Color(0xFFC0A060), fontSize = 10.sp, fontWeight = FontWeight.Bold)
                         Spacer(modifier = Modifier.height(8.dp))
-                        NavTabV9("WYJDŹ Z KAPLICY", onClick = onBack, color = Color(0xFF400000))
+                        NavTabV9(stringResource(R.string.temple_btn_exit), onClick = onBack, color = Color(0xFF400000))
                     }
                 }
             }
@@ -156,14 +157,14 @@ fun HeroTempleCardV9(
         Row(modifier = Modifier.padding(8.dp), verticalAlignment = Alignment.CenterVertically) {
             Column(modifier = Modifier.weight(1f)) {
                 Text(text = hero.name.uppercase(), color = if (hero.isDead) Color.Red else Color.White, fontWeight = FontWeight.Bold, fontSize = 11.sp)
-                Text(text = if (hero.isDead) "POLEGŁY" else "POCZYTALNOŚĆ: ${hero.sanity}%", color = Color.Gray, fontSize = 9.sp)
+                Text(text = if (hero.isDead) stringResource(R.string.temple_label_dead) else stringResource(R.string.temple_label_sanity, hero.sanity), color = Color.Gray, fontSize = 9.sp)
             }
             if (hero.isDead) {
                 Column(horizontalAlignment = Alignment.End) {
-                    NavTabV9("WSKRZESZ", onClick = onResurrect, modifier = Modifier.width(80.dp), color = Color(0xFF600000))
+                    NavTabV9(stringResource(R.string.temple_btn_resurrect), onClick = onResurrect, modifier = Modifier.width(80.dp), color = Color(0xFF600000))
                     if (canNegotiate) {
                         Text(
-                            text = "TARGUJ SIĘ", 
+                            text = stringResource(R.string.temple_btn_negotiate), 
                             color = Color.DarkGray, 
                             fontSize = 8.sp, 
                             modifier = Modifier.clickable { onToggleNegotiation() }.padding(top = 2.dp)
@@ -171,7 +172,7 @@ fun HeroTempleCardV9(
                     }
                 }
             } else {
-                NavTabV9("MÓDL SIĘ", onClick = onPray, modifier = Modifier.width(80.dp), color = Color(0xFF1A1A1A))
+                NavTabV9(stringResource(R.string.saints_btn_pray), onClick = onPray, modifier = Modifier.width(80.dp), color = Color(0xFF1A1A1A))
             }
         }
     }

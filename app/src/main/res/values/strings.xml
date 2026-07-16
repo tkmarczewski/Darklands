@@ -7,6 +7,10 @@
     <string name="btn_understand">ROZUMIEM</string>
     <string name="btn_yes">TAK</string>
     <string name="btn_no">NIE</string>
+    <string name="btn_return">POWRÓT</string>
+    <string name="btn_equip">ZAŁÓŻ</string>
+    <string name="btn_equipped">ZAŁOŻONO</string>
+    <string name="btn_use">UŻYJ</string>
 
     <string name="menu_city">MIASTO</string>
     <string name="menu_map">MAPA</string>
@@ -59,14 +63,19 @@
     <string name="creator_stage_career">PROFESJA</string>
     <string name="creator_stage_attributes">CECHY</string>
     <string name="creator_stage_skills">SPECJALIZACJE</string>
+    <string name="creator_stage_lifepath">ŚCIEŻKA</string>
     <string name="btn_randomize_all">LOSUJ WSZYSTKO</string>
     <string name="btn_randomize">LOSUJ</string>
     <string name="creator_select_path">WYBIERZ DROGĘ:</string>
     <string name="creator_points_label">DOSTĘPNE PUNKTY</string>
     <string name="btn_next">DALEJ</string>
     <string name="btn_finish">ZAKOŃCZ</string>
+    <string name="creator_lifepath_title">ZAKORZENIENIE W CZASIE</string>
+    <string name="creator_lifepath_desc">Możesz poświęcić lata na dodatkowy trening. Każdy cykl (5 lat) zwiększy Twoje umiejętności, ale przybliży Cię do progu śmiertelności.</string>
+    <string name="creator_btn_train">TRENUJ ( +5 LAT )</string>
+    <string name="creator_error_age_limit">Osiągnięto limit wytrzymałości biologicznej.</string>
 
-    <!-- Hub Screen (Renamed to OBOZOWISKO) -->
+    <!-- Hub Screen -->
     <string name="hub_title">OBOZOWISKO</string>
     <string name="hub_day">DZIEŃ %1$d</string>
     <string name="hub_world_status">STATUS ŚWIATA</string>
@@ -83,10 +92,23 @@
     <string name="stability_low">Powidoki i echa stają się codziennością. Ludzie boją się patrzeć w lustra.</string>
     <string name="stability_critical">Rzeczywistość rozpada się na Twoich oczach. Słyszysz statyczny szum kodu.</string>
 
+    <!-- Labels -->
+    <string name="label_party">DRUŻYNA</string>
+    <string name="label_stats">STATYSTYKI</string>
+    <string name="label_combat">WALKA</string>
+    <string name="label_character">POSTAĆ</string>
+    <string name="label_backpack">PLECAK</string>
+    <string name="label_weight_kg">%1$s kg</string>
+    <string name="label_age_years">WIEK KOTWICY: %1$d lat</string>
+    <string name="label_training_cycles">CYKLE TRENINGOWE: %1$d</string>
+    <string name="label_hp_current">HP: %1$d/%2$d</string>
+    <string name="label_level_xp">POZIOM: %1$d | XP: %2$d/%3$d</string>
+
     <!-- Language Selector -->
     <string name="settings_language_title">WYBIERZ JĘZYK</string>
     <string name="settings_language_close">ZAMKNIJ</string>
     <string name="btn_language">JĘZYK</string>
+
     <!-- Tavern Screen -->
     <string name="tavern_title">KARCZMA POD PĘKNIĘTYM KUFLEM</string>
     <string name="tavern_btn_rest">ODPOCZYNEK (50 G)</string>
@@ -125,6 +147,7 @@
     <string name="quest_journal_completed">UKOŃCZONE</string>
     <string name="quest_journal_empty_active">Brak aktywnych zadań.</string>
     <string name="quest_journal_empty_completed">Brak ukończonych zadań.</string>
+
     <!-- Player Identity Screen -->
     <string name="identity_title">JAK CIĘ ZWĄ, WĘDROWCZE?</string>
     <string name="identity_desc">To imię należy do Ciebie, nie do bohatera. Będzie ono zapisane w Kronikach Świata.</string>
@@ -175,6 +198,28 @@
     <string name="expedition_anchor_status">STATUS KOTWICY: STABILNY | ZAPIS LOGÓW AKTYWNY</string>
     <string name="expedition_quest_level">POZIOM</string>
 
+    <!-- Ritual Screen -->
+    <string name="ritual_title">RYTUAŁ ECHA</string>
+    <string name="ritual_desc">%1$s przekroczył granicę. Jego dusza dryfuje w Pęknięciu. Czy odważysz się przyciągnąć ją z powrotem?</string>
+    <string name="ritual_consequences_title">KONSEKWENCJE WSKRZESZENIA:</string>
+    <string name="ritual_consequence_stability">- Stabilność Świata: -15 (Era Pęknięcia się zbliża)</string>
+    <string name="ritual_consequence_corruption">- Korupcja Bohatera: +20</string>
+    <string name="ritual_consequence_sanity">- Sanity Bohatera: -15</string>
+    <string name="ritual_consequence_cost">- Koszt: 100 złota</string>
+    <string name="ritual_gold_status">TWOJE ZŁOTO: %1$d</string>
+    <string name="ritual_btn_perform">WYKONAJ RYTUAŁ ECHA</string>
+    <string name="ritual_btn_sacrifice">POZWÓL MU ODEJŚĆ (PERMANENTNA ŚMIERĆ)</string>
+    <string name="ritual_error_gold">Masz zbyt mało złota (wymagane 100).</string>
+    <string name="ritual_error_generic">Nie można przeprowadzić rytuału.</string>
+
+    <!-- World Map Screen -->
+    <string name="map_domain_label">DOMENA: %1$s</string>
+    <string name="map_patron_label">PATRON: %1$s</string>
+    <string name="map_warning_unstable">!!! OSTRZEŻENIE: KOORDYNATY NIESTABILNE !!!</string>
+    <string name="map_btn_travel">WYRUSZ W DROGĘ</string>
+    <string name="map_label_here">JESTEŚ TUTAJ</string>
+    <string name="map_label_current_location">(OBECNA LOKACJA)</string>
+
     <!-- City Screen V9 -->
     <string name="city_manifest_label">MANIFEST MIASTA</string>
     <string name="city_npcs_label">OBECNI NPC:</string>
@@ -197,6 +242,10 @@
     <string name="alchemy_btn_brew">WARZ MIKSTURĘ</string>
     <string name="alchemy_select_recipe_hint">Wybierz recepturę z listy.</string>
 
+    <!-- Character Details -->
+    <string name="detail_specializations">SPECJALIZACJE</string>
+    <string name="detail_no_specializations">Brak unikalnych biegłości.</string>
+
     <!-- Mastery Traits -->
     <string name="mastery_knight">MISTRZ MIECZA (+5 Atak)</string>
     <string name="mastery_mercenary">WETERAN WOJENNY (+5 Obrona)</string>
@@ -205,4 +254,68 @@
     <string name="mastery_alchemist">MISTRZ TRANSMUTACJI (Silniejsze mikstury)</string>
     <string name="mastery_priest">ŚWIĘTY GNIEW (Silniejsze modlitwy)</string>
     <string name="mastery_generic">MISTRZ RZEMIOSŁA</string>
+    <string name="saints_btn_pray">MÓDL SIĘ</string>
+    <string name="saints_btn_offer">ZŁÓŻ OFIARĘ (%1$d zł)</string>
+    <string name="saints_btn_cleanse">OCZYŚĆ Z MROKU</string>
+    <string name="tavern_label_local">LOKALNA TAVERNA</string>
+    <string name="tavern_label_echo">ECHO ROZMÓW</string>
+    <string name="tavern_label_interactions">INTERAKCJE</string>
+    <string name="tavern_label_exit">WYJŚCIE</string>
+    <string name="tavern_log_default">W powietrzu unosi się zapach dymu i starych opowieści.</string>
+    <string name="tavern_btn_hire_mercs">REKRUTUJ NAJEMNIKÓW</string>
+    <string name="tavern_btn_return_city">WRÓĆ DO MIASTA</string>
+    <string name="city_label_region">REGION: PÓŁNOC</string>
+    <string name="city_quest_board_title">۞ TABLICA WYROKÓW I ZLECEŃ ۞</string>
+    <string name="city_label_location">LOKALIZACJA: %1$s</string>
+    <string name="city_label_reward">NAGRODA: %1$d gp</string>
+    <string name="city_btn_back_city">POWRÓT DO MIASTA</string>
+    <string name="expedition_label_anomaly">ANOMALIA WYKRYTA</string>
+    <string name="expedition_label_interaction_required">INTERAKCJA WYMAGANA:</string>
+    <string name="expedition_log_sensor">> Sensory rejestrują anomalie w strukturze mgły...</string>
+    <string name="time_morning">PORANEK</string>
+    <string name="time_midday">POŁUDNIE</string>
+    <string name="time_afternoon">POPOŁUDNIE</string>
+    <string name="time_dusk">ZMIERZCH</string>
+    <string name="time_evening">WIECZÓR</string>
+    <string name="time_midnight">PÓŁNOC</string>
+    <string name="time_deep_night">GŁĘBOKA NOC</string>
+    <string name="quest_status_ready">۞ STATUS: GOTOWE DO ODDANIA</string>
+    <string name="quest_label_objective">CEL: %1$s</string>
+    <string name="market_empty">PUSTE SAKWY</string>
+    <string name="exit_dialog_title">WYJDŹ DO MENU</string>
+    <string name="exit_dialog_cancel">POZOSTAŃ</string>
+    <string name="label_status">STATUS</string>
+    <string name="market_label_title">RYNEK: %1$s</string>
+    <string name="market_label_inventory">TWOJE ZAPASY</string>
+    <string name="market_label_goods">LOKALNE TOWARY</string>
+    <string name="market_label_info">INFORMACJE</string>
+    <string name="market_log_waiting">> Handlarz czeka na Twoją decyzję.</string>
+    <string name="market_label_warning">OSTRZEŻENIE: %1$s</string>
+    <string name="quest_return_to">Wróć do: %1$s</string>
+    <string name="stat_str">SIŁA</string>
+    <string name="stat_agi">ZRĘCZNOŚĆ</string>
+    <string name="stat_int">INTELIGENCJA</string>
+    <string name="stat_per">PERCEPCJA</string>
+    <string name="stat_end">WYTRZYMAŁOŚĆ</string>
+    <string name="stat_cha">CHARYZMA</string>
+    <string name="stat_pie">POBOŻNOŚĆ</string>
+    <string name="gold_format">%1$d gp</string>
+    <string name="temple_label_title">KAPLICA CZYSTEGO ŚWIATŁA</string>
+    <string name="temple_label_faith">WIARA: %1$d</string>
+    <string name="temple_label_log">DZIENNIK DUSZY</string>
+    <string name="temple_label_status">STAN DUCHOWY</string>
+    <string name="temple_label_rituals">RYTUAŁY</string>
+    <string name="temple_log_default">Cisza kaplicy koi zmęczone umysły.</string>
+    <string name="temple_warning_negotiate">OSTRZEŻENIE: Targowanie się z siłami wyższymi narusza stabilność rzeczywistości.</string>
+    <string name="temple_btn_offering">ZŁÓŻ OFIARĘ (%1$d G)</string>
+    <string name="temple_btn_cancel_deal">ANULUJ TARG</string>
+    <string name="temple_btn_exit">WYJDŹ Z KAPLICY</string>
+    <string name="temple_label_dead">POLEGŁY</string>
+    <string name="temple_label_sanity">POCZYTALNOŚĆ: %1$d%%</string>
+    <string name="temple_btn_resurrect">WSKRZESZ</string>
+    <string name="temple_btn_negotiate">TARGUJ SIĘ</string>
+    <string name="log_label_title">REJESTR WYDARZEŃ</string>
+    <string name="log_empty">Rejestr milczy. Twoje czyny jeszcze nie zostały zapisane.</string>
+    <string name="log_label_day">DZIEŃ %1$d</string>
+    <string name="log_label_important">WAŻNE</string>
 </resources>

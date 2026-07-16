@@ -247,7 +247,7 @@ fun ItemDetailCard(item: Item, onEquip: () -> Unit) {
                         modifier = Modifier.height(30.dp),
                         contentPadding = PaddingValues(horizontal = 8.dp, vertical = 0.dp)
                     ) {
-                        Text("UŻYJ", fontSize = 10.sp)
+                        Text(stringResource(R.string.btn_use), fontSize = 10.sp)
                     }
                 }
             }
@@ -258,7 +258,7 @@ fun ItemDetailCard(item: Item, onEquip: () -> Unit) {
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                 val effects = item.effects.entries.joinToString(" | ") { "${it.key.uppercase()}: ${it.value}" }
                 Text(effects, color = Color.Green, fontSize = 10.sp, fontWeight = FontWeight.Bold)
-                Text("${item.weight} kg", color = Color.DarkGray, fontSize = 9.sp)
+                Text(stringResource(R.string.label_weight_kg, item.weight), color = Color.DarkGray, fontSize = 9.sp)
             }
         }
     }

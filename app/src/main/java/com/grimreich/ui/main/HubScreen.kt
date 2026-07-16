@@ -59,7 +59,8 @@ fun HubScreen(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(text = "${stringResource(R.string.hub_day_label)} ${state.day} | ${state.timeOfDay.uppercase()}", color = Color(0xFFC0A060), fontSize = 12.sp)
+                val timeStr = stringResource(state.timeOfDayRes)
+                Text(text = "${stringResource(R.string.hub_day_label)} ${state.day} | $timeStr", color = Color(0xFFC0A060), fontSize = 12.sp)
                 Text(text = state.locationName.uppercase(), color = Color.White, fontWeight = FontWeight.Bold, fontSize = 14.sp)
                 Text(text = "${stringResource(R.string.hub_stability_label)}: ${state.worldStability}%", color = if(state.worldStability < 40) Color.Red else Color.Green, fontSize = 12.sp)
             }
@@ -111,8 +112,6 @@ fun HubScreen(
                             modifier = Modifier.padding(top = 8.dp).verticalScroll(rememberScrollState())
                         ) {
                             NavTabV9(stringResource(R.string.hub_btn_to_city), onClick = onCity)
-                            
-                            // --- EXPEDITION VISIBILITY: Always allow for grinding/exploration ---
                             NavTabV9(stringResource(R.string.hub_btn_to_expedition), onClick = onExpedition, color = Color(0xFF3E2723))
                         }
                     }

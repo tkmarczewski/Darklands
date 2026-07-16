@@ -7,6 +7,10 @@
     <string name="btn_understand">I UNDERSTAND</string>
     <string name="btn_yes">YES</string>
     <string name="btn_no">NO</string>
+    <string name="btn_return">RETURN</string>
+    <string name="btn_equip">EQUIP</string>
+    <string name="btn_equipped">EQUIPPED</string>
+    <string name="btn_use">USE</string>
 
     <string name="menu_city">CITY</string>
     <string name="menu_map">MAP</string>
@@ -59,15 +63,20 @@
     <string name="creator_stage_career">PROFESSION</string>
     <string name="creator_stage_attributes">ATTRIBUTES</string>
     <string name="creator_stage_skills">SPECIALIZATIONS</string>
+    <string name="creator_stage_lifepath">PATH</string>
     <string name="btn_randomize_all">RANDOMIZE ALL</string>
     <string name="btn_randomize">RANDOMIZE</string>
     <string name="creator_select_path">CHOOSE PATH:</string>
     <string name="creator_points_label">AVAILABLE POINTS</string>
     <string name="btn_next">NEXT</string>
     <string name="btn_finish">FINISH</string>
+    <string name="creator_lifepath_title">TIME ROOTING</string>
+    <string name="creator_lifepath_desc">You can spend years on additional training. Each cycle (5 years) will increase your skills but bring you closer to the threshold of mortality.</string>
+    <string name="creator_btn_train">TRAIN ( +5 YEARS )</string>
+    <string name="creator_error_age_limit">Biological endurance limit reached.</string>
 
-    <!-- Hub Screen (Renamed to OBOZOWISKO) -->
-    <string name="hub_title">OBOZOWISKO</string>
+    <!-- Hub Screen -->
+    <string name="hub_title">CAMP</string>
     <string name="hub_day">DAY %1$d</string>
     <string name="hub_world_status">WORLD STATUS</string>
     <string name="hub_news">CHRONICLE OF EVENTS:</string>
@@ -83,10 +92,23 @@
     <string name="stability_low">Afterimages and echoes become commonplace. People fear looking into mirrors.</string>
     <string name="stability_critical">Reality crumbles before your eyes. You hear the static hum of code.</string>
 
+    <!-- Labels -->
+    <string name="label_party">PARTY</string>
+    <string name="label_stats">STATS</string>
+    <string name="label_combat">COMBAT</string>
+    <string name="label_character">CHARACTER</string>
+    <string name="label_backpack">BACKPACK</string>
+    <string name="label_weight_kg">%1$s kg</string>
+    <string name="label_age_years">ANCHOR AGE: %1$d years</string>
+    <string name="label_training_cycles">TRAINING CYCLES: %1$d</string>
+    <string name="label_hp_current">HP: %1$d/%2$d</string>
+    <string name="label_level_xp">LEVEL: %1$d | XP: %2$d/%3$d</string>
+
     <!-- Language Selector -->
     <string name="settings_language_title">SELECT LANGUAGE</string>
     <string name="settings_language_close">CLOSE</string>
     <string name="btn_language">LANGUAGE</string>
+
     <!-- Tavern Screen -->
     <string name="tavern_title">THE CRACKED MUG TAVERN</string>
     <string name="tavern_btn_rest">REST (50 G)</string>
@@ -125,13 +147,14 @@
     <string name="quest_journal_completed">COMPLETED</string>
     <string name="quest_journal_empty_active">No active quests.</string>
     <string name="quest_journal_empty_completed">No completed quests.</string>
+
     <!-- Player Identity Screen -->
     <string name="identity_title">HOW ARE YOU CALLED, WANDERER?</string>
     <string name="identity_desc">This name belongs to you, not the hero. It will be recorded in the Chronicles of the World.</string>
     <string name="identity_hint">YOUR NAME</string>
 
     <!-- City Screen -->
-    <string name="city_btn_exit">RETURN TO OBOZOWISKO</string>
+    <string name="city_btn_exit">RETURN TO CAMP</string>
     <string name="city_residents_label">RESIDENTS:</string>
     <string name="city_empty_residents">The streets are empty...</string>
     <string name="city_quest_menu_title">SELECT QUEST</string>
@@ -175,6 +198,28 @@
     <string name="expedition_anchor_status">ANCHOR STATUS: STABLE | LOG RECORDING ACTIVE</string>
     <string name="expedition_quest_level">LEVEL</string>
 
+    <!-- Ritual Screen -->
+    <string name="ritual_title">RITUAL OF ECHO</string>
+    <string name="ritual_desc">%1$s has crossed the boundary. His soul drifts in the Fracture. Do you dare pull it back?</string>
+    <string name="ritual_consequences_title">RESURRECTION CONSEQUENCES:</string>
+    <string name="ritual_consequence_stability">- World Stability: -15 (Era of Fracture approaches)</string>
+    <string name="ritual_consequence_corruption">- Hero Corruption: +20</string>
+    <string name="ritual_consequence_sanity">- Hero Sanity: -15</string>
+    <string name="ritual_consequence_cost">- Cost: 100 gold</string>
+    <string name="ritual_gold_status">YOUR GOLD: %1$d</string>
+    <string name="ritual_btn_perform">PERFORM ECHO RITUAL</string>
+    <string name="ritual_btn_sacrifice">LET HIM GO (PERMANENT DEATH)</string>
+    <string name="ritual_error_gold">Not enough gold (100 required).</string>
+    <string name="ritual_error_generic">Cannot perform ritual.</string>
+
+    <!-- World Map Screen -->
+    <string name="map_domain_label">DOMAIN: %1$s</string>
+    <string name="map_patron_label">PATRON: %1$s</string>
+    <string name="map_warning_unstable">!!! WARNING: COORDINATES UNSTABLE !!!</string>
+    <string name="map_btn_travel">SET OUT</string>
+    <string name="map_label_here">YOU ARE HERE</string>
+    <string name="map_label_current_location">(CURRENT LOCATION)</string>
+
     <!-- City Screen V9 -->
     <string name="city_manifest_label">CITY MANIFEST</string>
     <string name="city_npcs_label">PRESENT NPCs:</string>
@@ -197,6 +242,10 @@
     <string name="alchemy_btn_brew">BREW POTION</string>
     <string name="alchemy_select_recipe_hint">Select a recipe from the list.</string>
 
+    <!-- Character Details -->
+    <string name="detail_specializations">SPECIALIZATIONS</string>
+    <string name="detail_no_specializations">No unique proficiencies.</string>
+
     <!-- Mastery Traits -->
     <string name="mastery_knight">SWORD MASTER (+5 Attack)</string>
     <string name="mastery_mercenary">WAR VETERAN (+5 Defense)</string>
@@ -205,4 +254,68 @@
     <string name="mastery_alchemist">TRANSMUTATION MASTER (Stronger Potions)</string>
     <string name="mastery_priest">HOLY WRATH (Stronger Prayers)</string>
     <string name="mastery_generic">CRAFT MASTER</string>
+    <string name="saints_btn_pray">PRAY</string>
+    <string name="saints_btn_offer">MAKE AN OFFERING (%1$d G)</string>
+    <string name="saints_btn_cleanse">CLEANSE FROM DARKNESS</string>
+    <string name="tavern_label_local">LOCAL TAVERN</string>
+    <string name="tavern_label_echo">ECHO OF CONVERSATIONS</string>
+    <string name="tavern_label_interactions">INTERACTIONS</string>
+    <string name="tavern_label_exit">EXIT</string>
+    <string name="tavern_log_default">The air is thick with smoke and old tales.</string>
+    <string name="tavern_btn_hire_mercs">RECRUIT MERCENARIES</string>
+    <string name="tavern_btn_return_city">RETURN TO CITY</string>
+    <string name="city_label_region">REGION: NORTH</string>
+    <string name="city_quest_board_title">۞ NOTICE BOARD ۞</string>
+    <string name="city_label_location">LOCATION: %1$s</string>
+    <string name="city_label_reward">REWARD: %1$d G</string>
+    <string name="city_btn_back_city">RETURN TO CITY</string>
+    <string name="expedition_label_anomaly">ANOMALY DETECTED</string>
+    <string name="expedition_label_interaction_required">INTERACTION REQUIRED:</string>
+    <string name="expedition_log_sensor">> Sensors detecting anomalies in the mist structure...</string>
+    <string name="time_morning">MORNING</string>
+    <string name="time_midday">MIDDAY</string>
+    <string name="time_afternoon">AFTERNOON</string>
+    <string name="time_dusk">DUSK</string>
+    <string name="time_evening">EVENING</string>
+    <string name="time_midnight">MIDNIGHT</string>
+    <string name="time_deep_night">DEEP NIGHT</string>
+    <string name="quest_status_ready">۞ STATUS: READY TO TURN IN</string>
+    <string name="quest_label_objective">OBJECTIVE: %1$s</string>
+    <string name="market_empty">EMPTY POUCHES</string>
+    <string name="exit_dialog_title">EXIT TO MENU</string>
+    <string name="exit_dialog_cancel">STAY</string>
+    <string name="label_status">STATUS</string>
+    <string name="market_label_title">MARKET: %1$s</string>
+    <string name="market_label_inventory">YOUR SUPPLIES</string>
+    <string name="market_label_goods">LOCAL GOODS</string>
+    <string name="market_label_info">INFORMATION</string>
+    <string name="market_log_waiting">> The merchant is waiting for your decision.</string>
+    <string name="market_label_warning">WARNING: %1$s</string>
+    <string name="quest_return_to">Return to: %1$s</string>
+    <string name="stat_str">STRENGTH</string>
+    <string name="stat_agi">AGILITY</string>
+    <string name="stat_int">INTELLIGENCE</string>
+    <string name="stat_per">PERCEPTION</string>
+    <string name="stat_end">ENDURANCE</string>
+    <string name="stat_cha">CHARISMA</string>
+    <string name="stat_pie">PIETY</string>
+    <string name="gold_format">%1$d G</string>
+    <string name="temple_label_title">CHAPEL OF PURE LIGHT</string>
+    <string name="temple_label_faith">FAITH: %1$d</string>
+    <string name="temple_label_log">SOUL JOURNAL</string>
+    <string name="temple_label_status">SPIRITUAL STATE</string>
+    <string name="temple_label_rituals">RITUALS</string>
+    <string name="temple_log_default">The silence of the chapel soothes tired minds.</string>
+    <string name="temple_warning_negotiate">WARNING: Bargaining with higher powers violates reality stability.</string>
+    <string name="temple_btn_offering">MAKE AN OFFERING (%1$d G)</string>
+    <string name="temple_btn_cancel_deal">CANCEL DEAL</string>
+    <string name="temple_btn_exit">LEAVE CHAPEL</string>
+    <string name="temple_label_dead">FALLEN</string>
+    <string name="temple_label_sanity">SANITY: %1$d%%</string>
+    <string name="temple_btn_resurrect">RESURRECT</string>
+    <string name="temple_btn_negotiate">BARGAIN</string>
+    <string name="log_label_title">EVENT LOG</string>
+    <string name="log_empty">The log is silent. Your deeds have not been recorded yet.</string>
+    <string name="log_label_day">DAY %1$d</string>
+    <string name="log_label_important">IMPORTANT</string>
 </resources>

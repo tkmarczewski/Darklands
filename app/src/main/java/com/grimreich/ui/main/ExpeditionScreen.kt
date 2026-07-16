@@ -98,7 +98,7 @@ fun ExpeditionContent(
                         Spacer(modifier = Modifier.height(8.dp))
                         NavTabV9(stringResource(R.string.expedition_btn_understand), onClick = { onEvent(ExpeditionUiEvent.OnDismissEncounter) })
                     } else {
-                        Text(text = "> Sensory rejestrują anomalie w strukturze mgły...", color = Color.Gray, fontSize = 10.sp)
+                        Text(text = stringResource(R.string.expedition_log_sensor), color = Color.Gray, fontSize = 10.sp)
                     }
                 }
 
@@ -167,7 +167,7 @@ fun ExpeditionContent(
 fun EncounterViewV9(encounter: Encounter, onChoice: (EncounterChoice) -> Unit) {
     Column(modifier = Modifier.fillMaxSize().padding(8.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Text(text = "ANOMALIA WYKRYTA", color = Color.Red, fontSize = 8.sp, fontWeight = FontWeight.Bold)
+            Text(text = stringResource(R.string.expedition_label_anomaly), color = Color.Red, fontSize = 8.sp, fontWeight = FontWeight.Bold)
             Spacer(modifier = Modifier.width(8.dp))
             HorizontalDivider(modifier = Modifier.weight(1f), color = Color(0x33FF0000))
         }
@@ -180,7 +180,7 @@ fun EncounterViewV9(encounter: Encounter, onChoice: (EncounterChoice) -> Unit) {
         
         Spacer(modifier = Modifier.weight(1f))
         
-        Text(text = "INTERAKCJA WYMAGANA:", color = Color.Gray, fontSize = 9.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(bottom = 8.dp))
+        Text(text = stringResource(R.string.expedition_label_interaction_required), color = Color.Gray, fontSize = 9.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(bottom = 8.dp))
         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
             encounter.choices.forEach { choice ->
                 NavTabV9(

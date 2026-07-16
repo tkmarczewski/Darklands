@@ -11,9 +11,11 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.grimreich.R
 import com.grimreich.core.Hero
 import com.grimreich.grimreich.v1.Item
 import com.grimreich.ui.inventory.HeroPaperDoll
@@ -62,9 +64,9 @@ fun CharacterHubContent(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text("DRUŻYNA", color = Color(0xFFC0A060), fontSize = 24.sp, fontWeight = FontWeight.Bold)
+                    Text(stringResource(R.string.label_party), color = Color(0xFFC0A060), fontSize = 24.sp, fontWeight = FontWeight.Bold)
                     Button(onClick = onBack, colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF400000))) {
-                        Text("POWRÓT")
+                        Text(stringResource(R.string.btn_back))
                     }
                 }
                 
@@ -137,18 +139,18 @@ fun HeroTabChip(hero: HeroUi, isSelected: Boolean, onClick: () -> Unit) {
 @Composable
 fun HeroOverview(hero: HeroUi) {
     Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
-        Text("STATYSTYKI", color = Color(0xFFC0A060), fontWeight = FontWeight.Bold)
+        Text(stringResource(R.string.label_stats), color = Color(0xFFC0A060), fontWeight = FontWeight.Bold)
         Spacer(modifier = Modifier.height(8.dp))
-        StatRow("SIŁA", hero.combatStats.strength)
-        StatRow("ZRĘCZNOŚĆ", hero.combatStats.agility)
-        StatRow("INTELIGENCJA", hero.combatStats.intelligence)
-        StatRow("PERCEPCJA", hero.combatStats.perception)
-        StatRow("WYTRZYMAŁOŚĆ", hero.combatStats.endurance)
-        StatRow("CHARYZMA", hero.combatStats.charisma)
-        StatRow("POBOŻNOŚĆ", hero.combatStats.piety)
+        StatRow(stringResource(R.string.stat_str), hero.combatStats.strength)
+        StatRow(stringResource(R.string.stat_agi), hero.combatStats.agility)
+        StatRow(stringResource(R.string.stat_int), hero.combatStats.intelligence)
+        StatRow(stringResource(R.string.stat_per), hero.combatStats.perception)
+        StatRow(stringResource(R.string.stat_end), hero.combatStats.endurance)
+        StatRow(stringResource(R.string.stat_cha), hero.combatStats.charisma)
+        StatRow(stringResource(R.string.stat_pie), hero.combatStats.piety)
         
         Spacer(modifier = Modifier.height(16.dp))
-        Text("WALKA", color = Color(0xFFC0A060), fontWeight = FontWeight.Bold)
+        Text(stringResource(R.string.label_combat), color = Color(0xFFC0A060), fontWeight = FontWeight.Bold)
         StatRow("ATAK", hero.combatStats.attack)
         StatRow("PANCERZ", hero.combatStats.armor)
     }
@@ -167,17 +169,15 @@ fun HeroEquipment(hero: HeroUi, inventory: List<InventoryItemUi>, onEvent: (Char
     var selectedItem by remember { mutableStateOf<InventoryItemUi?>(null) }
     
     Row(modifier = Modifier.fillMaxSize().padding(16.dp)) {
-        // This would need to be updated to support UI models as well
-        // For now, let's keep it simple or assume they will be refactored too
         Column(modifier = Modifier.weight(1f)) {
-            Text("POSTAĆ", color = Color(0xFFC0A060), fontSize = 10.sp, fontWeight = FontWeight.Bold)
+            Text(stringResource(R.string.label_character), color = Color(0xFFC0A060), fontSize = 10.sp, fontWeight = FontWeight.Bold)
             // HeroPaperDoll(hero, inventory) { slot -> onEvent(CharacterHubUiEvent.UnequipItem(slot)) }
         }
         
         Spacer(modifier = Modifier.width(16.dp))
         
         Column(modifier = Modifier.weight(1.2f)) {
-            Text("PLECAK", color = Color(0xFFC0A060), fontSize = 10.sp, fontWeight = FontWeight.Bold)
+            Text(stringResource(R.string.label_backpack), color = Color(0xFFC0A060), fontSize = 10.sp, fontWeight = FontWeight.Bold)
             Spacer(modifier = Modifier.height(8.dp))
             
             LazyColumn(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
@@ -229,7 +229,7 @@ fun ItemDetailCardUi(item: InventoryItemUi, onEquip: () -> Unit) {
                 modifier = Modifier.fillMaxWidth(),
                 enabled = !item.isEquipped && item.canEquip
             ) {
-                Text(if (item.isEquipped) "ZAŁOŻONO" else "ZAŁÓŻ")
+                Text(if (item.isEquipped) stringResource(R.string.btn_equipped) else stringResource(R.string.btn_equip))
             }
         }
     }

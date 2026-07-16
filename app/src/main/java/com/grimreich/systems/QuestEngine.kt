@@ -1,11 +1,15 @@
 package com.grimreich.systems
 
+import android.content.Context
+import com.grimreich.R
 import com.grimreich.core.*
+import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class QuestEngine @Inject constructor(
+    @param:ApplicationContext private val context: Context,
     private val gameRepositoryProvider: dagger.Lazy<GameRepository>,
     private val experienceSystemProvider: dagger.Lazy<ExperienceSystem>
 ) {
@@ -32,23 +36,23 @@ class QuestEngine @Inject constructor(
         val actualState = state ?: gameRepository.currentState()
         var status = QuestStatus.LOCKED
 
-        if (questId.startsWith("resurrect_")) {
-            val hId = questId.removePrefix("resurrect_")
+        // PURIFICATION: All ID checks must be lowercase
+        val normalizedId = questId.lowercase().trim()
+
+        if (normalizedId.startsWith("resurrect_")) {
+            val hId = normalizedId.removePrefix("resurrect_")
             val hero = actualState.party.find { it.id == hId }
             
-            // --- FIX BUG: Proper status for resurrection ---
             if (hero != null && hero.isDead) {
                 val corpseId = "corpse_${hero.id}"
                 val hasCorpse = actualState.inventory.any { it.instanceId == corpseId }
-                // Only available if we HAVE the corpse
                 status = if (hasCorpse) QuestStatus.AVAILABLE else QuestStatus.LOCKED
             } else {
-                // Not dead or not in party anymore? Definitely not available.
                 status = QuestStatus.LOCKED
             }
         } else {
-            val def = registry[questId]
-            if (def != null && visited.add(questId)) {
+            val def = registry[normalizedId]
+            if (def != null && visited.add(normalizedId)) {
                 status = evaluateDefinitionStatus(def, actualState, visited)
             }
         }
@@ -80,38 +84,41 @@ class QuestEngine @Inject constructor(
     }
 
     fun activateQuestDirect(state: GameState, questId: String) {
-        val currentStatus = getStatus(questId, state)
+        val normalizedId = questId.lowercase().trim()
+        val currentStatus = getStatus(normalizedId, state)
         if (currentStatus != QuestStatus.AVAILABLE) {
-            android.util.Log.d("QuestEngine", "Activation blocked: $questId is $currentStatus")
+            android.util.Log.d("QuestEngine", "Activation blocked: $normalizedId is $currentStatus")
             return
         }
         
-        state.quest.activeQuestIds.add(questId)
-        state.quest.progress[questId] = QuestProgress(questId = questId, status = QuestStatus.ACTIVE)
-        state.logEntries.add("۞ NOWE ZADANIE: ${getDefinition(questId)?.title ?: questId}")
+        state.quest.activeQuestIds.add(normalizedId)
+        state.quest.progress[normalizedId] = QuestProgress(questId = normalizedId, status = QuestStatus.ACTIVE)
+        state.logEntries.add("۞ NOWE ZADANIE: ${getDefinition(normalizedId)?.title ?: normalizedId}")
     }
 
     fun advanceStepDirect(state: GameState, questId: String) {
-        val p = state.quest.progress[questId] ?: return
+        val normalizedId = questId.lowercase().trim()
+        val p = state.quest.progress[normalizedId] ?: return
         if (p.status != QuestStatus.ACTIVE) return
-        val def = registry[questId] ?: return
+        val def = registry[normalizedId] ?: return
         
         if (p.currentStepIndex < def.steps.size - 1) {
-            state.quest.progress[questId] = p.copy(currentStepIndex = p.currentStepIndex + 1)
-            android.util.Log.d("QuestEngine", "Advanced $questId to step ${p.currentStepIndex + 1}")
+            state.quest.progress[normalizedId] = p.copy(currentStepIndex = p.currentStepIndex + 1)
+            android.util.Log.d("QuestEngine", "Advanced $normalizedId to step ${p.currentStepIndex + 1}")
         } else {
-            state.quest.progress[questId] = p.copy(status = QuestStatus.OBJECTIVE_MET)
+            state.quest.progress[normalizedId] = p.copy(status = QuestStatus.OBJECTIVE_MET)
             state.logEntries.add("۞ CEL OSIĄGNIĘTY: ${def.title}")
-            state.logEntries.add("> Wróć do zleceniodawcy: ${def.originNpcId.uppercase()}")
+            state.logEntries.add("> ${context.getString(R.string.quest_return_to, def.originNpcId.uppercase())}")
         }
     }
 
     fun completeQuestDirect(state: GameState, questId: String) {
-        // Resolve "ACTIVE" alias from dialogue context
+        val normalizedId = questId.lowercase().trim()
+        // Resolve "active" alias from dialogue context
         val action = state.pendingAction
-        val actualQuestId = if (questId == "ACTIVE" && action is com.grimreich.core.PendingWorldAction.Dialogue && action.relatedQuestId != null) {
-            action.relatedQuestId!!
-        } else questId
+        val actualQuestId = if (normalizedId == "active" && action is com.grimreich.core.PendingWorldAction.Dialogue && action.relatedQuestId != null) {
+            action.relatedQuestId!!.lowercase()
+        } else normalizedId
 
         if (state.quest.completedQuestIds.contains(actualQuestId)) {
             state.quest.activeQuestIds.remove(actualQuestId)
@@ -120,27 +127,24 @@ class QuestEngine @Inject constructor(
 
         val p = state.quest.progress[actualQuestId] ?: return
         
-        // --- IRONCLAD VALIDATION: Only allow turn-in at the correct location and NPC ---
+        // --- IRONCLAD VALIDATION ---
         val def = registry[actualQuestId] ?: return
-        val currentCityId = state.world.locationId
+        val currentCityId = state.world.locationId.lowercase()
         
-        // MATCHING FIX: Case-insensitive city and NPC comparison
-        if (def.cityId.lowercase() != currentCityId.lowercase()) {
-            android.util.Log.e("QuestEngine", "Attempted to turn in quest $actualQuestId in wrong city: $currentCityId (expected ${def.cityId})")
+        if (def.cityId.lowercase() != currentCityId) {
+            android.util.Log.e("QuestEngine", "Attempted turn-in in wrong city: $currentCityId (expected ${def.cityId})")
             return
         }
         
         if (action is com.grimreich.core.PendingWorldAction.Dialogue) {
              val normalizedRole = action.npcRole.lowercase()
              val normalizedOrigin = def.originNpcId.lowercase()
-             // BUG-9 FIX: Allow "none" to skip NPC validation
              if (normalizedOrigin != "none" && normalizedRole != normalizedOrigin && action.npcName.lowercase() != normalizedOrigin) {
-                 android.util.Log.e("QuestEngine", "Attempted to turn in quest $actualQuestId to wrong NPC: $normalizedRole (Expected: $normalizedOrigin)")
+                 android.util.Log.e("QuestEngine", "Attempted turn-in to wrong NPC: $normalizedRole (expected $normalizedOrigin)")
                  return
              }
         }
 
-        // Allow completion if objective met or directly requested (for simple single-step quests)
         if (p.status != QuestStatus.OBJECTIVE_MET && p.status != QuestStatus.ACTIVE) return
         
         // --- ATOMIC TRANSITION ---
@@ -156,40 +160,43 @@ class QuestEngine @Inject constructor(
     }
 
     fun failQuestDirect(state: GameState, questId: String) {
-        state.quest.activeQuestIds.remove(questId)
-        state.quest.failedQuestIds.add(questId)
-        state.quest.progress[questId] = state.quest.progress[questId]?.copy(status = QuestStatus.FAILED) ?: QuestProgress(questId, QuestStatus.FAILED)
+        val normalizedId = questId.lowercase().trim()
+        state.quest.activeQuestIds.remove(normalizedId)
+        state.quest.failedQuestIds.add(normalizedId)
+        state.quest.progress[normalizedId] = state.quest.progress[normalizedId]?.copy(status = QuestStatus.FAILED) ?: QuestProgress(normalizedId, QuestStatus.FAILED)
     }
 
     fun getCurrentObjective(questId: String, state: GameState? = null): String {
-        val def = registry[questId] ?: return "???"
+        val normalizedId = questId.lowercase().trim()
+        val def = registry[normalizedId] ?: return "???"
         val actualState = state ?: gameRepository.currentState()
-        val p = actualState.quest.progress[questId] ?: return def.description
+        val p = actualState.quest.progress[normalizedId] ?: return def.description
         
         return if (p.status == QuestStatus.OBJECTIVE_MET) {
-            "Wróć do: ${def.originNpcId.uppercase()}"
+            context.getString(R.string.quest_return_to, def.originNpcId.uppercase())
         } else {
             def.steps.getOrNull(p.currentStepIndex)?.description ?: def.description
         }
     }
 
     fun isObjectiveMet(questId: String, state: GameState? = null): Boolean {
+        val normalizedId = questId.lowercase().trim()
         val s = state ?: gameRepository.currentState()
-        return s.quest.progress[questId]?.status == QuestStatus.OBJECTIVE_MET
+        return s.quest.progress[normalizedId]?.status == QuestStatus.OBJECTIVE_MET
     }
 
     fun getActiveQuestsForCity(cityId: String): List<QuestDefinition> {
         val state = gameRepository.currentState()
         return state.quest.activeQuestIds
             .mapNotNull { registry[it] }
-            .filter { it.cityId == cityId }
+            .filter { it.cityId.lowercase() == cityId.lowercase() }
     }
 
     fun getVisibleQuestBoard(state: GameState): Map<String, List<QuestDefinition>> {
         val sharedVisited = mutableSetOf<String>()
         return registry.values
             .filter { !it.isHidden && getStatus(it.id, state, sharedVisited) == QuestStatus.AVAILABLE }
-            .groupBy { it.cityId }
+            .groupBy { it.cityId.lowercase() }
             .mapValues { (cityId, quests) ->
                 shuffleQuests(quests, cityId, state.world.day)
             }
@@ -197,23 +204,21 @@ class QuestEngine @Inject constructor(
     
     fun getAvailableQuestsForCity(cityId: String, state: GameState): List<QuestDefinition> {
         val sharedVisited = mutableSetOf<String>()
+        val cityLower = cityId.lowercase()
         val allAvailable = registry.values.filter {
-            it.cityId == cityId && !it.isHidden && getStatus(it.id, state, sharedVisited) == QuestStatus.AVAILABLE
+            it.cityId.lowercase() == cityLower && !it.isHidden && getStatus(it.id, state, sharedVisited) == QuestStatus.AVAILABLE
         }
         
-        // --- BOARD FIX: Priority for Chain Quests ---
         val priorityQuests = allAvailable.filter { it.chainId != null }
         val randomQuests = allAvailable.filter { it.chainId == null }
         
-        return shuffleQuests(priorityQuests + randomQuests, cityId, state.world.day)
+        return shuffleQuests(priorityQuests + randomQuests, cityLower, state.world.day)
             .sortedWith(compareBy<QuestDefinition> { it.chainId ?: "zzz" }.thenBy { it.chainOrder }.thenBy { it.recommendedLevel })
     }
 
     private fun shuffleQuests(quests: List<QuestDefinition>, cityId: String, day: Int): List<QuestDefinition> {
         val seed = cityId.hashCode().toLong() + (day / 3)
         val cityRandom = kotlin.random.Random(seed)
-        
-        // Priority for chain quests, then take up to 6
         val sorted = quests.sortedByDescending { it.chainId != null }
         return sorted.shuffled(cityRandom).take(6)
     }
@@ -238,7 +243,7 @@ data class QuestDefinition(
     val recommendedLevel: Int = 1,
     val chainId: String? = null,
     val chainOrder: Int = 0,
-    val minWorldDay: Int = 1,
+    val minWorldDay: Int = 0,
     val requiredMetaAwareness: Int = 0,
     val repeatable: Boolean = false,
     val isHidden: Boolean = false

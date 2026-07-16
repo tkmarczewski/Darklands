@@ -7,6 +7,10 @@
     <string name="btn_understand">VERSTANDEN</string>
     <string name="btn_yes">JA</string>
     <string name="btn_no">NEIN</string>
+    <string name="btn_return">ZURÜCK</string>
+    <string name="btn_equip">AUSRÜSTEN</string>
+    <string name="btn_equipped">AUSGERÜSTET</string>
+    <string name="btn_use">BENUTZEN</string>
 
     <string name="menu_city">STADT</string>
     <string name="menu_map">KARTE</string>
@@ -59,16 +63,23 @@
     <string name="creator_stage_career">BERUF</string>
     <string name="creator_stage_attributes">ATTRIBUTE</string>
     <string name="creator_stage_skills">SPEZIALISIERUNGEN</string>
+    <string name="creator_stage_lifepath">WEG</string>
     <string name="btn_randomize_all">ALLES ZUFÄLLIG</string>
     <string name="btn_randomize">ZUFÄLLIG</string>
     <string name="creator_select_path">WEG WÄHLEN:</string>
     <string name="creator_points_label">VERFÜGBARE PUNKTE</string>
     <string name="btn_next">WEITER</string>
     <string name="btn_finish">ABSCHLIESSEN</string>
+    <string name="creator_lifepath_title">ZEITLICHE VERWURZELUNG</string>
+    <string name="creator_lifepath_desc">Du kannst Jahre für zusätzliches Training aufwenden. Jeder Zyklus (5 Jahre) erhöht deine Fähigkeiten, bringt dich aber näher an die Schwelle der Sterblichkeit.</string>
+    <string name="creator_btn_train">TRAINIEREN ( +5 JAHRE )</string>
+    <string name="creator_error_age_limit">Biologische Belastungsgrenze erreicht.</string>
+
     <!-- Hub Screen -->
+    <string name="hub_title">LAGER</string>
     <string name="hub_day">TAG %1$d</string>
     <string name="hub_world_status">WELTZUSTAND</string>
-    <string name="hub_news">LETZTE NEUIGKEITEN:</string>
+    <string name="hub_news">EREIGNISCHRONIK:</string>
     <string name="hub_party">DEINE GRUPPE</string>
     <string name="hub_news_empty">Stille im Äther...</string>
     <string name="hub_location_unknown">Unbekannter Ort</string>
@@ -81,10 +92,23 @@
     <string name="stability_low">Nachbilder und Echos werden zur Normalität. Die Menschen fürchten sich, in den Spiegel zu schauen.</string>
     <string name="stability_critical">Die Realität zerfällt vor Ihren Augen. Sie hören das statische Brummen des Codes.</string>
 
+    <!-- Labels -->
+    <string name="label_party">GRUPPE</string>
+    <string name="label_stats">WERTE</string>
+    <string name="label_combat">KAMPF</string>
+    <string name="label_character">CHARAKTER</string>
+    <string name="label_backpack">RUCKSACK</string>
+    <string name="label_weight_kg">%1$s kg</string>
+    <string name="label_age_years">ANKER-ALTER: %1$d Jahre</string>
+    <string name="label_training_cycles">TRAININGSZYKLEN: %1$d</string>
+    <string name="label_hp_current">LP: %1$d/%2$d</string>
+    <string name="label_level_xp">STUFE: %1$d | EP: %2$d/%3$d</string>
+
     <!-- Language Selector -->
     <string name="settings_language_title">SPRACHE WÄHLEN</string>
     <string name="settings_language_close">SCHLIESSEN</string>
     <string name="btn_language">SPRACHE</string>
+
     <!-- Tavern Screen -->
     <string name="tavern_title">SCHENKE ZUM GEBROCHENEN KRUG</string>
     <string name="tavern_btn_rest">RUHEN (50 G)</string>
@@ -123,13 +147,14 @@
     <string name="quest_journal_completed">ABGESCHLOSSEN</string>
     <string name="quest_journal_empty_active">Keine aktiven Aufträge.</string>
     <string name="quest_journal_empty_completed">Keine abgeschlossenen Aufträge.</string>
+
     <!-- Player Identity Screen -->
     <string name="identity_title">WIE WERDEN SIE GENANNT, WANDERER?</string>
     <string name="identity_desc">Dieser Name gehört dir, nicht dem Helden. Er wird in den Chroniken der Welt festgehalten.</string>
     <string name="identity_hint">DEIN NAME</string>
 
     <!-- City Screen -->
-    <string name="city_btn_exit">ZURÜCK ZUM HUB</string>
+    <string name="city_btn_exit">ZURÜCK ZUM LAGER</string>
     <string name="city_residents_label">BEWOHNER:</string>
     <string name="city_empty_residents">Die Straßen sind leer...</string>
     <string name="city_quest_menu_title">AUFTRAG WÄHLEN</string>
@@ -173,6 +198,28 @@
     <string name="expedition_anchor_status">ANKER-STATUS: STABIL | LOG-AUFZEICHNUNG AKTIV</string>
     <string name="expedition_quest_level">STUFE</string>
 
+    <!-- Ritual Screen -->
+    <string name="ritual_title">RITUAL DES ECHOS</string>
+    <string name="ritual_desc">%1$s hat die Grenze überschritten. Seine Seele treibt im Riss. Wagst du es, sie zurückzuholen?</string>
+    <string name="ritual_consequences_title">KONSEQUENZEN DER WIEDERBELEBUNG:</string>
+    <string name="ritual_consequence_stability">- Weltstabilität: -15 (Era des Risses naht)</string>
+    <string name="ritual_consequence_corruption">- Heldenverderbnis: +20</string>
+    <string name="ritual_consequence_sanity">- Heldengeist: -15</string>
+    <string name="ritual_consequence_cost">- Kosten: 100 Gold</string>
+    <string name="ritual_gold_status">DEIN GOLD: %1$d</string>
+    <string name="ritual_btn_perform">ECHO-RITUAL DURCHFÜHREN</string>
+    <string name="ritual_btn_sacrifice">LASS IHN GEHEN (PERMANENTER TOD)</string>
+    <string name="ritual_error_gold">Zu wenig Gold (100 benötigt).</string>
+    <string name="ritual_error_generic">Ritual kann nicht durchgeführt werden.</string>
+
+    <!-- World Map Screen -->
+    <string name="map_domain_label">DOMÄNE: %1$s</string>
+    <string name="map_patron_label">PATRON: %1$s</string>
+    <string name="map_warning_unstable">!!! WARNUNG: KOORDINATEN INSTABIL !!!</string>
+    <string name="map_btn_travel">AUFBRECHEN</string>
+    <string name="map_label_here">DU BIST HIER</string>
+    <string name="map_label_current_location">(AKTUELLER ORT)</string>
+
     <!-- City Screen V9 -->
     <string name="city_manifest_label">STADTMANIFEST</string>
     <string name="city_npcs_label">ANWESENDE NPCs:</string>
@@ -194,4 +241,81 @@
     <string name="alchemy_who_brews">WER BRAUT?</string>
     <string name="alchemy_btn_brew">TRANK BRAUEN</string>
     <string name="alchemy_select_recipe_hint">Wählen Sie ein Rezept aus der Liste.</string>
+
+    <!-- Character Details -->
+    <string name="detail_specializations">SPEZIALISIERUNGEN</string>
+    <string name="detail_no_specializations">Keine einzigartigen Fertigkeiten.</string>
+
+    <!-- Mastery Traits -->
+    <string name="mastery_knight">SCHWERTMEISTER (+5 Angriff)</string>
+    <string name="mastery_mercenary">KRIEGSVETERAN (+5 Verteidigung)</string>
+    <string name="mastery_scholar">CHIFFRIERER (Größere Resistenz gegen Glitches)</string>
+    <string name="mastery_thief">SCHATTEN (Erhöhte Ausweichchance)</string>
+    <string name="mastery_alchemist">TRANSMUTATIONSMEISTER (Stärkere Tränke)</string>
+    <string name="mastery_priest">HEILIGER ZORN (Stärkere Gebete)</string>
+    <string name="mastery_generic">HANDWERKSMEISTER</string>
+    <string name="saints_btn_pray">BETEN</string>
+    <string name="saints_btn_offer">OPFER DARBRINGEN (%1$d G)</string>
+    <string name="saints_btn_cleanse">VON DER DUNKELHEIT REINIGEN</string>
+    <string name="tavern_label_local">LOKALE SCHENKE</string>
+    <string name="tavern_label_echo">ECHO DER GESPRÄCHE</string>
+    <string name="tavern_label_interactions">INTERAKTIONEN</string>
+    <string name="tavern_label_exit">AUSGANG</string>
+    <string name="tavern_log_default">Die Luft ist erfüllt vom Geruch von Rauch und alten Geschichten.</string>
+    <string name="tavern_btn_hire_mercs">SÖLDNER ANWERBEN</string>
+    <string name="tavern_btn_return_city">ZURÜCK ZUR STADT</string>
+    <string name="city_label_region">REGION: NORDEN</string>
+    <string name="city_quest_board_title">۞ ANSCHLAGTAFEL ۞</string>
+    <string name="city_label_location">ORT: %1$s</string>
+    <string name="city_label_reward">BELOHNUNG: %1$d G</string>
+    <string name="city_btn_back_city">ZURÜCK ZUR STADT</string>
+    <string name="expedition_label_anomaly">ANOMALIE ENTDECKT</string>
+    <string name="expedition_label_interaction_required">INTERAKTION ERFORDERLICH:</string>
+    <string name="expedition_log_sensor">> Sensoren registrieren Anomalien in der Nebelstruktur...</string>
+    <string name="time_morning">MORGEN</string>
+    <string name="time_midday">MITTAG</string>
+    <string name="time_afternoon">NACHMITTAG</string>
+    <string name="time_dusk">DÄMMERUNG</string>
+    <string name="time_evening">ABEND</string>
+    <string name="time_midnight">MITTERNACHT</string>
+    <string name="time_deep_night">TIEFE NACHT</string>
+    <string name="quest_status_ready">۞ STATUS: BEREIT ZUR ABGABE</string>
+    <string name="quest_label_objective">ZIEL: %1$s</string>
+    <string name="market_empty">LEERE BEUTEL</string>
+    <string name="exit_dialog_title">ZUM MENÜ VERLASSEN</string>
+    <string name="exit_dialog_cancel">BLEIBEN</string>
+    <string name="label_status">STATUS</string>
+    <string name="market_label_title">MARKT: %1$s</string>
+    <string name="market_label_inventory">DEINE VORRÄTE</string>
+    <string name="market_label_goods">LOKALE WAREN</string>
+    <string name="market_label_info">INFORMATIONEN</string>
+    <string name="market_log_waiting">> Der Händler wartet auf Ihre Entscheidung.</string>
+    <string name="market_label_warning">WARNUNG: %1$s</string>
+    <string name="quest_return_to">Zurück zu: %1$s</string>
+    <string name="stat_str">STÄRKE</string>
+    <string name="stat_agi">BEWEGLICHKEIT</string>
+    <string name="stat_int">INTELLIGENZ</string>
+    <string name="stat_per">WAHRNEHMUNG</string>
+    <string name="stat_end">AUSDAUER</string>
+    <string name="stat_cha">CHARISMA</string>
+    <string name="stat_pie">FRÖMMIGKEIT</string>
+    <string name="gold_format">%1$d Gold</string>
+    <string name="temple_label_title">KAPELLE DES REINEN LICHTS</string>
+    <string name="temple_label_faith">GLAUBE: %1$d</string>
+    <string name="temple_label_log">SEELENJOURNAL</string>
+    <string name="temple_label_status">GEISTIGER ZUSTAND</string>
+    <string name="temple_label_rituals">RITUALE</string>
+    <string name="temple_log_default">Die Stille der Kapelle beruhigt müde Geister.</string>
+    <string name="temple_warning_negotiate">WARNUNG: Das Verhandeln mit höheren Mächten verletzt die Realitätsstabilität.</string>
+    <string name="temple_btn_offering">OPFER DARBRINGEN (%1$d G)</string>
+    <string name="temple_btn_cancel_deal">HANDEL ABBRECHEN</string>
+    <string name="temple_btn_exit">KAPELLE VERLASSEN</string>
+    <string name="temple_label_dead">GEFALLEN</string>
+    <string name="temple_label_sanity">GEISTESZUSTAND: %1$d%%</string>
+    <string name="temple_btn_resurrect">WIEDERBELEBEN</string>
+    <string name="temple_btn_negotiate">FEILSCHEN</string>
+    <string name="log_label_title">EREIGNISPROTOKOLL</string>
+    <string name="log_empty">Das Protokoll schweigt. Deine Taten wurden noch nie aufgezeichnet.</string>
+    <string name="log_label_day">TAG %1$d</string>
+    <string name="log_label_important">WICHTIG</string>
 </resources>

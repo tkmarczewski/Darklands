@@ -9,9 +9,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.grimreich.R
 
 data class SimpleLogEntry(
     val day: Int,
@@ -31,7 +33,7 @@ fun WorldLogScreen(
             .padding(16.dp)
     ) {
         Text(
-            text = "REJESTR WYDARZEŃ",
+            text = stringResource(R.string.log_label_title),
             style = MaterialTheme.typography.headlineMedium,
             color = Color(0xFFC0A060),
             modifier = Modifier.padding(bottom = 16.dp).align(Alignment.CenterHorizontally)
@@ -44,7 +46,7 @@ fun WorldLogScreen(
             if (logEntries.isEmpty()) {
                 item {
                     Text(
-                        "Rejestr milczy. Twoje czyny jeszcze nie zostały zapisane.",
+                        stringResource(R.string.log_empty),
                         color = Color.DarkGray,
                         fontSize = 14.sp,
                         modifier = Modifier.padding(16.dp)
@@ -62,7 +64,7 @@ fun WorldLogScreen(
             modifier = Modifier.fillMaxWidth().height(50.dp).padding(top = 8.dp),
             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF400000))
         ) {
-            Text("POWRÓT", color = Color.White, fontWeight = FontWeight.Bold)
+            Text(stringResource(R.string.btn_return), color = Color.White, fontWeight = FontWeight.Bold)
         }
     }
 }
@@ -77,14 +79,14 @@ private fun LogEntryCard(entry: SimpleLogEntry) {
         Column(modifier = Modifier.padding(12.dp)) {
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                 Text(
-                    text = "DZIEŃ ${entry.day}",
+                    text = stringResource(R.string.log_label_day, entry.day),
                     color = Color(0xFF800000),
                     fontWeight = FontWeight.Bold,
                     fontSize = 10.sp
                 )
                 if (entry.importance > 1) {
                     Text(
-                        text = "WAŻNE",
+                        text = stringResource(R.string.log_label_important),
                         color = Color(0xFFC0A060),
                         fontWeight = FontWeight.Bold,
                         fontSize = 10.sp

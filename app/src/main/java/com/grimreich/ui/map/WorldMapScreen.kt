@@ -1,8 +1,7 @@
 package com.grimreich.ui.map
 
-import androidx.compose.animation.core.*
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -12,102 +11,68 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.grimreich.R
-import kotlin.random.Random
+import com.grimreich.world.CityData
 
 @Composable
-fun WorldMapScreen(viewModel: WorldMapViewModel, onBack: () -> Unit) {
-    val state by viewModel.uiState.collectAsState()
-    val allCities = state.allCities
-
-    // GLITCH ANIMATION
-    val infiniteTransition = rememberInfiniteTransition(label = "map_glitch")
-    val jitterX by infiniteTransition.animateFloat(
-        initialValue = -2f,
-        targetValue = 2f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(50, easing = LinearEasing),
-            repeatMode = RepeatMode.Reverse
-        ),
-        label = "jitter"
-    )
+fun WorldMapScreen(
+    cities: List<CityData>,
+    currentCityId: String,
+    onCityClick: (String) -> Unit,
+    onBack: () -> Unit
+) {
+    var selectedCity by remember { mutableStateOf(cities.find { it.id == currentCityId }) }
 
     Box(modifier = Modifier.fillMaxSize().background(Color.Black)) {
-        // BACKGROUND TINT
-        if (state.worldStability < 20) {
-            Box(modifier = Modifier.fillMaxSize().background(Color(0x33FF0000)))
-        }
-
         Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
-            // HEADER
-            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
                 Text(
-                    text = if (state.worldStability < 15 && Random.nextFloat() < 0.2f) "KOD_GEOGRAFICZNY_USZKODZONY" else "MAPA GRIMREICH", 
-                    color = if (state.worldStability < 20) Color.Red else Color(0xFFE0C080), 
-                    fontWeight = FontWeight.Bold, 
-                    fontSize = 20.sp,
-                    modifier = if (state.worldStability < 10) Modifier.offset(x = jitterX.dp) else Modifier
+                    text = stringResource(R.string.menu_map),
+                    color = Color(0xFFC0A060),
+                    fontSize = 24.sp,
+                    fontWeight = FontWeight.Bold
                 )
-                Button(onClick = onBack, colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2A2A2A))) {
-                    Text("POWRÓT", color = Color(0xFFE0C080), fontSize = 10.sp)
+                Button(
+                    onClick = onBack,
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1A1A1A)),
+                    border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFFC0A060)),
+                    shape = MaterialTheme.shapes.extraSmall
+                ) {
+                    Text(stringResource(R.string.btn_back), color = Color(0xFFE0C080), fontSize = 10.sp)
                 }
             }
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            LazyColumn(modifier = Modifier.weight(1f)) {
-                items(allCities) { city ->
-                    val qCount = state.cityQuestCounts[city.id] ?: 0
-                    val isStabilityLow = state.worldStability < 35
-                    
-                    val name = if (isStabilityLow && Random.nextFloat() < 0.1f) {
-                        "SEKTOR_${city.id.uppercase().take(4)}_${Random.nextInt(100, 999)}"
-                    } else city.name
-
-                    MapLocationItem(
-                        name = name + if (qCount > 0) " ($qCount ZADANIA)" else "",
-                        isCurrent = city.id == state.currentLocationId,
-                        isSelected = city.id == state.selectedCityId,
-                        stability = state.worldStability,
-                        onClick = { viewModel.selectCity(city.id) }
-                    )
+            Row(modifier = Modifier.weight(1f)) {
+                // City List
+                LazyColumn(modifier = Modifier.weight(1f).padding(end = 8.dp)) {
+                    items(cities) { city ->
+                        CityMapCard(
+                            city = city,
+                            isCurrent = city.id == currentCityId,
+                            isSelected = city.id == selectedCity?.id,
+                            onClick = { selectedCity = city }
+                        )
+                    }
                 }
-            }
 
-            // TRAVEL PANEL
-            state.selectedCityData?.let { city ->
-                Surface(
-                    modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
-                    color = Color(0xD0000000),
-                    shape = MaterialTheme.shapes.medium,
-                    border = androidx.compose.foundation.BorderStroke(1.dp, if (state.worldStability < 30) Color.Red else Color.Transparent)
-                ) {
-                    Column(modifier = Modifier.padding(16.dp)) {
-                        Text(city.name.uppercase(), color = if (state.worldStability < 20) Color.Red else Color(0xFFE0C080), fontWeight = FontWeight.Bold)
-                        Text("DOMENA: ${city.phenomenon}", color = Color.LightGray, fontSize = 12.sp)
-                        Text("PATRON: ${city.prophet ?: "Nieznany"}", color = Color.LightGray, fontSize = 12.sp)
-                        
-                        if (state.worldStability < 15) {
-                            Text("!!! OSTRZEŻENIE: KOORDYNATY NIESTABILNE !!!", color = Color.Red, fontSize = 10.sp, fontWeight = FontWeight.Bold)
-                        }
-
-                        Spacer(modifier = Modifier.height(12.dp))
-                        if (city.id != state.currentLocationId) {
-                            Button(
-                                onClick = { viewModel.travelToSelected { onBack() } },
-                                modifier = Modifier.fillMaxWidth(),
-                                colors = ButtonDefaults.buttonColors(containerColor = if (state.worldStability < 20) Color(0xFF600000) else MaterialTheme.colorScheme.primary)
-                            ) {
-                                Text("WYRUSZ W DROGĘ")
-                            }
-                        } else {
-                            Text("JESTEŚ TUTAJ", color = Color.Gray, modifier = Modifier.align(Alignment.CenterHorizontally))
-                        }
+                // City Detail / Travel
+                Column(modifier = Modifier.weight(1f).padding(start = 8.dp)) {
+                    selectedCity?.let { city ->
+                        CityMapDetail(
+                            city = city,
+                            isCurrent = city.id == currentCityId,
+                            onTravel = { onCityClick(city.id) }
+                        )
                     }
                 }
             }
@@ -116,25 +81,66 @@ fun WorldMapScreen(viewModel: WorldMapViewModel, onBack: () -> Unit) {
 }
 
 @Composable
-fun MapLocationItem(name: String, isCurrent: Boolean, isSelected: Boolean, stability: Int = 100, onClick: () -> Unit) {
+fun CityMapDetail(city: CityData, isCurrent: Boolean, onTravel: () -> Unit) {
+    Surface(
+        color = Color(0xFF111111),
+        border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFF333333)),
+        modifier = Modifier.fillMaxSize()
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Text(city.name.uppercase(), color = Color.White, fontWeight = FontWeight.Bold, fontSize = 18.sp)
+            Text(city.loreDescription, color = Color.Gray, fontSize = 12.sp, modifier = Modifier.padding(vertical = 8.dp))
+            
+            HorizontalDivider(color = Color(0x33C0A060), modifier = Modifier.padding(vertical = 8.dp))
+            
+            Text(stringResource(R.string.map_domain_label, city.phenomenon), color = Color.LightGray, fontSize = 12.sp)
+            Text(stringResource(R.string.map_patron_label, city.prophet ?: "???"), color = Color.LightGray, fontSize = 12.sp)
+            
+            Spacer(modifier = Modifier.height(16.dp))
+            Text(stringResource(R.string.map_warning_unstable), color = Color.Red, fontSize = 10.sp, fontWeight = FontWeight.Bold)
+            
+            Spacer(modifier = Modifier.weight(1f))
+            
+            if (!isCurrent) {
+                Button(
+                    onClick = onTravel,
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFC0A060)),
+                    shape = MaterialTheme.shapes.extraSmall
+                ) {
+                    Text(stringResource(R.string.map_btn_travel), color = Color.Black, fontWeight = FontWeight.Bold)
+                }
+            } else {
+                Text(
+                    stringResource(R.string.map_label_here), 
+                    color = Color.Gray, 
+                    modifier = Modifier.align(Alignment.CenterHorizontally),
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun CityMapCard(city: CityData, isCurrent: Boolean, isSelected: Boolean, onClick: () -> Unit) {
     Surface(
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 4.dp)
             .clickable { onClick() },
-        color = when {
-            isSelected -> if (stability < 30) Color(0xFF4A0000) else Color(0xFF4A4A2A)
-            isCurrent -> if (stability < 30) Color(0xFF003000) else Color(0xFF2A4A2A)
-            else -> Color(0xFF1A1A1A)
-        },
-        shape = MaterialTheme.shapes.extraSmall,
-        border = if (isSelected && stability < 25) androidx.compose.foundation.BorderStroke(1.dp, Color.Red) else null
+        color = if (isSelected) Color(0xFF222222) else Color(0xFF0A0A0A),
+        border = androidx.compose.foundation.BorderStroke(1.dp, if (isSelected) Color(0xFFC0A060) else Color(0xFF222222))
     ) {
         Row(modifier = Modifier.padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
-            Text(text = name, color = if (isCurrent) Color(0xFFADFF2F) else Color.White, fontWeight = FontWeight.Bold)
-            if (isCurrent) {
-                Spacer(modifier = Modifier.width(8.dp))
-                Text("(OBECNA LOKACJA)", color = Color(0xFFADFF2F), fontSize = 10.sp)
+            Box(modifier = Modifier.size(8.dp).background(if (isCurrent) Color.Green else Color.DarkGray))
+            Spacer(modifier = Modifier.width(12.dp))
+            Column {
+                Text(city.name, color = if (isSelected) Color.White else Color.Gray, fontSize = 14.sp)
+                if (isCurrent) {
+                    Text(stringResource(R.string.map_label_current_location), color = Color(0xFFADFF2F), fontSize = 10.sp)
+                }
             }
         }
     }
