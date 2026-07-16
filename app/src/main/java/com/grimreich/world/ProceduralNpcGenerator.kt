@@ -51,7 +51,7 @@ class ProceduralNpcGenerator @Inject constructor(
                     npcList.add(NPC(
                         id = "echo_${echo.id}",
                         name = "ECHO_${echo.name.uppercase().replace(" ", "_")}",
-                        role = "ECHO",
+                        role = "echo",
                         startNodeId = "echo_start",
                         stability = 0.1f,
                         isInfested = true
@@ -63,7 +63,7 @@ class ProceduralNpcGenerator @Inject constructor(
             npcList.add(NPC(
                 id = "aelion",
                 name = if (isGrim20) "PROCES_AEL_ALPHA" else "Prorok Aelion",
-                role = "AELION",
+                role = "aelion",
                 isRegionalHero = true,
                 startNodeId = "aelion_start",
                 stability = (worldStability / 100f).coerceIn(0.1f, 1.0f)
@@ -73,7 +73,7 @@ class ProceduralNpcGenerator @Inject constructor(
             npcList.add(NPC(
                 id = "mira",
                 name = if (isGrim20) "SĘDZIA_MIRA_v2" else "Mira Wieloznaczna",
-                role = "MIRA",
+                role = "mira",
                 isRegionalHero = true,
                 startNodeId = "mira_start",
                 stability = (worldStability / 100f).coerceIn(0.1f, 1.0f)
@@ -84,7 +84,7 @@ class ProceduralNpcGenerator @Inject constructor(
             npcList.add(NPC(
                 id = "ravenn",
                 name = if (isGrim20) "OBSERWATOR_RAV" else "Ravenn Beztwarzowy",
-                role = "RAVENN",
+                role = "ravenn",
                 isRegionalHero = true,
                 startNodeId = "ravenn_start",
                 stability = (worldStability / 100f).coerceIn(0.1f, 1.0f)
@@ -125,7 +125,7 @@ class ProceduralNpcGenerator @Inject constructor(
                 npcList.add(NPC(
                     id = "npc_${role.lowercase()}_$cityId",
                     name = npcName,
-                    role = if (cityId == "twierdza_zelazna" && role == "Guard") "FORTRESS_GUARD" else role,
+                    role = if (cityId == "twierdza_zelazna" && role == "Guard") "guard" else role,
                     startNodeId = if (cityId == "twierdza_zelazna" && role == "Guard") "fortress_guard_start" else "${role.lowercase()}_start",
                     stability = (worldStability / 100f).coerceIn(0.05f, 1.0f),
                     isInfested = isInfested

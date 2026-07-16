@@ -39,7 +39,7 @@
       {
         "text": "Sprawdzę to (ZADANIE: Dezerter).",
         "targetNodeId": "end",
-        "triggerEvent": "ACTIVATE_QUEST",
+        "triggerEvent": "activate_quest",
         "triggerValue": "q_deserter",
         "requiredQuestId": "q_deserter",
         "requiredQuestStatus": "available"
@@ -77,7 +77,7 @@
       {
         "text": "Wracaj (ZAKOŃCZ ZADANIE).",
         "targetNodeId": "end",
-        "triggerEvent": "ADVANCE_QUEST",
+        "triggerEvent": "advance_quest",
         "triggerValue": "q_deserter"
       }
     ]
@@ -90,7 +90,7 @@
       {
         "text": "Pozwól mu odejść (ZYSKAJ WIEDZĘ).",
         "targetNodeId": "deserter_revelation",
-        "triggerEvent": "UNLOCK_LORE",
+        "triggerEvent": "unlock_lore",
         "triggerValue": "lore_cipher_sun"
       }
     ]
@@ -103,7 +103,7 @@
       {
         "text": "Wróć zameldować o zdarzeniu.",
         "targetNodeId": "end",
-        "triggerEvent": "ADVANCE_QUEST",
+        "triggerEvent": "advance_quest",
         "triggerValue": "q_deserter"
       }
     ]
@@ -116,7 +116,7 @@
       {
         "text": "Tak, pomogę (PRZYJMIJ: Wyrok Inkwizycji).",
         "targetNodeId": "end",
-        "triggerEvent": "ACTIVATE_QUEST",
+        "triggerEvent": "activate_quest",
         "triggerValue": "q_inquisition_verdict",
         "requiredQuestId": "q_inquisition_verdict",
         "requiredQuestStatus": "available"
@@ -141,11 +141,13 @@
       {
         "text": "Pokaż mi swoje towary.",
         "targetNodeId": "end",
-        "triggerEvent": "OPEN_MARKET"
+        "triggerEvent": "open_market"
       },
       {
         "text": "O jakich zbiorach mówisz?",
-        "targetNodeId": "merchant_quest_check"
+        "targetNodeId": "merchant_quest_check",
+        "requiredQuestId": "q_coast_harvest",
+        "requiredQuestStatus": "available"
       },
       {
         "text": "Tylko się rozglądam.",
@@ -161,7 +163,7 @@
       {
         "text": "Zajmę się tym (PRZYJMIJ: Żniwa Mgły).",
         "targetNodeId": "end",
-        "triggerEvent": "ACTIVATE_QUEST",
+        "triggerEvent": "activate_quest",
         "triggerValue": "q_coast_harvest",
         "requiredQuestId": "q_coast_harvest",
         "requiredQuestStatus": "available"
@@ -180,7 +182,7 @@
       {
         "text": "Zrozumiałem (ODBIERZ NAGRODĘ).",
         "targetNodeId": "end",
-        "triggerEvent": "COMPLETE_QUEST",
+        "triggerEvent": "complete_quest",
         "triggerValue": "q_inquisition_verdict"
       }
     ]
@@ -193,7 +195,7 @@
       {
         "text": "Dziękuję (ODBIERZ NAGRODĘ).",
         "targetNodeId": "end",
-        "triggerEvent": "COMPLETE_QUEST",
+        "triggerEvent": "complete_quest",
         "triggerValue": "q_deserter"
       }
     ]
@@ -206,7 +208,7 @@
       {
         "text": "Proszę, oto zioła (ZAKOŃCZ).",
         "targetNodeId": "merchant_next_task",
-        "triggerEvent": "COMPLETE_QUEST",
+        "triggerEvent": "complete_quest",
         "triggerValue": "q_coast_harvest"
       }
     ]
@@ -219,7 +221,7 @@
       {
         "text": "Dobrze, zajmę się tym (ZADANIE: List do Twierdzy).",
         "targetNodeId": "end",
-        "triggerEvent": "ACTIVATE_QUEST",
+        "triggerEvent": "activate_quest",
         "triggerValue": "q_fortress_letter",
         "requiredQuestId": "q_fortress_letter",
         "requiredQuestStatus": "available"
@@ -238,7 +240,7 @@
       {
         "text": "Dziękuję (ZAKOŃCZ DOSTAWĘ).",
         "targetNodeId": "end",
-        "triggerEvent": "COMPLETE_QUEST",
+        "triggerEvent": "complete_quest",
         "triggerValue": "q_fortress_letter"
       }
     ]
@@ -257,7 +259,7 @@
       {
         "text": "Zbadam te pęknięcia.",
         "targetNodeId": "end",
-        "triggerEvent": "ACTIVATE_QUEST",
+        "triggerEvent": "activate_quest",
         "triggerValue": "q_scribes_1",
         "requiredQuestId": "q_scribes_1",
         "requiredQuestStatus": "available"
@@ -272,7 +274,7 @@
       {
         "text": "Tak, oto dowody (ZAKOŃCZ).",
         "targetNodeId": "end",
-        "triggerEvent": "COMPLETE_QUEST",
+        "triggerEvent": "complete_quest",
         "triggerValue": "q_scribes_1"
       }
     ]
@@ -295,12 +297,12 @@
   {
     "id": "ravenn_ambush_suspect",
     "npcId": "ravenn",
-    "text": "Stój, Kotwico. Twoja trasa podróży jest... podejrzanie zsynchronizowana z serią wyroków wykonanych bez użycia ostrza. Jesteś albo największym pechowcem w Boreas, albo tym, kogo szukam. Ravenn Beztwarzowy chce z Tobą rozmawiać w Opactwie Ciszy.",
+    "text": "Stój, Kotwico. Twoja trasa podróżny jest... podejrzanie zsynchronizowana z serią wyroków wykonanych bez użycia ostrza. Jesteś albo największym pechowcem w Boreas, albo tym, kogo szukam. Ravenn Beztwarzowy chce z Tobą rozmawiać w Opactwie Ciszy.",
     "choices": [
       {
         "text": "Pójdę tam. (ZADANIE: Gabinet bez śladów)",
         "targetNodeId": "end",
-        "triggerEvent": "ACTIVATE_QUEST",
+        "triggerEvent": "activate_quest",
         "triggerValue": "q_verdict_1",
         "requiredQuestId": "q_verdict_1",
         "requiredQuestStatus": "available"
@@ -319,7 +321,7 @@
       {
         "text": "Zrozumiałem. (ZADANIE: Gabinet bez śladów)",
         "targetNodeId": "end",
-        "triggerEvent": "ACTIVATE_QUEST",
+        "triggerEvent": "activate_quest",
         "triggerValue": "q_verdict_1",
         "requiredQuestId": "q_verdict_1",
         "requiredQuestStatus": "available"
@@ -334,13 +336,13 @@
         {
             "text": "[ANALIZUJ DOWODY]",
             "targetNodeId": "ravenn_investigator",
-            "triggerEvent": "CHECK_WORLD_FLAG",
+            "triggerEvent": "check_world_flag",
             "triggerValue": "verdict_path_investigator"
         },
         {
             "text": "[OCZEKUJ WYROKU]",
             "targetNodeId": "ravenn_accused",
-            "triggerEvent": "CHECK_WORLD_FLAG",
+            "triggerEvent": "check_world_flag",
             "triggerValue": "verdict_path_suspect"
         }
     ]
@@ -348,12 +350,12 @@
   {
     "id": "ravenn_investigator",
     "npcId": "ravenn",
-    "text": "Twoja trasa podróży jest godna podziwu. Śledziłeś te usterki, zamiast przed nimi uciekać. Pomóż mi wejść do gabinetu, musimy zabezpieczyć dowody.",
+    "text": "Twoja trasa podróżny jest godna podziwu. Śledziłeś te usterki, zamiast przed nimi uciekać. Pomóż mi wejść do gabinetu, musimy zabezpieczyć dowody.",
     "choices": [
         {
             "text": "Zrobię to. (AKTYWUJ: Gabinet bez śladów)",
             "targetNodeId": "end",
-            "triggerEvent": "ACTIVATE_QUEST",
+            "triggerEvent": "activate_quest",
             "triggerValue": "q_verdict_1",
             "requiredQuestId": "q_verdict_1",
             "requiredQuestStatus": "available"
@@ -391,7 +393,7 @@
           {
               "text": "Zrobię to. (AKTYWUJ: Gabinet bez śladów)",
               "targetNodeId": "end",
-              "triggerEvent": "ACTIVATE_QUEST",
+              "triggerEvent": "activate_quest",
               "triggerValue": "q_verdict_1",
               "requiredQuestId": "q_verdict_1",
               "requiredQuestStatus": "available"
@@ -406,7 +408,7 @@
       {
         "text": "Dziękuję za nagrodę (ZAKOŃCZ).",
         "targetNodeId": "end",
-        "triggerEvent": "COMPLETE_QUEST",
+        "triggerEvent": "complete_quest",
         "triggerValue": "active"
       }
     ]

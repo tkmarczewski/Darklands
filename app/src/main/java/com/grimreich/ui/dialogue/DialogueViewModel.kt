@@ -2,8 +2,7 @@ package com.grimreich.ui.dialogue
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.grimreich.core.GameRepository
-import com.grimreich.core.GameState
+import com.grimreich.core.*
 import com.grimreich.grimreich.v1.DialogueChoice
 import com.grimreich.grimreich.v1.DialogueNode
 import com.grimreich.systems.DialogueManager
@@ -12,16 +11,15 @@ import com.grimreich.world.CityCatalogue
 import com.grimreich.systems.CombatSystem
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 data class DialogueUiState(
     val currentNode: DialogueNode? = null,
     val npcName: String = "",
     val npcRole: String = "",
-    val npcPortrait: String = "port_peasant",
+    val npcPortrait: String = "port_barbarian",
     val backgroundDrawable: String = "bg_city_default",
-    val availableChoices: List<ChoiceInfo> = emptyList(), // ZMIANA: Bardziej szczegółowe info
+    val availableChoices: List<ChoiceInfo> = emptyList(),
     val worldStability: Int = 100
 )
 
@@ -29,7 +27,7 @@ data class ChoiceInfo(
     val choice: DialogueChoice,
     val isVisible: Boolean,
     val isEnabled: Boolean,
-    val activeHeroName: String? = null // Jeśli inna postać przejmuje rozmowę
+    val activeHeroName: String? = null
 )
 
 @HiltViewModel
@@ -63,8 +61,6 @@ class DialogueViewModel @Inject constructor(
                     if (helper != null) {
                         ChoiceInfo(choice, isVisible = true, isEnabled = true, activeHeroName = helper.name)
                     } else {
-                        // DESIGN CHOICE: Hidden by user request to ensure each playthrough 
-                        // with different stats/heroes reveals different content.
                         ChoiceInfo(choice, isVisible = false, isEnabled = false)
                     }
                 }
@@ -72,8 +68,6 @@ class DialogueViewModel @Inject constructor(
 
             val currentCity = cityCatalogue.get(state.world.locationId)
 
-            // --- ONTOLOGICAL AUDIT: Glitch Address ---
-            // If stability is low, NPCs might reveal the Player's real name (The Anchor)
             val finalNpcName = if (state.world.globalStability < 25 && kotlin.random.Random.nextFloat() < 0.3f) {
                 state.playerName ?: npcName
             } else {
@@ -107,10 +101,6 @@ class DialogueViewModel @Inject constructor(
             initialValue = DialogueUiState()
         )
 
-    init {
-        // init body is empty, state is handled via stateIn
-    }
-
     private fun checkHeroRequirements(choice: DialogueChoice, hero: com.grimreich.core.Hero, state: GameState): Boolean {
         val attrs = choice.requiredAttributes ?: emptyMap()
         attrs.forEach { (attr, value) ->
@@ -122,7 +112,7 @@ class DialogueViewModel @Inject constructor(
                 "PIETY", "POBOŻNOŚĆ" -> hero.piety
                 "PERCEPTION", "PERCEPCJA", "PER" -> hero.perception
                 "ENDURANCE", "WYTRZYMAŁOŚĆ", "END" -> hero.endurance
-                else -> 0 // STRICT: Unknown attributes fail by default
+                else -> 0
             }
             if (heroVal < value) return false
         }
@@ -130,27 +120,24 @@ class DialogueViewModel @Inject constructor(
         if (choice.requiredQuestId != null) {
             val status = questEngine.getStatus(choice.requiredQuestId, state)
             if (choice.requiredQuestStatus != null) {
-                if (status.name != choice.requiredQuestStatus.uppercase()) return false
+                // Status check: Case-insensitive match between Enum and JSON string
+                if (status.name.lowercase() != choice.requiredQuestStatus.lowercase()) return false
             } else {
-                // Default behavior: if requiredQuestId is present, quest must be at least AVAILABLE
                 if (status == com.grimreich.core.QuestStatus.LOCKED) return false
             }
         }
 
-        if (choice.triggerEvent == "QUEST_ACTIVE" && !state.quest.activeQuestIds.contains(choice.triggerValue)) return false
-        if (choice.triggerEvent == "QUEST_OBJECTIVE_MET" && !questEngine.isObjectiveMet(choice.triggerValue ?: "", state)) return false
-        if (choice.triggerEvent == "QUEST_COMPLETED" && !state.quest.completedQuestIds.contains(choice.triggerValue)) return false
-        if (choice.triggerEvent == "REQUIRE_GOLD") {
+        // PURIFIED TRIGGERS (always lowercase checks)
+        val event = choice.triggerEvent?.lowercase() ?: ""
+        if (event == "quest_active" && !state.quest.activeQuestIds.contains(choice.triggerValue)) return false
+        if (event == "quest_objective_met" && !questEngine.isObjectiveMet(choice.triggerValue ?: "", state)) return false
+        if (event == "quest_completed" && !state.quest.completedQuestIds.contains(choice.triggerValue)) return false
+        if (event == "require_gold") {
             val amount = choice.triggerValue?.toIntOrNull() ?: 0
             if (state.gold < amount) return false
         }
-
-        if (choice.triggerEvent == "CHECK_WORLD_FLAG") {
-            if (!state.quest.worldFlags.contains(choice.triggerValue)) return false
-        }
-
-        if (choice.triggerEvent == "CHECK_WORLD_FLAG") {
-            if (!state.quest.worldFlags.contains(choice.triggerValue)) return false
+        if (event == "check_world_flag") {
+            if (!state.quest.worldFlags.contains(choice.triggerValue?.lowercase())) return false
         }
 
         return true
@@ -159,7 +146,6 @@ class DialogueViewModel @Inject constructor(
     fun choose(choice: DialogueChoice, onEnd: () -> Unit, onCombat: () -> Unit, onMarket: () -> Unit, onRitual: () -> Unit) {
         val state = gameRepository.currentState()
         
-        // WYKRYWANIE POMOCY: Jeśli opcja została wybrana przez "pomocnika", ustawiamy go jako aktywnego
         val choiceInfo = uiState.value.availableChoices.find { it.choice == choice }
         choiceInfo?.activeHeroName?.let { helperName ->
             val helper = state.party.find { it.name == helperName }
@@ -169,10 +155,8 @@ class DialogueViewModel @Inject constructor(
             }
         }
 
-        // Handle triggers (quest advances, item giving, etc)
         dialogueManager.handleTrigger(state, choice.triggerEvent, choice.triggerValue)
 
-        // Project Anchor: Dialogue choice is a meaningful action. Apply Blood Tax if in Iron Fortress.
         if (state.world.locationId == "twierdza_zelazna") {
             gameRepository.updateState { s ->
                 s.party.forEach { if (!it.isDead) it.hp = (it.hp - 1).coerceAtLeast(1) }
@@ -180,19 +164,17 @@ class DialogueViewModel @Inject constructor(
             }
         }
 
-        // SPECIAL TRANSITIONS
-        if (choice.triggerEvent == "START_COMBAT" || choice.isCombatTrigger) {
+        val trigger = choice.triggerEvent?.lowercase() ?: ""
+        
+        if (trigger == "start_combat" || choice.isCombatTrigger) {
             val enemyType = try { 
-                // FIX: If it's a combat trigger but triggerEvent is ADVANCE_QUEST (common for mixed choices),
-                // use a default enemy type if none provided in triggerValue.
-                val typeStr = choice.triggerValue ?: "BANDIT"
+                val typeStr = choice.triggerValue ?: "bandit"
                 com.grimreich.core.EnemyType.valueOf(typeStr.trim().uppercase())
             } catch (e: Exception) { 
                 com.grimreich.core.EnemyType.BANDIT 
             }
             val enemy = com.grimreich.core.Bestiary.get(enemyType)
             
-            // BUG-4 FIX: Set QuestCombatWin action before starting combat from dialogue
             val activeQuestId = questEngine.getActiveQuestsForCity(state.world.locationId).firstOrNull()?.id
             
             combatSystem.startCombat(enemy)
@@ -206,12 +188,12 @@ class DialogueViewModel @Inject constructor(
             return
         }
 
-        if (choice.triggerEvent == "OPEN_MARKET") {
+        if (trigger == "open_market") {
             onMarket()
             return
         }
 
-        if (choice.triggerEvent == "OPEN_RITUAL") {
+        if (trigger == "open_ritual") {
             onRitual()
             return
         }
