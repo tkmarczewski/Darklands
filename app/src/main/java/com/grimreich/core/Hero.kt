@@ -227,3 +227,4 @@ data class Hero(
         traumaMarks = this.traumaMarks.map { it.copy() }.toMutableList()
     )
 }
+

@@ -29,3 +29,4 @@ object DayNightSystem {
 
     fun fatigueMod(time: TimeOfDay): Float = if (time.isNight()) 1.5f else 1.0f
 }
+

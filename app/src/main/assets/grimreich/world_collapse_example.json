@@ -1,1 +1,1 @@
-{"id":"world-1","regions":[{"id":"r1","name":"Misty Vale"}],"notes":"example"}
+{ param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,"regions":[{ param($m) $key = $m.Groups[1].Value; $val = $m.Groups[2].Value.ToLower().Replace(' ', '_'); "`"$key`": `"$val`"" ,"name":"Misty Vale"}],"notes":"example"}

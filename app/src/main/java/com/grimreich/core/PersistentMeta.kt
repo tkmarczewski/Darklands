@@ -14,3 +14,4 @@ data class PersistentMeta(
         WRATH, FEAR, HOPE, EMPTINESS, LIGHT, SHADOW, PEACE
     }
 }
+

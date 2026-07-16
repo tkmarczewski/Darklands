@@ -112,3 +112,4 @@ object TradingEngine {
         return "Sprzedano ${item.name} za $sellPrice G."
     }
 }
+

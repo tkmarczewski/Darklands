@@ -31,3 +31,4 @@ object ShrineCatalogue {
     fun all(): List<Shrine> = shrines
     fun get(id: String): Shrine? = shrines.firstOrNull { it.id == id }
 }
+

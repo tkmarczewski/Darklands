@@ -34,3 +34,4 @@ data class CombatState(
     val initiativeOrder: MutableList<InitiativeSlot> = mutableListOf(),
     var currentTurnIndex: Int = 0
 )
+

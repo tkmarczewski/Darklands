@@ -220,3 +220,4 @@ object EncounterCatalog {
 
     fun all(): List<BattleEncounter> = encounters.values.toList()
 }
+

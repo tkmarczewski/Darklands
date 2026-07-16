@@ -139,3 +139,4 @@ class CharacterFactory @Inject constructor(
         }
     }
 }
+

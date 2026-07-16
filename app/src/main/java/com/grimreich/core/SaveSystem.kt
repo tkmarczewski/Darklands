@@ -163,3 +163,4 @@ class SaveSystem @Inject constructor() {
         return snapshot.copy(version = SAVE_VERSION)
     }
 }
+

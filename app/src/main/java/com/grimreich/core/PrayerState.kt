@@ -12,3 +12,4 @@ data class PrayerState(
         sins = sins.coerceAtLeast(0)
     }
 }
+

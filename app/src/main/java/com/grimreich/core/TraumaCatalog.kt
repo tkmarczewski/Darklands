@@ -53,3 +53,4 @@ object TraumaCatalog {
     
     fun getById(id: String): Trauma? = traumas.find { it.id == id }
 }
+

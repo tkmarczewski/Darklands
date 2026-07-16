@@ -17,3 +17,4 @@ fun applyTraitModifiers(hero: Hero) {
         else -> Unit
     }
 }
+

@@ -21,3 +21,4 @@ data class WorldState(
     var verdictIncidentsSeen: Int = 0,
     val reachedThresholds: MutableSet<Float> = mutableSetOf()
 )
+

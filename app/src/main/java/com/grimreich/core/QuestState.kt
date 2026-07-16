@@ -31,3 +31,4 @@ data class QuestState(
     val progress: MutableMap<String, QuestProgress> = mutableMapOf(),
     val worldFlags: MutableSet<String> = mutableSetOf()
 )
+

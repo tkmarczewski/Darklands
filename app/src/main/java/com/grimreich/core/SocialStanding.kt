@@ -10,3 +10,4 @@ data class SocialStanding(
     var suspicion: Int = 0,
     var respect: Int = 0
 )
+

@@ -172,3 +172,4 @@ object GameConstants {
         const val ECHO_GIFT_GOLD = 100
     }
 }
+

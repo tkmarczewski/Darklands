@@ -38,3 +38,4 @@ object RitualCatalog {
     
     fun getById(id: String): RitualRecipe? = recipes.find { it.id == id }
 }
+

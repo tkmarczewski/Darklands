@@ -34,3 +34,4 @@ object SaveIntegrity {
         return generateChecksum(json) == checksum
     }
 }
+

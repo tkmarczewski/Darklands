@@ -83,3 +83,4 @@ object WeaponQualitySystem {
     fun qualityDescription(quality: ItemQuality, itemName: String): String =
         "$itemName [${quality.label}]"
 }
+

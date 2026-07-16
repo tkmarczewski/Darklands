@@ -470,3 +470,4 @@ class CombatRound @Inject constructor(
         return "Leczenie: +$healHp HP, +$enduranceHeal Endurance. Morale: ${hero.morale}. Rany: ${hero.wounds.size}"
     }
 }
+

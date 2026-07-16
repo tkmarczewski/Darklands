@@ -117,3 +117,4 @@ data class GameState(
         companionShadows = this.companionShadows.map { it.deepCopy() }.toMutableList()
     )
 }
+

@@ -256,3 +256,4 @@ data class StatusEffectDto(
     val duration: Int,
     val magnitude: Int
 )
+

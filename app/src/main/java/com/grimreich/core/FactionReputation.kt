@@ -14,13 +14,13 @@ data class Faction(
 
 object FactionCatalogue {
     val factions = listOf(
-        Faction("CHURCH", "Zakon Świtu", FactionType.CHURCH, "Strażnicy paradygmatu."),
-        Faction("NOBILITY", "Arystokracja", FactionType.NOBILITY, "Dawni władcy tych ziem."),
-        Faction("MERCHANTS", "Gildia Kupiecka", FactionType.MERCHANTS, "Władcy handlu i esencji."),
-        Faction("PEASANTS", "Chłopi", FactionType.PEASANTS, "Ludzie starający się przetrwać."),
-        Faction("OUTLAWS", "Bandyci", FactionType.OUTLAWS, "Ci, którzy odrzucili prawo."),
-        Faction("MILITARY", "Wojsko", FactionType.MILITARY, "Ostatnia linia obrony murów."),
-        Faction("SCHOLARS", "Kolegium Uczonych", FactionType.SCHOLARS, "Badacze pęknięć rzeczywistości.")
+        Faction( param($m) '"' + $m.Groups[1].Value.ToLower() + '"' , "Zakon Świtu", FactionType.CHURCH, "Strażnicy paradygmatu."),
+        Faction( param($m) '"' + $m.Groups[1].Value.ToLower() + '"' , "Arystokracja", FactionType.NOBILITY, "Dawni władcy tych ziem."),
+        Faction( param($m) '"' + $m.Groups[1].Value.ToLower() + '"' , "Gildia Kupiecka", FactionType.MERCHANTS, "Władcy handlu i esencji."),
+        Faction( param($m) '"' + $m.Groups[1].Value.ToLower() + '"' , "Chłopi", FactionType.PEASANTS, "Ludzie starający się przetrwać."),
+        Faction( param($m) '"' + $m.Groups[1].Value.ToLower() + '"' , "Bandyci", FactionType.OUTLAWS, "Ci, którzy odrzucili prawo."),
+        Faction( param($m) '"' + $m.Groups[1].Value.ToLower() + '"' , "Wojsko", FactionType.MILITARY, "Ostatnia linia obrony murów."),
+        Faction( param($m) '"' + $m.Groups[1].Value.ToLower() + '"' , "Kolegium Uczonych", FactionType.SCHOLARS, "Badacze pęknięć rzeczywistości.")
     )
 
     fun findById(id: String) = factions.find { it.id == id }
@@ -81,3 +81,4 @@ class FactionReputationSystem @Inject constructor(
         }
     }
 }
+

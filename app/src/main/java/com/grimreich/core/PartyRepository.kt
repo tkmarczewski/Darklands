@@ -39,3 +39,4 @@ class PartyRepository @Inject constructor(
 
     fun all(): List<Hero> = gameRepository.currentState().party
 }
+

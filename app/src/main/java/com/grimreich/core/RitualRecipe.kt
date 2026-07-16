@@ -23,3 +23,4 @@ data class RitualRecipe(
     val sacrificeHp: Int = 10,
     val successMessage: String = "Rytuał zakończony sukcesem."
 )
+

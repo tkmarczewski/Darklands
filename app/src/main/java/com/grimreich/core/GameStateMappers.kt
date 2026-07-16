@@ -427,3 +427,4 @@ fun SaveSnapshotDto.toDomain(): SaveSnapshot = SaveSnapshot(
     state = session.toDomain(),
     checksum = checksum
 )
+

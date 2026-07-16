@@ -88,3 +88,4 @@ class SkillSystem @Inject constructor(
         return (hero.agility * enc.agilityMult).toInt()
     }
 }
+

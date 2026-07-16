@@ -86,3 +86,4 @@ class WorldMap @Inject constructor() {
         return issues.distinct()
     }
 }
+

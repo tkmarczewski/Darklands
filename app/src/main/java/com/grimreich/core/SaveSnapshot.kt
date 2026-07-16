@@ -7,3 +7,4 @@ data class SaveSnapshot(
     val state: GameState,
     val checksum: String? = null
 )
+

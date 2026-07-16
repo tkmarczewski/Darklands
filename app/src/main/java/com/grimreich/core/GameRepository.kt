@@ -191,3 +191,4 @@ class GameRepository @Inject constructor(
         repositoryScope.launch { sync() }
     }
 }
+

@@ -56,3 +56,4 @@ object LanguageManager {
 
     fun getAvailableLanguages(): List<Language> = Language.entries.toList()
 }
+

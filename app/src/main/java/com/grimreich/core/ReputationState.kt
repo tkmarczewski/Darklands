@@ -11,3 +11,4 @@ data class ReputationState(
      */
     val globalFactions: MutableMap<String, Int> = mutableMapOf()
 )
+

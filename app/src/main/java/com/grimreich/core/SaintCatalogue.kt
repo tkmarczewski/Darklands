@@ -18,3 +18,4 @@ object SaintCatalogue {
     fun all(): List<Saint> = saints.toList()
     fun get(id: String): Saint? = saints.firstOrNull { it.id == id }
 }
+

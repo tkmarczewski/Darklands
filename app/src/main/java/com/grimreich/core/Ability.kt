@@ -96,3 +96,4 @@ fun refundAbilityCost(hero: Hero, ability: Ability) {
         CostType.NONE -> Unit
     }
 }
+
