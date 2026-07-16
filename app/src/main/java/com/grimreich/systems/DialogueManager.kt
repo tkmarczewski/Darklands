@@ -6,6 +6,7 @@ import com.google.gson.reflect.TypeToken
 import com.grimreich.core.GameConstants
 import com.grimreich.core.GameRepository
 import com.grimreich.core.GameState
+import com.grimreich.core.QuestStatus
 import com.grimreich.grimreich.v1.DialogueChoice
 import com.grimreich.grimreich.v1.DialogueNode
 import dagger.Lazy
