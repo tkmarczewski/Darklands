@@ -83,7 +83,7 @@ class DialogueManager @Inject constructor(
             }
             "COMPLETE_QUEST" -> {
                 val action = state.pendingAction
-                val targetId = if ((value == "ACTIVE") && (action is com.grimreich.core.PendingWorldAction.Dialogue)) {
+                val targetId = if ((value == "active") && (action is com.grimreich.core.PendingWorldAction.Dialogue)) {
                     action.relatedQuestId
                 } else {
                     value

@@ -14,10 +14,15 @@ class CharacterFactory @Inject constructor(
 
     fun createHero(name: String, age: Int, career: Career, trainingCycles: Int = 0, echoId: String? = null): Hero {
         val state = gameRepository.currentState()
+        
+        // --- AGE PROTECTION FIX ---
+        // Ensure starting age is at least 18 (Life Path Anchor)
+        val correctedAge = if (age < 18) 18 else age
+        
         val hero = Hero(
             id = "hero_${UUID.randomUUID()}",
             name = name,
-            age = age,
+            age = correctedAge,
             currentCareer = career
         )
         careerChain.applyCareer(career, hero)
@@ -139,4 +144,3 @@ class CharacterFactory @Inject constructor(
         }
     }
 }
-

@@ -1,0 +1,80 @@
+{
+  "cities": [
+    "wybrzeze_polnocne",
+    "twierdza_zelazna",
+    "port_mglisty",
+    "opactwo_ciszy",
+    "serce_krainy"
+  ],
+  "factions": [
+    "church",
+    "nobility",
+    "merchants",
+    "peasants",
+    "outlaws",
+    "military",
+    "scholars"
+  ],
+  "npc_roles": [
+    "guard",
+    "merchant",
+    "mira",
+    "aelion",
+    "ravenn",
+    "mystic",
+    "beggar",
+    "deserter",
+    "peasant",
+    "priest",
+    "monk",
+    "assassin",
+    "ritualist",
+    "noble",
+    "scholar",
+    "hunter",
+    "archivist",
+    "echo",
+    "none"
+  ],
+  "enemy_types": [
+    "bandit",
+    "cultist",
+    "possessed_statue",
+    "fallen_priest",
+    "masked_impostor",
+    "silent_guardian",
+    "raven_assassin",
+    "arch_ritualist",
+    "ceiling_crawler",
+    "ghostly_sentinel",
+    "mind_reflection",
+    "ink_nightmare",
+    "ectoplasmic",
+    "void_wolf",
+    "paradox_hunter",
+    "mutant_ghoul",
+    "vampire_monk",
+    "golden_colossus",
+    "dark_rider",
+    "dream_wraith",
+    "hidden_demon",
+    "blood_curse",
+    "blood_wraith",
+    "doppelganger",
+    "winged_hulk",
+    "steel_wraith",
+    "past_shade_elite"
+  ],
+  "quest_items": [
+    "quest_corpse",
+    "letter_to_commander",
+    "echo_herbs",
+    "cipher_disc"
+  ],
+  "global_flags": [
+    "verdict_campaign_ready",
+    "verdict_path_investigator",
+    "verdict_path_suspect",
+    "verdict_ravenn_interaction_pending"
+  ]
+}
