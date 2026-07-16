@@ -54,6 +54,14 @@ class InventoryViewModel @Inject constructor(
         inventorySystem.unequip(heroId, slot)
     }
 
+    fun useItem() {
+        val item = _uiState.value.selectedItem ?: return
+        if (item.type == "potion") {
+            inventorySystem.useItem(item.instanceId)
+            _uiState.update { it.copy(selectedItem = null) }
+        }
+    }
+
     fun refresh() {
         val state = gameRepository.currentState()
         val heroId = selectedHeroId ?: state.activeHeroId

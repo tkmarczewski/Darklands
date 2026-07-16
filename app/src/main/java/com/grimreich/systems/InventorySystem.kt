@@ -23,6 +23,13 @@ class InventorySystem @Inject constructor(
                 return@updateState
             }
 
+            // BUG FIX: Prevent assigning the same item instance to multiple heroes
+            val currentOwner = state.party.find { h -> h.equipment.values.contains(instanceId) }
+            if (currentOwner != null && currentOwner.id != heroId) {
+                result = "Przedmiot jest już używany przez: ${currentOwner.name}"
+                return@updateState
+            }
+
             hero.equipment[slot] = instanceId
             state.logEntries.add("${hero.name} zakłada ${item.name}.")
             result = "Założono"

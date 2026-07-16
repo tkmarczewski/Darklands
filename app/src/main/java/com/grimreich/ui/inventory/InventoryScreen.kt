@@ -126,7 +126,11 @@ fun InventoryScreen(viewModel: InventoryViewModel, onBack: () -> Unit) {
                     // ITEM DETAIL CARD
                     state.selectedItem?.let { item ->
                         ItemDetailCard(item) {
-                            viewModel.equipItem()
+                            if (item.type == "potion") {
+                                viewModel.useItem()
+                            } else {
+                                viewModel.equipItem()
+                            }
                         }
                     }
                 }
@@ -235,6 +239,15 @@ fun ItemDetailCard(item: Item, onEquip: () -> Unit) {
                         contentPadding = PaddingValues(horizontal = 8.dp, vertical = 0.dp)
                     ) {
                         Text(stringResource(R.string.inventory_btn_equip), fontSize = 10.sp)
+                    }
+                } else if (item.type == "potion") {
+                    Button(
+                        onClick = onEquip, // We'll repurpose this for USE
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF400040)),
+                        modifier = Modifier.height(30.dp),
+                        contentPadding = PaddingValues(horizontal = 8.dp, vertical = 0.dp)
+                    ) {
+                        Text("UŻYJ", fontSize = 10.sp)
                     }
                 }
             }
