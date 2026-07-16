@@ -1,281 +1,281 @@
 [
   {
-    "type": "BANDIT",
+    "type": "bandit",
     "name": "Bandyta",
     "stats": { "maxHp": 25, "attack": 15, "defense": 10, "speed": 12, "morale": 8 },
-    "ai": "AGGRESSIVE",
+    "ai": "aggressive",
     "lootTable": { "goldMin": 5, "goldMax": 20, "itemChances": { "sword_short": 0.1, "pot_heal": 0.05 } },
     "xpReward": 10
   },
   {
-    "type": "CULTIST",
+    "type": "cultist",
     "name": "Kultysta Echa",
     "stats": { "maxHp": 30, "attack": 18, "defense": 8, "speed": 11, "morale": 20 },
-    "ai": "BERSERK",
+    "ai": "berserk",
     "lootTable": { "goldMin": 10, "goldMax": 30, "itemChances": { "ing_herb": 0.3 } },
     "xpReward": 15
   },
   {
-    "type": "BANDIT_LEADER",
+    "type": "bandit_leader",
     "name": "Szef Bandytów",
     "stats": { "maxHp": 50, "attack": 20, "defense": 15, "speed": 14, "morale": 12 },
-    "ai": "TACTICAL",
+    "ai": "tactical",
     "lootTable": { "goldMin": 20, "goldMax": 50, "itemChances": { "sword_long": 0.2, "armor_leather": 0.1 } },
     "xpReward": 25
   },
   {
-    "type": "WOLF",
+    "type": "wolf",
     "name": "Wilk",
     "stats": { "maxHp": 20, "attack": 14, "defense": 8, "speed": 16, "morale": 6 },
-    "ai": "AGGRESSIVE",
+    "ai": "aggressive",
     "lootTable": { "goldMin": 0, "goldMax": 0, "itemChances": { "ing_herb": 0.2 } },
     "xpReward": 5
   },
   {
-    "type": "SKELETON",
+    "type": "skeleton",
     "name": "Szkielet",
     "stats": { "maxHp": 15, "attack": 12, "defense": 5, "speed": 10, "morale": 20 },
-    "ai": "BERSERK",
+    "ai": "berserk",
     "lootTable": { "goldMin": 0, "goldMax": 5, "itemChances": { "ing_bone": 0.5 } },
     "xpReward": 8
   },
   {
-    "type": "CITY_GUARD",
+    "type": "city_guard",
     "name": "Strażnik Miejski",
     "stats": { "maxHp": 40, "attack": 18, "defense": 15, "speed": 12, "morale": 15 },
-    "ai": "DEFENSIVE",
+    "ai": "defensive",
     "lootTable": { "goldMin": 10, "goldMax": 30, "itemChances": { "sword_basic": 0.1, "mace_basic": 0.05 } },
     "xpReward": 15
   },
   {
-    "type": "RAUBRITTER_KNIGHT",
+    "type": "raubritter_knight",
     "name": "Rycerz Rozbójnik",
     "stats": { "maxHp": 80, "attack": 25, "defense": 20, "speed": 15, "morale": 18 },
-    "ai": "AGGRESSIVE",
+    "ai": "aggressive",
     "lootTable": { "goldMin": 50, "goldMax": 150, "itemChances": { "armor_plate_partial": 0.05, "sword_long": 0.15 } },
     "xpReward": 50
   },
   {
-    "type": "PAST_SHADE_ELITE",
+    "type": "past_shade_elite",
     "name": "Cień Przeszłości (Elitarny)",
     "stats": { "maxHp": 100, "attack": 30, "defense": 20, "speed": 18, "morale": 25 },
-    "ai": "TACTICAL",
+    "ai": "tactical",
     "lootTable": { "goldMin": 0, "goldMax": 0, "itemChances": { "ing_echo_dust": 1.0, "relic_echo_shard": 0.05 } },
     "xpReward": 100
   },
   {
-    "type": "RAUBRITTER_BOSS",
+    "type": "raubritter_boss",
     "name": "Baron von Schatten",
     "stats": { "maxHp": 150, "attack": 35, "defense": 25, "speed": 16, "morale": 30 },
-    "ai": "TACTICAL",
+    "ai": "tactical",
     "lootTable": { "goldMin": 200, "goldMax": 500, "itemChances": { "relic_broken_rosary": 0.02 } },
     "xpReward": 250
   },
   {
-    "type": "CULTIST_PRIEST",
+    "type": "cultist_priest",
     "name": "Kapłan Pęknięcia",
     "stats": { "maxHp": 120, "attack": 25, "defense": 15, "speed": 14, "morale": 40 },
-    "ai": "BERSERK",
+    "ai": "berserk",
     "lootTable": { "goldMin": 100, "goldMax": 300, "itemChances": { "relic_whispering_box": 0.02 } },
     "xpReward": 200
   },
   {
-    "type": "DEMON_MAJOR",
+    "type": "demon_major",
     "name": "Ghul Pierwotny",
     "stats": { "maxHp": 200, "attack": 40, "defense": 20, "speed": 20, "morale": 50 },
-    "ai": "AGGRESSIVE",
+    "ai": "aggressive",
     "lootTable": { "goldMin": 0, "goldMax": 0, "itemChances": { "relic_echo_shard": 0.01, "ing_echo_dust": 0.2 } },
     "xpReward": 400
   },
   {
-    "type": "POSSESSED_STATUE",
+    "type": "possessed_statue",
     "name": "Opętany Posąg",
     "stats": { "maxHp": 60, "attack": 22, "defense": 30, "speed": 8, "morale": 100 },
-    "ai": "BERSERK",
+    "ai": "berserk",
     "lootTable": { "goldMin": 0, "goldMax": 0, "itemChances": { "ing_stone": 1.0 } },
     "xpReward": 40
   },
   {
-    "type": "WINGED_HULK",
+    "type": "winged_hulk",
     "name": "Skrzydlaty Kadłub",
     "stats": { "maxHp": 120, "attack": 30, "defense": 15, "speed": 18, "morale": 40 },
-    "ai": "AGGRESSIVE",
+    "ai": "aggressive",
     "lootTable": { "goldMin": 0, "goldMax": 0, "itemChances": { "ing_bone": 0.5, "ing_echo_dust": 0.2 } },
     "xpReward": 150
   },
   {
-    "type": "STEEL_WRAITH",
+    "type": "steel_wraith",
     "name": "Stalowa Mara",
     "stats": { "maxHp": 100, "attack": 28, "defense": 25, "speed": 12, "morale": 100 },
-    "ai": "DEFENSIVE",
+    "ai": "defensive",
     "lootTable": { "goldMin": 20, "goldMax": 50, "itemChances": { "ing_stone": 0.5 } },
     "xpReward": 120
   },
   {
-    "type": "FALLEN_PRIEST",
+    "type": "fallen_priest",
     "name": "Upadły Kapłan",
     "stats": { "maxHp": 45, "attack": 20, "defense": 12, "speed": 12, "morale": 30 },
-    "ai": "TACTICAL",
+    "ai": "tactical",
     "lootTable": { "goldMin": 20, "goldMax": 60, "itemChances": { "relic_echo_shard": 0.05 } },
     "xpReward": 35
   },
   {
-    "type": "MASKED_IMPOSTOR",
+    "type": "masked_impostor",
     "name": "Zamaskowany Oszust",
     "stats": { "maxHp": 70, "attack": 24, "defense": 18, "speed": 16, "morale": 25 },
-    "ai": "TACTICAL",
+    "ai": "tactical",
     "lootTable": { "goldMin": 100, "goldMax": 200, "itemChances": { "sword_long": 0.2 } },
     "xpReward": 60
   },
   {
-    "type": "SILENT_GUARDIAN",
+    "type": "silent_guardian",
     "name": "Milczący Strażnik",
     "stats": { "maxHp": 55, "attack": 20, "defense": 22, "speed": 10, "morale": 100 },
-    "ai": "DEFENSIVE",
+    "ai": "defensive",
     "lootTable": { "goldMin": 0, "goldMax": 0, "itemChances": { "ing_bone": 0.3 } },
     "xpReward": 40
   },
   {
-    "type": "RAVEN_ASSASSIN",
+    "type": "raven_assassin",
     "name": "Zabójca Kruka",
     "stats": { "maxHp": 40, "attack": 28, "defense": 10, "speed": 22, "morale": 20 },
-    "ai": "TACTICAL",
+    "ai": "tactical",
     "lootTable": { "goldMin": 30, "goldMax": 80, "itemChances": { "sword_short": 0.5 } },
     "xpReward": 50
   },
   {
-    "type": "ARCH_RITUALIST",
+    "type": "arch_ritualist",
     "name": "Arcy-Rytualista",
     "stats": { "maxHp": 140, "attack": 32, "defense": 15, "speed": 14, "morale": 45 },
-    "ai": "BERSERK",
+    "ai": "berserk",
     "lootTable": { "goldMin": 150, "goldMax": 400, "itemChances": { "relic_whispering_box": 0.1 } },
     "xpReward": 250
   },
   {
-    "type": "CEILING_CRAWLER",
+    "type": "ceiling_crawler",
     "name": "Sufitowy Pełzacz",
     "stats": { "maxHp": 35, "attack": 25, "defense": 12, "speed": 20, "morale": 15 },
-    "ai": "AGGRESSIVE",
+    "ai": "aggressive",
     "lootTable": { "goldMin": 0, "goldMax": 0, "itemChances": { "ing_echo_dust": 0.2 } },
     "xpReward": 30
   },
   {
-    "type": "GHOSTLY_SENTINEL",
+    "type": "ghostly_sentinel",
     "name": "Widmowy Wartownik",
     "stats": { "maxHp": 60, "attack": 18, "defense": 25, "speed": 12, "morale": 100 },
-    "ai": "DEFENSIVE",
+    "ai": "defensive",
     "lootTable": { "goldMin": 0, "goldMax": 0, "itemChances": { "ing_echo_dust": 0.5 } },
     "xpReward": 45
   },
   {
-    "type": "MIND_REFLECTION",
+    "type": "mind_reflection",
     "name": "Odbicie Umysłu",
     "stats": { "maxHp": 90, "attack": 26, "defense": 20, "speed": 18, "morale": 50 },
-    "ai": "TACTICAL",
+    "ai": "tactical",
     "lootTable": { "goldMin": 0, "goldMax": 0, "itemChances": { "relic_echo_shard": 0.1 } },
     "xpReward": 120
   },
   {
-    "type": "INK_NIGHTMARE",
+    "type": "ink_nightmare",
     "name": "Atramentowa Zmora",
     "stats": { "maxHp": 75, "attack": 30, "defense": 14, "speed": 16, "morale": 40 },
-    "ai": "AGGRESSIVE",
+    "ai": "aggressive",
     "lootTable": { "goldMin": 0, "goldMax": 0, "itemChances": { "ing_echo_dust": 0.8 } },
     "xpReward": 80
   },
   {
-    "type": "ECTOPLASMIC",
+    "type": "ectoplasmic",
     "name": "Ektoplazmik",
     "stats": { "maxHp": 40, "attack": 15, "defense": 40, "speed": 10, "morale": 100 },
-    "ai": "DEFENSIVE",
+    "ai": "defensive",
     "lootTable": { "goldMin": 0, "goldMax": 0, "itemChances": { "ing_echo_dust": 0.4 } },
     "xpReward": 35
   },
   {
-    "type": "VOID_WOLF",
+    "type": "void_wolf",
     "name": "Widmowy Wilk (Pustka)",
     "stats": { "maxHp": 35, "attack": 22, "defense": 12, "speed": 20, "morale": 100 },
-    "ai": "AGGRESSIVE",
+    "ai": "aggressive",
     "lootTable": { "goldMin": 0, "goldMax": 0, "itemChances": { "ing_echo_dust": 0.3 } },
     "xpReward": 45
   },
   {
-    "type": "PARADOX_HUNTER",
+    "type": "paradox_hunter",
     "name": "Łowca Paradoksów",
     "stats": { "maxHp": 180, "attack": 40, "defense": 25, "speed": 22, "morale": 100 },
-    "ai": "TACTICAL",
+    "ai": "tactical",
     "lootTable": { "goldMin": 0, "goldMax": 0, "itemChances": { "relic_echo_shard": 0.2, "ing_echo_dust": 1.0 } },
     "xpReward": 500
   },
   {
-    "type": "MUTANT_GHOUL",
+    "type": "mutant_ghoul",
     "name": "Zmutowany Ghul (Dwa Serca)",
     "stats": { "maxHp": 110, "attack": 26, "defense": 18, "speed": 14, "morale": 100 },
-    "ai": "BERSERK",
+    "ai": "berserk",
     "lootTable": { "goldMin": 0, "goldMax": 0, "itemChances": { "ing_bone": 0.8 } },
     "xpReward": 70
   },
   {
-    "type": "VAMPIRE_MONK",
+    "type": "vampire_monk",
     "name": "Wampiryczny Mnich",
     "stats": { "maxHp": 95, "attack": 28, "defense": 20, "speed": 18, "morale": 45 },
-    "ai": "TACTICAL",
+    "ai": "tactical",
     "lootTable": { "goldMin": 40, "goldMax": 100, "itemChances": { "relic_broken_rosary": 0.1 } },
     "xpReward": 90
   },
   {
-    "type": "GOLDEN_COLOSSUS",
+    "type": "golden_colossus",
     "name": "Złoty Kolos",
     "stats": { "maxHp": 500, "attack": 45, "defense": 40, "speed": 6, "morale": 100 },
-    "ai": "BERSERK",
+    "ai": "berserk",
     "lootTable": { "goldMin": 1000, "goldMax": 2000, "itemChances": { "ing_gold_ore": 1.0 } },
     "xpReward": 1000
   },
   {
-    "type": "DARK_RIDER",
+    "type": "dark_rider",
     "name": "Mroczny Jeździec",
     "stats": { "maxHp": 130, "attack": 35, "defense": 25, "speed": 24, "morale": 50 },
-    "ai": "TACTICAL",
+    "ai": "tactical",
     "lootTable": { "goldMin": 150, "goldMax": 350, "itemChances": { "sword_long": 0.3 } },
     "xpReward": 200
   },
   {
-    "type": "DREAM_WRAITH",
+    "type": "dream_wraith",
     "name": "Widmo Snów",
     "stats": { "maxHp": 80, "attack": 32, "defense": 10, "speed": 20, "morale": 100 },
-    "ai": "AGGRESSIVE",
+    "ai": "aggressive",
     "lootTable": { "goldMin": 0, "goldMax": 0, "itemChances": { "ing_echo_dust": 0.6 } },
     "xpReward": 110
   },
   {
-    "type": "HIDDEN_DEMON",
+    "type": "hidden_demon",
     "name": "Ukryty Demon",
     "stats": { "maxHp": 100, "attack": 34, "defense": 15, "speed": 16, "morale": 60 },
-    "ai": "BERSERK",
+    "ai": "berserk",
     "lootTable": { "goldMin": 50, "goldMax": 150, "itemChances": { "ing_echo_dust": 0.4 } },
     "xpReward": 130
   },
   {
-    "type": "BLOOD_CURSE",
+    "type": "blood_curse",
     "name": "Klątwa Krwi (Finał)",
     "stats": { "maxHp": 250, "attack": 42, "defense": 20, "speed": 18, "morale": 100 },
-    "ai": "BERSERK",
+    "ai": "berserk",
     "lootTable": { "goldMin": 0, "goldMax": 0, "itemChances": { "relic_echo_shard": 1.0 } },
     "xpReward": 600
   },
   {
-    "type": "BLOOD_WRAITH",
+    "type": "blood_wraith",
     "name": "Krwawa Mara",
     "stats": { "maxHp": 40, "attack": 18, "defense": 10, "speed": 14, "morale": 100 },
-    "ai": "AGGRESSIVE",
+    "ai": "aggressive",
     "lootTable": { "goldMin": 0, "goldMax": 0, "itemChances": { "ing_echo_dust": 0.2 } },
     "xpReward": 30
   },
   {
-    "type": "DOPPELGANGER",
+    "type": "doppelganger",
     "name": "Sobowtór",
     "stats": { "maxHp": 100, "attack": 25, "defense": 20, "speed": 15, "morale": 30 },
-    "ai": "TACTICAL",
+    "ai": "tactical",
     "lootTable": { "goldMin": 50, "goldMax": 100, "itemChances": {} },
     "xpReward": 100
   }

@@ -6,7 +6,6 @@ import com.google.gson.reflect.TypeToken
 import com.grimreich.core.GameConstants
 import com.grimreich.core.GameRepository
 import com.grimreich.core.GameState
-import com.grimreich.core.QuestStatus
 import com.grimreich.grimreich.v1.DialogueChoice
 import com.grimreich.grimreich.v1.DialogueNode
 import dagger.Lazy
@@ -67,75 +66,71 @@ class DialogueManager @Inject constructor(
     fun handleTrigger(state: GameState, event: String?, value: String?) {
         if (event == null) return
         val engine = questEngine.get()
-        android.util.Log.d("DialogueManager", "[DIALOGUE] Trigger firing: $event -> $value")
-        when (event) {
-            "ACTIVATE_QUEST" -> {
-                value?.let { 
-                    engine.activateQuestDirect(state, it) 
-                }
+        
+        // PURIFICATION: All event triggers must be lowercase snake_case
+        val normalizedEvent = event.lowercase().trim()
+        android.util.Log.d("DialogueManager", "[DIALOGUE] Trigger firing: $normalizedEvent -> $value")
+        
+        when (normalizedEvent) {
+            "activate_quest" -> {
+                value?.let { engine.activateQuestDirect(state, it.lowercase()) }
             }
-            "ADVANCE_QUEST", "QUEST_OBJECTIVE_MET" -> {
-                value?.let { 
-                    engine.advanceStepDirect(state, it) 
-                }
+            "advance_quest", "quest_objective_met" -> {
+                value?.let { engine.advanceStepDirect(state, it.lowercase()) }
             }
-            "FAIL_QUEST" -> {
-                value?.let { engine.failQuestDirect(state, it) }
+            "fail_quest" -> {
+                value?.let { engine.failQuestDirect(state, it.lowercase()) }
             }
-            "COMPLETE_QUEST" -> {
+            "complete_quest" -> {
                 val action = state.pendingAction
-                val targetId = if ((value == "active") && (action is com.grimreich.core.PendingWorldAction.Dialogue)) {
+                val targetId = if ((value?.lowercase() == "active") && (action is com.grimreich.core.PendingWorldAction.Dialogue)) {
                     action.relatedQuestId
                 } else {
-                    value
+                    value?.lowercase()
                 }
                 
-                targetId?.let { 
-                    engine.completeQuestDirect(state, it) 
-                }
+                targetId?.let { engine.completeQuestDirect(state, it) }
             }
-            "INCREMENT_META" -> {
+            "increment_meta" -> {
                 val inc = value?.toIntOrNull() ?: 1
                 state.metaAwarenessLevel += inc
                 state.logEntries.add("Czujesz, że ktoś dopisał uwagę na marginesie twojej sesji.")
             }
-            "SET_WORLD_FLAG" -> {
-                value?.let { state.quest.worldFlags.add(it) }
+            "set_world_flag" -> {
+                value?.let { state.quest.worldFlags.add(it.lowercase()) }
             }
-            "GRANT_REPUTATION" -> {
+            "grant_reputation" -> {
                 val parts = value?.split(":") ?: return
                 if (parts.size == 2) {
-                    val faction = parts[0]
+                    val faction = parts[0].lowercase()
                     val amount = parts[1].toIntOrNull() ?: 0
                     state.reputation.globalFactions[faction] = (state.reputation.globalFactions[faction] ?: 0) + amount
                 }
             }
-            "GIVE_ITEM" -> {
+            "give_item" -> {
                 value?.let { itemId ->
                     val repo = gameRepositoryProvider.get()
-                    val item = repo.itemCatalogue.createInstance(itemId)
+                    val item = repo.itemCatalogue.createInstance(itemId.lowercase())
                     if (item != null) {
                         state.inventory.add(item)
                         state.logEntries.add("Otrzymano przedmiot: ${item.name}")
                     }
                 }
             }
-            "UNLOCK_LORE" -> {
+            "unlock_lore" -> {
                 value?.let { loreId ->
-                    if (state.unlockedLoreIds.add(loreId)) {
+                    if (state.unlockedLoreIds.add(loreId.lowercase())) {
                         state.logEntries.add("Nowy wpis w Kronice: $loreId")
                     }
                 }
             }
-            "CHECK_WORLD_FLAG" -> {
-                // Ta funkcja służy do weryfikacji w ViewModelu (UI visibility),
-                // ale możemy tu dodać logowanie diagnostyczne.
-                android.util.Log.d("DialogueManager", "Checked world flag: $value (Status: ${state.quest.worldFlags.contains(value)})")
+            "check_world_flag" -> {
+                android.util.Log.d("DialogueManager", "Checked world flag: $value (Status: ${state.quest.worldFlags.contains(value?.lowercase())})")
             }
-            "OPEN_MARKET" -> {
+            "open_market" -> {
                 state.logEntries.add("Otwierasz okno handlu...")
             }
-            "INCREMENT_STABILITY" -> {
+            "increment_stability" -> {
                 val amount = value?.toIntOrNull() ?: GameConstants.DEFAULT_STABILITY_INC
                 state.world.globalStability = (state.world.globalStability + amount).coerceAtMost(100)
                 state.logEntries.add("Poczucie celu wzmacnia paradygmat świata.")
@@ -144,21 +139,22 @@ class DialogueManager @Inject constructor(
     }
 
     fun getPortrait(role: String): String {
-        return when (role.uppercase()) {
-            "GUARD", "STRAZNIK", "FORTRESS_GUARD" -> "port_knight"
-            "MERCHANT", "KUPIEC" -> "port_alchemist"
-            "AELION" -> "port_priest"
-            "MIRA" -> "port_mage"
-            "RAVENN" -> "port_wraith"
-            "ECHO" -> "port_wraith"
-            "PEASANT" -> "port_barbarian"
-            "PRIEST" -> "port_priest"
-            "MONK" -> "port_priest"
-            "ASSASSIN" -> "port_rogue"
-            "RITUALIST" -> "port_alchemist"
-            "NOBLE" -> "port_knight"
-            "SCHOLAR" -> "port_scholar"
-            "HUNTER" -> "port_ranger"
+        // PURIFICATION: Role must match lowercase registry
+        return when (role.lowercase().trim()) {
+            "guard", "straznik", "fortress_guard" -> "port_knight"
+            "merchant", "kupiec" -> "port_alchemist"
+            "aelion" -> "port_priest"
+            "mira" -> "port_mage"
+            "ravenn" -> "port_wraith"
+            "echo" -> "port_wraith"
+            "peasant" -> "port_barbarian"
+            "priest" -> "port_priest"
+            "monk" -> "port_priest"
+            "assassin" -> "port_rogue"
+            "ritualist" -> "port_alchemist"
+            "noble" -> "port_knight"
+            "scholar" -> "port_scholar"
+            "hunter" -> "port_ranger"
             else -> "port_barbarian"
         }
     }
@@ -169,25 +165,18 @@ class DialogueManager @Inject constructor(
         return node.copy(text = glitchText(node.text, seed))
     }
 
-    /**
-     * SYSTEM TRAUMY (Funkcjonalność A): Wpływ traum na postrzeganie dialogu.
-     */
     fun applyTraumaEffects(node: DialogueNode, hero: com.grimreich.core.Hero): DialogueNode {
         if (hero.traumaMarks.isEmpty()) return node
         
         var modifiedText = node.text
-        
-        // Efekt ogólny: NPC reagują na głębokie rany duszy
         if (hero.traumaMarks.any { it.severity >= 2 }) {
             modifiedText = "[NPC COFA SIĘ Z PRZERAŻENIEM] $modifiedText"
         }
         
-        // Trauma "Wizja Echa": Tekst staje się bardziej ontologiczny
         if (hero.traumaMarks.any { it.id == "t_echo_vision" }) {
             modifiedText = modifiedText.replace(" ", " . ")
         }
 
-        // Trauma "Pusty Głos": Trudności w komunikacji
         if (hero.traumaMarks.any { it.id == "t_hollow_voice" }) {
             modifiedText = modifiedText.uppercase()
         }
@@ -213,7 +202,6 @@ class DialogueManager @Inject constructor(
 
     fun seedBasicDialogues() {
         nodes.clear()
-        // FAIL-FAST: Load immediately to detect broken assets at startup
         loadNodesFromAsset("grimreich/dialogues_pilot.json")
         loadNodesFromAsset("grimreich/dialogues_extended.json")
     }

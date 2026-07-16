@@ -71,10 +71,33 @@
     "echo_herbs",
     "cipher_disc"
   ],
+  "triggers": [
+    "activate_quest",
+    "advance_quest",
+    "complete_quest",
+    "fail_quest",
+    "increment_meta",
+    "set_world_flag",
+    "grant_reputation",
+    "give_item",
+    "unlock_lore",
+    "check_world_flag",
+    "open_market",
+    "increment_stability"
+  ],
   "global_flags": [
     "verdict_campaign_ready",
     "verdict_path_investigator",
     "verdict_path_suspect",
-    "verdict_ravenn_interaction_pending"
+    "verdict_ravenn_interaction_pending",
+    "meta_hint_1",
+    "meta_hint_2",
+    "meta_hint_3",
+    "meta_hint_4",
+    "meta_chain_unlock"
+  ],
+  "meta_trackers": [
+    "meta_verdict_incidents",
+    "meta_verdict_history"
   ]
 }

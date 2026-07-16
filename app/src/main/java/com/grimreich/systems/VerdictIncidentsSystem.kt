@@ -27,12 +27,13 @@ class VerdictIncidentsSystem @Inject constructor(
         if (!state.quest.worldFlags.any { it.startsWith("verdict_path_") }) {
             // Chance to be a suspect increases with companion shadows
             val suspectChance = 0.3f + (state.companionShadows.size * 0.15f)
-            val path = if (kotlin.random.Random.nextFloat() < suspectChance) "SUSPECT" else "INVESTIGATOR"
+            // PURIFICATION: Always use lowercase for path values
+            val path = if (kotlin.random.Random.nextFloat() < suspectChance) "suspect" else "investigator"
             state.quest.worldFlags.add("verdict_path_$path")
             android.util.Log.d("Verdict", "Path chosen: $path (Suspect chance was $suspectChance)")
         }
 
-        val isSuspect = state.quest.worldFlags.contains("verdict_path_SUSPECT")
+        val isSuspect = state.quest.worldFlags.contains("verdict_path_suspect")
 
         val current = state.quest.progress["meta_verdict_incidents"]?.variables?.get("count") ?: 0
         val next = current + 1
@@ -67,9 +68,6 @@ class VerdictIncidentsSystem @Inject constructor(
             }
             7 -> {
                 state.quest.worldFlags.add("verdict_campaign_ready")
-                // --- RAVENN AMBUSH FIX ---
-                // Do not add the log entry here. Instead, set a flag that triggers an interaction 
-                // in DialogueManager when the player is in a city.
                 state.quest.worldFlags.add("verdict_ravenn_interaction_pending")
             }
         }

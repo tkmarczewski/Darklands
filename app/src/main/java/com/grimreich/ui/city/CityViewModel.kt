@@ -114,7 +114,7 @@ class CityViewModel @Inject constructor(
 
     private fun triggerRavennAmbush() {
         val state = gameRepository.currentState()
-        val isSuspect = state.quest.worldFlags.contains("verdict_path_SUSPECT")
+        val isSuspect = state.quest.worldFlags.contains("verdict_path_suspect")
         val npcName = "Ravenn Beztwarzowy"
         val npcRole = "Ravenn"
         val node = if (isSuspect) "ravenn_ambush_suspect" else "ravenn_ambush_investigator"

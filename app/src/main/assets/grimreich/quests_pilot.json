@@ -11,7 +11,7 @@
     "steps": [
       {
         "description": "Wytrop 'Apostoła Błędu' ukrywającego się w dymiących zgliszczach na obrzeżach Wybrzeża i wymierz mu wyrok.",
-        "type": "COMBAT",
+        "type": "combat",
         "targetId": "cultist"
       }
     ]
@@ -28,7 +28,7 @@
     "steps": [
       {
         "description": "Odnajdź dezertera w zaułkach Portu Mglistego i rozstrzygnij jego los.",
-        "type": "DIALOGUE",
+        "type": "dialogue",
         "targetId": "deserter_start"
       }
     ]
@@ -45,7 +45,7 @@
     "steps": [
       {
         "description": "Przeszukaj strefy zerowej widoczności na Wybrzeżu i zbierz trzy pęki pulsujących błękitem ziół echa.",
-        "type": "INVESTIGATION",
+        "type": "investigation",
         "targetId": "gesta_mgla"
       }
     ]
@@ -62,7 +62,7 @@
     "steps": [
       {
         "description": "Przedrzyj się przez Północne Trakty i oddaj zapieczętowany zwój Dowódcy w sercu skalnego bastionu.",
-        "type": "DIALOGUE",
+        "type": "dialogue",
         "targetId": "fortress_commander_letter"
       }
     ]
@@ -79,7 +79,7 @@
     "steps": [
       {
         "description": "Zanalizuj anomalie w tekście Pękniętej Kroniki. Uważaj, czytanie kodu źródłowego może wywołać traumę ontologiczną.",
-        "type": "INVESTIGATION",
+        "type": "investigation",
         "targetId": "peknie_kronika"
       }
     ]
