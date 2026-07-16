@@ -56,7 +56,7 @@
     "description": "Pilny meldunek o pęknięciu w strukturze Wybrzeża musi dotrzeć do Dowódcy Ferrum w Twierdzy Żelaznej. Drogi są niebezpieczne, a Echo przybiera kształty poległych posłańców. Nie otwieraj pieczęci – jej blask może spalić Twoją tożsamość.",
     "rewardGold": 220,
     "cityId": "twierdza_zelazna",
-    "originNpcId": "FORTRESS_GUARD",
+    "originNpcId": "guard",
     "category": "SOCIAL",
     "recommendedLevel": 2,
     "steps": [

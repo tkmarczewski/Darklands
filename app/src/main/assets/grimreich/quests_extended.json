@@ -675,7 +675,7 @@
     "originNpcId": "ritualist",
     "category": "META",
     "chainId": "chain_blood",
-    "chainOrder": 5,
+    "chainOrder": 3,
     "recommendedLevel": 6,
     "prerequisiteQuestId": "q_blood_2",
     "steps": [
@@ -691,7 +691,7 @@
     "originNpcId": "ritualist",
     "category": "META",
     "chainId": "chain_blood",
-    "chainOrder": 8,
+    "chainOrder": 4,
     "recommendedLevel": 12,
     "prerequisiteQuestId": "q_blood_5_hard",
     "steps": [

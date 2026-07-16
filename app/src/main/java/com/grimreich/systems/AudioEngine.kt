@@ -138,6 +138,9 @@ class AudioEngine @Inject constructor(
     fun playForRoute(route: String) {
         lastRequestedRoute = route
         
+        // BUG-6 FIX: Do not change music during dialogue to prevent jumps/silence
+        if (route.contains("dialogue")) return
+
         // If world is already glitchy, override the request but save the route for later recovery
         if (currentStability < GameConstants.STABILITY_THRESHOLD_CRITICAL) {
             playMusic(R.raw.ost_glitch_ambient)

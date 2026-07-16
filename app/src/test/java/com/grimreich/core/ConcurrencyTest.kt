@@ -28,7 +28,8 @@ class ConcurrencyTest {
             echoSystemProvider = dagger.Lazy { mock(EchoSystem::class.java) },
             persistence = mockPersistence,
             cityCatalogue = CityCatalogue(),
-            itemCatalogue = ItemCatalogue()
+            itemCatalogue = ItemCatalogue(),
+            saveSystem = mock(SaveSystem::class.java)
         )
     }
 

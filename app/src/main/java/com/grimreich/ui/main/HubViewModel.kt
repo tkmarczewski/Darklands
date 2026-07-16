@@ -89,7 +89,7 @@ class HubViewModel @Inject constructor(
                     expeditionQuestsCount = state.quest.activeQuestIds.count { id -> 
                         val def = questEngine.getDefinition(id)
                         def != null && def.cityId == currentCityId
-                    }.coerceAtLeast(1), // FORCED MIN 1 TO ENSURE BUTTON VISIBILITY
+                    },
                     party = state.party,
                     worldStability = stability,
                     hubBackground = city?.backgroundDrawable ?: "bg_generic_city",

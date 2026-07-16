@@ -47,6 +47,7 @@ class DialogueManager @Inject constructor(
         
         if (nodes.isEmpty()) {
             loadNodesFromAsset("grimreich/dialogues_pilot.json")
+            loadNodesFromAsset("grimreich/dialogues_extended.json")
         }
         
         return nodes[id]
@@ -124,6 +125,11 @@ class DialogueManager @Inject constructor(
                         state.logEntries.add("Nowy wpis w Kronice: $loreId")
                     }
                 }
+            }
+            "CHECK_WORLD_FLAG" -> {
+                // Ta funkcja służy do weryfikacji w ViewModelu (UI visibility),
+                // ale możemy tu dodać logowanie diagnostyczne.
+                android.util.Log.d("DialogueManager", "Checked world flag: $value (Status: ${state.quest.worldFlags.contains(value)})")
             }
             "OPEN_MARKET" -> {
                 state.logEntries.add("Otwierasz okno handlu...")

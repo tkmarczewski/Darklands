@@ -20,19 +20,34 @@ class DialogueContentIntegrityTest {
         val gson = Gson()
         val type = object : TypeToken<List<DialogueNode>>() {}.type
         
-        assetsDir.listFiles { _, name -> name.endsWith(".json") }?.forEach { file ->
+        val allNodes = mutableListOf<DialogueNode>()
+        
+        // Phase 1: Load all nodes from all files
+        assetsDir.listFiles { _, name -> name.endsWith(".json") && name.contains("dialogue") }?.forEach { file ->
             try {
                 val json = file.readText()
-                if (file.name.contains("dialogue")) {
-                    val nodes: List<DialogueNode> = gson.fromJson(json, type)
-                    nodes.forEach { node ->
-                        assertTrue("Node ID cannot be empty in ${file.name}", node.id.isNotEmpty())
-                        assertTrue("NPC ID cannot be empty in node ${node.id}", node.npcId.isNotEmpty())
-                        assertTrue("Text cannot be empty in node ${node.id}", node.text.isNotEmpty())
-                    }
-                }
+                val nodes: List<DialogueNode> = gson.fromJson(json, type)
+                allNodes.addAll(nodes)
             } catch (e: Exception) {
                 fail("Failed to parse ${file.name}: ${e.message}")
+            }
+        }
+
+        val allNodeIds = allNodes.map { it.id }.toSet()
+        
+        // Phase 2: Validate each node and its links
+        allNodes.forEach { node ->
+            assertTrue("Node ID cannot be empty", node.id.isNotEmpty())
+            assertTrue("NPC ID cannot be empty in node ${node.id}", node.npcId.isNotEmpty())
+            assertTrue("Text cannot be empty in node ${node.id}", node.text.isNotEmpty())
+            
+            node.choices.forEach { choice ->
+                if (choice.targetNodeId != "end") {
+                    assertTrue(
+                        "Dead link: node '${node.id}' points to non-existent '${choice.targetNodeId}'",
+                        allNodeIds.contains(choice.targetNodeId)
+                    )
+                }
             }
         }
     }

@@ -64,11 +64,6 @@ class QuestEngine @Inject constructor(
         if (state.world.day < def.minWorldDay) return QuestStatus.LOCKED
         if (state.metaAwarenessLevel < def.requiredMetaAwareness) return QuestStatus.LOCKED
 
-        // Special Flags (Campaign Start)
-        if (def.id == "q_verdict_1" && !state.quest.worldFlags.contains("verdict_campaign_ready")) {
-            return QuestStatus.LOCKED
-        }
-
         // Prerequisites
         if (def.prerequisiteQuestId != null) {
             val preStatus = getStatus(def.prerequisiteQuestId, state, visited)
@@ -123,15 +118,18 @@ class QuestEngine @Inject constructor(
         val def = registry[actualQuestId] ?: return
         val currentCityId = state.world.locationId
         
-        // Match city and NPC role (originNpcId)
-        if (def.cityId != currentCityId) {
-            android.util.Log.e("QuestEngine", "Attempted to turn in quest $actualQuestId in wrong city: $currentCityId")
+        // MATCHING FIX: Case-insensitive city and NPC comparison
+        if (def.cityId.lowercase() != currentCityId.lowercase()) {
+            android.util.Log.e("QuestEngine", "Attempted to turn in quest $actualQuestId in wrong city: $currentCityId (expected ${def.cityId})")
             return
         }
         
         if (action is com.grimreich.core.PendingWorldAction.Dialogue) {
-             if (action.npcRole.lowercase() != def.originNpcId.lowercase() && action.npcName.lowercase() != def.originNpcId.lowercase()) {
-                 android.util.Log.e("QuestEngine", "Attempted to turn in quest $actualQuestId to wrong NPC: ${action.npcRole}")
+             val normalizedRole = action.npcRole.lowercase()
+             val normalizedOrigin = def.originNpcId.lowercase()
+             // BUG-9 FIX: Allow "none" to skip NPC validation
+             if (normalizedOrigin != "none" && normalizedRole != normalizedOrigin && action.npcName.lowercase() != normalizedOrigin) {
+                 android.util.Log.e("QuestEngine", "Attempted to turn in quest $actualQuestId to wrong NPC: $normalizedRole (Expected: $normalizedOrigin)")
                  return
              }
         }

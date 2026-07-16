@@ -361,7 +361,9 @@ class CombatSystem @Inject constructor(
             val progress = state.quest.progress[qId]
             if (def != null && progress != null) {
                 val currentStep = def.steps.getOrNull(progress.currentStepIndex)
-                if (currentStep?.type == StepType.COMBAT && (currentStep.targetId == "ANY" || currentStep.targetId == currentEnemyType)) {
+                if (currentStep?.type == StepType.COMBAT && 
+                    (currentStep.targetId == "ANY" || 
+                     currentStep.targetId.uppercase() == currentEnemyType?.uppercase())) {
                     questEngine.advanceStepDirect(state, qId)
                 }
             }

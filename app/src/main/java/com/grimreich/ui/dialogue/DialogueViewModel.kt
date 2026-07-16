@@ -145,6 +145,14 @@ class DialogueViewModel @Inject constructor(
             if (state.gold < amount) return false
         }
 
+        if (choice.triggerEvent == "CHECK_WORLD_FLAG") {
+            if (!state.quest.worldFlags.contains(choice.triggerValue)) return false
+        }
+
+        if (choice.triggerEvent == "CHECK_WORLD_FLAG") {
+            if (!state.quest.worldFlags.contains(choice.triggerValue)) return false
+        }
+
         return true
     }
 
@@ -183,8 +191,17 @@ class DialogueViewModel @Inject constructor(
                 com.grimreich.core.EnemyType.BANDIT 
             }
             val enemy = com.grimreich.core.Bestiary.get(enemyType)
+            
+            // BUG-4 FIX: Set QuestCombatWin action before starting combat from dialogue
+            val activeQuestId = questEngine.getActiveQuestsForCity(state.world.locationId).firstOrNull()?.id
+            
             combatSystem.startCombat(enemy)
-            gameRepository.updateState { it.pendingAction = com.grimreich.core.PendingWorldAction.None }
+            gameRepository.updateState { 
+                it.pendingAction = if (activeQuestId != null) 
+                    com.grimreich.core.PendingWorldAction.QuestCombatWin(activeQuestId)
+                else 
+                    com.grimreich.core.PendingWorldAction.None 
+            }
             onCombat()
             return
         }

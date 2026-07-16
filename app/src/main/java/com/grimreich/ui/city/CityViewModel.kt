@@ -11,7 +11,9 @@ import com.grimreich.world.ProceduralNpcGenerator
 import com.grimreich.grimreich.v1.NPC
 import com.grimreich.systems.QuestEngine
 import com.grimreich.systems.QuestDefinition
+import com.grimreich.systems.DialogueManager
 import com.grimreich.systems.AtmosphericDescriptionSystem
+import com.grimreich.systems.VerdictIncidentsSystem
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -46,7 +48,9 @@ class CityViewModel @Inject constructor(
     private val cityCatalogue: CityCatalogue,
     private val npcGenerator: ProceduralNpcGenerator,
     private val socialEventSystem: SocialEventSystem,
-    private val atmosphericDescriptionSystem: AtmosphericDescriptionSystem
+    private val dialogueManager: DialogueManager,
+    private val atmosphericDescriptionSystem: AtmosphericDescriptionSystem,
+    private val verdictIncidentsSystem: VerdictIncidentsSystem
 ) : ViewModel() {
 
     private val _isQuestMenuOpen = MutableStateFlow(false)
@@ -58,25 +62,6 @@ class CityViewModel @Inject constructor(
         val cityId = state.world.locationId
         val cityData = cityCatalogue.get(cityId)
         
-        // --- TRIGGER VERDICT INCIDENTS REMOVED FROM FLOW ---
-        // Moved to init to avoid multiple triggers on state updates (recruitment, etc)
-
-        // --- RAVENN AMBUSH CHECK ---
-        if (state.quest.worldFlags.contains("verdict_ravenn_interaction_pending")) {
-            val isSuspect = state.quest.worldFlags.contains("verdict_path_SUSPECT")
-            val npcName = "Ravenn Beztwarzowy"
-            val npcRole = "Ravenn"
-            val node = if (isSuspect) "ravenn_ambush_suspect" else "ravenn_ambush_investigator"
-            
-            // This will trigger an automatic navigation to dialogue when CityScreen starts
-            // and remove the pending flag.
-            gameRepository.updateState { s ->
-                s.quest.worldFlags.remove("verdict_ravenn_interaction_pending")
-                s.pendingAction = com.grimreich.core.PendingWorldAction.Dialogue(npcName, npcRole, node)
-            }
-            emitEffect(CityUiEffect.NavigateToDialogue(npcName, npcRole, node))
-        }
-
         val localAvailable = questEngine.getAvailableQuestsForCity(cityId, state)
         // --- QUEST BOARD FIX ---
         // Showing all available quests for the city, including story triggers
@@ -110,7 +95,35 @@ class CityViewModel @Inject constructor(
     val uiEffect = _uiEffect.asSharedFlow()
 
     init {
-        // init body is now empty as city entrance is handled by GameRootViewModel
+        // Trigger city entrance logic ONCE when ViewModel is created (on actual screen entry)
+        val cityId = gameRepository.currentState().world.locationId
+        if (cityId.isNotBlank()) {
+            verdictIncidentsSystem.onCityEntered(cityId)
+        }
+
+        // BUG-15 FIX: Reactive observer for Ravenn ambush to ensure it triggers even if player is standing in city
+        gameRepository.gameState
+            .map { it.quest.worldFlags.contains("verdict_ravenn_interaction_pending") }
+            .distinctUntilChanged()
+            .filter { it }
+            .onEach { 
+                triggerRavennAmbush()
+            }
+            .launchIn(viewModelScope)
+    }
+
+    private fun triggerRavennAmbush() {
+        val state = gameRepository.currentState()
+        val isSuspect = state.quest.worldFlags.contains("verdict_path_SUSPECT")
+        val npcName = "Ravenn Beztwarzowy"
+        val npcRole = "Ravenn"
+        val node = if (isSuspect) "ravenn_ambush_suspect" else "ravenn_ambush_investigator"
+        
+        gameRepository.updateState { s ->
+            s.quest.worldFlags.remove("verdict_ravenn_interaction_pending")
+            s.pendingAction = com.grimreich.core.PendingWorldAction.Dialogue(npcName, npcRole, node)
+        }
+        emitEffect(CityUiEffect.NavigateToDialogue(npcName, npcRole, node))
     }
 
     fun onEvent(event: CityUiEvent) {
@@ -146,15 +159,27 @@ class CityViewModel @Inject constructor(
             name
         }
 
+        // BUG-3 FIX: Set relatedQuestId for ANY active quest for this NPC to allow turn-in
+        val activeQuestForNpc = state.quest.activeQuestIds.mapNotNull { questEngine.getDefinition(it) }
+            .find { it.originNpcId.lowercase() == role.lowercase() || it.originNpcId.lowercase() == name.lowercase() }
+
         val questToComplete = state.quest.progress.values.find {
             val def = questEngine.getDefinition(it.questId)
             it.status == QuestStatus.OBJECTIVE_MET && 
-            def?.cityId == cityId && def.originNpcId.lowercase() == role.lowercase()
+            def?.cityId == cityId && (def.originNpcId.lowercase() == role.lowercase() || def.originNpcId.lowercase() == name.lowercase())
         }
 
+        // BUG-13 FIX: Route to specific done nodes instead of dead guard_report_back
         val targetNode = if (questToComplete != null) {
             when (role.lowercase()) {
-                "guard", "straznik" -> "guard_report_back"
+                "guard", "straznik" -> {
+                    when (questToComplete.questId) {
+                        "q_inquisition_verdict" -> "guard_verdict_done"
+                        "q_deserter" -> "guard_deserter_done"
+                        "q_fortress_letter" -> "fortress_commander_letter"
+                        else -> "quest_report_back_generic"
+                    }
+                }
                 "merchant", "kupiec" -> "merchant_report_back"
                 "mira" -> "mira_report_back"
                 else -> "quest_report_back_generic"
@@ -162,20 +187,12 @@ class CityViewModel @Inject constructor(
         } else node
 
         gameRepository.updateState { s ->
-            if (questToComplete != null) {
-                s.pendingAction = com.grimreich.core.PendingWorldAction.Dialogue(
-                    npcName = addressedName,
-                    npcRole = role,
-                    nodeId = targetNode,
-                    relatedQuestId = questToComplete.questId
-                )
-            } else {
-                s.pendingAction = com.grimreich.core.PendingWorldAction.Dialogue(
-                    npcName = addressedName,
-                    npcRole = role,
-                    nodeId = targetNode
-                )
-            }
+            s.pendingAction = com.grimreich.core.PendingWorldAction.Dialogue(
+                npcName = addressedName,
+                npcRole = role,
+                nodeId = targetNode,
+                relatedQuestId = activeQuestForNpc?.id ?: questToComplete?.questId
+            )
         }
         
         emitEffect(CityUiEffect.NavigateToDialogue(addressedName, role, targetNode))
@@ -185,8 +202,10 @@ class CityViewModel @Inject constructor(
         _isQuestMenuOpen.value = false
         val status = questEngine.getStatus(quest.id)
         
+        // BUG-14 FIX: Use fallback for missing originNpcId_quest_check nodes
+        val checkNode = "${quest.originNpcId.lowercase()}_quest_check"
         val targetNode = if (status == QuestStatus.ACTIVE || status == QuestStatus.OBJECTIVE_MET) {
-            "${quest.originNpcId.lowercase()}_quest_check"
+            if (dialogueManager.hasNode(checkNode)) checkNode else "quest_report_back_generic"
         } else {
             "${quest.originNpcId.lowercase()}_start"
         }
