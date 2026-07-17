@@ -6,7 +6,7 @@
     "rewardGold": 120,
     "cityId": "wybrzeze_polnocne",
     "originNpcId": "guard",
-    "category": "COMBAT",
+    "category": "combat",
     "recommendedLevel": 1,
     "steps": [
       {
@@ -23,7 +23,7 @@
     "rewardGold": 180,
     "cityId": "wybrzeze_polnocne",
     "originNpcId": "guard",
-    "category": "SOCIAL",
+    "category": "social",
     "recommendedLevel": 2,
     "steps": [
       {
@@ -40,7 +40,7 @@
     "rewardGold": 60,
     "cityId": "wybrzeze_polnocne",
     "originNpcId": "merchant",
-    "category": "INVESTIGATION",
+    "category": "investigation",
     "recommendedLevel": 1,
     "steps": [
       {
@@ -57,7 +57,7 @@
     "rewardGold": 220,
     "cityId": "twierdza_zelazna",
     "originNpcId": "guard",
-    "category": "SOCIAL",
+    "category": "social",
     "recommendedLevel": 2,
     "steps": [
       {
@@ -74,7 +74,7 @@
     "rewardGold": 200,
     "cityId": "serce_krainy",
     "originNpcId": "mira",
-    "category": "INVESTIGATION",
+    "category": "investigation",
     "recommendedLevel": 3,
     "steps": [
       {

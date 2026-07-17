@@ -34,7 +34,7 @@ class QuestEngine @Inject constructor(
 
     fun getStatus(questId: String, state: GameState? = null, visited: MutableSet<String> = mutableSetOf()): QuestStatus {
         val actualState = state ?: gameRepository.currentState()
-        var status = QuestStatus.LOCKED
+        var status = QuestStatus.locked
 
         // PURIFICATION: All ID checks must be lowercase
         val normalizedId = questId.lowercase().trim()
@@ -46,9 +46,9 @@ class QuestEngine @Inject constructor(
             if (hero != null && hero.isDead) {
                 val corpseId = "corpse_${hero.id}"
                 val hasCorpse = actualState.inventory.any { it.instanceId == corpseId }
-                status = if (hasCorpse) QuestStatus.AVAILABLE else QuestStatus.LOCKED
+                status = if (hasCorpse) QuestStatus.available else QuestStatus.locked
             } else {
-                status = QuestStatus.LOCKED
+                status = QuestStatus.locked
             }
         } else {
             val def = registry[normalizedId]
@@ -62,51 +62,51 @@ class QuestEngine @Inject constructor(
 
     private fun evaluateDefinitionStatus(def: QuestDefinition, state: GameState, visited: MutableSet<String>): QuestStatus {
         // --- PRIORITY 1: FINAL STATES ---
-        if (state.quest.completedQuestIds.contains(def.id)) return QuestStatus.COMPLETED
-        if (state.quest.failedQuestIds.contains(def.id)) return QuestStatus.FAILED
+        if (state.quest.completedQuestIds.contains(def.id)) return QuestStatus.completed
+        if (state.quest.failedQuestIds.contains(def.id)) return QuestStatus.failed
 
         // --- PRIORITY 2: CURRENTLY ACTIVE ---
         if (state.quest.activeQuestIds.contains(def.id)) {
-            return state.quest.progress[def.id]?.status ?: QuestStatus.ACTIVE
+            return state.quest.progress[def.id]?.status ?: QuestStatus.active
         }
 
         // --- PRIORITY 3: LOGIC REQUIREMENTS ---
-        if (state.world.day < def.minWorldDay) return QuestStatus.LOCKED
-        if (state.metaAwarenessLevel < def.requiredMetaAwareness) return QuestStatus.LOCKED
+        if (state.world.day < def.minWorldDay) return QuestStatus.locked
+        if (state.metaAwarenessLevel < def.requiredMetaAwareness) return QuestStatus.locked
 
         // Prerequisites
         if (def.prerequisiteQuestId != null) {
             val preStatus = getStatus(def.prerequisiteQuestId, state, visited)
-            if (preStatus != QuestStatus.COMPLETED) return QuestStatus.LOCKED
+            if (preStatus != QuestStatus.completed) return QuestStatus.locked
         }
 
-        return QuestStatus.AVAILABLE
+        return QuestStatus.available
     }
 
     fun activateQuestDirect(state: GameState, questId: String) {
         val normalizedId = questId.lowercase().trim()
         val currentStatus = getStatus(normalizedId, state)
-        if (currentStatus != QuestStatus.AVAILABLE) {
+        if (currentStatus != QuestStatus.available) {
             android.util.Log.d("QuestEngine", "Activation blocked: $normalizedId is $currentStatus")
             return
         }
         
         state.quest.activeQuestIds.add(normalizedId)
-        state.quest.progress[normalizedId] = QuestProgress(questId = normalizedId, status = QuestStatus.ACTIVE)
+        state.quest.progress[normalizedId] = QuestProgress(questId = normalizedId, status = QuestStatus.active)
         state.logEntries.add("۞ NOWE ZADANIE: ${getDefinition(normalizedId)?.title ?: normalizedId}")
     }
 
     fun advanceStepDirect(state: GameState, questId: String) {
         val normalizedId = questId.lowercase().trim()
         val p = state.quest.progress[normalizedId] ?: return
-        if (p.status != QuestStatus.ACTIVE) return
+        if (p.status != QuestStatus.active) return
         val def = registry[normalizedId] ?: return
         
         if (p.currentStepIndex < def.steps.size - 1) {
             state.quest.progress[normalizedId] = p.copy(currentStepIndex = p.currentStepIndex + 1)
             android.util.Log.d("QuestEngine", "Advanced $normalizedId to step ${p.currentStepIndex + 1}")
         } else {
-            state.quest.progress[normalizedId] = p.copy(status = QuestStatus.OBJECTIVE_MET)
+            state.quest.progress[normalizedId] = p.copy(status = QuestStatus.objective_met)
             state.logEntries.add("۞ CEL OSIĄGNIĘTY: ${def.title}")
             state.logEntries.add("> ${context.getString(R.string.quest_return_to, def.originNpcId.uppercase())}")
         }
@@ -145,12 +145,12 @@ class QuestEngine @Inject constructor(
              }
         }
 
-        if (p.status != QuestStatus.OBJECTIVE_MET && p.status != QuestStatus.ACTIVE) return
+        if (p.status != QuestStatus.objective_met && p.status != QuestStatus.active) return
         
         // --- ATOMIC TRANSITION ---
         state.quest.activeQuestIds.remove(actualQuestId)
         state.quest.completedQuestIds.add(actualQuestId)
-        state.quest.progress[actualQuestId] = p.copy(status = QuestStatus.COMPLETED)
+        state.quest.progress[actualQuestId] = p.copy(status = QuestStatus.completed)
         
         state.gold += def.rewardGold
         experienceSystem.addPartyXpDirect(state, def.recommendedLevel * 50).forEach { state.logEntries.add(it) }
@@ -163,7 +163,7 @@ class QuestEngine @Inject constructor(
         val normalizedId = questId.lowercase().trim()
         state.quest.activeQuestIds.remove(normalizedId)
         state.quest.failedQuestIds.add(normalizedId)
-        state.quest.progress[normalizedId] = state.quest.progress[normalizedId]?.copy(status = QuestStatus.FAILED) ?: QuestProgress(normalizedId, QuestStatus.FAILED)
+        state.quest.progress[normalizedId] = state.quest.progress[normalizedId]?.copy(status = QuestStatus.failed) ?: QuestProgress(normalizedId, QuestStatus.failed)
     }
 
     fun getCurrentObjective(questId: String, state: GameState? = null): String {
@@ -172,7 +172,7 @@ class QuestEngine @Inject constructor(
         val actualState = state ?: gameRepository.currentState()
         val p = actualState.quest.progress[normalizedId] ?: return def.description
         
-        return if (p.status == QuestStatus.OBJECTIVE_MET) {
+        return if (p.status == QuestStatus.objective_met) {
             context.getString(R.string.quest_return_to, def.originNpcId.uppercase())
         } else {
             def.steps.getOrNull(p.currentStepIndex)?.description ?: def.description
@@ -182,7 +182,7 @@ class QuestEngine @Inject constructor(
     fun isObjectiveMet(questId: String, state: GameState? = null): Boolean {
         val normalizedId = questId.lowercase().trim()
         val s = state ?: gameRepository.currentState()
-        return s.quest.progress[normalizedId]?.status == QuestStatus.OBJECTIVE_MET
+        return s.quest.progress[normalizedId]?.status == QuestStatus.objective_met
     }
 
     fun getActiveQuestsForCity(cityId: String): List<QuestDefinition> {
@@ -195,7 +195,7 @@ class QuestEngine @Inject constructor(
     fun getVisibleQuestBoard(state: GameState): Map<String, List<QuestDefinition>> {
         val sharedVisited = mutableSetOf<String>()
         return registry.values
-            .filter { !it.isHidden && getStatus(it.id, state, sharedVisited) == QuestStatus.AVAILABLE }
+            .filter { !it.isHidden && getStatus(it.id, state, sharedVisited) == QuestStatus.available }
             .groupBy { it.cityId.lowercase() }
             .mapValues { (cityId, quests) ->
                 shuffleQuests(quests, cityId, state.world.day)
@@ -206,14 +206,15 @@ class QuestEngine @Inject constructor(
         val sharedVisited = mutableSetOf<String>()
         val cityLower = cityId.lowercase()
         val allAvailable = registry.values.filter {
-            it.cityId.lowercase() == cityLower && !it.isHidden && getStatus(it.id, state, sharedVisited) == QuestStatus.AVAILABLE
+            it.cityId.lowercase() == cityLower && !it.isHidden && getStatus(it.id, state, sharedVisited) == QuestStatus.available
         }
         
         val priorityQuests = allAvailable.filter { it.chainId != null }
+            .sortedWith(compareBy<QuestDefinition> { it.chainId }.thenBy { it.chainOrder })
         val randomQuests = allAvailable.filter { it.chainId == null }
+            .let { shuffleQuests(it, cityLower, state.world.day) }
         
-        return shuffleQuests(priorityQuests + randomQuests, cityLower, state.world.day)
-            .sortedWith(compareBy<QuestDefinition> { it.chainId ?: "zzz" }.thenBy { it.chainOrder }.thenBy { it.recommendedLevel })
+        return (priorityQuests + randomQuests).take(6)
     }
 
     private fun shuffleQuests(quests: List<QuestDefinition>, cityId: String, day: Int): List<QuestDefinition> {
@@ -239,7 +240,7 @@ data class QuestDefinition(
     val cityId: String,
     val originNpcId: String,
     val prerequisiteQuestId: String? = null,
-    val category: QuestCategory = QuestCategory.MIXED,
+    val category: QuestCategory = QuestCategory.mixed,
     val recommendedLevel: Int = 1,
     val chainId: String? = null,
     val chainOrder: Int = 0,

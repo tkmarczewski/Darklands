@@ -23,7 +23,7 @@ class AbsoluteSystem @Inject constructor(
     fun applyAbsoluteOverride() {
         gameRepository.updateState { state ->
             if (state.world.globalStability < 5) {
-                state.world.weather = WeatherType.ECLIPSE
+                state.world.weather = WeatherType.eclipse
                 chronicleSystem.record("Absolut przejmuje kontrolę nad pogodą.")
             }
         }

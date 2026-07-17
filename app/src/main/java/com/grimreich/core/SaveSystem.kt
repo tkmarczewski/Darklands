@@ -114,10 +114,12 @@ class SaveSystem @Inject constructor() {
     fun hasAutoSave(): Boolean = autoSaveSnapshot != null
 
     fun computeStateHash(state: GameState): Int {
+        val partyProgressionHash = state.party.filter { !it.isDead }.sumOf { it.hp + it.xp }
         return java.util.Objects.hash(
             state.gold,
             state.world.day,
             state.party.size,
+            partyProgressionHash,
             state.quest.activeQuestIds.hashCode(),
             state.inventory.size,
             state.reputation.globalFactions.hashCode(),

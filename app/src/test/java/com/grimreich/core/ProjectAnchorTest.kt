@@ -55,7 +55,7 @@ class ProjectAnchorTest {
     @Test
     fun testTheBreathCondition() {
         val state = GameState()
-        state.world.ontologicalLevel = OntologicalLevel.ABSOLUTE
+        state.world.ontologicalLevel = OntologicalLevel.absolute
         state.world.globalStability = 100
         
         val engine = CollapseEngine(

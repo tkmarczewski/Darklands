@@ -7,17 +7,17 @@ class SeasonTest {
 
     @Test
     fun `displayName returns correct Polish names`() {
-        assertEquals("Wiosna", Season.SPRING.displayName())
-        assertEquals("Lato", Season.SUMMER.displayName())
-        assertEquals("Jesień", Season.AUTUMN.displayName())
-        assertEquals("Zima", Season.WINTER.displayName())
+        assertEquals("Wiosna", Season.spring.displayName())
+        assertEquals("Lato", Season.summer.displayName())
+        assertEquals("Jesień", Season.autumn.displayName())
+        assertEquals("Zima", Season.winter.displayName())
     }
 
     @Test
     fun `travelModifier returns correct values`() {
-        assertEquals(1.0f, Season.SPRING.travelModifier(), 0.001f)
-        assertEquals(0.9f, Season.SUMMER.travelModifier(), 0.001f)
-        assertEquals(1.1f, Season.AUTUMN.travelModifier(), 0.001f)
-        assertEquals(1.4f, Season.WINTER.travelModifier(), 0.001f)
+        assertEquals(1.0f, Season.spring.travelModifier(), 0.001f)
+        assertEquals(0.9f, Season.summer.travelModifier(), 0.001f)
+        assertEquals(1.1f, Season.autumn.travelModifier(), 0.001f)
+        assertEquals(1.4f, Season.winter.travelModifier(), 0.001f)
     }
 }

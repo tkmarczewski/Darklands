@@ -77,9 +77,10 @@ class StatePersistenceManager @Inject constructor(
         val (checksum, dataJson) = mutex.withLock {
             try {
                 val content = sessionFile.readText()
+                // BUG-03 FIX: Support both \n and \r\n, and trim checksum
                 val lines = content.split("\n", limit = 2)
                 if (lines.size < 2) return@withLock null to null
-                lines[0] to lines[1]
+                lines[0].trim() to lines[1]
             } catch (e: Exception) {
                 Log.e(TAG, "Blad wczytywania pliku sesji", e)
                 null to null

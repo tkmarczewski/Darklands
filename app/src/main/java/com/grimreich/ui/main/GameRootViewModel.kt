@@ -14,7 +14,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 enum class GameScreenMode {
-    MAIN_MENU, PLAYER_IDENTITY, CHARACTER_CREATOR, WORLD_MAP, CITY, COMBAT, TAVERN, TEMPLE, ALCHEMY, EVENTS, HUB, DIALOGUE, INVENTORY, QUESTS, CHRONICLE, RECRUIT, CHAR_DETAIL, MARKET, DEV_MENU, RITUAL, ENDING, EXPEDITION
+    main_menu, player_identity, character_creator, world_map, city, combat, tavern, temple, alchemy, events, hub, dialogue, inventory, quests, chronicle, recruit, char_detail, market, dev_menu, ritual, ending, expedition
 }
 
 @HiltViewModel
@@ -30,7 +30,7 @@ class GameRootViewModel @Inject constructor(
     val characterFactory: CharacterFactory
 ) : ViewModel() {
 
-    private val _mode = MutableStateFlow(GameScreenMode.MAIN_MENU)
+    private val _mode = MutableStateFlow(GameScreenMode.main_menu)
     val mode: StateFlow<GameScreenMode> = _mode.asStateFlow()
 
     private val _ending = MutableStateFlow(EndingSystem.GameEnding.NONE)
@@ -49,7 +49,7 @@ class GameRootViewModel @Inject constructor(
     fun confirmExitToMainMenu() {
         _showExitConfirmation.value = false
         saveGame() // Wymuszenie zapisu przed wyjściem
-        setMode(GameScreenMode.MAIN_MENU)
+        setMode(GameScreenMode.main_menu)
     }
 
     fun runContentValidation() {
@@ -74,7 +74,7 @@ class GameRootViewModel @Inject constructor(
             .onEach { end ->
                 if (end != EndingSystem.GameEnding.NONE) {
                     _ending.value = end
-                    setMode(GameScreenMode.ENDING)
+                    setMode(GameScreenMode.ending)
                 }
             }
             .launchIn(viewModelScope)
@@ -82,7 +82,7 @@ class GameRootViewModel @Inject constructor(
 
     fun setMode(mode: GameScreenMode) {
         val previousMode = _mode.value
-        if (mode == GameScreenMode.MAIN_MENU) {
+        if (mode == GameScreenMode.main_menu) {
             gameRepository.persistCurrentState()
         }
         
@@ -90,47 +90,47 @@ class GameRootViewModel @Inject constructor(
 
         // --- CITY ENTRY LOGIC: VERDICT INCIDENTS ---
         // Only trigger if entering CITY from MAP or EXPEDITION (actual travel/arrival)
-        if (mode == GameScreenMode.CITY && (previousMode == GameScreenMode.WORLD_MAP || previousMode == GameScreenMode.EXPEDITION)) {
+        if (mode == GameScreenMode.city && (previousMode == GameScreenMode.world_map || previousMode == GameScreenMode.expedition)) {
             val cityId = gameRepository.currentState().world.locationId
             if (cityId.isNotBlank()) {
                 verdictIncidentsSystem.onCityEntered(cityId)
             }
         }
         val route = when (mode) {
-            GameScreenMode.MAIN_MENU        -> "main_menu"
-            GameScreenMode.PLAYER_IDENTITY,
-            GameScreenMode.CHARACTER_CREATOR -> "character_creator"
-            GameScreenMode.HUB             -> "hub"
-            GameScreenMode.CITY            -> "city"
-            GameScreenMode.WORLD_MAP       -> "map"
-            GameScreenMode.COMBAT          -> "combat"
-            GameScreenMode.TAVERN          -> "tavern"
-            GameScreenMode.MARKET          -> "market"
-            GameScreenMode.EXPEDITION      -> "expedition"
-            GameScreenMode.EVENTS          -> "events"
-            GameScreenMode.RITUAL          -> "ritual"
-            GameScreenMode.ENDING          -> "ending"
-            GameScreenMode.TEMPLE          -> "ritual"
-            GameScreenMode.ALCHEMY         -> "alchemy"
-            GameScreenMode.DIALOGUE        -> "dialogue"
-            GameScreenMode.QUESTS          -> "hub"
-            GameScreenMode.CHRONICLE       -> "hub"
-            GameScreenMode.RECRUIT         -> "tavern"
-            GameScreenMode.INVENTORY       -> "hub"
-            GameScreenMode.CHAR_DETAIL     -> "hub"
-            GameScreenMode.DEV_MENU        -> "main_menu"
+            GameScreenMode.main_menu        -> "main_menu"
+            GameScreenMode.player_identity,
+            GameScreenMode.character_creator -> "character_creator"
+            GameScreenMode.hub             -> "hub"
+            GameScreenMode.city            -> "city"
+            GameScreenMode.world_map       -> "map"
+            GameScreenMode.combat          -> "combat"
+            GameScreenMode.tavern          -> "tavern"
+            GameScreenMode.market          -> "market"
+            GameScreenMode.expedition      -> "expedition"
+            GameScreenMode.events          -> "events"
+            GameScreenMode.ritual          -> "ritual"
+            GameScreenMode.ending          -> "ending"
+            GameScreenMode.temple          -> "temple"
+            GameScreenMode.alchemy         -> "alchemy"
+            GameScreenMode.dialogue        -> "dialogue"
+            GameScreenMode.quests          -> "hub"
+            GameScreenMode.chronicle       -> "hub"
+            GameScreenMode.recruit         -> "tavern"
+            GameScreenMode.inventory       -> "hub"
+            GameScreenMode.char_detail     -> "hub"
+            GameScreenMode.dev_menu        -> "main_menu"
         }
         audioEngine.playForRoute(route)
     }
 
     fun startNewGame() {
         gameRepository.clearSessionAndReset()
-        setMode(GameScreenMode.PLAYER_IDENTITY)
+        setMode(GameScreenMode.player_identity)
     }
 
     fun setPlayerIdentity(name: String) {
         _pendingPlayerName = name
-        setMode(GameScreenMode.CHARACTER_CREATOR)
+        setMode(GameScreenMode.character_creator)
     }
 
     fun finalizeCharacterCreation(name: String, career: Career, attrs: Map<String, Int>, skills: List<HeroSkill>, trainingCycles: Int = 0) {
@@ -201,14 +201,14 @@ class GameRootViewModel @Inject constructor(
             }
 
             gameRepository.persistCurrentState()
-            setMode(GameScreenMode.HUB)
+            setMode(GameScreenMode.hub)
         }
     }
 
     fun restoreSessionIfValid() {
         viewModelScope.launch {
             if (gameRepository.restoreIfAvailable()) {
-                setMode(GameScreenMode.HUB)
+                setMode(GameScreenMode.hub)
             }
         }
     }
@@ -217,9 +217,9 @@ class GameRootViewModel @Inject constructor(
         val hero = gameRepository.currentState().party.find { it.id == heroId }
         _inspectedHeroId.value = heroId
         if (hero != null && hero.isDead) {
-            setMode(GameScreenMode.RITUAL)
+            setMode(GameScreenMode.ritual)
         } else if (hero != null) {
-            setMode(GameScreenMode.CHAR_DETAIL)
+            setMode(GameScreenMode.char_detail)
         }
     }
 
@@ -287,9 +287,16 @@ class GameRootViewModel @Inject constructor(
         gameRepository.manualSave(slotId, label)
     }
 
+    fun initiateDialogue(name: String, role: String, node: String) {
+        gameRepository.updateState(shouldPersist = false) { state ->
+            state.pendingAction = PendingWorldAction.Dialogue(name, role, node)
+        }
+        setMode(GameScreenMode.dialogue)
+    }
+
     fun startDevCombat() {
-        val enemy = Bestiary.get(EnemyType.BANDIT)
+        val enemy = Bestiary.get(EnemyType.bandit)
         combatSystem.startCombat(enemy)
-        setMode(GameScreenMode.COMBAT)
+        setMode(GameScreenMode.combat)
     }
 }

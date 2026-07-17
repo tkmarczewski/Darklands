@@ -10,7 +10,7 @@ import dagger.Lazy
 import javax.inject.Inject
 import javax.inject.Singleton
 
-enum class EncounterType { COMBAT, INTERACTIVE, RESOURCE }
+enum class EncounterType { combat, interactive, resource }
 
 data class EncounterChoice(
     val label: String,
@@ -38,7 +38,7 @@ class EncounterSystem @Inject constructor(
     private val encounters = mutableListOf(
         Encounter(
             "enc_01", "Cienie w zaułku", "Widzisz migoczące światło w głębi uliczki.",
-            EncounterType.INTERACTIVE,
+            EncounterType.interactive,
             listOf(
                 EncounterChoice("Sprawdź", "Znalazłeś porzuconą torbę.", effect = { state ->
                     lootSystem.awardLootDirect(state, 1.0f)
@@ -49,7 +49,7 @@ class EncounterSystem @Inject constructor(
         Encounter(
             "enc_per_01", "Ukryta Skrytka",
             "Twoje zmysły podpowiadają, że pod luźnym kamieniem coś się znajduje.",
-            EncounterType.RESOURCE,
+            EncounterType.resource,
             listOf(
                 EncounterChoice("Przeszukaj skrytkę", "Znalazłeś stare monety!",
                     "perception", 12, effect = { state ->
@@ -62,7 +62,7 @@ class EncounterSystem @Inject constructor(
         Encounter(
             "enc_int_01", "Dziwny Mechanizm",
             "Na środku drogi stoi dziwna, pulsująca maszyna echa.",
-            EncounterType.INTERACTIVE,
+            EncounterType.interactive,
             listOf(
                 EncounterChoice("Rozszyfruj działanie",
                     "Ustabilizowałeś fragment rzeczywistości!", "intelligence", 14,
@@ -78,7 +78,7 @@ class EncounterSystem @Inject constructor(
             "echo_frozen_archivist", "Zamarznięty Archiwista",
             "Na środku traktu stoi postać pokryta szronem, mimo upału. Trzyma w rękach księgę, " +
             "której strony przewracają się same. 'Wszystko musi zostać skatalogowane, zanim zniknie', szepcze Archiwista.",
-            EncounterType.INTERACTIVE,
+            EncounterType.interactive,
             listOf(
                 EncounterChoice(
                     "Pomóż mu skatalogować otoczenie",
@@ -103,7 +103,7 @@ class EncounterSystem @Inject constructor(
             "Mała dziewczynka siedzi pod drzewem. Gdy mruga, jej postać przesuwa się o kilka " +
             "centymetrów w bok, zostawiając za sobą powidok. 'Widzisz to?' pyta, wskazując na niebo. " +
             "'Piksele spadają jak śnieg.'",
-            EncounterType.INTERACTIVE,
+            EncounterType.interactive,
             listOf(
                 EncounterChoice("Uspokój dziecko",
                     "Rzeczywistość odzyskuje ostrość.", "charisma", 13,
@@ -135,17 +135,17 @@ class EncounterSystem @Inject constructor(
         val hostileFactions = state.reputation.globalFactions.filter { it.value <= GameConstants.HOSTILE_REPUTATION_THRESHOLD }.keys
         if (hostileFactions.isNotEmpty() && random.nextFloat() < GameConstants.FACTION_RAID_CHANCE) {
             val factionId = hostileFactions.toList()[random.nextInt(hostileFactions.size)]
-            val enemyType = when (factionId.uppercase()) {
-                "CHURCH", "INKWIZYCJA" -> EnemyType.CITY_GUARD
-                "KNIGHTS", "ZAKON"     -> EnemyType.RAUBRITTER_KNIGHT
-                else                   -> EnemyType.BANDIT
+            val enemyType = when (factionId.lowercase()) {
+                "church", "inkwizycja" -> EnemyType.city_guard
+                "knights", "zakon"     -> EnemyType.raubritter_knight
+                else                   -> EnemyType.bandit
             }
             return Encounter(
                 id = "raid_${factionId}",
                 title = "Zasadzka: ${factionId.uppercase()}",
                 description = "Twoje działania przeciwko frakcji ${factionId.uppercase()} " +
                               "nie pozostały niezauważone. Grupa zabójców zastępuje Ci drogę!",
-                type = EncounterType.COMBAT,
+                type = EncounterType.combat,
                 choices = listOf(
                     EncounterChoice(
                         "Walcz o życie!", "Rozpoczyna się brutalne starcie.",

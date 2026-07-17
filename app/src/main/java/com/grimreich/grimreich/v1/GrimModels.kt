@@ -6,20 +6,20 @@ data class GrimWorld(val id: String, val name: String, val regions: List<Region>
 data class Region(val id: String, val name: String, val description: String, val encounters: List<Encounter>, val seed: Long?)
 
 enum class OntologicalLevel(val level: Int, val displayName: String) {
-    MATERIAL(1, "Materialne"),
-    ALTERED(2, "Zmienione"),
-    SPIRITS(3, "Duchy"),
-    RELICS(4, "Relikwie"),
-    UNIQUE(5, "Unikalne"),
-    COLOSSI(6, "Kolosy"),
-    APOCALYPSE(7, "Apokalipsa"),
-    TRANSCENDENCE(8, "Transcendencja"),
-    IDEAS(9, "Idee"),
-    IMPOSSIBILITY(10, "Niemożliwość"),
-    COSMOS(11, "Kosmos"),
-    ABSOLUTE(12, "Absolutne"),
-    META_NARRATION(13, "Meta-Narracja"),
-    ABSOLUTE_SCRIBES(14, "Skrybowie Absolutni")
+    material(1, "Materialne"),
+    altered(2, "Zmienione"),
+    spirits(3, "Duchy"),
+    relics(4, "Relikwie"),
+    unique(5, "Unikalne"),
+    colossi(6, "Kolosy"),
+    apocalypse(7, "Apokalipsa"),
+    transcendence(8, "Transcendencja"),
+    ideas(9, "Idee"),
+    impossibility(10, "Niemożliwość"),
+    cosmos(11, "Kosmos"),
+    absolute(12, "Absolutne"),
+    meta_narration(13, "Meta-Narracja"),
+    absolute_scribes(14, "Skrybowie Absolutni")
 }
 
 enum class ReputationLevel(val minScore: Int, val displayName: String) {

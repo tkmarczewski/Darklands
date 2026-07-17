@@ -1,23 +1,23 @@
 package com.grimreich.core
 
 enum class Season {
-    SPRING,
-    SUMMER,
-    AUTUMN,
-    WINTER;
+    spring,
+    summer,
+    autumn,
+    winter;
 
     fun displayName(): String = when (this) {
-        SPRING -> "Wiosna"
-        SUMMER -> "Lato"
-        AUTUMN -> "Jesień"
-        WINTER -> "Zima"
+        spring -> "Wiosna"
+        summer -> "Lato"
+        autumn -> "Jesień"
+        winter -> "Zima"
     }
 
     fun travelModifier(): Float = when (this) {
-        SUMMER -> 0.9f
-        SPRING -> 1.0f
-        AUTUMN -> 1.1f
-        WINTER -> 1.4f
+        summer -> 0.9f
+        spring -> 1.0f
+        autumn -> 1.1f
+        winter -> 1.4f
     }
 }
 

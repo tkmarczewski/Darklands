@@ -53,7 +53,7 @@ class MetaObservationSystem @Inject constructor(
             }
             completed >= GameConstants.META_QUEST_THRESHOLD && !state.quest.worldFlags.contains("meta_chain_unlock") -> {
                 state.quest.worldFlags.add("meta_chain_unlock")
-                if (questEngine.getStatus("q_meta_1", state) == QuestStatus.AVAILABLE) {
+                if (questEngine.getStatus("q_meta_1", state) == QuestStatus.available) {
                     questEngine.activateQuestDirect(state, "q_meta_1")
                 }
             }

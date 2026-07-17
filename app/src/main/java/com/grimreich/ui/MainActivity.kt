@@ -49,7 +49,7 @@ class MainActivity : LocalizedActivity() {
                 // --- SYSTEM BACK HANDLER ---
                 // If we are in Main Menu, let the system handle it (exit app).
                 // Otherwise, show confirmation dialog.
-                BackHandler(enabled = mode != com.grimreich.ui.main.GameScreenMode.MAIN_MENU) {
+                BackHandler(enabled = mode != com.grimreich.ui.main.GameScreenMode.main_menu) {
                     android.util.Log.d("TRIBUNAL", "Back action: requesting exit confirmation.")
                     rootViewModel.setExitConfirmationVisible(true)
                 }

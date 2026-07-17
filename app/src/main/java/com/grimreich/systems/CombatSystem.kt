@@ -31,7 +31,7 @@ class CombatSystem @Inject constructor(
             perception = hero.perception,
             piety = hero.piety,
             charisma = hero.charisma,
-            activeEffects = mutableListOf()
+            activeEffects = hero.activeStatusEffects.map { it.copy() }.toMutableList()
         )
     }
 
@@ -62,7 +62,7 @@ class CombatSystem @Inject constructor(
                 slots.add(InitiativeSlot(hero.id, isPlayer = true, initiativeValue = initVal))
             }
             val enemyInit = (enemy.stats.speed * 2) + combatRound.randomProvider.nextInt(0, 4)
-            slots.add(InitiativeSlot("ENEMY", false, enemyInit))
+            slots.add(InitiativeSlot("enemy", false, enemyInit))
             
             state.combat.initiativeOrder.clear()
             state.combat.initiativeOrder.addAll(slots.sortedByDescending { it.initiativeValue })
@@ -76,8 +76,8 @@ class CombatSystem @Inject constructor(
         }
     }
 
-    fun playerAttack() = resolvePlayerAction("ATTACK")
-    fun playerDefend() = resolvePlayerAction("DEFEND")
+    fun playerAttack() = resolvePlayerAction("attack")
+    fun playerDefend() = resolvePlayerAction("defend")
     fun useSkill(skillId: String) {
         val skill = SkillCatalogue.allSkills.find { it.id == skillId } ?: return
         
@@ -91,7 +91,7 @@ class CombatSystem @Inject constructor(
                 state.logEntries.add("Użycie Zapaści Umysłu naruszyło strukturę regionu.")
             }
         }
-        resolvePlayerAction("SKILL:$skillId")
+        resolvePlayerAction("skill:$skillId")
     }
 
     fun setActiveHero(heroId: String) {
@@ -186,11 +186,11 @@ class CombatSystem @Inject constructor(
         val enemyCombatant = getEnemyCombatant(c)
 
         val playerRound = when {
-            action.startsWith("SKILL:") -> {
-                val skillId = action.substringAfter("SKILL:")
+            action.startsWith("skill:") -> {
+                val skillId = action.substringAfter("skill:")
                 combatRound.resolveRound(heroCombatant, enemyCombatant, skillId)
             }
-            action == "DEFEND" -> {
+            action == "defend" -> {
                 heroCombatant.armor += 5
                 combatRound.resolveRound(heroCombatant, enemyCombatant, "system_defend")
             }
@@ -199,6 +199,8 @@ class CombatSystem @Inject constructor(
 
         c.log.addAll(playerRound.log)
         hero.hp = heroCombatant.hp
+        hero.activeStatusEffects.clear()
+        hero.activeStatusEffects.addAll(heroCombatant.activeEffects)
         c.enemyHp = enemyCombatant.hp
         c.enemyStamina = enemyCombatant.endurance
 
@@ -209,11 +211,11 @@ class CombatSystem @Inject constructor(
 
     private fun resolveEnemyTurnsInternal(state: GameState) {
         val c = state.combat
-        val enemyTypeStr = c.enemyType ?: "BANDIT"
-        val enemyDef = try { EnemyType.valueOf(enemyTypeStr) } catch (e: Exception) { EnemyType.BANDIT }
-        val enemyAi = Bestiary.get(enemyDef).ai
+        val enemyTypeStr = c.enemyType ?: "bandit"
+        val enemyDef = try { EnemyType.valueOf(enemyTypeStr.lowercase()) } catch (e: Exception) { EnemyType.bandit }
+        val enemyAi = try { Bestiary.get(enemyDef).ai } catch (e: Exception) { EnemyAI.aggressive }
 
-        while (c.active && !c.initiativeOrder[c.currentTurnIndex].isPlayer) {
+        while (c.active && c.initiativeOrder.getOrNull(c.currentTurnIndex)?.isPlayer == false) {
             val aliveHeroes = state.party.filter { !it.isDead }
             if (aliveHeroes.isEmpty()) {
                 c.active = false
@@ -223,9 +225,9 @@ class CombatSystem @Inject constructor(
 
             // AI STRATEGY: Target Selection
             val targetHero = when (enemyAi) {
-                EnemyAI.TACTICAL -> aliveHeroes.minBy { it.hp }
-                EnemyAI.BERSERK -> aliveHeroes.maxBy { it.morale }
-                EnemyAI.RANGED -> aliveHeroes.minBy { it.agility }
+                EnemyAI.tactical -> aliveHeroes.minBy { it.hp }
+                EnemyAI.berserk -> aliveHeroes.maxBy { it.morale }
+                EnemyAI.ranged -> aliveHeroes.minBy { it.agility }
                 else -> {
                     val index = combatRound.randomProvider.nextInt(aliveHeroes.size)
                     aliveHeroes[index]
@@ -236,7 +238,7 @@ class CombatSystem @Inject constructor(
             val targetCombatant = heroToCombatant(state, targetHero)
 
             // AI STRATEGY: Action Choice
-            if (enemyAi == EnemyAI.DEFENSIVE && combatRound.randomProvider.nextInt(100) < 30) {
+            if (enemyAi == EnemyAI.defensive && combatRound.randomProvider.nextInt(100) < 30) {
                 enemyCombatant.armor += 10
                 c.log.add("Tura przeciwnika: ${c.enemyName} przyjmuje postawę obronną!")
                 val enemyRound = combatRound.resolveRound(enemyCombatant, targetCombatant, "system_defend")
@@ -248,6 +250,8 @@ class CombatSystem @Inject constructor(
             }
 
             targetHero.hp = targetCombatant.hp
+            targetHero.activeStatusEffects.clear()
+            targetHero.activeStatusEffects.addAll(targetCombatant.activeEffects)
             c.enemyStamina = enemyCombatant.endurance
 
             if (targetHero.hp <= 0) handleHeroDeath(state, targetHero)
@@ -278,12 +282,12 @@ class CombatSystem @Inject constructor(
         }
         
         // Enemy init
-        val typeStr = c.enemyType ?: "BANDIT"
-        val type = try { EnemyType.valueOf(typeStr) } catch (e: Exception) { EnemyType.BANDIT }
+        val typeStr = c.enemyType ?: "bandit"
+        val type = try { EnemyType.valueOf(typeStr.lowercase()) } catch (e: Exception) { EnemyType.bandit }
         val enemy = Bestiary.get(type)
         // Enemy speed is their agility equivalent
         val enemyInit = enemy.stats.speed + combatRound.randomProvider.nextInt(0, 10)
-        slots.add(InitiativeSlot("ENEMY", false, enemyInit))
+        slots.add(InitiativeSlot("enemy", false, enemyInit))
 
         c.initiativeOrder.clear()
         c.initiativeOrder.addAll(slots.sortedByDescending { it.initiativeValue })
@@ -328,7 +332,7 @@ class CombatSystem @Inject constructor(
         
         val typeStr = c.enemyType
         val type = try { 
-            if (typeStr != null) EnemyType.valueOf(typeStr) else null 
+            if (typeStr != null) EnemyType.valueOf(typeStr.lowercase()) else null 
         } catch (e: Exception) { null }
         
         val enemyDef = type?.let { Bestiary.get(it) }
@@ -354,16 +358,16 @@ class CombatSystem @Inject constructor(
             state.pendingAction = com.grimreich.core.PendingWorldAction.None
         }
 
-        // Auto-advance ALL active quests if they have a COMBAT step matching the enemy
-        val currentEnemyType = state.combat.enemyType
+        // Auto-advance ALL active quests if they have a combat step matching the enemy
+        val currentEnemyType = state.combat.enemyType?.lowercase()
         state.quest.activeQuestIds.toList().forEach { qId ->
             val def = questEngine.getDefinition(qId)
             val progress = state.quest.progress[qId]
             if (def != null && progress != null) {
                 val currentStep = def.steps.getOrNull(progress.currentStepIndex)
-                if (currentStep?.type == StepType.COMBAT && 
-                    (currentStep.targetId == "ANY" || 
-                     currentStep.targetId.uppercase() == currentEnemyType?.uppercase())) {
+                if (currentStep?.type == StepType.combat && 
+                    (currentStep.targetId.lowercase() == "any" || 
+                     currentStep.targetId.lowercase() == currentEnemyType)) {
                     questEngine.advanceStepDirect(state, qId)
                 }
             }
@@ -374,7 +378,7 @@ class CombatSystem @Inject constructor(
         state.party.filter { !it.isDead }.forEach { hero ->
             // Szansa na traumę wzrasta wraz z siłą przeciwnika i niską stabilnością
             val chance = when {
-                enemy.type == EnemyType.PAST_SHADE_ELITE -> GameConstants.TRAUMA_CHANCE_ELITE
+                enemy.type == EnemyType.past_shade_elite -> GameConstants.TRAUMA_CHANCE_ELITE
                 enemy.ontologicalMass >= 30 -> GameConstants.TRAUMA_CHANCE_MASSIVE
                 hero.ontologicalStability < 50f -> GameConstants.TRAUMA_CHANCE_UNSTABLE
                 else -> GameConstants.TRAUMA_CHANCE_BASE

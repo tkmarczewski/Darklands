@@ -20,7 +20,8 @@ import com.grimreich.core.Hero
 fun CharDetailScreen(
     hero: Hero,
     onBack: () -> Unit,
-    onUpgrade: (String) -> Unit
+    onUpgrade: (String) -> Unit,
+    onRandomize: () -> Unit = {}
 ) {
     Column(
         modifier = Modifier

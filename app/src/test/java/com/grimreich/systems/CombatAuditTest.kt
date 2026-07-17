@@ -9,9 +9,9 @@ class CombatAuditTest {
 
     @Test
     fun testEnemyTypeExistence() {
-        // Verify that PAST_SHADE_ELITE is now part of the enum
-        val type = EnemyType.valueOf("PAST_SHADE_ELITE")
-        assertEquals("PAST_SHADE_ELITE", type.name)
+        // Verify that past_shade_elite is now part of the enum
+        val type = EnemyType.valueOf("past_shade_elite")
+        assertEquals("past_shade_elite", type.name)
     }
 
     @Test

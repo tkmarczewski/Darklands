@@ -18,7 +18,8 @@ class TravelSystem @Inject constructor(
     private val cityCatalogue: CityCatalogue,
     private val encounterSystem: EncounterSystem,
     private val worldStabilitySystem: WorldStabilitySystem,
-    private val collapseEngine: CollapseEngine
+    private val collapseEngine: CollapseEngine,
+    private val agingSystem: com.grimreich.core.AgingSystem
 ) {
     fun restDirect(state: GameState): String {
         state.world.fatigue = 0
@@ -39,10 +40,10 @@ class TravelSystem @Inject constructor(
 
     fun currentSeason(day: Int): Season {
         return when ((day / 30) % 4) {
-            0 -> Season.SPRING
-            1 -> Season.SUMMER
-            2 -> Season.AUTUMN
-            else -> Season.WINTER
+            0 -> Season.spring
+            1 -> Season.summer
+            2 -> Season.autumn
+            else -> Season.winter
         }
     }
 
@@ -61,9 +62,19 @@ class TravelSystem @Inject constructor(
         }
 
         gameRepository.updateState { s ->
+            val oldDay = s.world.day
             s.world.locationId = destCityId
             s.world.day += daysSpent
+            s.world.season = currentSeason(s.world.day)
             
+            // BUG-14: Process aging for elapsed years
+            val fullYearsPassed = (s.world.day / 365) - (oldDay / 365)
+            if (fullYearsPassed > 0) {
+                s.party.forEach { hero ->
+                    repeat(fullYearsPassed) { agingSystem.applyAgingToHero(hero, s) }
+                }
+            }
+
             // Advance career years (1 year = 365 days)
             val yearsPassed = daysSpent.toFloat() / 365f
             s.party.forEach { hero ->
@@ -91,10 +102,10 @@ class TravelSystem @Inject constructor(
     fun getSeasonDisplay(): String {
         val s = gameRepository.currentState().world.season
         return when (s) {
-            Season.SPRING -> "WIOSNA"
-            Season.SUMMER -> "LATO"
-            Season.AUTUMN -> "JESIEŃ"
-            Season.WINTER -> "ZIMA"
+            Season.spring -> "WIOSNA"
+            Season.summer -> "LATO"
+            Season.autumn -> "JESIEŃ"
+            Season.winter -> "ZIMA"
         }
     }
 }

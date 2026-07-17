@@ -25,28 +25,28 @@ import com.grimreich.ui.dialogue.DialogueViewModel
 import com.grimreich.ui.alchemy.AlchemyViewModel
 
 sealed class GameRoute(val route: String) {
-    object MainMenu : GameRoute("main_menu")
-    object PlayerIdentity : GameRoute("player_identity")
-    object CharacterCreator : GameRoute("character_creator")
-    object Hub : GameRoute("hub")
-    object WorldMap : GameRoute("world_map")
-    object City : GameRoute("city")
-    object Market : GameRoute("market")
-    object Alchemy : GameRoute("alchemy")
-    object Combat : GameRoute("combat")
-    object Tavern : GameRoute("tavern")
-    object Dialogue : GameRoute("dialogue")
-    object Quests : GameRoute("quests")
-    object Recruit : GameRoute("recruit")
-    object Inventory : GameRoute("inventory")
-    object Chronicle : GameRoute("chronicle")
-    object Expedition : GameRoute("expedition")
-    object DevMenu : GameRoute("dev_menu")
-    object Ritual : GameRoute("ritual")
-    object Ending : GameRoute("ending")
-    object CharDetail : GameRoute("char_detail")
-    object Temple : GameRoute("temple")
-    object Events : GameRoute("events")
+    object main_menu : GameRoute("main_menu")
+    object player_identity : GameRoute("player_identity")
+    object character_creator : GameRoute("character_creator")
+    object hub : GameRoute("hub")
+    object world_map : GameRoute("world_map")
+    object city : GameRoute("city")
+    object market : GameRoute("market")
+    object alchemy : GameRoute("alchemy")
+    object combat : GameRoute("combat")
+    object tavern : GameRoute("tavern")
+    object dialogue : GameRoute("dialogue")
+    object quests : GameRoute("quests")
+    object recruit : GameRoute("recruit")
+    object inventory : GameRoute("inventory")
+    object chronicle : GameRoute("chronicle")
+    object expedition : GameRoute("expedition")
+    object dev_menu : GameRoute("dev_menu")
+    object ritual : GameRoute("ritual")
+    object ending : GameRoute("ending")
+    object char_detail : GameRoute("char_detail")
+    object temple : GameRoute("temple")
+    object events : GameRoute("events")
 }
 
 @Composable
@@ -59,199 +59,199 @@ fun GameNavHost(
 
     LaunchedEffect(mode) {
         val route = when (mode) {
-            GameScreenMode.MAIN_MENU         -> GameRoute.MainMenu.route
-            GameScreenMode.PLAYER_IDENTITY   -> GameRoute.PlayerIdentity.route
-            GameScreenMode.CHARACTER_CREATOR -> GameRoute.CharacterCreator.route
-            GameScreenMode.HUB               -> GameRoute.Hub.route
-            GameScreenMode.WORLD_MAP         -> GameRoute.WorldMap.route
-            GameScreenMode.CITY              -> GameRoute.City.route
-            GameScreenMode.MARKET            -> GameRoute.Market.route
-            GameScreenMode.ALCHEMY           -> GameRoute.Alchemy.route
-            GameScreenMode.COMBAT            -> GameRoute.Combat.route
-            GameScreenMode.TAVERN            -> GameRoute.Tavern.route
-            GameScreenMode.DIALOGUE          -> GameRoute.Dialogue.route
-            GameScreenMode.QUESTS            -> GameRoute.Quests.route
-            GameScreenMode.RECRUIT           -> GameRoute.Recruit.route
-            GameScreenMode.INVENTORY         -> GameRoute.Inventory.route
-            GameScreenMode.CHRONICLE         -> GameRoute.Chronicle.route
-            GameScreenMode.EXPEDITION        -> GameRoute.Expedition.route
-            GameScreenMode.DEV_MENU          -> GameRoute.DevMenu.route
-            GameScreenMode.RITUAL            -> GameRoute.Ritual.route
-            GameScreenMode.ENDING            -> GameRoute.Ending.route
-            GameScreenMode.CHAR_DETAIL       -> GameRoute.CharDetail.route
-            GameScreenMode.TEMPLE            -> GameRoute.Temple.route   // fallback to city
-            GameScreenMode.EVENTS            -> GameRoute.Events.route   // fallback to hub
+            GameScreenMode.main_menu         -> GameRoute.main_menu.route
+            GameScreenMode.player_identity   -> GameRoute.player_identity.route
+            GameScreenMode.character_creator -> GameRoute.character_creator.route
+            GameScreenMode.hub               -> GameRoute.hub.route
+            GameScreenMode.world_map         -> GameRoute.world_map.route
+            GameScreenMode.city              -> GameRoute.city.route
+            GameScreenMode.market            -> GameRoute.market.route
+            GameScreenMode.alchemy           -> GameRoute.alchemy.route
+            GameScreenMode.combat            -> GameRoute.combat.route
+            GameScreenMode.tavern            -> GameRoute.tavern.route
+            GameScreenMode.dialogue          -> GameRoute.dialogue.route
+            GameScreenMode.quests            -> GameRoute.quests.route
+            GameScreenMode.recruit           -> GameRoute.recruit.route
+            GameScreenMode.inventory         -> GameRoute.inventory.route
+            GameScreenMode.chronicle         -> GameRoute.chronicle.route
+            GameScreenMode.expedition        -> GameRoute.expedition.route
+            GameScreenMode.dev_menu          -> GameRoute.dev_menu.route
+            GameScreenMode.ritual            -> GameRoute.ritual.route
+            GameScreenMode.ending            -> GameRoute.ending.route
+            GameScreenMode.char_detail       -> GameRoute.char_detail.route
+            GameScreenMode.temple            -> GameRoute.temple.route   // fallback to city
+            GameScreenMode.events            -> GameRoute.events.route   // fallback to hub
         }
         navController.navigate(route) {
             launchSingleTop = true
         }
     }
 
-    NavHost(navController = navController, startDestination = GameRoute.MainMenu.route) {
-        composable(GameRoute.MainMenu.route) {
+    NavHost(navController = navController, startDestination = GameRoute.main_menu.route) {
+        composable(GameRoute.main_menu.route) {
             MainMenuScreen(
                 onNewGame = { root.startNewGame() },
                 onContinue = { root.restoreSessionIfValid() },
                 onExit = { (context as? android.app.Activity)?.finish() },
-                onDevMenu = { root.setMode(GameScreenMode.DEV_MENU) }
+                onDevMenu = { root.setMode(GameScreenMode.dev_menu) }
             )
         }
 
-        composable(GameRoute.PlayerIdentity.route) {
+        composable(GameRoute.player_identity.route) {
             PlayerIdentityScreen(
                 onContinue = { name -> root.setPlayerIdentity(name) },
-                onBack = { root.setMode(GameScreenMode.MAIN_MENU) },
+                onBack = { root.setMode(GameScreenMode.main_menu) },
                 viewModel = hiltViewModel()
             )
         }
 
-        composable(GameRoute.CharacterCreator.route) {
+        composable(GameRoute.character_creator.route) {
             val isRalwing = root.pendingPlayerName?.trim()?.equals("ralwing", ignoreCase = true) == true
             CharacterCreatorScreen(
                 onStartGame = { name, career, attrs, skills, cycles ->
                     root.finalizeCharacterCreation(name, career, attrs, skills, cycles)
                 },
-                onBack = { root.setMode(GameScreenMode.PLAYER_IDENTITY) },
+                onBack = { root.setMode(GameScreenMode.player_identity) },
                 initialHeroName = if (isRalwing) "Felix Anderson" else "",
                 viewModel = hiltViewModel()
             )
         }
 
-        composable(GameRoute.Hub.route) {
+        composable(GameRoute.hub.route) {
             HubScreen(
                 viewModel = hiltViewModel(),
-                onCity = { root.setMode(GameScreenMode.CITY) },
-                onMap = { root.setMode(GameScreenMode.WORLD_MAP) },
-                onInventory = { root.setMode(GameScreenMode.INVENTORY) },
-                onQuests = { root.setMode(GameScreenMode.QUESTS) },
-                onWorldLog = { root.setMode(GameScreenMode.CHRONICLE) },
+                onCity = { root.setMode(GameScreenMode.city) },
+                onMap = { root.setMode(GameScreenMode.world_map) },
+                onInventory = { root.setMode(GameScreenMode.inventory) },
+                onQuests = { root.setMode(GameScreenMode.quests) },
+                onWorldLog = { root.setMode(GameScreenMode.chronicle) },
                 onCharacter = { root.inspectHero(it) },
-                onExpedition = { root.setMode(GameScreenMode.EXPEDITION) },
-                onEnding = { root.setMode(GameScreenMode.ENDING) }
+                onExpedition = { root.setMode(GameScreenMode.expedition) },
+                onEnding = { root.setMode(GameScreenMode.ending) }
             )
         }
 
-        composable(GameRoute.City.route) {
+        composable(GameRoute.city.route) {
             CityScreen(
                 viewModel = hiltViewModel(),
-                onMarket = { root.setMode(GameScreenMode.MARKET) },
-                onAlchemy = { root.setMode(GameScreenMode.ALCHEMY) },
-                onTavern = { root.setMode(GameScreenMode.TAVERN) },
-                onTemple = { root.setMode(GameScreenMode.TEMPLE) },
-                onRecruit = { root.setMode(GameScreenMode.RECRUIT) },
+                onMarket = { root.setMode(GameScreenMode.market) },
+                onAlchemy = { root.setMode(GameScreenMode.alchemy) },
+                onTavern = { root.setMode(GameScreenMode.tavern) },
+                onTemple = { root.setMode(GameScreenMode.temple) },
+                onRecruit = { root.setMode(GameScreenMode.recruit) },
                 onDialogue = { name, role, node -> 
-                    root.setMode(GameScreenMode.DIALOGUE) 
+                    root.initiateDialogue(name, role, node)
                 },
-                onMap = { root.setMode(GameScreenMode.WORLD_MAP) },
-                onInventory = { root.setMode(GameScreenMode.INVENTORY) },
-                onChronicle = { root.setMode(GameScreenMode.CHRONICLE) },
-                onQuests = { root.setMode(GameScreenMode.QUESTS) },
-                onExit = { root.setMode(GameScreenMode.HUB) }
+                onMap = { root.setMode(GameScreenMode.world_map) },
+                onInventory = { root.setMode(GameScreenMode.inventory) },
+                onChronicle = { root.setMode(GameScreenMode.chronicle) },
+                onQuests = { root.setMode(GameScreenMode.quests) },
+                onExit = { root.setMode(GameScreenMode.hub) }
             )
         }
 
-        composable(GameRoute.Tavern.route) {
+        composable(GameRoute.tavern.route) {
             TavernScreen(
                 viewModel = hiltViewModel(),
-                onHire = { root.setMode(GameScreenMode.RECRUIT) },
-                onExit = { root.setMode(GameScreenMode.CITY) }
+                onHire = { root.setMode(GameScreenMode.recruit) },
+                onExit = { root.setMode(GameScreenMode.city) }
             )
         }
 
-        composable(GameRoute.Recruit.route) {
+        composable(GameRoute.recruit.route) {
             RecruitmentScreen(
-                onBack = { root.setMode(GameScreenMode.TAVERN) },
+                onBack = { root.setMode(GameScreenMode.tavern) },
                 viewModel = hiltViewModel()
             )
         }
 
-        composable(GameRoute.Expedition.route) {
+        composable(GameRoute.expedition.route) {
             ExpeditionScreen(
                 viewModel = hiltViewModel(),
-                onBack = { root.setMode(GameScreenMode.HUB) },
-                onCombat = { root.setMode(GameScreenMode.COMBAT) },
-                onDialogue = { root.setMode(GameScreenMode.DIALOGUE) },
-                onMap = { root.setMode(GameScreenMode.WORLD_MAP) },
-                onInventory = { root.setMode(GameScreenMode.INVENTORY) },
-                onChronicle = { root.setMode(GameScreenMode.CHRONICLE) },
-                onQuests = { root.setMode(GameScreenMode.QUESTS) }
+                onBack = { root.setMode(GameScreenMode.hub) },
+                onCombat = { root.setMode(GameScreenMode.combat) },
+                onDialogue = { root.setMode(GameScreenMode.dialogue) },
+                onMap = { root.setMode(GameScreenMode.world_map) },
+                onInventory = { root.setMode(GameScreenMode.inventory) },
+                onChronicle = { root.setMode(GameScreenMode.chronicle) },
+                onQuests = { root.setMode(GameScreenMode.quests) }
             )
         }
 
-        composable(GameRoute.Combat.route) {
+        composable(GameRoute.combat.route) {
             CombatScreen(
                 viewModel = hiltViewModel(),
-                onExit = { root.setMode(GameScreenMode.HUB) }
+                onExit = { root.setMode(GameScreenMode.hub) }
             )
         }
 
-        composable(GameRoute.Dialogue.route) {
+        composable(GameRoute.dialogue.route) {
             DialogueScreen(
                 viewModel = hiltViewModel<DialogueViewModel>(),
                 onExit = { 
                     val state = root.gameRepository.currentState()
                     if (state.isExpeditionActive) {
-                        root.setMode(GameScreenMode.EXPEDITION)
+                        root.setMode(GameScreenMode.expedition)
                     } else if (state.world.locationId.isNotBlank()) {
-                        root.setMode(GameScreenMode.CITY)
+                        root.setMode(GameScreenMode.city)
                     } else {
-                        root.setMode(GameScreenMode.HUB)
+                        root.setMode(GameScreenMode.hub)
                     }
                 },
-                onMarket = { root.setMode(GameScreenMode.MARKET) },
-                onCombat = { root.setMode(GameScreenMode.COMBAT) },
-                onRitual = { root.setMode(GameScreenMode.RITUAL) }
+                onMarket = { root.setMode(GameScreenMode.market) },
+                onCombat = { root.setMode(GameScreenMode.combat) },
+                onRitual = { root.setMode(GameScreenMode.ritual) }
             )
         }
 
-        composable(GameRoute.Quests.route) {
+        composable(GameRoute.quests.route) {
             QuestJournalScreen(
                 viewModel = hiltViewModel(),
-                onBack = { root.setMode(GameScreenMode.HUB) }
+                onBack = { root.setMode(GameScreenMode.hub) }
             )
         }
 
-        composable(GameRoute.Inventory.route) {
+        composable(GameRoute.inventory.route) {
             InventoryScreen(
                 viewModel = hiltViewModel(),
-                onBack = { root.setMode(GameScreenMode.HUB) }
+                onBack = { root.setMode(GameScreenMode.hub) }
             )
         }
 
-        composable(GameRoute.Chronicle.route) {
+        composable(GameRoute.chronicle.route) {
             ChronicleScreen(
-                onBack = { root.setMode(GameScreenMode.HUB) }
+                onBack = { root.setMode(GameScreenMode.hub) }
             )
         }
 
-        composable(GameRoute.WorldMap.route) {
+        composable(GameRoute.world_map.route) {
             WorldMapScreen(
                 viewModel = hiltViewModel(),
-                onBack = { root.setMode(GameScreenMode.HUB) }
+                onBack = { root.setMode(GameScreenMode.hub) }
             )
         }
 
-        composable(GameRoute.Market.route) {
+        composable(GameRoute.market.route) {
             MarketScreen(
                 viewModel = hiltViewModel(),
-                onBack = { root.setMode(GameScreenMode.CITY) }
+                onBack = { root.setMode(GameScreenMode.city) }
             )
         }
 
-        composable(GameRoute.Temple.route) {
+        composable(GameRoute.temple.route) {
             com.grimreich.ui.city.TempleScreen(
                 viewModel = hiltViewModel(),
-                onBack = { root.setMode(GameScreenMode.CITY) }
+                onBack = { root.setMode(GameScreenMode.city) }
             )
         }
 
-        composable(GameRoute.DevMenu.route) {
+        composable(GameRoute.dev_menu.route) {
             DevMenuScreen(
-                onBack = { root.setMode(GameScreenMode.HUB) }
+                onBack = { root.setMode(GameScreenMode.hub) }
             )
         }
 
-        composable(GameRoute.Ritual.route) {
+        composable(GameRoute.ritual.route) {
             val ritualVm: com.grimreich.ui.ritual.RitualViewModel = hiltViewModel()
             val hero by ritualVm.deadHero.collectAsState()
             val gold by ritualVm.gold.collectAsState()
@@ -260,35 +260,35 @@ fun GameNavHost(
                     hero = it,
                     gold = gold,
                     ritualSystem = ritualVm.ritualSystem,
-                    onRevived = { root.setMode(GameScreenMode.HUB) },
-                    onSacrificed = { root.setMode(GameScreenMode.HUB) }
+                    onRevived = { root.setMode(GameScreenMode.hub) },
+                    onSacrificed = { root.setMode(GameScreenMode.hub) }
                 )
             }
         }
 
-        composable(GameRoute.Ending.route) {
+        composable(GameRoute.ending.route) {
             EndingScreen(
                 viewModel = hiltViewModel(),
                 root = root,
-                onFinish = { root.setMode(GameScreenMode.MAIN_MENU) }
+                onFinish = { root.setMode(GameScreenMode.main_menu) }
             )
         }
 
-        composable(GameRoute.Alchemy.route) {
+        composable(GameRoute.alchemy.route) {
             AlchemyScreen(
                 viewModel = hiltViewModel<AlchemyViewModel>(),
-                onBack = { root.setMode(GameScreenMode.CITY) }
+                onBack = { root.setMode(GameScreenMode.city) }
             )
         }
 
-        composable(GameRoute.CharDetail.route) {
+        composable(GameRoute.char_detail.route) {
             val hero by root.inspectedHero.collectAsState()
             hero?.let {
                 CharDetailScreen(
                     hero = it,
                     onUpgrade = { stat -> root.upgradeStat(it.id, stat) },
                     onRandomize = { root.randomizeAttributes(it.id) },
-                    onBack = { root.setMode(GameScreenMode.HUB) }
+                    onBack = { root.setMode(GameScreenMode.hub) }
                 )
             }
         }

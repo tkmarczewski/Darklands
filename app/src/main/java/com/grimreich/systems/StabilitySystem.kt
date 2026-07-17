@@ -48,11 +48,11 @@ class StabilitySystem @Inject constructor(
         // Seasonal Modifiers
         state.party.forEach { hero ->
             when (world.season) {
-                Season.WINTER -> {
+                Season.winter -> {
                     // Winter is harsh on stamina
                     hero.endurance = (hero.endurance - 1).coerceAtLeast(5)
                 }
-                Season.SUMMER -> {
+                Season.summer -> {
                     // Summer improves morale but increases fatigue if stability is low
                     if (stability < 50) {
                         world.fatigue = (world.fatigue + 1).coerceAtMost(100)
@@ -77,7 +77,7 @@ class StabilitySystem @Inject constructor(
             hero.normalize()
         }
 
-        state.world.weather = WeatherType.STORM // Permanent storm in collapse
+        state.world.weather = WeatherType.storm // Permanent storm in collapse
     }
 
     fun getStabilityModifier(): Float {

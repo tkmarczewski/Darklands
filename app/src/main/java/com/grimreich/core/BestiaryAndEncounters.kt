@@ -12,54 +12,54 @@ import kotlinx.serialization.Serializable
 @Serializable
 enum class EnemyType {
     // Ludzcy
-    BANDIT, BANDIT_LEADER, CITY_GUARD,
-    RAUBRITTER_SOLDIER, RAUBRITTER_KNIGHT, RAUBRITTER_BOSS,
-    MERCENARY,
+    bandit, bandit_leader, city_guard,
+    raubritter_soldier, raubritter_knight, raubritter_boss,
+    mercenary,
     // Kult
-    CULTIST, CULTIST_PRIEST, DEMON_MINOR, DEMON_MAJOR,
+    cultist, cultist_priest, demon_minor, demon_major,
     // Nieumarli
-    SKELETON, SKELETON_WARRIOR, ZOMBIE, GHOST,
+    skeleton, skeleton_warrior, zombie, ghost,
     // Zwierzęta
-    WOLF, WOLF_PACK_LEADER, WILD_BOAR,
+    wolf, wolf_pack_leader, wild_boar,
     // Specjalne
-    WITCH, DRAGON,
+    witch, dragon,
     // Ontologiczne
-    PAST_SHADE_ELITE,
+    past_shade_elite,
     
     // Brakujące typy z questów (Stabilizacja V2.0)
-    POSSESSED_STATUE,
-    FALLEN_PRIEST,
-    MASKED_IMPOSTOR,
-    SILENT_GUARDIAN,
-    RAVEN_ASSASSIN,
-    ARCH_RITUALIST,
-    CEILING_CRAWLER,
-    GHOSTLY_SENTINEL,
-    MIND_REFLECTION,
-    INK_NIGHTMARE,
-    ECTOPLASMIC,
-    VOID_WOLF,
-    PARADOX_HUNTER,
-    MUTANT_GHOUL,
-    VAMPIRE_MONK,
-    GOLDEN_COLOSSUS,
-    DARK_RIDER,
-    DREAM_WRAITH,
-    HIDDEN_DEMON,
-    BLOOD_CURSE,
-    BLOOD_WRAITH,
-    DOPPELGANGER,
-    WINGED_HULK,
-    STEEL_WRAITH
+    possessed_statue,
+    fallen_priest,
+    masked_impostor,
+    silent_guardian,
+    raven_assassin,
+    arch_ritualist,
+    ceiling_crawler,
+    ghostly_sentinel,
+    mind_reflection,
+    ink_nightmare,
+    ectoplasmic,
+    void_wolf,
+    paradox_hunter,
+    mutant_ghoul,
+    vampire_monk,
+    golden_colossus,
+    dark_rider,
+    dream_wraith,
+    hidden_demon,
+    blood_curse,
+    blood_wraith,
+    doppelganger,
+    winged_hulk,
+    steel_wraith
 }
 
 @Serializable
 enum class EnemyAI {
-    AGGRESSIVE,  // atakuje zawsze
-    DEFENSIVE,   // broni się, nie ściga
-    TACTICAL,    // sprytny, ucieka gdy przegrywa
-    BERSERK,     // walczy do śmierci
-    RANGED       // preferuje dystans
+    aggressive,  // atakuje zawsze
+    defensive,   // broni się, nie ściga
+    tactical,    // sprytny, ucieka gdy przegrywa
+    berserk,     // walczy do śmierci
+    ranged       // preferuje dystans
 }
 
 @Serializable
@@ -101,10 +101,10 @@ object Bestiary {
     }
 
     fun get(type: EnemyType): Enemy = enemies[type] ?: Enemy(
-        type      = EnemyType.BANDIT,
+        type      = EnemyType.bandit,
         name      = "Błąd Rzeczywistości (Bandyta)",
         stats     = EnemyStats(maxHp = 25, attack = 15, defense = 10, speed = 12, morale = 8),
-        ai        = EnemyAI.AGGRESSIVE,
+        ai        = EnemyAI.aggressive,
         lootTable = LootTable(goldMin = 5, goldMax = 20),
         xpReward  = 10
     )
@@ -136,21 +136,21 @@ object EncounterCatalog {
             id = "combat_bandits",
             name = "Bandyci",
             enemies = listOf(
-                EnemyType.BANDIT, EnemyType.BANDIT, EnemyType.BANDIT, EnemyType.BANDIT_LEADER
+                EnemyType.bandit, EnemyType.bandit, EnemyType.bandit, EnemyType.bandit_leader
             ),
             difficulty = 2
         ),
         "combat_alley_thieves" to BattleEncounter(
             id = "combat_alley_thieves",
             name = "Złodzieje w zaułku",
-            enemies = listOf(EnemyType.BANDIT, EnemyType.BANDIT),
+            enemies = listOf(EnemyType.bandit, EnemyType.bandit),
             difficulty = 1
         ),
         "combat_inn_brawl" to BattleEncounter(
             id = "combat_inn_brawl",
             name = "Awantura w karczmie",
             enemies = listOf(
-                EnemyType.MERCENARY, EnemyType.MERCENARY, EnemyType.BANDIT
+                EnemyType.mercenary, EnemyType.mercenary, EnemyType.bandit
             ),
             difficulty = 1
         ),
@@ -158,7 +158,7 @@ object EncounterCatalog {
             id = "combat_wolves",
             name = "Wataha wilków",
             enemies = listOf(
-                EnemyType.WOLF, EnemyType.WOLF, EnemyType.WOLF, EnemyType.WOLF_PACK_LEADER
+                EnemyType.wolf, EnemyType.wolf, EnemyType.wolf, EnemyType.wolf_pack_leader
             ),
             difficulty = 2
         ),
@@ -166,7 +166,7 @@ object EncounterCatalog {
             id = "combat_undead",
             name = "Szkielety",
             enemies = listOf(
-                EnemyType.SKELETON, EnemyType.SKELETON, EnemyType.SKELETON, EnemyType.SKELETON_WARRIOR
+                EnemyType.skeleton, EnemyType.skeleton, EnemyType.skeleton, EnemyType.skeleton_warrior
             ),
             difficulty = 2
         ),
@@ -174,8 +174,8 @@ object EncounterCatalog {
             id = "combat_cultists",
             name = "Kultyści",
             enemies = listOf(
-                EnemyType.CULTIST, EnemyType.CULTIST, EnemyType.CULTIST,
-                EnemyType.CULTIST_PRIEST, EnemyType.DEMON_MINOR
+                EnemyType.cultist, EnemyType.cultist, EnemyType.cultist,
+                EnemyType.cultist_priest, EnemyType.demon_minor
             ),
             difficulty = 4
         ),
@@ -183,7 +183,7 @@ object EncounterCatalog {
             id = "combat_raubritter_scouts",
             name = "Zwiadowcy raubrittera",
             enemies = listOf(
-                EnemyType.RAUBRITTER_SOLDIER, EnemyType.RAUBRITTER_SOLDIER, EnemyType.RAUBRITTER_KNIGHT
+                EnemyType.raubritter_soldier, EnemyType.raubritter_soldier, EnemyType.raubritter_knight
             ),
             difficulty = 3
         ),
@@ -191,16 +191,16 @@ object EncounterCatalog {
             id = "combat_raubritter_boss",
             name = "Raubritter i jego straż",
             enemies = listOf(
-                EnemyType.RAUBRITTER_SOLDIER, EnemyType.RAUBRITTER_SOLDIER,
-                EnemyType.RAUBRITTER_KNIGHT, EnemyType.RAUBRITTER_KNIGHT,
-                EnemyType.RAUBRITTER_BOSS
+                EnemyType.raubritter_soldier, EnemyType.raubritter_soldier,
+                EnemyType.raubritter_knight, EnemyType.raubritter_knight,
+                EnemyType.raubritter_boss
             ),
             difficulty = 5
         ),
         "combat_dragon" to BattleEncounter(
             id = "combat_dragon",
             name = "Smok",
-            enemies = listOf(EnemyType.DRAGON),
+            enemies = listOf(EnemyType.dragon),
             difficulty = 6
         )
     )
@@ -213,11 +213,10 @@ object EncounterCatalog {
         return encounter ?: BattleEncounter(
             id         = "error_fallback",
             name       = "Błąd Paradygmatu",
-            enemies    = listOf(EnemyType.BANDIT),
+            enemies    = listOf(EnemyType.bandit),
             difficulty = 1
         )
     }
 
     fun all(): List<BattleEncounter> = encounters.values.toList()
 }
-

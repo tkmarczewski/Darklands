@@ -19,7 +19,7 @@ data class CombatUiState(
     val potions: List<Item> = emptyList(),
     val availableSkills: List<CombatSkill> = emptyList(),
     val worldStability: Int = 100,
-    val ontologicalLevel: com.grimreich.grimreich.v1.OntologicalLevel = com.grimreich.grimreich.v1.OntologicalLevel.MATERIAL
+    val ontologicalLevel: com.grimreich.grimreich.v1.OntologicalLevel = com.grimreich.grimreich.v1.OntologicalLevel.material
 )
 
 @HiltViewModel

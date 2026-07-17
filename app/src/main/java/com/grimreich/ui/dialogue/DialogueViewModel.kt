@@ -123,7 +123,7 @@ class DialogueViewModel @Inject constructor(
                 // Status check: Case-insensitive match between Enum and JSON string
                 if (status.name.lowercase() != choice.requiredQuestStatus.lowercase()) return false
             } else {
-                if (status == com.grimreich.core.QuestStatus.LOCKED) return false
+                if (status == com.grimreich.core.QuestStatus.locked) return false
             }
         }
 
@@ -169,9 +169,9 @@ class DialogueViewModel @Inject constructor(
         if (trigger == "start_combat" || choice.isCombatTrigger) {
             val enemyType = try { 
                 val typeStr = choice.triggerValue ?: "bandit"
-                com.grimreich.core.EnemyType.valueOf(typeStr.trim().uppercase())
+                com.grimreich.core.EnemyType.valueOf(typeStr.trim().lowercase())
             } catch (e: Exception) { 
-                com.grimreich.core.EnemyType.BANDIT 
+                com.grimreich.core.EnemyType.bandit
             }
             val enemy = com.grimreich.core.Bestiary.get(enemyType)
             

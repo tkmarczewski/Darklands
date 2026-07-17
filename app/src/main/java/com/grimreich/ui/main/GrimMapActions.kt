@@ -12,10 +12,10 @@ class GrimMapActions @Inject constructor(
         gameRepository.updateState { state ->
             state.world.locationId = regionId
         }
-        root.setMode(GameScreenMode.CITY)
+        root.setMode(GameScreenMode.city)
     }
 
     fun openOtherSide(root: GameRootViewModel) {
-        root.setMode(GameScreenMode.COMBAT)
+        root.setMode(GameScreenMode.combat)
     }
 }

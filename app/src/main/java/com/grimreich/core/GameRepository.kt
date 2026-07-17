@@ -35,7 +35,8 @@ class GameRepository @Inject constructor(
     private val saveSystem: SaveSystem,
 ) {
     private val json = Json { ignoreUnknownKeys = true }
-    private val repositoryScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+    private val repositoryJob = SupervisorJob()
+    private val repositoryScope = CoroutineScope(repositoryJob + Dispatchers.IO)
 
     init {
         repositoryScope.launch { sync() }

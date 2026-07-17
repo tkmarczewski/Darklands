@@ -138,6 +138,7 @@ data class CombatantState(
                 } else {
                     activeEffects.add(StatusEffect(type, duration + 1, strength))
                 }
+                log.add("$name otrzymuje status: ${type.name}!")
                 return
             }
         }

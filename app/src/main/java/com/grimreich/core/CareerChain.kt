@@ -54,7 +54,9 @@ enum class Career(
 
 data class CareerEntry(
     val career: Career,
-    val yearsServed: Float
+    val yearsServed: Float,
+    val levelReached: Int = 1,
+    val dateReached: Long = 0L
 )
 
 @Singleton

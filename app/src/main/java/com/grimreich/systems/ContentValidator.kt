@@ -78,22 +78,22 @@ class ContentValidator @Inject constructor(
             // Validate Steps
             quest.steps.forEachIndexed { index, step ->
                 if (step.type == 
-                    StepType.EXPEDITION && cityCatalogue.get(step.targetId) == null) {
+                    StepType.expedition && cityCatalogue.get(step.targetId) == null) {
                     _errors.add(ContentError.QuestError("Quest '${quest.id}' step $index (EXPEDITION) refers to non-existent targetId (City): '${step.targetId}'"))
                 }
                 
-                if ((step.type == StepType.DIALOGUE || step.type == StepType.SOCIAL || step.type == StepType.META) && (!dialogueManager.hasNode(step.targetId)) && step.targetId != "end") {
-                    // Check if it's potentially a cityId for SOCIAL (some quests use cityId for location-based social)
-                    if (step.type == StepType.SOCIAL && cityCatalogue.get(step.targetId) != null) {
+                if ((step.type == StepType.dialogue || step.type == StepType.social || step.type == StepType.meta) && (!dialogueManager.hasNode(step.targetId)) && step.targetId != "end") {
+                    // Check if it's potentially a cityId for social (some quests use cityId for location-based social)
+                    if (step.type == StepType.social && cityCatalogue.get(step.targetId) != null) {
                         // Valid city reference
                     } else {
                         _errors.add(ContentError.DialogueError("Quest '${quest.id}' step $index (${step.type}) refers to non-existent nodeId/targetId: '${step.targetId}'", ErrorSeverity.WARNING))
                     }
                 }
 
-                if (step.type == StepType.COMBAT) {
+                if (step.type == StepType.combat) {
                     try {
-                        val enemyType = com.grimreich.core.EnemyType.valueOf(step.targetId)
+                        val enemyType = com.grimreich.core.EnemyType.valueOf(step.targetId.lowercase())
                         if (com.grimreich.core.Bestiary.get(enemyType).name.contains("Błąd Rzeczywistości")) {
                             _errors.add(ContentError.QuestError("Quest '${quest.id}' step $index (COMBAT) refers to enemy '$enemyType' which uses fallback bestiary entry.", ErrorSeverity.WARNING))
                         }
@@ -119,10 +119,9 @@ class ContentValidator @Inject constructor(
                     _errors.add(ContentError.DialogueError("Dialogue node '$nodeId' choice leads to non-existent nodeId: '${choice.targetNodeId}'"))
                 }
 
-                // Quest Trigger Validation
-                when (choice.triggerEvent) {
-                    "ACTIVATE_QUEST", "COMPLETE_QUEST", "FAIL_QUEST", "ADVANCE_QUEST" -> {
-                        if (choice.triggerValue != null && choice.triggerValue != "ACTIVE" && questEngine.getDefinition(choice.triggerValue) == null) {
+                when (choice.triggerEvent?.lowercase()) {
+                    "activate_quest", "complete_quest", "fail_quest", "advance_quest" -> {
+                        if (choice.triggerValue != null && choice.triggerValue.lowercase() != "active" && questEngine.getDefinition(choice.triggerValue.lowercase()) == null) {
                             _errors.add(ContentError.QuestError("Dialogue node '$nodeId' trigger '${choice.triggerEvent}' refers to non-existent questId: '${choice.triggerValue}'", ErrorSeverity.WARNING))
                         }
                     }

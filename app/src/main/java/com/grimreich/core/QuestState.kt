@@ -4,19 +4,19 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 enum class QuestStatus {
-    LOCKED, AVAILABLE, ACTIVE, OBJECTIVE_MET, COMPLETED, FAILED
+    locked, available, active, objective_met, completed, failed
 }
 
 @Serializable
-enum class StepType { COMBAT, DIALOGUE, INVESTIGATION, SOCIAL, META, EXPEDITION }
+enum class StepType { combat, dialogue, investigation, social, meta, expedition }
 
 @Serializable
-enum class QuestCategory { COMBAT, SOCIAL, INVESTIGATION, MIXED, META, ANOMALY, DRAMA, BEAST, INTRIGUE }
+enum class QuestCategory { combat, social, investigation, mixed, meta, anomaly, drama, beast, intrigue }
 
 @Serializable
 data class QuestProgress(
     val questId: String,
-    var status: QuestStatus = QuestStatus.LOCKED,
+    var status: QuestStatus = QuestStatus.locked,
     var currentStepIndex: Int = 0,
     val variables: Map<String, Int> = emptyMap(),
     val startedOnDay: Int = 0,

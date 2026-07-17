@@ -110,10 +110,10 @@ fun DevMenuOverlay(
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         DevBtn("VALIDATE") { root.runContentValidation() }
-                        DevBtn("HUB") { root.setMode(GameScreenMode.HUB); visible = false }
-                        DevBtn("MAPA") { root.setMode(GameScreenMode.WORLD_MAP); visible = false }
-                        DevBtn("MIASTO") { root.setMode(GameScreenMode.CITY); visible = false }
-                        DevBtn("QUESTY") { root.setMode(GameScreenMode.QUESTS); visible = false }
+                        DevBtn("HUB") { root.setMode(GameScreenMode.hub); visible = false }
+                        DevBtn("MAPA") { root.setMode(GameScreenMode.world_map); visible = false }
+                        DevBtn("MIASTO") { root.setMode(GameScreenMode.city); visible = false }
+                        DevBtn("QUESTY") { root.setMode(GameScreenMode.quests); visible = false }
                         DevBtn("+500 G") {
                             root.gameRepository.updateState { state ->
                                 state.gold += GameConstants.DEV_GOLD_GIFT
@@ -142,7 +142,7 @@ fun DevMenuOverlay(
                                 state.world.locationId = "wybrzeze_polnocne"
                                 state.gold += 1000
                             }
-                            root.setMode(GameScreenMode.HUB)
+                            root.setMode(GameScreenMode.hub)
                             visible = false
                         }
                         DevBtn("DUMP STATE") {
@@ -156,21 +156,21 @@ fun DevMenuOverlay(
                             root.gameRepository.updateState { state ->
                                 state.world.locationId = "wybrzeze_polnocne"
                             }
-                            root.setMode(GameScreenMode.CITY)
+                            root.setMode(GameScreenMode.city)
                             visible = false
                         }
                         DevBtn("TP: TWIERDZA") {
                             root.gameRepository.updateState { state ->
                                 state.world.locationId = "twierdza_zakonu"
                             }
-                            root.setMode(GameScreenMode.CITY)
+                            root.setMode(GameScreenMode.city)
                             visible = false
                         }
                         DevBtn("TP: SERCE") {
                             root.gameRepository.updateState { state ->
                                 state.world.locationId = "serce_krainy"
                             }
-                            root.setMode(GameScreenMode.CITY)
+                            root.setMode(GameScreenMode.city)
                             visible = false
                         }
                         DevBtn("GLITCH ON") {
@@ -251,7 +251,7 @@ fun DevMenuOverlay(
                             }
                         }
                         DevBtn("FINAŁ") {
-                            root.setMode(GameScreenMode.ENDING)
+                            root.setMode(GameScreenMode.ending)
                             visible = false
                         }
                     }

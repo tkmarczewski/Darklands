@@ -201,7 +201,7 @@ class DialogueManager @Inject constructor(
     }
 
     fun seedBasicDialogues() {
-        nodes.clear()
+        // BUG-15: Do NOT clear if we want to preserve modded or dynamic nodes
         loadNodesFromAsset("grimreich/dialogues_pilot.json")
         loadNodesFromAsset("grimreich/dialogues_extended.json")
     }

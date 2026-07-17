@@ -25,10 +25,10 @@ class ProceduralNpcGenerator @Inject constructor(
 
         // City Mood based on stability
         val mood = when {
-            worldStability > 80 -> "PROSPEROUS"
-            worldStability > 50 -> "CALM"
-            worldStability > 25 -> "UNSETTLED"
-            else -> "DESPERATE"
+            worldStability > 80 -> "prosperous"
+            worldStability > 50 -> "calm"
+            worldStability > 25 -> "unsettled"
+            else -> "desperate"
         }
 
         // 1. REGIONAL HEROES
@@ -41,7 +41,7 @@ class ProceduralNpcGenerator @Inject constructor(
                 npcList.add(NPC(
                     id = "echo_${shadow.id}",
                     name = "ECHO_${shadow.name.uppercase().replace(" ", "_")}",
-                    role = "CIEŃ_TOWARZYSZA",
+                    role = "shadow_companion",
                     startNodeId = "companion_shadow_start",
                     stability = 0.05f,
                     isInfested = true
@@ -92,24 +92,24 @@ class ProceduralNpcGenerator @Inject constructor(
         }
 
         // 2. CANONICAL ROLES with procedurally generated epithets
-        val baseRoles = listOf("Merchant", "Guard", "Mystic", "Beggar", "Peasant")
-        val advancedRoles = listOf("Noble", "Scholar", "Priest", "Monk", "Hunter", "Assassin", "Ritualist")
+        val baseRoles = listOf("merchant", "guard", "mystic", "beggar", "peasant")
+        val advancedRoles = listOf("noble", "scholar", "priest", "monk", "hunter", "assassin", "ritualist")
         
         val activeRoles = when(mood) {
-            "PROSPEROUS" -> baseRoles + listOf("Noble", "Scholar", "Priest")
-            "DESPERATE" -> baseRoles + listOf("Cultist", "Assassin", "Ritualist")
+            "prosperous" -> baseRoles + listOf("noble", "scholar", "priest")
+            "desperate" -> baseRoles + listOf("cultist", "assassin", "ritualist")
             else -> baseRoles + advancedRoles.filter { random.nextFloat() < 0.3f }
         }
 
         activeRoles.forEach { role ->
-            val guaranteed = (cityId == "wybrzeze_polnocne" && (role == "Guard" || role == "Merchant")) ||
-                             (cityId == "opactwo_ciszy" && (role == "Priest" || role == "Monk")) ||
-                             (cityId == "twierdza_zelazna" && role == "Ritualist")
+            val guaranteed = (cityId == "wybrzeze_polnocne" && (role == "guard" || role == "merchant")) ||
+                             (cityId == "opactwo_ciszy" && (role == "priest" || role == "monk")) ||
+                             (cityId == "twierdza_zelazna" && role == "ritualist")
 
             if (guaranteed || random.nextBoolean()) {
                 val epithet = when(mood) {
-                    "PROSPEROUS" -> listOf("Zamożny", "Dumny", "Uczciwy").random(random)
-                    "DESPERATE" -> listOf("Głodny", "Obłąkany", "Cichy").random(random)
+                    "prosperous" -> listOf("Zamożny", "Dumny", "Uczciwy").random(random)
+                    "desperate" -> listOf("Głodny", "Obłąkany", "Cichy").random(random)
                     else -> listOf("Zwykły", "Zmęczony", "Obcy").random(random)
                 }
 
@@ -125,8 +125,8 @@ class ProceduralNpcGenerator @Inject constructor(
                 npcList.add(NPC(
                     id = "npc_${role.lowercase()}_$cityId",
                     name = npcName,
-                    role = if (cityId == "twierdza_zelazna" && role == "Guard") "guard" else role,
-                    startNodeId = if (cityId == "twierdza_zelazna" && role == "Guard") "fortress_guard_start" else "${role.lowercase()}_start",
+                    role = if (cityId == "twierdza_zelazna" && role == "guard") "guard" else role,
+                    startNodeId = if (cityId == "twierdza_zelazna" && role == "guard") "fortress_guard_start" else "${role.lowercase()}_start",
                     stability = (worldStability / 100f).coerceIn(0.05f, 1.0f),
                     isInfested = isInfested
                 ))

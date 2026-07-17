@@ -2,8 +2,8 @@ package com.grimreich.grimreich.v1
 
 import kotlin.random.Random
 
-enum class LootRarity { COMMON, RARE, RELIC, CURSE }
-enum class LootType { MIST, BLOOD, RELIC_ITEM, CURSE_TOKEN }
+enum class LootRarity { common, rare, relic, curse }
+enum class LootType { mist, blood, relic_item, curse_token }
 
 data class OtherSideLootEntry(
     val id: String,
@@ -16,12 +16,12 @@ data class OtherSideGeneratedLoot(val entries: List<OtherSideLootEntry>)
 
 class OtherSideLootTable(private val random: Random = Random.Default) {
     private val baseTable = listOf(
-        OtherSideLootEntry("mist_shard_common", LootType.MIST, LootRarity.COMMON, 10),
-        OtherSideLootEntry("mist_shard_rare", LootType.MIST, LootRarity.RARE, 3),
-        OtherSideLootEntry("blood_seal_common", LootType.BLOOD, LootRarity.COMMON, 8),
-        OtherSideLootEntry("blood_seal_relic", LootType.BLOOD, LootRarity.RELIC, 1),
-        OtherSideLootEntry("relic_icon", LootType.RELIC_ITEM, LootRarity.RELIC, 1),
-        OtherSideLootEntry("curse_token", LootType.CURSE_TOKEN, LootRarity.CURSE, 5)
+        OtherSideLootEntry("mist_shard_common", LootType.mist, LootRarity.common, 10),
+        OtherSideLootEntry("mist_shard_rare", LootType.mist, LootRarity.rare, 3),
+        OtherSideLootEntry("blood_seal_common", LootType.blood, LootRarity.common, 8),
+        OtherSideLootEntry("blood_seal_relic", LootType.blood, LootRarity.relic, 1),
+        OtherSideLootEntry("relic_icon", LootType.relic_item, LootRarity.relic, 1),
+        OtherSideLootEntry("curse_token", LootType.curse_token, LootRarity.curse, 5)
     )
 
     fun generate(

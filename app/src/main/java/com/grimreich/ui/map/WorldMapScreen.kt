@@ -20,6 +20,24 @@ import com.grimreich.world.CityData
 
 @Composable
 fun WorldMapScreen(
+    viewModel: WorldMapViewModel,
+    onBack: () -> Unit
+) {
+    val uiState by viewModel.uiState.collectAsState()
+    
+    WorldMapScreen(
+        cities = uiState.allCities,
+        currentCityId = uiState.currentLocationId,
+        onCityClick = { cityId -> 
+            viewModel.selectCity(cityId)
+            viewModel.travelToSelected { onBack() }
+        },
+        onBack = onBack
+    )
+}
+
+@Composable
+fun WorldMapScreen(
     cities: List<CityData>,
     currentCityId: String,
     onCityClick: (String) -> Unit,

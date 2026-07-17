@@ -1,14 +1,14 @@
 package com.grimreich.core
 
 enum class WeatherType {
-    CLEAR, MIST, BLOOD_RAIN, ECLIPSE, STORM;
+    clear, mist, blood_rain, eclipse, storm;
 
     fun displayName(): String = when (this) {
-        CLEAR -> "Przejrzyście"
-        MIST -> "Mgła"
-        BLOOD_RAIN -> "Krwawy deszcz"
-        ECLIPSE -> "Zaćmienie"
-        STORM -> "Burza"
+        clear -> "Przejrzyście"
+        mist -> "Mgła"
+        blood_rain -> "Krwawy deszcz"
+        eclipse -> "Zaćmienie"
+        storm -> "Burza"
     }
 }
 

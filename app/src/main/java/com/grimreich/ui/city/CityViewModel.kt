@@ -165,7 +165,7 @@ class CityViewModel @Inject constructor(
 
         val questToComplete = state.quest.progress.values.find {
             val def = questEngine.getDefinition(it.questId)
-            it.status == QuestStatus.OBJECTIVE_MET && 
+            it.status == QuestStatus.objective_met &&
             def?.cityId == cityId && (def.originNpcId.lowercase() == role.lowercase() || def.originNpcId.lowercase() == name.lowercase())
         }
 
@@ -204,7 +204,7 @@ class CityViewModel @Inject constructor(
         
         // BUG-14 FIX: Use fallback for missing originNpcId_quest_check nodes
         val checkNode = "${quest.originNpcId.lowercase()}_quest_check"
-        val targetNode = if (status == QuestStatus.ACTIVE || status == QuestStatus.OBJECTIVE_MET) {
+        val targetNode = if (status == QuestStatus.active || status == QuestStatus.objective_met) {
             if (dialogueManager.hasNode(checkNode)) checkNode else "quest_report_back_generic"
         } else {
             "${quest.originNpcId.lowercase()}_start"

@@ -32,11 +32,13 @@ class RitualSystem @Inject constructor(
             hero.hp -= hpCost
             state.logEntries.add("RYTUAŁ: Krew została przelana. ($hpCost HP)")
             
-            if (hero.hp <= 0) {
-                hero.hp = 1 // Minimalne życie, aby nie umrzeć w trakcie (chyba że tak chcemy)
-                state.logEntries.add("RYTUAŁ: Jesteś na krawędzi istnienia.")
+            // Normalize and check death BEFORE continuing
+            hero.normalize()
+            
+            if (hero.isDead) {
+                state.logEntries.add("RYTUAŁ: Ofiara była zbyt wielka. ${hero.name} poległ.")
+                return@updateState
             }
-            hero.normalize() // Normalize HP early to ensure consistency
 
             if (recipe.requiredCipher == playerCipher) {
                 // Sukces: Usuń składniki i dodaj przedmiot
@@ -55,7 +57,7 @@ class RitualSystem @Inject constructor(
             } else {
                 // Porażka: Pęknięcie rzeczywistości (Ambusz)
                 state.logEntries.add("RYTUAŁ: Szyfr jest błędny! Rzeczywistość pęka.")
-                val enemy = Bestiary.get(EnemyType.BLOOD_WRAITH)
+                val enemy = Bestiary.get(EnemyType.blood_wraith)
                 combatSystem.startCombat(enemy)
                 success = false
             }

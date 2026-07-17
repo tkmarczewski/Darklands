@@ -184,6 +184,6 @@ class ContentValidationTest {
             gameRepositoryProvider = dagger.Lazy { mock<GameRepository>() },
             questEngine = dagger.Lazy { mock<QuestEngine>() }
         )
-        assertEquals("port_peasant", manager.getPortrait("UNKNOWN"))
+        assertEquals("port_barbarian", manager.getPortrait("UNKNOWN"))
     }
 }

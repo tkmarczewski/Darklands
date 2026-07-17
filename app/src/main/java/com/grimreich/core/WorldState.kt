@@ -9,16 +9,15 @@ data class WorldState(
     var timeOfDay: String = "morning",
     var fatigue: Int = 0,
     var lastEncounter: String = "none",
-    var season: Season = Season.SPRING,
+    var season: Season = Season.spring,
     var globalStability: Int = 100, // 0-100
-    var weather: WeatherType = WeatherType.CLEAR,
+    var weather: WeatherType = WeatherType.clear,
     var echoIntensity: Float = 0.0f, // 0.0 - 1.0 (Era of Fracture)
     var collapseProgress: Float = 0.0f, // 0.0 - 1.0 (Transition to 2.0)
     var collapseScenarioId: String? = null,
-    var ontologicalLevel: OntologicalLevel = OntologicalLevel.MATERIAL,
+    var ontologicalLevel: OntologicalLevel = OntologicalLevel.material,
     val discoveredLocations: MutableList<String> = mutableListOf(),
     var cityEntryCount: Int = 0, // TRACKS VISITS FOR VERDICT CAMPAIGN
     var verdictIncidentsSeen: Int = 0,
     val reachedThresholds: MutableSet<Float> = mutableSetOf()
 )
-

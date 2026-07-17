@@ -90,14 +90,14 @@ fun BadgeV9(text: String, color: Color) {
 
 fun getQuestCategoryColor(category: com.grimreich.core.QuestCategory): Color {
     return when (category) {
-        com.grimreich.core.QuestCategory.COMBAT -> Color(0xFFD32F2F)
-        com.grimreich.core.QuestCategory.SOCIAL -> Color(0xFF1976D2)
-        com.grimreich.core.QuestCategory.INVESTIGATION -> Color(0xFF7B1FA2)
-        com.grimreich.core.QuestCategory.MIXED -> Color(0xFF689F38)
-        com.grimreich.core.QuestCategory.META -> Color(0xFFFFD700)
-        com.grimreich.core.QuestCategory.ANOMALY -> Color(0xFF00ACC1)
-        com.grimreich.core.QuestCategory.DRAMA -> Color(0xFFF57C00)
-        com.grimreich.core.QuestCategory.BEAST -> Color(0xFF4E342E)
-        com.grimreich.core.QuestCategory.INTRIGUE -> Color(0xFF455A64)
+        com.grimreich.core.QuestCategory.combat -> Color(0xFFD32F2F)
+        com.grimreich.core.QuestCategory.social -> Color(0xFF1976D2)
+        com.grimreich.core.QuestCategory.investigation -> Color(0xFF7B1FA2)
+        com.grimreich.core.QuestCategory.mixed -> Color(0xFF689F38)
+        com.grimreich.core.QuestCategory.meta -> Color(0xFFFFD700)
+        com.grimreich.core.QuestCategory.anomaly -> Color(0xFF00ACC1)
+        com.grimreich.core.QuestCategory.drama -> Color(0xFFF57C00)
+        com.grimreich.core.QuestCategory.beast -> Color(0xFF4E342E)
+        com.grimreich.core.QuestCategory.intrigue -> Color(0xFF455A64)
     }
 }

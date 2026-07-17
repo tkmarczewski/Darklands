@@ -135,17 +135,17 @@ class ExpeditionViewModel @Inject constructor(
             val step = def.steps.getOrNull(progress.currentStepIndex) ?: return@updateState
             
             when (step.type) {
-                StepType.COMBAT -> {
+                StepType.combat -> {
                     state.pendingAction = com.grimreich.core.PendingWorldAction.QuestCombatWin(questId)
-                    val tid = step.targetId.trim().uppercase()
+                    val tid = step.targetId.trim().lowercase()
                     enemyType = try {
                         com.grimreich.core.EnemyType.valueOf(tid)
                     } catch (e: Exception) {
-                        com.grimreich.core.EnemyType.BANDIT
+                        com.grimreich.core.EnemyType.bandit
                     }
                     shouldCombat = true
                 }
-                StepType.DIALOGUE -> {
+                StepType.dialogue -> {
                     state.pendingAction = com.grimreich.core.PendingWorldAction.Dialogue(
                         npcName = "Kontakt",
                         npcRole = def.originNpcId,
@@ -154,7 +154,7 @@ class ExpeditionViewModel @Inject constructor(
                     )
                     shouldDialogue = true
                 }
-                StepType.INVESTIGATION -> {
+                StepType.investigation -> {
                     val currentCityId = state.world.locationId
                     if (currentCityId == def.cityId) {
                         questEngine.advanceStepDirect(state, questId)
@@ -167,19 +167,19 @@ class ExpeditionViewModel @Inject constructor(
                         _uiState.update { it.copy(content = ExpeditionContentState.EncounterLog(msg)) }
                     }
                 }
-                StepType.SOCIAL -> {
+                StepType.social -> {
                     questEngine.advanceStepDirect(state, questId)
                     val msg = "Interakcja społeczna w ${step.targetId} zakończona sukcesem."
                     state.logEntries.add(msg)
                     _uiState.update { it.copy(content = ExpeditionContentState.EncounterLog(msg)) }
                 }
-                StepType.META -> {
+                StepType.meta -> {
                     questEngine.advanceStepDirect(state, questId)
                     val msg = "Zrozumiano ontologiczny aspekt: ${step.targetId}. Ledger zaktualizowany."
                     state.logEntries.add(msg)
                     _uiState.update { it.copy(content = ExpeditionContentState.EncounterLog(msg)) }
                 }
-                StepType.EXPEDITION -> {
+                StepType.expedition -> {
                     val currentCityId = state.world.locationId
                     if (currentCityId == step.targetId) {
                         questEngine.advanceStepDirect(state, questId)
@@ -189,6 +189,9 @@ class ExpeditionViewModel @Inject constructor(
                         state.logEntries.add(msg)
                         _uiState.update { it.copy(content = ExpeditionContentState.EncounterLog(msg)) }
                     }
+                }
+                else -> {
+                    questEngine.advanceStepDirect(state, questId)
                 }
             }
         }
@@ -207,7 +210,6 @@ class ExpeditionViewModel @Inject constructor(
     private fun dismissEncounter() {
         encounterSystem.activeEncounter = null
         _uiState.update { it.copy(content = ExpeditionContentState.QuestList(emptyList())) }
-        // updateUiState will handle refreshing the quest list in the next flow emission
     }
 
     private fun handleEncounterChoice(choice: EncounterChoice) {

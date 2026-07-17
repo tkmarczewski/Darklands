@@ -2,7 +2,7 @@ package com.grimreich.core
 
 import javax.inject.Inject
 
-enum class FactionType { CHURCH, NOBILITY, MERCHANTS, PEASANTS, OUTLAWS, MILITARY, SCHOLARS }
+enum class FactionType { church, nobility, merchants, peasants, outlaws, military, scholars }
 
 data class Faction(
     val id: String,
@@ -14,13 +14,13 @@ data class Faction(
 
 object FactionCatalogue {
     val factions = listOf(
-        Faction("church", "Zakon Świtu", FactionType.CHURCH, "Strażnicy paradygmatu."),
-        Faction("nobility", "Arystokracja", FactionType.NOBILITY, "Dawni władcy tych ziem."),
-        Faction("merchants", "Gildia Kupiecka", FactionType.MERCHANTS, "Władcy handlu i esencji."),
-        Faction("peasants", "Chłopi", FactionType.PEASANTS, "Ludzie starający się przetrwać."),
-        Faction("outlaws", "Bandyci", FactionType.OUTLAWS, "Ci, którzy odrzucili prawo."),
-        Faction("military", "Wojsko", FactionType.MILITARY, "Ostatnia linia obrony murów."),
-        Faction("scholars", "Kolegium Uczonych", FactionType.SCHOLARS, "Badacze pęknięć rzeczywistości.")
+        Faction("church", "Zakon Świtu", FactionType.church, "Strażnicy paradygmatu."),
+        Faction("nobility", "Arystokracja", FactionType.nobility, "Dawni władcy tych ziem."),
+        Faction("merchants", "Gildia Kupiecka", FactionType.merchants, "Władcy handlu i esencji."),
+        Faction("peasants", "Chłopi", FactionType.peasants, "Ludzie starający się przetrwać."),
+        Faction("outlaws", "Bandyci", FactionType.outlaws, "Ci, którzy odrzucili prawo."),
+        Faction("military", "Wojsko", FactionType.military, "Ostatnia linia obrony murów."),
+        Faction("scholars", "Kolegium Uczonych", FactionType.scholars, "Badacze pęknięć rzeczywistości.")
     )
 
     fun findById(id: String) = factions.find { it.id == id }

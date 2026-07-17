@@ -108,7 +108,8 @@ fun Hero.toDto(): HeroDto = HeroDto(
     subjectType = subjectType.name,
     ontologicalMass = ontologicalMass,
     traumaMarks = traumaMarks.map { it.toDto() },
-    ontologicalStability = ontologicalStability
+    ontologicalStability = ontologicalStability,
+    activeStatusEffects = activeStatusEffects.map { it.toDto() }
 )
 
 fun Trauma.toDto(): TraumaDto = TraumaDto(id, name, description, statModifiers, severity)
@@ -137,9 +138,9 @@ fun HeroDto.toDomain(): Hero = Hero(
     hp = hp,
     maxHp = maxHp,
     isDead = isDead,
-    currentCareer = currentCareer?.let { Career.valueOf(it) },
-    trait = trait?.let { Trait.valueOf(it) },
-    subjectType = Hero.SubjectType.valueOf(subjectType),
+    currentCareer = currentCareer?.let { safeEnumValue(it, Career.MERCENARY) },
+    trait = trait?.let { safeEnumValue(it, Trait.NONE) },
+    subjectType = safeEnumValue(subjectType, Hero.SubjectType.VESSEL),
     ontologicalMass = ontologicalMass,
     ontologicalStability = ontologicalStability
 ).also {
@@ -150,18 +151,21 @@ fun HeroDto.toDomain(): Hero = Hero(
     it.abilities.addAll(abilities.map { it.toDomain() })
     it.passiveAbilities.addAll(passiveAbilities)
     it.traumaMarks.addAll(traumaMarks.map { it.toDomain() })
+    it.activeStatusEffects.addAll(activeStatusEffects.map { it.toDomain() })
 }
 
 fun CareerEntryDto.toDomain(): CareerEntry = CareerEntry(
-    career = Career.valueOf(careerName),
-    yearsServed = yearsServed.toFloat()
+    career = safeEnumValue(careerName, Career.MERCENARY),
+    yearsServed = yearsServed.toFloat(),
+    levelReached = levelReached,
+    dateReached = dateReached
 )
 
 fun CareerEntry.toDto(): CareerEntryDto = CareerEntryDto(
     careerName = career.name,
     yearsServed = yearsServed.toInt(),
-    levelReached = 1, // Default
-    dateReached = 0L // Default
+    levelReached = levelReached,
+    dateReached = dateReached
 )
 
 fun AbilityDto.toDomain(): Ability = Ability(
@@ -249,7 +253,7 @@ fun QuestProgress.toDto(): QuestProgressDto = QuestProgressDto(
 
 fun QuestProgressDto.toDomain(): QuestProgress = QuestProgress(
     questId = questId,
-    status = QuestStatus.valueOf(status),
+    status = safeEnumValue(status.lowercase(), QuestStatus.locked),
     currentStepIndex = currentStepIndex,
     variables = variables
 )
@@ -306,13 +310,13 @@ fun WorldStateDto.toDomain(): WorldState = WorldState(
     timeOfDay = timeOfDay,
     fatigue = fatigue,
     lastEncounter = lastEncounter,
-    season = Season.valueOf(season),
+    season = safeEnumValue(season, Season.spring),
     globalStability = globalStability,
-    weather = WeatherType.valueOf(weather),
+    weather = safeEnumValue(weather, WeatherType.clear),
     echoIntensity = echoIntensity,
     collapseProgress = collapseProgress,
     collapseScenarioId = collapseScenarioId,
-    ontologicalLevel = com.grimreich.grimreich.v1.OntologicalLevel.entries.find { it.level == ontologicalLevel } ?: com.grimreich.grimreich.v1.OntologicalLevel.MATERIAL,
+    ontologicalLevel = com.grimreich.grimreich.v1.OntologicalLevel.entries.find { it.level == ontologicalLevel } ?: com.grimreich.grimreich.v1.OntologicalLevel.material,
     cityEntryCount = cityEntryCount,
     verdictIncidentsSeen = verdictIncidentsSeen
 ).also {
@@ -390,7 +394,7 @@ fun StatusEffect.toDto(): StatusEffectDto = StatusEffectDto(
 )
 
 fun StatusEffectDto.toDomain(): StatusEffect = StatusEffect(
-    type = StatusEffectType.valueOf(type),
+    type = safeEnumValue(type, StatusEffectType.POISON),
     duration = duration,
     strength = magnitude
 )
@@ -409,7 +413,16 @@ fun PersistentMetaDto.toDomain(): PersistentMeta = PersistentMeta(
     maxMetaAwarenessReached = maxMetaAwarenessReached
 ).also {
     it.unlockedLegacyBuffs.addAll(unlockedLegacyBuffs)
-    it.unitedSelves.addAll(unitedSelves.map { s -> PersistentMeta.SelfAspect.valueOf(s) })
+    it.unitedSelves.addAll(unitedSelves.map { s -> safeEnumValue(s, PersistentMeta.SelfAspect.FEAR) })
+}
+
+inline fun <reified T : Enum<T>> safeEnumValue(name: String?, default: T): T {
+    if (name == null) return default
+    return try {
+        java.lang.Enum.valueOf(T::class.java, name)
+    } catch (e: Exception) {
+        default
+    }
 }
 
 fun SaveSnapshot.toDto(): SaveSnapshotDto = SaveSnapshotDto(

@@ -40,14 +40,14 @@ class VerdictIncidentsSystem @Inject constructor(
 
         state.quest.progress["meta_verdict_incidents"] = QuestProgress(
             questId = "meta_verdict_incidents",
-            status = QuestStatus.ACTIVE,
+            status = QuestStatus.active,
             variables = mapOf("count" to next)
         )
 
         // Store city in history for Ravenn's accusation evidence
         val visitHistory = state.quest.progress["meta_verdict_history"]?.variables?.toMutableMap() ?: mutableMapOf()
         visitHistory[cityId] = (visitHistory[cityId] ?: 0) + 1
-        state.quest.progress["meta_verdict_history"] = QuestProgress("meta_verdict_history", QuestStatus.ACTIVE, variables = visitHistory.toMap())
+        state.quest.progress["meta_verdict_history"] = QuestProgress("meta_verdict_history", QuestStatus.active, variables = visitHistory.toMap())
 
         // Incydenty pojawiają się wędrownie w dowolnym mieście
         when (next) {
