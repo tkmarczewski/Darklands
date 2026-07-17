@@ -73,13 +73,31 @@ class DialogueManager @Inject constructor(
         
         when (normalizedEvent) {
             "activate_quest" -> {
-                value?.let { engine.activateQuestDirect(state, it.lowercase()) }
+                val action = state.pendingAction
+                val targetId = if (value?.lowercase() == "active" && action is com.grimreich.core.PendingWorldAction.Dialogue) {
+                    action.relatedQuestId
+                } else {
+                    value?.lowercase()
+                }
+                targetId?.let { engine.activateQuestDirect(state, it) }
             }
             "advance_quest", "quest_objective_met" -> {
-                value?.let { engine.advanceStepDirect(state, it.lowercase()) }
+                val action = state.pendingAction
+                val targetId = if (value?.lowercase() == "active" && action is com.grimreich.core.PendingWorldAction.Dialogue) {
+                    action.relatedQuestId
+                } else {
+                    value?.lowercase()
+                }
+                targetId?.let { engine.advanceStepDirect(state, it) }
             }
             "fail_quest" -> {
-                value?.let { engine.failQuestDirect(state, it.lowercase()) }
+                val action = state.pendingAction
+                val targetId = if (value?.lowercase() == "active" && action is com.grimreich.core.PendingWorldAction.Dialogue) {
+                    action.relatedQuestId
+                } else {
+                    value?.lowercase()
+                }
+                targetId?.let { engine.failQuestDirect(state, it) }
             }
             "complete_quest" -> {
                 val action = state.pendingAction

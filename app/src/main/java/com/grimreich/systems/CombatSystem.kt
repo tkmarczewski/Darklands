@@ -313,12 +313,17 @@ class CombatSystem @Inject constructor(
     private fun handleHeroDeath(state: GameState, hero: Hero) {
         hero.isDead = true
         state.combat.log.add("TRAGEDIA: ${hero.name} poległ!")
-        state.logEntries.add("ZADANIE: Odzyskaj ciało ${hero.name} i zanieś je do Kaplicy.")
         
-        lootSystem.itemCatalogue.get("quest_corpse")?.copy(
-            instanceId = "corpse_${hero.id}",
-            name = "Zwłoki: ${hero.name}"
-        )?.let { state.inventory.add(it) }
+        if (hero.id == "hero_main") {
+            state.logEntries.add("KOTWICA PRZERWANA: Protokół odzyskiwania ${hero.name} aktywowany.")
+            state.combat.active = false // Immediate end of combat for main hero death
+        } else {
+            state.logEntries.add("ZADANIE: Odzyskaj ciało ${hero.name} i zanieś je do Kaplicy.")
+            lootSystem.itemCatalogue.get("quest_corpse")?.copy(
+                instanceId = "corpse_${hero.id}",
+                name = "Zwłoki: ${hero.name}"
+            )?.let { state.inventory.add(it) }
+        }
         
         if (state.companionShadows.none { it.id == hero.id }) {
             state.companionShadows.add(hero.deepCopy())

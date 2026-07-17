@@ -412,5 +412,101 @@
         "triggerValue": "active"
       }
     ]
+  },
+  {
+    "id": "peasant_start",
+    "npcId": "peasant",
+    "text": "Wybacz, panie... Mgła zabiera nam wszystko. Jeśli masz odwagę, spójrz na tablicę ogłoszeń, tam są prośby od tych, co jeszcze mają nadzieję.",
+    "choices": [
+      { "text": "Zajmę się twoją sprawą.", "targetNodeId": "end", "triggerEvent": "activate_quest", "triggerValue": "active" },
+      { "text": "Tylko słucham.", "targetNodeId": "end" }
+    ]
+  },
+  {
+    "id": "peasant_quest_check",
+    "npcId": "peasant",
+    "text": "Czy udało ci się rozwiązać sprawę z tablicy? Cała wioska na ciebie liczy.",
+    "choices": [
+      { "text": "Jeszcze nad tym pracuję.", "targetNodeId": "end" },
+      {
+        "text": "Zadanie wykonane (ODBIERZ NAGRODĘ).",
+        "targetNodeId": "end",
+        "triggerEvent": "complete_quest",
+        "triggerValue": "active",
+        "requiredQuestStatus": "objective_met"
+      }
+    ]
+  },
+  {
+    "id": "priest_start",
+    "npcId": "priest",
+    "text": "Szyfr Świata drży pod ciężarem naszych grzechów. Szukamy kogoś, kto ustabilizuje paradygmat wiary w tym regionie.",
+    "choices": [
+      { "text": "Podejmę się tego zadania.", "targetNodeId": "end", "triggerEvent": "activate_quest", "triggerValue": "active" },
+      { "text": "Niech Absolut ma was w opiece.", "targetNodeId": "end" }
+    ]
+  },
+  {
+    "id": "monk_start",
+    "npcId": "monk",
+    "text": "Cisza jest jedyną odpowiedzią na Echo. Ale nawet w ciszy słychać wołanie o pomoc.",
+    "choices": [
+      { "text": "Pomogę wam odzyskać spokój.", "targetNodeId": "end", "triggerEvent": "activate_quest", "triggerValue": "active" },
+      { "text": "Zostawię cię w Twoich myślach.", "targetNodeId": "end" }
+    ]
+  },
+  {
+    "id": "assassin_start",
+    "npcId": "assassin",
+    "text": "Niektórzy muszą zostać wymazani, by inni mogli istnieć. To czysta matematyka istnienia.",
+    "choices": [
+      { "text": "Przyjmuję zlecenie.", "targetNodeId": "end", "triggerEvent": "activate_quest", "triggerValue": "active" },
+      { "text": "Nie jestem mordercą.", "targetNodeId": "end" }
+    ]
+  },
+  {
+    "id": "ritualist_start",
+    "npcId": "ritualist",
+    "text": "Krew jest kluczem, a Kotwica zamkiem. Chcesz zobaczyć, co jest po drugiej stronie Szyfru?",
+    "choices": [
+      { "text": "Pokaż mi drogę.", "targetNodeId": "end", "triggerEvent": "activate_quest", "triggerValue": "active" },
+      { "text": "Innym razem.", "targetNodeId": "end" }
+    ]
+  },
+  {
+    "id": "noble_start",
+    "npcId": "noble",
+    "text": "Moje dziedzictwo pęka jak sucha gałąź. Odzyskaj to, co należy do mojego rodu, zanim nicość to pochłonie.",
+    "choices": [
+      { "text": "Uczynię to dla nagrody.", "targetNodeId": "end", "triggerEvent": "activate_quest", "triggerValue": "active" },
+      { "text": "Twoje złoto mnie nie kusi.", "targetNodeId": "end" }
+    ]
+  },
+  {
+    "id": "scholar_start",
+    "npcId": "scholar",
+    "text": "Dane są niekompletne. Potrzebuję próbek echa z tamtego miejsca, by zrozumieć tę usterkę.",
+    "choices": [
+      { "text": "Zgromadzę dla Ciebie te informacje.", "targetNodeId": "end", "triggerEvent": "activate_quest", "triggerValue": "active" },
+      { "text": "Nauka mnie nudzi.", "targetNodeId": "end" }
+    ]
+  },
+  {
+    "id": "archivist_start",
+    "npcId": "archivist",
+    "text": "Każdy czyn musi być zapisany. Ale niektóre strony Kroniki są puste... Pomóż mi je wypełnić.",
+    "choices": [
+      { "text": "Zapiszmy nową historię.", "targetNodeId": "end", "triggerEvent": "activate_quest", "triggerValue": "active" },
+      { "text": "Wolę pozostać poza rejestrem.", "targetNodeId": "end" }
+    ]
+  },
+  {
+    "id": "hunter_start",
+    "npcId": "hunter",
+    "text": "Bestia, która krąży wokół murów, nie jest z tego świata. Jej kod jest zepsuty. Trzeba go wyciąć.",
+    "choices": [
+      { "text": "Polujmy razem.", "targetNodeId": "end", "triggerEvent": "activate_quest", "triggerValue": "active" },
+      { "text": "Niech sama zdechnie.", "targetNodeId": "end" }
+    ]
   }
 ]

@@ -47,9 +47,9 @@ class GameRepository @Inject constructor(
     // FIX: reverted from suspend/Mutex back to a synchronous ReentrantLock.
     private val stateLock = ReentrantLock()
 
-    private val questEngine get() = questEngineProvider.get()
-    private val dialogueManager get() = dialogueManagerProvider.get()
-    private val questManifest get() = questManifestProvider.get()
+    val questEngine get() = questEngineProvider.get()
+    val dialogueManager get() = dialogueManagerProvider.get()
+    val questManifest get() = questManifestProvider.get()
 
     private val _gameState = MutableStateFlow(GameState())
     val gameState: StateFlow<GameState> = _gameState.asStateFlow()

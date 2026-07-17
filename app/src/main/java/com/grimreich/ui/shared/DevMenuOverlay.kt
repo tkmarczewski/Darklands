@@ -198,29 +198,27 @@ fun DevMenuOverlay(
                                 root.experienceSystem.addPartyXpDirect(state, 100)
                             }
                         }
-                        DevBtn("ADD_RALWING") {
+                        DevBtn("ADD_COMPANION") {
                             root.gameRepository.updateState { state ->
-                                val ralwingExists = state.party.any { it.id == "hero_ralwing" }
-                                if (!ralwingExists) {
-                                    val ralwing = Hero(
-                                        id = "hero_ralwing",
-                                        name = "Ralwing",
-                                        age = 40,
-                                        strength = 18,
-                                        agility = 16,
-                                        endurance = 15,
-                                        perception = 12,
-                                        intelligence = 10,
-                                        charisma = 10,
-                                        piety = 10,
-                                        hp = 50,
-                                        maxHp = 50,
-                                        portraitRes = "port_knight"
-                                    )
-                                    state.party.add(ralwing)
-                                }
+                                val companionId = "hero_companion_" + System.currentTimeMillis()
+                                val companion = Hero(
+                                    id = companionId,
+                                    name = "Najemnik",
+                                    age = 30,
+                                    strength = 15,
+                                    agility = 12,
+                                    endurance = 14,
+                                    perception = 10,
+                                    intelligence = 10,
+                                    charisma = 10,
+                                    piety = 10,
+                                    hp = 40,
+                                    maxHp = 40,
+                                    portraitRes = "port_knight"
+                                )
+                                state.party.add(companion)
                                 if (state.activeHeroId == null) {
-                                    state.activeHeroId = "hero_ralwing"
+                                    state.activeHeroId = companionId
                                 }
                             }
                         }
@@ -233,14 +231,17 @@ fun DevMenuOverlay(
                                 state.party.find { it.id == state.activeHeroId }?.let { hero ->
                                     hero.hp = 0
                                     hero.isDead = true
+                                    state.logEntries.add("DEV: Bohater ${hero.name} poległ.")
                                 }
                             }
+                            root.setMode(GameScreenMode.ritual)
                             visible = false
                         }
                         DevBtn("RITUAL") {
-                            val heroId = root.gameRepository.currentState().party.firstOrNull()?.id
+                            val heroId = root.gameRepository.currentState().activeHeroId
                             if (heroId != null) {
                                 root.inspectHero(heroId)
+                                root.setMode(GameScreenMode.ritual)
                             }
                             visible = false
                         }
@@ -252,6 +253,31 @@ fun DevMenuOverlay(
                         }
                         DevBtn("FINAŁ") {
                             root.setMode(GameScreenMode.ending)
+                            visible = false
+                        }
+                        DevBtn("START BLOOD") {
+                            root.startQuest("q_blood_icon")
+                            visible = false
+                        }
+                        DevBtn("ADVANCE") {
+                            root.gameRepository.updateState { state ->
+                                root.gameRepository.questEngine.advanceStepDirect(state, "q_blood_icon")
+                            }
+                            visible = false
+                        }
+                        DevBtn("COMPLETE") {
+                            root.gameRepository.updateState { state ->
+                                root.gameRepository.questEngine.completeQuestDirect(state, "q_blood_icon")
+                            }
+                            visible = false
+                        }
+                        DevBtn("MAIN MENU") {
+                            root.setMode(GameScreenMode.main_menu)
+                            visible = false
+                        }
+                        DevBtn("QUICK START") {
+                            root.finalizeCharacterCreation("Felix Anderson", com.grimreich.core.Career.SCHOLAR, emptyMap(), emptyList())
+                            root.gameRepository.updateState { it.gold = 5000 }
                             visible = false
                         }
                     }

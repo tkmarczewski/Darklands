@@ -148,7 +148,7 @@ class CityViewModel @Inject constructor(
         startDialogue(npc.name, npc.role, npc.startNodeId ?: "generic_start")
     }
 
-    private fun startDialogue(name: String, role: String, node: String) {
+    private fun startDialogue(name: String, role: String, node: String, questId: String? = null) {
         val state = gameRepository.currentState()
         val cityId = state.world.locationId
         
@@ -168,6 +168,8 @@ class CityViewModel @Inject constructor(
             it.status == QuestStatus.objective_met &&
             def?.cityId == cityId && (def.originNpcId.lowercase() == role.lowercase() || def.originNpcId.lowercase() == name.lowercase())
         }
+
+        val finalQuestId = questId ?: activeQuestForNpc?.id ?: questToComplete?.questId
 
         // BUG-13 FIX: Route to specific done nodes instead of dead guard_report_back
         val targetNode = if (questToComplete != null) {
@@ -191,7 +193,7 @@ class CityViewModel @Inject constructor(
                 npcName = addressedName,
                 npcRole = role,
                 nodeId = targetNode,
-                relatedQuestId = activeQuestForNpc?.id ?: questToComplete?.questId
+                relatedQuestId = finalQuestId
             )
         }
         
@@ -202,15 +204,27 @@ class CityViewModel @Inject constructor(
         _isQuestMenuOpen.value = false
         val status = questEngine.getStatus(quest.id)
         
-        // BUG-14 FIX: Use fallback for missing originNpcId_quest_check nodes
-        val checkNode = "${quest.originNpcId.lowercase()}_quest_check"
+        // BUG-14 FIX: Priority for quest-specific nodes, then role fallbacks
+        val questStartNode = "${quest.id}_start"
+        val questCheckNode = "${quest.id}_check"
+        val roleCheckNode = "${quest.originNpcId.lowercase()}_quest_check"
+        val roleStartNode = "${quest.originNpcId.lowercase()}_start"
+
         val targetNode = if (status == QuestStatus.active || status == QuestStatus.objective_met) {
-            if (dialogueManager.hasNode(checkNode)) checkNode else "quest_report_back_generic"
+            when {
+                dialogueManager.hasNode(questCheckNode) -> questCheckNode
+                dialogueManager.hasNode(roleCheckNode) -> roleCheckNode
+                else -> "quest_report_back_generic"
+            }
         } else {
-            "${quest.originNpcId.lowercase()}_start"
+            when {
+                dialogueManager.hasNode(questStartNode) -> questStartNode
+                dialogueManager.hasNode(roleStartNode) -> roleStartNode
+                else -> "peasant_start"
+            }
         }
 
-        startDialogue(quest.originNpcId.uppercase(), quest.originNpcId, targetNode)
+        startDialogue(quest.originNpcId.uppercase(), quest.originNpcId, targetNode, quest.id)
     }
 }
 

@@ -67,6 +67,27 @@ class GameRootViewModel @Inject constructor(
     init {
         audioEngine.playForRoute("main_menu")
 
+        // --- DEATH OBSERVER: BG RITUAL ---
+        gameRepository.gameState
+            .map { state ->
+                val hero = state.party.find { h -> h.id == "hero_main" }
+                val isDead = hero?.isDead ?: false
+                val combatActive = state.combat.active
+                if (hero != null && isDead) {
+                    android.util.Log.d("TRIBUNAL", "Hero Main is dead! Combat active: $combatActive")
+                }
+                isDead && !combatActive // Wait until combat is resolved/deactivated
+            }
+            .distinctUntilChanged()
+            .onEach { shouldTriggerRitual ->
+                if (shouldTriggerRitual && _mode.value != GameScreenMode.ritual) {
+                    android.util.Log.e("TRIBUNAL", "Navigating to Ritual screen for hero_main")
+                    _inspectedHeroId.value = "hero_main"
+                    setMode(GameScreenMode.ritual)
+                }
+            }
+            .launchIn(viewModelScope)
+
         // Ending observer
         gameRepository.gameState
             .map { endingSystem.checkEndingConditions(it) }
@@ -292,6 +313,12 @@ class GameRootViewModel @Inject constructor(
             state.pendingAction = PendingWorldAction.Dialogue(name, role, node)
         }
         setMode(GameScreenMode.dialogue)
+    }
+
+    fun startQuest(questId: String) {
+        gameRepository.updateState { state ->
+            gameRepository.questEngine.activateQuestDirect(state, questId)
+        }
     }
 
     fun startDevCombat() {

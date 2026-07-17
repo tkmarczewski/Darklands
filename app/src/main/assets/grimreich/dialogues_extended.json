@@ -1,5 +1,87 @@
 [
   {
+    "id": "q_blood_icon_start",
+    "npcId": "peasant",
+    "text": "Panie! Posąg w Raskhold... on krwawi! Ikona szepcze nasze imiona, a ludzie znikają we mgle. Błagam, pomóż nam, zanim wszyscy zostaniemy wymazani!",
+    "choices": [
+      {
+        "text": "Zajmę się Krwawą Ikoną. (PRZYJMIJ)",
+        "targetNodeId": "end",
+        "triggerEvent": "activate_quest",
+        "triggerValue": "q_blood_icon"
+      },
+      {
+        "text": "To nie moja sprawa.",
+        "targetNodeId": "end"
+      }
+    ]
+  },
+  {
+    "id": "q_lost_apostle_start",
+    "npcId": "priest",
+    "text": "Brat Kael oszalał. Ukradł 'Księgę Zer' i uciekł do lasów. Jeśli odprawi rytuał restartu, cała nasza sesja rzeczywistości przestanie istnieć. Musisz go powstrzymać!",
+    "choices": [
+      {
+        "text": "Odnajdę apostoła i odzyskam księgę.",
+        "targetNodeId": "end",
+        "triggerEvent": "activate_quest",
+        "triggerValue": "q_lost_apostle"
+      }
+    ]
+  },
+  {
+    "id": "q_altar_silence_start",
+    "npcId": "monk",
+    "text": "Pod Opactwem bije serce Ciszy. To Strefa Buforowa, o której nikt nie powinien wiedzieć. Coś się tam obudziło... coś, co żywi się naszymi wspomnieniami.",
+    "choices": [
+      {
+        "text": "Zejdę do fundamentów Opactwa.",
+        "targetNodeId": "end",
+        "triggerEvent": "activate_quest",
+        "triggerValue": "q_altar_silence"
+      }
+    ]
+  },
+  {
+    "id": "q_house_shadows_start",
+    "npcId": "noble",
+    "text": "Moja sypialnia... coś w niej jest. Słyszę drapanie o strukturę świata. Moi strażnicy znika i zostają po nich tylko puste pancerze. Pomóż mi, Kotwico!",
+    "choices": [
+      {
+        "text": "Spędzę noc w Twoim domu. Zobaczę, co czai się w cieniach.",
+        "targetNodeId": "end",
+        "triggerEvent": "activate_quest",
+        "triggerValue": "q_house_shadows"
+      }
+    ]
+  },
+  {
+    "id": "q_golden_ruins_betrayal_start",
+    "npcId": "scholar",
+    "text": "Ekspedycja do Złotych Ruin... kontakt został zerwany. Boję się, że ktoś próbował zrebootować sesję tylko dla siebie. Musisz sprawdzić wykopaliska.",
+    "choices": [
+      {
+        "text": "Sprawdzę, co stało się w ruinach.",
+        "targetNodeId": "end",
+        "triggerEvent": "activate_quest",
+        "triggerValue": "q_golden_ruins_betrayal"
+      }
+    ]
+  },
+  {
+    "id": "q_shadowless_wolves_start",
+    "npcId": "hunter",
+    "text": "Widziałeś ich? Wilki bez cieni... One nie gryzą ciała, one wygryzają nas z Kroniki. Jeśli stracisz cień, przestaniesz istnieć w oczach Szyfru.",
+    "choices": [
+      {
+        "text": "Wytropię tę watahę.",
+        "targetNodeId": "end",
+        "triggerEvent": "activate_quest",
+        "triggerValue": "q_shadowless_wolves"
+      }
+    ]
+  },
+  {
     "id": "cracked_chronicle_int_test",
     "npcId": "none",
     "text": "Kronika drży w Twoich dłoniach. Atrament wydaje się pulsować, układając się w kształty, które nie powinny istnieć. Pomiędzy wierszami dostrzegasz pęknięcia w samej strukturze zapisu – coś próbuje wyciec z tej historii.",
