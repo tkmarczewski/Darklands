@@ -1,168 +1,55 @@
 package com.grimreich.core
 
-import kotlinx.serialization.builtins.MapSerializer
-import kotlinx.serialization.builtins.serializer
-import kotlinx.serialization.json.Json
+import com.grimreich.systems.StatePersistenceManager
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 import javax.inject.Singleton
 
-const val SAVE_VERSION = 3
-
-// ==================== SAVE SYSTEM ====================
-data class SaveSlot(
-    val slotId: Int,
-    val snapshot: SaveSnapshot?,
-    val isEmpty: Boolean = snapshot == null
-)
-
 @Singleton
 class SaveSystem @Inject constructor() {
-    private val slots = java.util.concurrent.ConcurrentHashMap<Int, SaveSnapshot>()
-    private var autoSaveSnapshot: SaveSnapshot? = null
-    private var lastAutoSaveHash: Int = 0
-    
-    private val json = Json {
-        ignoreUnknownKeys = true
-        encodeDefaults = true
-    }
+    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+    private val saveSlots = mutableMapOf<Int, SaveSnapshot>()
 
-    suspend fun save(gameState: GameState, slotId: Int = 0, label: String = ""): SaveSnapshot {
-        val stateCopy = gameState.deepCopy()
-        val dto = stateCopy.toDto()
-        val stateJson = json.encodeToString(SessionStateDto.serializer(), dto)
-
-        val checksum = try {
-            SaveIntegrity.generateChecksum(stateJson)
-        } catch (e: Exception) {
-            ""
-        }
-
+    fun save(state: GameState, slotId: Int, label: String = "") {
         val snapshot = SaveSnapshot(
-            version   = SAVE_VERSION,
+            version = SAVE_VERSION,
             timestamp = System.currentTimeMillis(),
-            label     = label.ifEmpty { "Save ${slotId + 1}" },
-            state     = stateCopy,
-            checksum  = checksum
+            label = label,
+            state = state.deepCopy()
         )
-        slots[slotId] = snapshot
-        return snapshot
+        saveSlots[slotId] = snapshot
     }
 
-    fun load(slotId: Int = 0): SaveSnapshot? = slots[slotId]?.let { it.copy(state = it.state.deepCopy()) }
-
-    fun isCompatible(snapshot: SaveSnapshot): Boolean {
-        return snapshot.version >= 1 && snapshot.version <= SAVE_VERSION
+    fun load(slotId: Int): SaveSnapshot? {
+        return saveSlots[slotId]?.let { it.copy(state = it.state.deepCopy()) }
     }
 
-    fun getSlot(slotId: Int): SaveSlot = SaveSlot(
-        slotId   = slotId,
-        snapshot = slots[slotId]
-    )
-
-    fun getAllSlots(count: Int = 3): List<SaveSlot> = (0 until count.coerceAtLeast(0)).map { getSlot(it) }
-
-    fun deleteSlot(slotId: Int) { slots.remove(slotId) }
-
-    fun importSlots(persisted: Map<Int, SaveSnapshot>) {
-        slots.clear()
-        slots.putAll(persisted.filterKeys { it >= 0 })
+    fun restore(slotId: Int): GameState? {
+        return saveSlots[slotId]?.state?.deepCopy()
     }
 
-    fun exportSlots(): Map<Int, SaveSnapshot> = slots.toMap()
+    fun getSlots(): Map<Int, SaveSnapshot> = saveSlots.toMap()
 
-    fun clearAll() {
-        slots.clear()
-        autoSaveSnapshot = null
-        lastAutoSaveHash = 0
+    fun deleteSlot(slotId: Int) {
+        saveSlots.remove(slotId)
     }
 
-    suspend fun saveToPersistence(persistence: com.grimreich.systems.StatePersistenceManager) {
-        persistence.persistSlots(slots)
-    }
+    fun computeStateHash(state: GameState): Int = SaveIntegrity.computeStateHash(state)
 
-    suspend fun restoreFromPersistence(persistence: com.grimreich.systems.StatePersistenceManager) {
-        importSlots(persistence.restoreSlots())
-    }
-
-    // ==================== AUTOSAVE ====================
-    suspend fun autoSave(gameState: GameState): Boolean {
-        val hash = computeStateHash(gameState)
-        if (hash == lastAutoSaveHash) return false
-
-        val stateCopy = gameState.deepCopy()
-        val dto = stateCopy.toDto()
-        val stateJson = json.encodeToString(SessionStateDto.serializer(), dto)
-
-        val checksum = try {
-            SaveIntegrity.generateChecksum(stateJson)
-        } catch (e: Exception) {
-            ""
+    fun saveToPersistence(persistence: StatePersistenceManager) {
+        scope.launch {
+            persistence.persistSlots(saveSlots)
         }
-
-        autoSaveSnapshot = SaveSnapshot(
-            version   = SAVE_VERSION,
-            timestamp = System.currentTimeMillis(),
-            label     = "Autosave",
-            state     = stateCopy,
-            checksum  = checksum
-        )
-        lastAutoSaveHash = hash
-        return true
     }
 
-    fun loadAutoSave(): SaveSnapshot? = autoSaveSnapshot?.let { it.copy(state = it.state.deepCopy()) }
-    fun hasAutoSave(): Boolean = autoSaveSnapshot != null
-
-    fun computeStateHash(state: GameState): Int {
-        val partyProgressionHash = state.party.filter { !it.isDead }.sumOf { it.hp + it.xp }
-        return java.util.Objects.hash(
-            state.gold,
-            state.world.day,
-            state.party.size,
-            partyProgressionHash,
-            state.quest.activeQuestIds.hashCode(),
-            state.inventory.size,
-            state.reputation.globalFactions.hashCode(),
-            state.reputation.globalFactions.values.sum(),
-            state.metaAwarenessLevel
-        )
-    }
-
-    // ==================== VALIDATION ====================
-    data class ValidationResult(
-        val isValid: Boolean,
-        val version: Int,
-        val isCompatible: Boolean,
-        val message: String
-    )
-
-    suspend fun validate(snapshot: SaveSnapshot): ValidationResult {
-        val compatible = isCompatible(snapshot)
-        val dto = snapshot.state.toDto()
-        val stateJson = json.encodeToString(SessionStateDto.serializer(), dto)
-        val checksumValid = snapshot.checksum?.let { SaveIntegrity.verify(stateJson, it) } ?: false
-
-        val isValid = snapshot.version >= 1 &&
-            snapshot.state.gold >= 0 &&
-            snapshot.state.world.day >= 1 &&
-            checksumValid
-
-        return ValidationResult(
-            isValid      = isValid,
-            version      = snapshot.version,
-            isCompatible = compatible,
-            message = when {
-                !compatible    -> "Niezgodna wersja zapisu (${snapshot.version} vs $SAVE_VERSION)"
-                !checksumValid -> "Naruszona integralność zapisu (Checksum mismatch)"
-                !isValid       -> "Uszkodzony zapis — nieprawidłowy stan gry"
-                else           -> "Zapis poprawny (wersja ${snapshot.version})"
-            }
-        )
-    }
-
-    fun migrateIfNeeded(snapshot: SaveSnapshot): SaveSnapshot {
-        if (snapshot.version == SAVE_VERSION) return snapshot
-        return snapshot.copy(version = SAVE_VERSION)
+    fun restoreFromPersistence(persistence: StatePersistenceManager) {
+        scope.launch {
+            val restored = persistence.restoreSlots()
+            saveSlots.clear()
+            saveSlots.putAll(restored)
+        }
     }
 }
-

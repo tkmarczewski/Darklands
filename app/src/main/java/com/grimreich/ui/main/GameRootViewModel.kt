@@ -73,17 +73,19 @@ class GameRootViewModel @Inject constructor(
                 val hero = state.party.find { h -> h.id == "hero_main" }
                 val isDead = hero?.isDead ?: false
                 val combatActive = state.combat.active
-                if (hero != null && isDead) {
-                    android.util.Log.d("TRIBUNAL", "Hero Main is dead! Combat active: $combatActive")
-                }
-                isDead && !combatActive // Wait until combat is resolved/deactivated
+                
+                Triple(hero, isDead, combatActive)
             }
             .distinctUntilChanged()
-            .onEach { shouldTriggerRitual ->
-                if (shouldTriggerRitual && _mode.value != GameScreenMode.ritual) {
+            .onEach { (hero, isDead, combatActive) ->
+                if (hero != null && isDead && !combatActive && _mode.value != GameScreenMode.ritual) {
                     android.util.Log.e("TRIBUNAL", "Navigating to Ritual screen for hero_main")
                     _inspectedHeroId.value = "hero_main"
                     setMode(GameScreenMode.ritual)
+                } else if (hero == null && !combatActive && _mode.value != GameScreenMode.main_menu && _mode.value != GameScreenMode.player_identity && _mode.value != GameScreenMode.character_creator) {
+                    // If main hero is sacrificed or missing, return to start
+                    android.util.Log.e("TRIBUNAL", "Hero main GONE. Returning to start.")
+                    setMode(GameScreenMode.main_menu)
                 }
             }
             .launchIn(viewModelScope)

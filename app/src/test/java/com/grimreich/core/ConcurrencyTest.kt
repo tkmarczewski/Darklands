@@ -36,6 +36,7 @@ class ConcurrencyTest {
     @Test
     fun concurrentUpdateState_shouldNotCorruptGold() = runBlocking {
         val repo = buildRepo()
+        repo.updateState(shouldPersist = false) { it.gold = 0 }
 
         val jobs = (1..100).map {
             launch(Dispatchers.Default) {

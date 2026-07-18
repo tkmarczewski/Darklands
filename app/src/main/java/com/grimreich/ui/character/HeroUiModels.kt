@@ -1,5 +1,20 @@
 package com.grimreich.ui.character
 
+import androidx.compose.runtime.Immutable
+
+@Immutable
+data class CharacterHubUiState(
+    val selectedHeroId: String? = null,
+    val selectedTab: CharacterHubTab = CharacterHubTab.OVERVIEW,
+    val heroes: List<HeroUi> = emptyList(),
+    val inventory: List<InventoryItemUi> = emptyList(),
+    val isLoading: Boolean = false
+) {
+    val selectedHero: HeroUi? get() = heroes.find { it.id == selectedHeroId }
+}
+
+enum class CharacterHubTab { OVERVIEW, EQUIPMENT, PARTY }
+
 data class HeroUi(
     val id: String,
     val name: String,
@@ -31,10 +46,18 @@ data class HeroCombatStatsUi(
 data class HeroEffectUi(
     val id: String,
     val label: String,
-    val isBuff: Boolean
+    val isPositive: Boolean
 )
 
-enum class HeroStatusUi { ALIVE, WOUNDED, DEAD }
+enum class HeroStatusUi { 
+    alive, wounded, dead;
+
+    companion object {
+        @JvmField val ALIVE = alive
+        @JvmField val WOUNDED = wounded
+        @JvmField val DEAD = dead
+    }
+}
 
 data class InventoryItemUi(
     val instanceId: String,
@@ -42,11 +65,10 @@ data class InventoryItemUi(
     val name: String,
     val iconResId: Int,
     val type: String,
-    val weight: Double,
+    val weight: Float,
     val value: Int,
     val rarity: String,
-    val slot: String?,
+    val slot: String? = null,
     val isEquipped: Boolean = false,
-    val canEquip: Boolean = true,
-    val statPreview: String? = null
+    val canEquip: Boolean = true
 )

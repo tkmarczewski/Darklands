@@ -4,17 +4,26 @@ data class Ability(
     val id: String,
     val name: String,
     val description: String,
-    val costType: CostType = CostType.NONE,
+    val costType: CostType = CostType.none,
     val costValue: Int = 0
 )
 
 enum class CostType {
-    NONE,
-    PRAYER,
-    HP,
-    SANITY,
-    MANA,
-    STAMINA
+    none,
+    prayer,
+    hp,
+    sanity,
+    mana,
+    stamina;
+
+    companion object {
+        @JvmField val NONE = none
+        @JvmField val PRAYER = prayer
+        @JvmField val HP = hp
+        @JvmField val SANITY = sanity
+        @JvmField val MANA = mana
+        @JvmField val STAMINA = stamina
+    }
 }
 
 object AbilityRegistry {
@@ -22,7 +31,7 @@ object AbilityRegistry {
         id = "solarian_strike",
         name = "Uderzenie Solarianu",
         description = "Potężny atak zadający obrażenia zależne od Pobożności.",
-        costType = CostType.PRAYER,
+        costType = CostType.prayer,
         costValue = 5
     )
 
@@ -30,7 +39,7 @@ object AbilityRegistry {
         id = "shadow_veil",
         name = "Zasłona Cienia",
         description = "Zmniejsza szansę na bycie trafionym przez przeciwników.",
-        costType = CostType.SANITY,
+        costType = CostType.sanity,
         costValue = 2
     )
 
@@ -38,14 +47,14 @@ object AbilityRegistry {
         id = "iron_skin",
         name = "Żelazna Skóra",
         description = "Tymczasowo zwiększa Wytrzymałość.",
-        costType = CostType.NONE
+        costType = CostType.none
     )
 
     val HOLY_RAGE = Ability(
         id = "holy_rage",
         name = "Święta Furia",
         description = "Zwiększa Siłę w walce kosztem Pobożności.",
-        costType = CostType.PRAYER,
+        costType = CostType.prayer,
         costValue = 10
     )
 
@@ -53,7 +62,7 @@ object AbilityRegistry {
         id = "mind_read",
         name = "Czytanie w Myślach",
         description = "Pozwala zajrzeć w echa cudzej świadomości.",
-        costType = CostType.SANITY,
+        costType = CostType.sanity,
         costValue = 5
     )
 
@@ -61,22 +70,22 @@ object AbilityRegistry {
 }
 
 fun canPayAbilityCost(hero: Hero, ability: Ability): Boolean = when (ability.costType) {
-    CostType.MANA -> true
-    CostType.STAMINA -> hero.endurance >= ability.costValue
-    CostType.SANITY -> hero.sanity >= ability.costValue
-    CostType.HP -> hero.hp > ability.costValue && hero.hp - ability.costValue >= 1
-    CostType.NONE -> true
-    CostType.PRAYER -> hero.piety >= ability.costValue
+    CostType.mana -> true
+    CostType.stamina -> hero.endurance >= ability.costValue
+    CostType.sanity -> hero.sanity >= ability.costValue
+    CostType.hp -> hero.hp > ability.costValue && hero.hp - ability.costValue >= 1
+    CostType.none -> true
+    CostType.prayer -> hero.piety >= ability.costValue
 }
 
 fun payAbilityCost(hero: Hero, ability: Ability) {
     when (ability.costType) {
-        CostType.MANA -> Unit
-        CostType.STAMINA -> hero.endurance = (hero.endurance - ability.costValue).coerceAtLeast(0)
-        CostType.SANITY -> hero.sanity = (hero.sanity - ability.costValue).coerceAtLeast(0)
-        CostType.HP -> hero.hp = (hero.hp - ability.costValue).coerceAtLeast(1)
-        CostType.PRAYER -> hero.piety = (hero.piety - ability.costValue).coerceAtLeast(0)
-        CostType.NONE -> Unit
+        CostType.mana -> Unit
+        CostType.stamina -> hero.endurance = (hero.endurance - ability.costValue).coerceAtLeast(0)
+        CostType.sanity -> hero.sanity = (hero.sanity - ability.costValue).coerceAtLeast(0)
+        CostType.hp -> hero.hp = (hero.hp - ability.costValue).coerceAtLeast(1)
+        CostType.prayer -> hero.piety = (hero.piety - ability.costValue).coerceAtLeast(0)
+        CostType.none -> Unit
     }
 }
 
@@ -88,12 +97,11 @@ fun tryPayAbilityCost(hero: Hero, ability: Ability): Boolean {
 
 fun refundAbilityCost(hero: Hero, ability: Ability) {
     when (ability.costType) {
-        CostType.MANA -> Unit
-        CostType.STAMINA -> hero.endurance = (hero.endurance + ability.costValue).coerceAtMost(99)
-        CostType.SANITY -> hero.sanity = (hero.sanity + ability.costValue).coerceAtMost(100)
-        CostType.HP -> hero.hp = (hero.hp + ability.costValue).coerceAtMost(hero.maxHp)
-        CostType.PRAYER -> hero.piety = (hero.piety + ability.costValue).coerceAtMost(99)
-        CostType.NONE -> Unit
+        CostType.mana -> Unit
+        CostType.stamina -> hero.endurance = (hero.endurance + ability.costValue).coerceAtMost(99)
+        CostType.sanity -> hero.sanity = (hero.sanity + ability.costValue).coerceAtMost(100)
+        CostType.hp -> hero.hp = (hero.hp + ability.costValue).coerceAtMost(hero.maxHp)
+        CostType.prayer -> hero.piety = (hero.piety + ability.costValue).coerceAtMost(99)
+        CostType.none -> Unit
     }
 }
-

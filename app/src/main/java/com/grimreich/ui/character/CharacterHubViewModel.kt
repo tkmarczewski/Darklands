@@ -20,20 +20,8 @@ sealed interface CharacterHubUiEvent {
     data class ReorderParty(val fromIndex: Int, val toIndex: Int) : CharacterHubUiEvent
 }
 
-enum class CharacterHubTab { OVERVIEW, EQUIPMENT, PARTY }
-
 sealed interface CharacterHubUiEffect {
     data class ShowMessage(val message: String) : CharacterHubUiEffect
-}
-
-data class CharacterHubUiState(
-    val selectedHeroId: String? = null,
-    val selectedTab: CharacterHubTab = CharacterHubTab.OVERVIEW,
-    val heroes: List<HeroUi> = emptyList(),
-    val inventory: List<InventoryItemUi> = emptyList(),
-    val isLoading: Boolean = false
-) {
-    val selectedHero: HeroUi? get() = heroes.find { it.id == selectedHeroId }
 }
 
 @HiltViewModel

@@ -1,9 +1,20 @@
 package com.grimreich.grimreich.v1
 
-enum class OtherSideLoyalty { LOYAL, TORN, BETRAYER }
+import kotlinx.serialization.Serializable
+
+@Serializable
+enum class OtherSideLoyalty {
+    loyal, torn, betrayer;
+
+    companion object {
+        @JvmField val LOYAL = loyal
+        @JvmField val TORN = torn
+        @JvmField val BETRAYER = betrayer
+    }
+}
 
 data class OtherSideNpcState(
-    val npcName: String,
+    val name: String,
     val loyalty: OtherSideLoyalty,
     val sanity: Int,
     val corruption: Int,

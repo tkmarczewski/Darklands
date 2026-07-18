@@ -48,7 +48,7 @@ class CollapseEngine @Inject constructor(
         
         thresholds.forEach { threshold ->
             if (before < threshold && after >= threshold) {
-                if (state.world.reachedThresholds.add(threshold)) {
+                if (state.world.reachedThresholds.add(threshold.toString())) {
                     triggerEffectDirect(state, threshold)
                 }
             }
@@ -57,7 +57,9 @@ class CollapseEngine @Inject constructor(
 
     private fun triggerEffectDirect(state: GameState, threshold: Float) {
         val scenarioId = state.world.collapseScenarioId ?: return
-        val scenario = try { CollapseScenario.valueOf(scenarioId) } catch (e: Exception) { return }
+        val scenario = try { 
+            com.grimreich.grimreich.v1.CollapseScenario.valueOf(scenarioId.lowercase()) 
+        } catch (e: Exception) { return }
 
         state.logEntries.add("KRYZYS: Przekroczono próg upadku ${(threshold * 100).toInt()}%!")
 

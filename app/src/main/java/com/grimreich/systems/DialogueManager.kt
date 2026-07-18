@@ -67,7 +67,7 @@ class DialogueManager @Inject constructor(
         if (event == null) return
         val engine = questEngine.get()
         
-        // PURIFICATION: All event triggers must be lowercase snake_case
+        // PURIFICATION: All event triggers are case-insensitive
         val normalizedEvent = event.lowercase().trim()
         android.util.Log.d("DialogueManager", "[DIALOGUE] Trigger firing: $normalizedEvent -> $value")
         

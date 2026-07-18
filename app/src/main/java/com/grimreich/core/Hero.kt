@@ -70,7 +70,7 @@ data class Hero(
     var masteryTrait: String? = null,
 
     // --- ONTOLOGICAL AUDIT: Hierarchia Bytu ---
-    var subjectType: SubjectType = SubjectType.VESSEL,
+    var subjectType: SubjectType = SubjectType.vessel,
     var ontologicalMass: Int = 10,
 
     // --- SYSTEM TRAUMY (Funkcjonalność A) ---
@@ -82,10 +82,17 @@ data class Hero(
 ) {
 
     enum class SubjectType {
-        VESSEL,     // Standardowy mieszkaniec L1
-        AWAKE,      // Przebudzony (Prorok)
-        TRAVELER,   // Inkarnacja Kotwicy
-        ANCHOR      // Sama Kotwica (Gracz)
+        vessel,     // Standardowy mieszkaniec L1
+        awake,      // Przebudzony (Prorok)
+        traveler,   // Inkarnacja Kotwicy
+        anchor;      // Sama Kotwica (Gracz)
+
+        companion object {
+            @JvmField val VESSEL = vessel
+            @JvmField val AWAKE = awake
+            @JvmField val TRAVELER = traveler
+            @JvmField val ANCHOR = anchor
+        }
     }
 
     /**

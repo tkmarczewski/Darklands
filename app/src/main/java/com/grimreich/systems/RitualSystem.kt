@@ -78,14 +78,18 @@ class RitualSystem @Inject constructor(
         gameRepository.updateState { state ->
             val hero = state.party.find { it.id == heroId }
             if (hero != null && state.gold >= 100) {
+                // Restriction: BG Ritual for BG only
+                if (hero.id != "hero_main") {
+                    state.logEntries.add("RYTUAŁ: Ten rytuał działa tylko na Prawdziwe Kotwice (BG). Towarzyszy wskrześ w Świątyni.")
+                    return@updateState
+                }
+
                 state.gold -= 100
                 hero.isDead = false
+                // BUG-05 FIX: Normalize first, then set HP=1 to avoid "healing" above 1 during normalization
+                hero.normalize()
                 hero.hp = 1
                 hero.sanity -= 15
-                hero.corruption += 20
-                state.world.globalStability -= 15
-                state.logEntries.add("RYTUAŁ: ${hero.name} powrócił z Pęknięcia, ale nie jest już taki sam.")
-                hero.normalize()
                 success = true
             }
         }

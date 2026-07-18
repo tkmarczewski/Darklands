@@ -465,6 +465,23 @@
     ]
   },
   {
+    "id": "fortress_guard_start",
+    "npcId": "guard",
+    "text": "Stój! Twierdza Żelazna stoi niewzruszona. Jeśli szukasz Dowódcy Ferruma, musisz mieć ważny powód. Inaczej wracaj do mgły.",
+    "choices": [
+      {
+        "text": "Mam wiadomość dla Dowódcy (List do Twierdzy).",
+        "targetNodeId": "fortress_commander_letter",
+        "requiredQuestId": "q_fortress_letter",
+        "requiredQuestStatus": "active"
+      },
+      {
+        "text": "Tylko przechodzę.",
+        "targetNodeId": "end"
+      }
+    ]
+  },
+  {
     "id": "ritualist_start",
     "npcId": "ritualist",
     "text": "Krew jest kluczem, a Kotwica zamkiem. Chcesz zobaczyć, co jest po drugiej stronie Szyfru?",

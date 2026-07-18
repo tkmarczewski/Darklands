@@ -79,10 +79,11 @@ class MutationSystem @Inject constructor(
                 )
                 val target = evolvable.random(selectionRng)
                 val nextTier = when (target.tier) {
-                    MutationTier.DORMANT      -> MutationTier.MANIFESTED
-                    MutationTier.MANIFESTED   -> MutationTier.DOMINANT
-                    MutationTier.DOMINANT     -> MutationTier.TRANSCENDENT
-                    MutationTier.TRANSCENDENT -> MutationTier.TRANSCENDENT
+                    MutationTier.dormant      -> MutationTier.manifested
+                    MutationTier.manifested   -> MutationTier.dominant
+                    MutationTier.dominant     -> MutationTier.transcendent
+                    MutationTier.transcendent -> MutationTier.transcendent
+                    else                      -> MutationTier.manifested
                 }
 
                 val updated = target.copy(tier = nextTier)
@@ -100,8 +101,8 @@ class MutationSystem @Inject constructor(
         val selectionRng = Random(mutation.id.hashCode().toLong())
         val bonusAttr = mutation.attributeModifiers.keys.randomOrNull(selectionRng) ?: "strength"
         val bonusValue = when (mutation.tier) {
-            MutationTier.DOMINANT     -> 2
-            MutationTier.TRANSCENDENT -> 3
+            MutationTier.dominant     -> 2
+            MutationTier.transcendent -> 3
             else                      -> 1
         }
         modifyHeroStat(hero, bonusAttr, bonusValue)

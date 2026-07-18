@@ -21,9 +21,9 @@ class CharacterHubUiMapper @Inject constructor(
 
     private fun mapHero(hero: Hero, state: GameState, isActive: Boolean): HeroUi {
         val status = when {
-            hero.isDead -> HeroStatusUi.DEAD
-            hero.hp < hero.maxHp / 2 -> HeroStatusUi.WOUNDED
-            else -> HeroStatusUi.ALIVE
+            hero.isDead -> HeroStatusUi.dead
+            hero.hp < hero.maxHp / 2 -> HeroStatusUi.wounded
+            else -> HeroStatusUi.alive
         }
 
         val combatStats = HeroCombatStatsUi(
@@ -41,7 +41,7 @@ class CharacterHubUiMapper @Inject constructor(
         return HeroUi(
             id = hero.id,
             name = hero.name,
-            classLabel = hero.currentCareer?.name ?: "Wędrowiec",
+            classLabel = hero.currentCareer?.displayName ?: "Wędrowiec",
             portraitResId = getResId(hero.portraitRes, "drawable"),
             level = hero.level,
             hp = hero.hp,
@@ -67,7 +67,7 @@ class CharacterHubUiMapper @Inject constructor(
             name = item.name,
             iconResId = getResId("ic_item_${item.type}", "drawable"),
             type = item.type,
-            weight = item.weight,
+            weight = item.weight.toFloat(),
             value = item.value,
             rarity = item.rarity,
             slot = item.slot,

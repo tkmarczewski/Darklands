@@ -152,16 +152,3 @@ fun DialogueScreen(
         }
     }
 }
-
-@Composable
-fun NavTabV9(text: String, onClick: () -> Unit, color: Color = Color(0xFF1A1A1A), enabled: Boolean = true, modifier: Modifier = Modifier) {
-    Surface(
-        modifier = modifier.fillMaxWidth().heightIn(min = 36.dp).clickable(enabled = enabled) { onClick() },
-        color = if (enabled) color else Color.Black,
-        border = androidx.compose.foundation.BorderStroke(1.dp, if (enabled) Color(0xFFC0A060) else Color(0xFF111111))
-    ) {
-        Box(contentAlignment = Alignment.Center, modifier = Modifier.padding(8.dp)) {
-            Text(text = text.uppercase(), color = if (enabled) Color.White else Color.DarkGray, fontSize = 10.sp, fontWeight = FontWeight.Bold)
-        }
-    }
-}

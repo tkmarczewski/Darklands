@@ -261,7 +261,7 @@ fun GameNavHost(
                     gold = gold,
                     ritualSystem = ritualVm.ritualSystem,
                     onRevived = { root.setMode(GameScreenMode.hub) },
-                    onSacrificed = { root.setMode(GameScreenMode.hub) }
+                    onSacrificed = { root.setMode(GameScreenMode.main_menu) }
                 )
             }
         }

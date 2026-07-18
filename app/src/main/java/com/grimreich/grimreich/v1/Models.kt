@@ -1,5 +1,7 @@
 package com.grimreich.grimreich.v1
 
+import kotlinx.serialization.Serializable
+
 data class NonlinearTime(
     var regionName: String,
     var mistTimeLevel: Int,
@@ -159,6 +161,16 @@ data class WorldCollapse(
 )
 
 // Poprawna i jedyna definicja CollapseScenario
+@Serializable
 enum class CollapseScenario {
-    MIST_OBLIVION, BLOOD_RUIN, REFLECTION_RECKONING, FULLNESS_ASCENSION, CHAOS_DOMINION, ZERO_END
+    mist_oblivion, blood_ruin, reflection_reckoning, fullness_ascension, chaos_dominion, zero_end;
+
+    companion object {
+        @JvmField val MIST_OBLIVION = mist_oblivion
+        @JvmField val BLOOD_RUIN = blood_ruin
+        @JvmField val REFLECTION_RECKONING = reflection_reckoning
+        @JvmField val FULLNESS_ASCENSION = fullness_ascension
+        @JvmField val CHAOS_DOMINION = chaos_dominion
+        @JvmField val ZERO_END = zero_end
+    }
 }

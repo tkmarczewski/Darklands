@@ -56,7 +56,7 @@ class WorldMapViewModel @Inject constructor(
 
                 _uiState.update { 
                     it.copy(
-                        discoveredLocations = state.world.discoveredLocations,
+                        discoveredLocations = state.world.discoveredLocations.toList(),
                         currentLocationId = state.world.locationId,
                         allCities = allCities,
                         selectedCityData = cityCatalogue.get(it.selectedCityId),

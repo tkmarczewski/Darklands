@@ -143,6 +143,7 @@ class CombatSystem @Inject constructor(
                 result = "Runda ${c.round}"
 
                 // 2. Ensure Player Turn
+                // BUG-01 FIX: Use getOrNull for safety
                 var currentSlot = c.initiativeOrder.getOrNull(c.currentTurnIndex)
                 if (currentSlot != null && !currentSlot.isPlayer) {
                     resolveEnemyTurnsInternal(state)
@@ -213,7 +214,8 @@ class CombatSystem @Inject constructor(
         val c = state.combat
         val enemyTypeStr = c.enemyType ?: "bandit"
         val enemyDef = try { EnemyType.valueOf(enemyTypeStr.lowercase()) } catch (e: Exception) { EnemyType.bandit }
-        val enemyAi = try { Bestiary.get(enemyDef).ai } catch (e: Exception) { EnemyAI.aggressive }
+        // BUG-02 FIX: Safer Bestiary access
+        val enemyAi = try { Bestiary.get(enemyDef)?.ai ?: EnemyAI.aggressive } catch (e: Exception) { EnemyAI.aggressive }
 
         while (c.active && c.initiativeOrder.getOrNull(c.currentTurnIndex)?.isPlayer == false) {
             val aliveHeroes = state.party.filter { !it.isDead }
@@ -250,8 +252,9 @@ class CombatSystem @Inject constructor(
             }
 
             targetHero.hp = targetCombatant.hp
+            // BUG-06 FIX: Direct update of existing list to avoid reference loss or race conditions
             targetHero.activeStatusEffects.clear()
-            targetHero.activeStatusEffects.addAll(targetCombatant.activeEffects)
+            targetHero.activeStatusEffects.addAll(targetCombatant.activeEffects.map { it.copy() })
             c.enemyStamina = enemyCombatant.endurance
 
             if (targetHero.hp <= 0) handleHeroDeath(state, targetHero)

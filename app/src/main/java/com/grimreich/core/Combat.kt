@@ -7,34 +7,43 @@ import javax.inject.Singleton
 import kotlin.random.Random
 
 // ==================== MORALE SYSTEM ====================
+@Serializable
 enum class MoraleStatus {
-    HEROIC, STEADY, SHAKEN, PANICKED, ROUTED;
+    heroic, steady, shaken, panicked, routed;
+
+    companion object {
+        @JvmField val HEROIC = heroic
+        @JvmField val STEADY = steady
+        @JvmField val SHAKEN = shaken
+        @JvmField val PANICKED = panicked
+        @JvmField val ROUTED = routed
+    }
 
     fun attackModifier(): Float = when (this) {
-        HEROIC   -> 1.2f
-        STEADY   -> 1.0f
-        SHAKEN   -> 0.8f
-        PANICKED -> 0.5f
-        ROUTED   -> 0.0f
+        heroic, HEROIC   -> 1.2f
+        steady, STEADY   -> 1.0f
+        shaken, SHAKEN   -> 0.8f
+        panicked, PANICKED -> 0.5f
+        routed, ROUTED   -> 0.0f
     }
 
     fun defenseModifier(): Float = when (this) {
-        HEROIC   -> 1.1f
-        STEADY   -> 1.0f
-        SHAKEN   -> 0.85f
-        PANICKED -> 0.6f
-        ROUTED   -> 0.0f
+        heroic, HEROIC   -> 1.1f
+        steady, STEADY   -> 1.0f
+        shaken, SHAKEN   -> 0.85f
+        panicked, PANICKED -> 0.6f
+        routed, ROUTED   -> 0.0f
     }
 }
 
 @Singleton
 class MoraleSystem @Inject constructor() {
     fun computeStatus(morale: Int): MoraleStatus = when {
-        morale >= GameConstants.Combat.MORALE_HEROIC_THRESHOLD   -> MoraleStatus.HEROIC
-        morale >= GameConstants.Combat.MORALE_STEADY_THRESHOLD   -> MoraleStatus.STEADY
-        morale >= GameConstants.Combat.MORALE_SHAKEN_THRESHOLD   -> MoraleStatus.SHAKEN
-        morale >= GameConstants.Combat.MORALE_PANICKED_THRESHOLD -> MoraleStatus.PANICKED
-        else                                                      -> MoraleStatus.ROUTED
+        morale >= GameConstants.Combat.MORALE_HEROIC_THRESHOLD   -> MoraleStatus.heroic
+        morale >= GameConstants.Combat.MORALE_STEADY_THRESHOLD   -> MoraleStatus.steady
+        morale >= GameConstants.Combat.MORALE_SHAKEN_THRESHOLD   -> MoraleStatus.shaken
+        morale >= GameConstants.Combat.MORALE_PANICKED_THRESHOLD -> MoraleStatus.panicked
+        else                                                      -> MoraleStatus.routed
     }
 
     fun moraleAfterHit(morale: Int, dmgTaken: Int): Int =
@@ -49,7 +58,18 @@ class MoraleSystem @Inject constructor() {
 
 // ==================== STATUS EFFECTS ====================
 @Serializable
-enum class StatusEffectType { POISON, BLEED, FIRE, FREEZE, WET, SHOCK }
+enum class StatusEffectType { 
+    poison, bleed, fire, freeze, wet, shock;
+
+    companion object {
+        @JvmField val POISON = poison
+        @JvmField val BLEED = bleed
+        @JvmField val FIRE = fire
+        @JvmField val FREEZE = freeze
+        @JvmField val WET = wet
+        @JvmField val SHOCK = shock
+    }
+}
 
 @Serializable
 data class StatusEffect(
@@ -59,7 +79,17 @@ data class StatusEffect(
 )
 
 // ==================== COMBAT MODELS ====================
-enum class SkillType { MELEE, RANGED, PRAYER, ALCHEMY, ECHO }
+@Serializable
+enum class SkillType { melee, ranged, prayer, alchemy, echo;
+
+    companion object {
+        @JvmField val MELEE = melee
+        @JvmField val RANGED = ranged
+        @JvmField val PRAYER = prayer
+        @JvmField val ALCHEMY = alchemy
+        @JvmField val ECHO = echo
+    }
+}
 
 data class SkillResult(
     val damage: Int = 0,
@@ -78,7 +108,16 @@ data class CombatSkill(
     val effect: (CombatantState, CombatantState) -> SkillResult
 )
 
-enum class WoundType { NONE, LIGHT, SERIOUS, CRITICAL }
+@Serializable
+enum class WoundType { none, light, serious, critical;
+
+    companion object {
+        @JvmField val NONE = none
+        @JvmField val LIGHT = light
+        @JvmField val SERIOUS = serious
+        @JvmField val CRITICAL = critical
+    }
+}
 
 data class CombatantState(
     val name: String,
@@ -103,36 +142,29 @@ data class CombatantState(
         morale = morale.coerceIn(0, GameConstants.Combat.MAX_MORALE)
     }
 
-    /**
-     * Centralized method to apply status effects with synergistic logic.
-     * Part of Iteration 3 Faza 2 audit.
-     */
     fun applyStatus(type: StatusEffectType, strength: Int, duration: Int, log: MutableList<String>) {
-        // SYNERGY: WET vs FIRE (Neutralization)
-        if (type == StatusEffectType.WET) {
-            activeEffects.find { it.type == StatusEffectType.FIRE }?.let {
+        if (type == StatusEffectType.wet || type == StatusEffectType.WET) {
+            activeEffects.find { it.type == StatusEffectType.fire || it.type == StatusEffectType.FIRE }?.let {
                 activeEffects.remove(it)
                 log.add("Woda gasi płomienie na $name!")
                 return
             }
         }
-        if (type == StatusEffectType.FIRE) {
-            activeEffects.find { it.type == StatusEffectType.WET }?.let {
+        if (type == StatusEffectType.fire || type == StatusEffectType.FIRE) {
+            activeEffects.find { it.type == StatusEffectType.wet || it.type == StatusEffectType.WET }?.let {
                 activeEffects.remove(it)
                 log.add("Ogień odparowuje wodę z $name!")
                 return
             }
         }
 
-        // SYNERGY: WET + FREEZE (Shatter)
-        if (type == StatusEffectType.FREEZE) {
-            activeEffects.find { it.type == StatusEffectType.WET }?.let {
+        if (type == StatusEffectType.freeze || type == StatusEffectType.FREEZE) {
+            activeEffects.find { it.type == StatusEffectType.wet || it.type == StatusEffectType.WET }?.let {
                 val shatterDmg = 10
                 hp = (hp - shatterDmg).coerceAtLeast(0)
                 log.add("Mroźne powietrze ścina wodę na $name! NAGŁE PĘKNIĘCIE: -$shatterDmg HP.")
                 
-                // Bonus duration for freeze on wet target
-                val existing = activeEffects.find { it.type == StatusEffectType.FREEZE }
+                val existing = activeEffects.find { it.type == StatusEffectType.freeze || it.type == StatusEffectType.FREEZE }
                 if (existing != null) {
                     existing.duration = (existing.duration + duration + 1).coerceAtMost(10)
                 } else {
@@ -200,7 +232,6 @@ class CombatRound @Inject constructor(
         val worldState = gameRepository.currentState().world
         val ontologicalLevel = worldState.ontologicalLevel.level
         
-        // ONTOLOGICAL IMPACT: Higher levels make reality sharper and more lethal
         val dmgMultiplier = 1.0f + (ontologicalLevel - 1) * 0.05f
         val dodgeReduction = (ontologicalLevel - 1) * 0.02f
 
@@ -209,7 +240,7 @@ class CombatRound @Inject constructor(
         
         if (isDefeated(attacker)) {
             return RoundResult(0, 0, attacker.morale, defender.morale,
-                WoundType.NONE, WoundType.NONE, log)
+                WoundType.none, WoundType.none, log)
         }
 
         val skill = SkillCatalogue.allSkills.find { it.id == skillId }
@@ -219,16 +250,12 @@ class CombatRound @Inject constructor(
             
             if (hasResources) {
                 attacker.endurance -= skill.staminaCost
-                // favor (piety) is treated as a threshold stat, not consumed for now
                 
                 log.add("${attacker.name} używa ${skill.name}!")
                 val hpBefore = defender.hp
                 val result = skill.effect(attacker, defender)
                 if (result.message.isNotBlank()) log.add(result.message)
                 
-                // BUG FIX: Skill results already applied to defender.hp inside skill.effect lambda.
-                // Manual subtraction removed to prevent double damage.
-                // Apply ontological multiplier to skill damage too
                 val baseDmg = (hpBefore - defender.hp)
                 if (baseDmg > 0 && dmgMultiplier > 1.0f) {
                     val extraDmg = (baseDmg * (dmgMultiplier - 1.0f)).toInt()
@@ -287,11 +314,9 @@ class CombatRound @Inject constructor(
     ): Int {
         if (attacker.maxHp <= 0 || defender.maxHp <= 0) return 0
 
-        // BALANCE FIX: Attacker's Perception now counters Defender's Agility-based dodge.
         val baseDodge = (GameConstants.Combat.BASE_DODGE_CHANCE +
             ((defender.agility - 10) * GameConstants.Combat.AGILITY_DODGE_MODIFIER))
         val perceptionBonus = (attacker.perception - 10) * 0.01f
-        // ONTOLOGICAL FIX: Higher levels reduce dodge chance
         val finalDodgeChance = (baseDodge - perceptionBonus - dodgeReduction).coerceIn(0.05f, 0.8f)
         
         val dodged = randomProvider.nextFloat() < finalDodgeChance
@@ -301,8 +326,8 @@ class CombatRound @Inject constructor(
         }
 
         var rawAtk = attacker.attackBase + (attacker.strength / 2)
-        if (defender.activeEffects.any { it.type == StatusEffectType.WET } &&
-            attacker.activeEffects.any { it.type == StatusEffectType.SHOCK }) {
+        if ((defender.activeEffects.any { it.type == StatusEffectType.wet || it.type == StatusEffectType.WET }) &&
+            (attacker.activeEffects.any { it.type == StatusEffectType.shock || it.type == StatusEffectType.SHOCK })) {
             rawAtk = (rawAtk * 1.5f).toInt()
             log.add("Przewodnictwo! Mokry wróg otrzymuje zwiększone obrażenia od porażenia.")
         }
@@ -310,8 +335,7 @@ class CombatRound @Inject constructor(
         val attackerStatus = moraleSystem.computeStatus(attacker.morale)
         val defenderStatus = moraleSystem.computeStatus(defender.morale)
 
-        // FIX (M-01): Routed combatants deal NO damage
-        if (attackerStatus == MoraleStatus.ROUTED) {
+        if (attackerStatus == MoraleStatus.routed || attackerStatus == MoraleStatus.ROUTED) {
             log.add("${attacker.name} jest zbyt przerażony, by walczyć!")
             return 0
         }
@@ -319,11 +343,10 @@ class CombatRound @Inject constructor(
         val defArmor = defender.armor
 
         val critChance = (attacker.perception * GameConstants.Combat.PERCEPTION_CRIT_MODIFIER)
-            .coerceIn(0f, 0.8f) // FIX (M-02): Clamp crit chance
+            .coerceIn(0f, 0.8f) 
         val isCrit   = randomProvider.nextFloat() < critChance
         val critMod  = if (isCrit) GameConstants.Combat.CRITICAL_HIT_MULTIPLIER else 1.0f
 
-        // ONTOLOGICAL FIX: Apply damage multiplier
         val attackRoll = (rawAtk * attackerStatus.attackModifier() *
             (0.7f + randomProvider.nextFloat() * 0.6f) * critMod * dmgMultiplier).toInt()
         val defendRoll = (defArmor * defenderStatus.defenseModifier() *
@@ -337,7 +360,6 @@ class CombatRound @Inject constructor(
         log.add("${attacker.name} atakuje ${defender.name}: $dmg obrażeń.")
 
         if (attacker.charisma >= 10) {
-            // BALANCE FIX: Buffed charisma morale regen (removed divisor)
             val regen = (attacker.charisma - 9) * GameConstants.Combat.CHARISMA_MORALE_REGEN
             attacker.morale = (attacker.morale + regen)
                 .coerceAtMost(GameConstants.Combat.MAX_MORALE)
@@ -357,10 +379,8 @@ class CombatRound @Inject constructor(
         val attackerStatus = moraleSystem.computeStatus(attacker.morale)
         val defenderStatus = moraleSystem.computeStatus(defender.morale)
         
-        // FIX (M-01): Routed defenders don't counter
-        if (defenderStatus == MoraleStatus.ROUTED) return 0
+        if (defenderStatus == MoraleStatus.routed || defenderStatus == MoraleStatus.ROUTED) return 0
 
-        // ONTOLOGICAL FIX: Apply damage multiplier
         val counterAtk  = (defender.attackBase * defenderStatus.attackModifier() *
             (0.6f + randomProvider.nextFloat() * 0.8f) * dmgMultiplier).toInt()
         val attackerDef = (attacker.armor * attackerStatus.defenseModifier() *
@@ -375,7 +395,7 @@ class CombatRound @Inject constructor(
 
     private fun applyWound(combatant: CombatantState, log: MutableList<String>): WoundType {
         val wound = computeWound(combatant)
-        if (wound != WoundType.NONE && !combatant.wounds.contains(wound)) {
+        if (wound != WoundType.none && wound != WoundType.NONE && !combatant.wounds.contains(wound)) {
             combatant.wounds.add(wound)
             log.add("${combatant.name} otrzymuje ranę: $wound")
         }
@@ -387,37 +407,36 @@ class CombatRound @Inject constructor(
         while (it.hasNext()) {
             val effect = it.next()
             when (effect.type) {
-                StatusEffectType.POISON -> {
+                StatusEffectType.poison, StatusEffectType.POISON -> {
                     combatant.hp = (combatant.hp - effect.strength).coerceAtLeast(0)
                     log.add("${combatant.name} cierpi od trucizny: -${effect.strength} HP.")
                 }
-                StatusEffectType.BLEED -> {
+                StatusEffectType.bleed, StatusEffectType.BLEED -> {
                     combatant.hp        = (combatant.hp - effect.strength).coerceAtLeast(0)
                     combatant.endurance = (combatant.endurance - 1).coerceAtLeast(0)
                     log.add("${combatant.name} krwawi: -${effect.strength} HP.")
                 }
-                StatusEffectType.FIRE -> {
+                StatusEffectType.fire, StatusEffectType.FIRE -> {
                     combatant.hp    = (combatant.hp - effect.strength).coerceAtLeast(0)
                     combatant.morale = (combatant.morale - 2).coerceAtLeast(0)
                     log.add("${combatant.name} płonie: -${effect.strength} HP.")
                 }
-                StatusEffectType.FREEZE -> {
+                StatusEffectType.freeze, StatusEffectType.FREEZE -> {
                     combatant.morale = (combatant.morale - 1).coerceAtLeast(0)
                     log.add("${combatant.name} jest przemarznięty.")
                 }
-                StatusEffectType.WET -> {
+                StatusEffectType.wet, StatusEffectType.WET -> {
                     log.add("${combatant.name} jest przemoczony.")
                     val shockActive = combatant.activeEffects.any {
-                        it !== effect && it.type == StatusEffectType.SHOCK
+                        it !== effect && (it.type == StatusEffectType.shock || it.type == StatusEffectType.SHOCK)
                     }
                     if (shockActive) {
-                        // SYNERGY: Increased shock damage on wet targets
                         val shockDmg = effect.strength * 3
                         combatant.hp = (combatant.hp - shockDmg).coerceAtLeast(0)
                         log.add("BŁYSKAWICA! Prąd przebiega przez mokre ciało ${combatant.name}: -$shockDmg HP!")
                     }
                 }
-                StatusEffectType.SHOCK -> {
+                StatusEffectType.shock, StatusEffectType.SHOCK -> {
                     combatant.endurance = (combatant.endurance - 2).coerceAtLeast(0)
                     log.add("${combatant.name} drży od wyładowań.")
                 }
@@ -445,16 +464,15 @@ class CombatRound @Inject constructor(
     private fun computeWound(state: CombatantState): WoundType {
         val hpPercent = if (state.maxHp > 0) state.hp.toFloat() / state.maxHp else 0f
         return when {
-            // FIX (PRECISION): Use small epsilon for zero checks
-            hpPercent <= 0.001f                                                      -> WoundType.CRITICAL
-            hpPercent <= GameConstants.Combat.WOUND_THRESHOLD_SERIOUS && state.endurance < 5  -> WoundType.SERIOUS
-            hpPercent <= GameConstants.Combat.WOUND_THRESHOLD_LIGHT   && state.endurance < 10 -> WoundType.LIGHT
-            else                                                                     -> WoundType.NONE
+            hpPercent <= 0.001f                                                      -> WoundType.critical
+            hpPercent <= GameConstants.Combat.WOUND_THRESHOLD_SERIOUS && state.endurance < 5  -> WoundType.serious
+            hpPercent <= GameConstants.Combat.WOUND_THRESHOLD_LIGHT   && state.endurance < 10 -> WoundType.light
+            else                                                                     -> WoundType.none
         }
     }
 
     fun isDefeated(state: CombatantState): Boolean =
-        state.hp <= 0 || moraleSystem.computeStatus(state.morale) == MoraleStatus.ROUTED
+        state.hp <= 0 || moraleSystem.computeStatus(state.morale) == MoraleStatus.routed || moraleSystem.computeStatus(state.morale) == MoraleStatus.ROUTED
 
     fun postCombatRecovery(hero: CombatantState): String {
         val healHp = (hero.maxHp * GameConstants.Combat.HP_RECOVERY_RATIO)
@@ -471,4 +489,3 @@ class CombatRound @Inject constructor(
         return "Leczenie: +$healHp HP, +$enduranceHeal Endurance. Morale: ${hero.morale}. Rany: ${hero.wounds.size}"
     }
 }
-

@@ -21,19 +21,19 @@ class OtherSideNpcLogic {
         val corruption = (baseCorruption + dogmaFactor).toInt().coerceIn(0, 20)
         val sanity = (baseSanity - dogmaFactor).toInt().coerceIn(0, 20)
         val loyalty = when {
-            corruption <= 5 && sanity >= 10 -> OtherSideLoyalty.LOYAL
-            corruption in 6..12 -> OtherSideLoyalty.TORN
-            else -> OtherSideLoyalty.BETRAYER
+            corruption <= 5 && sanity >= 10 -> OtherSideLoyalty.loyal
+            corruption in 6..12 -> OtherSideLoyalty.torn
+            else -> OtherSideLoyalty.betrayer
         }
         val deathRisk = when (loyalty) {
-            OtherSideLoyalty.LOYAL -> (corruption / 2)
-            OtherSideLoyalty.TORN -> (5 + corruption / 2)
-            OtherSideLoyalty.BETRAYER -> (10 + corruption)
+            OtherSideLoyalty.loyal -> (corruption / 2)
+            OtherSideLoyalty.torn -> (5 + corruption / 2)
+            OtherSideLoyalty.betrayer -> (10 + corruption)
         }.coerceIn(0, 25)
         val rewardModifier = when (loyalty) {
-            OtherSideLoyalty.LOYAL -> 2 - (corruption / 10)
-            OtherSideLoyalty.TORN -> 0
-            OtherSideLoyalty.BETRAYER -> -2
+            OtherSideLoyalty.loyal -> 2 - (corruption / 10)
+            OtherSideLoyalty.torn -> 0
+            OtherSideLoyalty.betrayer -> -2
         }
         val notes = buildString {
             append("Chaos=").append(chaos)

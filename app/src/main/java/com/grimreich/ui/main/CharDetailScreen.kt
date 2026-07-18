@@ -34,12 +34,22 @@ fun CharDetailScreen(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(
-                text = hero.name.uppercase(),
-                color = Color(0xFFC0A060),
-                fontSize = 24.sp,
-                fontWeight = FontWeight.Bold
-            )
+            Column {
+                Text(
+                    text = hero.name.uppercase(),
+                    color = Color(0xFFC0A060),
+                    fontSize = 24.sp,
+                    fontWeight = FontWeight.Bold
+                )
+                hero.masteryTrait?.let { mastery ->
+                    Text(
+                        text = "MISTRZOSTWO: ${mastery.uppercase().replace("_", " ")}",
+                        color = Color(0xFF4A6000),
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.ExtraBold
+                    )
+                }
+            }
             Button(
                 onClick = onBack,
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2A2A2A))
@@ -74,12 +84,15 @@ fun CharDetailScreen(
                 
                 if (hero.attributePoints > 0) {
                     Spacer(modifier = Modifier.height(16.dp))
-                    Surface(color = Color(0xFF4A6000), shape = MaterialTheme.shapes.extraSmall) {
+                    Button(
+                        onClick = onRandomize,
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4A6000)),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
                         Text(
-                            stringResource(R.string.creator_points_label) + ": ${hero.attributePoints}",
-                            modifier = Modifier.padding(8.dp),
+                            stringResource(R.string.creator_points_label) + ": ${hero.attributePoints} [LOSOWO]",
                             color = Color.White,
-                            fontSize = 12.sp,
+                            fontSize = 11.sp,
                             fontWeight = FontWeight.Bold
                         )
                     }

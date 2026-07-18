@@ -247,9 +247,10 @@ fun PartyManagement(heroes: List<HeroUi>, onEvent: (CharacterHubUiEvent) -> Unit
                 Row(modifier = Modifier.padding(12.dp), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
                     Text(hero.name.uppercase(), color = Color.White, fontWeight = FontWeight.Bold)
                     Text(hero.status.name, color = when(hero.status) {
-                        HeroStatusUi.DEAD -> Color.Red
-                        HeroStatusUi.WOUNDED -> Color.Yellow
-                        HeroStatusUi.ALIVE -> Color.Green
+                        HeroStatusUi.dead -> Color.Red
+                        HeroStatusUi.wounded -> Color.Yellow
+                        HeroStatusUi.alive -> Color.Green
+                        else -> Color.Gray
                     }, fontSize = 10.sp)
                 }
             }

@@ -46,7 +46,7 @@
       {
         "description": "Przeszukaj strefy zerowej widoczności na Wybrzeżu i zbierz trzy pęki pulsujących błękitem ziół echa.",
         "type": "investigation",
-        "targetId": "gesta_mgla"
+        "targetId": "harvest_herbs_coast"
       }
     ]
   },
@@ -79,8 +79,8 @@
     "steps": [
       {
         "description": "Zanalizuj anomalie w tekście Pękniętej Kroniki. Uważaj, czytanie kodu źródłowego może wywołać traumę ontologiczną.",
-        "type": "investigation",
-        "targetId": "peknie_kronika"
+        "type": "dialogue",
+        "targetId": "cracked_chronicle_int_test"
       }
     ]
   }

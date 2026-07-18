@@ -59,7 +59,7 @@ class CollapseEngineTest {
         // Crossing 60% threshold
         collapseEngine.processCollapseEvent(CollapseEvent.DayEnded) // +0.05 -> 0.64
         
-        assertTrue("Threshold 0.6 should be reached", state.world.reachedThresholds.contains(0.6f))
+        assertTrue("Threshold 0.6 should be reached", state.world.reachedThresholds.contains("0.6"))
         val logsAt60 = state.logEntries.count { it.contains("Przekroczono próg upadku 60%") }
         assertEquals(1, logsAt60)
 

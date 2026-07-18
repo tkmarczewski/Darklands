@@ -1,8 +1,10 @@
 package com.grimreich.core
 
+import kotlinx.serialization.Serializable
 import javax.inject.Inject
 import javax.inject.Singleton
 
+@Serializable
 enum class Career(
     val displayName: String,
     val minAge: Int,
@@ -17,41 +19,53 @@ enum class Career(
     val virtueBonus: Int = 0,
     val description: String = ""
 ) {
-    // --- AGE PROTECTION V4.5: Minimalny wiek grywalny to 18 lat ---
-    PAGE("Paż", 18, 22, strBonus = 1, agiBonus = 1,
+    page("Paż", 18, 22, strBonus = 1, agiBonus = 1,
         description = "Młody sługa uczący się podstaw rycerskiego rzemiosła."),
-    SQUIRE("Giermek", 18, 25, requiredStrength = 10, strBonus = 2, agiBonus = 1,
+    squire("Giermek", 18, 25, requiredStrength = 10, strBonus = 2, agiBonus = 1,
         description = "Pomocnik rycerza, szkolący się w walce i etykiecie."),
-    KNIGHT("Rycerz", 21, 60, requiredVirtue = 30, requiredStrength = 12, strBonus = 3, virtueBonus = 5,
+    knight("Rycerz", 21, 60, requiredVirtue = 30, requiredStrength = 12, strBonus = 3, virtueBonus = 5,
         description = "Zakonny wojownik, obrońca wiary i tradycji."),
-    MERCENARY("Najemnik", 18, 60, requiredStrength = 11, strBonus = 2, agiBonus = 2,
+    mercenary("Najemnik", 18, 60, requiredStrength = 11, strBonus = 2, agiBonus = 2,
         description = "Wojownik do wynajęcia, znający realia wojny."),
-    SCHOLAR("Uczony", 18, 80, requiredIntelligence = 12, intBonus = 4,
+    scholar("Uczony", 18, 80, requiredIntelligence = 12, intBonus = 4,
         description = "Poszukiwacz wiedzy, badający starożytne pisma."),
-    MONK("Mnich", 18, 80, requiredVirtue = 20, virtueBonus = 5, intBonus = 1,
+    monk("Mnich", 18, 80, requiredVirtue = 20, virtueBonus = 5, intBonus = 1,
         description = "Sługa kościoła, oddany modlitwie i kontemplacji."),
-    THIEF("Złodziej", 18, 50, requiredAgility = 12, agiBonus = 3,
+    thief("Złodziej", 18, 50, requiredAgility = 12, agiBonus = 3,
         description = "Cień miejskich zaułków, mistrz manipulacji."),
-    ALCHEMIST("Alchemik", 18, 70, requiredIntelligence = 14, intBonus = 3,
+    alchemist("Alchemik", 18, 70, requiredIntelligence = 14, intBonus = 3,
         description = "Mistrz eliksirów i przemian materii."),
-    CRAFTSMAN("Rzemieślnik", 18, 70, requiredStrength = 10, strBonus = 2,
+    craftsman("Rzemieślnik", 18, 70, requiredStrength = 10, strBonus = 2,
         description = "Twórca przedmiotów, znający się na metalurgii."),
-    MERCHANT("Kupiec", 18, 75, requiredIntelligence = 10,
+    merchant("Kupiec", 18, 75, requiredIntelligence = 10,
         description = "Handlarz, znający wartość towarów i ludzi."),
-    GUARD("Strażnik", 18, 60, requiredStrength = 10, strBonus = 1, agiBonus = 1,
+    guard("Strażnik", 18, 60, requiredStrength = 10, strBonus = 1, agiBonus = 1,
         description = "Obrońca porządku miejskiego."),
-    PRIEST("Kapłan", 21, 80, requiredVirtue = 40, virtueBonus = 10, intBonus = 2,
+    priest("Kapłan", 21, 80, requiredVirtue = 40, virtueBonus = 10, intBonus = 2,
         description = "Ustanowiony sługa wiary, prowadzący wiernych."),
-    PHYSICIAN("Cyrulik", 18, 70, requiredIntelligence = 11, intBonus = 2,
+    physician("Cyrulik", 18, 70, requiredIntelligence = 11, intBonus = 2,
         description = "Uzdrowiciel, znający anatomię i zioła."),
-    APPRENTICE("Uczeń", 18, 25, intBonus = 1,
+    apprentice("Uczeń", 18, 25, intBonus = 1,
         description = "Młody adept sztuki lub rzemiosła."),
-    INQUISITOR("Inkwizytor", 25, 60, requiredVirtue = 50, requiredIntelligence = 12, virtueBonus = 15,
+    inquisitor("Inkwizytor", 25, 60, requiredVirtue = 50, requiredIntelligence = 12, virtueBonus = 15,
         description = "Łowca heretyków i tępiciel mroku."),
-    ROGUE("Łotr", 18, 50, requiredAgility = 11, agiBonus = 2,
-        description = "Awanturnik żyjący na krawędzi prawa.")
+    rogue("Łotr", 18, 50, requiredAgility = 11, agiBonus = 2,
+        description = "Awanturnik żyjący na krawędzi prawa.");
+
+    companion object {
+        @JvmField val PAGE = page; @JvmField val SQUIRE = squire; @JvmField val KNIGHT = knight
+        @JvmField val MERCENARY = mercenary; @JvmField val SCHOLAR = scholar; @JvmField val MONK = monk
+        @JvmField val THIEF = thief; @JvmField val ALCHEMIST = alchemist; @JvmField val CRAFTSMAN = craftsman
+        @JvmField val MERCHANT = merchant; @JvmField val GUARD = guard; @JvmField val PRIEST = priest
+        @JvmField val PHYSICIAN = physician; @JvmField val APPRENTICE = apprentice; @JvmField val INQUISITOR = inquisitor
+        @JvmField val ROGUE = rogue
+        
+        // Added for UI matching
+        @JvmField val ALCH = alchemist
+    }
 }
 
+@Serializable
 data class CareerEntry(
     val career: Career,
     val yearsServed: Float,

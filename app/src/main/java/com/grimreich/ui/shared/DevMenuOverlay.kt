@@ -34,10 +34,10 @@ fun DevMenuOverlay(
 
         Column(
             modifier = Modifier
-                .align(Alignment.TopEnd)
+                .align(Alignment.TopStart)
                 .padding(8.dp)
                 .zIndex(100f),
-            horizontalAlignment = Alignment.End
+            horizontalAlignment = Alignment.Start
         ) {
             if (contentErrors.isNotEmpty()) {
                 val criticalCount = contentErrors.count { it.severity == com.grimreich.systems.ErrorSeverity.CRITICAL }
@@ -161,7 +161,7 @@ fun DevMenuOverlay(
                         }
                         DevBtn("TP: TWIERDZA") {
                             root.gameRepository.updateState { state ->
-                                state.world.locationId = "twierdza_zakonu"
+                                state.world.locationId = "twierdza_zelazna"
                             }
                             root.setMode(GameScreenMode.city)
                             visible = false

@@ -174,7 +174,7 @@ class CityViewModel @Inject constructor(
         // BUG-13 FIX: Route to specific done nodes instead of dead guard_report_back
         val targetNode = if (questToComplete != null) {
             when (role.lowercase()) {
-                "guard", "straznik" -> {
+                "guard", "straznik", "fortress_guard" -> {
                     when (questToComplete.questId) {
                         "q_inquisition_verdict" -> "guard_verdict_done"
                         "q_deserter" -> "guard_deserter_done"

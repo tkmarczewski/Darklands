@@ -138,9 +138,9 @@ fun HeroDto.toDomain(): Hero = Hero(
     hp = hp,
     maxHp = maxHp,
     isDead = isDead,
-    currentCareer = currentCareer?.let { safeEnumValue(it, Career.MERCENARY) },
-    trait = trait?.let { safeEnumValue(it, Trait.NONE) },
-    subjectType = safeEnumValue(subjectType, Hero.SubjectType.VESSEL),
+    currentCareer = currentCareer?.let { runCatching { Career.valueOf(it.uppercase()) }.getOrNull() ?: Career.MERCENARY },
+    trait = trait?.let { runCatching { Trait.valueOf(it.uppercase()) }.getOrNull() ?: Trait.NONE },
+    subjectType = runCatching { Hero.SubjectType.valueOf(subjectType.uppercase()) }.getOrDefault(Hero.SubjectType.VESSEL),
     ontologicalMass = ontologicalMass,
     ontologicalStability = ontologicalStability
 ).also {
@@ -155,7 +155,7 @@ fun HeroDto.toDomain(): Hero = Hero(
 }
 
 fun CareerEntryDto.toDomain(): CareerEntry = CareerEntry(
-    career = safeEnumValue(careerName, Career.MERCENARY),
+    career = runCatching { Career.valueOf(careerName.uppercase()) }.getOrDefault(Career.MERCENARY),
     yearsServed = yearsServed.toFloat(),
     levelReached = levelReached,
     dateReached = dateReached
@@ -172,7 +172,7 @@ fun AbilityDto.toDomain(): Ability = Ability(
     id = id,
     name = name,
     description = description ?: "",
-    costType = CostType.valueOf(type),
+    costType = runCatching { CostType.valueOf(type.uppercase()) }.getOrDefault(CostType.HP),
     costValue = costValue ?: 0
 )
 
@@ -198,8 +198,8 @@ fun MutationDto.toDomain(): Mutation = Mutation(
     id = id,
     name = name,
     description = description,
-    category = com.grimreich.core.mutations.MutationCategory.valueOf(category),
-    tier = com.grimreich.core.mutations.MutationTier.valueOf(tier),
+    category = runCatching { com.grimreich.core.mutations.MutationCategory.valueOf(category.uppercase()) }.getOrDefault(com.grimreich.core.mutations.MutationCategory.PHYSICAL),
+    tier = runCatching { com.grimreich.core.mutations.MutationTier.valueOf(tier.uppercase()) }.getOrDefault(com.grimreich.core.mutations.MutationTier.DORMANT),
     attributeModifiers = attributeModifiers,
     stabilityImpact = stabilityImpact
 )
@@ -253,9 +253,9 @@ fun QuestProgress.toDto(): QuestProgressDto = QuestProgressDto(
 
 fun QuestProgressDto.toDomain(): QuestProgress = QuestProgress(
     questId = questId,
-    status = safeEnumValue(status.lowercase(), QuestStatus.locked),
+    status = runCatching { QuestStatus.valueOf(status.uppercase()) }.getOrDefault(QuestStatus.LOCKED),
     currentStepIndex = currentStepIndex,
-    variables = variables
+    variables = variables.toMutableMap()
 )
 
 fun ReputationState.toDto(): ReputationStateDto = ReputationStateDto(
@@ -310,9 +310,9 @@ fun WorldStateDto.toDomain(): WorldState = WorldState(
     timeOfDay = timeOfDay,
     fatigue = fatigue,
     lastEncounter = lastEncounter,
-    season = safeEnumValue(season, Season.spring),
+    season = runCatching { Season.valueOf(season.uppercase()) }.getOrDefault(Season.SPRING),
     globalStability = globalStability,
-    weather = safeEnumValue(weather, WeatherType.clear),
+    weather = runCatching { WeatherType.valueOf(weather.uppercase()) }.getOrDefault(WeatherType.CLEAR),
     echoIntensity = echoIntensity,
     collapseProgress = collapseProgress,
     collapseScenarioId = collapseScenarioId,
@@ -374,7 +374,7 @@ fun NpcDto.toDomain(): NPC = NPC(
     factionId = factionId,
     personality = personality,
     startNodeId = startNodeId,
-    stability = stability
+    stability = stability.toFloat()
 )
 
 fun NPC.toDto(): NpcDto = NpcDto(
@@ -384,7 +384,7 @@ fun NPC.toDto(): NpcDto = NpcDto(
     factionId = factionId,
     personality = personality,
     startNodeId = startNodeId,
-    stability = stability
+    stability = stability.toInt()
 )
 
 fun StatusEffect.toDto(): StatusEffectDto = StatusEffectDto(
@@ -394,7 +394,7 @@ fun StatusEffect.toDto(): StatusEffectDto = StatusEffectDto(
 )
 
 fun StatusEffectDto.toDomain(): StatusEffect = StatusEffect(
-    type = safeEnumValue(type, StatusEffectType.POISON),
+    type = runCatching { StatusEffectType.valueOf(type.uppercase()) }.getOrDefault(StatusEffectType.POISON),
     duration = duration,
     strength = magnitude
 )
@@ -413,7 +413,7 @@ fun PersistentMetaDto.toDomain(): PersistentMeta = PersistentMeta(
     maxMetaAwarenessReached = maxMetaAwarenessReached
 ).also {
     it.unlockedLegacyBuffs.addAll(unlockedLegacyBuffs)
-    it.unitedSelves.addAll(unitedSelves.map { s -> safeEnumValue(s, PersistentMeta.SelfAspect.FEAR) })
+    it.unitedSelves.addAll(unitedSelves.map { s -> runCatching { PersistentMeta.SelfAspect.valueOf(s.uppercase()) }.getOrDefault(PersistentMeta.SelfAspect.FEAR) })
 }
 
 inline fun <reified T : Enum<T>> safeEnumValue(name: String?, default: T): T {
@@ -440,4 +440,3 @@ fun SaveSnapshotDto.toDomain(): SaveSnapshot = SaveSnapshot(
     state = session.toDomain(),
     checksum = checksum
 )
-

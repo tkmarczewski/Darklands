@@ -1,10 +1,12 @@
 package com.grimreich.grimreich.v1
 
 import com.grimreich.core.GameState
+import kotlinx.serialization.Serializable
 
 data class GrimWorld(val id: String, val name: String, val regions: List<Region>, val factions: List<Faction>, val notes: String?)
 data class Region(val id: String, val name: String, val description: String, val encounters: List<Encounter>, val seed: Long?)
 
+@Serializable
 enum class OntologicalLevel(val level: Int, val displayName: String) {
     material(1, "Materialne"),
     altered(2, "Zmienione"),
@@ -22,16 +24,23 @@ enum class OntologicalLevel(val level: Int, val displayName: String) {
     absolute_scribes(14, "Skrybowie Absolutni")
 }
 
+@Serializable
 enum class ReputationLevel(val minScore: Int, val displayName: String) {
-    HATED(-100, "Znienawidzony"),
-    HOSTILE(-50, "Wrogi"),
-    NEUTRAL(0, "Neutralny"),
-    FRIENDLY(50, "Przyjazny"),
-    EXALTED(100, "Wywyższony");
+    hated(-100, "Znienawidzony"),
+    hostile(-50, "Wrogi"),
+    neutral(0, "Neutralny"),
+    friendly(50, "Przyjazny"),
+    exalted(100, "Wywyższony");
 
     companion object {
+        @JvmField val HATED = hated
+        @JvmField val HOSTILE = hostile
+        @JvmField val NEUTRAL = neutral
+        @JvmField val FRIENDLY = friendly
+        @JvmField val EXALTED = exalted
+
         fun fromScore(score: Int): ReputationLevel {
-            return entries.sortedByDescending { it.minScore }.firstOrNull { score >= it.minScore } ?: HATED
+            return entries.sortedByDescending { it.minScore }.firstOrNull { score >= it.minScore } ?: hated
         }
     }
 }

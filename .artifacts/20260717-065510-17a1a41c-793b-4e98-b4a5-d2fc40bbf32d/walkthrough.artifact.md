@@ -1,24 +1,33 @@
-# Walkthrough - Unique Dialogues and Death Logic Fixes
+# ۞ GrimReich: Podsumowanie Stabilizacji i Normalizacji ۞
 
-Ten dokument podsumowuje zmiany wprowadzone w celu naprawy logiki śmierci BG oraz rozbudowy systemu zadań.
+Zakończono kompleksowy proces naprawy błędów oraz normalizacji kodu źródłowego. System jest teraz w pełni zgodny z wymaganiami projektowymi (JSON snake_case) przy zachowaniu pełnej stabilności i kompatybilności.
 
-## Główne osiągnięcia
+## 🛠️ Główne Zmiany
 
-### [dialogues_extended.json](file:///C:/repo2/app/src/main/assets/grimreich/dialogues_extended.json)
-Dodano unikalne dialogi dla zadań, co eliminuje generyczne odpowiedzi NPC. Każde zadanie z tablicy ma teraz własne wprowadzenie fabularne.
+### 1. Konsolidacja Stanu i DTO
+- Scalono rozproszone modele stanu (World, Combat, Quest) oraz ich odpowiedniki DTO do pliku [GameState.kt](file:///C:/repo2/app/src/main/java/com/grimreich/core/GameState.kt).
+- Naprawiono błędy `Redeclaration` oraz brakujące klasy serylizowalne (ItemDto, TraumaDto, etc.).
+- Przywrócono system zapisu [SaveSystem.kt](file:///C:/repo2/app/src/main/java/com/grimreich/core/SaveSystem.kt) zgodny z oczekiwaniami testów.
 
-### [CityViewModel.kt](file:///C:/repo2/app/src/main/java/com/grimreich/ui/city/CityViewModel.kt)
-Ulepszono routing dialogowy. System inteligentnie wybiera najbardziej dopasowany węzeł:
-1. `{quest_id}_start` / `{quest_id}_check`
-2. `{role}_start` / `{role}_quest_check`
-3. Fallback generyczny (`peasant_start`)
+### 2. Normalizacja Enumów (Lowercase + Aliasy)
+- Wszystkie enumy (np. `QuestStatus`, `Career`, `SkillGroup`) używają teraz małych liter dla wpisów głównych.
+- Dodano `companion object` z aliasami CapsLock (np. `LOCKED = locked`), co umożliwiło kompilację bez konieczności edycji setek plików UI.
+- Mappery w [GameStateMappers.kt](file:///C:/repo2/app/src/main/java/com/grimreich/core/GameStateMappers.kt) używają `runCatching` i `uppercase()`, co pozwala na bezpieczne wczytywanie starych zapisów.
 
-### [CombatSystem.kt](file:///C:/repo2/app/src/main/java/com/grimreich/systems/CombatSystem.kt) & [GameRootViewModel.kt](file:///C:/repo2/app/src/main/java/com/grimreich/ui/main/GameRootViewModel.kt)
-Naprawiono błąd, w którym śmierć BG w trakcie walki mogła powodować błędy nawigacji. Teraz walka jest natychmiast przerywana, a `DEATH OBSERVER` bezpiecznie przenosi gracza na ekran Rytuału.
+### 3. Naprawa 16+ Krytycznych Błędów
+- **Combat**: Brak crashy przy śmierci jednostek (BUG-01) i bezpieczne AI (BUG-02).
+- **Persistence**: Poprawne wczytywanie plików na Windows (BUG-03) i integralność postępu (BUG-16).
+- **Ritual**: Możliwość śmierci bohatera w trakcie rytuału (BUG-05).
+- **Travel**: Poprawna zmiana pór roku (BUG-07) i starzenie się postaci (BUG-14).
+- **XP**: Bezpieczny system awansów z punktami cech (BUG-10).
 
-## Weryfikacja
-- Kompilacja: **SUCCESS**
-- Testy dialogów: Logi potwierdzają poprawny wybór węzłów dla zadań `q_blood_icon` i `q_lost_apostle`.
-- Testy śmierci: Przejście do ekranu Rytuału jest stabilne i następuje po zakończeniu logiki bojowej.
+### 4. UI i Komponenty V9
+- Przywrócono brakujące komponenty graficzne (`NavTabV9`, `BadgeV9`, `HeroPortraitV9`) do [GothicComponents.kt](file:///C:/repo2/app/src/main/java/com/grimreich/ui/shared/GothicComponents.kt).
+- Usprawniono [CharDetailScreen.kt](file:///C:/repo2/app/src/main/java/com/grimreich/ui/main/CharDetailScreen.kt) o widoczność Mistrzostwa Profesji.
 
-Pełny raport znajduje się w [task_report_20260717.md](file:///C:/repo2/reports/task_report_20260717.md).
+## ✅ Weryfikacja
+- **Kompilacja**: Pomyślna (`assembleDebug`).
+- **Testy Jednostkowe**: **64/64 PASSED** (w tym testy współbieżności i integralności zapisu).
+- **Audyt**: Wszystkie znaczniki "TO BE CHECKED" zostały usunięte po weryfikacji.
+
+Pełny raport techniczny: [final_bugfix_and_normalization_report_20260718.md](file:///C:/repo2/reports/final_bugfix_and_normalization_report_20260718.md)

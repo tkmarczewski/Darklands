@@ -1,103 +1,147 @@
 package com.grimreich.ui.shared
 
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.grimreich.R
+import com.grimreich.core.QuestCategory
 import com.grimreich.core.Hero
 
-/**
- * Przycisk nawigacyjny w stylu V9 (Gothic Obsidian).
- */
 @Composable
-fun NavTabV9(text: String, onClick: () -> Unit, modifier: Modifier = Modifier, color: Color = Color(0xFF2E1A1A)) {
-    Surface(
-        modifier = modifier.fillMaxWidth().height(32.dp).clickable { onClick() },
-        color = color,
-        border = BorderStroke(1.dp, Color(0xFFC0A060))
+fun GothicButton(
+    text: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    containerColor: Color = Color(0xFF330000)
+) {
+    Button(
+        onClick = onClick,
+        modifier = modifier.height(50.dp),
+        enabled = enabled,
+        shape = RoundedCornerShape(2.dp),
+        colors = ButtonDefaults.buttonColors(
+            containerColor = containerColor,
+            contentColor = Color.White,
+            disabledContainerColor = Color(0xFF111111)
+        )
     ) {
-        Box(contentAlignment = Alignment.Center) {
-            Text(text = text.uppercase(), color = Color.White, fontSize = 10.sp, fontWeight = FontWeight.Bold)
-        }
+        Text(text.uppercase(), fontWeight = FontWeight.Bold)
     }
 }
 
-/**
- * Portret bohatera w dolnym pasku (Command Center V9).
- */
 @Composable
-fun HeroPortraitV9(hero: Hero, onClick: () -> Unit) {
-    Column(
-        modifier = Modifier.width(60.dp).clickable { onClick() },
-        horizontalAlignment = Alignment.CenterHorizontally
+fun GothicCard(
+    modifier: Modifier = Modifier,
+    content: @Composable () -> Unit
+) {
+    Card(
+        modifier = modifier.border(1.dp, Color(0xFF444444), RoundedCornerShape(4.dp)),
+        colors = CardDefaults.cardColors(containerColor = Color(0xFF111111)),
+        shape = RoundedCornerShape(4.dp)
     ) {
-        Box {
-            Image(
-                painter = painterResource(id = R.drawable.ui_frame_portrait_mini),
-                contentDescription = null,
-                modifier = Modifier.size(50.dp)
-            )
-            // Diegetyczne HP BAR (Overlay)
-            Box(
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .fillMaxWidth(if (hero.maxHp > 0) hero.hp.toFloat() / hero.maxHp else 0f)
-                    .height(3.dp)
-                    .background(Color.Red)
-            )
-        }
+        content()
+    }
+}
+
+@Composable
+fun StatRow(label: String, value: String, color: Color = Color.White) {
+    Row(
+        modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(label, color = Color.Gray, fontSize = 12.sp)
+        Spacer(modifier = Modifier.weight(1f))
+        Text(value, color = color, fontWeight = FontWeight.Bold)
+    }
+}
+
+@Composable
+fun CategoryBadge(category: QuestCategory) {
+    Box(
+        modifier = Modifier
+            .background(getQuestCategoryColor(category), RoundedCornerShape(4.dp))
+            .padding(horizontal = 8.dp, vertical = 2.dp)
+    ) {
         Text(
-            text = hero.name.uppercase(), 
-            color = if (hero.isDead) Color.Red else Color.Gray, 
-            fontSize = 8.sp, 
-            fontWeight = FontWeight.Bold,
-            maxLines = 1
+            category.name.uppercase(),
+            fontSize = 10.sp,
+            color = Color.White,
+            fontWeight = FontWeight.Bold
         )
     }
 }
 
-/**
- * Odznaka kategorii zadania/przedmiotu.
- */
 @Composable
 fun BadgeV9(text: String, color: Color) {
     Surface(
-        color = Color.Transparent,
+        color = color.copy(alpha = 0.2f),
         border = androidx.compose.foundation.BorderStroke(1.dp, color),
-        shape = androidx.compose.foundation.shape.RoundedCornerShape(2.dp)
+        shape = RoundedCornerShape(2.dp)
     ) {
         Text(
-            text = text.uppercase(), 
-            color = color, 
-            fontSize = 8.sp, 
-            fontWeight = FontWeight.Bold, 
-            modifier = Modifier.padding(horizontal = 4.dp, vertical = 1.dp)
+            text = text.uppercase(),
+            modifier = Modifier.padding(horizontal = 4.dp, vertical = 1.dp),
+            fontSize = 8.sp,
+            color = color,
+            fontWeight = FontWeight.Bold
         )
     }
 }
 
-fun getQuestCategoryColor(category: com.grimreich.core.QuestCategory): Color {
+@Composable
+fun NavTabV9(text: String, onClick: () -> Unit, color: Color = Color(0xFF1A1A1A), enabled: Boolean = true, modifier: Modifier = Modifier) {
+    Surface(
+        modifier = modifier.fillMaxWidth().heightIn(min = 36.dp).clickable(enabled = enabled) { onClick() },
+        color = if (enabled) color else Color.Black,
+        border = androidx.compose.foundation.BorderStroke(1.dp, if (enabled) Color(0xFFC0A060) else Color(0xFF111111))
+    ) {
+        Box(contentAlignment = Alignment.Center, modifier = Modifier.padding(8.dp)) {
+            Text(text = text.uppercase(), color = if (enabled) Color.White else Color.DarkGray, fontSize = 10.sp, fontWeight = FontWeight.Bold)
+        }
+    }
+}
+
+@Composable
+fun HeroPortraitV9(hero: Hero, onClick: () -> Unit) {
+    Box(
+        modifier = Modifier
+            .size(48.dp)
+            .border(1.dp, if (hero.isDead) Color.Red else Color(0xFFC0A060))
+            .clickable { onClick() },
+        contentAlignment = Alignment.Center
+    ) {
+        Text(hero.name.take(1), color = Color.White)
+        if (hero.isDead) {
+             Box(modifier = Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.5f)))
+        }
+    }
+}
+
+fun getQuestCategoryColor(category: QuestCategory): Color {
     return when (category) {
-        com.grimreich.core.QuestCategory.combat -> Color(0xFFD32F2F)
-        com.grimreich.core.QuestCategory.social -> Color(0xFF1976D2)
-        com.grimreich.core.QuestCategory.investigation -> Color(0xFF7B1FA2)
-        com.grimreich.core.QuestCategory.mixed -> Color(0xFF689F38)
-        com.grimreich.core.QuestCategory.meta -> Color(0xFFFFD700)
-        com.grimreich.core.QuestCategory.anomaly -> Color(0xFF00ACC1)
-        com.grimreich.core.QuestCategory.drama -> Color(0xFFF57C00)
-        com.grimreich.core.QuestCategory.beast -> Color(0xFF4E342E)
-        com.grimreich.core.QuestCategory.intrigue -> Color(0xFF455A64)
+        QuestCategory.combat, QuestCategory.COMBAT -> Color(0xFFD32F2F)
+        QuestCategory.social, QuestCategory.SOCIAL -> Color(0xFF1976D2)
+        QuestCategory.investigation, QuestCategory.INVESTIGATION -> Color(0xFF7B1FA2)
+        QuestCategory.mixed, QuestCategory.MIXED -> Color(0xFF689F38)
+        QuestCategory.meta, QuestCategory.META -> Color(0xFFFFD700)
+        QuestCategory.anomaly, QuestCategory.ANOMALY -> Color(0xFF00ACC1)
+        QuestCategory.drama, QuestCategory.DRAMA -> Color(0xFFF57C00)
+        QuestCategory.beast, QuestCategory.BEAST -> Color(0xFF4E342E)
+        QuestCategory.intrigue, QuestCategory.INTRIGUE -> Color(0xFF455A64)
+        QuestCategory.expedition, QuestCategory.EXPEDITION -> Color(0xFF004D40)
+        QuestCategory.dialogue, QuestCategory.DIALOGUE -> Color(0xFF0D47A1)
+        QuestCategory.ritual, QuestCategory.RITUAL -> Color(0xFF311B92)
+        QuestCategory.bounty, QuestCategory.BOUNTY -> Color(0xFFBF360C)
+        else -> Color.Gray
     }
 }
