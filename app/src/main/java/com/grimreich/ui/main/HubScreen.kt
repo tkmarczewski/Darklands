@@ -10,10 +10,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -42,9 +39,39 @@ fun HubScreen(
     onWorldLog: () -> Unit,
     onCharacter: (String) -> Unit,
     onExpedition: () -> Unit,
-    onEnding: () -> Unit
+    onEnding: () -> Unit,
+    onBack: () -> Unit // Dodane
 ) {
     val state by viewModel.uiState.collectAsState()
+    var showExitDialog by remember { mutableStateOf(false) }
+
+    if (showExitDialog) {
+        AlertDialog(
+            onDismissRequest = { showExitDialog = false },
+            title = { Text("ZAKOŃCZYĆ PRZYGODĘ?") },
+            text = { Text("Niezapisany postęp może zostać utracony. Czy na pewno chcesz wrócić do menu głównego?") },
+            confirmButton = {
+                Button(
+                    onClick = { onBack() },
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4A0000))
+                ) {
+                    Text("WYJDŹ")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showExitDialog = false }) {
+                    Text("ZOSTAŃ", color = Color.White)
+                }
+            },
+            containerColor = Color(0xFF111111),
+            titleContentColor = Color.Red,
+            textContentColor = Color.White
+        )
+    }
+
+    androidx.activity.compose.BackHandler {
+        showExitDialog = true
+    }
 
     LaunchedEffect(state.worldStability) {
         viewModel.checkForEnding { onEnding() }

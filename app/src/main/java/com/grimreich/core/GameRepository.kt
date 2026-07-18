@@ -73,9 +73,7 @@ class GameRepository @Inject constructor(
             mutable.normalizeState()
             _gameState.value = mutable
 
-            if (mutable.logEntries.isNotEmpty()) {
-                _gameLogs.value = mutable.logEntries.toList()
-            }
+            _gameLogs.value = mutable.logEntries.toList()
 
             if (shouldPersist) {
                 persistCurrentState()

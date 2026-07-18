@@ -2,12 +2,11 @@ package com.grimreich.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
@@ -32,10 +31,24 @@ fun DevMenuScreen(
             .fillMaxSize()
             .background(Color(0xFF111111))
             .padding(16.dp)
+            .verticalScroll(rememberScrollState())
     ) {
-        Text("NARZĘDZIA SKRYBY (DEBUG)", color = Color.Red, fontSize = 24.sp, fontWeight = FontWeight.Bold)
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text("NARZĘDZIA SKRYBY (DEBUG)", color = Color.Red, fontSize = 20.sp, fontWeight = FontWeight.Bold)
+            Button(
+                onClick = onBack,
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4A0000)),
+                shape = androidx.compose.foundation.shape.RoundedCornerShape(4.dp)
+            ) {
+                Text("WYJŚCIE X", fontSize = 10.sp)
+            }
+        }
         
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(12.dp))
 
         // --- SEKCJA 1: STATYSTYKI ---
         Card(
@@ -43,6 +56,9 @@ fun DevMenuScreen(
             modifier = Modifier.fillMaxWidth()
         ) {
             Column(modifier = Modifier.padding(8.dp)) {
+                if (gameState.party.isEmpty()) {
+                    Text("DRUŻYNA PUSTA", color = Color.Gray, fontSize = 12.sp)
+                }
                 gameState.party.forEach { hero ->
                     Text("BOHATER: ${hero.name} | WIEK: ${hero.age} | HP: ${hero.hp}/${hero.maxHp}", color = Color.Cyan, fontSize = 12.sp)
                 }
@@ -50,56 +66,77 @@ fun DevMenuScreen(
             }
         }
 
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(12.dp))
 
         // --- SEKCJA 2: MODYFIKATORY ŚWIATA ---
         Text("MODYFIKATORY ŚWIATA", color = Color.White, fontSize = 10.sp, fontWeight = FontWeight.Bold)
-        FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.padding(vertical = 4.dp)) {
-            Button(onClick = { viewModel.addGold(1000) }, colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4A4A00))) { Text("GP+1k") }
-            Button(onClick = { viewModel.healParty() }, colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF004A00))) { Text("HEAL") }
-            Button(onClick = { viewModel.addTestHero() }, colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF00004A))) { Text("+HERO") }
-            Button(onClick = { viewModel.addXp(100) }) { Text("XP+100") }
-            Button(onClick = { viewModel.levelUp() }) { Text("LVL+") }
-            Button(onClick = { viewModel.addDays(100) }) { Text("DAYS+100") }
-            Button(onClick = { root.startDevCombat() }, colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4A0000))) { Text("COMBAT") }
-            Button(onClick = { viewModel.dumpState() }) { Text("DUMP") }
+        FlowRow(
+            horizontalArrangement = Arrangement.spacedBy(8.dp), 
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+            modifier = Modifier.padding(vertical = 4.dp)
+        ) {
+            DevButton("GP+1k", Color(0xFF4A4A00)) { viewModel.addGold(1000) }
+            DevButton("HEAL", Color(0xFF004A00)) { viewModel.healParty() }
+            DevButton("+HERO", Color(0xFF00004A)) { viewModel.addTestHero() }
+            DevButton("XP+100", Color.DarkGray) { viewModel.addXp(100) }
+            DevButton("LVL+", Color.DarkGray) { viewModel.levelUp() }
+            DevButton("DAYS+100", Color.DarkGray) { viewModel.addDays(100) }
+            DevButton("COMBAT", Color(0xFF4A0000)) { root.startDevCombat() }
+            DevButton("DUMP", Color.Black) { viewModel.dumpState() }
         }
 
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(12.dp))
         
         // --- SEKCJA 3: KONTROLA ZADAŃ ---
-        Text("QUEST INFO: $questInfo", color = Color.Yellow, fontSize = 12.sp)
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.padding(vertical = 4.dp)) {
-            Button(onClick = { viewModel.startQuest("q_blood_icon") }) { Text("START BLOOD") }
-            Button(onClick = { viewModel.stepSuccess("q_blood_icon") }) { Text("ADVANCE") }
-            Button(onClick = { viewModel.stepFail("q_blood_icon") }, colors = ButtonDefaults.buttonColors(containerColor = Color.DarkGray)) { Text("FAIL") }
+        Text("QUEST INFO: $questInfo", color = Color.Yellow, fontSize = 11.sp)
+        FlowRow(
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+            modifier = Modifier.padding(vertical = 4.dp)
+        ) {
+            DevButton("START BLOOD", Color(0xFF1B5E20)) { viewModel.startQuest("q_blood_icon") }
+            DevButton("ADVANCE", Color(0xFF0D47A1)) { viewModel.stepSuccess("q_blood_icon") }
+            DevButton("FAIL", Color(0xFFB71C1C)) { viewModel.stepFail("q_blood_icon") }
         }
 
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(12.dp))
 
         // --- SEKCJA 4: SYSTEM ---
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            Button(onClick = { root.saveGame() }) { Text("FORCE SAVE") }
-            Button(onClick = { root.forceSync() }) { Text("SYNC") }
+        FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            DevButton("FORCE SAVE", Color(0xFF455A64)) { root.saveGame() }
+            DevButton("SYNC", Color(0xFF455A64)) { root.forceSync() }
         }
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // --- SEKCJA 5: LOGI ---
-        LazyColumn(modifier = Modifier.weight(1f).fillMaxWidth().background(Color.Black).padding(4.dp)) {
-            items(logEntries) { log ->
+        // --- SEKCJA 5: LOGI (Static height in scrollable column) ---
+        Text("LOGI SYSTEMOWE", color = Color.Gray, fontSize = 10.sp)
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(200.dp)
+                .background(Color.Black)
+                .padding(4.dp)
+                .verticalScroll(rememberScrollState())
+        ) {
+            logEntries.forEach { log ->
                 Text("- $log", color = Color.LightGray, fontSize = 10.sp)
             }
         }
 
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(24.dp))
+    }
+}
 
-        Button(
-            onClick = onBack,
-            modifier = Modifier.fillMaxWidth().height(50.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF333333))
-        ) {
-            Text("POWRÓT DO GRY")
-        }
+@Composable
+fun DevButton(text: String, color: Color, onClick: () -> Unit) {
+    Button(
+        onClick = onClick,
+        colors = ButtonDefaults.buttonColors(containerColor = color),
+        shape = androidx.compose.foundation.shape.RoundedCornerShape(2.dp),
+        modifier = Modifier.heightIn(min = 32.dp),
+        contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp)
+    ) {
+        Text(text, fontSize = 10.sp, fontWeight = FontWeight.Bold, color = Color.White)
     }
 }

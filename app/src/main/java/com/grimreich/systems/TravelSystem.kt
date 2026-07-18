@@ -54,7 +54,7 @@ class TravelSystem @Inject constructor(
         if (current == destCityId) return
         
         val terrain = worldMap.terrainBetween(current, destCityId)
-        val daysSpent = when (terrain?.name) {
+        val daysSpent = when (terrain?.name?.uppercase()) {
             "ROAD" -> 7
             "FOREST" -> 14
             "MOUNTAIN" -> 21

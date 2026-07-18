@@ -135,15 +135,11 @@ class CombatSystem @Inject constructor(
         gameRepository.updateState { state ->
             val c = state.combat
             if (c.active && c.initiativeOrder.isNotEmpty()) {
-                // 1. Advance Round and Recalculate if at start
-                if (c.currentTurnIndex == 0) {
-                    c.round++
-                    recalculateInitiative(state)
-                }
+                // BUG-NEW-03 FIX: We only increment round and recalculate initiative 
+                // when the turn queue actually wraps around (handled in advanceTurn).
                 result = "Runda ${c.round}"
 
-                // 2. Ensure Player Turn
-                // BUG-01 FIX: Use getOrNull for safety
+                // 1. Ensure Player Turn
                 var currentSlot = c.initiativeOrder.getOrNull(c.currentTurnIndex)
                 if (currentSlot != null && !currentSlot.isPlayer) {
                     resolveEnemyTurnsInternal(state)
@@ -409,14 +405,18 @@ class CombatSystem @Inject constructor(
         val c = state.combat
         if (c.initiativeOrder.isEmpty()) return
         
+        val prevIndex = c.currentTurnIndex
         c.currentTurnIndex = (c.currentTurnIndex + 1) % c.initiativeOrder.size
         
+        // BUG-NEW-03: Increment round only when we wrap back to the first combatant
+        if (c.currentTurnIndex == 0 && prevIndex != 0) {
+            c.round++
+            recalculateInitiative(state)
+        }
+
         val nextSlot = c.initiativeOrder[c.currentTurnIndex]
         if (nextSlot.isPlayer) {
             c.activeHeroId = nextSlot.id
-        } else {
-            // It's enemy's turn. In a real turn-based system, we'd trigger AI here.
-            // For now, we stay on previous hero or first alive.
         }
     }
 }

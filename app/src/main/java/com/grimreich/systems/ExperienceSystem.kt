@@ -76,8 +76,8 @@ class ExperienceSystem @Inject constructor(
             state?.logEntries?.add("BOHATER AWANSOWAŁ! ${hero.name} jest teraz na poziomie ${hero.level}. Otrzymano ${GameConstants.ATTR_POINTS_PER_LEVEL} punkty cech.")
             
             levelsGained++
-            // Safety break: don't level up more than MAX_LEVEL in one go
-            if (levelsGained >= GameConstants.MAX_LEVEL) break
+            // Safety break: don't exceed max level
+            if (hero.level >= GameConstants.MAX_LEVEL) break
         }
         return levelsGained
     }

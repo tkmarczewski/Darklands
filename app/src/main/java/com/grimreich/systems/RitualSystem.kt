@@ -14,6 +14,8 @@ class RitualSystem @Inject constructor(
      */
     fun performRitual(recipe: RitualRecipe, playerCipher: List<SymbolType>): Boolean {
         var success = false
+        var enemyToFight: Enemy? = null
+
         gameRepository.updateState { state ->
             val hero = state.party.find { it.id == state.activeHeroId } ?: return@updateState
             
@@ -57,13 +59,18 @@ class RitualSystem @Inject constructor(
             } else {
                 // Porażka: Pęknięcie rzeczywistości (Ambusz)
                 state.logEntries.add("RYTUAŁ: Szyfr jest błędny! Rzeczywistość pęka.")
-                val enemy = Bestiary.get(EnemyType.blood_wraith)
-                combatSystem.startCombat(enemy)
+                enemyToFight = Bestiary.get(EnemyType.blood_wraith)
                 success = false
             }
             
             hero.normalize()
         }
+
+        // Trigger combat outside updateState lock to avoid nested locks
+        enemyToFight?.let { enemy ->
+            combatSystem.startCombat(enemy)
+        }
+
         return success
     }
 

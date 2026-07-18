@@ -127,7 +127,8 @@ fun GameNavHost(
                 onWorldLog = { root.setMode(GameScreenMode.chronicle) },
                 onCharacter = { root.inspectHero(it) },
                 onExpedition = { root.setMode(GameScreenMode.expedition) },
-                onEnding = { root.setMode(GameScreenMode.ending) }
+                onEnding = { root.setMode(GameScreenMode.ending) },
+                onBack = { root.setMode(GameScreenMode.main_menu) }
             )
         }
 

@@ -222,6 +222,10 @@ class ExpeditionViewModel @Inject constructor(
         
         if (choice.combatEnemyType != null) {
             val enemy = com.grimreich.core.Bestiary.get(choice.combatEnemyType)
+            // BUG-FIX: Ensure we return to expedition state after combat win
+            gameRepository.updateState { 
+                it.pendingAction = com.grimreich.core.PendingWorldAction.QuestCombatWin("any") 
+            }
             combatSystem.startCombat(enemy)
             _uiState.update { it.copy(content = ExpeditionContentState.EncounterLog("Rozpoczyna się starcie: ${enemy.name}!")) }
             emitEffect(ExpeditionUiEffect.NavigateToCombat)

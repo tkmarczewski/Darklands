@@ -153,7 +153,8 @@ class QuestEngine @Inject constructor(
         state.quest.progress[actualQuestId] = p.copy(status = QuestStatus.completed)
         
         state.gold += def.rewardGold
-        experienceSystem.addPartyXpDirect(state, def.recommendedLevel * 50).forEach { state.logEntries.add(it) }
+        val xpToAward = (def.recommendedLevel * 50).coerceAtLeast(50)
+        experienceSystem.addPartyXpDirect(state, xpToAward).forEach { state.logEntries.add(it) }
         
         state.logEntries.add("۞ ZADANIE UKOŃCZONE: ${def.title}")
         android.util.Log.i("QuestEngine", "Quest $actualQuestId COMPLETED and removed from active list.")
