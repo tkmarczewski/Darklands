@@ -191,8 +191,8 @@ class CharacterCreatorViewModel @Inject constructor(
     }
 
     fun randomizeAll() {
-        val careers = Career.entries.filter { it.minAge <= 14 }
-        val career = careers.random()
+        val careers = Career.entries.filter { it.minAge <= 18 }
+        val career = if (careers.isNotEmpty()) careers.random() else Career.MERCENARY
         selectCareer(career)
         randomizeAttributes()
         randomizeSkills()

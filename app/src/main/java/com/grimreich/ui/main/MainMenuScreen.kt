@@ -63,6 +63,8 @@ fun MainMenuScreen(
 
             MenuButton(stringResource(R.string.btn_language), onClick = { showLanguageSelector = true })
 
+            MenuButton("DEV MENU", color = Color.Magenta, onClick = onDevMenu)
+
             MenuButton(stringResource(R.string.btn_exit), color = Color(0xFF4A0000), onClick = onExit)
             
             Spacer(modifier = Modifier.height(32.dp))

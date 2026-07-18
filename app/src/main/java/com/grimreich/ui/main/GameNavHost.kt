@@ -247,6 +247,7 @@ fun GameNavHost(
 
         composable(GameRoute.dev_menu.route) {
             DevMenuScreen(
+                root = root,
                 onBack = { root.setMode(GameScreenMode.hub) }
             )
         }

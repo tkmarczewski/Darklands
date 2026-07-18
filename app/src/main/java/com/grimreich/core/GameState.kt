@@ -93,6 +93,7 @@ data class GameState(
     }
 }
 
+@Serializable
 enum class QuestStatus {
     locked, available, active, objective_met, completed, failed;
 
@@ -106,6 +107,7 @@ enum class QuestStatus {
     }
 }
 
+@Serializable
 enum class QuestCategory { 
     combat, social, investigation, mixed, meta, anomaly, drama, beast, intrigue, expedition, dialogue, ritual, bounty;
 
@@ -126,6 +128,7 @@ enum class QuestCategory {
     }
 }
 
+@Serializable
 enum class StepType { 
     kill, collect, talk, reach, combat, dialogue, investigation, social, meta, expedition;
 
@@ -143,10 +146,15 @@ enum class StepType {
     }
 }
 
+@Serializable
 sealed class PendingWorldAction {
+    @Serializable
     object None : PendingWorldAction()
+    @Serializable
     data class ResolveQuest(val questId: String) : PendingWorldAction()
+    @Serializable
     data class QuestCombatWin(val questId: String) : PendingWorldAction()
+    @Serializable
     data class Dialogue(
         val npcName: String,
         val npcRole: String,
@@ -155,6 +163,7 @@ sealed class PendingWorldAction {
     ) : PendingWorldAction()
 }
 
+@Serializable
 data class QuestState(
     val activeQuestIds: MutableSet<String> = mutableSetOf(),
     val completedQuestIds: MutableSet<String> = mutableSetOf(),
@@ -163,6 +172,7 @@ data class QuestState(
     val worldFlags: MutableSet<String> = mutableSetOf()
 )
 
+@Serializable
 data class QuestProgress(
     val questId: String,
     var status: QuestStatus = QuestStatus.locked,
@@ -170,11 +180,13 @@ data class QuestProgress(
     val variables: MutableMap<String, String> = mutableMapOf()
 )
 
+@Serializable
 data class ReputationState(
     val globalFactions: MutableMap<String, Int> = mutableMapOf(),
     val cityFactions: MutableMap<String, MutableMap<String, Int>> = mutableMapOf()
 )
 
+@Serializable
 data class PrayerState(
     var faith: Int = 0,
     var virtue: Int = 50,
@@ -188,6 +200,7 @@ data class PrayerState(
     }
 }
 
+@Serializable
 data class WorldState(
     var region: String = "wybrzeze_polnocne",
     var locationId: String = "wybrzeze_polnocne",
@@ -208,6 +221,7 @@ data class WorldState(
     val reachedThresholds: MutableSet<String> = mutableSetOf()
 )
 
+@Serializable
 data class CombatState(
     var active: Boolean = false,
     var round: Int = 0,
@@ -230,6 +244,7 @@ data class CombatState(
     var currentTurnIndex: Int = 0
 )
 
+@Serializable
 data class InitiativeSlot(
     val id: String,
     val isPlayer: Boolean,

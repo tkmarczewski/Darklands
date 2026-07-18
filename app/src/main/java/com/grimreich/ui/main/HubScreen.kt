@@ -128,7 +128,10 @@ fun HubScreen(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     state.party.forEach { hero ->
-                        HeroPortraitV9(hero = hero, onClick = { onCharacter(hero.id) })
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            HeroPortraitV9(hero = hero, onClick = { onCharacter(hero.id) })
+                            Text(text = "LAT: ${hero.age}", color = Color.Gray, fontSize = 9.sp)
+                        }
                     }
                     // ZŁOTO NA KOŃCU PASKA
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {

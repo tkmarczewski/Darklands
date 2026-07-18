@@ -12,17 +12,17 @@ object SkillCatalogue {
         CombatSkill(
             id = "poison_blade",
             name = "Ostrze Trucizny",
-            type = SkillType.MELEE,
+            type = SkillType.melee,
             staminaCost = 5
         ) { _, target ->
-            target.applyStatus(StatusEffectType.POISON, 3, 4, mutableListOf())
+            target.applyStatus(StatusEffectType.poison, 3, 4, mutableListOf())
             SkillResult(damage = 0, statusApplied = true, message = "Broń ocieka trucizną! Wróg zostaje otruty.")
         },
 
         CombatSkill(
             id = "bash",
             name = "Taran",
-            type = SkillType.MELEE,
+            type = SkillType.melee,
             staminaCost = 8
         ) { user, target ->
             if (target.maxHp <= 0) return@CombatSkill SkillResult(message = "Cel jest już pokonany.")
@@ -34,7 +34,7 @@ object SkillCatalogue {
         CombatSkill(
             id = "prayer_shield",
             name = "Modlitwa Ochrony",
-            type = SkillType.PRAYER,
+            type = SkillType.prayer,
             favorCost = 5
         ) { user, _ ->
             user.armor = (user.armor + 5).coerceAtMost(50)
@@ -44,7 +44,7 @@ object SkillCatalogue {
         CombatSkill(
             id = "echo_step",
             name = "Krok Echa",
-            type = SkillType.ECHO,
+            type = SkillType.echo,
             echoCost = 0.05f,
             description = "Nagasz rzeczywistość, by uniknąć trafienia. Zwiększa obronę kosztem echa."
         ) { user, _ ->
@@ -55,11 +55,10 @@ object SkillCatalogue {
         CombatSkill(
             id = "righteous_fury",
             name = "Słuszny Gniew",
-            type = SkillType.PRAYER,
+            type = SkillType.prayer,
             favorCost = 15,
             description = "Potężne uderzenie nasycone wiarą."
         ) { user, target ->
-            // BALANCE FIX: Scaled with Piety instead of just attackBase
             val dmg = user.attackBase + user.piety
             target.hp = (target.hp - dmg).coerceAtLeast(0)
             SkillResult(damage = dmg, message = "Święty blask poraża wroga za $dmg obrażeń.")
@@ -68,11 +67,10 @@ object SkillCatalogue {
         CombatSkill(
             id = "mind_collapse",
             name = "Zapaść Umysłu",
-            type = SkillType.ECHO,
+            type = SkillType.echo,
             echoCost = 0.15f,
             description = "Przelewasz mrok prosto do umysłu wroga. Ogromne obrażenia, ale destabilizuje świat."
         ) { user, target ->
-            // BALANCE FIX: Fixed damage based on Intelligence to avoid boss one-shots
             val dmg = 15 + user.intelligence
             target.hp = (target.hp - dmg).coerceAtLeast(0)
             SkillResult(damage = dmg, message = "Przerażający szept echa rozdziera jaźń przeciwnika. Zadano $dmg obrażeń.")
@@ -81,7 +79,7 @@ object SkillCatalogue {
         CombatSkill(
             id = "system_defend",
             name = "Obrona",
-            type = SkillType.MELEE
+            type = SkillType.melee
         ) { _, _ ->
             SkillResult(message = "Przyjmuje postawę obronną.")
         }

@@ -229,7 +229,8 @@ fun QuestBoardModal(state: CityUiState, onEvent: (CityUiEvent) -> Unit) {
                             Column(modifier = Modifier.padding(14.dp)) {
                                 Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()) {
                                     Text(text = quest.title.uppercase(), color = Color.White, fontWeight = FontWeight.Bold, fontSize = 14.sp, modifier = Modifier.weight(1f))
-                                    BadgeV9(text = quest.category.name, color = getQuestCategoryColor(quest.category))
+                                    val catName = quest.category?.name?.uppercase() ?: "UNKNOWN"
+                                    BadgeV9(text = catName, color = getQuestCategoryColor(quest.category ?: com.grimreich.core.QuestCategory.combat))
                                 }
                                 Spacer(modifier = Modifier.height(6.dp))
                                 Text(text = quest.description, color = Color.LightGray, fontSize = 11.sp, lineHeight = 16.sp)

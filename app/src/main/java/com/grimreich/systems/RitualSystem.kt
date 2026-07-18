@@ -90,6 +90,15 @@ class RitualSystem @Inject constructor(
                 hero.normalize()
                 hero.hp = 1
                 hero.sanity -= 15
+
+                // --- BUG-06 FIX: Trauma on Resurrection ---
+                val trauma = TraumaCatalog.getRandomTrauma()
+                if (hero.traumaMarks.none { it.id == trauma.id }) {
+                    hero.traumaMarks.add(trauma)
+                    hero.ontologicalStability -= GameConstants.TRAUMA_STABILITY_LOSS
+                    state.logEntries.add("TRAUMA: Wskrzeszenie pozostawiło ślad na duszy ${hero.name}: ${trauma.name}.")
+                }
+
                 success = true
             }
         }

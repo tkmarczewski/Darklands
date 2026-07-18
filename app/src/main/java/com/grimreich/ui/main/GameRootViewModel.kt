@@ -166,8 +166,7 @@ class GameRootViewModel @Inject constructor(
                 // --- ONTOLOGICAL AUDIT: Anchor Sync ---
                 state.persistentMeta.anchorIdentity = state.playerName
 
-                val isRalwing = state.playerName?.trim()?.equals("ralwing", ignoreCase = true) == true || 
-                                name.trim().equals("ralwing", ignoreCase = true)
+                val isRalwing = state.playerName?.trim()?.equals("ralwing", ignoreCase = true) == true || name.trim().equals("ralwing", ignoreCase = true)
                 
                 val finalHeroName = if (isRalwing) "Felix Anderson" else name
                 state.heroName = finalHeroName

@@ -2,10 +2,9 @@ package com.grimreich.systems
 
 import com.grimreich.core.GameConstants
 import com.grimreich.core.GameState
-import com.grimreich.core.GameRepository
-import com.grimreich.core.Bestiary
-import com.grimreich.core.CombatRandomProvider
 import com.grimreich.core.EnemyType
+import com.grimreich.core.Hero
+import com.grimreich.core.CombatRandomProvider
 import dagger.Lazy
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -34,7 +33,6 @@ class EncounterSystem @Inject constructor(
     private val lootSystem: LootSystem,
     private val chronicleSystem: Lazy<ChronicleSystem>
 ) {
-    // FIX: mutableListOf dla możliwości addEncounter/removeEncounter w testach
     private val encounters = mutableListOf(
         Encounter(
             "enc_01", "Cienie w zaułku", "Widzisz migoczące światło w głębi uliczki.",
@@ -44,6 +42,13 @@ class EncounterSystem @Inject constructor(
                     lootSystem.awardLootDirect(state, 1.0f)
                 }),
                 EncounterChoice("Ignoruj", "Przeszedłeś obok.", effect = { "Bezpieczeństwo przede wszystkim." })
+            )
+        ),
+        Encounter(
+            "enc_combat_test", "Bandyci na Trakcie", "Grupa zdesperowanych rzezimieszków blokuje drogę.",
+            EncounterType.combat,
+            listOf(
+                EncounterChoice("Walcz!", "Chwytasz za broń.", effect = { "POJEDYNEK" }, combatEnemyType = EnemyType.bandit)
             )
         ),
         Encounter(
@@ -73,7 +78,6 @@ class EncounterSystem @Inject constructor(
                 EncounterChoice("Omiń", "Wygląda niebezpiecznie.", effect = { "Przyspieszyłeś kroku." })
             )
         ),
-        // --- NARRATIVE ECHO EVENTS ---
         Encounter(
             "echo_frozen_archivist", "Zamarznięty Archiwista",
             "Na środku traktu stoi postać pokryta szronem, mimo upału. Trzyma w rękach księgę, " +
@@ -124,14 +128,11 @@ class EncounterSystem @Inject constructor(
 
     var activeEncounter: Encounter? = null
 
-    /** Resets active encounter to null. */
     fun clearActiveEncounter() {
         activeEncounter = null
     }
 
-    // FIX: Usunięto kotlin.random.Random — parametr to CombatRandomProvider
     fun rollEncounter(random: CombatRandomProvider, state: GameState): Encounter? {
-        // --- FACTION RAIDS ---
         val hostileFactions = state.reputation.globalFactions.filter { it.value <= GameConstants.HOSTILE_REPUTATION_THRESHOLD }.keys
         if (hostileFactions.isNotEmpty() && random.nextFloat() < GameConstants.FACTION_RAID_CHANCE) {
             val factionId = hostileFactions.toList()[random.nextInt(hostileFactions.size)]
@@ -165,9 +166,6 @@ class EncounterSystem @Inject constructor(
         activeEncounter = encounter
     }
 
-    /** Dla testów: wstrzyknięcie własnego encountera. */
     fun addEncounter(encounter: Encounter) { encounters.add(encounter) }
-
-    /** Dla testów: usunięcie encountera po id. */
-    fun removeEncounter(id: String) { encounters.removeAll { it.id == id } }
+    fun removeEncounter(id: String) { encounters.removeIf { it.id == id } }
 }

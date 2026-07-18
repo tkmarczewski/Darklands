@@ -112,7 +112,8 @@ class ExpeditionViewModel @Inject constructor(
         val content = when {
             activeEncounter != null -> ExpeditionContentState.EncounterActive(activeEncounter)
             _uiState.value.content is ExpeditionContentState.EncounterLog -> _uiState.value.content
-            else -> ExpeditionContentState.QuestList(quests)
+            quests.isNotEmpty() -> ExpeditionContentState.QuestList(quests)
+            else -> ExpeditionContentState.QuestList(emptyList())
         }
 
         _uiState.update { 

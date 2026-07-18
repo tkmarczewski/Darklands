@@ -59,6 +59,7 @@ fun CharacterCreatorScreen(
 
         Spacer(modifier = Modifier.height(12.dp))
 
+        /*
         Row(modifier = Modifier.fillMaxWidth().padding(bottom = 4.dp), horizontalArrangement = Arrangement.End) {
             Button(
                 onClick = { 
@@ -73,6 +74,7 @@ fun CharacterCreatorScreen(
                 Text(stringResource(R.string.btn_randomize_all), fontSize = 9.sp, color = Color.Black, fontWeight = FontWeight.Bold)
             }
         }
+        */
 
         Box(modifier = Modifier.weight(1f)) {
             when (state.stage) {

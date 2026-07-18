@@ -11,7 +11,7 @@ import javax.inject.Inject
 @HiltViewModel
 class DevMenuViewModel @Inject constructor(
     private val questEngine: QuestEngine,
-    private val gameRepository: com.grimreich.core.GameRepository
+    val gameRepository: com.grimreich.core.GameRepository
 ) : ViewModel() {
 
     val logEntries: StateFlow<List<String>> = gameRepository.gameLogs
@@ -21,6 +21,73 @@ class DevMenuViewModel @Inject constructor(
 
     fun addLog(msg: String) {
         gameRepository.log(msg)
+    }
+
+    fun addGold(amount: Int) {
+        gameRepository.updateState { it.gold += amount }
+        addLog("DEBUG: Dodano $amount gp")
+    }
+
+    fun healParty() {
+        gameRepository.updateState { state ->
+            state.party.forEach { hero ->
+                hero.hp = hero.maxHp
+                hero.isDead = false
+                hero.activeStatusEffects.clear()
+            }
+        }
+        addLog("DEBUG: Drużyna uleczona")
+    }
+
+    fun addTestHero() {
+        gameRepository.updateState { state ->
+            val hero = com.grimreich.core.Hero(
+                id = "hero_main",
+                name = "Debug Hero",
+                age = 18,
+                hp = 50,
+                maxHp = 50
+            )
+            state.party.clear()
+            state.party.add(hero)
+            state.activeHeroId = hero.id
+        }
+        addLog("DEBUG: Dodano Debug Hero")
+    }
+
+    fun addXp(amount: Int) {
+        gameRepository.updateState { state ->
+            state.party.forEach { it.xp += amount }
+        }
+        addLog("DEBUG: Dodano $amount XP")
+    }
+
+    fun levelUp() {
+        gameRepository.updateState { state ->
+            state.party.forEach { it.level++ }
+        }
+        addLog("DEBUG: Level UP!")
+    }
+
+    fun addDays(amount: Int) {
+        gameRepository.updateState { state ->
+            val oldDay = state.world.day
+            state.world.day += amount
+            val fullYearsPassed = (state.world.day / 365) - (oldDay / 365)
+            if (fullYearsPassed > 0) {
+                state.party.forEach { hero ->
+                    hero.age += fullYearsPassed
+                }
+                addLog("DEBUG: Upłynęło $fullYearsPassed lat.")
+            }
+        }
+        addLog("DEBUG: Przesunięto czas o $amount dni.")
+    }
+
+    fun dumpState() {
+        val state = gameRepository.currentState()
+        android.util.Log.d("TRIBUNAL_DEBUG", "Full State: $state")
+        addLog("DEBUG: State dumped to logcat")
     }
 
     fun startQuest(id: String) {
