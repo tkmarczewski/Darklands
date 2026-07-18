@@ -1,38 +1,33 @@
-# Raport z Testów Stabilności i Naprawy Błędów (Samsung Device)
+# Kompleksowy Raport z Testów Stabilności i Naprawy Błędów
 
-## 1. Naprawione Błędy (Bugfixes)
+## 1. Naprawione Błędy Krytyczne (BUG-NEW)
 
-### [BUG-14] Starzenie się Bohatera
-- **Problem**: Brak przyrostu wieku postaci podczas długotrwałych podróży i ekspedycji.
-- **Rozwiązanie**: W `TravelSystem.kt` dodano logikę przeliczania pełnych lat (365 dni) przy każdej zmianie `world.day`.
-- **Weryfikacja**: Przeskok czasu o 400 dni na urządzeniu Samsung zaowocował poprawną inkrementacją wieku z 18 do 19 lat.
+| ID | Opis | Rozwiązanie |
+|---|---|---|
+| **BUG-NEW-01** | Błąd przeliczania czasu podróży (Terrain Mismatch) | Dodano `.uppercase()` do porównania nazw terenów. |
+| **BUG-NEW-02** | Zagnieżdżony lock w rytuałach (Combat Race Condition) | Wywołanie walki po nieudanym rytuale przeniesiono poza blok `updateState`. |
+| **BUG-NEW-03** | Niepoprawna inkrementacja rund walki | Przeniesiono `round++` do momentu pełnego obrotu kolejki inicjatywy. |
+| **BUG-NEW-04** | Logi gry nie były czyszczone w UI | Usunięto warunek `isNotEmpty()` przy synchronizacji `_gameLogs`. |
+| **BUG-NEW-05** | Brak XP za zadania o niskim poziomie | Dodano minimalną nagrodę 50 XP dla każdego zadania. |
+| **BUG-NEW-06** | Błędny safety break przy zdobywaniu poziomów | Poprawiono warunek na `hero.level >= MAX_LEVEL`. |
 
-### [BUG-06] System Traumy po Wskrzeszeniu
-- **Problem**: Rytuał wskrzeszenia nie nakładał negatywnych efektów na psychikę bohatera.
-- **Rozwiązanie**: Zmodyfikowano `RitualSystem.kt`. Każde wskrzeszenie `hero_main` dodaje teraz losową traumę z `TraumaCatalog` oraz obniża stabilność ontologiczną o 20 pkt.
-- **Weryfikacja**: Testowa śmierć w walce i wskrzeszenie potwierdziły dodanie traumy (np. "Trzęsące się dłonie") widocznej w logach Kroniki.
+## 2. Zadania i Ekspedycja (UX)
 
-### [Build & Runtime] Stabilność Aplikacji
-- **Błędy Kompilacji**: Usunięto adnotację `@Serializable` z klas domenowych (`GameState`, `Hero`, `NPC`, `Item`), które nie są bezpośrednio serializowane. Rozwiązało to problem z polami `Any` i brakiem sub-serializatorów w Kotlin/Serialization.
-- **NPE na Tablicy Zadań**: Dodano bezpieczną obsługę kategorii zadań w `CityScreen.kt`.
-- **ConcurrentModificationException**: Zastosowano kopiowanie mapy węzłów w `ContentValidator.kt`.
+- **Pętla Ravenn / Krwawa Mara**: Naprawiono logikę zaliczania walki w `CombatSystem.kt`. Zwycięstwo z Marą teraz poprawnie przesuwa krok zadania `q_inquisition_verdict`.
+- **Nawigacja Ekspedycji**: Po walce lub zdarzeniu gracz pozostaje w trybie ekspedycji, widząc pozostałe cele, zamiast być wyrzucanym do Huba.
+- **Tablica Ogłoszeń**: Ograniczono liczbę zadań do 6 najbardziej istotnych (priorytet zadań fabularnych i łańcuchów).
 
-## 2. Rozbudowa Narzędzi (DEV Menu)
+## 3. Poprawki Interfejsu (UI)
 
-Przywrócono i rozszerzono panel deweloperski (przycisk Magenta w lewym górnym rogu):
-- Bezpośrednie dodawanie złota (`GP+1k`).
-- Pełne leczenie drużyny (`HEAL`).
-- Szybkie dodawanie bohatera testowego (`+HERO`).
-- Przeskok czasu (`DAYS+100`).
-- Wymuszanie walki testowej (`COMBAT`).
-- Zrzut pełnego stanu do logcat (`DUMP`).
+- **Dialogi**: Włączono przewijanie pionowe (`verticalScroll`) dla długich tekstów dialogowych.
+- **DEV Menu**: Przebudowano układ przycisków, aby mieściły się na ekranie bez ucinania. Dodano wyraźny przycisk wyjścia ("ZAMKNIJ X").
+- **Bezpieczeństwo**: Przycisk BACK w Hubie wyświetla teraz dialog potwierdzenia przed powrotem do menu głównego.
 
-## 3. Status Synchronizacji (Push)
+## 4. Status Synchronizacji (Push)
 
 - **Repozytorium**: `https://github.com/tkmarczewski/Darklands.git`
 - **Branch**: `master`
-- **Status**: Pomyślnie wysłano wszystkie zmiany (`git push`).
-- **Data raportu**: 2026-07-18
+- **Ostatni Commit**: `Fix critical logic (terrain, round counter, xp), expedition navigation, quest loops (Mara/Ravenn), and UI (scrollable dialogue, exit confirmation).`
 
 ---
-**Werdykt**: Aplikacja gotowa do testów produkcyjnych. System starzenia i traumy działa zgodnie ze specyfikacją.
+**Werdykt**: Wszystkie zgłoszone błędy seryjne i interfejsowe zostały usunięte. System jest stabilny i gotowy do dalszego rozwoju.
