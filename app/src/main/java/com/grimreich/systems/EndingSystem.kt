@@ -24,16 +24,15 @@ class EndingSystem @Inject constructor(
     }
 
     fun checkEndingConditions(state: GameState): GameEnding {
-        // Project Anchor: Endings can only trigger after the first day
-        if (state.world.day <= 1 && state.world.globalStability == 100) return GameEnding.NONE
+        // Project Anchor: Endings can only trigger after a significant journey
+        if (state.world.day < 5) return GameEnding.NONE
 
         return when {
-            // FIX (PRECISION): Use epsilon for float comparisons
+            // ... (rest of logic)
             state.world.collapseProgress >= 0.999f -> GameEnding.TOTAL_COLLAPSE
             state.world.echoIntensity >= 0.999f -> GameEnding.ECHO_DOMINION
             state.party.all { it.isDead } -> GameEnding.ABANDONED
-            state.world.globalStability >= 90 && state.prayer.faith >= 80 -> GameEnding.FAITH_ASCENSION
-            state.world.globalStability >= 95 -> GameEnding.RESTORATION
+            state.world.globalStability >= 95 && state.quest.completedQuestIds.isNotEmpty() -> GameEnding.RESTORATION
             else -> GameEnding.NONE
         }
     }

@@ -91,6 +91,16 @@ class ProceduralNpcGenerator @Inject constructor(
             ))
         }
 
+        if (cityId == "port_mglisty") {
+            npcList.add(NPC(
+                id = "deserter",
+                name = if (isGrim20) "BŁĄD_STR_09" else "Zatroskany Dezerter",
+                role = "deserter",
+                startNodeId = "deserter_start",
+                stability = (worldStability / 100f).coerceIn(0.1f, 1.0f)
+            ))
+        }
+
         // 2. CANONICAL ROLES with procedurally generated epithets
         val baseRoles = listOf("merchant", "guard", "mystic", "beggar", "peasant")
         val advancedRoles = listOf("noble", "scholar", "priest", "monk", "hunter", "assassin", "ritualist")

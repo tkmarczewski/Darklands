@@ -86,6 +86,9 @@ data class GameState(
         trimLogs()
         prayer.normalize()
         
+        world.globalStability = world.globalStability.coerceIn(0, 100)
+        world.echoIntensity = world.echoIntensity.coerceIn(0f, 5f)
+
         // Sync anchor identity for persistence
         if (playerName != null) {
             persistentMeta.anchorIdentity = playerName

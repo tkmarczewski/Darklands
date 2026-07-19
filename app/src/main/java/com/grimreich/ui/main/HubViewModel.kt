@@ -33,7 +33,7 @@ data class HubUiState(
 
 @HiltViewModel
 class HubViewModel @Inject constructor(
-    private val gameRepository: GameRepository,
+    gameRepository: GameRepository,
     private val questEngine: QuestEngine,
     private val cityCatalogue: CityCatalogue,
     private val visualContentSystem: com.grimreich.systems.VisualContentSystem,
