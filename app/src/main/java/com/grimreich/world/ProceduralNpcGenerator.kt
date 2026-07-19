@@ -126,7 +126,7 @@ class ProceduralNpcGenerator @Inject constructor(
                 val npcName = if (isGrim20) {
                     "INSTANCJA_${role.uppercase().take(3)}_${(100..999).random(random)}"
                 } else {
-                    "${generateName(role, random)} ($epithet)"
+                    "${generateName(role, random, cityId)} ($epithet)"
                 }
 
                 val infestationChance = if (worldStability < 20) 0.4f else if (worldStability < 50) 0.1f else 0.01f
@@ -146,8 +146,11 @@ class ProceduralNpcGenerator @Inject constructor(
         return npcList
     }
 
-    private fun generateName(role: String, random: Random): String {
+    private fun generateName(role: String, random: Random, cityId: String): String {
         val names = listOf("Aldous", "Vane", "Kael", "Mina", "Garrick", "Liora", "Thane", "Elowen")
-        return names.random(random) + " ($role)"
+        val baseName = names.random(random)
+        // Anti-duplicate suffix based on city hash
+        val suffix = if (random.nextBoolean()) " I" else " II"
+        return baseName + (if (random.nextFloat() < 0.2f) suffix else "") + " ($role)"
     }
 }

@@ -1,0 +1,40 @@
+[
+  {
+    "id": "beggar_start",
+    "npcId": "beggar",
+    "text": "Panie... jedna moneta za słowo prawdy? Szyfr jest głodny, a ja jestem tylko pustym miejscem w pamięci...",
+    "choices": [
+      {
+        "text": "Masz tu kilka monet (Płacisz 5 gp).",
+        "targetNodeId": "beggar_paid",
+        "triggerEvent": "pay_gold",
+        "triggerValue": "5"
+      },
+      {
+        "text": "Nie mam nic dla ciebie.",
+        "targetNodeId": "beggar_ignore"
+      }
+    ]
+  },
+  {
+    "id": "beggar_paid",
+    "npcId": "beggar",
+    "text": "Dziękuję... Słuchaj uważnie: widziałem, jak tekst na tablicy ogłoszeń sam się zmieniał o północy. To nie są zlecenia, to instrukcje od kogoś... z zewnątrz.",
+    "choices": [
+      {
+        "text": "Ciekawa obserwacja. (ZYSKAJ WIEDZĘ)",
+        "targetNodeId": "end",
+        "triggerEvent": "unlock_lore",
+        "triggerValue": "lore_beggar_tip"
+      }
+    ]
+  },
+  {
+    "id": "beggar_ignore",
+    "npcId": "beggar",
+    "text": "Wszyscy ignorują błędy... póki same nie przyjdą ich wymazać. Idź swoją drogą, Kotwico.",
+    "choices": [
+      { "text": "Zegnaj.", "targetNodeId": "end" }
+    ]
+  }
+]

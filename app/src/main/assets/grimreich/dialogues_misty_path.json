@@ -1,0 +1,45 @@
+[
+  {
+    "id": "misty_path",
+    "npcId": "none",
+    "text": "Wizje we mgle są coraz silniejsze. Widzisz dom, którego nie ma na mapie, i kobietę, która woła Cię po imieniu, choć nigdy jej nie spotkałeś.",
+    "choices": [
+      {
+        "text": "Zignoruj wizję i skup się na stabilności.",
+        "targetNodeId": "end",
+        "triggerEvent": "advance_quest",
+        "triggerValue": "q_remembering_mists"
+      },
+      {
+        "text": "Podejdź do kobiety (Ryzyko Sanity).",
+        "targetNodeId": "misty_path_choice",
+        "triggerEvent": "advance_quest",
+        "triggerValue": "q_remembering_mists"
+      }
+    ]
+  },
+  {
+    "id": "misty_path_choice",
+    "npcId": "none",
+    "text": "Gdy dotykasz jej dłoni, postać rozpada się na tysiąc małych cyfr. Twoja Kronika wzbogaca się o nową, niepokojącą adnotację.",
+    "choices": [
+      {
+        "text": "Wróć zameldować o tym odkryciu.",
+        "targetNodeId": "end"
+      }
+    ]
+  },
+  {
+    "id": "misty_path_report",
+    "npcId": "archivist",
+    "text": "A więc Mgła zaczęła personalizować swoje błędy... To fascynujące i przerażające zarazem. Twoja obecność tutaj naprawdę destabilizuje Szyfr.",
+    "choices": [
+      {
+        "text": "Dopełnij zapisu (ZAKOŃCZ).",
+        "targetNodeId": "end",
+        "triggerEvent": "complete_quest",
+        "triggerValue": "q_remembering_mists"
+      }
+    ]
+  }
+]

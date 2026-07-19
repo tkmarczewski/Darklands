@@ -26,22 +26,22 @@ fun DevMenuOverlay(
         content()
 
         if (mode != GameScreenMode.dev_menu) {
-            // DUŻY, JASKRAWY PRZYCISK DEV
+            // MNIEJSZY PRZYCISK DEV, PRZESUNIĘTY ABY NIE ZASŁANIAĆ NPC
             Surface(
                 modifier = Modifier
-                    .padding(40.dp)
-                    .size(100.dp)
+                    .padding(top = 16.dp, start = 16.dp)
+                    .size(60.dp)
                     .align(Alignment.TopStart)
                     .clickable { 
                         android.util.Log.e("TRIBUNAL", "!!! DEV CLICK DETECTED !!!")
                         root.setMode(GameScreenMode.dev_menu) 
                     },
-                color = Color.Magenta.copy(alpha = 0.7f),
+                color = Color.Magenta.copy(alpha = 0.4f),
                 shape = androidx.compose.foundation.shape.CircleShape,
-                tonalElevation = 8.dp
+                tonalElevation = 4.dp
             ) {
                 Box(contentAlignment = Alignment.Center) {
-                    Text("DEV MENU", color = Color.White, fontSize = 12.sp, fontWeight = androidx.compose.ui.text.font.FontWeight.Bold)
+                    Text("DEV", color = Color.White, fontSize = 9.sp, fontWeight = androidx.compose.ui.text.font.FontWeight.Bold)
                 }
             }
         } else {

@@ -111,8 +111,8 @@ class ContentValidator @Inject constructor(
     }
 
     private fun validateDialogues() {
-        val nodes = dialogueManager.getAllNodes().toMap() // Create a copy to avoid ConcurrentModificationException
-        nodes.forEach { (nodeId, node) ->
+        val nodesCopy = dialogueManager.getAllNodes().toMap() 
+        nodesCopy.forEach { (nodeId, node) ->
             node.choices.forEach { choice ->
                 // Target Node Validation
                 if (choice.targetNodeId != "end" && !dialogueManager.hasNode(choice.targetNodeId)) {

@@ -45,7 +45,7 @@ class DialogueManager @Inject constructor(
         nodes[node.id] = node
     }
 
-    fun getAllNodes(): Map<String, DialogueNode> = nodes
+    fun getAllNodes(): Map<String, DialogueNode> = synchronized(loadLock) { nodes.toMap() }
 
     fun hasNode(nodeId: String): Boolean = nodes.containsKey(nodeId)
 
@@ -119,6 +119,22 @@ class DialogueManager @Inject constructor(
                 
                 targetId?.let { engine.completeQuestDirect(state, it) }
             }
+            "pay_gold" -> {
+                val amount = value?.toIntOrNull() ?: 0
+                if (state.gold >= amount) {
+                    state.gold -= amount
+                    state.logEntries.add("Stracono $amount gp.")
+                }
+            }
+            "unlock_lore" -> {
+                value?.let { 
+                    if (!state.quest.worldFlags.contains(it.lowercase())) {
+                        state.quest.worldFlags.add(it.lowercase())
+                        state.logEntries.add("۞ ODKRYTO WIEDZĘ: ${it.replace("lore_", "").replace("_", " ").uppercase()}")
+                    }
+                    state.unlockedLoreIds.add(it.lowercase())
+                }
+            }
             "increment_meta" -> {
                 val inc = value?.toIntOrNull() ?: 1
                 state.metaAwarenessLevel += inc
@@ -147,9 +163,11 @@ class DialogueManager @Inject constructor(
             }
             "unlock_lore" -> {
                 value?.let { loreId ->
-                    if (state.unlockedLoreIds.add(loreId.lowercase())) {
-                        state.logEntries.add("Nowy wpis w Kronice: $loreId")
+                    if (!state.quest.worldFlags.contains(loreId.lowercase())) {
+                        state.quest.worldFlags.add(loreId.lowercase())
+                        state.logEntries.add("۞ ODKRYTO WIEDZĘ: ${loreId.replace("lore_", "").replace("_", " ").uppercase()}")
                     }
+                    state.unlockedLoreIds.add(loreId.lowercase())
                 }
             }
             "check_world_flag" -> {
@@ -234,6 +252,8 @@ class DialogueManager @Inject constructor(
             // BUG-15: Do NOT clear if we want to preserve modded or dynamic nodes
             loadNodesFromAsset("grimreich/dialogues_pilot.json")
             loadNodesFromAsset("grimreich/dialogues_extended.json")
+            loadNodesFromAsset("grimreich/dialogues_beggars.json")
+            loadNodesFromAsset("grimreich/dialogues_misty_path.json")
             isLoaded = true
         }
     }

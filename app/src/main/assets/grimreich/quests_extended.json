@@ -149,7 +149,8 @@
     "category": "anomaly",
     "recommendedLevel": 3,
     "steps": [
-      { "description": "Przejdź przez ścieżkę wizji we mgle, nie dając się zwieść fałszywym wspomnieniom.", "type": "investigation", "targetId": "misty_path" }
+      { "description": "Przejdź przez ścieżkę wizji we mgle, nie dając się zwieść fałszywym wspomnieniom.", "type": "investigation", "targetId": "misty_path" },
+      { "description": "Wróć do Archiwisty i opowiedz, co widziałeś.", "type": "dialogue", "targetId": "misty_path_report" }
     ]
   },
   {
