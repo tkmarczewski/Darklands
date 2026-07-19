@@ -19,10 +19,15 @@ import com.grimreich.ui.shared.DevMenuOverlay
 import com.grimreich.core.GameBootstrapper
 import com.grimreich.core.LanguageManager
 import com.grimreich.ui.theme.GrimTheme
+import com.grimreich.systems.AudioEngine
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : LocalizedActivity() {
+    @Inject lateinit var audioEngine: AudioEngine
+    @Inject lateinit var gameRepository: com.grimreich.core.GameRepository
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         
@@ -59,5 +64,11 @@ class MainActivity : LocalizedActivity() {
                 }
             }
         }
+    }
+
+    override fun onDestroy() {
+        audioEngine.release()
+        gameRepository.close()
+        super.onDestroy()
     }
 }

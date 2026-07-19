@@ -42,6 +42,5 @@ class WorldSimulationCoordinator @Inject constructor(
             // 5. Global Simulation
             worldSimulation2_0.simulateDirect(state)
         }
-        gameRepository.persistCurrentState()
     }
 }

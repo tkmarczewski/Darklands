@@ -1,7 +1,13 @@
 package com.grimreich.core
 
 import com.grimreich.grimreich.v1.Item
+import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.descriptors.PrimitiveKind
+import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
+import kotlinx.serialization.descriptors.SerialDescriptor
+import kotlinx.serialization.encoding.Decoder
+import kotlinx.serialization.encoding.Encoder
 
 /**
  * Bestiariusz i encountery z Grimreich: pełna lista wrogów ze statystykami,
@@ -9,7 +15,7 @@ import kotlinx.serialization.Serializable
  */
 
 // ────────── ENEMY TYPES ──────────────────────────────────────────────────────
-@Serializable
+@Serializable(with = EnemyTypeSerializer::class)
 enum class EnemyType {
     // Ludzcy
     bandit, bandit_leader, city_guard,
@@ -53,13 +59,41 @@ enum class EnemyType {
     steel_wraith
 }
 
-@Serializable
+object EnemyTypeSerializer : KSerializer<EnemyType> {
+    override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor("EnemyType", PrimitiveKind.STRING)
+    override fun serialize(encoder: Encoder, value: EnemyType) = encoder.encodeString(value.name)
+    override fun deserialize(decoder: Decoder): EnemyType {
+        val name = decoder.decodeString().lowercase().trim()
+        return try {
+            EnemyType.valueOf(name)
+        } catch (e: Exception) {
+            android.util.Log.w("EnemyTypeSerializer", "Unknown EnemyType: $name. Falling back to bandit.")
+            EnemyType.bandit
+        }
+    }
+}
+
+@Serializable(with = EnemyAISerializer::class)
 enum class EnemyAI {
     aggressive,  // atakuje zawsze
     defensive,   // broni się, nie ściga
     tactical,    // sprytny, ucieka gdy przegrywa
     berserk,     // walczy do śmierci
     ranged       // preferuje dystans
+}
+
+object EnemyAISerializer : KSerializer<EnemyAI> {
+    override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor("EnemyAI", PrimitiveKind.STRING)
+    override fun serialize(encoder: Encoder, value: EnemyAI) = encoder.encodeString(value.name)
+    override fun deserialize(decoder: Decoder): EnemyAI {
+        val name = decoder.decodeString().lowercase().trim()
+        return try {
+            EnemyAI.valueOf(name)
+        } catch (e: Exception) {
+            android.util.Log.w("EnemyAISerializer", "Unknown EnemyAI: $name. Falling back to aggressive.")
+            EnemyAI.aggressive
+        }
+    }
 }
 
 @Serializable

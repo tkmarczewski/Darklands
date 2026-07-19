@@ -10,6 +10,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
@@ -193,4 +194,14 @@ class AudioEngine @Inject constructor(
     }
 
     fun getCurrentStability(): Int = currentStability
+
+    /**
+     * Zwalnia zasoby i anuluje obserwację stanu gry.
+     * Powinno być wywołane przy zamykaniu aplikacji (np. w MainActivity.onDestroy).
+     */
+    fun release() {
+        Log.d(TAG, "Releasing AudioEngine resources...")
+        scope.cancel()
+        stopMusicInternal()
+    }
 }

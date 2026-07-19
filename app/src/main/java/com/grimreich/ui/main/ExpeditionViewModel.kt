@@ -76,6 +76,7 @@ class ExpeditionViewModel @Inject constructor(
             is ExpeditionUiEvent.OnEncounterChoiceClick -> handleEncounterChoice(event.choice)
             ExpeditionUiEvent.OnDismissEncounter -> dismissEncounter()
             ExpeditionUiEvent.OnBackClick -> {
+                hasRolledForCurrentVisit = false // BUG-NEW-10 FIX: Reset roll flag on back
                 gameRepository.updateState { it.isExpeditionActive = false }
                 emitEffect(ExpeditionUiEffect.NavigateBack)
             }

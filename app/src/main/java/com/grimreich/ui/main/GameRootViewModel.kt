@@ -276,16 +276,20 @@ class GameRootViewModel @Inject constructor(
             val points = hero.attributePoints
             if (points > 0) {
                 val stats = listOf("STR", "AGI", "INT", "END", "PER", "CHA", "PIE")
+                // BUG-NEW-12 FIX: Randomize with better point handling and internal safety
                 repeat(points) {
-                    val target = stats.random()
-                    when (target) {
-                        "STR" -> hero.strength++
-                        "AGI" -> hero.agility++
-                        "INT" -> hero.intelligence++
-                        "END" -> hero.endurance++
-                        "PER" -> hero.perception++
-                        "CHA" -> hero.charisma++
-                        "PIE" -> hero.piety++
+                    if (hero.attributePoints > 0) {
+                        val target = stats.random()
+                        when (target) {
+                            "STR" -> hero.strength++
+                            "AGI" -> hero.agility++
+                            "INT" -> hero.intelligence++
+                            "END" -> hero.endurance++
+                            "PER" -> hero.perception++
+                            "CHA" -> hero.charisma++
+                            "PIE" -> hero.piety++
+                        }
+                        hero.attributePoints--
                     }
                 }
                 hero.attributePoints = 0

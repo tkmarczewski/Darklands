@@ -126,10 +126,17 @@ class EncounterSystem @Inject constructor(
         )
     )
 
-    var activeEncounter: Encounter? = null
+    private val lock = Any()
+    private var _activeEncounter: Encounter? = null
+
+    var activeEncounter: Encounter?
+        get() = synchronized(lock) { _activeEncounter }
+        set(value) = synchronized(lock) { _activeEncounter = value }
 
     fun clearActiveEncounter() {
-        activeEncounter = null
+        synchronized(lock) {
+            _activeEncounter = null
+        }
     }
 
     fun rollEncounter(random: CombatRandomProvider, state: GameState): Encounter? {

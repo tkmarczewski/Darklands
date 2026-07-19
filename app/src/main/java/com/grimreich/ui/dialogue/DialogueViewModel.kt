@@ -144,23 +144,24 @@ class DialogueViewModel @Inject constructor(
     }
 
     fun choose(choice: DialogueChoice, onEnd: () -> Unit, onCombat: () -> Unit, onMarket: () -> Unit, onRitual: () -> Unit) {
-        val state = gameRepository.currentState()
+        val currentState = gameRepository.currentState()
         
         val choiceInfo = uiState.value.availableChoices.find { it.choice == choice }
         choiceInfo?.activeHeroName?.let { helperName ->
-            val helper = state.party.find { it.name == helperName }
+            val helper = currentState.party.find { it.name == helperName }
             if (helper != null) {
                 gameRepository.updateState { it.activeHeroId = helper.id }
-                state.logEntries.add("${helper.name} przejmuje inicjatywę w rozmowie.")
+                gameRepository.log("${helper.name} przejmuje inicjatywę w rozmowie.")
             }
         }
 
-        dialogueManager.handleTrigger(state, choice.triggerEvent, choice.triggerValue)
-
-        if (state.world.locationId == "twierdza_zelazna") {
-            gameRepository.updateState { s ->
-                s.party.forEach { if (!it.isDead) it.hp = (it.hp - 1).coerceAtLeast(1) }
-                s.logEntries.add("Krew: Decyzja kosztuje. Kotwica pije z Naczyń.")
+        // BUG-NEW-14 FIX: Wrap trigger handling in updateState for consistency and UI refresh
+        gameRepository.updateState { state ->
+            dialogueManager.handleTrigger(state, choice.triggerEvent, choice.triggerValue)
+            
+            if (state.world.locationId == "twierdza_zelazna") {
+                state.party.forEach { if (!it.isDead) it.hp = (it.hp - 1).coerceAtLeast(1) }
+                state.logEntries.add("Krew: Decyzja kosztuje. Kotwica pije z Naczyń.")
             }
         }
 
@@ -175,7 +176,7 @@ class DialogueViewModel @Inject constructor(
             }
             val enemy = com.grimreich.core.Bestiary.get(enemyType)
             
-            val activeQuestId = questEngine.getActiveQuestsForCity(state.world.locationId).firstOrNull()?.id
+            val activeQuestId = questEngine.getActiveQuestsForCity(currentState.world.locationId).firstOrNull()?.id
             
             combatSystem.startCombat(enemy)
             gameRepository.updateState { 

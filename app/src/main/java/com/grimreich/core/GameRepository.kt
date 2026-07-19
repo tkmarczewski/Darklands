@@ -10,6 +10,8 @@ import com.grimreich.world.CityCatalogue
 import com.grimreich.world.ItemCatalogue
 import dagger.Lazy
 import kotlinx.coroutines.*
+import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -38,11 +40,32 @@ class GameRepository @Inject constructor(
     private val repositoryJob = SupervisorJob()
     private val repositoryScope = CoroutineScope(repositoryJob + Dispatchers.IO)
 
+    private val saveRequests = MutableSharedFlow<GameState>(
+        extraBufferCapacity = 1,
+        onBufferOverflow = BufferOverflow.DROP_OLDEST
+    )
+
     private val syncMutex = Mutex()
     private val saveMutex = Mutex()
 
     init {
         repositoryScope.launch { sync() }
+        
+        // BUG-NEW-LEAK-02: Collector for conflated save requests.
+        // Ensures only the latest state is saved and multiple requests don't pile up.
+        repositoryScope.launch {
+            saveRequests.collect { snapshot ->
+                saveMutex.withLock {
+                    try {
+                        val dto = snapshot.toDto()
+                        persistence.persist(dto)
+                        Log.d("GameRepository", "Conflated auto-save completed.")
+                    } catch (e: Exception) {
+                        Log.e("GameRepository", "Auto-save failed", e)
+                    }
+                }
+            }
+        }
     }
 
     // FIX: reverted from suspend/Mutex back to a synchronous ReentrantLock.
@@ -148,17 +171,16 @@ class GameRepository @Inject constructor(
     }
 
     fun persistCurrentState() {
-        val stateSnapshot = _gameState.value.deepCopy()
-        repositoryScope.launch {
-            saveMutex.withLock {
-                try {
-                    val dto = stateSnapshot.toDto()
-                    persistence.persist(dto)
-                } catch (e: Exception) {
-                    Log.e("GameRepository", "Auto-save failed", e)
-                }
-            }
-        }
+        val snapshot = _gameState.value.deepCopy()
+        saveRequests.tryEmit(snapshot)
+    }
+
+    /**
+     * Zamyka repozytorium i anuluje wszystkie oczekujące operacje.
+     */
+    fun close() {
+        Log.d("GameRepository", "Closing repository and cancelling jobs...")
+        repositoryJob.cancel()
     }
 
     fun manualSave(slotId: Int, label: String = "") {

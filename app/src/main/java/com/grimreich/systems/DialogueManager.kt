@@ -10,6 +10,8 @@ import com.grimreich.grimreich.v1.DialogueChoice
 import com.grimreich.grimreich.v1.DialogueNode
 import dagger.Lazy
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.random.Random
@@ -22,15 +24,20 @@ class DialogueManager @Inject constructor(
 ) {
     private val nodes = mutableMapOf<String, DialogueNode>()
     private val gson = Gson()
+    private val loadLock = Any()
+    private var isLoaded = false
 
     fun loadNodesFromAsset(path: String) {
-        try {
-            val json = context.assets.open(path).bufferedReader().use { it.readText() }
-            val type = object : TypeToken<List<DialogueNode>>() {}.type
-            val loaded: List<DialogueNode> = gson.fromJson(json, type)
-            loaded.forEach { registerNode(it) }
-        } catch (e: Exception) {
-            android.util.Log.e("DialogueManager", "Error loading dialogues: ${e.message}")
+        synchronized(loadLock) {
+            try {
+                val json = context.assets.open(path).bufferedReader().use { it.readText() }
+                val type = object : TypeToken<List<DialogueNode>>() {}.type
+                val loaded: List<DialogueNode> = gson.fromJson(json, type)
+                loaded.forEach { registerNode(it) }
+                android.util.Log.d("DialogueManager", "Loaded ${loaded.size} nodes from $path")
+            } catch (e: Exception) {
+                android.util.Log.e("DialogueManager", "Error loading dialogues from $path: ${e.message}")
+            }
         }
     }
 
@@ -45,17 +52,20 @@ class DialogueManager @Inject constructor(
     fun getNode(id: String): DialogueNode? {
         if (id == "end") return null
         
-        if (nodes.isEmpty()) {
-            loadNodesFromAsset("grimreich/dialogues_pilot.json")
-            loadNodesFromAsset("grimreich/dialogues_extended.json")
+        synchronized(loadLock) {
+            if (!isLoaded && nodes.isEmpty()) {
+                seedBasicDialogues()
+            }
         }
         
         return nodes[id]
     }
 
     fun makeChoice(choice: DialogueChoice): DialogueNode? {
-        val state = gameRepositoryProvider.get().currentState()
-        handleTrigger(state, choice.triggerEvent, choice.triggerValue)
+        val repo = gameRepositoryProvider.get()
+        repo.updateState { state ->
+            handleTrigger(state, choice.triggerEvent, choice.triggerValue)
+        }
         
         if (choice.targetNodeId == "end") {
             return null
@@ -219,8 +229,12 @@ class DialogueManager @Inject constructor(
     }
 
     fun seedBasicDialogues() {
-        // BUG-15: Do NOT clear if we want to preserve modded or dynamic nodes
-        loadNodesFromAsset("grimreich/dialogues_pilot.json")
-        loadNodesFromAsset("grimreich/dialogues_extended.json")
+        synchronized(loadLock) {
+            if (isLoaded) return
+            // BUG-15: Do NOT clear if we want to preserve modded or dynamic nodes
+            loadNodesFromAsset("grimreich/dialogues_pilot.json")
+            loadNodesFromAsset("grimreich/dialogues_extended.json")
+            isLoaded = true
+        }
     }
 }

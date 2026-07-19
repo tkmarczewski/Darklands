@@ -92,6 +92,14 @@ class InventorySystem @Inject constructor(
             
             val equippedSlot = from.equipment.entries.firstOrNull { it.value == instanceId }?.key
             if (equippedSlot != null) {
+                // BUG-NEW-11 FIX: If target already has an item in this slot, unequip it first
+                // to prevent it from being orphaned (still in inventory but missing from equipment map).
+                if (to.equipment[equippedSlot] != null) {
+                    val targetOldItemInstanceId = to.equipment[equippedSlot]
+                    to.equipment[equippedSlot] = null
+                    android.util.Log.d("InventorySystem", "Target already had item in slot $equippedSlot (ID: $targetOldItemInstanceId). Unequipping it first.")
+                }
+
                 from.equipment[equippedSlot] = null
                 to.equipment[equippedSlot] = instanceId
             }
