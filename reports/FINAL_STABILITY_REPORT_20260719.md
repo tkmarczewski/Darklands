@@ -24,7 +24,15 @@
 
 - **Normalizacja JSON**: Dodano dedykowane serializatory dla `EnemyType` i `EnemyAI`, które automatycznie konwertują wartości z formatu UPPERCASE do lowercase, eliminując ryzyko crashy przy wczytywaniu nieprawidłowo sformatowanych assetów.
 
-## 4. Status Synchronizacji (Push)
+## 4. Wyniki Testów (Samsung Device)
+
+Przeprowadzono pełny test produkcyjny na fizycznym urządzeniu Samsung:
+- **Kreacja**: Stworzono bohatera "FinalKlaus", statystyki zainicjalizowane poprawnie.
+- **Stabilność**: Wielokrotne przejścia Miasto <-> Ekspedycja bez crashy.
+- **Wydajność**: Mechanizm *Conflated Saves* działa poprawnie – brak opóźnień (lagów) przy szybkich zmianach stanu.
+- **Weryfikacja Inwariantów**: Ręczny audyt UI potwierdził poprawność przeliczania HP i złota po zdarzeniach czasu rzeczywistego.
+
+## 5. Status Synchronizacji (Push)
 
 - **Repozytorium**: `https://github.com/tkmarczewski/Darklands.git`
 - **Branch**: `master`
