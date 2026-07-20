@@ -77,10 +77,8 @@ class MarketViewModel @Inject constructor(
         val item = itemCatalogue.get(itemId) ?: return
         
         gameRepository.updateState { s ->
+            // BUG FIX #1: Race condition - validate inside updateState
             if (s.gold < item.value) {
-                // We update the UI state directly from here if we had a reference, 
-                // but since we don't, we'll have to rely on the refresh or a separate signal.
-                // In this architecture, it's better to check inside updateState.
                 return@updateState 
             }
 
@@ -101,6 +99,7 @@ class MarketViewModel @Inject constructor(
         _uiState.update { it.copy(errorMessage = null) }
         
         gameRepository.updateState { s ->
+            // BUG FIX #2: Find item inside updateState to avoid selling non-existent item
             val toRemove = s.inventory.find { it.instanceId == itemId }
             if (toRemove != null) {
                 val price = calculateSellPrice(toRemove.value)

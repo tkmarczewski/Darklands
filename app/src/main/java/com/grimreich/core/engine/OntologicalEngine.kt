@@ -55,7 +55,13 @@ class OntologicalEngine @Inject constructor(
             state.party.forEach { hero ->
                 if (!hero.isDead && hero.hp < hero.maxHp) {
                     val healAmount = (hero.maxHp * 0.05f).toInt().coerceAtLeast(1)
-                    hero.hp = (hero.hp + healAmount).coerceAtMost(hero.maxHp)
+                    // BUG FIX #1: Avoid direct reference mutation
+                    // Note: If hero is a data class with var, this still mutates.
+                    // But in this engine, state.party is a MutableList of Hero objects.
+                    // To be TRULY safe against data races with UI, we should replace the object.
+                    val updatedHero = hero.copy(hp = (hero.hp + healAmount).coerceAtMost(hero.maxHp))
+                    val index = state.party.indexOf(hero)
+                    state.party[index] = updatedHero
                 }
             }
         }
@@ -65,7 +71,8 @@ class OntologicalEngine @Inject constructor(
         val state = gameRepository.currentState()
         val stability = state.world.globalStability
         
-        val random = Random(state.world.day.toLong() + state.world.fatigue.toLong())
+        // BUG FIX #5: Use stable seed for the entire day to ensure determinism
+        val random = Random(state.world.day.toLong() + state.world.locationId.hashCode())
 
         // Glitches are more common during expeditions even at higher stability
         val threshold = if (state.isExpeditionActive) 60 else 40

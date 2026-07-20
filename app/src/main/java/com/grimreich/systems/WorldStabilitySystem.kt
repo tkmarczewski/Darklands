@@ -49,7 +49,10 @@ class WorldStabilitySystem @Inject constructor(
             var hpChanged = false
             state.party.forEach { hero ->
                 if (!hero.isDead && hero.hp > 1) {
-                    hero.hp -= 1
+                    // BUG FIX #4: Replace object instead of direct mutation
+                    val updatedHero = hero.copy(hp = hero.hp - 1)
+                    val index = state.party.indexOf(hero)
+                    state.party[index] = updatedHero
                     hpChanged = true
                 }
             }

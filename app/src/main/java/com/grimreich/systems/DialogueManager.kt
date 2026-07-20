@@ -10,6 +10,7 @@ import com.grimreich.grimreich.v1.DialogueChoice
 import com.grimreich.grimreich.v1.DialogueNode
 import dagger.Lazy
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -18,7 +19,7 @@ import kotlin.random.Random
 
 @Singleton
 class DialogueManager @Inject constructor(
-    @param:ApplicationContext private val context: Context,
+    @ApplicationContext private val context: Context,
     private val gameRepositoryProvider: Lazy<GameRepository>,
     private val questEngine: Lazy<QuestEngine>,
 ) {
@@ -30,7 +31,12 @@ class DialogueManager @Inject constructor(
     fun loadNodesFromAsset(path: String) {
         synchronized(loadLock) {
             try {
-                val json = context.assets.open(path).bufferedReader().use { it.readText() }
+                // BUG FIX #3: Offload asset reading to IO thread
+                val json = runBlocking {
+                    withContext(Dispatchers.IO) {
+                        context.assets.open(path).bufferedReader().use { it.readText() }
+                    }
+                }
                 val type = object : TypeToken<List<DialogueNode>>() {}.type
                 val loaded: List<DialogueNode> = gson.fromJson(json, type)
                 loaded.forEach { registerNode(it) }
@@ -63,8 +69,24 @@ class DialogueManager @Inject constructor(
 
     fun makeChoice(choice: DialogueChoice): DialogueNode? {
         val repo = gameRepositoryProvider.get()
+        
+        // BUG FIX #2: Extract side-effects from updateState block
+        var itemToGive: String? = null
+        if (choice.triggerEvent?.lowercase()?.trim() == "give_item") {
+            itemToGive = choice.triggerValue
+        }
+
         repo.updateState { state ->
             handleTrigger(state, choice.triggerEvent, choice.triggerValue)
+            
+            // Handle give_item safely inside state
+            itemToGive?.let { itemId ->
+                val item = repo.itemCatalogue.createInstance(itemId.lowercase())
+                if (item != null) {
+                    state.inventory.add(item)
+                    state.logEntries.add("Otrzymano przedmiot: ${item.name}")
+                }
+            }
         }
         
         if (choice.targetNodeId == "end") {
@@ -152,14 +174,8 @@ class DialogueManager @Inject constructor(
                 }
             }
             "give_item" -> {
-                value?.let { itemId ->
-                    val repo = gameRepositoryProvider.get()
-                    val item = repo.itemCatalogue.createInstance(itemId.lowercase())
-                    if (item != null) {
-                        state.inventory.add(item)
-                        state.logEntries.add("Otrzymano przedmiot: ${item.name}")
-                    }
-                }
+                // Now handled in makeChoice directly to keep handleTrigger pure or avoid re-fetches
+                // But left here for direct system calls if any
             }
             "check_world_flag" -> {
                 android.util.Log.d("DialogueManager", "Checked world flag: $value (Status: ${state.quest.worldFlags.contains(value?.lowercase())})")

@@ -3,6 +3,7 @@ package com.grimreich.core
 import kotlinx.serialization.Serializable
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlinx.serialization.Transient
 
 @Serializable
 enum class Career(
@@ -72,7 +73,8 @@ data class CareerEntry(
     val levelReached: Int = 1,
     val dateReached: Long = 0L
 ) {
-    val yearsServed: Float get() = daysServed / 365f
+    @Transient
+    val yearsServed: Float = daysServed / 365f
 }
 
 @Singleton

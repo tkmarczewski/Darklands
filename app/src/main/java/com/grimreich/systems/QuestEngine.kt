@@ -76,7 +76,9 @@ class QuestEngine @Inject constructor(
 
         // Prerequisites
         if (def.prerequisiteQuestId != null) {
-            val preStatus = getStatus(def.prerequisiteQuestId, state, visited)
+            // BUG FIX #4: Use a fresh visited set for prerequisites to avoid "swallowing" quests
+            // that are both prerequisites and independent board entries
+            val preStatus = getStatus(def.prerequisiteQuestId, state, mutableSetOf())
             if (preStatus != QuestStatus.completed) return QuestStatus.locked
         }
 
@@ -201,9 +203,8 @@ class QuestEngine @Inject constructor(
     }
 
     fun getVisibleQuestBoard(state: GameState): Map<String, List<QuestDefinition>> {
-        val sharedVisited = mutableSetOf<String>()
         return registry.values
-            .filter { !it.isHidden && getStatus(it.id, state, sharedVisited) == QuestStatus.available }
+            .filter { !it.isHidden && getStatus(it.id, state, mutableSetOf()) == QuestStatus.available }
             .groupBy { it.cityId.lowercase() }
             .mapValues { (cityId, quests) ->
                 shuffleQuests(quests, cityId, state.world.day)
@@ -211,10 +212,9 @@ class QuestEngine @Inject constructor(
     }
     
     fun getAvailableQuestsForCity(cityId: String, state: GameState): List<QuestDefinition> {
-        val sharedVisited = mutableSetOf<String>()
         val cityLower = cityId.lowercase()
         val allAvailable = registry.values.filter {
-            it.cityId.lowercase() == cityLower && !it.isHidden && getStatus(it.id, state, sharedVisited) == QuestStatus.available
+            it.cityId.lowercase() == cityLower && !it.isHidden && getStatus(it.id, state, mutableSetOf()) == QuestStatus.available
         }
         
         val priorityQuests = allAvailable.filter { it.chainId != null }
