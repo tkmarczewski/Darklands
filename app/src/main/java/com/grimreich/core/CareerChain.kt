@@ -68,10 +68,12 @@ enum class Career(
 @Serializable
 data class CareerEntry(
     val career: Career,
-    val yearsServed: Float,
+    val daysServed: Int = 0,
     val levelReached: Int = 1,
     val dateReached: Long = 0L
-)
+) {
+    val yearsServed: Float get() = daysServed / 365f
+}
 
 @Singleton
 class CareerChain @Inject constructor() {
@@ -98,7 +100,7 @@ class CareerChain @Inject constructor() {
         hero.virtue         = (hero.virtue      + career.virtueBonus).coerceIn(0, VIRTUE_CAP)
         
         if (hero.careerHistory.none { it.career == career }) {
-            hero.careerHistory.add(CareerEntry(career = career, yearsServed = 0f))
+            hero.careerHistory.add(CareerEntry(career = career, daysServed = 0))
         }
         return hero
     }

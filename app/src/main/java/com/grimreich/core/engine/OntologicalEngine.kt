@@ -1,6 +1,7 @@
 package com.grimreich.core.engine
 
 import com.grimreich.core.GameRepository
+import com.grimreich.systems.DefaultCollapseRandomProvider
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.random.Random
@@ -11,12 +12,18 @@ import kotlin.random.Random
  */
 @Singleton
 class OntologicalEngine @Inject constructor(
-    private val gameRepository: GameRepository
+    private val gameRepository: GameRepository,
+    private val collapseRandomProvider: com.grimreich.contracts.CollapseRandomProvider
 ) {
     fun processRealityShift() {
         gameRepository.updateState { state ->
+            // Use seed-based random for deterministic shifts
+            val random = if (collapseRandomProvider is DefaultCollapseRandomProvider) {
+                 Random(state.world.day.toLong() + state.world.locationId.hashCode())
+            } else Random.Default
+
             // Random fluctuations in stability
-            val baseShift = Random.nextInt(-2, 3)
+            val baseShift = random.nextInt(-2, 3)
             var shift = baseShift
             var reason = "natural fluctuation"
 
@@ -24,7 +31,7 @@ class OntologicalEngine @Inject constructor(
             if (state.isExpeditionActive) {
                 shift -= 5 // Constant drain
                 reason = "expedition drain"
-                if (Random.nextFloat() < 0.3f) {
+                if (random.nextFloat() < 0.3f) {
                     shift -= 3 // Extra spikes
                     reason = "expedition rift spike"
                 }
@@ -57,6 +64,8 @@ class OntologicalEngine @Inject constructor(
     fun isGlitchActive(): Boolean {
         val state = gameRepository.currentState()
         val stability = state.world.globalStability
+        
+        val random = Random(state.world.day.toLong() + state.world.fatigue.toLong())
 
         // Glitches are more common during expeditions even at higher stability
         val threshold = if (state.isExpeditionActive) 60 else 40
@@ -64,6 +73,6 @@ class OntologicalEngine @Inject constructor(
         // BUG-R3-07: Clamp finalChance to [0, 1] to prevent probability exceeding 100%
         val finalChance = if (state.isExpeditionActive) (baseChance * 1.5f).coerceAtMost(1.0f) else baseChance
 
-        return stability < threshold && Random.nextFloat() < finalChance
+        return stability < threshold && random.nextFloat() < finalChance
     }
 }

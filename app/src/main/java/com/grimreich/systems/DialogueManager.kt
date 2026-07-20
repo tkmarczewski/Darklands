@@ -161,15 +161,6 @@ class DialogueManager @Inject constructor(
                     }
                 }
             }
-            "unlock_lore" -> {
-                value?.let { loreId ->
-                    if (!state.quest.worldFlags.contains(loreId.lowercase())) {
-                        state.quest.worldFlags.add(loreId.lowercase())
-                        state.logEntries.add("۞ ODKRYTO WIEDZĘ: ${loreId.replace("lore_", "").replace("_", " ").uppercase()}")
-                    }
-                    state.unlockedLoreIds.add(loreId.lowercase())
-                }
-            }
             "check_world_flag" -> {
                 android.util.Log.d("DialogueManager", "Checked world flag: $value (Status: ${state.quest.worldFlags.contains(value?.lowercase())})")
             }

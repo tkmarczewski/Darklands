@@ -116,9 +116,16 @@ class QuestEngine @Inject constructor(
         val normalizedId = questId.lowercase().trim()
         // Resolve "active" alias from dialogue context
         val action = state.pendingAction
-        val actualQuestId = if (normalizedId == "active" && action is com.grimreich.core.PendingWorldAction.Dialogue && action.relatedQuestId != null) {
-            action.relatedQuestId!!.lowercase()
-        } else normalizedId
+        val actualQuestId = if (normalizedId == "active" && action is com.grimreich.core.PendingWorldAction.Dialogue) {
+            val relatedId = action.relatedQuestId
+            if (relatedId == null) {
+                android.util.Log.e("QuestEngine", "Attempted to complete 'active' quest but relatedQuestId is NULL in Dialogue action")
+                return
+            }
+            relatedId.lowercase()
+        } else {
+            normalizedId
+        }
 
         if (state.quest.completedQuestIds.contains(actualQuestId)) {
             state.quest.activeQuestIds.remove(actualQuestId)

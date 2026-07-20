@@ -12,7 +12,7 @@ class ProceduralNpcGenerator @Inject constructor(
     private val echoSystem: com.grimreich.core.EchoSystem
 ) {
     init {
-        android.util.Log.e("ProceduralNpcGenerator", "INIT: NPC Generator ready.")
+        android.util.Log.d("ProceduralNpcGenerator", "INIT: NPC Generator ready.")
     }
 
     fun generateForCity(cityId: String, state: GameState): List<NPC> {

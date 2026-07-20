@@ -75,12 +75,11 @@ class TravelSystem @Inject constructor(
                 }
             }
 
-            // Advance career years (1 year = 365 days)
-            val yearsPassed = daysSpent.toFloat() / 365f
+            // Advance career days
             s.party.forEach { hero ->
                 val entry = hero.careerHistory.find { it.career == hero.currentCareer }
                 if (entry != null) {
-                    val updated = entry.copy(yearsServed = entry.yearsServed + yearsPassed)
+                    val updated = entry.copy(daysServed = entry.daysServed + daysSpent)
                     val index = hero.careerHistory.indexOf(entry)
                     hero.careerHistory[index] = updated
                 }
