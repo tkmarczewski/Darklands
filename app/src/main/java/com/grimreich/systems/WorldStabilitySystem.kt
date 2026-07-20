@@ -46,12 +46,16 @@ class WorldStabilitySystem @Inject constructor(
      */
     private fun applyAnchorTax(state: GameState) {
         if (state.world.locationId == "twierdza_zelazna") {
+            var hpChanged = false
             state.party.forEach { hero ->
-                if (!hero.isDead) {
-                    hero.hp = (hero.hp - 1).coerceAtLeast(1)
+                if (!hero.isDead && hero.hp > 1) {
+                    hero.hp -= 1
+                    hpChanged = true
                 }
             }
-            state.logEntries.add("Krew: Kotwica porusza się, a Naczynia krwawią.")
+            if (hpChanged) {
+                state.logEntries.add("Krew: Kotwica porusza się, a Naczynia krwawią.")
+            }
         }
     }
 

@@ -8,7 +8,6 @@ import com.grimreich.world.ItemCatalogue
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import javax.inject.Inject
-import java.text.Normalizer
 
 import com.grimreich.core.Hero
 
@@ -52,51 +51,62 @@ class MarketViewModel @Inject constructor(
         val stock = city?.marketStock ?: emptyList()
         val forSale = stock.mapNotNull { itemId ->
             itemCatalogue.get(itemId)?.let { item ->
-                MarketItem(item.templateId, item.name, item.value, (item.value * 0.5).toInt())
+                MarketItem(item.templateId, item.name, item.value, calculateSellPrice(item.value))
             }
         }
 
         val toSell = state.inventory.map { item ->
-            MarketItem(item.instanceId, item.name, item.value, (item.value * 0.5).toInt())
+            MarketItem(item.instanceId, item.name, item.value, calculateSellPrice(item.value))
         }
 
-        _uiState.update { 
-            it.copy(
+        _uiState.update { currentState -> 
+            currentState.copy(
                 cityName = city?.name ?: "Nieznane Miasto",
                 playerGold = state.gold,
                 itemsForSale = forSale,
                 itemsToSell = toSell,
-                party = state.party.toList()
+                party = state.party.map { hero -> hero.deepCopy() }, // Deep copy for UI stability
+                errorMessage = null // Reset error on refresh
             )
         }
     }
 
-    fun buy(itemId: String) {
-        val state = gameRepository.currentState()
-        val item = itemCatalogue.get(itemId) ?: return
-        if (state.gold < item.value) {
-            _uiState.update { it.copy(errorMessage = "Brak złota!") }
-            return
-        }
+    private fun calculateSellPrice(baseValue: Int): Int = (baseValue * 0.5).toInt()
 
+    fun buy(itemId: String) {
+        val item = itemCatalogue.get(itemId) ?: return
+        
         gameRepository.updateState { s ->
+            if (s.gold < item.value) {
+                // We update the UI state directly from here if we had a reference, 
+                // but since we don't, we'll have to rely on the refresh or a separate signal.
+                // In this architecture, it's better to check inside updateState.
+                return@updateState 
+            }
+
             s.gold -= item.value
             itemCatalogue.createInstance(itemId)?.let { s.inventory.add(it) }
             s.logEntries.add("Kupiono: ${item.name} za ${item.value} G.")
         }
+        
+        // Final check for UI feedback (after updateState)
+        if (gameRepository.currentState().gold < item.value) {
+            _uiState.update { it.copy(errorMessage = "Brak złota!") }
+        } else {
+            _uiState.update { it.copy(errorMessage = null) }
+        }
     }
 
     fun sell(itemId: String) {
-        val state = gameRepository.currentState()
-        val item = state.inventory.find { it.instanceId == itemId } ?: return
-        val price = (item.value * 0.5).toInt()
-
+        _uiState.update { it.copy(errorMessage = null) }
+        
         gameRepository.updateState { s ->
             val toRemove = s.inventory.find { it.instanceId == itemId }
             if (toRemove != null) {
+                val price = calculateSellPrice(toRemove.value)
                 s.inventory.remove(toRemove)
                 s.gold += price
-                s.logEntries.add("Sprzedano: ${item.name} za $price G.")
+                s.logEntries.add("Sprzedano: ${toRemove.name} za $price G.")
             }
         }
     }

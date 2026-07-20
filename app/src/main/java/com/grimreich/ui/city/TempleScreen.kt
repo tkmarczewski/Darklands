@@ -16,13 +16,14 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.grimreich.R
 import com.grimreich.core.Hero
 import com.grimreich.ui.shared.*
 
 @Composable
 fun TempleScreen(
-    viewModel: TempleViewModel,
+    viewModel: TempleViewModel = hiltViewModel(),
     onBack: () -> Unit
 ) {
     val state by viewModel.uiState.collectAsState()
@@ -57,13 +58,37 @@ fun TempleScreen(
                     HorizontalDivider(color = Color(0x33C0A060), thickness = 1.dp, modifier = Modifier.padding(vertical = 4.dp))
                     
                     LazyColumn(modifier = Modifier.fillMaxSize()) {
-                        item {
-                            Text(
-                                text = if (state.logs.isEmpty()) "> ${stringResource(R.string.temple_log_default)}" else "> ${state.logs}",
-                                color = Color.LightGray,
-                                fontSize = 11.sp,
-                                lineHeight = 16.sp
-                            )
+                        if (state.logs.isEmpty()) {
+                            item {
+                                Text(
+                                    text = "> ${stringResource(R.string.temple_log_default)}",
+                                    color = Color.LightGray,
+                                    fontSize = 11.sp,
+                                    lineHeight = 16.sp
+                                )
+                            }
+                        } else {
+                            items(state.logs) { log ->
+                                Text(
+                                    text = "> $log",
+                                    color = Color.LightGray,
+                                    fontSize = 11.sp,
+                                    lineHeight = 16.sp
+                                )
+                                Spacer(modifier = Modifier.height(4.dp))
+                            }
+                        }
+
+                        state.errorMessage?.let { error ->
+                            item {
+                                Spacer(modifier = Modifier.height(8.dp))
+                                Text(
+                                    text = "!! $error",
+                                    color = Color.Red,
+                                    fontSize = 11.sp,
+                                    fontWeight = FontWeight.Bold
+                                )
+                            }
                         }
                         if (state.isNegotiating) {
                             item {
@@ -87,7 +112,7 @@ fun TempleScreen(
                     HorizontalDivider(color = Color(0x33C0A060), thickness = 1.dp, modifier = Modifier.padding(vertical = 4.dp))
                     
                     LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                        items(state.party) { hero ->
+                        items(state.party, key = { it.id }) { hero ->
                             HeroTempleCardV9(
                                 hero = hero, 
                                 onPray = { viewModel.pray(hero.id) }, 

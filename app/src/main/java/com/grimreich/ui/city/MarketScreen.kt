@@ -60,7 +60,7 @@ fun MarketScreen(
                         }
                     } else {
                         LazyColumn(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                            items(state.itemsToSell) { item ->
+                            items(state.itemsToSell, key = { it.id }) { item ->
                                 MarketItemRowV9(
                                     name = item.name,
                                     price = item.sellPrice,
@@ -80,7 +80,7 @@ fun MarketScreen(
                     HorizontalDivider(color = Color(0x33C0A060), thickness = 1.dp, modifier = Modifier.padding(vertical = 4.dp))
                     
                     LazyColumn(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                        items(state.itemsForSale) { item ->
+                        items(state.itemsForSale, key = { it.id }) { item ->
                             MarketItemRowV9(
                                 name = item.name,
                                 price = item.price,

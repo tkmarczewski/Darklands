@@ -13,8 +13,9 @@ data class TempleUiState(
     val party: List<Hero> = emptyList(),
     val faith: Int = 0,
     val gold: Int = 0,
-    val logs: String = "",
-    val isNegotiating: Boolean = false
+    val logs: List<String> = emptyList(),
+    val isNegotiating: Boolean = false,
+    val errorMessage: String? = null
 )
 
 @HiltViewModel
@@ -31,7 +32,7 @@ class TempleViewModel @Inject constructor(
             .onEach { state ->
                 _uiState.update { 
                     it.copy(
-                        party = state.party,
+                        party = state.party.map { h -> h.deepCopy() }, // BUG FIX #6: avoid mutable reference
                         faith = state.prayer.faith,
                         gold = state.gold
                     )
@@ -42,21 +43,43 @@ class TempleViewModel @Inject constructor(
 
     fun pray(heroId: String) {
         val result = churchSystem.pray(heroId)
-        _uiState.update { it.copy(logs = result) }
+        addLog(result)
+    }
+
+    private fun addLog(message: String) {
+        _uiState.update { 
+            val newLogs = (it.logs + message).takeLast(10)
+            it.copy(logs = newLogs, errorMessage = null)
+        }
     }
 
     fun makeOffering(amount: Int) {
+        if (amount > _uiState.value.gold) {
+            _uiState.update { it.copy(errorMessage = "Brak złota na ofiarę!") }
+            return
+        }
         val result = churchSystem.makeOffering(amount)
-        _uiState.update { it.copy(logs = result) }
+        addLog(result)
     }
 
     fun toggleNegotiation() {
-        _uiState.update { it.copy(isNegotiating = !it.isNegotiating) }
+        _uiState.update { it.copy(isNegotiating = !it.isNegotiating, errorMessage = null) }
     }
 
     fun resurrect(heroId: String) {
+        val hero = _uiState.value.party.find { it.id == heroId } ?: return
+        if (!hero.isDead) return
+
         val isNegotiated = _uiState.value.isNegotiating
+        val cost = if (isNegotiated) 150 else 300
+        
+        if (_uiState.value.gold < cost) {
+            _uiState.update { it.copy(errorMessage = "Brak złota na wskrzeszenie ($cost G)!") }
+            return
+        }
+
         val result = churchSystem.performResurrection(heroId, isNegotiated)
-        _uiState.update { it.copy(logs = result, isNegotiating = false) }
+        addLog(result)
+        _uiState.update { it.copy(isNegotiating = false) }
     }
 }
