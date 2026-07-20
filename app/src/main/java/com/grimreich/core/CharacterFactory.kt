@@ -32,7 +32,7 @@ class CharacterFactory @Inject constructor(
             // Each cycle adds 5 years of service and increases stats/skills
             val entry = hero.careerHistory.find { it.career == career }
             if (entry != null) {
-                val updated = entry.copy(yearsServed = entry.yearsServed + 5f)
+                val updated = entry.copy(daysServed = entry.daysServed + (5 * 365))
                 val index = hero.careerHistory.indexOf(entry)
                 hero.careerHistory[index] = updated
             }

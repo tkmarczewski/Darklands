@@ -21,9 +21,7 @@ class AgingSystem @Inject constructor(
         hero.currentCareer?.let { current ->
             val entry = hero.careerHistory.find { it.career == current }
             if (entry != null) {
-                // CareerEntry is a data class with val, we need to replace it or change to var.
-                // Checking CareerChain.kt... it's a data class with val.
-                val updatedEntry = entry.copy(yearsServed = entry.yearsServed + 1)
+                val updatedEntry = entry.copy(daysServed = entry.daysServed + 365)
                 val index = hero.careerHistory.indexOf(entry)
                 hero.careerHistory[index] = updatedEntry
             }
