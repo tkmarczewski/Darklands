@@ -1,5 +1,6 @@
 package com.grimreich.core.engine
 
+import com.grimreich.contracts.CollapseRandomProvider
 import com.grimreich.core.GameRepository
 import com.grimreich.core.GameState
 import com.grimreich.core.WorldState
@@ -14,18 +15,20 @@ import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.any
 import org.mockito.kotlin.whenever
 
-
 class OntologicalEngineTest {
 
     @Mock
     private lateinit var gameRepository: GameRepository
+
+    @Mock
+    private lateinit var collapseRandomProvider: CollapseRandomProvider
 
     private lateinit var engine: OntologicalEngine
 
     @Before
     fun setup() {
         MockitoAnnotations.openMocks(this)
-        engine = OntologicalEngine(gameRepository)
+        engine = OntologicalEngine(gameRepository, collapseRandomProvider)
     }
 
     @Test

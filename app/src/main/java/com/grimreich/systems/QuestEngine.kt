@@ -154,7 +154,11 @@ class QuestEngine @Inject constructor(
              }
         }
 
-        if (p.status != QuestStatus.objective_met && p.status != QuestStatus.active) return
+        if (p.status != QuestStatus.objective_met) {
+            // BUG FIX #7: Only allow completion if objective is met
+            android.util.Log.w("QuestEngine", "Attempted to complete quest $actualQuestId but objective is not met (current status: ${p.status})")
+            return
+        }
         
         // --- ATOMIC TRANSITION ---
         state.quest.activeQuestIds.remove(actualQuestId)

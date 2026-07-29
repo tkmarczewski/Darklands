@@ -5,6 +5,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -12,42 +14,52 @@ import javax.inject.Singleton
 class SaveSystem @Inject constructor() {
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
     private val saveSlots = mutableMapOf<Int, SaveSnapshot>()
+    private val slotsLock = Mutex()
 
-    fun save(state: GameState, slotId: Int, label: String = "") {
-        val snapshot = SaveSnapshot(
-            version = SAVE_VERSION,
-            timestamp = System.currentTimeMillis(),
-            label = label,
-            state = state.deepCopy()
-        )
-        saveSlots[slotId] = snapshot
+    suspend fun save(state: GameState, slotId: Int, label: String = "") {
+        slotsLock.withLock {
+            val snapshot = SaveSnapshot(
+                version = SAVE_VERSION,
+                timestamp = System.currentTimeMillis(),
+                label = label,
+                state = state.deepCopy()
+            )
+            saveSlots[slotId] = snapshot
+        }
     }
 
-    fun load(slotId: Int): SaveSnapshot? {
-        return saveSlots[slotId]?.let { it.copy(state = it.state.deepCopy()) }
+    suspend fun load(slotId: Int): SaveSnapshot? {
+        return slotsLock.withLock {
+            saveSlots[slotId]?.let { it.copy(state = it.state.deepCopy()) }
+        }
     }
 
-    fun restore(slotId: Int): GameState? {
-        return saveSlots[slotId]?.state?.deepCopy()
+    suspend fun restore(slotId: Int): GameState? {
+        return slotsLock.withLock {
+            saveSlots[slotId]?.state?.deepCopy()
+        }
     }
 
-    fun getSlots(): Map<Int, SaveSnapshot> = saveSlots.toMap()
+    suspend fun getSlots(): Map<Int, SaveSnapshot> = slotsLock.withLock { saveSlots.toMap() }
 
-    fun deleteSlot(slotId: Int) {
-        saveSlots.remove(slotId)
+    suspend fun deleteSlot(slotId: Int) {
+        slotsLock.withLock {
+            saveSlots.remove(slotId)
+        }
     }
 
     fun computeStateHash(state: GameState): Int = SaveIntegrity.computeStateHash(state)
 
     fun saveToPersistence(persistence: StatePersistenceManager) {
         scope.launch {
-            persistence.persistSlots(saveSlots)
+            val copy = slotsLock.withLock { saveSlots.toMap() }
+            persistence.persistSlots(copy)
         }
     }
 
-    fun restoreFromPersistence(persistence: StatePersistenceManager) {
-        scope.launch {
-            val restored = persistence.restoreSlots()
+    suspend fun restoreFromPersistence(persistence: StatePersistenceManager) {
+        val restored = persistence.restoreSlots()
+        slotsLock.withLock {
             saveSlots.clear()
             saveSlots.putAll(restored)
         }

@@ -327,7 +327,10 @@ class CombatSystem @Inject constructor(
         if (state.companionShadows.none { it.id == hero.id }) {
             state.companionShadows.add(hero.deepCopy())
         }
+        
+        // BUG FIX #9: Recalculate initiative or adjust index to prevent turn desync
         state.combat.initiativeOrder.removeAll { it.id == hero.id }
+        recalculateInitiative(state)
     }
 
     private fun handleCombatWin(state: GameState, c: CombatState) {
