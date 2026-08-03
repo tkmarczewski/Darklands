@@ -74,22 +74,31 @@ class MarketViewModel @Inject constructor(
     private fun calculateSellPrice(baseValue: Int): Int = (baseValue * 0.5).toInt()
 
     fun buy(itemId: String) {
-        val item = itemCatalogue.get(itemId) ?: return
-        
+        var purchaseSuccessful = false
+        var itemName = ""
+        var itemPrice = 0
+
         gameRepository.updateState { s ->
-            // BUG FIX #1: Race condition - validate inside updateState
-            if (s.gold < item.value) {
+            // BUG FIX #3 & #4: Race condition - validate everything inside updateState
+            val itemTemplate = itemCatalogue.get(itemId)
+            if (itemTemplate == null || s.gold < itemTemplate.value) {
                 return@updateState 
             }
 
-            s.gold -= item.value
-            itemCatalogue.createInstance(itemId)?.let { s.inventory.add(it) }
-            s.logEntries.add("Kupiono: ${item.name} za ${item.value} G.")
+            itemName = itemTemplate.name
+            itemPrice = itemTemplate.value
+            
+            itemCatalogue.createInstance(itemId)?.let { instance ->
+                s.gold -= itemPrice
+                s.inventory.add(instance)
+                s.logEntries.add("Kupiono: $itemName za $itemPrice G.")
+                purchaseSuccessful = true
+            }
         }
         
-        // Final check for UI feedback (after updateState)
-        if (gameRepository.currentState().gold < item.value) {
-            _uiState.update { it.copy(errorMessage = "Brak złota!") }
+        // Final check for UI feedback
+        if (!purchaseSuccessful) {
+            _uiState.update { it.copy(errorMessage = "Nie można kupić przedmiotu (brak złota lub przedmiot niedostępny)!") }
         } else {
             _uiState.update { it.copy(errorMessage = null) }
         }

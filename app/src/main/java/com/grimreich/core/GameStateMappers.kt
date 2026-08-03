@@ -156,14 +156,14 @@ fun HeroDto.toDomain(): Hero = Hero(
 
 fun CareerEntryDto.toDomain(): CareerEntry = CareerEntry(
     career = runCatching { Career.valueOf(careerName.uppercase()) }.getOrDefault(Career.MERCENARY),
-    daysServed = (yearsServed * 365).toInt(),
+    daysServed = daysServed,
     levelReached = levelReached,
     dateReached = dateReached
 )
 
 fun CareerEntry.toDto(): CareerEntryDto = CareerEntryDto(
     careerName = career.name,
-    yearsServed = yearsServed.toInt(),
+    daysServed = daysServed,
     levelReached = levelReached,
     dateReached = dateReached
 )

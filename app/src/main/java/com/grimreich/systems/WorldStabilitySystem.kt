@@ -47,12 +47,11 @@ class WorldStabilitySystem @Inject constructor(
     private fun applyAnchorTax(state: GameState) {
         if (state.world.locationId == "twierdza_zelazna") {
             var hpChanged = false
-            state.party.forEach { hero ->
+            for (i in state.party.indices) {
+                val hero = state.party[i]
                 if (!hero.isDead && hero.hp > 1) {
-                    // BUG FIX #4: Replace object instead of direct mutation
-                    val updatedHero = hero.copy(hp = hero.hp - 1)
-                    val index = state.party.indexOf(hero)
-                    state.party[index] = updatedHero
+                    // BUG FIX #5: Use index to update instead of indexOf to avoid reference/identity issues
+                    state.party[i] = hero.copy(hp = hero.hp - 1)
                     hpChanged = true
                 }
             }

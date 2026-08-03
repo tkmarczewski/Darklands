@@ -343,7 +343,7 @@ data class HeroDto(
 @Serializable
 data class CareerEntryDto(
     val careerName: String,
-    val yearsServed: Int,
+    val daysServed: Int,
     val levelReached: Int,
     val dateReached: Long
 )

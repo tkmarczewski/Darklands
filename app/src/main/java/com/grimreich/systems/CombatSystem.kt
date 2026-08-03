@@ -295,19 +295,25 @@ class CombatSystem @Inject constructor(
         state.logEntries.add("TRIBUNAL_LOG_014: Ustalono sekwencję działań (Inicjatywa).")
     }
 
-    private fun getEnemyCombatant(c: CombatState) = CombatantState(
-        name = c.enemyName,
-        hp = c.enemyHp,
-        maxHp = c.enemyMaxHp,
-        endurance = c.enemyStamina,
-        morale = 80,
-        armor = c.enemyDefense,
-        attackBase = c.enemyAttack,
-        strength = c.enemyStrength,
-        agility = c.enemyAgility,
-        intelligence = c.enemyIntelligence,
-        activeEffects = c.enemyEffects.toMutableList()
-    )
+    private fun getEnemyCombatant(c: CombatState): CombatantState {
+        val typeStr = c.enemyType ?: "bandit"
+        val type = try { EnemyType.valueOf(typeStr.lowercase()) } catch (e: Exception) { EnemyType.bandit }
+        val enemy = Bestiary.get(type)
+
+        return CombatantState(
+            name = c.enemyName,
+            hp = c.enemyHp,
+            maxHp = c.enemyMaxHp,
+            endurance = c.enemyStamina,
+            morale = enemy.stats.morale, // BUG FIX #10: Use morale from Bestiary instead of hardcoded 80
+            armor = c.enemyDefense,
+            attackBase = c.enemyAttack,
+            strength = c.enemyStrength,
+            agility = c.enemyAgility,
+            intelligence = c.enemyIntelligence,
+            activeEffects = c.enemyEffects.toMutableList()
+        )
+    }
 
     private fun handleHeroDeath(state: GameState, hero: Hero) {
         hero.isDead = true
@@ -328,9 +334,15 @@ class CombatSystem @Inject constructor(
             state.companionShadows.add(hero.deepCopy())
         }
         
-        // BUG FIX #9: Recalculate initiative or adjust index to prevent turn desync
-        state.combat.initiativeOrder.removeAll { it.id == hero.id }
-        recalculateInitiative(state)
+        // BUG FIX #9 & #11: Adjust currentTurnIndex instead of full recalculation mid-round
+        val initiativeOrder = state.combat.initiativeOrder
+        val deadIndex = initiativeOrder.indexOfFirst { it.id == hero.id }
+        if (deadIndex != -1) {
+            if (deadIndex <= state.combat.currentTurnIndex) {
+                state.combat.currentTurnIndex--
+            }
+            initiativeOrder.removeAt(deadIndex)
+        }
     }
 
     private fun handleCombatWin(state: GameState, c: CombatState) {
@@ -409,16 +421,17 @@ class CombatSystem @Inject constructor(
         if (c.initiativeOrder.isEmpty()) return
         
         val prevIndex = c.currentTurnIndex
-        c.currentTurnIndex = (c.currentTurnIndex + 1) % c.initiativeOrder.size
+        val size = c.initiativeOrder.size
+        c.currentTurnIndex = (c.currentTurnIndex + 1) % size
         
-        // BUG-NEW-03: Increment round only when we wrap back to the first combatant
-        if (c.currentTurnIndex == 0 && prevIndex != 0) {
+        // BUG-NEW-03 & #11: Increment round only when we wrap back to the first combatant from the LAST one
+        if (c.currentTurnIndex == 0 && prevIndex == size - 1) {
             c.round++
             recalculateInitiative(state)
         }
 
-        val nextSlot = c.initiativeOrder[c.currentTurnIndex]
-        if (nextSlot.isPlayer) {
+        val nextSlot = c.initiativeOrder.getOrNull(c.currentTurnIndex)
+        if (nextSlot?.isPlayer == true) {
             c.activeHeroId = nextSlot.id
         }
     }

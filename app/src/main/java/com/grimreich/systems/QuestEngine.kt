@@ -7,6 +7,8 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import javax.inject.Singleton
 
+import java.util.concurrent.ConcurrentHashMap
+
 @Singleton
 class QuestEngine @Inject constructor(
     @param:ApplicationContext private val context: Context,
@@ -15,7 +17,7 @@ class QuestEngine @Inject constructor(
 ) {
     private val gameRepository get() = gameRepositoryProvider.get()
     private val experienceSystem get() = experienceSystemProvider.get()
-    private val registry = mutableMapOf<String, QuestDefinition>()
+    private val registry = ConcurrentHashMap<String, QuestDefinition>()
 
     fun register(definition: QuestDefinition) {
         if (registry.containsKey(definition.id)) {
@@ -156,8 +158,12 @@ class QuestEngine @Inject constructor(
 
         if (p.status != QuestStatus.objective_met) {
             // BUG FIX #7: Only allow completion if objective is met
-            android.util.Log.w("QuestEngine", "Attempted to complete quest $actualQuestId but objective is not met (current status: ${p.status})")
-            return
+            // We also check if the current step is actually the last one
+            val isActuallyDone = def.steps.isNotEmpty() && p.currentStepIndex >= def.steps.size - 1
+            if (!isActuallyDone) {
+                android.util.Log.w("QuestEngine", "Attempted to complete quest $actualQuestId but objective is not met and steps are not finished.")
+                return
+            }
         }
         
         // --- ATOMIC TRANSITION ---
