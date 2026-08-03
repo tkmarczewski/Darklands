@@ -74,7 +74,7 @@ data class CareerEntry(
     val dateReached: Long = 0L
 ) {
     @Transient
-    val yearsServed: Float = daysServed / 365f
+    val yearsServed: Float get() = daysServed / 365f
 }
 
 @Singleton

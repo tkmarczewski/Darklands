@@ -14,7 +14,6 @@ class CombatSystem @Inject constructor(
     private val lootSystem: LootSystem,
 ) {
     private var onCombatEnd: (() -> Unit)? = null
-    private var pendingCombatEndCallback: (() -> Unit)? = null
 
     private fun heroToCombatant(state: GameState, hero: Hero): CombatantState {
         return CombatantState(
@@ -81,16 +80,7 @@ class CombatSystem @Inject constructor(
     fun useSkill(skillId: String) {
         val skill = SkillCatalogue.allSkills.find { it.id == skillId } ?: return
         
-        gameRepository.updateState { state ->
-            if (state.world.echoIntensity < skill.echoCost) return@updateState
-            state.world.echoIntensity -= skill.echoCost
-            
-            // Apply stability impact for mind_collapse
-            if (skill.id == "mind_collapse") {
-                state.world.globalStability = (state.world.globalStability - GameConstants.SKILL_STABILITY_LOSS_HEAVY).coerceAtLeast(0)
-                state.logEntries.add("Użycie Zapaści Umysłu naruszyło strukturę regionu.")
-            }
-        }
+        // BUG FIX: Deduct cost inside resolvePlayerAction or after validation
         resolvePlayerAction("skill:$skillId")
     }
 
@@ -103,6 +93,14 @@ class CombatSystem @Inject constructor(
         gameRepository.updateState { state ->
             val heroId = state.combat.activeHeroId ?: state.party.firstOrNull { !it.isDead }?.id ?: return@updateState
             val hero = state.party.find { it.id == heroId } ?: return@updateState
+            
+            // BUG FIX: Ensure the hero is not dead before using a potion
+            if (hero.isDead) {
+                msg = "Nie można użyć mikstury na poległym bohaterze!"
+                state.combat.log.add(msg)
+                return@updateState
+            }
+
             val item = state.inventory.find { it.instanceId == itemId } ?: return@updateState
             
             if (item.effects.containsKey("heal")) {
@@ -130,7 +128,6 @@ class CombatSystem @Inject constructor(
 
     fun resolvePlayerAction(action: String): String {
         var result = ""
-        pendingCombatEndCallback = null
 
         gameRepository.updateState { state ->
             val c = state.combat
@@ -185,6 +182,22 @@ class CombatSystem @Inject constructor(
         val playerRound = when {
             action.startsWith("skill:") -> {
                 val skillId = action.substringAfter("skill:")
+                val skill = SkillCatalogue.allSkills.find { it.id == skillId }
+                
+                // BUG FIX: Apply resource costs only when the action is actually processed
+                if (skill != null) {
+                    if (state.world.echoIntensity < skill.echoCost) {
+                        c.log.add("Brak wystarczającej intensywności echa!")
+                        return
+                    }
+                    state.world.echoIntensity -= skill.echoCost
+                    
+                    if (skill.id == "mind_collapse") {
+                        state.world.globalStability = (state.world.globalStability - GameConstants.SKILL_STABILITY_LOSS_HEAVY).coerceAtLeast(0)
+                        state.logEntries.add("Użycie Zapaści Umysłu naruszyło strukturę regionu.")
+                    }
+                }
+
                 combatRound.resolveRound(heroCombatant, enemyCombatant, skillId)
             }
             action == "defend" -> {
@@ -285,7 +298,8 @@ class CombatSystem @Inject constructor(
         val type = try { EnemyType.valueOf(typeStr.lowercase()) } catch (e: Exception) { EnemyType.bandit }
         val enemy = Bestiary.get(type)
         // Enemy speed is their agility equivalent
-        val enemyInit = enemy.stats.speed + combatRound.randomProvider.nextInt(0, 10)
+        // BUG FIX: Null safety for Bestiary.get
+        val enemyInit = (enemy?.stats?.speed ?: 10) + combatRound.randomProvider.nextInt(0, 10)
         slots.add(InitiativeSlot("enemy", false, enemyInit))
 
         c.initiativeOrder.clear()
@@ -305,7 +319,8 @@ class CombatSystem @Inject constructor(
             hp = c.enemyHp,
             maxHp = c.enemyMaxHp,
             endurance = c.enemyStamina,
-            morale = enemy.stats.morale, // BUG FIX #10: Use morale from Bestiary instead of hardcoded 80
+            // BUG FIX: Null safety for Bestiary.get
+            morale = enemy?.stats?.morale ?: 80,
             armor = c.enemyDefense,
             attackBase = c.enemyAttack,
             strength = c.enemyStrength,
@@ -403,7 +418,7 @@ class CombatSystem @Inject constructor(
                 else -> GameConstants.TRAUMA_CHANCE_BASE
             }
 
-            if (kotlin.random.Random.nextFloat() < chance) {
+            if (combatRound.randomProvider.nextFloat() < chance) {
                 val trauma = TraumaCatalog.getRandomTrauma()
                 if (hero.traumaMarks.none { it.id == trauma.id }) {
                     hero.traumaMarks.add(trauma)
