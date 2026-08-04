@@ -17,33 +17,40 @@ import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.random.Random
 
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
+import java.util.concurrent.ConcurrentHashMap
+
 @Singleton
 class DialogueManager @Inject constructor(
     @ApplicationContext private val context: Context,
     private val gameRepositoryProvider: Lazy<GameRepository>,
     private val questEngine: Lazy<QuestEngine>,
 ) {
-    private val nodes = mutableMapOf<String, DialogueNode>()
+    private val nodes = ConcurrentHashMap<String, DialogueNode>()
     private val gson = Gson()
     private val loadLock = Any()
     private var isLoaded = false
+    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
 
-    fun loadNodesFromAsset(path: String) {
-        synchronized(loadLock) {
-            try {
-                // BUG FIX #3: Offload asset reading to IO thread
-                val json = runBlocking {
-                    withContext(Dispatchers.IO) {
-                        context.assets.open(path).bufferedReader().use { it.readText() }
-                    }
-                }
-                val type = object : TypeToken<List<DialogueNode>>() {}.type
-                val loaded: List<DialogueNode> = gson.fromJson(json, type)
-                loaded.forEach { registerNode(it) }
-                android.util.Log.d("DialogueManager", "Loaded ${loaded.size} nodes from $path")
-            } catch (e: Exception) {
-                android.util.Log.e("DialogueManager", "Error loading dialogues from $path: ${e.message}")
+    init {
+        scope.launch {
+            seedBasicDialogues()
+        }
+    }
+
+    suspend fun loadNodesFromAsset(path: String) {
+        try {
+            val json = withContext(Dispatchers.IO) {
+                context.assets.open(path).bufferedReader().use { it.readText() }
             }
+            val type = object : TypeToken<List<DialogueNode>>() {}.type
+            val loaded: List<DialogueNode> = gson.fromJson(json, type)
+            loaded.forEach { registerNode(it) }
+            android.util.Log.d("DialogueManager", "Loaded ${loaded.size} nodes from $path")
+        } catch (e: Exception) {
+            android.util.Log.e("DialogueManager", "Error loading dialogues from $path: ${e.message}")
         }
     }
 
@@ -57,42 +64,7 @@ class DialogueManager @Inject constructor(
 
     fun getNode(id: String): DialogueNode? {
         if (id == "end") return null
-        
-        synchronized(loadLock) {
-            if (!isLoaded && nodes.isEmpty()) {
-                seedBasicDialogues()
-            }
-        }
-        
         return nodes[id]
-    }
-
-    fun makeChoice(choice: DialogueChoice): DialogueNode? {
-        val repo = gameRepositoryProvider.get()
-        
-        // BUG FIX #2: Extract side-effects from updateState block
-        var itemToGive: String? = null
-        if (choice.triggerEvent?.lowercase()?.trim() == "give_item") {
-            itemToGive = choice.triggerValue
-        }
-
-        repo.updateState { state ->
-            handleTrigger(state, choice.triggerEvent, choice.triggerValue)
-            
-            // Handle give_item safely inside state
-            itemToGive?.let { itemId ->
-                val item = repo.itemCatalogue.createInstance(itemId.lowercase())
-                if (item != null) {
-                    state.inventory.add(item)
-                    state.logEntries.add("Otrzymano przedmiot: ${item.name}")
-                }
-            }
-        }
-        
-        if (choice.targetNodeId == "end") {
-            return null
-        }
-        return getNode(choice.targetNodeId)
     }
 
     fun handleTrigger(state: GameState, event: String?, value: String?) {
@@ -174,8 +146,14 @@ class DialogueManager @Inject constructor(
                 }
             }
             "give_item" -> {
-                // Now handled in makeChoice directly to keep handleTrigger pure or avoid re-fetches
-                // But left here for direct system calls if any
+                value?.let { itemId ->
+                    val repo = gameRepositoryProvider.get()
+                    val item = repo.itemCatalogue.createInstance(itemId.lowercase().trim())
+                    if (item != null) {
+                        state.inventory.add(item)
+                        state.logEntries.add("۞ OTRZYMANO: ${item.name}")
+                    }
+                }
             }
             "check_world_flag" -> {
                 android.util.Log.d("DialogueManager", "Checked world flag: $value (Status: ${state.quest.worldFlags.contains(value?.lowercase())})")
@@ -253,15 +231,13 @@ class DialogueManager @Inject constructor(
         return sb.toString()
     }
 
-    fun seedBasicDialogues() {
-        synchronized(loadLock) {
-            if (isLoaded) return
-            // BUG-15: Do NOT clear if we want to preserve modded or dynamic nodes
-            loadNodesFromAsset("grimreich/dialogues_pilot.json")
-            loadNodesFromAsset("grimreich/dialogues_extended.json")
-            loadNodesFromAsset("grimreich/dialogues_beggars.json")
-            loadNodesFromAsset("grimreich/dialogues_misty_path.json")
-            isLoaded = true
-        }
+    suspend fun seedBasicDialogues() {
+        if (isLoaded) return
+        // BUG-15: Do NOT clear if we want to preserve modded or dynamic nodes
+        loadNodesFromAsset("grimreich/dialogues_pilot.json")
+        loadNodesFromAsset("grimreich/dialogues_extended.json")
+        loadNodesFromAsset("grimreich/dialogues_beggars.json")
+        loadNodesFromAsset("grimreich/dialogues_misty_path.json")
+        isLoaded = true
     }
 }

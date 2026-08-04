@@ -78,9 +78,9 @@ class QuestEngine @Inject constructor(
 
         // Prerequisites
         if (def.prerequisiteQuestId != null) {
-            // BUG FIX #4: Use a fresh visited set for prerequisites to avoid "swallowing" quests
-            // that are both prerequisites and independent board entries
-            val preStatus = getStatus(def.prerequisiteQuestId, state, mutableSetOf())
+            // BUG FIX #4 & #12: Propagate the visited set to detect circular dependencies 
+            // while still allowing status checks. 
+            val preStatus = getStatus(def.prerequisiteQuestId, state, visited)
             if (preStatus != QuestStatus.completed) return QuestStatus.locked
         }
 
@@ -89,8 +89,15 @@ class QuestEngine @Inject constructor(
 
     fun activateQuestDirect(state: GameState, questId: String) {
         val normalizedId = questId.lowercase().trim()
+        
+        // HARDENING: Prevent reactivation of finalized quests
+        if (state.quest.completedQuestIds.contains(normalizedId) || state.quest.failedQuestIds.contains(normalizedId)) {
+            android.util.Log.w("QuestEngine", "Attempted to reactivate finalized quest: $normalizedId")
+            return
+        }
+
         val currentStatus = getStatus(normalizedId, state)
-        if (currentStatus != QuestStatus.available) {
+        if (currentStatus != QuestStatus.available && !state.quest.activeQuestIds.contains(normalizedId)) {
             android.util.Log.d("QuestEngine", "Activation blocked: $normalizedId is $currentStatus")
             return
         }

@@ -7,6 +7,7 @@ import com.grimreich.core.GameState
 import com.grimreich.core.WorldMap
 import com.grimreich.core.WorldState
 import com.grimreich.world.CityCatalogue
+import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotEquals
 import org.junit.Assert.assertTrue
@@ -84,7 +85,7 @@ class ContentValidationTest {
             gameRepositoryProvider = { mockRepository },
             questEngine = { mock<QuestEngine>() }
         )
-        manager.seedBasicDialogues()
+        runBlocking { manager.seedBasicDialogues() }
 
         val guardNode = manager.getNode("guard_start")
         assertTrue("Node should exist", guardNode != null)
@@ -107,7 +108,7 @@ class ContentValidationTest {
             gameRepositoryProvider = { mockRepository },
             questEngine = { mock<QuestEngine>() }
         )
-        manager.seedBasicDialogues()
+        runBlocking { manager.seedBasicDialogues() }
 
         val innkeeperNode = manager.getNode("innkeeper_start")
         assertTrue("Innkeeper node should exist", innkeeperNode != null)
@@ -163,7 +164,7 @@ class ContentValidationTest {
             gameRepositoryProvider = dagger.Lazy { mock<GameRepository>() },
             questEngine = dagger.Lazy { mock<QuestEngine>() }
         )
-        manager.seedBasicDialogues()
+        runBlocking { manager.seedBasicDialogues() }
         assertEquals(null, manager.getNode("non_existent"))
     }
 
