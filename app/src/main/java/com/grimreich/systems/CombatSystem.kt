@@ -50,6 +50,7 @@ class CombatSystem @Inject constructor(
             state.combat.enemyIntelligence = 10 // Baseline for procedural enemies
             state.combat.enemyStrength = 10
             state.combat.enemyStamina = 10
+            state.combat.enemyMorale = enemy.stats.morale
             state.combat.activeHeroId = state.party.firstOrNull { !it.isDead }?.id
             state.combat.log.clear()
             state.combat.log.add("Początek walki z ${enemy.name}!")
@@ -213,6 +214,7 @@ class CombatSystem @Inject constructor(
         hero.activeStatusEffects.addAll(heroCombatant.activeEffects)
         c.enemyHp = enemyCombatant.hp
         c.enemyStamina = enemyCombatant.endurance
+        c.enemyMorale = enemyCombatant.morale
 
         if (hero.hp <= 0) {
             handleHeroDeath(state, hero)
@@ -265,6 +267,7 @@ class CombatSystem @Inject constructor(
             targetHero.activeStatusEffects.clear()
             targetHero.activeStatusEffects.addAll(targetCombatant.activeEffects.map { it.copy() })
             c.enemyStamina = enemyCombatant.endurance
+            c.enemyMorale = enemyCombatant.morale
 
             if (targetHero.hp <= 0) handleHeroDeath(state, targetHero)
 
@@ -319,8 +322,7 @@ class CombatSystem @Inject constructor(
             hp = c.enemyHp,
             maxHp = c.enemyMaxHp,
             endurance = c.enemyStamina,
-            // BUG FIX: Null safety for Bestiary.get
-            morale = enemy?.stats?.morale ?: 80,
+            morale = c.enemyMorale,
             armor = c.enemyDefense,
             attackBase = c.enemyAttack,
             strength = c.enemyStrength,

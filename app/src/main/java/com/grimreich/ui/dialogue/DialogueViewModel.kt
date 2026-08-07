@@ -147,16 +147,17 @@ class DialogueViewModel @Inject constructor(
         val currentState = gameRepository.currentState()
         
         val choiceInfo = uiState.value.availableChoices.find { it.choice == choice }
-        choiceInfo?.activeHeroName?.let { helperName ->
-            val helper = currentState.party.find { it.name == helperName }
-            if (helper != null) {
-                gameRepository.updateState { it.activeHeroId = helper.id }
-                gameRepository.log("${helper.name} przejmuje inicjatywę w rozmowie.")
-            }
+        val helper = choiceInfo?.activeHeroName?.let { helperName -> 
+            currentState.party.find { it.name == helperName } 
         }
 
         // BUG-NEW-14 FIX: Wrap trigger handling in updateState for consistency and UI refresh
         gameRepository.updateState { state ->
+            if (helper != null) {
+                state.activeHeroId = helper.id
+                gameRepository.logDirect(state, "${helper.name} przejmuje inicjatywę w rozmowie.")
+            }
+
             dialogueManager.handleTrigger(state, choice.triggerEvent, choice.triggerValue)
             
             if (state.world.locationId == "twierdza_zelazna") {

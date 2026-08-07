@@ -1,5 +1,6 @@
 package com.grimreich.core
 
+import android.util.Log
 import com.grimreich.core.mutations.Mutation
 import com.grimreich.grimreich.v1.NPC
 import com.grimreich.grimreich.v1.Item
@@ -138,9 +139,9 @@ fun HeroDto.toDomain(): Hero = Hero(
     hp = hp,
     maxHp = maxHp,
     isDead = isDead,
-    currentCareer = currentCareer?.let { runCatching { Career.valueOf(it.uppercase()) }.getOrNull() ?: Career.MERCENARY },
-    trait = trait?.let { runCatching { Trait.valueOf(it.uppercase()) }.getOrNull() ?: Trait.NONE },
-    subjectType = runCatching { Hero.SubjectType.valueOf(subjectType.uppercase()) }.getOrDefault(Hero.SubjectType.VESSEL),
+    currentCareer = currentCareer?.let { runCatching { Career.valueOf(it.uppercase()) }.onFailure { Log.w("Mappers", "Failed to parse career: $it") }.getOrNull() ?: Career.MERCENARY },
+    trait = trait?.let { runCatching { Trait.valueOf(it.uppercase()) }.onFailure { Log.w("Mappers", "Failed to parse trait: $it") }.getOrNull() ?: Trait.NONE },
+    subjectType = runCatching { Hero.SubjectType.valueOf(subjectType.uppercase()) }.onFailure { Log.w("Mappers", "Failed to parse subjectType: $subjectType") }.getOrDefault(Hero.SubjectType.VESSEL),
     ontologicalMass = ontologicalMass,
     ontologicalStability = ontologicalStability
 ).also {
@@ -155,7 +156,7 @@ fun HeroDto.toDomain(): Hero = Hero(
 }
 
 fun CareerEntryDto.toDomain(): CareerEntry = CareerEntry(
-    career = runCatching { Career.valueOf(careerName.uppercase()) }.getOrDefault(Career.MERCENARY),
+    career = runCatching { Career.valueOf(careerName.uppercase()) }.onFailure { Log.w("Mappers", "Failed to parse career entry: $careerName") }.getOrDefault(Career.MERCENARY),
     daysServed = daysServed,
     levelReached = levelReached,
     dateReached = dateReached
@@ -172,7 +173,7 @@ fun AbilityDto.toDomain(): Ability = Ability(
     id = id,
     name = name,
     description = description ?: "",
-    costType = runCatching { CostType.valueOf(type.uppercase()) }.getOrDefault(CostType.HP),
+    costType = runCatching { CostType.valueOf(type.uppercase()) }.onFailure { Log.w("Mappers", "Failed to parse costType: $type") }.getOrDefault(CostType.HP),
     costValue = costValue ?: 0
 )
 
@@ -198,8 +199,8 @@ fun MutationDto.toDomain(): Mutation = Mutation(
     id = id,
     name = name,
     description = description,
-    category = runCatching { com.grimreich.core.mutations.MutationCategory.valueOf(category.uppercase()) }.getOrDefault(com.grimreich.core.mutations.MutationCategory.PHYSICAL),
-    tier = runCatching { com.grimreich.core.mutations.MutationTier.valueOf(tier.uppercase()) }.getOrDefault(com.grimreich.core.mutations.MutationTier.DORMANT),
+    category = runCatching { com.grimreich.core.mutations.MutationCategory.valueOf(category.uppercase()) }.onFailure { Log.w("Mappers", "Failed to parse mutation category: $category") }.getOrDefault(com.grimreich.core.mutations.MutationCategory.PHYSICAL),
+    tier = runCatching { com.grimreich.core.mutations.MutationTier.valueOf(tier.uppercase()) }.onFailure { Log.w("Mappers", "Failed to parse mutation tier: $tier") }.getOrDefault(com.grimreich.core.mutations.MutationTier.DORMANT),
     attributeModifiers = attributeModifiers,
     stabilityImpact = stabilityImpact
 )
@@ -253,7 +254,7 @@ fun QuestProgress.toDto(): QuestProgressDto = QuestProgressDto(
 
 fun QuestProgressDto.toDomain(): QuestProgress = QuestProgress(
     questId = questId,
-    status = runCatching { QuestStatus.valueOf(status.uppercase()) }.getOrDefault(QuestStatus.LOCKED),
+    status = runCatching { QuestStatus.valueOf(status.uppercase()) }.onFailure { Log.w("Mappers", "Failed to parse quest status: $status") }.getOrDefault(QuestStatus.LOCKED),
     currentStepIndex = currentStepIndex,
     variables = variables.toMutableMap()
 )
@@ -310,9 +311,9 @@ fun WorldStateDto.toDomain(): WorldState = WorldState(
     timeOfDay = timeOfDay,
     fatigue = fatigue,
     lastEncounter = lastEncounter,
-    season = runCatching { Season.valueOf(season.lowercase()) }.getOrDefault(Season.spring),
+    season = runCatching { Season.valueOf(season.lowercase()) }.onFailure { Log.w("Mappers", "Failed to parse season: $season") }.getOrDefault(Season.spring),
     globalStability = globalStability,
-    weather = runCatching { WeatherType.valueOf(weather.lowercase()) }.getOrDefault(WeatherType.clear),
+    weather = runCatching { WeatherType.valueOf(weather.lowercase()) }.onFailure { Log.w("Mappers", "Failed to parse weather: $weather") }.getOrDefault(WeatherType.clear),
     echoIntensity = echoIntensity,
     collapseProgress = collapseProgress,
     collapseScenarioId = collapseScenarioId,
@@ -335,6 +336,8 @@ fun CombatState.toDto(): CombatStateDto = CombatStateDto(
     enemyAgility = enemyAgility,
     enemyIntelligence = enemyIntelligence,
     enemyStrength = enemyStrength,
+    enemyStamina = enemyStamina,
+    enemyMorale = enemyMorale,
     enemyEffects = enemyEffects.map { it.toDto() },
     heroEffects = heroEffects.map { it.toDto() },
     log = log,
@@ -355,6 +358,8 @@ fun CombatStateDto.toDomain(): CombatState = CombatState().also {
     it.enemyAgility = enemyAgility
     it.enemyIntelligence = enemyIntelligence
     it.enemyStrength = enemyStrength
+    it.enemyStamina = enemyStamina
+    it.enemyMorale = enemyMorale
     it.currentTargetHeroId = currentTargetHeroId
     it.activeHeroId = activeHeroId
     it.currentTurnIndex = currentTurnIndex
@@ -394,7 +399,7 @@ fun StatusEffect.toDto(): StatusEffectDto = StatusEffectDto(
 )
 
 fun StatusEffectDto.toDomain(): StatusEffect = StatusEffect(
-    type = runCatching { StatusEffectType.valueOf(type.uppercase()) }.getOrDefault(StatusEffectType.POISON),
+    type = runCatching { StatusEffectType.valueOf(type.uppercase()) }.onFailure { Log.w("Mappers", "Failed to parse statusEffect type: $type") }.getOrDefault(StatusEffectType.POISON),
     duration = duration,
     strength = magnitude
 )
@@ -421,6 +426,7 @@ inline fun <reified T : Enum<T>> safeEnumValue(name: String?, default: T): T {
     return try {
         java.lang.Enum.valueOf(T::class.java, name)
     } catch (e: Exception) {
+        Log.w("GameStateMappers", "Failed to parse enum ${T::class.java.simpleName} from value: $name. Using default: $default")
         default
     }
 }

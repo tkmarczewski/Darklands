@@ -83,6 +83,7 @@ data class GameState(
     fun normalizeState() {
         party.forEach { it.normalize() }
         hireableHeroes.forEach { it.normalize() }
+        companionShadows.forEach { it.normalize() }
         trimLogs()
         prayer.normalize()
         
@@ -238,6 +239,7 @@ data class CombatState(
     var enemyIntelligence: Int = 0,
     var enemyStrength: Int = 0,
     var enemyStamina: Int = 0,
+    var enemyMorale: Int = 80,
     val enemyEffects: MutableList<StatusEffect> = mutableListOf(),
     val heroEffects: MutableList<StatusEffect> = mutableListOf(),
     val log: MutableList<String> = mutableListOf(),
@@ -431,6 +433,8 @@ data class CombatStateDto(
     val enemyAgility: Int,
     val enemyIntelligence: Int,
     val enemyStrength: Int,
+    val enemyStamina: Int,
+    val enemyMorale: Int,
     val enemyEffects: List<StatusEffectDto>,
     val heroEffects: List<StatusEffectDto>,
     val log: List<String>,

@@ -48,20 +48,18 @@ class TravelSystem @Inject constructor(
     }
 
     fun travelTo(destCityId: String) {
-        val state = gameRepository.currentState()
-        val current = state.world.locationId
-        
-        if (current == destCityId) return
-        
-        val terrain = worldMap.terrainBetween(current, destCityId)
-        val daysSpent = when (terrain?.name?.uppercase()) {
-            "ROAD" -> 7
-            "FOREST" -> 14
-            "MOUNTAIN" -> 21
-            else -> 10
-        }
-
         gameRepository.updateState { s ->
+            val current = s.world.locationId
+            if (current == destCityId) return@updateState
+
+            val terrain = worldMap.terrainBetween(current, destCityId)
+            val daysSpent = when (terrain?.name?.uppercase()) {
+                "ROAD" -> 7
+                "FOREST" -> 14
+                "MOUNTAIN" -> 21
+                else -> 10
+            }
+
             val oldDay = s.world.day
             s.world.locationId = destCityId
             s.world.day += daysSpent

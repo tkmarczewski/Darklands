@@ -43,7 +43,7 @@ class LootSystem @Inject constructor(
     fun awardLootFromTableDirect(state: GameState, table: LootTable): List<String> {
         val messages = mutableListOf<String>()
         if (table.goldMax > 0) {
-            val gold = (table.goldMin..table.goldMax).random()
+            val gold = random.nextInt(table.goldMin, table.goldMax + 1)
             if (gold > 0) {
                 state.gold += gold
                 messages.add("Zdobyto $gold złota.")

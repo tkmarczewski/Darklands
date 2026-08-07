@@ -113,22 +113,25 @@ class GameRepository @Inject constructor(
 
     fun log(message: String) {
         if (stateLock.isHeldByCurrentThread) {
-            // We are already in an updateState block. 
-            // Mutate the logs directly if we have a reference, 
-            // but we don't have the "mutable" object here.
-            // This design is flawed for nested logs.
-            // WORKAROUND: Log to android log and rely on outer block to finish.
-            Log.d("GameRepository", "LOG (Nested): $message")
-            // Since we can't easily inject into the outer transform, 
-            // we'll have to skip adding to logEntries here or risk the lost-update.
-            // Better to change the API to accept state if available.
+            // BUG FIX: If we are already in an updateState block, we can't call updateState again.
+            // But we might be able to append to the log if we were passing the state around.
+            // For now, at least log it so it's not completely lost in production.
+            Log.i("GameRepository", "LOG (Nested): $message")
             return
         }
         updateState(shouldPersist = false) { state ->
-            state.logEntries.add(message)
-            state.trimLogs()
-            _gameLogs.value = state.logEntries.toList()
+            logDirect(state, message)
         }
+    }
+
+    /**
+     * Appends a message directly to the provided state's log.
+     * Use this when already inside an updateState block.
+     */
+    fun logDirect(state: GameState, message: String) {
+        state.logEntries.add(message)
+        state.trimLogs()
+        _gameLogs.value = state.logEntries.toList()
     }
 
     suspend fun sync() = syncMutex.withLock {

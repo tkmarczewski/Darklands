@@ -45,9 +45,9 @@ class OntologicalEngine @Inject constructor(
             // BUG-R3-08: Added critical stability warning threshold at <= 10
             when {
                 state.world.globalStability <= 10 ->
-                    gameRepository.log("KRYTYCZNE: Stabilność rzeczywistości osiągnęła poziom krytyczny (${state.world.globalStability})!")
+                    gameRepository.logDirect(state, "KRYTYCZNE: Stabilność rzeczywistości osiągnęła poziom krytyczny (${state.world.globalStability})!")
                 state.world.globalStability < 30 ->
-                    gameRepository.log("Rzeczywistość staje się niestabilna...")
+                    gameRepository.logDirect(state, "Rzeczywistość staje się niestabilna...")
             }
 
             // --- PASSIVE HEALING DURING TIME PASSAGE ---
