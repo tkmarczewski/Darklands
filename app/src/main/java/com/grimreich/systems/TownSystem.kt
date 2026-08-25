@@ -16,7 +16,11 @@ class TownSystem @Inject constructor(
                 return@updateState
             }
             state.gold -= amount
-            state.logEntries.add("Zainwestowano $amount zł w miasto $cityId.")
+            // BUG FIX: Add mechanical impact to investment
+            val stabilityBonus = (amount / 20).coerceIn(1, 10)
+            state.world.globalStability = (state.world.globalStability + stabilityBonus).coerceAtMost(100)
+            
+            state.logEntries.add("Zainwestowano $amount zł w miasto $cityId. Stabilność wzrosła o $stabilityBonus.")
             result = "Zainwestowano $amount zł w miasto $cityId."
         }
         return result

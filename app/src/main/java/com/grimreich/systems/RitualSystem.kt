@@ -96,7 +96,7 @@ class RitualSystem @Inject constructor(
                 // BUG-05 FIX: Normalize first, then set HP=1 to avoid "healing" above 1 during normalization
                 hero.normalize()
                 hero.hp = 1
-                hero.sanity -= 15
+                hero.sanity = (hero.sanity - 15).coerceAtLeast(0)
 
                 // --- BUG-06 FIX: Trauma on Resurrection ---
                 val trauma = TraumaCatalog.getRandomTrauma()

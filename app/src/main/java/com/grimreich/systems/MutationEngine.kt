@@ -16,12 +16,13 @@ class MutationEngine @Inject constructor(
      * Refactored to use a single updateState block for performance.
      */
     fun processMutations() {
-        gameRepository.updateState { state ->
-            // World-level effects
-            if (state.world.echoIntensity > 0.6f) {
-                chronicleSystem.record("Miejscowa fauna zaczyna mutować pod wpływem Echa.", 3)
-            }
+        // BUG FIX: Extract side-effects from updateState to prevent nested transactions
+        val currentState = gameRepository.currentState()
+        if (currentState.world.echoIntensity > 0.6f) {
+            chronicleSystem.record("Miejscowa fauna zaczyna mutować pod wpływem Echa.", 3)
+        }
 
+        gameRepository.updateState { state ->
             // Party-level effects
             state.party.forEach { hero ->
                 mutationSystem.checkForNewMutationDirect(

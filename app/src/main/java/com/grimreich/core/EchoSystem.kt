@@ -119,15 +119,16 @@ class EchoSystem @Inject constructor(
      */
     fun forceRealityLeak(regionId: String): String {
         var result = ""
-        val state = gameRepository.currentState()
-        
-        if (state.world.locationId != regionId) {
-            return "Nie znajdujesz się w tym regionie."
-        }
-
-        worldStabilitySystem.changeStability(-20, "Rytuał Wymuszenia Echa")
         
         gameRepository.updateState { s ->
+            if (s.world.locationId != regionId) {
+                result = "Nie znajdujesz się w tym regionie."
+                return@updateState
+            }
+
+            // BUG FIX: Single atomic transaction for stability change and rewards
+            worldStabilitySystem.changeStabilityDirect(s, -20, "Rytuał Wymuszenia Echa")
+
             // MORALITY SYSTEM: Forcing reality leak is a sin
             s.prayer.sins += 1
             s.prayer.normalize()

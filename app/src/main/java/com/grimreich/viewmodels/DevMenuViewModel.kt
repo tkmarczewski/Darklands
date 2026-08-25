@@ -91,14 +91,16 @@ class DevMenuViewModel @Inject constructor(
     }
 
     fun startQuest(id: String) {
-        val state = gameRepository.currentState()
-        questEngine.activateQuestDirect(state, id)
+        gameRepository.updateState { state ->
+            questEngine.activateQuestDirect(state, id)
+        }
         refreshInfo(id)
     }
 
     fun stepSuccess(id: String) {
-        val state = gameRepository.currentState()
-        questEngine.advanceStepDirect(state, id)
+        gameRepository.updateState { state ->
+            questEngine.advanceStepDirect(state, id)
+        }
         refreshInfo(id)
     }
 

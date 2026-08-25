@@ -19,7 +19,9 @@ class TravelSystem @Inject constructor(
     private val encounterSystem: EncounterSystem,
     private val worldStabilitySystem: WorldStabilitySystem,
     private val collapseEngine: CollapseEngine,
-    private val agingSystem: com.grimreich.core.AgingSystem
+    private val agingSystem: com.grimreich.core.AgingSystem,
+    private val randomEventManager: RandomEventManager,
+    private val randomProvider: com.grimreich.core.CombatRandomProvider
 ) {
     fun restDirect(state: GameState): String {
         state.world.fatigue = 0
@@ -93,6 +95,13 @@ class TravelSystem @Inject constructor(
             }
             
             s.logEntries.add("Podróż do ${cityCatalogue.get(destCityId)?.name ?: destCityId} trwała $daysSpent dni.")
+
+            // BUG FIX: Integrate encounterSystem and randomEventManager in travel
+            // Higher chance for longer travels
+            val encounterChance = 0.1f + (daysSpent * 0.02f).coerceAtMost(0.4f)
+            if (randomProvider.nextFloat() < encounterChance) {
+                randomEventManager.triggerTravelEvent()
+            }
         }
     }
 

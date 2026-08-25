@@ -85,7 +85,7 @@ class RandomEventManager @Inject constructor(
             s.world.globalStability = (s.world.globalStability + event.stabilityDelta).coerceIn(0, 100)
             // FIX: gold nie może spaść poniżej 0
             s.gold = (s.gold + event.goldDelta).coerceAtLeast(0)
-            s.party.forEach { hero ->
+            s.party.filter { !it.isDead }.forEach { hero ->
                 hero.hp      = (hero.hp      + event.hpDelta     ).coerceIn(0, hero.maxHp)
                 hero.sanity  = (hero.sanity  + event.sanityDelta ).coerceIn(0, 100)
                 hero.morale  = (hero.morale  + event.moraleDelta ).coerceIn(0, 100)
