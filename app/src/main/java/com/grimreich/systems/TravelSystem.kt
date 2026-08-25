@@ -90,6 +90,13 @@ class TravelSystem @Inject constructor(
             // Travel also contributes to collapse
             collapseEngine.processCollapseEventDirect(s, CollapseEvent.TravelCompleted(daysSpent * 2))
             
+            // BUG FIX: Actually trigger encounters during travel
+            val encounter = encounterSystem.rollEncounter(randomProvider, s)
+            if (encounter != null) {
+                encounterSystem.selectEncounter(encounter)
+                s.logEntries.add("SPOTKANIE NA SZLAKU: ${encounter.title}")
+            }
+            
             if (!s.world.discoveredLocations.contains(destCityId)) {
                 s.world.discoveredLocations.add(destCityId)
             }

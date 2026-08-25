@@ -22,6 +22,7 @@ class WorldSimulation2_0 @Inject constructor(
     fun simulateDirect(state: GameState) {
         worldStabilitySystem.advanceDayDirect(state, "Symulacja świata postępuje.")
         // BUG FIX: Apply atmospheric and seasonal effects exactly once per simulated day
+        // This ensures consistent application of weather/season penalties like winter frost.
         stabilitySystem.applyAtmosphericEffectsDirect(state)
     }
 }

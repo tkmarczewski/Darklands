@@ -63,13 +63,15 @@ class QuestEngine @Inject constructor(
     }
 
     private fun evaluateDefinitionStatus(def: QuestDefinition, state: GameState, visited: MutableSet<String>): QuestStatus {
-        // --- PRIORITY 1: FINAL STATES ---
-        if (state.quest.completedQuestIds.contains(def.id)) return QuestStatus.completed
-        if (state.quest.failedQuestIds.contains(def.id)) return QuestStatus.failed
-
-        // --- PRIORITY 2: CURRENTLY ACTIVE ---
+        // --- PRIORITY 1: CURRENTLY ACTIVE ---
         if (state.quest.activeQuestIds.contains(def.id)) {
             return state.quest.progress[def.id]?.status ?: QuestStatus.active
+        }
+
+        // --- PRIORITY 2: FINAL STATES (NON-REPEATABLE) ---
+        if (!def.repeatable) {
+            if (state.quest.completedQuestIds.contains(def.id)) return QuestStatus.completed
+            if (state.quest.failedQuestIds.contains(def.id)) return QuestStatus.failed
         }
 
         // --- PRIORITY 3: LOGIC REQUIREMENTS ---
@@ -89,11 +91,14 @@ class QuestEngine @Inject constructor(
 
     fun activateQuestDirect(state: GameState, questId: String) {
         val normalizedId = questId.lowercase().trim()
+        val def = registry[normalizedId]
         
-        // HARDENING: Prevent reactivation of finalized quests
-        if (state.quest.completedQuestIds.contains(normalizedId) || state.quest.failedQuestIds.contains(normalizedId)) {
-            android.util.Log.w("QuestEngine", "Attempted to reactivate finalized quest: $normalizedId")
-            return
+        // HARDENING: Prevent reactivation of finalized non-repeatable quests
+        if (def != null && !def.repeatable) {
+            if (state.quest.completedQuestIds.contains(normalizedId) || state.quest.failedQuestIds.contains(normalizedId)) {
+                android.util.Log.w("QuestEngine", "Attempted to reactivate finalized quest: $normalizedId")
+                return
+            }
         }
 
         val currentStatus = getStatus(normalizedId, state)
@@ -175,8 +180,14 @@ class QuestEngine @Inject constructor(
         
         // --- ATOMIC TRANSITION ---
         state.quest.activeQuestIds.remove(actualQuestId)
-        state.quest.completedQuestIds.add(actualQuestId)
-        state.quest.progress[actualQuestId] = p.copy(status = QuestStatus.completed)
+        
+        // For non-repeatable quests, track globally
+        if (def.repeatable) {
+            state.quest.progress.remove(actualQuestId)
+        } else {
+            state.quest.completedQuestIds.add(actualQuestId)
+            state.quest.progress[actualQuestId] = p.copy(status = QuestStatus.completed)
+        }
         
         state.gold += def.rewardGold
         val xpToAward = (def.recommendedLevel * 50).coerceAtLeast(50)
