@@ -129,9 +129,9 @@ class DialogueViewModel @Inject constructor(
 
         // PURIFIED TRIGGERS (always lowercase checks)
         val event = choice.triggerEvent?.lowercase() ?: ""
-        if (event == "quest_active" && !state.quest.activeQuestIds.contains(choice.triggerValue)) return false
+        if (event == "quest_active" && !state.quest.activeQuestIds.contains(choice.triggerValue?.lowercase())) return false
         if (event == "quest_objective_met" && !questEngine.isObjectiveMet(choice.triggerValue ?: "", state)) return false
-        if (event == "quest_completed" && !state.quest.completedQuestIds.contains(choice.triggerValue)) return false
+        if (event == "quest_completed" && !state.quest.completedQuestIds.contains(choice.triggerValue?.lowercase())) return false
         if (event == "require_gold") {
             val amount = choice.triggerValue?.toIntOrNull() ?: 0
             if (state.gold < amount) return false

@@ -379,7 +379,7 @@ fun NpcDto.toDomain(): NPC = NPC(
     factionId = factionId,
     personality = personality,
     startNodeId = startNodeId,
-    stability = stability.toFloat()
+    stability = stability
 )
 
 fun NPC.toDto(): NpcDto = NpcDto(
@@ -389,7 +389,7 @@ fun NPC.toDto(): NpcDto = NpcDto(
     factionId = factionId,
     personality = personality,
     startNodeId = startNodeId,
-    stability = stability.toInt()
+    stability = stability
 )
 
 fun StatusEffect.toDto(): StatusEffectDto = StatusEffectDto(

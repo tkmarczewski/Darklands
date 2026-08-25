@@ -133,6 +133,7 @@ data class CombatantState(
     var perception: Int = 5,
     var charisma: Int = 5,
     var piety: Int = 5,
+    var echo: Float = 0f,
     var activeEffects: MutableList<StatusEffect> = mutableListOf(),
     var wounds: MutableList<WoundType> = mutableListOf()
 ) {
@@ -246,10 +247,14 @@ class CombatRound @Inject constructor(
         val skill = SkillCatalogue.allSkills.find { it.id == skillId }
         val dmgToDefender: Int
         if (skill != null) {
-            val hasResources = attacker.endurance >= skill.staminaCost && attacker.piety >= skill.favorCost
+            val hasResources = attacker.endurance >= skill.staminaCost && 
+                             attacker.piety >= skill.favorCost &&
+                             attacker.echo >= skill.echoCost
             
             if (hasResources) {
                 attacker.endurance -= skill.staminaCost
+                attacker.piety -= skill.favorCost
+                attacker.echo -= skill.echoCost
                 
                 log.add("${attacker.name} używa ${skill.name}!")
                 val hpBefore = defender.hp
@@ -464,10 +469,10 @@ class CombatRound @Inject constructor(
     private fun computeWound(state: CombatantState): WoundType {
         val hpPercent = if (state.maxHp > 0) state.hp.toFloat() / state.maxHp else 0f
         return when {
-            hpPercent <= 0.001f                                                      -> WoundType.critical
-            hpPercent <= GameConstants.Combat.WOUND_THRESHOLD_SERIOUS && state.endurance < 5  -> WoundType.serious
-            hpPercent <= GameConstants.Combat.WOUND_THRESHOLD_LIGHT   && state.endurance < 10 -> WoundType.light
-            else                                                                     -> WoundType.none
+            hpPercent <= 0.001f -> WoundType.critical
+            hpPercent <= GameConstants.Combat.WOUND_THRESHOLD_SERIOUS || state.endurance < 5 -> WoundType.serious
+            hpPercent <= GameConstants.Combat.WOUND_THRESHOLD_LIGHT || state.endurance < 10 -> WoundType.light
+            else -> WoundType.none
         }
     }
 

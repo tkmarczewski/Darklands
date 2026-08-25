@@ -26,16 +26,13 @@ class StabilitySystem @Inject constructor(
         
         if (delta < 0) state.logEntries.add("Stabilność rzeczywistości słabnie...")
         
-        // Apply Seasonal Modifiers to heroes based on stability
-        applyAtmosphericEffectsDirect(state)
-        
         // CULMINATION: Zero Stability Logic
         if (next == 0 && current > 0) {
             triggerCollapseDirect(state)
         }
     }
 
-    private fun applyAtmosphericEffectsDirect(state: GameState) {
+    fun applyAtmosphericEffectsDirect(state: GameState) {
         val world = state.world
         val stability = world.globalStability
 

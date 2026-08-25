@@ -80,7 +80,7 @@ class OntologicalEngineTest {
         engine.processRealityShift()
 
         if (lowStabilityState.world.globalStability < 30) {
-            verify(gameRepository, atLeastOnce()).log(any())
+            verify(gameRepository, atLeastOnce()).logDirect(any(), any())
         }
     }
 

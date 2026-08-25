@@ -10,7 +10,8 @@ import javax.inject.Singleton
 @Singleton
 class WorldSimulation2_0 @Inject constructor(
     private val gameRepository: GameRepository,
-    private val worldStabilitySystem: WorldStabilitySystem
+    private val worldStabilitySystem: WorldStabilitySystem,
+    private val stabilitySystem: StabilitySystem
 ) {
     fun simulate() {
         gameRepository.updateState { s -> 
@@ -20,5 +21,7 @@ class WorldSimulation2_0 @Inject constructor(
 
     fun simulateDirect(state: GameState) {
         worldStabilitySystem.advanceDayDirect(state, "Symulacja świata postępuje.")
+        // BUG FIX: Apply atmospheric and seasonal effects exactly once per simulated day
+        stabilitySystem.applyAtmosphericEffectsDirect(state)
     }
 }

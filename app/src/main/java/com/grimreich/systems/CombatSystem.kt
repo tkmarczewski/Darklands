@@ -30,6 +30,7 @@ class CombatSystem @Inject constructor(
             perception = hero.perception,
             piety = hero.piety,
             charisma = hero.charisma,
+            echo = state.world.echoIntensity,
             activeEffects = hero.activeStatusEffects.map { it.copy() }.toMutableList()
         )
     }
@@ -328,6 +329,7 @@ class CombatSystem @Inject constructor(
             strength = c.enemyStrength,
             agility = c.enemyAgility,
             intelligence = c.enemyIntelligence,
+            echo = 0f, // Enemies typically don't use player-style Echo pools yet
             activeEffects = c.enemyEffects.toMutableList()
         )
     }

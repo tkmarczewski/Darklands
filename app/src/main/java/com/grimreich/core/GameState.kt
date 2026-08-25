@@ -459,7 +459,7 @@ data class NpcDto(
     val factionId: String?,
     val personality: String,
     val startNodeId: String?,
-    val stability: Int
+    val stability: Float
 )
 
 @Serializable
