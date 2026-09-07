@@ -51,7 +51,10 @@ class RandomEventManager @Inject constructor(
         if (random.nextFloat() >= 0.15f) return null
         if (cityEvents.isEmpty()) return null
         val event = cityEvents[random.nextInt(cityEvents.size)]
-        applyEventEffects(event)
+        
+        gameRepository.updateState { state ->
+            applyEventEffectsDirect(state, event)
+        }
         return "WYDARZENIE: ${event.description}"
     }
 
@@ -62,7 +65,22 @@ class RandomEventManager @Inject constructor(
         if (random.nextFloat() >= 0.25f) return null
         if (travelEvents.isEmpty()) return null
         val event = travelEvents[random.nextInt(travelEvents.size)]
-        applyEventEffects(event)
+        
+        gameRepository.updateState { state ->
+            applyEventEffectsDirect(state, event)
+        }
+        return "PODRÓŻ: ${event.description}"
+    }
+
+    /**
+     * Umożliwia wywołanie zdarzenia bezpośrednio wewnątrz istniejącego bloku updateState.
+     * FIX: Zapobiega lost-update przy zagnieżdżonych wywołaniach reentrant locka (BUG #4).
+     */
+    fun triggerTravelEventDirect(state: com.grimreich.core.GameState): String? {
+        if (random.nextFloat() >= 0.25f) return null
+        if (travelEvents.isEmpty()) return null
+        val event = travelEvents[random.nextInt(travelEvents.size)]
+        applyEventEffectsDirect(state, event)
         return "PODRÓŻ: ${event.description}"
     }
 
@@ -71,26 +89,33 @@ class RandomEventManager @Inject constructor(
      * Szansa wzrasta przy niskiej stabilności.
      */
     fun triggerHubEvent(): String? {
-        val stability = gameRepository.currentState().world.globalStability
+        val stateSnapshot = gameRepository.currentState()
+        val stability = stateSnapshot.world.globalStability
         val chance = if (stability < 40) 0.2f else 0.05f
         if (random.nextFloat() >= chance) return null
         if (hubEvents.isEmpty()) return null
         val event = hubEvents[random.nextInt(hubEvents.size)]
-        applyEventEffects(event)
+        
+        gameRepository.updateState { state ->
+            applyEventEffectsDirect(state, event)
+        }
         return "MIEJSCE POSTOJU: ${event.description}"
+    }
+
+    fun applyEventEffectsDirect(state: com.grimreich.core.GameState, event: GameEvent) {
+        state.world.globalStability = (state.world.globalStability + event.stabilityDelta).coerceIn(0, 100)
+        state.gold = (state.gold + event.goldDelta).coerceAtLeast(0)
+        state.party.filter { !it.isDead }.forEach { hero ->
+            hero.hp      = (hero.hp      + event.hpDelta     ).coerceIn(0, hero.maxHp)
+            hero.sanity  = (hero.sanity  + event.sanityDelta ).coerceIn(0, 100)
+            hero.morale  = (hero.morale  + event.moraleDelta ).coerceIn(0, 100)
+        }
+        state.logEntries.add("Zdarzenie: ${event.description}")
     }
 
     private fun applyEventEffects(event: GameEvent) {
         gameRepository.updateState { s ->
-            s.world.globalStability = (s.world.globalStability + event.stabilityDelta).coerceIn(0, 100)
-            // FIX: gold nie może spaść poniżej 0
-            s.gold = (s.gold + event.goldDelta).coerceAtLeast(0)
-            s.party.filter { !it.isDead }.forEach { hero ->
-                hero.hp      = (hero.hp      + event.hpDelta     ).coerceIn(0, hero.maxHp)
-                hero.sanity  = (hero.sanity  + event.sanityDelta ).coerceIn(0, 100)
-                hero.morale  = (hero.morale  + event.moraleDelta ).coerceIn(0, 100)
-            }
-            s.logEntries.add("Zdarzenie: ${event.description}")
+            applyEventEffectsDirect(s, event)
         }
     }
 

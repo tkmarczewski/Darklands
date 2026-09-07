@@ -104,10 +104,11 @@ class TravelSystem @Inject constructor(
             s.logEntries.add("Podróż do ${cityCatalogue.get(destCityId)?.name ?: destCityId} trwała $daysSpent dni.")
 
             // BUG FIX: Integrate encounterSystem and randomEventManager in travel
-            // Higher chance for longer travels
+            // Higher chance for longer travels. 
+            // FIX: Use triggerTravelEventDirect to avoid nested transactions (BUG #4).
             val encounterChance = 0.1f + (daysSpent * 0.02f).coerceAtMost(0.4f)
             if (randomProvider.nextFloat() < encounterChance) {
-                randomEventManager.triggerTravelEvent()
+                randomEventManager.triggerTravelEventDirect(s)
             }
         }
     }

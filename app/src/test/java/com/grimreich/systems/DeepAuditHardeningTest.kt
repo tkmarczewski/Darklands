@@ -66,7 +66,8 @@ class DeepAuditHardeningTest {
         
         travelSystem.travelTo("city_b")
         
-        verify(randomEventManager, times(1)).triggerTravelEvent()
+        // FIX: The implementation now uses triggerTravelEventDirect(s)
+        verify(randomEventManager, times(1)).triggerTravelEventDirect(any())
         assertEquals("city_b", state.world.locationId)
     }
 

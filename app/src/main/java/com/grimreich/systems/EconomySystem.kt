@@ -17,7 +17,7 @@ class EconomySystem @Inject constructor(
         val regionalModifier = city?.priceModifier ?: 1.0f
         
         // Use either Merchants reputation or ruling faction reputation
-        val rulingFaction = city?.rulingFaction ?: "MERCHANTS"
+        val rulingFaction = city?.rulingFaction ?: "merchants"
         val rep = factionReputationSystem.getReputation(rulingFaction)
 
         val reputationModifier = FactionReputationSystem.buyModifier(rep)

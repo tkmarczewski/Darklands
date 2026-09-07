@@ -153,14 +153,19 @@ class CombatSystem @Inject constructor(
                         if (actingHero.isDead) {
                             advanceTurn(state)
                         } else {
-                            processHeroAction(state, actingHero, action)
+                            val actionSuccess = processHeroAction(state, actingHero, action)
                             
-                            // Check Combat End Condition
-                            if (c.enemyHp <= 0) {
-                                handleCombatWin(state, c)
+                            if (actionSuccess) {
+                                // Check Combat End Condition
+                                if (c.enemyHp <= 0) {
+                                    handleCombatWin(state, c)
+                                } else {
+                                    advanceTurn(state)
+                                    resolveEnemyTurnsInternal(state)
+                                }
                             } else {
-                                advanceTurn(state)
-                                resolveEnemyTurnsInternal(state)
+                                // Action failed (e.g. not enough resources) -> DON'T advance turn
+                                android.util.Log.d("CombatSystem", "Action failed for ${actingHero.name}, keeping turn.")
                             }
                         }
                     }
@@ -176,10 +181,12 @@ class CombatSystem @Inject constructor(
         return result
     }
 
-    private fun processHeroAction(state: GameState, hero: Hero, action: String) {
+    private fun processHeroAction(state: GameState, hero: Hero, action: String): Boolean {
         val c = state.combat
         val heroCombatant = heroToCombatant(state, hero)
         val enemyCombatant = getEnemyCombatant(c)
+
+        var actionSuccessful = true
 
         val playerRound = when {
             action.startsWith("skill:") -> {
@@ -190,7 +197,8 @@ class CombatSystem @Inject constructor(
                 if (skill != null) {
                     if (state.world.echoIntensity < skill.echoCost) {
                         c.log.add("Brak wystarczającej intensywności echa!")
-                        return
+                        actionSuccessful = false
+                        return false
                     }
                     state.world.echoIntensity -= skill.echoCost
                     
@@ -209,17 +217,21 @@ class CombatSystem @Inject constructor(
             else -> combatRound.resolveRound(heroCombatant, enemyCombatant)
         }
 
-        c.log.addAll(playerRound.log)
-        hero.hp = heroCombatant.hp
-        hero.activeStatusEffects.clear()
-        hero.activeStatusEffects.addAll(heroCombatant.activeEffects)
-        c.enemyHp = enemyCombatant.hp
-        c.enemyStamina = enemyCombatant.endurance
-        c.enemyMorale = enemyCombatant.morale
+        if (actionSuccessful) {
+            c.log.addAll(playerRound.log)
+            hero.hp = heroCombatant.hp
+            hero.activeStatusEffects.clear()
+            hero.activeStatusEffects.addAll(heroCombatant.activeEffects)
+            c.enemyHp = enemyCombatant.hp
+            c.enemyStamina = enemyCombatant.endurance
+            c.enemyMorale = enemyCombatant.morale
 
-        if (hero.hp <= 0) {
-            handleHeroDeath(state, hero)
+            if (hero.hp <= 0) {
+                handleHeroDeath(state, hero)
+            }
         }
+        
+        return actionSuccessful
     }
 
     private fun resolveEnemyTurnsInternal(state: GameState) {

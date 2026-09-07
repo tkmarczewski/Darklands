@@ -43,9 +43,14 @@ class SaintsViewModel @Inject constructor(
     }
 
     fun cleanse() {
-        val hero = gameRepository.currentState().party.firstOrNull() ?: return
-        val msg = churchSystem.cleanseRelic(hero.id)
-        updateLog(msg)
+        val state = gameRepository.currentState()
+        val relic = state.inventory.find { it.type == "relic" }
+        if (relic != null) {
+            val msg = churchSystem.cleanseRelic(relic.instanceId)
+            updateLog(msg)
+        } else {
+            updateLog("Nie posiadasz żadnej relikwii do oczyszczenia.")
+        }
     }
 
     fun updateLog(msg: String) {

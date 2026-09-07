@@ -99,19 +99,42 @@ class ExpeditionViewModel @Inject constructor(
             val rolled = encounterSystem.rollEncounter(random, state)
             if (rolled != null) {
                 encounterSystem.selectEncounter(rolled)
-                _uiState.update { 
-                    it.copy(
-                        regionName = city?.name ?: "Pogranicze",
-                        content = ExpeditionContentState.EncounterActive(rolled),
-                        canLeave = false
-                    )
-                }
+                // UI will update in the next pass via activeEncounter check below
                 return
             }
         }
 
+        // BUG-FIX: Enforce attribute requirements for encounter choices in the UI
+        val processedEncounter = activeEncounter?.let { enc ->
+            val activeHero = state.party.find { it.id == state.activeHeroId } ?: state.party.firstOrNull()
+            enc.copy(
+                choices = enc.choices.map { choice ->
+                    val isAvailable = if (choice.requiredAttribute != null && activeHero != null) {
+                        val attrValue = when (choice.requiredAttribute.lowercase()) {
+                            "strength" -> activeHero.effectiveStrength()
+                            "agility" -> activeHero.effectiveAgility()
+                            "intelligence" -> activeHero.effectiveIntelligence()
+                            "perception" -> activeHero.effectivePerception()
+                            "endurance" -> activeHero.effectiveEndurance()
+                            "charisma" -> activeHero.effectiveCharisma()
+                            "piety" -> activeHero.effectivePiety()
+                            else -> 0
+                        }
+                        attrValue >= choice.requiredValue
+                    } else true
+                    
+                    // We can either disable it or hide it. 
+                    // To maintain labels, let's keep the choice but the UI should handle availability.
+                    // For now, let's append a requirement text to the label if failed.
+                    if (!isAvailable) {
+                        choice.copy(label = "[LOCKED] ${choice.label} (${choice.requiredAttribute} ${choice.requiredValue})")
+                    } else choice
+                }
+            )
+        }
+
         val content = when {
-            activeEncounter != null -> ExpeditionContentState.EncounterActive(activeEncounter)
+            processedEncounter != null -> ExpeditionContentState.EncounterActive(processedEncounter)
             _uiState.value.content is ExpeditionContentState.EncounterLog -> _uiState.value.content
             quests.isNotEmpty() -> ExpeditionContentState.QuestList(quests)
             else -> ExpeditionContentState.QuestList(emptyList())

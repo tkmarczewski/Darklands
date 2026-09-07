@@ -49,18 +49,21 @@ class RecruitmentViewModel @Inject constructor(
             .launchIn(viewModelScope)
     }
 
-    fun hireHero(hero: Hero) {
-        val state = gameRepository.currentState()
+    fun hireHero(hero: com.grimreich.core.Hero) {
         val cost = _uiState.value.hireCosts[hero.id] ?: 100
         
-        android.util.Log.d("RecruitmentViewModel", "[RECRUIT] Attempting to hire ${hero.name}. Cost: $cost, Gold: ${state.gold}, Party: ${state.party.size}")
-
-        if (state.gold < cost || state.party.size >= GameConstants.MAX_PARTY_SIZE) {
-            android.util.Log.w("RecruitmentViewModel", "[RECRUIT] Hire failed: Insufficient gold or party full.")
-            return
-        }
-
         gameRepository.updateState { s ->
+            android.util.Log.d("RecruitmentViewModel", "[RECRUIT] Attempting to hire ${hero.name}. Cost: $cost, Gold: ${s.gold}, Party: ${s.party.size}")
+
+            if (s.gold < cost) {
+                android.util.Log.w("RecruitmentViewModel", "[RECRUIT] Hire failed: Insufficient gold.")
+                return@updateState
+            }
+            if (s.party.size >= com.grimreich.core.GameConstants.MAX_PARTY_SIZE) {
+                android.util.Log.w("RecruitmentViewModel", "[RECRUIT] Hire failed: Party full.")
+                return@updateState
+            }
+
             s.gold -= cost
             s.party.add(hero)
             s.hireableHeroes.removeIf { it.id == hero.id }
