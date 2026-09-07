@@ -17,8 +17,12 @@ class VerdictIncidentsSystem @Inject constructor(
     private val questEngine: QuestEngine
 ) {
     fun onCityEntered(cityId: String) {
-        val state = gameRepository.currentState()
-        
+        gameRepository.updateState { state ->
+            onCityEnteredDirect(state, cityId)
+        }
+    }
+
+    fun onCityEnteredDirect(state: com.grimreich.core.GameState, cityId: String) {
         // Nie naliczamy incydentów, jeśli kampania jest już gotowa lub ukończona
         if (state.quest.worldFlags.contains("verdict_campaign_ready") || 
             state.quest.completedQuestIds.contains("q_verdict_1")) return

@@ -7,6 +7,10 @@ import kotlin.random.Random
 enum class NpcType { merchant, quest_giver, companion, villager, guard, enemy_npc, boss_humanoid }
 enum class NpcState { peaceful, alert, hostile, infested, corrupted, fleeing, dead }
 
+/* 
+ * SYSTEM W TRAKCIE ROZWOJU: Planowana implementacja mutacji wizualnych i statystyk NPC w Iteracji 8.
+ * Obecnie służy jedynie jako placeholder dla ontologicznych zmian w mieszkańcach miast.
+
 object NpcMutationSystem {
     fun applyRandomMutation(npc: NPC, state: GameState) {
         val stability = state.world.globalStability
@@ -16,3 +20,4 @@ object NpcMutationSystem {
         }
     }
 }
+*/
