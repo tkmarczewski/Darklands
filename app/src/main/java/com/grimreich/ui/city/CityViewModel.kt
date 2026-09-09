@@ -14,6 +14,7 @@ import com.grimreich.systems.QuestDefinition
 import com.grimreich.systems.DialogueManager
 import com.grimreich.systems.AtmosphericDescriptionSystem
 import com.grimreich.systems.VerdictIncidentsSystem
+import com.grimreich.systems.RandomEventManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -50,7 +51,8 @@ class CityViewModel @Inject constructor(
     private val socialEventSystem: SocialEventSystem,
     private val dialogueManager: DialogueManager,
     private val atmosphericDescriptionSystem: AtmosphericDescriptionSystem,
-    private val verdictIncidentsSystem: VerdictIncidentsSystem
+    private val verdictIncidentsSystem: VerdictIncidentsSystem,
+    private val randomEventManager: RandomEventManager
 ) : ViewModel() {
 
     private val _isQuestMenuOpen = MutableStateFlow(false)
@@ -99,6 +101,11 @@ class CityViewModel @Inject constructor(
         val cityId = gameRepository.currentState().world.locationId
         if (cityId.isNotBlank()) {
             verdictIncidentsSystem.onCityEntered(cityId)
+            
+            // AUD-04: Trigger a random city event
+            randomEventManager.triggerCityEvent()?.let { msg ->
+                gameRepository.log(msg)
+            }
         }
 
         // BUG-15 FIX: Reactive observer for Ravenn ambush to ensure it triggers even if player is standing in city

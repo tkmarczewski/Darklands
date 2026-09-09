@@ -235,7 +235,8 @@ fun QuestState.toDto(): QuestStateDto = QuestStateDto(
     activeQuestIds = activeQuestIds.toList(),
     completedQuestIds = completedQuestIds.toList(),
     failedQuestIds = failedQuestIds.toList(),
-    progress = progress.mapValues { it.value.toDto() }
+    progress = progress.mapValues { it.value.toDto() },
+    worldFlags = worldFlags.toList()
 )
 
 fun QuestStateDto.toDomain(): QuestState = QuestState().also {
@@ -243,6 +244,7 @@ fun QuestStateDto.toDomain(): QuestState = QuestState().also {
     it.completedQuestIds.addAll(completedQuestIds)
     it.failedQuestIds.addAll(failedQuestIds)
     it.progress.putAll(progress.mapValues { entry -> entry.value.toDomain() })
+    it.worldFlags.addAll(worldFlags)
 }
 
 fun QuestProgress.toDto(): QuestProgressDto = QuestProgressDto(

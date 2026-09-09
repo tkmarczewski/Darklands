@@ -235,6 +235,27 @@ class ExpeditionViewModel @Inject constructor(
 
     private fun handleEncounterChoice(choice: EncounterChoice) {
         var msg = ""
+        val stateSnapshot = gameRepository.currentState()
+        
+        // AUD-02: Enforce attribute requirements before executing effect
+        val activeHero = stateSnapshot.party.find { it.id == stateSnapshot.activeHeroId } ?: stateSnapshot.party.firstOrNull()
+        if (choice.requiredAttribute != null && activeHero != null) {
+            val attrValue = when (choice.requiredAttribute.lowercase()) {
+                "strength" -> activeHero.effectiveStrength()
+                "agility" -> activeHero.effectiveAgility()
+                "intelligence" -> activeHero.effectiveIntelligence()
+                "perception" -> activeHero.effectivePerception()
+                "endurance" -> activeHero.effectiveEndurance()
+                "charisma" -> activeHero.effectiveCharisma()
+                "piety" -> activeHero.effectivePiety()
+                else -> 0
+            }
+            if (attrValue < choice.requiredValue) {
+                _uiState.update { it.copy(content = ExpeditionContentState.EncounterLog("Nie posiadasz wystarczających umiejętności: ${choice.requiredAttribute} ${choice.requiredValue}")) }
+                return
+            }
+        }
+
         gameRepository.updateState { state ->
             msg = choice.effect(state)
         }

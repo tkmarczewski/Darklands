@@ -375,7 +375,8 @@ data class QuestStateDto(
     val activeQuestIds: List<String>,
     val completedQuestIds: List<String>,
     val failedQuestIds: List<String>,
-    val progress: Map<String, QuestProgressDto>
+    val progress: Map<String, QuestProgressDto>,
+    val worldFlags: List<String>
 )
 
 @Serializable

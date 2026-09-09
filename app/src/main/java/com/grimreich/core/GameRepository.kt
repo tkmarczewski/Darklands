@@ -47,9 +47,10 @@ class GameRepository @Inject constructor(
 
     private val syncMutex = Mutex()
     private val saveMutex = Mutex()
+    private var syncJob: Job? = null
 
     init {
-        repositoryScope.launch { sync() }
+        syncJob = repositoryScope.launch { sync() }
         
         // BUG-NEW-LEAK-02: Collector for conflated save requests.
         // Ensures only the latest state is saved and multiple requests don't pile up.
@@ -132,6 +133,14 @@ class GameRepository @Inject constructor(
         state.logEntries.add(message)
         state.trimLogs()
         _gameLogs.value = state.logEntries.toList()
+    }
+
+    /**
+     * Ensures that the repository is fully synchronized before proceeding.
+     * Use this in ViewModels that require access to catalogues immediately after startup.
+     */
+    suspend fun awaitSync() {
+        syncJob?.join()
     }
 
     suspend fun sync() = syncMutex.withLock {

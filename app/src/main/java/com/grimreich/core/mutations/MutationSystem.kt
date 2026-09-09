@@ -83,7 +83,6 @@ class MutationSystem @Inject constructor(
                     MutationTier.manifested   -> MutationTier.dominant
                     MutationTier.dominant     -> MutationTier.transcendent
                     MutationTier.transcendent -> MutationTier.transcendent
-                    else                      -> MutationTier.manifested
                 }
 
                 val updated = target.copy(tier = nextTier)

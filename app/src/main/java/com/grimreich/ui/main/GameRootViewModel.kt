@@ -65,6 +65,9 @@ class GameRootViewModel @Inject constructor(
     val pendingPlayerName: String? get() = _pendingPlayerName
 
     init {
+        viewModelScope.launch {
+            gameRepository.awaitSync()
+        }
         audioEngine.playForRoute("main_menu")
 
         // --- DEATH OBSERVER: BG RITUAL ---

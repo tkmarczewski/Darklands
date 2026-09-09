@@ -9,6 +9,7 @@ import com.grimreich.core.GameRepository
 import com.grimreich.core.Hero
 import com.grimreich.systems.EndingSystem
 import com.grimreich.systems.QuestEngine
+import com.grimreich.systems.RandomEventManager
 import com.grimreich.world.CityCatalogue
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
@@ -33,11 +34,12 @@ data class HubUiState(
 
 @HiltViewModel
 class HubViewModel @Inject constructor(
-    gameRepository: GameRepository,
+    private val gameRepository: GameRepository,
     private val questEngine: QuestEngine,
     private val cityCatalogue: CityCatalogue,
     private val visualContentSystem: com.grimreich.systems.VisualContentSystem,
     private val atmosphericLogSystem: com.grimreich.systems.AtmosphericLogSystem,
+    private val randomEventManager: RandomEventManager,
     private val endingSystem: EndingSystem
 ) : ViewModel() {
 
@@ -47,6 +49,12 @@ class HubViewModel @Inject constructor(
     fun checkForEnding(onTrigger: () -> Unit) {
         if (endingSystem.shouldTriggerMetaEnding()) {
             onTrigger()
+        }
+    }
+
+    fun triggerHubEvent() {
+        randomEventManager.triggerHubEvent()?.let { msg ->
+            gameRepository.log(msg)
         }
     }
 
