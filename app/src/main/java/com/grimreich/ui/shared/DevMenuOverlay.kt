@@ -14,6 +14,7 @@ import androidx.compose.ui.zIndex
 import com.grimreich.ui.main.GameRootViewModel
 import com.grimreich.ui.main.GameScreenMode
 import com.grimreich.ui.DevMenuScreen
+import androidx.activity.compose.BackHandler
 
 @Composable
 fun DevMenuOverlay(
@@ -21,6 +22,12 @@ fun DevMenuOverlay(
     content: @Composable () -> Unit
 ) {
     val mode by root.mode.collectAsState()
+
+    if (mode == GameScreenMode.dev_menu) {
+        BackHandler {
+            root.setMode(GameScreenMode.hub)
+        }
+    }
 
     Box(modifier = Modifier.fillMaxSize()) {
         content()

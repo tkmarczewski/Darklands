@@ -145,11 +145,11 @@ class InventorySystem @Inject constructor(
     fun getEquippedItems(hero: Hero): EquippedItems {
         val state = gameRepository.currentState()
         val gear = EquippedItems()
-        hero.equipment["weapon"]?.let { instId -> gear.weapon = state.inventory.find { it.instanceId == instId } }
-        hero.equipment["armor"]?.let { instId -> gear.bodyArmor = state.inventory.find { it.instanceId == instId } }
-        hero.equipment["helmet"]?.let { instId -> gear.helmet = state.inventory.find { it.instanceId == instId } }
-        hero.equipment["shield"]?.let { instId -> gear.shield = state.inventory.find { it.instanceId == instId } }
-        hero.equipment["accessory"]?.let { instId -> gear.accessory = state.inventory.find { it.instanceId == instId } }
+        hero.equipment["weapon"]?.let { instId -> gear.weapon = state.inventory.find { it.instanceId == instId || it.templateId == instId } }
+        hero.equipment["armor"]?.let { instId -> gear.bodyArmor = state.inventory.find { it.instanceId == instId || it.templateId == instId } }
+        hero.equipment["helmet"]?.let { instId -> gear.helmet = state.inventory.find { it.instanceId == instId || it.templateId == instId } }
+        hero.equipment["shield"]?.let { instId -> gear.shield = state.inventory.find { it.instanceId == instId || it.templateId == instId } }
+        hero.equipment["accessory"]?.let { instId -> gear.accessory = state.inventory.find { it.instanceId == instId || it.templateId == instId } }
         return gear
     }
 }

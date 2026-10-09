@@ -456,7 +456,7 @@ class CombatSystem @Inject constructor(
         c.currentTurnIndex = (c.currentTurnIndex + 1) % size
         
         // BUG-NEW-03 & #11: Increment round only when we wrap back to the first combatant from the LAST one
-        if (c.currentTurnIndex == 0 && prevIndex == size - 1) {
+        if (c.currentTurnIndex == 0 && (prevIndex == size - 1 || prevIndex < 0)) {
             c.round++
             recalculateInitiative(state)
         }

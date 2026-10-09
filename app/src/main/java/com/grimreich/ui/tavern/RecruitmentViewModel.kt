@@ -65,6 +65,21 @@ class RecruitmentViewModel @Inject constructor(
             }
 
             s.gold -= cost
+
+            // Instantiate starting equipment into inventory and link instance IDs
+            hero.equipment.forEach { (slot, itemOrTemplateId) ->
+                if (itemOrTemplateId != null) {
+                    val existingInInventory = s.inventory.find { it.instanceId == itemOrTemplateId }
+                    if (existingInInventory == null) {
+                        val itemInstance = gameRepository.itemCatalogue.createInstance(itemOrTemplateId)
+                        if (itemInstance != null) {
+                            s.inventory.add(itemInstance)
+                            hero.equipment[slot] = itemInstance.instanceId
+                        }
+                    }
+                }
+            }
+
             s.party.add(hero)
             s.hireableHeroes.removeIf { it.id == hero.id }
             s.logEntries.add("Zrekrutowano: ${hero.name} za $cost zł.")

@@ -1,11 +1,14 @@
 package com.grimreich.ui.main
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.grimreich.core.GameRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 
@@ -22,7 +25,9 @@ class MainMenuViewModel @Inject constructor(
     val uiState: StateFlow<MainMenuUiState> = _uiState.asStateFlow()
 
     init {
-        refresh()
+        gameRepository.gameState
+            .onEach { refresh() }
+            .launchIn(viewModelScope)
     }
 
     fun refresh() {

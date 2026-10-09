@@ -30,7 +30,7 @@ fun DevMenuScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(Color(0xFF111111))
-            .padding(16.dp)
+            .padding(horizontal = 24.dp, vertical = 16.dp) // Zwiększony padding boczny dla Pixel 10
             .verticalScroll(rememberScrollState())
     ) {
         Row(
@@ -42,7 +42,8 @@ fun DevMenuScreen(
             Button(
                 onClick = onBack,
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4A0000)),
-                shape = androidx.compose.foundation.shape.RoundedCornerShape(4.dp)
+                shape = androidx.compose.foundation.shape.RoundedCornerShape(4.dp),
+                modifier = Modifier.padding(end = 8.dp) // Dodatkowy odstęp od krawędzi ekranu
             ) {
                 Text("WYJŚCIE X", fontSize = 10.sp)
             }

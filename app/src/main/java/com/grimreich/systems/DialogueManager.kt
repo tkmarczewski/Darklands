@@ -20,6 +20,8 @@ import kotlin.random.Random
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import java.util.concurrent.ConcurrentHashMap
 
 @Singleton
@@ -31,6 +33,7 @@ class DialogueManager @Inject constructor(
     private val nodes = ConcurrentHashMap<String, DialogueNode>()
     private val gson = Gson()
     private val loadLock = Any()
+    private val seedMutex = Mutex()
     private var isLoaded = false
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
 
@@ -233,11 +236,14 @@ class DialogueManager @Inject constructor(
 
     suspend fun seedBasicDialogues() {
         if (isLoaded) return
-        // BUG-15: Do NOT clear if we want to preserve modded or dynamic nodes
-        loadNodesFromAsset("grimreich/dialogues_pilot.json")
-        loadNodesFromAsset("grimreich/dialogues_extended.json")
-        loadNodesFromAsset("grimreich/dialogues_beggars.json")
-        loadNodesFromAsset("grimreich/dialogues_misty_path.json")
-        isLoaded = true
+        seedMutex.withLock {
+            if (isLoaded) return
+            // BUG-15: Do NOT clear if we want to preserve modded or dynamic nodes
+            loadNodesFromAsset("grimreich/dialogues_pilot.json")
+            loadNodesFromAsset("grimreich/dialogues_extended.json")
+            loadNodesFromAsset("grimreich/dialogues_beggars.json")
+            loadNodesFromAsset("grimreich/dialogues_misty_path.json")
+            isLoaded = true
+        }
     }
 }

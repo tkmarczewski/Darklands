@@ -6,6 +6,7 @@ import com.grimreich.core.EnemyType
 import com.grimreich.core.Hero
 import com.grimreich.core.CombatRandomProvider
 import dagger.Lazy
+import java.util.concurrent.CopyOnWriteArrayList
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -33,95 +34,97 @@ class EncounterSystem @Inject constructor(
     private val lootSystem: LootSystem,
     private val chronicleSystem: Lazy<ChronicleSystem>
 ) {
-    private val encounters = mutableListOf(
-        Encounter(
-            "enc_01", "Cienie w zaułku", "Widzisz migoczące światło w głębi uliczki.",
-            EncounterType.interactive,
-            listOf(
-                EncounterChoice("Sprawdź", "Znalazłeś porzuconą torbę.", effect = { state ->
-                    lootSystem.awardLootDirect(state, 1.0f)
-                }),
-                EncounterChoice("Ignoruj", "Przeszedłeś obok.", effect = { "Bezpieczeństwo przede wszystkim." })
-            )
-        ),
-        Encounter(
-            "enc_combat_test", "Bandyci na Trakcie", "Grupa zdesperowanych rzezimieszków blokuje drogę.",
-            EncounterType.combat,
-            listOf(
-                EncounterChoice("Walcz!", "Chwytasz za broń.", effect = { "POJEDYNEK" }, combatEnemyType = EnemyType.bandit)
-            )
-        ),
-        Encounter(
-            "enc_per_01", "Ukryta Skrytka",
-            "Twoje zmysły podpowiadają, że pod luźnym kamieniem coś się znajduje.",
-            EncounterType.resource,
-            listOf(
-                EncounterChoice("Przeszukaj skrytkę", "Znalazłeś stare monety!",
-                    "perception", 12, effect = { state ->
-                        state.gold += 50
-                        "Znalazłeś 50 złota!"
+    private val encounters = CopyOnWriteArrayList<Encounter>(
+        listOf(
+            Encounter(
+                "enc_01", "Cienie w zaułku", "Widzisz migoczące światło w głębi uliczki.",
+                EncounterType.interactive,
+                listOf(
+                    EncounterChoice("Sprawdź", "Znalazłeś porzuconą torbę.", effect = { state ->
+                        lootSystem.awardLootDirect(state, 1.0f)
                     }),
-                EncounterChoice("Zostaw to", "Może to pułapka.", effect = { "Lepiej nie ryzykować." })
-            )
-        ),
-        Encounter(
-            "enc_int_01", "Dziwny Mechanizm",
-            "Na środku drogi stoi dziwna, pulsująca maszyna echa.",
-            EncounterType.interactive,
-            listOf(
-                EncounterChoice("Rozszyfruj działanie",
-                    "Ustabilizowałeś fragment rzeczywistości!", "intelligence", 14,
-                    effect = { state ->
-                        state.world.globalStability += 10
-                        "Stabilność świata wzrosła!"
-                    }),
-                EncounterChoice("Omiń", "Wygląda niebezpiecznie.", effect = { "Przyspieszyłeś kroku." })
-            )
-        ),
-        Encounter(
-            "echo_frozen_archivist", "Zamarznięty Archiwista",
-            "Na środku traktu stoi postać pokryta szronem, mimo upału. Trzyma w rękach księgę, " +
-            "której strony przewracają się same. 'Wszystko musi zostać skatalogowane, zanim zniknie', szepcze Archiwista.",
-            EncounterType.interactive,
-            listOf(
-                EncounterChoice(
-                    "Pomóż mu skatalogować otoczenie",
-                    "Pamięć jest kotwicą.", "intelligence", 14,
-                    effect = { s ->
-                        chronicleSystem.get().unlock("lore_fracture_origin")
-                        s.world.globalStability += 5
-                        "Twoja pomoc uspokaja Archiwistę. Wręcza Ci zapisany zwój."
-                    }),
-                EncounterChoice(
-                    "Zabierz księgę siłą",
-                    "Księga rozpada się w proch.", "strength", 15,
-                    effect = { s ->
-                        s.gold += 100
-                        s.world.globalStability -= 5
-                        "Znalazłeś 100 złota w pyłach księgi."
-                    })
-            )
-        ),
-        Encounter(
-            "echo_glitched_child", "Błąd w Obrazie",
-            "Mała dziewczynka siedzi pod drzewem. Gdy mruga, jej postać przesuwa się o kilka " +
-            "centymetrów w bok, zostawiając za sobą powidok. 'Widzisz to?' pyta, wskazując na niebo. " +
-            "'Piksele spadają jak śnieg.'",
-            EncounterType.interactive,
-            listOf(
-                EncounterChoice("Uspokój dziecko",
-                    "Rzeczywistość odzyskuje ostrość.", "charisma", 13,
-                    effect = { s ->
-                        s.party.forEach { h -> h.hp = (h.hp + 10).coerceAtMost(h.maxHp) }
-                        "Dziewczynka uśmiecha się. Odzyskaliście spokój ducha."
-                    }),
-                EncounterChoice("Zbadaj niebo",
-                    "Widzisz błękitny kod.", "perception", 15,
-                    effect = { s ->
-                        chronicleSystem.get().unlock("lore_scribes")
-                        s.world.echoIntensity += 0.1f
-                        "Widzisz surowy kod rzeczywistości. Twoja Kotwica drży."
-                    })
+                    EncounterChoice("Ignoruj", "Przeszedłeś obok.", effect = { "Bezpieczeństwo przede wszystkim." })
+                )
+            ),
+            Encounter(
+                "enc_combat_test", "Bandyci na Trakcie", "Grupa zdesperowanych rzezimieszków blokuje drogę.",
+                EncounterType.combat,
+                listOf(
+                    EncounterChoice("Walcz!", "Chwytasz za broń.", effect = { "POJEDYNEK" }, combatEnemyType = EnemyType.bandit)
+                )
+            ),
+            Encounter(
+                "enc_per_01", "Ukryta Skrytka",
+                "Twoje zmysły podpowiadają, że pod luźnym kamieniem coś się znajduje.",
+                EncounterType.resource,
+                listOf(
+                    EncounterChoice("Przeszukaj skrytkę", "Znalazłeś stare monety!",
+                        "perception", 12, effect = { state ->
+                            state.gold += 50
+                            "Znalazłeś 50 złota!"
+                        }),
+                    EncounterChoice("Zostaw to", "Może to pułapka.", effect = { "Lepiej nie rytywować." })
+                )
+            ),
+            Encounter(
+                "enc_int_01", "Dziwny Mechanizm",
+                "Na środku drogi stoi dziwna, pulsująca maszyna echa.",
+                EncounterType.interactive,
+                listOf(
+                    EncounterChoice("Rozszyfruj działanie",
+                        "Ustabilizowałeś fragment rzeczywistości!", "intelligence", 14,
+                        effect = { state ->
+                            state.world.globalStability += 10
+                            "Stabilność świata wzrosła!"
+                        }),
+                    EncounterChoice("Omiń", "Wygląda niebezpiecznie.", effect = { "Przyspieszyłeś kroku." })
+                )
+            ),
+            Encounter(
+                "echo_frozen_archivist", "Zamarznięty Archiwista",
+                "Na środku traktu stoi postać pokryta szronem, mimo upału. Trzyma w rękach księgę, " +
+                "której strony przewracają się same. 'Wszystko musi zostać skatalogowane, zanim zniknie', szepcze Archiwista.",
+                EncounterType.interactive,
+                listOf(
+                    EncounterChoice(
+                        "Pomóż mu skatalogować otoczenie",
+                        "Pamięć jest kotwicą.", "intelligence", 14,
+                        effect = { s ->
+                            chronicleSystem.get().unlock("lore_fracture_origin")
+                            s.world.globalStability += 5
+                            "Twoja pomoc uspokaja Archiwistę. Wręcza Ci zapisany zwój."
+                        }),
+                    EncounterChoice(
+                        "Zabierz księgę siłą",
+                        "Księga rozpada się w proch.", "strength", 15,
+                        effect = { s ->
+                            s.gold += 100
+                            s.world.globalStability -= 5
+                            "Znalazłeś 100 złota w pyłach księgi."
+                        })
+                )
+            ),
+            Encounter(
+                "echo_glitched_child", "Błąd w Obrazie",
+                "Mała dziewczynka siedzi pod drzewem. Gdy mruga, jej postać przesuwa się o kilka " +
+                "centymetrów w bok, zostawiając za sobą powidok. 'Widzisz to?' pyta, wskazując na niebo. " +
+                "'Piksele spadają jak śnieg.'",
+                EncounterType.interactive,
+                listOf(
+                    EncounterChoice("Uspokój dziecko",
+                        "Rzeczywistość odzyskuje ostrość.", "charisma", 13,
+                        effect = { s ->
+                            s.party.forEach { h -> h.hp = (h.hp + 10).coerceAtMost(h.maxHp) }
+                            "Dziewczynka uśmiecha się. Odzyskaliście spokój ducha."
+                        }),
+                    EncounterChoice("Zbadaj niebo",
+                        "Widzisz błękitny kod.", "perception", 15,
+                        effect = { s ->
+                            chronicleSystem.get().unlock("lore_scribes")
+                            s.world.echoIntensity += 0.1f
+                            "Widzisz surowy kod rzeczywistości. Twoja Kotwica drży."
+                        })
+                )
             )
         )
     )
