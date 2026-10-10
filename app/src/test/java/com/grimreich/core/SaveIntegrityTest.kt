@@ -40,4 +40,19 @@ class SaveIntegrityTest {
         val checksum = SaveIntegrity.generateChecksum(largeJson)
         assertTrue(SaveIntegrity.verify(largeJson, checksum))
     }
+
+    @Test
+    fun `computeStateHash changes on quest ID or reputation change`() {
+        val state1 = GameState()
+        state1.quest.activeQuestIds.add("quest_a")
+        state1.reputation.globalFactions["faction_x"] = 10
+        state1.reputation.globalFactions["faction_y"] = -10
+
+        val state2 = GameState()
+        state2.quest.activeQuestIds.add("quest_b")
+        state2.reputation.globalFactions["faction_x"] = -10
+        state2.reputation.globalFactions["faction_y"] = 10
+
+        assertNotEquals(SaveIntegrity.computeStateHash(state1), SaveIntegrity.computeStateHash(state2))
+    }
 }

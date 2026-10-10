@@ -42,10 +42,22 @@ object SaveIntegrity {
         var result = state.world.day
         result = 31 * result + state.gold
         result = 31 * result + state.party.sumOf { it.hp + it.xp + it.level }
-        result = 31 * result + state.quest.completedQuestIds.size
-        result = 31 * result + state.quest.activeQuestIds.size
-        result = 31 * result + state.quest.failedQuestIds.size
-        result = 31 * result + state.reputation.globalFactions.values.sum()
+
+        state.quest.completedQuestIds.sorted().forEach {
+            result = 31 * result + it.hashCode()
+        }
+        state.quest.activeQuestIds.sorted().forEach {
+            result = 31 * result + it.hashCode()
+        }
+        state.quest.failedQuestIds.sorted().forEach {
+            result = 31 * result + it.hashCode()
+        }
+
+        state.reputation.globalFactions.toSortedMap().forEach { (faction, value) ->
+            result = 31 * result + faction.hashCode()
+            result = 31 * result + value
+        }
+
         result = 31 * result + state.inventory.size
         result = 31 * result + (state.playerName?.hashCode() ?: 0)
         result = 31 * result + (state.heroName?.hashCode() ?: 0)

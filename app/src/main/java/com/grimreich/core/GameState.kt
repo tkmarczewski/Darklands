@@ -87,6 +87,7 @@ data class GameState(
         trimLogs()
         prayer.normalize()
         
+        gold = gold.coerceAtLeast(0)
         world.globalStability = world.globalStability.coerceIn(0, 100)
         world.echoIntensity = world.echoIntensity.coerceIn(0f, 5f)
 
@@ -212,6 +213,7 @@ data class WorldState(
     var timeOfDay: String = "morning",
     var fatigue: Int = 0,
     var lastEncounter: Long = 0L,
+    var lastCityEventDay: Long = 0L,
     var season: Season = Season.spring,
     var globalStability: Int = 100,
     var weather: WeatherType = WeatherType.clear,
@@ -339,7 +341,8 @@ data class HeroDto(
     val ontologicalMass: Int,
     val traumaMarks: List<TraumaDto>,
     val ontologicalStability: Float,
-    val activeStatusEffects: List<StatusEffectDto>
+    val activeStatusEffects: List<StatusEffectDto> = emptyList(),
+    val worldStatusEffects: List<StatusEffectDto> = emptyList()
 )
 
 @Serializable
@@ -409,6 +412,7 @@ data class WorldStateDto(
     val timeOfDay: String,
     val fatigue: Int,
     val lastEncounter: Long,
+    val lastCityEventDay: Long = 0L,
     val season: String,
     val globalStability: Int,
     val weather: String,

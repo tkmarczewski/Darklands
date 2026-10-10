@@ -3,6 +3,7 @@ package com.grimreich.ui.city
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.grimreich.core.GameRepository
+import com.grimreich.systems.EconomySystem
 import com.grimreich.world.CityCatalogue
 import com.grimreich.world.ItemCatalogue
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -31,7 +32,8 @@ data class MarketUiState(
 class MarketViewModel @Inject constructor(
     private val gameRepository: GameRepository,
     private val cityCatalogue: CityCatalogue,
-    private val itemCatalogue: ItemCatalogue
+    private val itemCatalogue: ItemCatalogue,
+    private val economySystem: EconomySystem
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(MarketUiState())
@@ -51,12 +53,16 @@ class MarketViewModel @Inject constructor(
         val stock = city?.marketStock ?: emptyList()
         val forSale = stock.mapNotNull { itemId ->
             itemCatalogue.get(itemId)?.let { item ->
-                MarketItem(item.templateId, item.name, item.value, calculateSellPrice(item.value))
+                val price = economySystem.priceInCity(cityId, item.value)
+                val sellPrice = economySystem.calculateSellPrice(cityId, item)
+                MarketItem(item.templateId, item.name, price, sellPrice)
             }
         }
 
         val toSell = state.inventory.map { item ->
-            MarketItem(item.instanceId, item.name, item.value, calculateSellPrice(item.value))
+            val buyPrice = economySystem.priceInCity(cityId, item.value)
+            val sellPrice = economySystem.calculateSellPrice(cityId, item)
+            MarketItem(item.instanceId, item.name, buyPrice, sellPrice)
         }
 
         _uiState.update { currentState -> 
@@ -71,22 +77,24 @@ class MarketViewModel @Inject constructor(
         }
     }
 
-    private fun calculateSellPrice(baseValue: Int): Int = (baseValue * 0.5).toInt()
-
     fun buy(itemId: String) {
         var purchaseSuccessful = false
         var itemName = ""
         var itemPrice = 0
 
         gameRepository.updateState { s ->
-            // BUG FIX #3 & #4: Race condition - validate everything inside updateState
+            val cityId = s.world.locationId
             val itemTemplate = itemCatalogue.get(itemId)
-            if (itemTemplate == null || s.gold < itemTemplate.value) {
-                return@updateState 
+            if (itemTemplate == null) {
+                return@updateState
+            }
+
+            itemPrice = economySystem.priceInCity(cityId, itemTemplate.value)
+            if (s.gold < itemPrice) {
+                return@updateState
             }
 
             itemName = itemTemplate.name
-            itemPrice = itemTemplate.value
             
             itemCatalogue.createInstance(itemId)?.let { instance ->
                 s.gold -= itemPrice
@@ -108,10 +116,10 @@ class MarketViewModel @Inject constructor(
         _uiState.update { it.copy(errorMessage = null) }
         
         gameRepository.updateState { s ->
-            // BUG FIX #2: Find item inside updateState to avoid selling non-existent item
+            val cityId = s.world.locationId
             val toRemove = s.inventory.find { it.instanceId == itemId }
             if (toRemove != null) {
-                val price = calculateSellPrice(toRemove.value)
+                val price = economySystem.calculateSellPrice(cityId, toRemove)
                 s.inventory.remove(toRemove)
                 s.gold += price
                 s.logEntries.add("Sprzedano: ${toRemove.name} za $price G.")

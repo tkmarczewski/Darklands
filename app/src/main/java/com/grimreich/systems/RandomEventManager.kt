@@ -48,14 +48,20 @@ class RandomEventManager @Inject constructor(
      * Zwraca opis zdarzenia lub null jeśli nic się nie wydarzyło.
      */
     fun triggerCityEvent(): String? {
+        val currentDay = gameRepository.currentState().world.day.toLong()
+        if (gameRepository.currentState().world.lastCityEventDay == currentDay) return null
         if (random.nextFloat() >= 0.15f) return null
         if (cityEvents.isEmpty()) return null
         val event = cityEvents[random.nextInt(cityEvents.size)]
         
+        var triggeredMsg: String? = null
         gameRepository.updateState { state ->
+            if (state.world.lastCityEventDay == currentDay) return@updateState
+            state.world.lastCityEventDay = currentDay
             applyEventEffectsDirect(state, event)
+            triggeredMsg = "WYDARZENIE: ${event.description}"
         }
-        return "WYDARZENIE: ${event.description}"
+        return triggeredMsg
     }
 
     /**
@@ -109,8 +115,14 @@ class RandomEventManager @Inject constructor(
             hero.hp      = (hero.hp      + event.hpDelta     ).coerceIn(0, hero.maxHp)
             hero.sanity  = (hero.sanity  + event.sanityDelta ).coerceIn(0, 100)
             hero.morale  = (hero.morale  + event.moraleDelta ).coerceIn(0, 100)
+
+            hero.normalize()
+            if (hero.isDead) {
+                state.logEntries.add("ŚMIERĆ: ${hero.name} poległ w wyniku zdarzenia!")
+            }
         }
         state.logEntries.add("Zdarzenie: ${event.description}")
+        state.normalizeState()
     }
 
     private fun applyEventEffects(event: GameEvent) {

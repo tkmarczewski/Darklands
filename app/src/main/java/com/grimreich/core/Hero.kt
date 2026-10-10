@@ -78,7 +78,8 @@ data class Hero(
     var ontologicalStability: Float = 100f, // 0 - 100
 
     // CAREER STATUS EFFECTS (BUG-06)
-    val activeStatusEffects: MutableList<StatusEffect> = mutableListOf()
+    val activeStatusEffects: MutableList<StatusEffect> = mutableListOf(),
+    val worldStatusEffects: MutableList<StatusEffect> = mutableListOf()
 ) {
 
     enum class SubjectType {
@@ -235,7 +236,8 @@ data class Hero(
         passiveAbilities = this.passiveAbilities.toMutableSet(),
         equipment = this.equipment.toMutableMap(),
         traumaMarks = this.traumaMarks.map { it.copy() }.toMutableList(),
-        activeStatusEffects = this.activeStatusEffects.map { it.copy() }.toMutableList()
+        activeStatusEffects = this.activeStatusEffects.map { it.copy() }.toMutableList(),
+        worldStatusEffects = this.worldStatusEffects.map { it.copy() }.toMutableList()
     )
 }
 

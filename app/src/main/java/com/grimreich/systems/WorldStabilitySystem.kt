@@ -119,6 +119,18 @@ class WorldStabilitySystem @Inject constructor(
     fun advanceDayDirect(state: GameState, reason: String) {
         state.world.day += 1
         state.logEntries.add("Dzień ${state.world.day}: $reason")
+
+        state.party.forEach { hero ->
+            val iterator = hero.worldStatusEffects.iterator()
+            while (iterator.hasNext()) {
+                val effect = iterator.next()
+                effect.duration--
+                if (effect.duration <= 0) {
+                    iterator.remove()
+                }
+            }
+        }
+
         advanceCollapseDirect(state, CollapseEvent.DayEnded)
     }
 }

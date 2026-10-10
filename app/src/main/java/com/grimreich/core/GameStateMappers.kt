@@ -110,7 +110,8 @@ fun Hero.toDto(): HeroDto = HeroDto(
     ontologicalMass = ontologicalMass,
     traumaMarks = traumaMarks.map { it.toDto() },
     ontologicalStability = ontologicalStability,
-    activeStatusEffects = activeStatusEffects.map { it.toDto() }
+    activeStatusEffects = activeStatusEffects.map { it.toDto() },
+    worldStatusEffects = worldStatusEffects.map { it.toDto() }
 )
 
 fun Trauma.toDto(): TraumaDto = TraumaDto(id, name, description, statModifiers, severity)
@@ -153,6 +154,7 @@ fun HeroDto.toDomain(): Hero = Hero(
     it.passiveAbilities.addAll(passiveAbilities)
     it.traumaMarks.addAll(traumaMarks.map { it.toDomain() })
     it.activeStatusEffects.addAll(activeStatusEffects.map { it.toDomain() })
+    it.worldStatusEffects.addAll(worldStatusEffects.map { it.toDomain() })
 }
 
 fun CareerEntryDto.toDomain(): CareerEntry = CareerEntry(
@@ -293,6 +295,7 @@ fun WorldState.toDto(): WorldStateDto = WorldStateDto(
     timeOfDay = timeOfDay,
     fatigue = fatigue,
     lastEncounter = lastEncounter,
+    lastCityEventDay = lastCityEventDay,
     season = season.name,
     globalStability = globalStability,
     weather = weather.name,
@@ -313,6 +316,7 @@ fun WorldStateDto.toDomain(): WorldState = WorldState(
     timeOfDay = timeOfDay,
     fatigue = fatigue,
     lastEncounter = lastEncounter,
+    lastCityEventDay = lastCityEventDay,
     season = runCatching { Season.valueOf(season.lowercase()) }.onFailure { Log.w("Mappers", "Failed to parse season: $season") }.getOrDefault(Season.spring),
     globalStability = globalStability,
     weather = runCatching { WeatherType.valueOf(weather.lowercase()) }.onFailure { Log.w("Mappers", "Failed to parse weather: $weather") }.getOrDefault(WeatherType.clear),

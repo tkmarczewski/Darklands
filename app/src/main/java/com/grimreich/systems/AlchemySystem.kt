@@ -50,10 +50,15 @@ class AlchemySystem @Inject constructor(
                 itemsToRemove.addAll(found.take(qty))
             }
 
-            // Atomic removal after all checks pass
-            itemsToRemove.forEach { state.inventory.remove(it) }
+            val craftedItem = itemCatalogue.createInstance(recipe.resultItemId)
+            if (craftedItem == null) {
+                result = "Błąd: Nie udało się wytworzyć przedmiotu ${recipe.resultItemId}."
+                return@updateState
+            }
 
-            itemCatalogue.createInstance(recipe.resultItemId)?.let { state.inventory.add(it) }
+            // Atomic removal after item creation passes
+            itemsToRemove.forEach { state.inventory.remove(it) }
+            state.inventory.add(craftedItem)
             
             // PROGRESSION FIX: Grant XP for successful crafting
             experienceSystem.addPartyXpDirect(state, 10)

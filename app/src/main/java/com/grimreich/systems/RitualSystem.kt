@@ -43,18 +43,19 @@ class RitualSystem @Inject constructor(
             }
 
             if (recipe.requiredCipher == playerCipher) {
-                // Sukces: Usuń składniki i dodaj przedmiot
-                recipe.requiredIngredients.forEach { id ->
-                    state.inventory.find { it.templateId == id }?.let { item ->
-                        state.inventory.remove(item)
-                    }
-                }
-                
                 val newItem = gameRepository.itemCatalogue.createInstance(recipe.targetItemId)
                 if (newItem != null) {
+                    recipe.requiredIngredients.forEach { id ->
+                        state.inventory.find { it.templateId == id }?.let { item ->
+                            state.inventory.remove(item)
+                        }
+                    }
                     state.inventory.add(newItem)
                     state.logEntries.add("RYTUAŁ: ${recipe.successMessage}")
                     success = true
+                } else {
+                    state.logEntries.add("RYTUAŁ: Nie udało się powołać przedmiotu ${recipe.targetItemId}.")
+                    success = false
                 }
             } else {
                 // Porażka: Pęknięcie rzeczywistości (Ambusz)
