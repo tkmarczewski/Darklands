@@ -250,7 +250,6 @@ fun PartyManagement(heroes: List<HeroUi>, onEvent: (CharacterHubUiEvent) -> Unit
                         HeroStatusUi.dead -> Color.Red
                         HeroStatusUi.wounded -> Color.Yellow
                         HeroStatusUi.alive -> Color.Green
-                        else -> Color.Gray
                     }, fontSize = 10.sp)
                 }
             }

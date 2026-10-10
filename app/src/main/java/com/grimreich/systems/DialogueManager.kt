@@ -26,7 +26,7 @@ import java.util.concurrent.ConcurrentHashMap
 
 @Singleton
 class DialogueManager @Inject constructor(
-    @ApplicationContext private val context: Context,
+    @param:ApplicationContext private val context: Context,
     private val gameRepositoryProvider: Lazy<GameRepository>,
     private val questEngine: Lazy<QuestEngine>,
 ) {

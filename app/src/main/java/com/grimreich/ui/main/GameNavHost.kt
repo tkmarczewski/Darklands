@@ -182,7 +182,16 @@ fun GameNavHost(
         composable(GameRoute.combat.route) {
             CombatScreen(
                 viewModel = hiltViewModel(),
-                onExit = { root.setMode(GameScreenMode.hub) }
+                onExit = { 
+                    val state = root.gameRepository.currentState()
+                    if (state.isExpeditionActive) {
+                        root.setMode(GameScreenMode.expedition)
+                    } else if (state.world.locationId.isNotBlank()) {
+                        root.setMode(GameScreenMode.city)
+                    } else {
+                        root.setMode(GameScreenMode.hub)
+                    }
+                }
             )
         }
 

@@ -262,7 +262,8 @@ class ExpeditionViewModel @Inject constructor(
         
         if (choice.combatEnemyType != null) {
             val enemy = com.grimreich.core.Bestiary.get(choice.combatEnemyType)
-            // BUG-FIX: Ensure we return to expedition state after combat win
+            // BUG-FIX: Ensure we return to expedition state after combat win and clear active encounter
+            encounterSystem.clearActiveEncounter()
             gameRepository.updateState { 
                 it.pendingAction = com.grimreich.core.PendingWorldAction.QuestCombatWin("any") 
             }

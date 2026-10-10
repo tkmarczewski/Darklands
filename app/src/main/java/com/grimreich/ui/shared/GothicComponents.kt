@@ -142,6 +142,5 @@ fun getQuestCategoryColor(category: QuestCategory): Color {
         QuestCategory.dialogue, QuestCategory.DIALOGUE -> Color(0xFF0D47A1)
         QuestCategory.ritual, QuestCategory.RITUAL -> Color(0xFF311B92)
         QuestCategory.bounty, QuestCategory.BOUNTY -> Color(0xFFBF360C)
-        else -> Color.Gray
     }
 }
