@@ -111,14 +111,16 @@ data class Hero(
         // If max HP increased (e.g. via stat upgrade), grant the same amount of current HP
         // FIX BUG: Only heal if hero was alive and not at 0 HP
         if (maxHp > oldMaxHp && !isDead && hp > 0) {
-            hp += (maxHp - oldMaxHp)
+            hp = (hp + (maxHp - oldMaxHp)).coerceAtMost(maxHp)
         }
 
         hp = hp.coerceIn(0, maxHp)
         
         // --- FIX BUG: Death consistency ---
-        if (hp <= 0 && !isDead) {
+        if (hp <= 0) {
             isDead = true
+        } else if (isDead && hp > 0) {
+            isDead = false
         }
 
         sanity = sanity.coerceIn(0, 100)

@@ -145,7 +145,8 @@ class DialogueManager @Inject constructor(
                 if (parts.size == 2) {
                     val faction = parts[0].lowercase()
                     val amount = parts[1].toIntOrNull() ?: 0
-                    state.reputation.globalFactions[faction] = (state.reputation.globalFactions[faction] ?: 0) + amount
+                    val current = state.reputation.globalFactions[faction] ?: 0
+                    state.reputation.globalFactions[faction] = (current + amount).coerceIn(-100, 100)
                 }
             }
             "give_item" -> {

@@ -90,6 +90,8 @@ class InventorySystem @Inject constructor(
             val from = state.party.find { it.id == fromHeroId } ?: run { result = "Brak nadawcy"; return@updateState }
             val to = state.party.find { it.id == toHeroId } ?: run { result = "Brak odbiorcy"; return@updateState }
             
+            val item = state.inventory.find { it.instanceId == instanceId } ?: run { result = "Brak przedmiotu"; return@updateState }
+
             val equippedSlot = from.equipment.entries.firstOrNull { it.value == instanceId }?.key
             if (equippedSlot != null) {
                 // BUG-NEW-11 FIX: If target already has an item in this slot, unequip it first
@@ -104,7 +106,7 @@ class InventorySystem @Inject constructor(
                 to.equipment[equippedSlot] = instanceId
             }
             
-            state.logEntries.add("Przekazano przedmiot od ${from.name} do ${to.name}.")
+            state.logEntries.add("Przekazano przedmiot ${item.name} od ${from.name} do ${to.name}.")
             result = "Przekazano"
         }
         return result
@@ -128,6 +130,11 @@ class InventorySystem @Inject constructor(
             val item = state.inventory.find { it.instanceId == instanceId } ?: run { result = "Brak"; return@updateState }
             val activeHeroId = state.activeHeroId ?: return@updateState
             val targetHero = state.party.find { it.id == activeHeroId } ?: return@updateState
+
+            if (targetHero.isDead || targetHero.hp <= 0) {
+                result = "Nie można użyć na martwym bohaterze!"
+                return@updateState
+            }
 
             val heal = item.effects["heal"] ?: 0
             val sanity = item.effects["sanity"] ?: 0

@@ -367,7 +367,7 @@ class CombatRound @Inject constructor(
         if (attacker.charisma >= 10) {
             val regen = (attacker.charisma - 9) * GameConstants.Combat.CHARISMA_MORALE_REGEN
             attacker.morale = (attacker.morale + regen)
-                .coerceAtMost(GameConstants.Combat.MAX_MORALE)
+                .coerceIn(0, GameConstants.Combat.MAX_MORALE)
             if (regen > 0) log.add("${attacker.name} zagrzewa siebie do walki. (+${regen} Morale)")
         }
 
@@ -470,8 +470,9 @@ class CombatRound @Inject constructor(
         val hpPercent = if (state.maxHp > 0) state.hp.toFloat() / state.maxHp else 0f
         return when {
             hpPercent <= 0.001f -> WoundType.critical
-            hpPercent <= GameConstants.Combat.WOUND_THRESHOLD_SERIOUS || state.endurance < 5 -> WoundType.serious
-            hpPercent <= GameConstants.Combat.WOUND_THRESHOLD_LIGHT || state.endurance < 10 -> WoundType.light
+            hpPercent <= GameConstants.Combat.WOUND_THRESHOLD_SERIOUS -> WoundType.serious
+            hpPercent <= GameConstants.Combat.WOUND_THRESHOLD_LIGHT && state.endurance < 5 -> WoundType.serious
+            hpPercent <= GameConstants.Combat.WOUND_THRESHOLD_LIGHT -> WoundType.light
             else -> WoundType.none
         }
     }
