@@ -214,6 +214,7 @@ data class WorldState(
     var fatigue: Int = 0,
     var lastEncounter: Long = 0L,
     var lastCityEventDay: Long = 0L,
+    var lastWealthDrainDay: Long = 0L,
     var season: Season = Season.spring,
     var globalStability: Int = 100,
     var weather: WeatherType = WeatherType.clear,

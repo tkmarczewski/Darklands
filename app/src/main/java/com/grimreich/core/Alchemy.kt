@@ -21,7 +21,7 @@ class AlchemyCore @Inject constructor(
 ) {
     fun brew(hero: Hero): String {
         hero.normalize()
-        val alchSkill = hero.skills.getOrDefault("ALCH", 5)
+        val alchSkill = hero.skills["Alchemia"] ?: hero.skills["alchemy"] ?: hero.skills["ALCH"] ?: 5
         val result = when {
             alchSkill >= GameConstants.Character.SPECIALIZED_SKILL_BASE_VALUE -> "Uwarzono mistrzowski eliksir."
             alchSkill >= 15 -> "Powstał solidny eliksir."

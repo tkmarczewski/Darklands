@@ -168,12 +168,10 @@ class QuestEngine @Inject constructor(
              }
         }
 
-        if (p.status != QuestStatus.objective_met) {
-            // BUG FIX #7: Only allow completion if objective is met
-            // We also check if the current step is actually the last one
+        if (p.status != QuestStatus.objective_met && p.status != QuestStatus.completed) {
             val isActuallyDone = def.steps.isNotEmpty() && p.currentStepIndex >= def.steps.size - 1
             if (!isActuallyDone) {
-                android.util.Log.w("QuestEngine", "Attempted to complete quest $actualQuestId but objective is not met and steps are not finished.")
+                android.util.Log.w("QuestEngine", "Attempted to complete quest $actualQuestId but objective is not met (status: ${p.status}).")
                 return
             }
         }

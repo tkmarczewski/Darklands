@@ -15,10 +15,11 @@ enum class Trait(val displayName: String, val description: String) {
 }
 
 fun applyTraitModifiers(hero: Hero) {
-    when (hero.trait) {
-        Trait.IRON_HEART, Trait.iron_heart -> hero.maxHp += 5
-        Trait.SOLAR_EYE, Trait.solar_eye -> hero.piety += 1
-        Trait.QUICK_HANDS, Trait.quick_hands -> hero.agility += 1
+    val traitName = hero.trait?.name?.uppercase() ?: return
+    when (traitName) {
+        "IRON_HEART" -> hero.maxHp += 5
+        "SOLAR_EYE" -> hero.piety += 1
+        "QUICK_HANDS" -> hero.agility += 1
         else -> Unit
     }
 }

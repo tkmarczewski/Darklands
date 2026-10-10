@@ -21,9 +21,9 @@ class WorldAIDirector @Inject constructor(
             // BUG FIX: Limit the frequency of stability drain based on world day 
             // to avoid draining it too fast if onTick is called multiple times per day.
             // Assuming one drain per day max if gold is high.
-            if (state.world.lastEncounter != state.world.day.toLong()) {
+            if (state.world.lastWealthDrainDay != state.world.day.toLong()) {
                 stabilitySystem.updateStabilityDirect(state, -1)
-                state.world.lastEncounter = state.world.day.toLong()
+                state.world.lastWealthDrainDay = state.world.day.toLong()
                 
                 // Project Cipher: Narrative link between wealth and instability
                 if (state.world.day % 5 == 0) {
