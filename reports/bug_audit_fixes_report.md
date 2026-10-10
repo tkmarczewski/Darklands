@@ -9,7 +9,7 @@ Niniejszy raport zawiera wyniki szczegółowej analizy kodu źródłowego Kotlin
 ### 🔴 BUG #1: Niespójność Stanu Śmierci w `Hero.normalize()`
 - **Plik**: `app/src/main/java/com/grimreich/core/Hero.kt`
 - **Analiza**:
-  Przed poprawką metoda `normalize()` ustawiała `isDead = true` gdy `hp <= 0`, ale nie resetowała flagi `isDead = false` gdy bohater został wyleczony/wskrzeszony i miał `hp > 0`.
+  Metoda `normalize()` ustawiała `isDead = true` gdy `hp <= 0`, ale nie resetowała flagi `isDead = false` gdy bohater został wyleczony/wskrzeszony i miał `hp > 0`.
 - **Status**: **POTWIERDZONY i NAPRAWIONY**.
 - **Fix**:
   ```kotlin
@@ -73,8 +73,44 @@ Niniejszy raport zawiera wyniki szczegółowej analizy kodu źródłowego Kotlin
 
 ---
 
+### 🔴 BUG #7: Pomijanie `worldStatusEffects` w `CombatSystem.heroToCombatant()`
+- **Plik**: `app/src/main/java/com/grimreich/systems/CombatSystem.kt`
+- **Analiza**:
+  Podczas inicjalizacji walki konwertowano tylko `activeStatusEffects` bohatera, całkowicie pomijając `worldStatusEffects` (efekty środowiskowe zdobyte poza walką, np. zatrucie z eksploracji).
+- **Status**: **POTWIERDZONY i NAPRAWIONY**.
+- **Fix**: Połączono efekty: `(hero.activeStatusEffects + hero.worldStatusEffects)`.
+
+---
+
+### 🔴 BUG #8: Pomijanie Odblokowań w `MetaObservationSystem.onQuestCompleted()`
+- **Plik**: `app/src/main/java/com/grimreich/systems/MetaObservationSystem.kt`
+- **Analiza**:
+  Użycie konstrukcji `when` powodowało, że po przekroczeniu progu (np. 9 zadań) wykonywana była tylko pierwsza pasująca gałąź, pomijając kolejne progowe wariancje meta-świadomości.
+- **Status**: **POTWIERDZONY i NAPRAWIONY**.
+- **Fix**: Zmieniono blok `when` na niezależne warunki `if`.
+
+---
+
+### 🔴 BUG #9: Kolejność Normalizacji w `RitualSystem.performResurrection()`
+- **Plik**: `app/src/main/java/com/grimreich/systems/RitualSystem.kt`
+- **Analiza**:
+  Wskrzeszenie wywoływało `normalize()` przed ustawieniem `hp = 1`. W rezultacie `normalize()` widziało `hp = 0` i ponownie ustawiało `isDead = true`, pozostawiając wskrzeszonego bohatera z flagą `isDead = true`.
+- **Status**: **POTWIERDZONY i NAPRAWIONY**.
+- **Fix**: Ustawiono `hp = 1` przed wywołaniem `normalize()`.
+
+---
+
+### 🔴 BUG #10: Ryzyko Przepływu/Przekroczenia Zakresu Zakupu w `CommoditySystem.buyGood()`
+- **Plik**: `app/src/main/java/com/grimreich/core/CommoditySystem.kt`
+- **Analiza**:
+  Obliczenie `totalCost` typu `Long` mogło przekroczyć zakres `Int.MAX_VALUE` i przy konwersji do `Int` wywołać nieprzewidziane operacje na złocie.
+- **Status**: **POTWIERDZONY i NAPRAWIONY**.
+- **Fix**: Dodano sprawdzanie warunku `totalCost > Int.MAX_VALUE`.
+
+---
+
 ## 2. Podsumowanie Testów Automatycznych
-Po wprowadzeniu poprawek uruchomiono pełną suitę testową Gradle:
+Po wprowadzeniu wszystkich poprawek uruchomiono pełną suitę testową Gradle:
 - **Komenda**: `app:testDebugUnitTest`
 - **Wynik**: **93 PASSED, 0 FAILED** (100% testów zakończonych sukcesem).
 - **Kompilacja**: `app:assembleDebug` zakończona powodzeniem.

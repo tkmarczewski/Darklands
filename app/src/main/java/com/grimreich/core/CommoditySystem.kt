@@ -73,7 +73,7 @@ object TradingEngine {
         val unitPrice = getCalculator().priceInCity(cityId, good.basePrice)
         val totalCost = unitPrice.toLong() * safeQty.toLong()
         
-        if (state.gold < totalCost) {
+        if (totalCost > Int.MAX_VALUE || state.gold < totalCost) {
             return "Brak złota. Potrzeba $totalCost G."
         }
         

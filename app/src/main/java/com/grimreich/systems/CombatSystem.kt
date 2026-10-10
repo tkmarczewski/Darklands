@@ -31,7 +31,7 @@ class CombatSystem @Inject constructor(
             piety = hero.piety,
             charisma = hero.charisma,
             echo = state.world.echoIntensity,
-            activeEffects = hero.activeStatusEffects.map { it.copy() }.toMutableList()
+            activeEffects = (hero.activeStatusEffects + hero.worldStatusEffects).map { it.copy() }.toMutableList()
         )
     }
 

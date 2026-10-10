@@ -29,33 +29,31 @@ class MetaObservationSystem @Inject constructor(
             "q_lost_scribe" -> uniteSelf(state, PersistentMeta.SelfAspect.PEACE)
         }
 
-        when {
-            completed >= 4 && !state.quest.worldFlags.contains("meta_hint_1") -> {
-                state.quest.worldFlags.add("meta_hint_1")
-                state.metaAwarenessLevel += 1
-                state.logEntries.add("Na marginesie Kroniki: 'Podmiot reaguje zgodnie z przewidywaniem.'")
-                chronicleSystem.unlock("lore_scribes")
-            }
-            completed >= 9 && !state.quest.worldFlags.contains("meta_hint_2") -> {
-                state.quest.worldFlags.add("meta_hint_2")
-                state.metaAwarenessLevel += 1
-                state.logEntries.add("Nie do niego. Do tego, który wybiera.")
-            }
-            completed >= 15 && !state.quest.worldFlags.contains("meta_hint_3") -> {
-                state.quest.worldFlags.add("meta_hint_3")
-                state.metaAwarenessLevel += 1
-                state.logEntries.add("Kronika nie opisuje bohatera. Opisuje ciebie.")
-            }
-            completed >= 22 && !state.quest.worldFlags.contains("meta_hint_4") -> {
-                state.quest.worldFlags.add("meta_hint_4")
-                state.metaAwarenessLevel += 1
-                state.logEntries.add("Archiwista bez twarzy zna twoje imię, lecz nie zna bohatera.")
-            }
-            completed >= GameConstants.META_QUEST_THRESHOLD && !state.quest.worldFlags.contains("meta_chain_unlock") -> {
-                state.quest.worldFlags.add("meta_chain_unlock")
-                if (questEngine.getStatus("q_meta_1", state) == QuestStatus.available) {
-                    questEngine.activateQuestDirect(state, "q_meta_1")
-                }
+        if (completed >= 4 && !state.quest.worldFlags.contains("meta_hint_1")) {
+            state.quest.worldFlags.add("meta_hint_1")
+            state.metaAwarenessLevel += 1
+            state.logEntries.add("Na marginesie Kroniki: 'Podmiot reaguje zgodnie z przewidywaniem.'")
+            chronicleSystem.unlock("lore_scribes")
+        }
+        if (completed >= 9 && !state.quest.worldFlags.contains("meta_hint_2")) {
+            state.quest.worldFlags.add("meta_hint_2")
+            state.metaAwarenessLevel += 1
+            state.logEntries.add("Nie do niego. Do tego, który wybiera.")
+        }
+        if (completed >= 15 && !state.quest.worldFlags.contains("meta_hint_3")) {
+            state.quest.worldFlags.add("meta_hint_3")
+            state.metaAwarenessLevel += 1
+            state.logEntries.add("Kronika nie opisuje bohatera. Opisuje ciebie.")
+        }
+        if (completed >= 22 && !state.quest.worldFlags.contains("meta_hint_4")) {
+            state.quest.worldFlags.add("meta_hint_4")
+            state.metaAwarenessLevel += 1
+            state.logEntries.add("Archiwista bez twarzy zna twoje imię, lecz nie zna bohatera.")
+        }
+        if (completed >= GameConstants.META_QUEST_THRESHOLD && !state.quest.worldFlags.contains("meta_chain_unlock")) {
+            state.quest.worldFlags.add("meta_chain_unlock")
+            if (questEngine.getStatus("q_meta_1", state) == QuestStatus.available) {
+                questEngine.activateQuestDirect(state, "q_meta_1")
             }
         }
     }
