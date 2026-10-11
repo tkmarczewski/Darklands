@@ -1,23 +1,29 @@
-# Raport Szczegółowego Audytu Błędów, Testów na Samsung SM-A546B i Aktualizacji Gradle
+# Raport Szczegółowego Audytu Błędów, Testów na Samsung SM-A546B i Aktualizacji Gradle 9.8.1
 
 Niniejszy raport zawiera podsumowanie prac wykonanych w projekcie **GrimReich / Darklands**:
 
 ---
 
-## 1. Naprawa Błędu Przejścia w Ekspedycji (Expedition Encounter Freeze Fix)
+## 1. Aktualizacja Gradle Wrapper do 9.8.1
+- **Gradle Wrapper**: Plik `gradle/wrapper/gradle-wrapper.properties` został zaktualizowany do wersji **Gradle 9.8.1** (`https://services.gradle.org/distributions/gradle-9.8.1-bin.zip`).
+- **Status**: Projekt buduje się i przechodzi wszystkie testy unitowe na Gradle 9.8.1 bez zakłóceń.
+
+---
+
+## 2. Naprawa Błędu Przejścia w Ekspedycji (Expedition Encounter Freeze Fix)
 - **Problem**: Po zakończeniu walki ze zdarzenia losowego w Ekspedycji (np. Bandyci na Trakcie), nieczyszczony stan `activeEncounter` powodował zapętlenie widoku zdarzenia.
 - **Naprawa**: Wyczyszczono `activeEncounter` przy starcie walki w `ExpeditionViewModel.kt` oraz dodano powrót do widoku ekspedycji w `GameNavHost.kt`.
 
 ---
 
-## 2. Eliminacja Ostrzeżeń Kompilatora Kotlin i Gradle
-- Wyeliminowano wszystkie 4 ostrzeżenia kompilatora Kotlin w plikach `CareerChain.kt`, `DialogueManager.kt`, `CharacterHubScreen.kt` oraz `GothicComponents.kt`.
+## 3. Eliminacja Ostrzeżeń Kompilatora Kotlin i Gradle
+- Wyeliminowano wszystkie ostrzeżenia kompilatora Kotlin w plikach `CareerChain.kt`, `DialogueManager.kt`, `CharacterHubScreen.kt` oraz `GothicComponents.kt`.
 - Zmigrowano deklaracje zadań w `app/build.gradle` na nowoczesne API Gradle `layout.buildDirectory` oraz `tasks.register`.
 - **Wynik kompilacji Kotlin**: **0 ostrzeżeń (0 warnings)**.
 
 ---
 
-## 3. Testy na Smartfonie Samsung Galaxy A54 5G (`SM-A546B`)
+## 4. Testy na Smartfonie Samsung Galaxy A54 5G (`SM-A546B`)
 - Wykonano pełne przejęcie w 100% ręcznie na fizycznym smartfonie Samsung (OLED 2340x1080) bez oszustw i bez Dev Menu.
 - Przetestowano kreację postaci, eksplorację miasta, tablicę ogłoszeń, walkę turową, świątynię oraz tawernę.
 
@@ -35,7 +41,7 @@ Niniejszy raport zawiera podsumowanie prac wykonanych w projekcie **GrimReich / 
 
 ---
 
-## 4. Audyt i Naprawa 37 Błędów Kodowych
+## 5. Audyt i Naprawa 37 Błędów Kodowych
 Wszystkie 37 zgłoszonych w audycie pozycji zostało zweryfikowanych i naprawionych, a cały projekt przeszedł suitę testową.
 
 ---
@@ -43,4 +49,4 @@ Wszystkie 37 zgłoszonych w audycie pozycji zostało zweryfikowanych i naprawion
 ## Wyniki Testów Automatycznych
 - **Testy Gradle**: `app:testDebugUnitTest` -> **93 PASSED, 0 FAILED**.
 - **Kompilacja**: `app:assembleDebug` -> **BUILD SUCCESSFUL (0 warnings)**.
-- **Git Branch**: Wszystkie zmiany zostały zmodyfikowane i wysłane do zdalnej gałęzi `master`.
+- **Git Branch**: Wszystkie zmiany zostały zmodyfikowane i wysłane do gałęzi `master`.

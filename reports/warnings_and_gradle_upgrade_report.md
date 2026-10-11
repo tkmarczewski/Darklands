@@ -1,4 +1,4 @@
-# Raport z Naprawy Ostrzeżeń Kodu, Poprawki Ekspedycji i Aktualizacji Gradle
+# Raport z Naprawy Ostrzeżeń Kodu, Poprawki Ekspedycji i Aktualizacji Gradle do 9.8.1
 
 Niniejszy raport zawiera zestawienie prac wykonanych przy eliminacji ostrzeżeń kompilatora Kotlin, aktualizacji konfiguracyjnej Gradle oraz naprawy nawigacji podczas starć w trybie Ekspedycji.
 
@@ -35,8 +35,9 @@ Wszystkie ostrzeżenia generowane przez kompilator Kotlin (`compileDebugKotlin`)
 
 ---
 
-## 3. Aktualizacja i Modernizacja Gradle / Build System
-- **Wersja Gradle**: Gradle Wrapper `9.6.1-bin.zip` oraz Android Gradle Plugin `9.2.1`.
+## 3. Aktualizacja Gradle Wrapper do 9.8.1
+- **Wersja Gradle**: Zaktualizowano Gradle Wrapper w `gradle/wrapper/gradle-wrapper.properties` do wersji **Gradle 9.8.1** (`gradle-9.8.1-bin.zip`).
+- **Wersja AGP**: Android Gradle Plugin `9.2.1`.
 - **Nowoczesne API Zadań w `app/build.gradle`**: Zmigrowano deklarację zadania `jacocoTestReport` na nowoczesne API `tasks.register('jacocoTestReport', JacocoReport)` z wykorzystaniem `layout.buildDirectory` oraz `tasks.named('testDebugUnitTest')`.
 
 ---
