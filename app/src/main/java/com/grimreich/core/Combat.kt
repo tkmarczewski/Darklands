@@ -133,6 +133,7 @@ data class CombatantState(
     var perception: Int = 5,
     var charisma: Int = 5,
     var piety: Int = 5,
+    var divineFavor: Int = 0,
     var echo: Float = 0f,
     var activeEffects: MutableList<StatusEffect> = mutableListOf(),
     var wounds: MutableList<WoundType> = mutableListOf()
@@ -248,12 +249,12 @@ class CombatRound @Inject constructor(
         val dmgToDefender: Int
         if (skill != null) {
             val hasResources = attacker.endurance >= skill.staminaCost && 
-                             attacker.piety >= skill.favorCost &&
+                             attacker.divineFavor >= skill.favorCost &&
                              attacker.echo >= skill.echoCost
             
             if (hasResources) {
                 attacker.endurance -= skill.staminaCost
-                attacker.piety -= skill.favorCost
+                attacker.divineFavor -= skill.favorCost
                 attacker.echo -= skill.echoCost
                 
                 log.add("${attacker.name} używa ${skill.name}!")
@@ -386,7 +387,7 @@ class CombatRound @Inject constructor(
         
         if (defenderStatus == MoraleStatus.routed || defenderStatus == MoraleStatus.ROUTED) return 0
 
-        val counterAtk  = (defender.attackBase * defenderStatus.attackModifier() *
+        val counterAtk  = ((defender.attackBase + defender.strength / 2) * defenderStatus.attackModifier() *
             (0.6f + randomProvider.nextFloat() * 0.8f) * dmgMultiplier).toInt()
         val attackerDef = (attacker.armor * attackerStatus.defenseModifier() *
             (0.5f + randomProvider.nextFloat() * 0.5f)).toInt()
@@ -484,11 +485,14 @@ class CombatRound @Inject constructor(
         val healHp = (hero.maxHp * GameConstants.Combat.HP_RECOVERY_RATIO)
             .toInt().coerceAtLeast(1)
         hero.hp = (hero.hp + healHp).coerceAtMost(hero.maxHp)
-        val enduranceHeal = randomProvider.nextInt(
-            GameConstants.Combat.POST_COMBAT_HEAL_HP_MIN,
-            GameConstants.Combat.POST_COMBAT_HEAL_HP_MAX + 1
-        )
-        hero.endurance = (hero.endurance + enduranceHeal).coerceAtMost(99)
+        val minHeal = GameConstants.Combat.POST_COMBAT_HEAL_HP_MIN
+        val maxHeal = GameConstants.Combat.POST_COMBAT_HEAL_HP_MAX
+        val enduranceHeal = if (maxHeal >= minHeal) {
+            randomProvider.nextInt(minHeal, maxHeal + 1)
+        } else {
+            minHeal
+        }
+        hero.endurance = (hero.endurance + enduranceHeal).coerceAtMost(100)
         hero.morale    = moraleSystem.moraleAfterKill(hero.morale)
         if (hero.wounds.isNotEmpty()) hero.wounds.removeAt(hero.wounds.lastIndex)
         hero.normalize()

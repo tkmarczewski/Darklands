@@ -15,14 +15,17 @@ class SaveSystem @Inject constructor() {
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
     private val saveSlots = mutableMapOf<Int, SaveSnapshot>()
     private val slotsLock = Mutex()
+    private val persistenceLock = Mutex()
 
     suspend fun save(state: GameState, slotId: Int, label: String = "") {
+        val hash = computeStateHash(state).toString()
         slotsLock.withLock {
             val snapshot = SaveSnapshot(
                 version = SAVE_VERSION,
                 timestamp = System.currentTimeMillis(),
                 label = label,
-                state = state.deepCopy()
+                state = state.deepCopy(),
+                checksum = hash
             )
             saveSlots[slotId] = snapshot
         }
@@ -36,7 +39,9 @@ class SaveSystem @Inject constructor() {
 
     suspend fun restore(slotId: Int): GameState? {
         return slotsLock.withLock {
-            saveSlots[slotId]?.state?.deepCopy()
+            val snapshot = saveSlots[slotId] ?: return@withLock null
+            snapshot.state.normalizeState()
+            snapshot.state.deepCopy()
         }
     }
 
@@ -52,8 +57,10 @@ class SaveSystem @Inject constructor() {
 
     fun saveToPersistence(persistence: StatePersistenceManager) {
         scope.launch {
-            val copy = slotsLock.withLock { saveSlots.toMap() }
-            persistence.persistSlots(copy)
+            persistenceLock.withLock {
+                val copy = slotsLock.withLock { saveSlots.toMap() }
+                persistence.persistSlots(copy)
+            }
         }
     }
 

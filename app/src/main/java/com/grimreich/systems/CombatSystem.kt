@@ -30,6 +30,7 @@ class CombatSystem @Inject constructor(
             perception = hero.perception,
             piety = hero.piety,
             charisma = hero.charisma,
+            divineFavor = hero.divineFavor,
             echo = state.world.echoIntensity,
             activeEffects = (hero.activeStatusEffects + hero.worldStatusEffects).map { it.copy() }.toMutableList()
         )
