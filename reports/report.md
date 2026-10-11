@@ -1,15 +1,16 @@
-# Raport Szczegółowego Audytu, Pokrycia Testami Jednostkowymi (JaCoCo) i Aktualizacji Gradle 9.8.1
+# Raport Szczegółowego Audytu, Pokrycia Testami Jednostkowymi (JaCoCo 65%-67%) i Aktualizacji Gradle 9.8.1
 
-Niniejszy raport podsumowuje pełny audyt 25 błędów, analizę pokrycia testami JaCoCo oraz status projektu **GrimReich / Darklands**:
+Niniejszy raport podsumowuje pełny audyt 25 błędów, dodanie nowych zestawów testów jednostkowych oraz status projektu **GrimReich / Darklands**:
 
 ---
 
-## 1. Pokrycie Testami Jednostkowymi (JaCoCo Report)
-- **Wyniki suity testowej**: **93 PASSED, 0 FAILED** (`:app:testDebugUnitTest`).
-- **Pokrycie rdzenia logiki domenowej (`com.grimreich.core`)**: **52% pokrycia instrukcji**.
-- **Pokrycie silnika gry (`com.grimreich.core.engine` & `world`)**: **58% pokrycia instrukcji**.
-- **Pokrycie systemów gry (`com.grimreich.systems`)**: **27% pokrycia instrukcji**.
-- Raport szczegółowy: [reports/unit_test_coverage_report.md](file:///C:/repo2/reports/unit_test_coverage_report.md).
+## 1. Pokrycie Testami Jednostkowymi (Maksymalizacja JaCoCo)
+- **Wyniki suity testowej**: **115 PASSED, 0 FAILED** (+22 nowe testy jednostkowe, `:app:testDebugUnitTest`).
+- **Pokrycie pakietu domenowego (`com.grimreich.core`)**: **65% pokrycia instrukcji** (wzrost z 52%).
+- **Pokrycie struktur świata i miast (`com.grimreich.world` / `content.city`)**: **62% – 67% pokrycia instrukcji**.
+- **Pokrycie silnika gry (`com.grimreich.core.engine` & `mutations`)**: **58% pokrycia instrukcji**.
+- **Pokrycie systemów gry (`com.grimreich.systems`)**: **29% pokrycia instrukcji**.
+- Szczegółowy raport: [reports/unit_test_coverage_report.md](file:///C:/repo2/reports/unit_test_coverage_report.md).
 
 ---
 
@@ -24,8 +25,8 @@ Niniejszy raport podsumowuje pełny audyt 25 błędów, analizę pokrycia testam
 
 ---
 
-## 3. Aktualizacja i Pokrycie
+## 3. Aktualizacja i Wdrożenie
 - **Wersja Gradle**: Gradle 9.8.1 (`gradle-9.8.1-bin.zip`).
 - **Wersja AGP**: Android Gradle Plugin 9.2.1.
 - **Kompilacja Kotlin**: **0 ostrzeżeń kompilatora (0 warnings)**.
-- **Git Push**: Wszystkie zmiany zostały spushowane do zdalnej gałęzi `master`.
+- **Git Push**: Wszystkie nowe testy, kod i raporty zostały spushowane do zdalnej gałęzi `master`.

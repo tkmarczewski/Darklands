@@ -258,7 +258,7 @@ fun QuestProgress.toDto(): QuestProgressDto = QuestProgressDto(
 
 fun QuestProgressDto.toDomain(): QuestProgress = QuestProgress(
     questId = questId,
-    status = runCatching { QuestStatus.valueOf(status.uppercase()) }.onFailure { Log.w("Mappers", "Failed to parse quest status: $status") }.getOrDefault(QuestStatus.LOCKED),
+    status = runCatching { QuestStatus.valueOf(status.lowercase()) }.onFailure { Log.w("Mappers", "Failed to parse quest status: $status") }.getOrDefault(QuestStatus.locked),
     currentStepIndex = currentStepIndex,
     variables = variables.toMutableMap()
 )
