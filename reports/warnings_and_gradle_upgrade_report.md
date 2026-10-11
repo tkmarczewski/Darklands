@@ -36,13 +36,12 @@ Wszystkie ostrzeżenia generowane przez kompilator Kotlin (`compileDebugKotlin`)
 ---
 
 ## 3. Aktualizacja i Modernizacja Gradle / Build System
-- **Wersja Gradle**: Weryfikacja Gradle Wrapper `9.6.1-bin.zip` oraz Android Gradle Plugin `9.2.1`.
-- **Czyszczenie Gradle Properties**: Usunięto przestarzałą eksperymentalną flagę z `gradle.properties`.
-- **Nowoczesne API Zadań w `app/build.gradle`**: Zmigrowano deklarację zadania `jacocoTestReport` na nowoczesne API `tasks.register('jacocoTestReport', JacocoReport)` z wykorzystaniem `layout.buildDirectory`.
+- **Wersja Gradle**: Gradle Wrapper `9.6.1-bin.zip` oraz Android Gradle Plugin `9.2.1`.
+- **Nowoczesne API Zadań w `app/build.gradle`**: Zmigrowano deklarację zadania `jacocoTestReport` na nowoczesne API `tasks.register('jacocoTestReport', JacocoReport)` z wykorzystaniem `layout.buildDirectory` oraz `tasks.named('testDebugUnitTest')`.
 
 ---
 
 ## 4. Weryfikacja Testów Automatycznych
-- **Kompilacja Kotlin (`compileDebugKotlin`)**: **0 ostrzeżeń (0 warnings)**.
+- **Kompilacja Kotlin (`compileDebugKotlin`)**: **0 ostrzeżeń w kodzie źródłowym (0 warnings)**.
 - **Testy jednostkowe (`app:testDebugUnitTest`)**: **93 PASSED, 0 FAILED**.
 - **Kompilacja APK (`app:assembleDebug`)**: **BUILD SUCCESSFUL**.
