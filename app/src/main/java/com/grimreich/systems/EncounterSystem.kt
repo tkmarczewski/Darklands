@@ -176,6 +176,31 @@ class EncounterSystem @Inject constructor(
         activeEncounter = encounter
     }
 
+    fun executeChoice(state: GameState, choice: EncounterChoice): String {
+        val attr = choice.requiredAttribute
+        if (attr != null && choice.requiredValue > 0) {
+            val activeHero = state.party.find { it.id == state.activeHeroId } ?: state.party.firstOrNull()
+            if (activeHero != null) {
+                val heroVal = when (attr.lowercase()) {
+                    "perception", "per" -> activeHero.perception
+                    "intelligence", "int" -> activeHero.intelligence
+                    "strength", "str" -> activeHero.strength
+                    "agility", "agi" -> activeHero.agility
+                    "charisma", "cha" -> activeHero.charisma
+                    "endurance", "end" -> activeHero.endurance
+                    "piety", "pie" -> activeHero.piety
+                    else -> 10
+                }
+                if (heroVal < choice.requiredValue) {
+                    return "Wymóg nie spełniony: $attr $heroVal/${choice.requiredValue}"
+                }
+            }
+        }
+        val resultMsg = choice.effect(state)
+        state.normalizeState()
+        return resultMsg
+    }
+
     fun addEncounter(encounter: Encounter) { encounters.add(encounter) }
     fun removeEncounter(id: String) { encounters.removeIf { it.id == id } }
 }

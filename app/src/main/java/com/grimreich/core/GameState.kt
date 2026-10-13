@@ -43,7 +43,7 @@ data class GameState(
         return this.copy(
             party = this.party.map { it.deepCopy() }.toMutableList(),
             hireableHeroes = this.hireableHeroes.map { it.deepCopy() }.toMutableList(),
-            inventory = this.inventory.toMutableList(), // Item is data class
+            inventory = this.inventory.map { it.deepCopy() }.toMutableList(),
             logEntries = this.logEntries.toMutableList(),
             quest = this.quest.copy(
                 activeQuestIds = this.quest.activeQuestIds.toMutableSet(),

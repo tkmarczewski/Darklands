@@ -87,7 +87,12 @@ data class Item(
     val lore: String = "",
     val properties: Map<String, Any> = emptyMap(),
     val effects: Map<String, Int> = emptyMap()
-)
+) {
+    fun deepCopy(): Item = this.copy(
+        properties = properties.toMap(),
+        effects = effects.toMap()
+    )
+}
 
 data class LootEntry(val itemId: String, val weight: Int = 1, val minQty: Int = 1, val maxQty: Int = 1)
 data class GeneratedLoot(val entries: List<LootEntry>)

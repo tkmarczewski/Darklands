@@ -18,13 +18,14 @@ class SaveSystem @Inject constructor() {
     private val persistenceLock = Mutex()
 
     suspend fun save(state: GameState, slotId: Int, label: String = "") {
-        val hash = computeStateHash(state).toString()
         slotsLock.withLock {
+            val copy = state.deepCopy()
+            val hash = computeStateHash(copy).toString()
             val snapshot = SaveSnapshot(
                 version = SAVE_VERSION,
                 timestamp = System.currentTimeMillis(),
                 label = label,
-                state = state.deepCopy(),
+                state = copy,
                 checksum = hash
             )
             saveSlots[slotId] = snapshot
@@ -40,6 +41,11 @@ class SaveSystem @Inject constructor() {
     suspend fun restore(slotId: Int): GameState? {
         return slotsLock.withLock {
             val snapshot = saveSlots[slotId] ?: return@withLock null
+            val currentHash = computeStateHash(snapshot.state).toString()
+            if (snapshot.checksum != null && snapshot.checksum != currentHash) {
+                android.util.Log.e("SaveSystem", "Checksum mismatch detected for slot $slotId! Expected ${snapshot.checksum}, got $currentHash")
+                return@withLock null
+            }
             snapshot.state.normalizeState()
             snapshot.state.deepCopy()
         }
@@ -55,12 +61,22 @@ class SaveSystem @Inject constructor() {
 
     fun computeStateHash(state: GameState): Int = SaveIntegrity.computeStateHash(state)
 
-    fun saveToPersistence(persistence: StatePersistenceManager) {
-        scope.launch {
+    suspend fun saveToPersistenceDirect(persistence: StatePersistenceManager): Boolean {
+        return try {
             persistenceLock.withLock {
                 val copy = slotsLock.withLock { saveSlots.toMap() }
                 persistence.persistSlots(copy)
             }
+            true
+        } catch (e: Exception) {
+            android.util.Log.e("SaveSystem", "Failed to persist slots", e)
+            false
+        }
+    }
+
+    fun saveToPersistence(persistence: StatePersistenceManager) {
+        scope.launch {
+            saveToPersistenceDirect(persistence)
         }
     }
 

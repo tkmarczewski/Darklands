@@ -240,7 +240,17 @@ class CombatRound @Inject constructor(
         applyStatusTick(attacker, log)
         applyStatusTick(defender, log)
         
-        if (isDefeated(attacker)) {
+        val attackerStatus = moraleSystem.computeStatus(attacker.morale)
+        if (isDefeated(attacker) || attackerStatus == MoraleStatus.routed || attackerStatus == MoraleStatus.ROUTED) {
+            if (attackerStatus == MoraleStatus.routed || attackerStatus == MoraleStatus.ROUTED) {
+                log.add("${attacker.name} jest zbyt przerażony, by działać!")
+            }
+            return RoundResult(0, 0, attacker.morale, defender.morale,
+                WoundType.none, WoundType.none, log)
+        }
+
+        if (isDefeated(defender)) {
+            log.add("${defender.name} już poległ!")
             return RoundResult(0, 0, attacker.morale, defender.morale,
                 WoundType.none, WoundType.none, log)
         }
@@ -332,8 +342,10 @@ class CombatRound @Inject constructor(
         }
 
         var rawAtk = attacker.attackBase + (attacker.strength / 2)
-        if ((defender.activeEffects.any { it.type == StatusEffectType.wet || it.type == StatusEffectType.WET }) &&
-            (attacker.activeEffects.any { it.type == StatusEffectType.shock || it.type == StatusEffectType.SHOCK })) {
+        val defenderIsWet = defender.activeEffects.any { it.type == StatusEffectType.wet || it.type == StatusEffectType.WET }
+        val shockPresent = attacker.activeEffects.any { it.type == StatusEffectType.shock || it.type == StatusEffectType.SHOCK } ||
+                defender.activeEffects.any { it.type == StatusEffectType.shock || it.type == StatusEffectType.SHOCK }
+        if (defenderIsWet && shockPresent) {
             rawAtk = (rawAtk * 1.5f).toInt()
             log.add("Przewodnictwo! Mokry wróg otrzymuje zwiększone obrażenia od porażenia.")
         }

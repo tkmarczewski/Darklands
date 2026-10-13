@@ -119,6 +119,11 @@ class MarketViewModel @Inject constructor(
             val cityId = s.world.locationId
             val toRemove = s.inventory.find { it.instanceId == itemId }
             if (toRemove != null) {
+                s.party.forEach { hero ->
+                    hero.equipment.entries.filter { it.value == toRemove.instanceId || it.value == toRemove.templateId }.forEach { (slot, _) ->
+                        hero.equipment[slot] = null
+                    }
+                }
                 val price = economySystem.calculateSellPrice(cityId, toRemove)
                 s.inventory.remove(toRemove)
                 s.gold += price

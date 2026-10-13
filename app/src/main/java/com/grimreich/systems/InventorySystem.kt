@@ -139,6 +139,16 @@ class InventorySystem @Inject constructor(
             val heal = item.effects["heal"] ?: 0
             val sanity = item.effects["sanity"] ?: 0
             
+            if (heal <= 0 && sanity <= 0) {
+                result = "Przedmiot ${item.name} nie ma natychmiastowego efektu do użycia!"
+                return@updateState
+            }
+
+            if ((heal > 0 && targetHero.hp >= targetHero.maxHp) && (sanity <= 0 || targetHero.sanity >= 100)) {
+                result = "${targetHero.name} ma już pełne zdrowie!"
+                return@updateState
+            }
+
             if (heal > 0) targetHero.hp = (targetHero.hp + heal).coerceAtMost(targetHero.maxHp)
             if (sanity > 0) targetHero.sanity = (targetHero.sanity + sanity).coerceAtMost(100)
 

@@ -108,8 +108,66 @@ class DevMenuViewModel @Inject constructor(
         addLog("Manual step fail triggered for $id")
     }
 
-    fun resetQuest(id: String) {
-        addLog("Reset requested for $id - Engine 2.0 does not support raw reset yet.")
+    fun triggerEnding(root: com.grimreich.ui.main.GameRootViewModel, type: String) {
+        gameRepository.updateState { s ->
+            when (type) {
+                "TOTAL_COLLAPSE" -> {
+                    s.world.collapseProgress = 1.0f
+                    s.world.echoIntensity = 0.0f
+                }
+                "ECHO_DOMINION" -> {
+                    s.world.collapseProgress = 0.0f
+                    s.world.echoIntensity = 5.0f
+                }
+                "ABANDONED" -> {
+                    s.world.collapseProgress = 0.0f
+                    s.world.echoIntensity = 0.0f
+                    s.party.forEach { it.hp = 0; it.isDead = true }
+                }
+                "RESTORATION" -> {
+                    s.world.collapseProgress = 0.0f
+                    s.world.echoIntensity = 0.0f
+                    s.world.globalStability = 100
+                    s.quest.completedQuestIds.add("q_1")
+                }
+                "OBSERVED" -> {
+                    s.world.collapseProgress = 0.0f
+                    s.world.echoIntensity = 0.0f
+                    s.metaAwarenessLevel = 5
+                    s.quest.completedQuestIds.add("q_meta_7")
+                }
+                "GOOD" -> {
+                    s.world.collapseProgress = 0.0f
+                    s.world.echoIntensity = 0.0f
+                    s.prayer.faith = 100
+                    s.prayer.virtue = 100
+                    s.world.globalStability = 100
+                    s.prayer.sins = 0
+                }
+                "PRAGMATIC" -> {
+                    s.world.collapseProgress = 0.0f
+                    s.world.echoIntensity = 0.0f
+                    s.prayer.faith = 40
+                    s.world.globalStability = 50
+                    s.prayer.virtue = 10
+                    s.prayer.sins = 1
+                }
+                "CORRUPTED" -> {
+                    s.world.collapseProgress = 0.0f
+                    s.world.echoIntensity = 0.0f
+                    s.world.globalStability = 10
+                    s.prayer.sins = 20
+                }
+                "REDEMPTION" -> {
+                    s.world.collapseProgress = 0.0f
+                    s.world.echoIntensity = 0.0f
+                    s.prayer.faith = 10
+                    s.world.globalStability = 35
+                    s.prayer.sins = 5
+                }
+            }
+        }
+        root.setMode(com.grimreich.ui.main.GameScreenMode.ending)
     }
 
     private fun refreshInfo(id: String) {

@@ -103,9 +103,16 @@ class ContentValidator @Inject constructor(
                 }
             }
             
-            // Detect Prerequisite Cycles
-            if (quest.prerequisiteQuestId == quest.id) {
-                _errors.add(ContentError.QuestError("Quest '${quest.id}' has a self-referencing prerequisite cycle."))
+            // Detect Prerequisite Cycles (multi-step cycle detection)
+            var currentPrereq = quest.prerequisiteQuestId
+            val visitedQuests = mutableSetOf(quest.id)
+            while (currentPrereq != null) {
+                if (visitedQuests.contains(currentPrereq)) {
+                    _errors.add(ContentError.QuestError("Quest '${quest.id}' has a circular prerequisite dependency cycle involving '$currentPrereq'."))
+                    break
+                }
+                visitedQuests.add(currentPrereq)
+                currentPrereq = questEngine.getDefinition(currentPrereq)?.prerequisiteQuestId
             }
         }
     }

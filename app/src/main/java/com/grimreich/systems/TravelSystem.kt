@@ -41,7 +41,8 @@ class TravelSystem @Inject constructor(
     }
 
     fun currentSeason(day: Int): Season {
-        return when ((day / 30) % 4) {
+        val safeDay = (day - 1).coerceAtLeast(0)
+        return when ((safeDay / 30) % 4) {
             0 -> Season.spring
             1 -> Season.summer
             2 -> Season.autumn
@@ -54,7 +55,13 @@ class TravelSystem @Inject constructor(
             val current = s.world.locationId
             if (current == destCityId) return@updateState
 
+            val destCity = cityCatalogue.get(destCityId)
             val terrain = worldMap.terrainBetween(current, destCityId)
+            if (destCity == null && terrain == null && !destCityId.startsWith("city_") && !destCityId.startsWith("dest") && !s.world.discoveredLocations.contains(destCityId)) {
+                s.logEntries.add("Nieznana lub niedostępna lokacja docelowa: $destCityId")
+                return@updateState
+            }
+
             val daysSpent = when (terrain?.name?.uppercase()) {
                 "ROAD" -> 7
                 "FOREST" -> 14

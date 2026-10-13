@@ -108,6 +108,9 @@ object TradingEngine {
         val item = state.inventory.find { it.instanceId == itemId } ?: return "Brak przedmiotu."
         val sellPrice = quoteSell(cityId, item)
         state.inventory.remove(item)
+        state.party.forEach { hero ->
+            hero.equipment.entries.removeIf { it.value == itemId }
+        }
         state.gold += sellPrice
         return "Sprzedano ${item.name} za $sellPrice G."
     }

@@ -57,6 +57,13 @@ class TradeSystem @Inject constructor(
                 result = "Nie masz tego przedmiotu w ekwipunku."
                 return@updateState
             }
+
+            state.party.forEach { hero ->
+                hero.equipment.entries.filter { it.value == found.instanceId || it.value == found.templateId }.forEach { (slot, _) ->
+                    hero.equipment[slot] = null
+                }
+            }
+
             state.inventory.remove(found)
             state.gold += sellPrice
             state.logEntries.add("Sprzedano ${item.name} za $sellPrice zl.")

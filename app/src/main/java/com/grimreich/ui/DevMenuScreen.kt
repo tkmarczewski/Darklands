@@ -30,7 +30,7 @@ fun DevMenuScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(Color(0xFF111111))
-            .padding(horizontal = 24.dp, vertical = 16.dp) // Zwiększony padding boczny dla Pixel 10
+            .padding(horizontal = 24.dp, vertical = 16.dp)
             .verticalScroll(rememberScrollState())
     ) {
         Row(
@@ -43,7 +43,7 @@ fun DevMenuScreen(
                 onClick = onBack,
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4A0000)),
                 shape = androidx.compose.foundation.shape.RoundedCornerShape(4.dp),
-                modifier = Modifier.padding(end = 8.dp) // Dodatkowy odstęp od krawędzi ekranu
+                modifier = Modifier.padding(end = 8.dp)
             ) {
                 Text("WYJŚCIE X", fontSize = 10.sp)
             }
@@ -102,7 +102,27 @@ fun DevMenuScreen(
 
         Spacer(modifier = Modifier.height(12.dp))
 
-        // --- SEKCJA 4: SYSTEM ---
+        // --- SEKCJA 4: ZAKOŃCZENIA (ENDINGS) ---
+        Text("PODGLĄD ZAKOŃCZEŃ (9 ENDINGS)", color = Color(0xFFFF8A80), fontSize = 10.sp, fontWeight = FontWeight.Bold)
+        FlowRow(
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+            modifier = Modifier.padding(vertical = 4.dp)
+        ) {
+            DevButton("END: COLLAPSE", Color(0xFF880E4F)) { viewModel.triggerEnding(root, "TOTAL_COLLAPSE") }
+            DevButton("END: ECHO", Color(0xFF4A148C)) { viewModel.triggerEnding(root, "ECHO_DOMINION") }
+            DevButton("END: ABANDONED", Color(0xFF311B92)) { viewModel.triggerEnding(root, "ABANDONED") }
+            DevButton("END: RESTORATION", Color(0xFF004D40)) { viewModel.triggerEnding(root, "RESTORATION") }
+            DevButton("END: OBSERVED", Color(0xFF0D47A1)) { viewModel.triggerEnding(root, "OBSERVED") }
+            DevButton("END: GOOD", Color(0xFF1B5E20)) { viewModel.triggerEnding(root, "GOOD") }
+            DevButton("END: PRAGMATIC", Color(0xFFE65100)) { viewModel.triggerEnding(root, "PRAGMATIC") }
+            DevButton("END: CORRUPTED", Color(0xFF3E2723)) { viewModel.triggerEnding(root, "CORRUPTED") }
+            DevButton("END: REDEMPTION", Color(0xFF33691E)) { viewModel.triggerEnding(root, "REDEMPTION") }
+        }
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        // --- SEKCJA 5: SYSTEM ---
         FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             DevButton("FORCE SAVE", Color(0xFF455A64)) { root.saveGame() }
             DevButton("SYNC", Color(0xFF455A64)) { root.forceSync() }
@@ -110,7 +130,7 @@ fun DevMenuScreen(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // --- SEKCJA 5: LOGI (Static height in scrollable column) ---
+        // --- SEKCJA 6: LOGI ---
         Text("LOGI SYSTEMOWE", color = Color.Gray, fontSize = 10.sp)
         Column(
             modifier = Modifier

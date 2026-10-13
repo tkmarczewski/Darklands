@@ -27,8 +27,19 @@ class EndingViewModel @Inject constructor(
 
     init {
         val s = gameRepository.currentState()
+        val desc = when {
+            s.world.collapseProgress >= 0.999f -> "ZAPAŚĆ ŚWIATA (TOTAL COLLAPSE)\n\nRzeczywistość rozpadła się na Twoich oczach. Szyfr przestał istnieć, a wraz z nim wszystko, co znałeś."
+            s.world.echoIntensity >= 4.99f -> "DOMINIUM ECHA (ECHO DOMINION)\n\nEcho pochłonęło Boreas. Świat stał się szeptem w pustce, a Twoi bohaterowie - jedynie usterkami w nieskończonym cyklu."
+            s.party.isNotEmpty() && s.party.all { it.isDead } -> "OPUSZCZONY ŚWIAT (ABANDONED)\n\nPustka pochłonęła ostatnie ślady Twojej obecności. Nikt nie opowie Twojej historii."
+            s.world.globalStability >= 95 && s.quest.completedQuestIds.isNotEmpty() -> "ODBUDOWA RZECZYWISTOŚCI (RESTORATION)\n\nStabilność została przywrócona. Paradygmat Boreas przetrwał, a pęknięcia zaczęły się goić."
+            s.quest.completedQuestIds.contains("q_meta_7") && s.metaAwarenessLevel >= 4 -> "MARGINES SESJI (OBSERVED)\n\nTo nie bohater był obserwowany. Skrybowie Absolutu od początku notowali ciebie — podmiot wyboru, czytelnika, sprawcę sesji. Bohater był tylko figurą zapisu."
+            s.prayer.faith >= 60 && s.prayer.virtue >= 50 && s.world.globalStability >= 80 && s.prayer.sins <= 2 -> "ŚWIĘTE ODRODZENIE (GOOD)\n\nGrimReich zostało oczyszczone z mroku dzięki twojej niezłomnej wierze."
+            s.prayer.faith >= 30 && s.world.globalStability >= 40 -> "KRUCHY POKÓJ (PRAGMATIC)\n\nMrok został powstrzymany, ale blizny na duszy krainy pozostaną na zawsze."
+            s.world.globalStability < 30 || s.prayer.sins >= 10 -> "WIECZNA NOC (CORRUPTED)\n\nUległeś pokusie mroku. GrimReich stało się częścią Drugiej Strony."
+            else -> "GORZKIE ODKUPIENIE (REDEMPTION)\n\nMimo wielu błędów, w ostatniej chwili odnalazłeś ścieżkę do światła."
+        }
         _uiState.value = EndingUiState(
-            summary = endingSystem.finaleStatus(),
+            summary = desc,
             metaAwareness = s.metaAwarenessLevel,
             stability = s.world.globalStability
         )

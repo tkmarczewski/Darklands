@@ -187,7 +187,8 @@ class QuestEngine @Inject constructor(
             state.quest.progress[actualQuestId] = p.copy(status = QuestStatus.completed)
         }
         
-        state.gold += def.rewardGold
+        val safeGold = (state.gold.toLong() + def.rewardGold.coerceAtLeast(0).toLong()).coerceAtMost(Int.MAX_VALUE.toLong()).toInt()
+        state.gold = safeGold
         val xpToAward = (def.recommendedLevel * 50).coerceAtLeast(50)
         experienceSystem.addPartyXpDirect(state, xpToAward).forEach { state.logEntries.add(it) }
         
