@@ -42,7 +42,7 @@ class CharacterFactory @Inject constructor(
                 hero.skills[skill] = value + 10
             }
             
-            hero.age += 5
+            hero.age += 4
             agingSystem.applyAgingToHero(hero, state)
         }
         

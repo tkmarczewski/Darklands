@@ -123,11 +123,18 @@ data class Hero(
             isDead = false
         }
 
+        strength = strength.coerceAtLeast(1)
+        agility = agility.coerceAtLeast(1)
+        perception = perception.coerceAtLeast(1)
+        intelligence = intelligence.coerceAtLeast(1)
+        endurance = endurance.coerceAtLeast(1)
+        charisma = charisma.coerceAtLeast(1)
+        piety = piety.coerceAtLeast(1)
+
         sanity = sanity.coerceIn(0, 100)
         corruption = corruption.coerceIn(0, 100)
         morale = morale.coerceIn(0, 100)
         divineFavor = divineFavor.coerceIn(0, 150)
-        endurance = endurance.coerceAtLeast(0)
         ontologicalStability = ontologicalStability.coerceIn(0f, 100f)
     }
 
