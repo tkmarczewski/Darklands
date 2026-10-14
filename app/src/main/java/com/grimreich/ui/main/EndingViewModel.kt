@@ -29,7 +29,7 @@ class EndingViewModel @Inject constructor(
         val s = gameRepository.currentState()
         val desc = when {
             s.world.collapseProgress >= 0.999f -> "ZAPAŚĆ ŚWIATA (TOTAL COLLAPSE)\n\nRzeczywistość rozpadła się na Twoich oczach. Szyfr przestał istnieć, a wraz z nim wszystko, co znałeś."
-            s.world.echoIntensity >= 4.99f -> "DOMINIUM ECHA (ECHO DOMINION)\n\nEcho pochłonęło Boreas. Świat stał się szeptem w pustce, a Twoi bohaterowie - jedynie usterkami w nieskończonym cyklu."
+            s.world.echoIntensity >= 0.999f -> "DOMINIUM ECHA (ECHO DOMINION)\n\nEcho pochłonęło Boreas. Świat stał się szeptem w pustce, a Twoi bohaterowie - jedynie usterkami w nieskończonym cyklu."
             s.party.isNotEmpty() && s.party.all { it.isDead } -> "OPUSZCZONY ŚWIAT (ABANDONED)\n\nPustka pochłonęła ostatnie ślady Twojej obecności. Nikt nie opowie Twojej historii."
             s.world.globalStability >= 95 && s.quest.completedQuestIds.isNotEmpty() -> "ODBUDOWA RZECZYWISTOŚCI (RESTORATION)\n\nStabilność została przywrócona. Paradygmat Boreas przetrwał, a pęknięcia zaczęły się goić."
             s.quest.completedQuestIds.contains("q_meta_7") && s.metaAwarenessLevel >= 4 -> "MARGINES SESJI (OBSERVED)\n\nTo nie bohater był obserwowany. Skrybowie Absolutu od początku notowali ciebie — podmiot wyboru, czytelnika, sprawcę sesji. Bohater był tylko figurą zapisu."
