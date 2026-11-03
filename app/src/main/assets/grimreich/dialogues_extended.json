@@ -605,5 +605,61 @@
     "choices": [
       { "text": "Weź pióro skryby.", "targetNodeId": "end", "triggerEvent": "advance_quest", "triggerValue": "q_lost_scribe" }
     ]
+  },
+  {
+    "id": "cipher_pixel_investigate",
+    "npcId": "archivist",
+    "text": "Dotykasz czarnego kwadratu. Zamiast zimnej skały czujesz wibracje surowego kodu. Kwadrat emituje ciąg znaków: '0x00_PIXEL_ERROR'.",
+    "choices": [
+      { "text": "Odczytaj parametr i prześlij log.", "targetNodeId": "end", "triggerEvent": "advance_quest", "triggerValue": "q_cipher_1" }
+    ]
+  },
+  {
+    "id": "cipher_comment_dialogue",
+    "npcId": "archivist",
+    "text": "Czytasz komentarz na marginesie: '// TODO: Usuń tę wioskę przed v1.0'. Postaci wokół Ciebie trącą nasycenie kolorów i zaczynają przezroczystość.",
+    "choices": [
+      { "text": "Usuń komentarz i zablokuj flagę kasowania.", "targetNodeId": "end", "triggerEvent": "advance_quest", "triggerValue": "q_cipher_2" }
+    ]
+  },
+  {
+    "id": "cipher_cache_investigate",
+    "npcId": "archivist",
+    "text": "Stoisz w strefie podręcznej. Skrzynie wypełniają zapomniane miecze i pancerze z wersji alfa GrimReich.",
+    "choices": [
+      { "text": "Pobierz Zakazany Rdzeń Pamięci.", "targetNodeId": "end", "triggerEvent": "advance_quest", "triggerValue": "q_cipher_3" }
+    ]
+  },
+  {
+    "id": "cipher_final_rewrite",
+    "npcId": "archivist",
+    "text": "Stoisz przed ołtarzem. Kod Szyfru pulsuje w powietrzu. Przycisk 'REWRITE' czeka na Twój dotyk.",
+    "choices": [
+      { "text": "Zatwierdź nową wersję rzeczywistości.", "targetNodeId": "end", "triggerEvent": "complete_quest", "triggerValue": "q_cipher_4" }
+    ]
+  },
+  {
+    "id": "monolith_depth_contact",
+    "npcId": "scholar",
+    "text": "Wsłuchujesz się w szum mosiężnej twarzy zastyganej w falach portu. 'Jestem pierwszą instalacją... nie wymazuj mnie...', szepcze głos.",
+    "choices": [
+      { "text": "Nawiąż stabilny kontakt z Kolosem.", "targetNodeId": "end", "triggerEvent": "advance_quest", "triggerValue": "q_monolith_1" }
+    ]
+  },
+  {
+    "id": "monolith_heartbeat_locate",
+    "npcId": "scholar",
+    "text": "Rytmiczne uderzenia pod przełęczą wskazują miejsce ukrycia mosiężnego serca. Kamień wokół wycieka płynną miedzią.",
+    "choices": [
+      { "text": "Zlokalizuj punkt węzłowy tytana.", "targetNodeId": "end", "triggerEvent": "advance_quest", "triggerValue": "q_monolith_2" }
+    ]
+  },
+  {
+    "id": "monolith_final_bind",
+    "npcId": "scholar",
+    "text": "Głos Kolosa cichnie. Mosiężna masa wlewa się w fundamenty Kotwicy. 'Jestem związany...', brzmi ostatnie echo.",
+    "choices": [
+      { "text": "Zapisz uspokojenie tytana w Kronice.", "targetNodeId": "end", "triggerEvent": "complete_quest", "triggerValue": "q_monolith_4" }
+    ]
   }
 ]

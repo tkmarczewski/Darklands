@@ -757,5 +757,131 @@
       { "description": "Odszukaj Pióro ukryte w podziemnych archiwach zakazanej wiedzy.", "type": "investigation", "targetId": "scribe_pen" },
       { "description": "Złóż swój podpis na 'Ledgerze Rzeczywistości', pieczętując los Boreas.", "type": "dialogue", "targetId": "ledger_signing" }
     ]
+  },
+  {
+    "id": "q_cipher_1",
+    "title": "Piksel na Horyzoncie",
+    "description": "Na horyzoncie Wybrzeża pojawił się nieruchomy, czarny kwadrat, który nie rzuca cienia. Każdy, kto w niego spogląda dłużej niż trzy uderzenia serca, zaczyna wypluwać czarny atrament.",
+    "rewardGold": 180,
+    "cityId": "wybrzeze_polnocne",
+    "originNpcId": "archivist",
+    "category": "meta",
+    "chainId": "chain_cipher",
+    "chainOrder": 1,
+    "recommendedLevel": 3,
+    "steps": [
+      { "description": "Zbadaj czarny kwadrat na horyzoncie i odczytaj jego parametr.", "type": "investigation", "targetId": "cipher_pixel_investigate" }
+    ]
+  },
+  {
+    "id": "q_cipher_2",
+    "title": "Komentarz w Kodzie Źródłowym",
+    "description": "W najstarszym manuskrypcie Opactwa znaleziono komentarz: '// TODO: Usuń tę wioskę przed v1.0'. Mieszkańcy wioski zaczynają tracić stałość fizyczną.",
+    "rewardGold": 220,
+    "cityId": "opactwo_ciszy",
+    "originNpcId": "archivist",
+    "category": "meta",
+    "chainId": "chain_cipher",
+    "chainOrder": 2,
+    "prerequisiteQuestId": "q_cipher_1",
+    "recommendedLevel": 5,
+    "steps": [
+      { "description": "Przeanalizuj komentarz i ustabilizuj tożsamość mieszkańców.", "type": "dialogue", "targetId": "cipher_comment_dialogue" }
+    ]
+  },
+  {
+    "id": "q_cipher_3",
+    "title": "Kieszeń Pamięci Podręcznej",
+    "description": "Pod fundamentami Twierdzy odkryto 'Kieszeń Pamięci', w której zmagazynowano usunięte artefakty z poprzedniej iteracji gry.",
+    "rewardGold": 300,
+    "cityId": "twierdza_zelazna",
+    "originNpcId": "archivist",
+    "category": "meta",
+    "chainId": "chain_cipher",
+    "chainOrder": 3,
+    "prerequisiteQuestId": "q_cipher_2",
+    "recommendedLevel": 7,
+    "steps": [
+      { "description": "Zejdź do kieszeni pamięci i odszukaj Zakazany Rdzeń.", "type": "investigation", "targetId": "cipher_cache_investigate" }
+    ]
+  },
+  {
+    "id": "q_cipher_4",
+    "title": "Ostateczna Rewizja Szyfru",
+    "description": "Finał łańcucha Szyfru. Bohater staje przed ołtarzem w Sercu Krainy, w którym wyryto surowy kod całej jego sesji.",
+    "rewardGold": 600,
+    "cityId": "serce_krainy",
+    "originNpcId": "archivist",
+    "category": "meta",
+    "chainId": "chain_cipher",
+    "chainOrder": 4,
+    "prerequisiteQuestId": "q_cipher_3",
+    "recommendedLevel": 9,
+    "steps": [
+      { "description": "Przeprowadź ceremonię nadpisania zmiennych w Szyfrze Świata.", "type": "dialogue", "targetId": "cipher_final_rewrite" }
+    ]
+  },
+  {
+    "id": "q_monolith_1",
+    "title": "Cień w Głębinie",
+    "description": "Fale w Porcie Mglistym zaczęły układać się w kształt gigantycznej, mosiężnej twarzy zastyganej pod wodą. To obudzony Kolos z Warstwy 6.",
+    "rewardGold": 200,
+    "cityId": "port_mglisty",
+    "originNpcId": "scholar",
+    "category": "anomaly",
+    "chainId": "chain_monolith",
+    "chainOrder": 1,
+    "recommendedLevel": 4,
+    "steps": [
+      { "description": "Nawiąż kontakt z głosem uśpionego mosiężnego Kolosa.", "type": "investigation", "targetId": "monolith_depth_contact" }
+    ]
+  },
+  {
+    "id": "q_monolith_2",
+    "title": "Tętno Pod Kamieniem",
+    "description": "Skały wokół Twierdzy drżą w częstotliwości uderzeń serca tytana. Przełęcz zaczyna krwawić płynnym mosiądzem.",
+    "rewardGold": 250,
+    "cityId": "twierdza_zelazna",
+    "originNpcId": "scholar",
+    "category": "anomaly",
+    "chainId": "chain_monolith",
+    "chainOrder": 2,
+    "prerequisiteQuestId": "q_monolith_1",
+    "recommendedLevel": 6,
+    "steps": [
+      { "description": "Zlokalizuj rdzeń tytana pod przełęczą.", "type": "investigation", "targetId": "monolith_heartbeat_locate" }
+    ]
+  },
+  {
+    "id": "q_monolith_3",
+    "title": "Inwokacja Kolosa",
+    "description": "Trzy wieże w Sercu Krainy emitują wiązkę statycznego blasku skierowaną w niebo. Kolos próbuje wbić swoją strukturę w bieżącą sesję gry.",
+    "rewardGold": 350,
+    "cityId": "serce_krainy",
+    "originNpcId": "scholar",
+    "category": "anomaly",
+    "chainId": "chain_monolith",
+    "chainOrder": 3,
+    "prerequisiteQuestId": "q_monolith_2",
+    "recommendedLevel": 8,
+    "steps": [
+      { "description": "Stocz pojedynek z Przesunięciem Formy w centrum wież.", "type": "combat", "targetId": "ectoplasmic" }
+    ]
+  },
+  {
+    "id": "q_monolith_4",
+    "title": "Kotwica Absolutu",
+    "description": "Finał łańcucha Kolosa. Połączenie masy ontologicznej bohatera z procesem Kolosa.",
+    "rewardGold": 700,
+    "cityId": "serce_krainy",
+    "originNpcId": "scholar",
+    "category": "anomaly",
+    "chainId": "chain_monolith",
+    "chainOrder": 4,
+    "prerequisiteQuestId": "q_monolith_3",
+    "recommendedLevel": 11,
+    "steps": [
+      { "description": "Zwiąż wolę Kotwicy z fundamentem światła i uspokój tytana.", "type": "dialogue", "targetId": "monolith_final_bind" }
+    ]
   }
 ]
