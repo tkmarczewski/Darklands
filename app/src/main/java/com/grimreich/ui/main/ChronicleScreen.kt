@@ -17,6 +17,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.grimreich.R
 import com.grimreich.grimreich.v1.ChronicleEntry
+import com.grimreich.systems.WikiDisplayModel
 
 @Composable
 fun ChronicleScreen(
@@ -24,7 +25,11 @@ fun ChronicleScreen(
     viewModel: ChronicleViewModel = hiltViewModel()
 ) {
     val entries by viewModel.unlockedEntries.collectAsState()
+    val wikiEntries by viewModel.wikiEntries.collectAsState()
+    val selectedTab by viewModel.selectedTab.collectAsState()
+
     var selectedEntry by remember { mutableStateOf<ChronicleEntry?>(null) }
+    var selectedWikiEntry by remember { mutableStateOf<WikiDisplayModel?>(null) }
 
     Column(
         modifier = Modifier
@@ -40,11 +45,40 @@ fun ChronicleScreen(
             modifier = Modifier.align(Alignment.CenterHorizontally).padding(bottom = 8.dp)
         )
 
+        // --- TAB SELECTOR ---
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 12.dp),
+            horizontalArrangement = Arrangement.Center
+        ) {
+            Button(
+                onClick = { viewModel.selectTab(ChronicleTab.CHRONICLE_LORE) },
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = if (selectedTab == ChronicleTab.CHRONICLE_LORE) Color(0xFF8B0000) else Color(0xFF1E1E1E)
+                ),
+                modifier = Modifier.padding(end = 8.dp)
+            ) {
+                Text("KRONIKA ECHA", color = if (selectedTab == ChronicleTab.CHRONICLE_LORE) Color.White else Color.Gray)
+            }
+            Button(
+                onClick = { viewModel.selectTab(ChronicleTab.PRZEWODNIK_WIKI) },
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = if (selectedTab == ChronicleTab.PRZEWODNIK_WIKI) Color(0xFF8B0000) else Color(0xFF1E1E1E)
+                )
+            ) {
+                Text("PRZEWODNIK & WIKI", color = if (selectedTab == ChronicleTab.PRZEWODNIK_WIKI) Color.White else Color.Gray)
+            }
+        }
+
         // --- REALITY DECRYPTION PROGRESS (Project Cipher) ---
-        // Using entries.size vs hardcoded target for now
         val progress = if (entries.isNotEmpty()) (entries.size.toFloat() / 50f).coerceAtMost(1f) else 0f
-        Column(modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp)) {
-            Text(stringResource(R.string.chronicle_decode_prefix) + "${(progress * 100).toInt()}" + stringResource(R.string.chronicle_decode_suffix), color = Color.Gray, fontSize = 10.sp)
+        Column(modifier = Modifier.fillMaxWidth().padding(bottom = 12.dp)) {
+            Text(
+                stringResource(R.string.chronicle_decode_prefix) + "${(progress * 100).toInt()}" + stringResource(R.string.chronicle_decode_suffix),
+                color = Color.Gray,
+                fontSize = 10.sp
+            )
             LinearProgressIndicator(
                 progress = { progress },
                 modifier = Modifier.fillMaxWidth().height(4.dp),
@@ -54,50 +88,99 @@ fun ChronicleScreen(
         }
 
         Row(modifier = Modifier.weight(1f)) {
-            // Left: Entry List
-            LazyColumn(modifier = Modifier.weight(0.4f)) {
-                items(entries) { entry ->
-                    Surface(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 4.dp)
-                            .clickable { selectedEntry = entry },
-                        color = if (selectedEntry?.id == entry.id) Color(0xFF202020) else Color.Transparent,
-                        border = if (selectedEntry?.id == entry.id) androidx.compose.foundation.BorderStroke(1.dp, Color(0xFFC0A060)) else null
-                    ) {
-                        Column(modifier = Modifier.padding(8.dp)) {
-                            Text(entry.title, color = Color.White, fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
-                            Text(entry.category.uppercase(), color = Color.Gray, fontSize = 10.sp)
+            if (selectedTab == ChronicleTab.CHRONICLE_LORE) {
+                // Left: Entry List
+                LazyColumn(modifier = Modifier.weight(0.4f)) {
+                    items(entries) { entry ->
+                        Surface(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 4.dp)
+                                .clickable { selectedEntry = entry },
+                            color = if (selectedEntry?.id == entry.id) Color(0xFF202020) else Color.Transparent,
+                            border = if (selectedEntry?.id == entry.id) androidx.compose.foundation.BorderStroke(1.dp, Color(0xFFC0A060)) else null
+                        ) {
+                            Column(modifier = Modifier.padding(8.dp)) {
+                                Text(entry.title, color = Color.White, fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
+                                Text(entry.category.uppercase(), color = Color.Gray, fontSize = 10.sp)
+                            }
                         }
                     }
                 }
-            }
 
-            Spacer(modifier = Modifier.width(16.dp))
+                Spacer(modifier = Modifier.width(16.dp))
 
-            // Right: Content Detail
-            Surface(
-                modifier = Modifier.weight(0.6f).fillMaxHeight(),
-                color = Color(0xFF101010),
-                border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFF222222))
-            ) {
-                selectedEntry?.let { entry ->
-                    LazyColumn(modifier = Modifier.padding(16.dp)) {
-                        item {
-                            Text(entry.title, color = Color(0xFFC0A060), fontSize = 18.sp, fontWeight = FontWeight.Bold)
-                            Spacer(modifier = Modifier.height(12.dp))
-                            Text(entry.fullText, color = Color.LightGray, fontSize = 14.sp, lineHeight = 20.sp)
+                // Right: Content Detail
+                Surface(
+                    modifier = Modifier.weight(0.6f).fillMaxHeight(),
+                    color = Color(0xFF101010),
+                    border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFF222222))
+                ) {
+                    selectedEntry?.let { entry ->
+                        LazyColumn(modifier = Modifier.padding(16.dp)) {
+                            item {
+                                Text(entry.title, color = Color(0xFFC0A060), fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                                Spacer(modifier = Modifier.height(12.dp))
+                                Text(entry.fullText, color = Color.LightGray, fontSize = 14.sp, lineHeight = 20.sp)
+                            }
+                        }
+                    } ?: Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
+                        Text(stringResource(R.string.chronicle_select_hint), color = Color.DarkGray, fontSize = 12.sp)
+                    }
+                }
+            } else {
+                // Wiki / Guide Tab
+                LazyColumn(modifier = Modifier.weight(0.4f)) {
+                    items(wikiEntries) { wiki ->
+                        Surface(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 4.dp)
+                                .clickable { selectedWikiEntry = wiki },
+                            color = if (selectedWikiEntry?.id == wiki.id) Color(0xFF202020) else Color.Transparent,
+                            border = if (selectedWikiEntry?.id == wiki.id) androidx.compose.foundation.BorderStroke(1.dp, Color(0xFFC0A060)) else null
+                        ) {
+                            Column(modifier = Modifier.padding(8.dp)) {
+                                Text(
+                                    wiki.title,
+                                    color = if (wiki.isUnlocked) Color(0xFFC0A060) else Color.Gray,
+                                    fontSize = 14.sp,
+                                    fontWeight = FontWeight.SemiBold
+                                )
+                                Text(wiki.category, color = Color.DarkGray, fontSize = 10.sp)
+                            }
                         }
                     }
-                } ?: Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
-                    Text(stringResource(R.string.chronicle_select_hint), color = Color.DarkGray, fontSize = 12.sp)
+                }
+
+                Spacer(modifier = Modifier.width(16.dp))
+
+                Surface(
+                    modifier = Modifier.weight(0.6f).fillMaxHeight(),
+                    color = Color(0xFF101010),
+                    border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFF222222))
+                ) {
+                    selectedWikiEntry?.let { wiki ->
+                        LazyColumn(modifier = Modifier.padding(16.dp)) {
+                            item {
+                                Text(wiki.title, color = Color(0xFFC0A060), fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                                Spacer(modifier = Modifier.height(8.dp))
+                                Text(wiki.summary, color = Color(0xFF80D0FF), fontSize = 12.sp, fontWeight = FontWeight.Medium)
+                                Spacer(modifier = Modifier.height(12.dp))
+                                Text(wiki.fullText, color = Color.LightGray, fontSize = 14.sp, lineHeight = 20.sp)
+                            }
+                        }
+                    } ?: Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
+                        Text("Wybierz wpis z Przewodnika, aby zapoznać się z wiedzą Szyfru.", color = Color.DarkGray, fontSize = 12.sp)
+                    }
                 }
             }
         }
 
         Button(
             onClick = {
-                selectedEntry = null // Clear state before back
+                selectedEntry = null
+                selectedWikiEntry = null
                 onBack()
             },
             modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
