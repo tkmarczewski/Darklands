@@ -27,7 +27,7 @@ class CharacterFactory @Inject constructor(
         )
         careerChain.applyCareer(career, hero)
         
-        // --- LIFE PATH CYCLES (Darklands style) ---
+        // --- LIFE PATH CYCLES (GrimReich style) ---
         repeat(trainingCycles) {
             // Each cycle adds 5 years of service and increases stats/skills
             val entry = hero.careerHistory.find { it.career == career }

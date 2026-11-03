@@ -69,4 +69,23 @@ class ProjectAnchorTest {
         
         assertTrue(state.logEntries.any { it.contains("TRIBUNAL_LOG: Nie ma już błędów") })
     }
+
+    @Test
+    fun testNoLegacyDarklandsNameInSourceCode() {
+        val srcMainDir = java.io.File("src/main")
+        assertTrue("src/main directory must exist", srcMainDir.exists())
+
+        val legacyMatches = mutableListOf<String>()
+        srcMainDir.walkTopDown().filter { it.isFile && (it.extension == "kt" || it.extension == "java" || it.extension == "xml" || it.extension == "json") }.forEach { file ->
+            val text = file.readText()
+            if (text.contains("darklands", ignoreCase = true)) {
+                legacyMatches.add(file.path)
+            }
+        }
+
+        assertTrue(
+            "Found legacy 'Darklands' references in production source files:\n${legacyMatches.joinToString("\n")}",
+            legacyMatches.isEmpty()
+        )
+    }
 }

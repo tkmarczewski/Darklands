@@ -82,9 +82,9 @@ class ContentValidator @Inject constructor(
                     _errors.add(ContentError.QuestError("Quest '${quest.id}' step $index (EXPEDITION) refers to non-existent targetId (City): '${step.targetId}'"))
                 }
                 
-                if ((step.type == StepType.dialogue || step.type == StepType.social || step.type == StepType.meta) && (!dialogueManager.hasNode(step.targetId)) && step.targetId != "end") {
-                    // Check if it's potentially a cityId for social (some quests use cityId for location-based social)
-                    if (step.type == StepType.social && cityCatalogue.get(step.targetId) != null) {
+                if ((step.type == StepType.dialogue || step.type == StepType.social || step.type == StepType.meta || step.type == StepType.investigation) && (!dialogueManager.hasNode(step.targetId)) && step.targetId != "end") {
+                    // Check if it's potentially a cityId for social/investigation (some quests use cityId for location-based targets)
+                    if ((step.type == StepType.social || step.type == StepType.investigation) && cityCatalogue.get(step.targetId) != null) {
                         // Valid city reference
                     } else {
                         _errors.add(ContentError.DialogueError("Quest '${quest.id}' step $index (${step.type}) refers to non-existent nodeId/targetId: '${step.targetId}'", ErrorSeverity.WARNING))

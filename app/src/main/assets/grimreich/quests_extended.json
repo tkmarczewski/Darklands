@@ -245,7 +245,7 @@
     "category": "anomaly",
     "recommendedLevel": 7,
     "steps": [
-      { "description": "Wywołaj burzę echa, spalając rzadkie kadzidła w ruinach starej kaplicy.", "type": "investigation", "targetId": "echo_storm" },
+      { "description": "Wywołaj burzę echa, spalając rzadkie kadzidła w ruinach starej kaplicy.", "type": "investigation", "targetId": "storm_summoning" },
       { "description": "Wejdź do widmowej świątyni i skopiuj dane ze świetlistego ołtarza.", "type": "dialogue", "targetId": "phantom_temple_enter" }
     ]
   },

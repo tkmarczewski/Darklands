@@ -33,7 +33,7 @@ Gra prowadzi przez konfrontację z siedmioma ideologiami Proroków:
 
 ```powershell
 # Sklonuj repozytorium
-git clone https://github.com/tkmarczewski/Darklands.git
+git clone https://github.com/tkmarczewski/GrimReich.git
 
 # Zbuduj projekt
 ./gradlew assembleDebug

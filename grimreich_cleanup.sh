@@ -3,7 +3,7 @@
 
 echo "Cleaning up legacy assets and temporary files..."
 
-# Remove any stray Darklands references if they somehow reappear
+# Remove any stray legacy references if they somehow reappear
 find . -type d -name "darklandsmobile" -exec rm -rf {} +
 
 # Clean build artifacts

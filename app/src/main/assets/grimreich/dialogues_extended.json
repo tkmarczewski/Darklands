@@ -189,15 +189,15 @@
       {
         "text": "Zrozum, że to komentarz bezpośrednio do Ciebie.",
         "targetNodeId": "meta_truth_reveal",
-        "triggerEvent": "increment_meta",
-        "triggerValue": "2",
+        "triggerEvent": "advance_quest",
+        "triggerValue": "q_meta_1",
         "requiredAttributes": { "perception": 20 }
       },
       {
         "text": "Próbuj rozszyfrować autorów tej notatki.",
         "targetNodeId": "meta_truth_reveal",
-        "triggerEvent": "increment_meta",
-        "triggerValue": "1",
+        "triggerEvent": "advance_quest",
+        "triggerValue": "q_meta_1",
         "requiredAttributes": { "intelligence": 18 }
       },
       {
@@ -508,6 +508,102 @@
         "text": "Będę o tym pamiętał.",
         "targetNodeId": "end"
       }
+    ]
+  },
+  {
+    "id": "silent_cellar",
+    "npcId": "monk",
+    "text": "Zstępujesz do piwnic Opactwa. Powietrze jest lodowate, a cisza dźwięczy w uszach jak rozproszony szum. Widzisz strefę buforową, gdzie wspomnienia mnichów zastygną w kryształowych fiolkach.",
+    "choices": [
+      { "text": "Zbadaj fiolki wspomnień.", "targetNodeId": "end", "triggerEvent": "advance_quest", "triggerValue": "q_altar_silence" }
+    ]
+  },
+  {
+    "id": "burgrabia_bedroom",
+    "npcId": "noble",
+    "text": "Czekasz w mroku sypialni Burgrabiego. Deski podłogowe trzeszczą pod naciskiem czegoś, co porusza się po suficie. Cienie wyciągają ramiona w stronę Twojej broni.",
+    "choices": [
+      { "text": "Zasadź się na sufitowego pełzacza.", "targetNodeId": "end", "triggerEvent": "advance_quest", "triggerValue": "q_house_shadows" }
+    ]
+  },
+  {
+    "id": "living_forest",
+    "npcId": "none",
+    "text": "Kora drzew unosi się i opada. Korzenie żyją własnym tętnem, a ziemia pod Twoimi stopami poddaje się jak miękka tkanka. Odnajdujesz pulsujący Węzeł Oddechowy.",
+    "choices": [
+      { "text": "Ustabilizuj tętno Węzła.", "targetNodeId": "end", "triggerEvent": "advance_quest", "triggerValue": "q_breathing_forest" }
+    ]
+  },
+  {
+    "id": "broken_clockwork",
+    "npcId": "none",
+    "text": "Ruiny wieży kryją gigantyczne koła zębate, które obracają się w lewo. Każde tyknięcie wymazuje minione sekundy i przywraca stan poprzedni.",
+    "choices": [
+      { "text": "Zablokuj mechanizm czasem obecnym.", "targetNodeId": "end", "triggerEvent": "advance_quest", "triggerValue": "q_backwards_clock" }
+    ]
+  },
+  {
+    "id": "mirror_lake",
+    "npcId": "none",
+    "text": "Tafle jeziora pokrywa gęsty atrament. Spoglądasz w dół i widzisz twarze z poprzednich iteracji gry. Jedno z odbić wyciąga dłoń i próbuje uchwycić Twój cień.",
+    "choices": [
+      { "text": "Przetrwaj konfrontację z odbiciem.", "targetNodeId": "end", "triggerEvent": "advance_quest", "triggerValue": "q_mirror_lake" }
+    ]
+  },
+  {
+    "id": "paradox_convergence",
+    "npcId": "none",
+    "text": "Przestrzeń wokół zbiega się w trzech nakładających się płaszczyznach. Światło załamuje się wielokrotnie, a w centrum majaczy cień Trójwersyjnego Łowcy.",
+    "choices": [
+      { "text": "Ustal punkt zbieżności paradygmatu.", "targetNodeId": "end", "triggerEvent": "advance_quest", "triggerValue": "q_triple_hunter" }
+    ]
+  },
+  {
+    "id": "misty_tracks",
+    "npcId": "none",
+    "text": "Ślady we mgle lśnią błękitną poświatą. Prowadzą głęboko w spowite czarnym szumem zarośla, gdzie słychać cichy płacz dziecka.",
+    "choices": [
+      { "text": "Idź za błękitnym blaskiem.", "targetNodeId": "end", "triggerEvent": "advance_quest", "triggerValue": "q_mist_child" }
+    ]
+  },
+  {
+    "id": "old_relic",
+    "npcId": "none",
+    "text": "W gruzach starej latarni odnajdujesz mosiężny amulet wyryty znakami Szyfru. To Relikwia Zapomnienia, zdolna zamknąć niekończący się cykl istnienia.",
+    "choices": [
+      { "text": "Podnieś relikwię zapomnienia.", "targetNodeId": "end", "triggerEvent": "advance_quest", "triggerValue": "q_undying_mother" }
+    ]
+  },
+  {
+    "id": "demon_lens",
+    "npcId": "merchant",
+    "text": "Przykładasz soczewkę do oka. Twarze przechodniów zamieniają się w czarne zarysy przetrwalników Echa. Szepczą między sobą w zakazanym kodzie.",
+    "choices": [
+      { "text": "Przeanalizuj ukryte kształty w tłumie.", "targetNodeId": "end", "triggerEvent": "advance_quest", "triggerValue": "q_demon_merchant" }
+    ]
+  },
+  {
+    "id": "groom_records",
+    "npcId": "none",
+    "text": "Przeglądasz pożółkłe księgi małżeńskie. W miejscu podpisu pana młodego widnieje tylko czarna plama atramentu, która wciąż jest mokra.",
+    "choices": [
+      { "text": "Odkryj fałszerstwo w księdze.", "targetNodeId": "end", "triggerEvent": "advance_quest", "triggerValue": "q_blood_dowry" }
+    ]
+  },
+  {
+    "id": "empty_apartment",
+    "npcId": "ravenn",
+    "text": "Mieszkanie Liry Voss zniknęło. Stoisz na idealnie gładkiej kamiennej płycie. W kącie dostrzegasz jednak dziennik ukryty w kieszeni czasowej.",
+    "choices": [
+      { "text": "Wybierz dziennik z kieszeni czasowej.", "targetNodeId": "end", "triggerEvent": "advance_quest", "triggerValue": "q_verdict_2" }
+    ]
+  },
+  {
+    "id": "scribe_pen",
+    "npcId": "priest",
+    "text": "W najgłębszym archiwum Opactwa na kamiennym ołtarzu leży czarne Pióro Skryby. Gdy się do niego zbliżasz, atrament sam spływa na krawędź stołu.",
+    "choices": [
+      { "text": "Weź pióro skryby.", "targetNodeId": "end", "triggerEvent": "advance_quest", "triggerValue": "q_lost_scribe" }
     ]
   }
 ]

@@ -65,7 +65,7 @@ data class Hero(
     val activeMutations: MutableList<Mutation> = mutableListOf(),
     val passiveAbilities: MutableSet<String> = mutableSetOf(),
     
-    // CAREER MASTERY (Darklands / Iteration 6)
+    // CAREER MASTERY (GrimReich / Iteration 6)
     var isMaster: Boolean = false,
     var masteryTrait: String? = null,
 
