@@ -229,9 +229,18 @@ data class WorldState(
 )
 
 @Serializable
+enum class CombatStance {
+    BALANCED,
+    AGGRESSIVE_ASSAULT,
+    DEFENSIVE_BASTION,
+    ECHO_RESONANCE
+}
+
+@Serializable
 data class CombatState(
     var active: Boolean = false,
     var round: Int = 0,
+    var currentStance: CombatStance = CombatStance.BALANCED,
     var enemyName: String = "",
     var enemyType: String? = null,
     var enemyHp: Int = 0,
@@ -432,6 +441,7 @@ data class WorldStateDto(
 data class CombatStateDto(
     val active: Boolean,
     val round: Int,
+    val currentStance: CombatStance = CombatStance.BALANCED,
     val enemyName: String,
     val enemyType: String? = null,
     val enemyHp: Int,

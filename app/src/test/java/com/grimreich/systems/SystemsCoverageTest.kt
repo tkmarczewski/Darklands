@@ -129,4 +129,23 @@ class SystemsCoverageTest {
         assertEquals("Mistrzowska", quality.label)
         assertEquals(2.0f, quality.priceMultiplier, 0.01f)
     }
+
+    @Test
+    fun testCombatStanceAndSynergies() {
+        val realCombatSystem = CombatSystem(gameRepository, mock(), mock(), mock(), mock(), mock())
+        
+        realCombatSystem.setCombatStance(CombatStance.AGGRESSIVE_ASSAULT)
+        assertEquals(CombatStance.AGGRESSIVE_ASSAULT, state.combat.currentStance)
+
+        val knight = Hero(id = "h1", name = "Knight", currentCareer = Career.KNIGHT)
+        val priest = Hero(id = "h2", name = "Priest", currentCareer = Career.PRIEST)
+        
+        state.party.clear()
+        state.party.add(knight)
+        state.party.add(priest)
+
+        val synergies = realCombatSystem.getPartySynergies(state.party)
+        assertEquals(1, synergies.size)
+        assertEquals("Błogosławiona Stal", synergies[0].name)
+    }
 }

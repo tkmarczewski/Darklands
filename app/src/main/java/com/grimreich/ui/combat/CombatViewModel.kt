@@ -74,6 +74,14 @@ class CombatViewModel @Inject constructor(
         combatSystem.setActiveHero(heroId)
     }
 
+    fun setStance(stance: com.grimreich.core.CombatStance) {
+        combatSystem.setCombatStance(stance)
+    }
+
+    fun getSynergies(): List<com.grimreich.systems.PartySynergy> {
+        return combatSystem.getPartySynergies(gameRepository.currentState().party)
+    }
+
     fun exitCombat(onExit: () -> Unit) {
         gameRepository.updateState { 
             it.combat.active = false 

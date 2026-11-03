@@ -318,4 +318,16 @@
     <string name="log_empty">Das Protokoll schweigt. Deine Taten wurden noch nie aufgezeichnet.</string>
     <string name="log_label_day">TAG %1$d</string>
     <string name="log_label_important">WICHTIG</string>
+
+    <!-- Combat Stances & Synergies -->
+    <string name="combat_stance_title">TAKTIKSCHUTZ</string>
+    <string name="combat_stance_balanced">Ausgewogen</string>
+    <string name="combat_stance_aggressive">Ansturm (+20% ATK)</string>
+    <string name="combat_stance_defensive">Bastion (+25% DEF)</string>
+    <string name="combat_stance_echo">Echo-Resonanz</string>
+    <string name="combat_synergies_title">GRUPPENSYNERGIE:</string>
+
+    <!-- Campfire Rest -->
+    <string name="hub_btn_campfire">LAGERFEUER RAST (20 G)</string>
+    <string name="hub_campfire_log_rest">Am Lagerfeuer gerastet. LP und Geisteszustand wiederhergestellt.</string>
 </resources>

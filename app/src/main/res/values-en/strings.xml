@@ -318,4 +318,16 @@
     <string name="log_empty">The log is silent. Your deeds have not been recorded yet.</string>
     <string name="log_label_day">DAY %1$d</string>
     <string name="log_label_important">IMPORTANT</string>
+
+    <!-- Combat Stances & Synergies -->
+    <string name="combat_stance_title">TACTICAL STANCE</string>
+    <string name="combat_stance_balanced">Balanced</string>
+    <string name="combat_stance_aggressive">Assault (+20% ATK)</string>
+    <string name="combat_stance_defensive">Bastion (+25% DEF)</string>
+    <string name="combat_stance_echo">Echo Resonance</string>
+    <string name="combat_synergies_title">PARTY SYNERGY:</string>
+
+    <!-- Campfire Rest -->
+    <string name="hub_btn_campfire">CAMPFIRE REST (20 G)</string>
+    <string name="hub_campfire_log_rest">Rested at the campfire. Restored party HP and Sanity.</string>
 </resources>

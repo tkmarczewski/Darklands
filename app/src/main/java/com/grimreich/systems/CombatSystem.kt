@@ -4,6 +4,15 @@ import com.grimreich.core.*
 import javax.inject.Inject
 import javax.inject.Singleton
 
+data class PartySynergy(
+    val id: String,
+    val name: String,
+    val description: String,
+    val attackBonus: Int = 0,
+    val defenseBonus: Int = 0,
+    val dodgeBonus: Int = 0
+)
+
 @Singleton
 class CombatSystem @Inject constructor(
     private val gameRepository: GameRepository,
@@ -15,15 +24,69 @@ class CombatSystem @Inject constructor(
 ) {
     private var onCombatEnd: (() -> Unit)? = null
 
+    fun setCombatStance(stance: CombatStance) {
+        gameRepository.updateState { state ->
+            state.combat.currentStance = stance
+            val stanceName = when (stance) {
+                CombatStance.BALANCED -> "Zrównoważona"
+                CombatStance.AGGRESSIVE_ASSAULT -> "Szturm Taktyczny (+20% ATK, -10% DEF)"
+                CombatStance.DEFENSIVE_BASTION -> "Bastion Obrony (+25% DEF, -10% ATK)"
+                CombatStance.ECHO_RESONANCE -> "Rezonans Echa (+15% ATK)"
+            }
+            state.combat.log.add("Zmieniono stancję taktyczną na: $stanceName")
+        }
+    }
+
+    fun getPartySynergies(party: List<Hero>): List<PartySynergy> {
+        val synergies = mutableListOf<PartySynergy>()
+        val careers = party.filter { hero -> !hero.isDead }.map { hero -> hero.currentCareer?.name?.lowercase().orEmpty() }
+        
+        if (careers.contains("knight") && careers.contains("priest")) {
+            synergies.add(PartySynergy("s_blessed_steel", "Błogosławiona Stal", "Rycerz + Kapłan: +10 Obrona, +5 Atak", attackBonus = 5, defenseBonus = 10))
+        }
+        if (careers.contains("mage") && careers.contains("alchemist")) {
+            synergies.add(PartySynergy("s_ethereal_catalysis", "Eteryczna Kataliza", "Mag + Alchemik: +12 Atak Magiczny", attackBonus = 12))
+        }
+        if (careers.contains("rogue") && careers.contains("ranger")) {
+            synergies.add(PartySynergy("s_shadow_arrow", "Cień i Strzała", "Łotrzyk + Łowca: +10 Unik / Zwinność", dodgeBonus = 10))
+        }
+        if (careers.contains("barbarian") && careers.contains("mercenary")) {
+            synergies.add(PartySynergy("s_savage_frenzy", "Dziki Szał", "Barbarzyńca + Najemnik: +12 Atak", attackBonus = 12))
+        }
+        return synergies
+    }
+
     private fun heroToCombatant(state: GameState, hero: Hero): CombatantState {
+        val synergies = getPartySynergies(state.party)
+        val synAtk = synergies.sumOf { it.attackBonus }
+        val synDef = synergies.sumOf { it.defenseBonus }
+
+        var baseAtk = hero.effectiveAttack(state.inventory) + synAtk
+        var baseArmor = hero.effectiveArmor(state.inventory) + synDef
+
+        when (state.combat.currentStance) {
+            CombatStance.AGGRESSIVE_ASSAULT -> {
+                baseAtk = (baseAtk * 1.2f).toInt()
+                baseArmor = (baseArmor * 0.9f).toInt()
+            }
+            CombatStance.DEFENSIVE_BASTION -> {
+                baseArmor = (baseArmor * 1.25f).toInt()
+                baseAtk = (baseAtk * 0.9f).toInt()
+            }
+            CombatStance.ECHO_RESONANCE -> {
+                baseAtk = (baseAtk * 1.15f).toInt()
+            }
+            else -> {}
+        }
+
         return CombatantState(
             name = hero.name,
             hp = hero.hp,
             maxHp = hero.maxHp,
             endurance = hero.effectiveEndurance(),
             morale = hero.morale,
-            armor = hero.effectiveArmor(state.inventory),
-            attackBase = hero.effectiveAttack(state.inventory),
+            armor = baseArmor,
+            attackBase = baseAtk,
             strength = hero.strength,
             agility = hero.agility,
             intelligence = hero.intelligence,

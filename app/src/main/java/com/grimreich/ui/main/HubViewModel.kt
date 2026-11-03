@@ -58,6 +58,34 @@ class HubViewModel @Inject constructor(
         }
     }
 
+    fun restAtCampfire() {
+        gameRepository.updateState { state ->
+            if (state.gold < 20) {
+                gameRepository.logDirect(state, "Zbyt mało złota na zaopatrzenie ogniska (wymagane 20 gp).")
+                return@updateState
+            }
+            state.gold -= 20
+            
+            state.party.filter { !it.isDead }.forEach { hero ->
+                val healHp = (hero.maxHp * 0.25f).toInt().coerceAtLeast(10)
+                hero.hp = (hero.hp + healHp).coerceAtMost(hero.maxHp)
+                hero.sanity = (hero.sanity + 15).coerceAtMost(100)
+            }
+            
+            val logMessage = "Odpoczęto przy ognisku. Odzyskano zdrowie i poczytalność drużyny."
+            gameRepository.logDirect(state, logMessage)
+
+            val activeCareers = state.party.filter { hero -> !hero.isDead }.map { hero -> hero.currentCareer?.name?.lowercase().orEmpty() }
+            val banter = when {
+                activeCareers.contains("priest") -> "Kapłan cicho snuje modlitwę przy ognisku, kojąc nerwy drużyny."
+                activeCareers.contains("alchemist") -> "Alchemik parzy aromatyczny wywar ze zgromadzonych ziół."
+                activeCareers.contains("knight") -> "Rycerz poleruje pancerz i czuwa przy ogniu w mroku nocy."
+                else -> "Ciepło ogniska i spokój obozowiska podnoszą siły duchowe drużyny."
+            }
+            gameRepository.logDirect(state, "> $banter")
+        }
+    }
+
     init {
         combine(gameRepository.gameState, gameRepository.gameLogs) { state, logs ->
             state to logs

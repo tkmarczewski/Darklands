@@ -318,4 +318,16 @@
     <string name="log_empty">Rejestr milczy. Twoje czyny jeszcze nie zostały zapisane.</string>
     <string name="log_label_day">DZIEŃ %1$d</string>
     <string name="log_label_important">WAŻNE</string>
+
+    <!-- Combat Stances & Synergies -->
+    <string name="combat_stance_title">STANCJA TAKTYCZNA</string>
+    <string name="combat_stance_balanced">Zrównoważona</string>
+    <string name="combat_stance_aggressive">Szturm (+20% ATK)</string>
+    <string name="combat_stance_defensive">Bastion (+25% DEF)</string>
+    <string name="combat_stance_echo">Rezonans Echa</string>
+    <string name="combat_synergies_title">SYNERGIA DRUŻYNY:</string>
+
+    <!-- Campfire Rest -->
+    <string name="hub_btn_campfire">OGNISKO I REST (20 G)</string>
+    <string name="hub_campfire_log_rest">Odpoczęto przy ognisku. Odzyskano HP i Sanity drużyny.</string>
 </resources>
