@@ -114,10 +114,8 @@ class GameRepository @Inject constructor(
 
     fun log(message: String) {
         if (stateLock.isHeldByCurrentThread) {
-            // BUG FIX: If we are already in an updateState block, we can't call updateState again.
-            // But we might be able to append to the log if we were passing the state around.
-            // For now, at least log it so it's not completely lost in production.
             Log.i("GameRepository", "LOG (Nested): $message")
+            logDirect(_gameState.value, message)
             return
         }
         updateState(shouldPersist = false) { state ->
@@ -199,11 +197,25 @@ class GameRepository @Inject constructor(
         saveRequests.tryEmit(snapshot)
     }
 
+    fun flushAndPersistSync() {
+        try {
+            val snapshot = _gameState.value.deepCopy()
+            val dto = snapshot.toDto()
+            kotlinx.coroutines.runBlocking(Dispatchers.IO) {
+                persistence.persist(dto)
+            }
+            Log.d("GameRepository", "Synchronous flush save completed.")
+        } catch (e: Exception) {
+            Log.e("GameRepository", "Synchronous flush save failed", e)
+        }
+    }
+
     /**
-     * Zamyka repozytorium i anuluje wszystkie oczekujące operacje.
+     * Zamyka repozytorium i anuluje wszystkie oczekujące operacje po opróżnieniu zapisu.
      */
     fun close() {
-        Log.d("GameRepository", "Closing repository and cancelling jobs...")
+        Log.d("GameRepository", "Closing repository, flushing save and cancelling jobs...")
+        flushAndPersistSync()
         repositoryJob.cancel()
     }
 
@@ -231,8 +243,14 @@ class GameRepository @Inject constructor(
     fun hasSession(): Boolean = persistence.exists() && persistence.hasPersistedSession()
 
     fun clearSessionAndReset() {
+        val metaCopy = _gameState.value.persistentMeta.copy(
+            unlockedLegacyBuffs = _gameState.value.persistentMeta.unlockedLegacyBuffs.toMutableSet(),
+            unitedSelves = _gameState.value.persistentMeta.unitedSelves.toMutableList()
+        )
         persistence.clearSessionOnly()
-        _gameState.value = GameState()
+        val newState = GameState()
+        newState.persistentMeta = metaCopy
+        _gameState.value = newState
         _gameLogs.value = emptyList()
         repositoryScope.launch { sync() }
     }

@@ -322,8 +322,8 @@
     <!-- Combat Stances & Synergies -->
     <string name="combat_stance_title">STANCJA TAKTYCZNA</string>
     <string name="combat_stance_balanced">Zrównoważona</string>
-    <string name="combat_stance_aggressive">Szturm (+20% ATK)</string>
-    <string name="combat_stance_defensive">Bastion (+25% DEF)</string>
+    <string name="combat_stance_aggressive">Szturm (+20%% ATK)</string>
+    <string name="combat_stance_defensive">Bastion (+25%% DEF)</string>
     <string name="combat_stance_echo">Rezonans Echa</string>
     <string name="combat_synergies_title">SYNERGIA DRUŻYNY:</string>
 

@@ -118,9 +118,18 @@ class DialogueManager @Inject constructor(
             }
             "pay_gold" -> {
                 val amount = value?.toIntOrNull() ?: 0
-                if (state.gold >= amount) {
+                if (amount > 0 && state.gold >= amount) {
                     state.gold -= amount
                     state.logEntries.add("Stracono $amount gp.")
+                } else if (amount <= 0) {
+                    android.util.Log.w("DialogueManager", "Rejected invalid pay_gold amount: $amount")
+                }
+            }
+            "give_gold", "add_gold" -> {
+                val amount = value?.toIntOrNull() ?: 0
+                if (amount > 0) {
+                    state.gold = (state.gold.toLong() + amount).coerceAtMost(Int.MAX_VALUE.toLong()).toInt()
+                    state.logEntries.add("Otrzymano $amount gp.")
                 }
             }
             "unlock_lore" -> {

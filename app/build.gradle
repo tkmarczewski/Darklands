@@ -19,11 +19,6 @@ android {
         versionName = "1.0.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
-    sourceSets {
-        main {
-            java.srcDirs += files("build/generated/ksp/main/kotlin", "build/generated/ksp/debug/kotlin")
-        }
-    }
     buildFeatures { 
         viewBinding = true 
         compose = true

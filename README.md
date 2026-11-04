@@ -38,7 +38,7 @@ git clone https://github.com/tkmarczewski/GrimReich.git
 # Zbuduj projekt
 ./gradlew assembleDebug
 
-# Uruchom testy (38 przypadków PASS)
+# Uruchom testy (145 przypadków PASS)
 ./gradlew test
 ```
 

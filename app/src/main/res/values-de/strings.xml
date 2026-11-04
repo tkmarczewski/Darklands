@@ -322,8 +322,8 @@
     <!-- Combat Stances & Synergies -->
     <string name="combat_stance_title">TAKTIKSCHUTZ</string>
     <string name="combat_stance_balanced">Ausgewogen</string>
-    <string name="combat_stance_aggressive">Ansturm (+20% ATK)</string>
-    <string name="combat_stance_defensive">Bastion (+25% DEF)</string>
+    <string name="combat_stance_aggressive">Ansturm (+20%% ATK)</string>
+    <string name="combat_stance_defensive">Bastion (+25%% DEF)</string>
     <string name="combat_stance_echo">Echo-Resonanz</string>
     <string name="combat_synergies_title">GRUPPENSYNERGIE:</string>
 

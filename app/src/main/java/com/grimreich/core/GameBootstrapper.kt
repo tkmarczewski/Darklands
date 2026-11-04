@@ -31,7 +31,8 @@ class GameBootstrapper @Inject constructor(
         val existingHeroName = oldState.heroName
         val existingLore = oldState.unlockedLoreIds.toSet()
         val existingMeta = oldState.persistentMeta.copy(
-            unlockedLegacyBuffs = oldState.persistentMeta.unlockedLegacyBuffs.toMutableSet()
+            unlockedLegacyBuffs = oldState.persistentMeta.unlockedLegacyBuffs.toMutableSet(),
+            unitedSelves = oldState.persistentMeta.unitedSelves.toMutableList()
         )
 
         // Clear session volatile caches (synced already above, but we can re-clear if needed)
@@ -58,6 +59,7 @@ class GameBootstrapper @Inject constructor(
             state.persistentMeta.apply {
                 totalSessionsFinished = existingMeta.totalSessionsFinished
                 unlockedLegacyBuffs.addAll(existingMeta.unlockedLegacyBuffs)
+                unitedSelves.addAll(existingMeta.unitedSelves)
                 maxMetaAwarenessReached = existingMeta.maxMetaAwarenessReached
             }
 
