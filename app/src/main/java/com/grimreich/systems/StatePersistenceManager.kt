@@ -132,6 +132,16 @@ class StatePersistenceManager @Inject constructor(
         if (sessionFile.exists()) sessionFile.delete()
     }
 
+    fun clearAllDataAndSlots() {
+        Log.d(TAG, "Clearing all persisted sessions AND save slots (Destruction Wipe)")
+        if (sessionFile.exists()) sessionFile.delete()
+        if (slotsFile.exists()) slotsFile.delete()
+        val tempSession = File(context.filesDir, "$sessionFileName.tmp")
+        if (tempSession.exists()) tempSession.delete()
+        val tempSlots = File(context.filesDir, "$slotsFileName.tmp")
+        if (tempSlots.exists()) tempSlots.delete()
+    }
+
     suspend fun persistSlots(slots: Map<Int, SaveSnapshot>) = withContext(Dispatchers.IO) {
         val slotsDto = slots.mapValues { it.value.toDto() }
         val serializer = MapSerializer(Int.serializer(), SaveSnapshotDto.serializer())

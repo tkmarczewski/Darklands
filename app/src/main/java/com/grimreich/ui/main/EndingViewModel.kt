@@ -77,13 +77,6 @@ class EndingViewModel @Inject constructor(
     }
 
     fun delete() {
-        gameRepository.clearSessionAndReset()
-        gameRepository.updateState { state ->
-            gameRepository.logDirect(state, """
-                WYBRANO: DESTRUKCJA. Ostatni wybór administratora. Przesuwasz palcem po krawędzi nieistnienia i wydajesz komendę systemową, na którą Skrybowie czekali od dekad. 
-                Cisza zapada natychmiastowo. Nie ma ognia, nie ma krzyku – jest tylko ciche 'klik' i nagłe zgaśnięcie wszystkich świateł. Dane zostają wyczyszczone, sektory pamięci zwolnione. 
-                Świat i Twoje dziedzictwo znikają w czerni, której nie rozświetli już żadna anomalia. Pozwoliłeś im wszystkim zasnąć. Sesja zakończona. Powodzenie wymazania: 100%.
-            """.trimIndent())
-        }
+        gameRepository.deleteAllDataAndWipe()
     }
 }

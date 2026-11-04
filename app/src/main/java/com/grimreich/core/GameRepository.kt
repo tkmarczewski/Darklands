@@ -89,18 +89,25 @@ class GameRepository @Inject constructor(
         repositoryScope.launch { sync() }
     }
 
+    private val activeTransactionState = ThreadLocal<GameState?>()
+
     fun updateState(shouldPersist: Boolean = true, transform: (GameState) -> Unit) {
         val startTime = System.currentTimeMillis()
         stateLock.withReentrantLock {
             val mutable = _gameState.value.deepCopy()
-            transform(mutable)
-            mutable.normalizeState()
-            _gameState.value = mutable
+            val previousTx = activeTransactionState.get()
+            activeTransactionState.set(mutable)
+            try {
+                transform(mutable)
+                mutable.normalizeState()
+                _gameState.value = mutable
+                _gameLogs.value = mutable.logEntries.toList()
 
-            _gameLogs.value = mutable.logEntries.toList()
-
-            if (shouldPersist) {
-                persistCurrentState()
+                if (shouldPersist) {
+                    persistCurrentState()
+                }
+            } finally {
+                activeTransactionState.set(previousTx)
             }
         }
         val duration = System.currentTimeMillis() - startTime
@@ -113,9 +120,10 @@ class GameRepository @Inject constructor(
         updateState(shouldPersist = true, transform = transform)
 
     fun log(message: String) {
-        if (stateLock.isHeldByCurrentThread) {
-            Log.i("GameRepository", "LOG (Nested): $message")
-            logDirect(_gameState.value, message)
+        val currentTx = activeTransactionState.get()
+        if (currentTx != null) {
+            Log.i("GameRepository", "LOG (Nested Tx): $message")
+            logDirect(currentTx, message)
             return
         }
         updateState(shouldPersist = false) { state ->
@@ -253,6 +261,22 @@ class GameRepository @Inject constructor(
         _gameState.value = newState
         _gameLogs.value = emptyList()
         repositoryScope.launch { sync() }
+    }
+
+    /**
+     * Purges ALL save slots, session files, disk persistence, and persistent metadata ("Destrukcja").
+     * Does NOT save a new session afterward.
+     */
+    fun deleteAllDataAndWipe() {
+        stateLock.withReentrantLock {
+            persistence.clearAllDataAndSlots()
+            kotlinx.coroutines.runBlocking(kotlinx.coroutines.Dispatchers.IO) {
+                saveSystem.clearAllSlots()
+            }
+            val wipedState = GameState()
+            _gameState.value = wipedState
+            _gameLogs.value = emptyList()
+        }
     }
 }
 

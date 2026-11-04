@@ -40,6 +40,9 @@ android {
     testOptions {
         unitTests.returnDefaultValues = true
     }
+    lint {
+        ignoreTestSources = true
+    }
 }
 
 detekt {
