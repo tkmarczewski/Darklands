@@ -29,12 +29,10 @@ class EchoSystem @Inject constructor(
         prettyPrint = true
     }
     
+    private val lock = Any()
+
     @Transient
     private val eternalHeroes = mutableListOf<Hero>()
-
-    init {
-        // BUG-03: Moved to loadEchoesAsync to prevent blocking main thread during Hilt init
-    }
 
     suspend fun loadEchoesAsync() = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
         val file = File(context.filesDir, ECHO_FILE)
@@ -42,10 +40,13 @@ class EchoSystem @Inject constructor(
             try {
                 val content = file.readText()
                 val dtos = json.decodeFromString<List<HeroDto>>(content)
-                eternalHeroes.clear()
-                eternalHeroes.addAll(dtos.map { it.toDomain() })
+                val loaded = dtos.map { it.toDomain() }
+                synchronized(lock) {
+                    eternalHeroes.clear()
+                    eternalHeroes.addAll(loaded)
+                }
             } catch (e: Exception) {
-                e.printStackTrace()
+                android.util.Log.e("EchoSystem", "Failed to load eternal echoes", e)
             }
         }
     }
@@ -54,14 +55,16 @@ class EchoSystem @Inject constructor(
     fun init(context: Context) {}
 
     fun recordHero(hero: Hero, context: Context) {
-        if (eternalHeroes.none { it.id == hero.id }) {
-            eternalHeroes.add(hero)
-            // Limit the list size to prevent memory bloat (BUG-R4-11)
-            if (eternalHeroes.size > MAX_ETERNAL_HEROES) {
-                eternalHeroes.removeAt(0)
+        val heroCopy = hero.deepCopy()
+        synchronized(lock) {
+            if (eternalHeroes.none { it.id == heroCopy.id }) {
+                eternalHeroes.add(heroCopy)
+                if (eternalHeroes.size > MAX_ETERNAL_HEROES) {
+                    eternalHeroes.removeAt(0)
+                }
             }
-            save(context)
         }
+        save(context)
     }
 
     private fun save(context: Context) {
@@ -69,7 +72,8 @@ class EchoSystem @Inject constructor(
             val file = File(context.filesDir, ECHO_FILE)
             val tempFile = File(context.filesDir, "$ECHO_FILE.tmp")
             
-            val dtos = eternalHeroes.map { it.toDto() }
+            val snapshot = synchronized(lock) { eternalHeroes.map { it.deepCopy() } }
+            val dtos = snapshot.map { it.toDto() }
             val content = json.encodeToString(dtos)
             
             // ATOMIC WRITE: Write to temp file then rename
@@ -83,20 +87,21 @@ class EchoSystem @Inject constructor(
                 tempFile.renameTo(file)
             }
         } catch (e: Exception) {
-            // Guard against IO errors (Round 4 Audit)
-            e.printStackTrace()
+            android.util.Log.e("EchoSystem", "Failed to save eternal echoes", e)
         }
     }
 
     fun getRandomEcho(): Hero? {
-        return if (eternalHeroes.isNotEmpty()) eternalHeroes.random() else null
+        return synchronized(lock) {
+            if (eternalHeroes.isNotEmpty()) eternalHeroes.random().deepCopy() else null
+        }
     }
 
     /**
      * Links a new hero to an eternal echo for inheritance.
      */
     fun linkToEcho(hero: Hero, echoId: String) {
-        val echo = eternalHeroes.find { it.id == echoId } ?: return
+        val echo = synchronized(lock) { eternalHeroes.find { it.id == echoId }?.deepCopy() } ?: return
         
         // Inheritance logic (Iteration 6)
         val bonusXp = (echo.xp * 0.1f).toInt().coerceAtLeast(100)

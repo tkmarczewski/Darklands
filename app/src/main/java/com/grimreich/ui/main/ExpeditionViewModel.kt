@@ -238,8 +238,12 @@ class ExpeditionViewModel @Inject constructor(
         val stateSnapshot = gameRepository.currentState()
         
         // AUD-02: Enforce attribute requirements before executing effect
-        val activeHero = stateSnapshot.party.find { it.id == stateSnapshot.activeHeroId } ?: stateSnapshot.party.firstOrNull()
-        if (choice.requiredAttribute != null && activeHero != null) {
+        val activeHero = stateSnapshot.party.find { it.id == stateSnapshot.activeHeroId } ?: stateSnapshot.party.firstOrNull { !it.isDead }
+        if (choice.requiredAttribute != null) {
+            if (activeHero == null) {
+                _uiState.update { it.copy(content = ExpeditionContentState.EncounterLog("Brak aktywnego bohatera do wykonania tej akcji.")) }
+                return
+            }
             val attrValue = when (choice.requiredAttribute.lowercase()) {
                 "strength" -> activeHero.effectiveStrength()
                 "agility" -> activeHero.effectiveAgility()

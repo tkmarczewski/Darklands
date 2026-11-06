@@ -101,8 +101,14 @@ class QuestEngine @Inject constructor(
             }
         }
 
+        // HARDENING: Prevent resetting progress of already active quests
+        if (state.quest.activeQuestIds.contains(normalizedId)) {
+            android.util.Log.d("QuestEngine", "Quest $normalizedId is already active. Ignoring re-activation.")
+            return
+        }
+
         val currentStatus = getStatus(normalizedId, state)
-        if (currentStatus != QuestStatus.available && !state.quest.activeQuestIds.contains(normalizedId)) {
+        if (currentStatus != QuestStatus.available) {
             android.util.Log.d("QuestEngine", "Activation blocked: $normalizedId is $currentStatus")
             return
         }

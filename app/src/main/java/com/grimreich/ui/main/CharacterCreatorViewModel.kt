@@ -66,6 +66,12 @@ class CharacterCreatorViewModel @Inject constructor(
             else -> {}
         }
 
+        // Preserve Legacy Buffs across career changes
+        val meta = gameRepository.currentState().persistentMeta
+        if (meta.unlockedLegacyBuffs.contains("SCRIBES_EYE")) {
+            newAttrs["Int"] = (newAttrs["Int"] ?: 10) + 5
+        }
+
         _uiState.update {
             it.copy(
                 selectedCareer = career,
@@ -165,6 +171,19 @@ class CharacterCreatorViewModel @Inject constructor(
         val career = _uiState.value.selectedCareer
         val newAttrs = _uiState.value.attributes.toMutableMap()
         newAttrs.keys.forEach { newAttrs[it] = GameConstants.DEFAULT_ATTRIBUTE_VALUE }
+        
+        when (career) {
+            Career.KNIGHT -> { newAttrs["Str"] = 13; newAttrs["End"] = 12 }
+            Career.ALCHEMIST -> { newAttrs["Int"] = 14; newAttrs["Cha"] = 12 }
+            Career.GUARD -> { newAttrs["Per"] = 13; newAttrs["Agi"] = 12 }
+            Career.SCHOLAR -> { newAttrs["Int"] = 15; newAttrs["Str"] = 8 }
+            else -> {}
+        }
+
+        val meta = gameRepository.currentState().persistentMeta
+        if (meta.unlockedLegacyBuffs.contains("SCRIBES_EYE")) {
+            newAttrs["Int"] = (newAttrs["Int"] ?: 10) + 5
+        }
         
         _uiState.update { it.copy(attributes = newAttrs, pointsRemaining = 20) }
 
