@@ -32,7 +32,7 @@ class SaintsViewModel @Inject constructor(
     }
 
     fun pray() {
-        val hero = gameRepository.currentState().party.firstOrNull() ?: return
+        val hero = gameRepository.currentState().party.firstOrNull { !it.isDead } ?: return
         val msg = churchSystem.pray(hero.id)
         updateLog(msg)
     }

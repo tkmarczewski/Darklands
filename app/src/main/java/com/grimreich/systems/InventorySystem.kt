@@ -14,6 +14,10 @@ class InventorySystem @Inject constructor(
         var result = ""
         gameRepository.updateState { state ->
             val hero = state.party.find { it.id == heroId } ?: run { result = "Brak bohatera"; return@updateState }
+            if (hero.isDead) {
+                result = "Nie można ubierać poległego bohatera."
+                return@updateState
+            }
             val item = state.inventory.find { it.instanceId == instanceId } ?: run { result = "Brak przedmiotu"; return@updateState }
             val slot = item.slot ?: run { result = "Brak slotu"; return@updateState }
             

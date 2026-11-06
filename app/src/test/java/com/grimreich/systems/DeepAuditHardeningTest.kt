@@ -59,6 +59,7 @@ class DeepAuditHardeningTest {
     @Test
     fun `travelTo should trigger travel event based on chance`() {
         state.world.locationId = "city_a"
+        state.party.add(com.grimreich.core.Hero(id = "hero_test", name = "Test Hero", age = 25))
         whenever(worldMap.terrainBetween("city_a", "city_b")).thenReturn(mock()) // Default days = 10
         
         // Force encounter trigger by making randomProvider return 0.0 (below any threshold)

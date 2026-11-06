@@ -55,6 +55,11 @@ class TravelSystem @Inject constructor(
             val current = s.world.locationId
             if (current == destCityId) return@updateState
 
+            if (s.party.none { !it.isDead }) {
+                s.logEntries.add("Brak żywych bohaterów do podjęcia podróży.")
+                return@updateState
+            }
+
             val destCity = cityCatalogue.get(destCityId)
             val terrain = worldMap.terrainBetween(current, destCityId)
             if (destCity == null && terrain == null && !destCityId.startsWith("city_") && !destCityId.startsWith("dest") && !s.world.discoveredLocations.contains(destCityId)) {
