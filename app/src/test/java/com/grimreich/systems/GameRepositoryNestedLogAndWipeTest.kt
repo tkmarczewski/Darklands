@@ -9,7 +9,9 @@ import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
+import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 
 class GameRepositoryNestedLogAndWipeTest {
 
@@ -25,6 +27,10 @@ class GameRepositoryNestedLogAndWipeTest {
         saveSystem = mock()
         cityCatalogue = mock()
         itemCatalogue = mock()
+
+        kotlinx.coroutines.runBlocking {
+            whenever(saveSystem.wipeAll(any())).thenReturn(Unit)
+        }
 
         repo = GameRepository(
             questEngineProvider = dagger.Lazy { mock() },
@@ -64,8 +70,22 @@ class GameRepositoryNestedLogAndWipeTest {
 
         repo.deleteAllDataAndWipe()
 
+        assertTrue("repo.isWiped must be true after wipe", repo.isWiped)
         assertEquals("Gold should be reset to default initial gold (100)", 100, repo.currentState().gold)
         assertEquals("Total sessions finished should be reset to 0", 0, repo.currentState().persistentMeta.totalSessionsFinished)
         assertFalse("Unlocked legacy buffs should be empty after wipe", repo.currentState().persistentMeta.unlockedLegacyBuffs.contains("SCRIBES_EYE"))
+    }
+
+    @Test
+    fun `persistCurrentState should do nothing when isWiped is true`() = kotlinx.coroutines.test.runTest {
+        repo.deleteAllDataAndWipe()
+        assertTrue(repo.isWiped)
+
+        // Attempting to persist should be blocked
+        repo.persistCurrentState()
+        repo.flushAndPersistSync()
+
+        // Verify persistence.persist was never called while isWiped was true
+        org.mockito.kotlin.verify(persistence, org.mockito.kotlin.never()).persist(org.mockito.kotlin.any())
     }
 }
