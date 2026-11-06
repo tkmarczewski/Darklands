@@ -78,7 +78,9 @@ class AudioEngine @Inject constructor(
             if (player.playbackParams.pitch != 1.0f) {
                 player.setPlaybackParams(player.playbackParams.setPitch(1.0f))
             }
-        } catch (e: Exception) {}
+        } catch (e: Exception) {
+            android.util.Log.w("AudioEngine", "Failed to reset pitch", e)
+        }
     }
 
     fun playMusic(resId: Int, loop: Boolean = true) {

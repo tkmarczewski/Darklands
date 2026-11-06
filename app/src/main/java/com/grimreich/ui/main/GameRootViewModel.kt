@@ -85,8 +85,8 @@ class GameRootViewModel @Inject constructor(
                     android.util.Log.e("TRIBUNAL", "Navigating to Ritual screen for hero_main")
                     _inspectedHeroId.value = "hero_main"
                     setMode(GameScreenMode.ritual)
-                } else if (hero == null && !combatActive && _mode.value != GameScreenMode.main_menu && _mode.value != GameScreenMode.player_identity && _mode.value != GameScreenMode.character_creator) {
-                    // If main hero is sacrificed or missing, return to start
+                } else if (hero == null && !combatActive && _mode.value != GameScreenMode.main_menu && _mode.value != GameScreenMode.player_identity && _mode.value != GameScreenMode.character_creator && _mode.value != GameScreenMode.ending) {
+                    // If main hero is sacrificed or missing, return to start (except when on ending screen handling wipe)
                     android.util.Log.e("TRIBUNAL", "Hero main GONE. Returning to start.")
                     setMode(GameScreenMode.main_menu)
                 }

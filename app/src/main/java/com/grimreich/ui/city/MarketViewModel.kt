@@ -114,6 +114,7 @@ class MarketViewModel @Inject constructor(
 
     fun sell(itemId: String) {
         _uiState.update { it.copy(errorMessage = null) }
+        var sellSuccessful = false
         
         gameRepository.updateState { s ->
             val cityId = s.world.locationId
@@ -126,9 +127,14 @@ class MarketViewModel @Inject constructor(
                 }
                 val price = economySystem.calculateSellPrice(cityId, toRemove)
                 s.inventory.remove(toRemove)
-                s.gold += price
+                s.gold = (s.gold.toLong() + price.toLong()).coerceAtMost(Int.MAX_VALUE.toLong()).toInt()
                 s.logEntries.add("Sprzedano: ${toRemove.name} za $price G.")
+                sellSuccessful = true
             }
+        }
+
+        if (!sellSuccessful) {
+            _uiState.update { it.copy(errorMessage = "Nie można sprzedać przedmiotu (brak przedmiotu w ekwipunku)!") }
         }
     }
 }
