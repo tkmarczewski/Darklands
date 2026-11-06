@@ -110,7 +110,7 @@ class RandomEventManager @Inject constructor(
 
     fun applyEventEffectsDirect(state: com.grimreich.core.GameState, event: GameEvent) {
         state.world.globalStability = (state.world.globalStability + event.stabilityDelta).coerceIn(0, 100)
-        state.gold = (state.gold + event.goldDelta).coerceAtLeast(0)
+        state.gold = (state.gold.toLong() + event.goldDelta.toLong()).coerceAtLeast(0L).coerceAtMost(Int.MAX_VALUE.toLong()).toInt()
         state.party.filter { !it.isDead }.forEach { hero ->
             hero.hp      = (hero.hp      + event.hpDelta     ).coerceIn(0, hero.maxHp)
             hero.sanity  = (hero.sanity  + event.sanityDelta ).coerceIn(0, 100)
