@@ -13,6 +13,7 @@ import com.grimreich.world.CityCatalogue
 import com.grimreich.systems.EncounterSystem
 import com.grimreich.systems.Encounter
 import com.grimreich.systems.EncounterChoice
+import com.grimreich.systems.WorldStabilitySystem
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -51,6 +52,7 @@ class ExpeditionViewModel @Inject constructor(
     private val cityCatalogue: CityCatalogue,
     private val encounterSystem: EncounterSystem,
     private val combatSystem: com.grimreich.systems.CombatSystem,
+    private val worldStabilitySystem: WorldStabilitySystem,
     private val random: CombatRandomProvider
 ) : ViewModel() {
 
@@ -77,7 +79,10 @@ class ExpeditionViewModel @Inject constructor(
             ExpeditionUiEvent.OnDismissEncounter -> dismissEncounter()
             ExpeditionUiEvent.OnBackClick -> {
                 hasRolledForCurrentVisit = false // BUG-NEW-10 FIX: Reset roll flag on back
-                gameRepository.updateState { it.isExpeditionActive = false }
+                gameRepository.updateState { s ->
+                    s.isExpeditionActive = false
+                    worldStabilitySystem.advanceDayDirect(s, "Powrót z ekspedycji")
+                }
                 emitEffect(ExpeditionUiEffect.NavigateBack)
             }
         }
