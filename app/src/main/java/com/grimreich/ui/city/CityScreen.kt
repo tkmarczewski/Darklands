@@ -4,6 +4,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
@@ -138,7 +139,12 @@ fun CityContent(
                                 .padding(8.dp)
                         ) {
                             Text(stringResource(R.string.city_npcs_label), color = Color(0xFFC0A060), fontSize = 9.sp, fontWeight = FontWeight.Bold)
-                            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .horizontalScroll(rememberScrollState()),
+                                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
                                 state.npcs.forEach { npc ->
                                     Surface(
                                         modifier = Modifier.clickable { onEvent(CityUiEvent.OnNpcClick(npc)) },
@@ -156,12 +162,17 @@ fun CityContent(
                 Spacer(modifier = Modifier.width(4.dp))
 
                 // 3. PRAWY KAFEL: LOKACJE I ZADANIA
-                Column(modifier = Modifier.weight(0.7f).fillMaxHeight()) {
-                    GothicObsidianCard(modifier = Modifier.weight(1.2f), headerColor = Color(0xFF1B5E20)) {
+                Column(
+                    modifier = Modifier
+                        .weight(0.75f)
+                        .fillMaxHeight()
+                        .verticalScroll(rememberScrollState())
+                ) {
+                    GothicObsidianCard(modifier = Modifier.fillMaxWidth(), headerColor = Color(0xFF1B5E20)) {
                         Text(text = stringResource(R.string.city_locations_label), color = Color(0xFFC0A060), fontSize = 10.sp, fontWeight = FontWeight.Bold)
                         Column(
                             verticalArrangement = Arrangement.spacedBy(4.dp), 
-                            modifier = Modifier.padding(top = 4.dp).verticalScroll(rememberScrollState())
+                            modifier = Modifier.padding(top = 4.dp)
                         ) {
                             NavTabV9(stringResource(R.string.city_btn_market), onClick = { onEvent(CityUiEvent.OnMarketClick) })
                             NavTabV9(stringResource(R.string.city_btn_tavern), onClick = { onEvent(CityUiEvent.OnTavernClick) })
@@ -171,7 +182,7 @@ fun CityContent(
                         }
                     }
                     Spacer(modifier = Modifier.height(4.dp))
-                    GothicObsidianCard(modifier = Modifier.weight(0.8f), headerColor = Color(0xFF0D47A1)) {
+                    GothicObsidianCard(modifier = Modifier.fillMaxWidth(), headerColor = Color(0xFF0D47A1)) {
                         Text(text = stringResource(R.string.menu_quests), color = Color(0xFFC0A060), fontSize = 10.sp, fontWeight = FontWeight.Bold)
                         NavTabV9(stringResource(R.string.city_btn_quest_board), onClick = { onEvent(CityUiEvent.ToggleQuestMenu(true)) }, modifier = Modifier.padding(top = 4.dp), color = Color(0xFF1A237E))
                         Spacer(modifier = Modifier.height(4.dp))

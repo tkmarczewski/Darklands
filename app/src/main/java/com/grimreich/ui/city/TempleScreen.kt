@@ -1,5 +1,7 @@
 package com.grimreich.ui.city
 
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -127,8 +129,13 @@ fun TempleScreen(
                 Spacer(modifier = Modifier.width(4.dp))
 
                 // 3. PRAWY KAFEL: RYTUAŁY
-                Column(modifier = Modifier.weight(0.7f).fillMaxHeight()) {
-                    GothicObsidianCard(modifier = Modifier.weight(1f), headerColor = Color(0xFF4A148C)) {
+                Column(
+                    modifier = Modifier
+                        .weight(0.75f)
+                        .fillMaxHeight()
+                        .verticalScroll(rememberScrollState())
+                ) {
+                    GothicObsidianCard(modifier = Modifier.fillMaxWidth(), headerColor = Color(0xFF4A148C)) {
                         Text(text = stringResource(R.string.temple_label_rituals), color = Color(0xFFC0A060), fontSize = 10.sp, fontWeight = FontWeight.Bold)
                         HorizontalDivider(color = Color(0x33C0A060), thickness = 1.dp, modifier = Modifier.padding(vertical = 4.dp))
                         
@@ -140,7 +147,7 @@ fun TempleScreen(
                         }
                     }
                     Spacer(modifier = Modifier.height(4.dp))
-                    GothicObsidianCard(modifier = Modifier.weight(0.5f), headerColor = Color(0xFF400000)) {
+                    GothicObsidianCard(modifier = Modifier.fillMaxWidth(), headerColor = Color(0xFF400000)) {
                         Text(text = stringResource(R.string.btn_return), color = Color(0xFFC0A060), fontSize = 10.sp, fontWeight = FontWeight.Bold)
                         Spacer(modifier = Modifier.height(8.dp))
                         NavTabV9(stringResource(R.string.temple_btn_exit), onClick = onBack, color = Color(0xFF400000))

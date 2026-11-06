@@ -53,6 +53,7 @@ class ExpeditionViewModel @Inject constructor(
     private val encounterSystem: EncounterSystem,
     private val combatSystem: com.grimreich.systems.CombatSystem,
     private val worldStabilitySystem: WorldStabilitySystem,
+    private val dialogueManager: com.grimreich.systems.DialogueManager,
     private val random: CombatRandomProvider
 ) : ViewModel() {
 
@@ -188,9 +189,19 @@ class ExpeditionViewModel @Inject constructor(
                 StepType.investigation -> {
                     val currentCityId = state.world.locationId
                     if (currentCityId == def.cityId) {
-                        questEngine.advanceStepDirect(state, questId)
-                        val msg = "Zbadano cel: ${step.targetId}. Cel zadania został osiągnięty."
-                        state.logEntries.add(msg)
+                        if (dialogueManager.hasNode(step.targetId)) {
+                            state.pendingAction = com.grimreich.core.PendingWorldAction.Dialogue(
+                                npcName = "Śledztwo",
+                                npcRole = def.originNpcId,
+                                nodeId = step.targetId,
+                                relatedQuestId = questId
+                            )
+                            shouldDialogue = true
+                        } else {
+                            questEngine.advanceStepDirect(state, questId)
+                            val msg = "Zbadano cel: ${step.targetId}. Cel zadania został osiągnięty."
+                            state.logEntries.add(msg)
+                        }
                     } else {
                         val msg = "Zbyt daleko od celu. Musisz wrócić do ${def.cityId}."
                         state.logEntries.add(msg)

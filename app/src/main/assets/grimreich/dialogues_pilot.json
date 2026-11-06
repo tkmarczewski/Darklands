@@ -139,6 +139,12 @@
         "requiredQuestStatus": "objective_met"
       },
       {
+        "text": "Szukam ziół echa w mgle (Żniwa Mgły).",
+        "targetNodeId": "harvest_herbs_coast",
+        "requiredQuestId": "q_coast_harvest",
+        "requiredQuestStatus": "active"
+      },
+      {
         "text": "Pokaż mi swoje towary.",
         "targetNodeId": "end",
         "triggerEvent": "open_market"

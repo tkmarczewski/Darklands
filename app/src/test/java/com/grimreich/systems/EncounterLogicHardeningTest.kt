@@ -45,9 +45,10 @@ class EncounterLogicHardeningTest {
         }
 
         val worldStabilitySystem: com.grimreich.systems.WorldStabilitySystem = mock()
+        val dialogueManager: com.grimreich.systems.DialogueManager = mock()
 
         viewModel = ExpeditionViewModel(
-            gameRepository, questEngine, cityCatalogue, encounterSystem, combatSystem, worldStabilitySystem, random
+            gameRepository, questEngine, cityCatalogue, encounterSystem, combatSystem, worldStabilitySystem, dialogueManager, random
         )
     }
 
