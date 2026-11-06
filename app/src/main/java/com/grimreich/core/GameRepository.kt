@@ -40,6 +40,10 @@ class GameRepository @Inject constructor(
     private val repositoryJob = SupervisorJob()
     private val repositoryScope = CoroutineScope(repositoryJob + Dispatchers.IO)
 
+    @Volatile
+    var isWiped: Boolean = false
+        private set
+
     private val saveRequests = MutableSharedFlow<GameState>(
         extraBufferCapacity = 1,
         onBufferOverflow = BufferOverflow.DROP_OLDEST
@@ -174,6 +178,7 @@ class GameRepository @Inject constructor(
     }
 
     suspend fun restoreIfAvailable(): Boolean {
+        isWiped = false
         return try {
             val restored = persistence.restore()
             if (restored != null) {
@@ -201,6 +206,7 @@ class GameRepository @Inject constructor(
     }
 
     fun persistCurrentState() {
+        if (isWiped) return
         val snapshot = _gameState.value.deepCopy()
         saveRequests.tryEmit(snapshot)
     }
@@ -228,6 +234,7 @@ class GameRepository @Inject constructor(
     }
 
     fun manualSave(slotId: Int, label: String = "") {
+        if (isWiped) return
         val stateSnapshot = _gameState.value.deepCopy()
         repositoryScope.launch {
             saveMutex.withLock {
@@ -251,6 +258,7 @@ class GameRepository @Inject constructor(
     fun hasSession(): Boolean = persistence.exists() && persistence.hasPersistedSession()
 
     fun clearSessionAndReset() {
+        isWiped = false
         val metaCopy = _gameState.value.persistentMeta.copy(
             unlockedLegacyBuffs = _gameState.value.persistentMeta.unlockedLegacyBuffs.toMutableSet(),
             unitedSelves = _gameState.value.persistentMeta.unitedSelves.toMutableList()
@@ -267,15 +275,21 @@ class GameRepository @Inject constructor(
      * Purges ALL save slots, session files, disk persistence, and persistent metadata ("Destrukcja").
      * Does NOT save a new session afterward.
      */
+    @OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
     fun deleteAllDataAndWipe() {
         stateLock.withReentrantLock {
-            persistence.clearAllDataAndSlots()
-            kotlinx.coroutines.runBlocking(kotlinx.coroutines.Dispatchers.IO) {
-                saveSystem.clearAllSlots()
-            }
+            isWiped = true
+            saveRequests.resetReplayCache()
+            
             val wipedState = GameState()
             _gameState.value = wipedState
             _gameLogs.value = emptyList()
+        }
+        
+        repositoryScope.launch {
+            saveMutex.withLock {
+                saveSystem.wipeAll(persistence)
+            }
         }
     }
 }

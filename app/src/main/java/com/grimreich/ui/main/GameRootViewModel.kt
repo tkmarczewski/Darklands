@@ -109,7 +109,9 @@ class GameRootViewModel @Inject constructor(
     fun setMode(mode: GameScreenMode) {
         val previousMode = _mode.value
         if (mode == GameScreenMode.main_menu) {
-            gameRepository.persistCurrentState()
+            if (!gameRepository.isWiped) {
+                gameRepository.persistCurrentState()
+            }
         }
         
         _mode.value = mode

@@ -65,6 +65,15 @@ class SaveSystem @Inject constructor() {
         }
     }
 
+    suspend fun wipeAll(persistence: StatePersistenceManager) {
+        slotsLock.withLock {
+            saveSlots.clear()
+        }
+        persistenceLock.withLock {
+            persistence.clearAllDataAndSlots()
+        }
+    }
+
     fun computeStateHash(state: GameState): Int = SaveIntegrity.computeStateHash(state)
 
     suspend fun saveToPersistenceDirect(persistence: StatePersistenceManager): Boolean {

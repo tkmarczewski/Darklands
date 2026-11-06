@@ -167,14 +167,18 @@ class CityViewModel @Inject constructor(
         }
 
         // BUG-3 FIX: Set relatedQuestId for ANY active quest for this NPC to allow turn-in
-        val activeQuestForNpc = state.quest.activeQuestIds.mapNotNull { questEngine.getDefinition(it) }
-            .find { it.originNpcId.lowercase() == role.lowercase() || it.originNpcId.lowercase() == name.lowercase() }
+        val activeQuestForNpc = if (questId == null) {
+            state.quest.activeQuestIds.mapNotNull { questEngine.getDefinition(it) }
+                .find { it.originNpcId.lowercase() == role.lowercase() || it.originNpcId.lowercase() == name.lowercase() }
+        } else null
 
-        val questToComplete = state.quest.progress.values.find {
-            val def = questEngine.getDefinition(it.questId)
-            it.status == QuestStatus.objective_met &&
-            def?.cityId == cityId && (def.originNpcId.lowercase() == role.lowercase() || def.originNpcId.lowercase() == name.lowercase())
-        }
+        val questToComplete = if (questId == null) {
+            state.quest.progress.values.find {
+                val def = questEngine.getDefinition(it.questId)
+                it.status == QuestStatus.objective_met &&
+                def?.cityId == cityId && (def.originNpcId.lowercase() == role.lowercase() || def.originNpcId.lowercase() == name.lowercase())
+            }
+        } else null
 
         val finalQuestId = questId ?: activeQuestForNpc?.id ?: questToComplete?.questId
 
