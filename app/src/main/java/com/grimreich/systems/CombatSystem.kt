@@ -95,8 +95,27 @@ class CombatSystem @Inject constructor(
             charisma = hero.charisma,
             divineFavor = hero.divineFavor,
             echo = state.world.echoIntensity,
-            activeEffects = (hero.activeStatusEffects + hero.worldStatusEffects).map { it.copy() }.toMutableList()
+            activeEffects = hero.activeStatusEffects.map { it.copy() }.toMutableList(),
+            worldEffects = hero.worldStatusEffects.map { it.copy() }.toMutableList()
         )
+    }
+
+    private fun syncCombatantToHero(hero: Hero, combatant: CombatantState) {
+        hero.hp = combatant.hp
+        hero.morale = combatant.morale
+        hero.divineFavor = combatant.divineFavor
+        hero.activeStatusEffects.clear()
+        hero.activeStatusEffects.addAll(combatant.activeEffects.map { it.copy() })
+        hero.worldStatusEffects.clear()
+        hero.worldStatusEffects.addAll(combatant.worldEffects.map { it.copy() })
+    }
+
+    private fun syncCombatantToEnemy(c: CombatState, enemyCombatant: CombatantState) {
+        c.enemyHp = enemyCombatant.hp
+        c.enemyStamina = enemyCombatant.endurance
+        c.enemyMorale = enemyCombatant.morale
+        c.enemyEffects.clear()
+        c.enemyEffects.addAll(enemyCombatant.activeEffects.map { it.copy() })
     }
 
     fun startCombat(enemy: Enemy, onEnd: (() -> Unit)? = null) {
@@ -283,25 +302,8 @@ class CombatSystem @Inject constructor(
 
         if (actionSuccessful) {
             c.log.addAll(playerRound.log)
-            hero.hp = heroCombatant.hp
-            
-            // FIX: World effects should not be copied back into activeStatusEffects.
-            // We isolate the active effects from the merged heroCombatant list by removing known world effects.
-            val returnedActiveEffects = heroCombatant.activeEffects.filter { combatantEffect -> 
-                !hero.worldStatusEffects.any { worldEffect -> 
-                    worldEffect.type == combatantEffect.type && worldEffect.duration == combatantEffect.duration && worldEffect.strength == combatantEffect.strength 
-                }
-            }
-            hero.activeStatusEffects.clear()
-            hero.activeStatusEffects.addAll(returnedActiveEffects)
-            
-            c.enemyHp = enemyCombatant.hp
-            c.enemyStamina = enemyCombatant.endurance
-            c.enemyMorale = enemyCombatant.morale
-            
-            // FIX: Update enemy effects list correctly to persist poisons/burns between rounds
-            c.enemyEffects.clear()
-            c.enemyEffects.addAll(enemyCombatant.activeEffects)
+            syncCombatantToHero(hero, heroCombatant)
+            syncCombatantToEnemy(c, enemyCombatant)
 
             if (hero.hp <= 0) {
                 handleHeroDeath(state, hero)
@@ -352,23 +354,8 @@ class CombatSystem @Inject constructor(
                 c.log.addAll(enemyRound.log)
             }
 
-            targetHero.hp = targetCombatant.hp
-            
-            // FIX: World effects isolation for enemy turn
-            val returnedTargetEffects = targetCombatant.activeEffects.filter { combatantEffect -> 
-                !targetHero.worldStatusEffects.any { worldEffect -> 
-                    worldEffect.type == combatantEffect.type && worldEffect.duration == combatantEffect.duration && worldEffect.strength == combatantEffect.strength 
-                }
-            }
-            targetHero.activeStatusEffects.clear()
-            targetHero.activeStatusEffects.addAll(returnedTargetEffects.map { it.copy() })
-            
-            c.enemyStamina = enemyCombatant.endurance
-            c.enemyMorale = enemyCombatant.morale
-            
-            // FIX: Ensure enemy effects are updated
-            c.enemyEffects.clear()
-            c.enemyEffects.addAll(enemyCombatant.activeEffects.map { it.copy() })
+            syncCombatantToHero(targetHero, targetCombatant)
+            syncCombatantToEnemy(c, enemyCombatant)
 
             if (targetHero.hp <= 0) handleHeroDeath(state, targetHero)
 
@@ -489,24 +476,30 @@ class CombatSystem @Inject constructor(
             lootSystem.awardLootFromTableDirect(state, enemyDef.lootTable).forEach { c.log.add(it) }
         }
 
+        val advancedQuests = mutableSetOf<String>()
+
         val action = state.pendingAction
         if (action is com.grimreich.core.PendingWorldAction.QuestCombatWin) {
             android.util.Log.d("CombatSystem", "[QUEST] Advancing quest ${action.questId} after win")
             questEngine.advanceStepDirect(state, action.questId)
+            advancedQuests.add(action.questId.lowercase().trim())
             state.pendingAction = com.grimreich.core.PendingWorldAction.None
         }
 
-        // Auto-advance ALL active quests if they have a combat step matching the enemy
+        // Auto-advance active quests if they have a combat step matching the enemy, avoiding double progression
         val currentEnemyType = state.combat.enemyType?.lowercase()
         state.quest.activeQuestIds.toList().forEach { qId ->
-            val def = questEngine.getDefinition(qId)
-            val progress = state.quest.progress[qId]
-            if (def != null && progress != null) {
-                val currentStep = def.steps.getOrNull(progress.currentStepIndex)
-                if (currentStep?.type == StepType.combat && 
-                    (currentStep.targetId.lowercase() == "any" || 
-                     currentStep.targetId.lowercase() == currentEnemyType)) {
-                    questEngine.advanceStepDirect(state, qId)
+            val normalizedQId = qId.lowercase().trim()
+            if (!advancedQuests.contains(normalizedQId)) {
+                val def = questEngine.getDefinition(qId)
+                val progress = state.quest.progress[normalizedQId]
+                if (def != null && progress != null) {
+                    val currentStep = def.steps.getOrNull(progress.currentStepIndex)
+                    if (currentStep?.type == StepType.combat && 
+                        (currentStep.targetId.lowercase() == "any" || 
+                         currentStep.targetId.lowercase() == currentEnemyType)) {
+                        questEngine.advanceStepDirect(state, qId)
+                    }
                 }
             }
         }

@@ -68,7 +68,9 @@ class DialogueViewModel @Inject constructor(
 
             val currentCity = cityCatalogue.get(state.world.locationId)
 
-            val finalNpcName = if (state.world.globalStability < 25 && kotlin.random.Random.nextFloat() < 0.3f) {
+            val npcNameSeed = (state.world.day.hashCode() + (node?.id?.hashCode() ?: 0)).toLong()
+            val glitchChance = kotlin.random.Random(npcNameSeed).nextFloat()
+            val finalNpcName = if (state.world.globalStability < 25 && glitchChance < 0.3f) {
                 state.playerName ?: npcName
             } else {
                 npcName

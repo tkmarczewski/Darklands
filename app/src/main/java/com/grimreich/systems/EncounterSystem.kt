@@ -179,7 +179,7 @@ class EncounterSystem @Inject constructor(
     fun executeChoice(state: GameState, choice: EncounterChoice): String {
         val attr = choice.requiredAttribute
         if (attr != null && choice.requiredValue > 0) {
-            val activeHero = state.party.find { it.id == state.activeHeroId } ?: state.party.firstOrNull()
+            val activeHero = state.party.find { it.id == state.activeHeroId } ?: state.party.firstOrNull { !it.isDead }
             if (activeHero != null) {
                 val heroVal = when (attr.lowercase()) {
                     "perception", "per" -> activeHero.perception
@@ -194,6 +194,8 @@ class EncounterSystem @Inject constructor(
                 if (heroVal < choice.requiredValue) {
                     return "Wymóg nie spełniony: $attr $heroVal/${choice.requiredValue}"
                 }
+            } else {
+                return "Brak aktywnego bohatera do wykonania tej akcji."
             }
         }
         val resultMsg = choice.effect(state)

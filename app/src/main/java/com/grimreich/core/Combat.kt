@@ -136,6 +136,7 @@ data class CombatantState(
     var divineFavor: Int = 0,
     var echo: Float = 0f,
     var activeEffects: MutableList<StatusEffect> = mutableListOf(),
+    var worldEffects: MutableList<StatusEffect> = mutableListOf(),
     var wounds: MutableList<WoundType> = mutableListOf()
 ) {
     fun normalize() {
@@ -421,7 +422,12 @@ class CombatRound @Inject constructor(
     }
 
     private fun applyStatusTick(combatant: CombatantState, log: MutableList<String>) {
-        val it = combatant.activeEffects.iterator()
+        tickEffectsList(combatant, combatant.activeEffects, log)
+        tickEffectsList(combatant, combatant.worldEffects, log)
+    }
+
+    private fun tickEffectsList(combatant: CombatantState, effects: MutableList<StatusEffect>, log: MutableList<String>) {
+        val it = effects.iterator()
         while (it.hasNext()) {
             val effect = it.next()
             when (effect.type) {
@@ -445,7 +451,7 @@ class CombatRound @Inject constructor(
                 }
                 StatusEffectType.wet, StatusEffectType.WET -> {
                     log.add("${combatant.name} jest przemoczony.")
-                    val shockActive = combatant.activeEffects.any {
+                    val shockActive = (combatant.activeEffects + combatant.worldEffects).any {
                         it !== effect && (it.type == StatusEffectType.shock || it.type == StatusEffectType.SHOCK)
                     }
                     if (shockActive) {
