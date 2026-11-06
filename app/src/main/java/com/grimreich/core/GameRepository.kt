@@ -61,6 +61,10 @@ class GameRepository @Inject constructor(
         repositoryScope.launch {
             saveRequests.collect { snapshot ->
                 saveMutex.withLock {
+                    if (isWiped) {
+                        Log.d("GameRepository", "Auto-save cancelled (isWiped = true).")
+                        return@withLock
+                    }
                     try {
                         val dto = snapshot.toDto()
                         persistence.persist(dto)
@@ -212,6 +216,10 @@ class GameRepository @Inject constructor(
     }
 
     fun flushAndPersistSync() {
+        if (isWiped) {
+            Log.d("GameRepository", "Sync flush cancelled (isWiped = true).")
+            return
+        }
         try {
             val snapshot = _gameState.value.deepCopy()
             val dto = snapshot.toDto()
@@ -238,6 +246,7 @@ class GameRepository @Inject constructor(
         val stateSnapshot = _gameState.value.deepCopy()
         repositoryScope.launch {
             saveMutex.withLock {
+                if (isWiped) return@withLock
                 try {
                     saveSystem.save(stateSnapshot, slotId, label)
                     saveSystem.saveToPersistence(persistence)
