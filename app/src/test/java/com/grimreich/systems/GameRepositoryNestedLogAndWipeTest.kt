@@ -28,6 +28,9 @@ class GameRepositoryNestedLogAndWipeTest {
         cityCatalogue = mock()
         itemCatalogue = mock()
 
+        val mockAssets: android.content.res.AssetManager = mock()
+        whenever(persistence.assets()).thenReturn(mockAssets)
+
         kotlinx.coroutines.runBlocking {
             whenever(saveSystem.wipeAll(any())).thenReturn(Unit)
         }

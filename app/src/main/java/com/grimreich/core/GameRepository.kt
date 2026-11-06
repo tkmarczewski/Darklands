@@ -171,12 +171,15 @@ class GameRepository @Inject constructor(
         com.grimreich.core.TradingEngine.initialize(economySystemProvider.get())
 
         try {
-            val jsonString = persistence.assets().open("grimreich/bestiary_pilot.json").bufferedReader().use { it.readText() }
-            val loadedEnemies: List<Enemy> = json.decodeFromString(ListSerializer(Enemy.serializer()), jsonString)
-            
-            if (loadedEnemies.isEmpty()) throw IllegalStateException("Bestiary is empty")
-            
-            Bestiary.loadFromList(loadedEnemies)
+            val assets = try { persistence.assets() } catch (e: Exception) { null }
+            if (assets != null) {
+                val jsonString = assets.open("grimreich/bestiary_pilot.json").bufferedReader().use { it.readText() }
+                val loadedEnemies: List<Enemy> = json.decodeFromString(ListSerializer(Enemy.serializer()), jsonString)
+                
+                if (loadedEnemies.isEmpty()) throw IllegalStateException("Bestiary is empty")
+                
+                Bestiary.loadFromList(loadedEnemies)
+            }
         } catch (e: Exception) {
             Log.e("GameRepository", "CRITICAL: Failed to load bestiary", e)
             log("[Bestiary] Failed to load external data: ${e.message}")
