@@ -25,12 +25,17 @@ class ChurchSystem @Inject constructor(
     fun makeOffering(goldAmount: Int): String {
         var msg = ""
         gameRepository.updateState { state ->
+            if (goldAmount <= 0) {
+                msg = "Kwota ofiary musi być dodatnia."
+                return@updateState
+            }
             if (state.gold >= goldAmount) {
                 state.gold -= goldAmount
-                state.prayer.faith += goldAmount / 2
+                val faithGain = (goldAmount / 2).coerceAtMost(50)
+                state.prayer.faith = (state.prayer.faith + faithGain).coerceAtMost(100)
                 state.prayer.virtue += 2 // MORALITY SYSTEM
                 state.prayer.normalize()
-                msg = "Złożono ofiarę w wysokości $goldAmount zł. Bogowie patrzą łaskawiej (+${goldAmount/2} Faith)."
+                msg = "Złożono ofiarę w wysokości $goldAmount zł. Bogowie patrzą łaskawiej (+$faithGain Wiary)."
                 state.logEntries.add(msg)
             } else {
                 msg = "Nie masz wystarczająco dużo złota."

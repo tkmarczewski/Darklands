@@ -54,8 +54,8 @@ class TempleViewModel @Inject constructor(
     }
 
     fun makeOffering(amount: Int) {
-        if (amount > _uiState.value.gold) {
-            _uiState.update { it.copy(errorMessage = "Brak złota na ofiarę!") }
+        if (amount <= 0 || amount > _uiState.value.gold) {
+            _uiState.update { it.copy(errorMessage = "Nieprawidłowa kwota ofiary!") }
             return
         }
         val result = churchSystem.makeOffering(amount)
