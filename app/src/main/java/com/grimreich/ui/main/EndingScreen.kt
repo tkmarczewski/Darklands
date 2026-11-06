@@ -18,6 +18,9 @@ import androidx.compose.ui.res.stringResource
 import com.grimreich.R
 import com.grimreich.ui.effects.glitchEffect
 
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+
 @Composable
 fun EndingScreen(
     viewModel: EndingViewModel,
@@ -34,11 +37,14 @@ fun EndingScreen(
         state.summary 
     }
 
+    val scrollState = rememberScrollState()
+
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(Color.Black)
             .padding(32.dp)
+            .verticalScroll(scrollState)
             .glitchEffect(active = state.stability < 10, intensity = 3f),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center

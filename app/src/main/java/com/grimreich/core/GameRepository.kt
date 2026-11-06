@@ -184,7 +184,6 @@ class GameRepository @Inject constructor(
     }
 
     suspend fun restoreIfAvailable(): Boolean {
-        isWiped = false
         return try {
             val restored = persistence.restore()
             if (restored != null) {
@@ -193,6 +192,7 @@ class GameRepository @Inject constructor(
                     return false
                 }
                 
+                isWiped = false
                 saveSystem.restoreFromPersistence(persistence)
                 
                 val domain = restored.toDomain()
@@ -291,16 +291,20 @@ class GameRepository @Inject constructor(
         stateLock.withReentrantLock {
             isWiped = true
             saveRequests.resetReplayCache()
-            
-            val wipedState = GameState()
-            _gameState.value = wipedState
-            _gameLogs.value = emptyList()
         }
         
+        // 1. Wipe files from disk FIRST before emitting state change to observers
         withContext(Dispatchers.IO + NonCancellable) {
             saveMutex.withLock {
                 saveSystem.wipeAll(persistence)
             }
+        }
+
+        // 2. Update memory state AFTER disk files are completely purged
+        stateLock.withReentrantLock {
+            val wipedState = GameState()
+            _gameState.value = wipedState
+            _gameLogs.value = emptyList()
         }
     }
 }
