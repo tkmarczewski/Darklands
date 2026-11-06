@@ -17,6 +17,8 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.NonCancellable
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.builtins.ListSerializer
 import java.util.concurrent.locks.ReentrantLock
@@ -285,7 +287,7 @@ class GameRepository @Inject constructor(
      * Does NOT save a new session afterward.
      */
     @OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
-    fun deleteAllDataAndWipe() {
+    suspend fun deleteAllDataAndWipe() {
         stateLock.withReentrantLock {
             isWiped = true
             saveRequests.resetReplayCache()
@@ -295,7 +297,7 @@ class GameRepository @Inject constructor(
             _gameLogs.value = emptyList()
         }
         
-        repositoryScope.launch {
+        withContext(Dispatchers.IO + NonCancellable) {
             saveMutex.withLock {
                 saveSystem.wipeAll(persistence)
             }

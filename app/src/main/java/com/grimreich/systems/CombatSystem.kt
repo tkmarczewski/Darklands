@@ -284,11 +284,24 @@ class CombatSystem @Inject constructor(
         if (actionSuccessful) {
             c.log.addAll(playerRound.log)
             hero.hp = heroCombatant.hp
+            
+            // FIX: World effects should not be copied back into activeStatusEffects.
+            // We isolate the active effects from the merged heroCombatant list by removing known world effects.
+            val returnedActiveEffects = heroCombatant.activeEffects.filter { combatantEffect -> 
+                !hero.worldStatusEffects.any { worldEffect -> 
+                    worldEffect.type == combatantEffect.type && worldEffect.duration == combatantEffect.duration && worldEffect.strength == combatantEffect.strength 
+                }
+            }
             hero.activeStatusEffects.clear()
-            hero.activeStatusEffects.addAll(heroCombatant.activeEffects)
+            hero.activeStatusEffects.addAll(returnedActiveEffects)
+            
             c.enemyHp = enemyCombatant.hp
             c.enemyStamina = enemyCombatant.endurance
             c.enemyMorale = enemyCombatant.morale
+            
+            // FIX: Update enemy effects list correctly to persist poisons/burns between rounds
+            c.enemyEffects.clear()
+            c.enemyEffects.addAll(enemyCombatant.activeEffects)
 
             if (hero.hp <= 0) {
                 handleHeroDeath(state, hero)
@@ -340,11 +353,22 @@ class CombatSystem @Inject constructor(
             }
 
             targetHero.hp = targetCombatant.hp
-            // BUG-06 FIX: Direct update of existing list to avoid reference loss or race conditions
+            
+            // FIX: World effects isolation for enemy turn
+            val returnedTargetEffects = targetCombatant.activeEffects.filter { combatantEffect -> 
+                !targetHero.worldStatusEffects.any { worldEffect -> 
+                    worldEffect.type == combatantEffect.type && worldEffect.duration == combatantEffect.duration && worldEffect.strength == combatantEffect.strength 
+                }
+            }
             targetHero.activeStatusEffects.clear()
-            targetHero.activeStatusEffects.addAll(targetCombatant.activeEffects.map { it.copy() })
+            targetHero.activeStatusEffects.addAll(returnedTargetEffects.map { it.copy() })
+            
             c.enemyStamina = enemyCombatant.endurance
             c.enemyMorale = enemyCombatant.morale
+            
+            // FIX: Ensure enemy effects are updated
+            c.enemyEffects.clear()
+            c.enemyEffects.addAll(enemyCombatant.activeEffects.map { it.copy() })
 
             if (targetHero.hp <= 0) handleHeroDeath(state, targetHero)
 

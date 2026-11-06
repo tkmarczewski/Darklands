@@ -52,7 +52,7 @@ class GameRepositoryNestedLogAndWipeTest {
     }
 
     @Test
-    fun `deleteAllDataAndWipe should completely reset state and wipe persistent meta`() {
+    fun `deleteAllDataAndWipe should completely reset state and wipe persistent meta`() = kotlinx.coroutines.test.runTest {
         repo.updateState { state ->
             state.gold = 9999
             state.persistentMeta.totalSessionsFinished = 10

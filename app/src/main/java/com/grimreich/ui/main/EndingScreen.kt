@@ -97,8 +97,9 @@ fun EndingScreen(
             stringResource(R.string.ending_desc_delete), 
             Color.Red
         ) {
-            viewModel.delete()
-            onFinish()
+            viewModel.delete {
+                onFinish()
+            }
         }
     }
 }

@@ -1,6 +1,7 @@
 package com.grimreich.ui.main
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.grimreich.core.GameRepository
 import com.grimreich.core.GameState
 import com.grimreich.systems.EndingSystem
@@ -8,6 +9,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 data class EndingUiState(
@@ -76,7 +78,10 @@ class EndingViewModel @Inject constructor(
         gameRepository.clearSessionAndReset()
     }
 
-    fun delete() {
-        gameRepository.deleteAllDataAndWipe()
+    fun delete(onFinish: () -> Unit) {
+        viewModelScope.launch {
+            gameRepository.deleteAllDataAndWipe()
+            onFinish()
+        }
     }
 }

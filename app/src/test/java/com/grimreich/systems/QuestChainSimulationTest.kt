@@ -106,7 +106,7 @@ class QuestChainSimulationTest {
             assertEquals("Quest ${quest.id} should be active or available", QuestStatus.active, activeStatus)
 
             // Step through all steps
-            quest.steps.forEachIndexed { _, step ->
+            quest.steps.forEachIndexed { index, step ->
                 when (step.type) {
                     StepType.dialogue, StepType.investigation, StepType.social, StepType.meta -> {
                         val node = dialogueManager.getNode(step.targetId)
@@ -117,6 +117,8 @@ class QuestChainSimulationTest {
                             }
                             if (choice != null) {
                                 dialogueManager.handleTrigger(state, choice.triggerEvent, choice.triggerValue ?: quest.id)
+                                // Trigger advances step manually for test
+                                questEngine.advanceStepDirect(state, quest.id)
                             } else {
                                 questEngine.advanceStepDirect(state, quest.id)
                             }

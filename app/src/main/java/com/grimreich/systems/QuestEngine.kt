@@ -169,11 +169,8 @@ class QuestEngine @Inject constructor(
         }
 
         if (p.status != QuestStatus.objective_met && p.status != QuestStatus.completed) {
-            val isActuallyDone = def.steps.isNotEmpty() && p.currentStepIndex >= def.steps.size - 1
-            if (!isActuallyDone) {
-                android.util.Log.w("QuestEngine", "Attempted to complete quest $actualQuestId but objective is not met (status: ${p.status}).")
-                return
-            }
+            android.util.Log.w("QuestEngine", "Attempted to complete quest $actualQuestId but objective is not met (status: ${p.status}).")
+            return
         }
         
         // --- ATOMIC TRANSITION ---
