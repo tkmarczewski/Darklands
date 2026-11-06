@@ -109,9 +109,12 @@ object TradingEngine {
         val sellPrice = quoteSell(cityId, item)
         state.inventory.remove(item)
         state.party.forEach { hero ->
-            hero.equipment.entries.removeIf { it.value == itemId }
+            hero.equipment.entries.filter { it.value == itemId }.forEach { (slot, _) ->
+                hero.equipment[slot] = null
+            }
         }
-        state.gold += sellPrice
+        val safeGold = (state.gold.toLong() + sellPrice.toLong()).coerceAtMost(Int.MAX_VALUE.toLong()).toInt()
+        state.gold = safeGold
         return "Sprzedano ${item.name} za $sellPrice G."
     }
 }

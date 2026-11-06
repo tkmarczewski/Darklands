@@ -45,7 +45,7 @@ class LootSystem @Inject constructor(
         if (table.goldMax > 0) {
             val gold = random.nextInt(table.goldMin, table.goldMax + 1)
             if (gold > 0) {
-                state.gold += gold
+                state.gold = (state.gold.toLong() + gold.toLong()).coerceAtMost(Int.MAX_VALUE.toLong()).toInt()
                 messages.add("Zdobyto $gold złota.")
             }
         }

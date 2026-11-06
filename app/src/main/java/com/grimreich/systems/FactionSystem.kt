@@ -27,12 +27,12 @@ class FactionSystem @Inject constructor(
     }
 
     private fun mapToFactionId(faction: FactionId): String = when (faction) {
-        FactionId.CHURCH -> "CHURCH"
-        FactionId.COMMONERS -> "PEASANTS"
-        FactionId.NOBILITY -> "NOBILITY"
-        FactionId.ALCHEMISTS -> "SCHOLARS"
-        FactionId.MILITARY -> "MILITARY"
-        FactionId.MERCHANTS -> "MERCHANTS"
+        FactionId.CHURCH -> "church"
+        FactionId.COMMONERS -> "peasants"
+        FactionId.NOBILITY -> "nobility"
+        FactionId.ALCHEMISTS -> "scholars"
+        FactionId.MILITARY -> "military"
+        FactionId.MERCHANTS -> "merchants"
     }
     
     fun getFactionLabel(faction: FactionId): String = when (faction) {
